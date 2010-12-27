@@ -1,1 +1,7 @@
 Scat is a web-based Point-of-Sale (POS) system.
+
+Scat uses the jQuery and jQueryUI Javascript libraries.
+  http://jquery.com/
+
+Scat includes the Tablesorter 2.0 plugin for jQuery:
+  http://tablesorter.com/docs/
