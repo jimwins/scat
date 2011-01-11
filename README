@@ -5,3 +5,5 @@ Scat uses the jQuery and jQueryUI Javascript libraries.
 
 Scat includes the Tablesorter 2.0 plugin for jQuery:
   http://tablesorter.com/docs/
+
+See the LICENSE file for licensing information.
