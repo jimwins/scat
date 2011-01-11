@@ -13,8 +13,8 @@ header("content-type: text/html;charset=utf-8");?>
   /* prettier tables */
   table { border-collapse:collapse; }
   thead tr { background: rgba(0,0,0,0.2); color: rgba(0,0,0,0.5); }
-  tbody tr:nth-child(odd) { background:rgba(255,255,255,0.3); }
-  tbody tr:nth-child(even) { background:rgba(255,255,255,0.2); }
+  tbody tr:nth-child(odd) { background-color:rgba(255,255,255,0.3); }
+  tbody tr:nth-child(even) { background-color:rgba(255,255,255,0.2); }
   tbody tr:hover { background:rgba(255,255,255,0.4); }
   th, td { padding:4px 6px; border:2px solid rgba(255,255,255,0.05); }
   td.num {
@@ -98,7 +98,7 @@ if (!$db->real_connect("localhost","root","","scat"))
 $db->set_charset('utf8');
 
 function dump_table($r, $calc = false) {
-  $c= $meta= 0;
+  $c= $meta= $line= 0;
   if (!$r->num_rows) {
     echo 'No results.';
     return;
@@ -106,9 +106,13 @@ function dump_table($r, $calc = false) {
   if (!strcmp($r->fetch_field_direct(0)->name, "meta")) {
     $meta= 1;
   }
+  if (!strncmp($r->fetch_field_direct($meta)->name, "#", 1)) {
+    $line= 1;
+  }
   echo '<table class="sortable">';
-  echo '<thead>';
-  echo '<tr><th class="num">#</th>';
+  echo '<thead><tr>';
+  if (!$line)
+    echo '<th>#</th>';
   for ($i= $meta; $i < $r->field_count; $i++) {
     $name= $r->fetch_field_direct($i)->name;
     echo '<th>', strtok($name, '$'), '</th>';
@@ -129,7 +133,8 @@ function dump_table($r, $calc = false) {
     } else {
       echo '<tr>';
     }
-    echo '<tr><td class="num">', ++$c, '</td>';
+    if (!$line)
+      echo '<td class="num">', ++$c, '</td>';
     for ($i= $meta; $i < $r->field_count; $i++) {
       $name= $r->fetch_field_direct($i)->name;
       $class= strlen($row[$i]) ? strchr($name, '$') : '';
