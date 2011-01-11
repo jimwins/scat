@@ -42,7 +42,7 @@ $q= "CREATE TEMPORARY TABLE co_pricing
       FROM item";
 $r= $db->query($q) or die("query failed: ". $db->error);
 $q= "UPDATE item, co_pricing
-        SET retail_price = IF(description NOT LIKE 'MSRP%',
+        SET retail_price = IF(description IS NULL OR description NOT LIKE 'MSRP%',
                               price,
                               SUBSTRING_INDEX(description, 'MSRP $', -1)),
             discount_type = IF(description LIKE '%Sale: %',
