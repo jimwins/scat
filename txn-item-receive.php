@@ -27,6 +27,7 @@ foreach ($terms as $term) {
                OR barcode.code LIKE '%$term%')";
   }
 }
+$criteria[]= "(active AND NOT deleted)";
 
 $q= "SELECT
             item.id id,

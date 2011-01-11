@@ -27,6 +27,8 @@ foreach ($terms as $term) {
                OR barcode.code LIKE '%$term%')";
   }
 }
+# XXX allow option to include inactive and/or deleted
+$criteria[]= "(active AND NOT deleted)";
 
 $q= "SELECT
             item.code Code\$item,

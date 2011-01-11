@@ -26,7 +26,7 @@ CREATE TABLE `barcode` (
   `code` varchar(255) NOT NULL,
   `item` int(10) unsigned NOT NULL,
   `quantity` int(10) unsigned NOT NULL DEFAULT '1',
-  KEY `item` (`item`),
+  PRIMARY KEY (`item`,`code`),
   KEY `code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -41,8 +41,9 @@ DROP TABLE IF EXISTS `brand`;
 CREATE TABLE `brand` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=240 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -61,9 +62,11 @@ CREATE TABLE `item` (
   `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
   `discount` decimal(9,2) DEFAULT NULL,
   `minimum_quantity` int(10) unsigned NOT NULL,
+  `active` bit(1) DEFAULT NULL,
+  `deleted` bit(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=8372 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -80,7 +83,7 @@ CREATE TABLE `txn` (
   `type` enum('internal','vendor','customer') NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `type` (`type`,`number`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -96,10 +99,11 @@ CREATE TABLE `txn_line` (
   `line` int(10) unsigned NOT NULL,
   `item` int(10) unsigned DEFAULT NULL,
   `ordered` int(10) unsigned NOT NULL,
+  `shipped` int(10) unsigned NOT NULL,
   `allocated` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`,`line`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -111,4 +115,4 @@ CREATE TABLE `txn_line` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-12-26 21:52:30
+-- Dump completed on 2011-01-11 12:49:13
