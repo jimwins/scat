@@ -98,9 +98,9 @@ CREATE TABLE `txn_line` (
   `txn` int(10) unsigned NOT NULL,
   `line` int(10) unsigned NOT NULL,
   `item` int(10) unsigned DEFAULT NULL,
-  `ordered` int(10) unsigned NOT NULL,
-  `shipped` int(10) unsigned NOT NULL,
-  `allocated` int(10) unsigned NOT NULL,
+  `ordered` int(11) NOT NULL,
+  `shipped` int(11) NOT NULL,
+  `allocated` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`,`line`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -115,4 +115,4 @@ CREATE TABLE `txn_line` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-01-11 12:49:13
+-- Dump completed on 2011-01-19 19:01:15
