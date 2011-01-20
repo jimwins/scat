@@ -46,6 +46,7 @@ $q= "SELECT
               WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
               WHEN 'relative' THEN CONCAT('$', discount, ' off')
             END Discount,
+            (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) Stock\$right,
             minimum_quantity Minimum\$right
        FROM item
        JOIN brand ON (item.brand = brand.id)
