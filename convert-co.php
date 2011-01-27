@@ -47,10 +47,10 @@ $q= "UPDATE item, co_pricing
         SET retail_price = IF(description IS NULL OR description NOT LIKE 'MSRP%',
                               price,
                               SUBSTRING_INDEX(description, 'MSRP $', -1)),
-            discount_type = IF(description LIKE '%Sale: %',
+            discount_type = IF(description LIKE '%/ Sale: %',
                                'percentage',
                                NULL),
-            discount= IF(description LIKE '%Sale: %',
+            discount= IF(description LIKE '%/ Sale: %',
                          SUBSTRING_INDEX(description,'/ Sale: ',-1),
                          NULL)
       WHERE item.id = co_pricing.id";
@@ -67,11 +67,15 @@ echo "Loaded ", $db->affected_rows, " barcodes.<br>";
 
 # TRANSACTIONS
 #
+$q= "TRUNCATE txn_line";
+$r= $db->query($q) or die("query failed: ". $db->error);
+echo "Flushed transaction lines.<br>";
+
 # incomplete transactions
 $q= "INSERT IGNORE
        INTO txn (id, number, created, type)
      SELECT id AS id,
-            number AS number,
+            IFNULL(number, 0) AS number,
             date AS created,
             CASE type
               WHEN 1 THEN 'customer'
@@ -105,9 +109,10 @@ echo "Loaded ", $db->affected_rows, " transaction lines from incomplete orders.<
 $q= "INSERT IGNORE
        INTO txn (id, number, created, type)
      SELECT id_request AS id,
-            IF(type = 2,
-               SUBSTRING_INDEX(formatted_request_number, '-', -1),
-               number) AS number,
+            IFNULL(IF(type = 2,
+                      SUBSTRING_INDEX(formatted_request_number, '-', -1),
+                      number),
+                   0) AS number,
             date_request AS created,
             CASE type
               WHEN 1 THEN 'customer'
@@ -133,8 +138,8 @@ $q= "INSERT
        JOIN co.transaction tx ON (tx.id = co.id_parent)
       WHERE co.id_parent IS NOT NULL
      ON DUPLICATE KEY
-     UPDATE ordered = IF(NOT allocated, ordered + VALUES(ordered), ordered),
-            allocated = IF(NOT allocated, allocated + VALUES(allocated), allocated)";
+     UPDATE ordered = ordered + VALUES(ordered),
+            allocated = allocated + VALUES(allocated)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " (or so) transaction lines.<br>";
 
