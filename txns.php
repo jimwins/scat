@@ -23,7 +23,7 @@ $q= $_GET['q'];
 
 $q= "SELECT
             txn.type AS meta,
-            CONCAT(type, '|', txn.number) AS Number\$txn,
+            CONCAT(id, '|', type, '|', txn.number) AS Number\$txn,
             txn.created AS Created\$date,
             SUM(ordered) AS Ordered,
             SUM(shipped) AS Shipped,

@@ -3,10 +3,9 @@ require 'scat.php';
 
 head("transaction");
 
-$type= $_REQUEST['type'];
-$number= (int)$_REQUEST['number'];
+$id= (int)$_REQUEST['id'];
 
-if (!$type || !$number) die("no transaction specified.");
+if (!$id) die("no transaction specified.");
 
 switch ($type) {
 case 'vendor';
@@ -78,7 +77,7 @@ $q= "SELECT
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        JOIN item ON (txn_line.item = item.id)
-      WHERE number = '$number' AND type = '$type'
+      WHERE txn.id = $id
       ORDER BY line ASC";
 
 dump_table($db->query($q));

@@ -57,7 +57,7 @@ dump_table($db->query($q));
 $r= $db->query("SET @count = 0");
 
 $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
-            txn AS Transaction,
+            CONCAT(txn, '|', txn.type, '|', txn.number) AS Transaction\$txn,
             CASE type
               WHEN 'customer' THEN IF(allocated < 0, 'Sale', 'Return')
               WHEN 'vendor' THEN 'Stock'

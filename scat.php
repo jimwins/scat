@@ -150,11 +150,11 @@ function dump_table($r, $calc = false) {
 function expand_field($data, $class) {
   switch ($class) {
   case '$txn':
-    list($type, $number)= preg_split('/\|/', $data);
+    list($id, $type, $number)= preg_split('/\|/', $data);
     $desc= array('internal' => 'Transfer',
                  'customer' => 'Invoice',
                  'vendor' => 'Purchase Order');
-    return '<a href="txn.php?type='.ashtml($type).'&amp;number='.ashtml($number).'">'.$desc[$type].' '.ashtml($number).'</a>';
+    return '<a href="txn.php?id='.ashtml($id).'">'.$desc[$type].' '.ashtml($number).'</a>';
   case '$item':
     return '<a href="item.php?code='.ashtml($data).'">'.ashtml($data).'</a>';
   default:
