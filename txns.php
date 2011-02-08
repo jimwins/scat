@@ -10,16 +10,18 @@ if ($type) {
   $criteria= '1=1';
 }
 
-/*
-$q= $_GET['q'];
 ?>
-<form method="get" action="<?=$_SERVER['PHP_SELF']?>">
-<input id="focus" type="text" name="q" value="<?=htmlspecialchars($q)?>">
-<input type="submit" value="Search">
+<form method="get" action="txn.php">
+<select name="type">
+ <option value="customer">Invoice
+ <option value="vendor">Purchase Order
+ <option value="internal">Internal
+</select>
+<input id="focus" type="text" name="number" value="">
+<input type="submit" value="Look Up">
 </form>
 <br>
 <?
-*/
 
 $q= "SELECT
             txn.type AS meta,
