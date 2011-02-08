@@ -5,6 +5,18 @@ head("transaction");
 
 $id= (int)$_REQUEST['id'];
 
+$type= $_REQUEST['type'];
+$number= (int)$_REQUEST['number'];
+if (!$id && $type) {
+  $r= $db->query("SELECT id FROM txn WHERE type = '". $db->real_escape_string($type) ."' AND number = $number");
+
+  if (!$r->num_rows)
+      die("<h2>No such transaction found.</h2>");
+
+  $row= $r->fetch_row();
+  $id= $row[0];
+}
+
 if (!$id) die("no transaction specified.");
 
 switch ($type) {
