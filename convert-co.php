@@ -14,7 +14,7 @@ $q= "INSERT INTO item (id, code, name, minimum_quantity, active, deleted)
             (active = 't') active,
             (deleted = 't') deleted
        FROM co.item
-      WHERE deleted = 'f' AND type = 2
+      WHERE type = 2
      ON DUPLICATE KEY
      UPDATE code = VALUES(code),
             name = VALUES(name),
@@ -65,6 +65,33 @@ $q= "INSERT IGNORE INTO barcode (code, item)
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " barcodes.<br>";
 
+# PERSONS
+#
+$q= "INSERT INTO person (id, name, company, address, email, phone, tax_id,
+                         active, deleted)
+     SELECT id,
+            (SELECT REPLACE(REPLACE(value, '|', ' '), '  ', ' ') FROM co.metavalue WHERE id_item = item.id AND id_metatype = 2 ORDER BY id DESC LIMIT 1) name,
+            (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 3 ORDER BY id DESC LIMIT 1) company,
+            (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 5 ORDER BY id DESC LIMIT 1) address,
+            (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 9 ORDER BY id DESC LIMIT 1) email,
+            (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 8 ORDER BY id DESC LIMIT 1) phone,
+            (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 6 ORDER BY id DESC LIMIT 1) tax_id,
+            (active = 't') active,
+            (deleted = 't') deleted
+       FROM co.item
+      WHERE type IN (1,3,6)
+     ON DUPLICATE KEY
+     UPDATE
+            name = VALUES(name),
+            company = VALUES(company),
+            address = VALUES(address),
+            email = VALUES(email),
+            phone = VALUES(phone),
+            active = VALUES(active),
+            deleted = VALUES(deleted)";
+$r= $db->query($q) or die("query failed: ". $db->error);
+echo "Loaded ", $db->affected_rows, " people.<br>";
+
 # TRANSACTIONS
 #
 $q= "TRUNCATE txn_line";
@@ -72,8 +99,8 @@ $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Flushed transaction lines.<br>";
 
 # incomplete transactions
-$q= "INSERT IGNORE
-       INTO txn (id, number, created, type)
+$q= "INSERT
+       INTO txn (id, number, created, type, person)
      SELECT id AS id,
             IFNULL(number, 0) AS number,
             date AS created,
@@ -81,12 +108,15 @@ $q= "INSERT IGNORE
               WHEN 1 THEN 'customer'
               WHEN 2 THEN 'vendor'
               WHEN 3 THEN 'internal'
-            END AS type
+            END AS type,
+            id_item AS person
        FROM co.request
-      WHERE id_parent IS NULL";
+      WHERE id_parent IS NULL
+     ON DUPLICATE KEY
+     UPDATE
+            person = VALUES(person)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
-
 
 # lines from requests (un-received items)
 #
@@ -106,8 +136,8 @@ $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " transaction lines from incomplete orders.<br>";
 
 # basics
-$q= "INSERT IGNORE
-       INTO txn (id, number, created, type)
+$q= "INSERT
+       INTO txn (id, number, created, type, person)
      SELECT id_request AS id,
             IFNULL(IF(type = 2,
                       SUBSTRING_INDEX(formatted_request_number, '-', -1),
@@ -118,9 +148,13 @@ $q= "INSERT IGNORE
               WHEN 1 THEN 'customer'
               WHEN 2 THEN 'vendor'
               WHEN 3 THEN 'internal'
-            END AS type
+            END AS type,
+            id_item AS person
        FROM co.transaction
-      WHERE id_parent IS NULL";
+      WHERE id_parent IS NULL
+     ON DUPLICATE KEY
+     UPDATE
+            person = VALUES(person)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " transactions.<br>";
 
