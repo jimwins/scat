@@ -27,11 +27,15 @@ $q= "SELECT
             txn.type AS meta,
             CONCAT(txn.id, '|', type, '|', txn.number) AS Number\$txn,
             txn.created AS Created\$date,
+            CONCAT(txn.person, '|', IFNULL(person.company,''),
+                   '|', IFNULL(person.name,''))
+              AS Person\$person,
             SUM(ordered) AS Ordered,
             SUM(shipped) AS Shipped,
             SUM(allocated) AS Allocated
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
+       LEFT JOIN person ON (txn.person = person.id)
       WHERE $criteria
       GROUP BY txn.id
       ORDER BY created DESC

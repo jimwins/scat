@@ -155,6 +155,10 @@ function expand_field($data, $class) {
                  'customer' => 'Invoice',
                  'vendor' => 'Purchase Order');
     return '<a href="txn.php?id='.ashtml($id).'">'.$desc[$type].' '.ashtml($number).'</a>';
+  case '$person':
+    list($id, $company, $name)= preg_split('/\|/', $data, 3);
+    if (!$id) return '';
+    return '<a href="person.php?id='.ashtml($id).'">'.ashtml($company).($name&&$company?" (":"").ashtml($name).($name&&$company?")":"").'</a>';
   case '$item':
     return '<a href="item.php?code='.ashtml($data).'">'.ashtml($data).'</a>';
   default:
