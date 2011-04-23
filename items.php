@@ -49,7 +49,7 @@ $q= "SELECT
             (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) Stock\$right,
             minimum_quantity Minimum\$right
        FROM item
-       JOIN brand ON (item.brand = brand.id)
+  LEFT JOIN brand ON (item.brand = brand.id)
   LEFT JOIN barcode ON (item.id = barcode.item)
       WHERE " . join(' AND ', $criteria) . "
    GROUP BY item.id";
