@@ -9,7 +9,18 @@ header("content-type: text/html;charset=utf-8");?>
 <head>
  <title><?=ashtml($title)?></title>
  <style type="text/css">
-  body { background: #ba9d6c; }
+  body { background: #ba9d6c; padding-top: 28px; }
+
+  header {
+   width: 100%;
+   position: fixed;
+   top: 0;
+   left: 0;
+   padding: 4px 16px;
+   background: #d2c09f;
+   -webkit-box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  }
+
   /* prettier tables */
   table { border-collapse:collapse; }
   thead tr { background: rgba(0,0,0,0.2); color: rgba(0,0,0,0.5); }
@@ -33,7 +44,7 @@ header("content-type: text/html;charset=utf-8");?>
   }
 
   /* form styling */
-  form {
+  form.rock {
     border-radius: 10px;
     -webkit-box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
     background-color: rgba(255,255,255,0.2);
@@ -87,6 +98,17 @@ $(document).ready(function()
  </script>
 </head>
 <body>
+<header>
+<a href="./" title="Home"><img src="./icons/house.png" width="16" height="16" alt="Home"></a>
+&nbsp;
+<a href="#" onclick="return false" title="Cart"><img src="./icons/cart.png" width="16" height="16" alt="Cart"></a>
+&nbsp;
+<a href="./items.php" title="Items"><img src="./icons/tag_blue.png" width="16" height="16" alt="Items"></a>
+&nbsp;
+<a href="./txns.php" title="Transactions"><img src="./icons/table.png" width="16" height="16" alt="Transactions"></a>
+&nbsp;
+<a href="#" onclick="return false" title="Reports"><img src="./icons/report.png" width="16" height="16" alt="Reports"></a>
+</header>
 <?
 }
 
