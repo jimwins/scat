@@ -51,6 +51,12 @@ function setQuantity(row, qty) {
   var ext= qty * row.data('price');
   $('.ext', row).text(ext.toFixed(2));
 }
+function updatePrice(row, price) {
+  //XXX validate price
+  row.data('price', price);
+  var ext= row.data('quantity') * price;
+  $('.ext', row).text(ext.toFixed(2));
+}
 
 function setActiveRow(row) {
   if (lastItem) {
@@ -59,6 +65,25 @@ function setActiveRow(row) {
   lastItem= row;
   lastItem.addClass('active');
 }
+
+$('.price').live('dblclick', function() {
+  fld= $('<input type="text" size="6">');
+  fld.val($(this).text());
+
+  fld.keypress(function(event) {
+    if (event.which == '13') {
+      price= parseFloat($(this).val());
+      prc= $('<span class="price">' + price.toFixed(2) +  '</span>');
+      updatePrice($(this).closest('tr'), price);
+      $(this).replaceWith(prc);
+      updateTotal();
+    }
+    return true;
+  });
+
+  $(this).replaceWith(fld);
+  fld.focus().select();
+});
 
 function addItem(item) {
   // check for a matching row
@@ -78,9 +103,17 @@ function addItem(item) {
     }
 
     // add the new row
-    row= $('<tr valign="top"><td><a onclick="$(this).parent().parent().remove(); updateTotal(); return false" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">' + item.quantity + '</span></td><td>' + item.code + '</td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
+    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">' + item.quantity + '</span></td><td>' + item.code + '</td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
     row.data(item);
     row.appendTo('#items tbody');
+    $('.remove', row).click(function () {
+      if ($(this).closest('tr').is('.active')) {
+        lastItem= null;
+      }
+      $(this).closest('tr').remove();
+      updateTotal();
+      return false;
+    });
     row.click(function() { setActiveRow($(this)); });
     setActiveRow(row);
   }
