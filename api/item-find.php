@@ -39,7 +39,8 @@ $q= "SELECT
               WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
               WHEN 'relative' THEN CONCAT('$', discount, ' off')
             END discount,
-            (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) stock
+            (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) stock,
+            barcode.quantity quantity
        FROM item
   LEFT JOIN brand ON (item.brand = brand.id)
   LEFT JOIN barcode ON (item.id = barcode.item)
@@ -55,6 +56,11 @@ if (!$r) {
 
 $items= array();
 while ($row= $r->fetch_assoc()) {
+  /* force numeric values to numeric type */
+  $row['msrp']= (float)$row['msrp'];
+  $row['price']= (float)$row['price'];
+  $row['stock']= (int)$row['stock'];
+  $row['quantity']= (int)$row['quantity'];
   $items[]= $row;
 }
 
