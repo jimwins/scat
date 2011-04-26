@@ -20,7 +20,7 @@ head("Scat");
 .choices img {
   vertical-align: middle;
 }
-#tax, #total {
+tfoot td {
   background-color:rgba(255,255,255,0.5);
   font-weight: bold;
 }
@@ -75,6 +75,7 @@ function updateTotal() {
   $('#items .ext').each(function() {
     total= total + parseFloat($(this).text());
   });
+  $('#items #subtotal').text(total.toFixed(2))
   var tax= total * 0.0975;
   $('#items #tax').text(tax.toFixed(2))
   $('#items #total').text((total + tax).toFixed(2))
@@ -155,6 +156,7 @@ $(function() {
   <tr><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
+  <tr><th colspan=3></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
   <tr><th colspan=3></th><th align="right">Tax:</th><td id="tax" class="dollar">0.00</td></tr>
   <tr><th colspan=3></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
  </tfoot>
