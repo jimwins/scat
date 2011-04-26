@@ -20,6 +20,9 @@ head("Scat");
 .choices img {
   vertical-align: middle;
 }
+tbody tr.active {
+  background-color:rgba(255,192,192,0.4);
+}
 tfoot td {
   background-color:rgba(255,255,255,0.5);
   font-weight: bold;
@@ -49,6 +52,14 @@ function setQuantity(row, qty) {
   $('.ext', row).text(ext.toFixed(2));
 }
 
+function setActiveRow(row) {
+  if (lastItem) {
+    lastItem.removeClass('active');
+  }
+  lastItem= row;
+  lastItem.addClass('active');
+}
+
 function addItem(item) {
   // check for a matching row
   var row= $("#items td:match(" + item.code + ")").parent()
@@ -56,7 +67,7 @@ function addItem(item) {
   // have one? just increment quantity
   if (row.length) {
     setQuantity(row, row.data('quantity') + item.quantity);
-    lastItem= row;
+    setActiveRow(row);
   }
   // otherwise add the row
   else {
@@ -67,9 +78,11 @@ function addItem(item) {
     }
 
     // add the new row
-    $('#items tbody').append('<tr valign="top"><td><a onclick="$(this).parent().parent().remove(); updateTotal(); return false" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">' + item.quantity + '</span></td><td>' + item.code + '</td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
-    lastItem= $('#items tbody tr:last');
-    lastItem.data(item);
+    row= $('<tr valign="top"><td><a onclick="$(this).parent().parent().remove(); updateTotal(); return false" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">' + item.quantity + '</span></td><td>' + item.code + '</td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
+    row.data(item);
+    row.appendTo('#items tbody');
+    row.click(function() { setActiveRow($(this)); });
+    setActiveRow(row);
   }
 
   updateTotal();
@@ -107,8 +120,7 @@ $(function() {
     // short integer and recently scanned? adjust quantity
     if (q.length < 3 && lastItem && parseInt(q) > 0) {
       snd.yes.play();
-      var qty= parseInt(q);
-      setQuantity(lastItem, qty);
+      setQuantity(lastItem, parseInt(q));
       updateTotal();
       return false;
     }
