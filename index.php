@@ -9,6 +9,7 @@ head("Scat");
   padding: 6px;
   background: rgba(0,0,0,0.1);
   border-radius: 4px;
+  width: 80%;
 }
 .choices span {
   margin-right: 8px;
@@ -18,6 +19,10 @@ head("Scat");
 }
 .choices img {
   vertical-align: middle;
+}
+#tax, #total {
+  background-color:rgba(255,255,255,0.5);
+  font-weight: bold;
 }
 </style>
 <script>
@@ -59,7 +64,7 @@ function addItem(item) {
 
     // add the new row
     $('#items tbody').append('<tr valign="top"><td align="center"><a style="float:left; text-align: left" onclick="$(this).parent().parent().remove(); updateTotal(); return false"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a><span class="qty">1</span></td><td align="center">' + item.code + '</td><td>' + desc + '</td><td class="dollar right">' + item.price + '</td><td class="dollar right ext">' + item.price + '</td></tr>');
-    lastItem= $('#items tbody tr:first');
+    lastItem= $('#items tbody tr:last');
   }
 
   updateTotal();
@@ -70,7 +75,9 @@ function updateTotal() {
   $('#items .ext').each(function() {
     total= total + parseFloat($(this).text());
   });
-  $('#items #total').text(total.toFixed(2))
+  var tax= total * 0.0975;
+  $('#items #tax').text(tax.toFixed(2))
+  $('#items #total').text((total + tax).toFixed(2))
 }
 
 $(function() {
@@ -148,6 +155,7 @@ $(function() {
   <tr><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
+  <tr><th colspan=3></th><th align="right">Tax:</th><td id="tax" class="dollar">0.00</td></tr>
   <tr><th colspan=3></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
  </tfoot>
  <tbody>
