@@ -29,13 +29,12 @@ $q= "SELECT
             item.name name,
             brand.name brand,
             retail_price msrp,
-            IF(discount_type,
-               CASE discount_type
-                 WHEN 'percentage' THEN ROUND(retail_price * ((100 - discount) / 100), 2)
-                 WHEN 'relative' THEN (retail_price - discount) 
-                 WHEN 'fixed' THEN (discount)
-               END,
-               NULL) price,
+            CASE discount_type
+              WHEN 'percentage' THEN ROUND(retail_price * ((100 - discount) / 100), 2)
+              WHEN 'relative' THEN (retail_price - discount) 
+              WHEN 'fixed' THEN (discount)
+              ELSE retail_price
+            END price,
             CASE discount_type
               WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
               WHEN 'relative' THEN CONCAT('$', discount, ' off')
@@ -45,7 +44,8 @@ $q= "SELECT
   LEFT JOIN brand ON (item.brand = brand.id)
   LEFT JOIN barcode ON (item.id = barcode.item)
       WHERE " . join(' AND ', $criteria) . "
-   GROUP BY item.id";
+   GROUP BY item.id
+      LIMIT 10";
 
 $r= $db->query($q);
 if (!$r) {
