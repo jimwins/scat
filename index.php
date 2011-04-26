@@ -42,16 +42,20 @@ $.getFocusedElement = function() {
 
 var lastItem;
 
+function setQuantity(row, qty) {
+  $('.qty', row).text(qty);
+  row.data('quantity', qty);
+  var ext= qty * row.data('price');
+  $('.ext', row).text(ext.toFixed(2));
+}
+
 function addItem(item) {
-  // look for matching row
+  // check for a matching row
   var row= $("#items td:match(" + item.code + ")").parent()
 
   // have one? just increment quantity
   if (row.length) {
-    var qty= parseInt($('.qty', row).text());
-    $('.qty', row).text(++qty);
-    var ext= qty * parseFloat($(row).children(":eq(3)").text());
-    $(row).children(":eq(4)").text(ext.toFixed(2));
+    setQuantity(row, row.data('quantity') + item.quantity);
     lastItem= row;
   }
   // otherwise add the row
@@ -59,12 +63,13 @@ function addItem(item) {
     // build name/description
     var desc = item.name;
     if (item.discount) {
-      desc+= '<br><small>MSRP $' + item.msrp + ' / ' + item.discount + '</small>';
+      desc+= '<br><small>MSRP $' + item.msrp.toFixed(2) + ' / ' + item.discount + '</small>';
     }
 
     // add the new row
-    $('#items tbody').append('<tr valign="top"><td align="center"><a style="float:left; text-align: left" onclick="$(this).parent().parent().remove(); updateTotal(); return false"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a><span class="qty">1</span></td><td align="center">' + item.code + '</td><td>' + desc + '</td><td class="dollar right">' + item.price + '</td><td class="dollar right ext">' + item.price + '</td></tr>');
+    $('#items tbody').append('<tr valign="top"><td><a onclick="$(this).parent().parent().remove(); updateTotal(); return false" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">' + item.quantity + '</span></td><td>' + item.code + '</td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
     lastItem= $('#items tbody tr:last');
+    lastItem.data(item);
   }
 
   updateTotal();
@@ -101,8 +106,9 @@ $(function() {
 
     // short integer and recently scanned? adjust quantity
     if (q.length < 3 && lastItem && parseInt(q) > 0) {
-      $('.qty', lastItem).text(parseInt(q));
       snd.yes.play();
+      var qty= parseInt(q);
+      setQuantity(lastItem, qty);
       updateTotal();
       return false;
     }
@@ -153,12 +159,12 @@ $(function() {
  <div class="error"></div>
  <table width="80%">
  <thead>
-  <tr><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
+  <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
-  <tr><th colspan=3></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
-  <tr><th colspan=3></th><th align="right">Tax:</th><td id="tax" class="dollar">0.00</td></tr>
-  <tr><th colspan=3></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
+  <tr><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
+  <tr><th colspan=4></th><th align="right">Tax (9.75%):</th><td id="tax" class="dollar">0.00</td></tr>
+  <tr><th colspan=4></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
  </tfoot>
  <tbody>
  </tbody>
