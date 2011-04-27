@@ -27,6 +27,10 @@ tfoot td {
   background-color:rgba(255,255,255,0.5);
   font-weight: bold;
 }
+.over {
+  font-weight: bold;
+  color: #600;
+}
 </style>
 <script>
 var snd= new Object;
@@ -50,12 +54,21 @@ function setQuantity(row, qty) {
   row.data('quantity', qty);
   var ext= qty * row.data('price');
   $('.ext', row).text(ext.toFixed(2));
+  if (qty > row.data('stock')) {
+    $('.qty', row).addClass('over');
+  } else {
+    $('.qty', row).removeClass('over');
+  }
 }
 function updatePrice(row, price) {
   //XXX validate price
   row.data('price', price);
   var ext= row.data('quantity') * price;
   $('.ext', row).text(ext.toFixed(2));
+}
+
+function updateName(row, name) {
+  row.data('name', name);
 }
 
 function setActiveRow(row) {
@@ -88,6 +101,27 @@ $('.price').live('dblclick', function() {
   fld.focus().select();
 });
 
+$('.name').live('dblclick', function() {
+  fld= $('<input type="text" size="40">');
+  fld.val($(this).text());
+
+  fld.bind('keypress blur', function(event) {
+    if (event.type == 'keypress' && event.which != '13') {
+      return true;
+    }
+  
+    name= $(this).val();
+    prc= $('<span class="name">' + name +  '</span>');
+    updateName($(this).closest('tr'), name);
+    $(this).replaceWith(prc);
+
+    return true;
+  });
+
+  $(this).replaceWith(fld);
+  fld.focus().select();
+});
+
 function addItem(item) {
   // check for a matching row
   var row= $("#items td:match(" + item.code + ")").parent()
@@ -100,14 +134,15 @@ function addItem(item) {
   // otherwise add the row
   else {
     // build name/description
-    var desc = item.name;
+    var desc = '<span class="name">' + item.name + '</name>';
     if (item.discount) {
       desc+= '<br><small>MSRP $' + item.msrp.toFixed(2) + ' / ' + item.discount + '</small>';
     }
 
     // add the new row
-    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">' + item.quantity + '</span></td><td>' + item.code + '</td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
+    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">1</span></td><td>' + item.code + '</td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
     row.data(item);
+    setQuantity(row, item.quantity); // so 'over' class gets set
     row.appendTo('#items tbody');
     $('.remove', row).click(function () {
       if ($(this).closest('tr').is('.active')) {
