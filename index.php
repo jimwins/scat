@@ -134,7 +134,7 @@ function addItem(item) {
   // otherwise add the row
   else {
     // build name/description
-    var desc = '<span class="name">' + item.name + '</name>';
+    var desc = '<span class="name">' + item.name + '</span>';
     if (item.discount) {
       desc+= '<br><small>MSRP $' + item.msrp.toFixed(2) + ' / ' + item.discount + '</small>';
     }
@@ -189,7 +189,7 @@ $(function() {
     var q = $('input[name="q"]', this).val();
 
     // short integer and recently scanned? adjust quantity
-    if (q.length < 3 && lastItem && parseInt(q) > 0) {
+    if (q.length < 4 && lastItem && parseInt(q) != 0) {
       snd.yes.play();
       setQuantity(lastItem, parseInt(q));
       updateTotal();
