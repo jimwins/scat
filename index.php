@@ -70,14 +70,17 @@ $('.price').live('dblclick', function() {
   fld= $('<input type="text" size="6">');
   fld.val($(this).text());
 
-  fld.keypress(function(event) {
-    if (event.which == '13') {
-      price= parseFloat($(this).val());
-      prc= $('<span class="price">' + price.toFixed(2) +  '</span>');
-      updatePrice($(this).closest('tr'), price);
-      $(this).replaceWith(prc);
-      updateTotal();
+  fld.bind('keypress blur', function(event) {
+    if (event.type == 'keypress' && event.which != '13') {
+      return true;
     }
+  
+    price= parseFloat($(this).val());
+    prc= $('<span class="price">' + price.toFixed(2) +  '</span>');
+    updatePrice($(this).closest('tr'), price);
+    $(this).replaceWith(prc);
+    updateTotal();
+
     return true;
   });
 
