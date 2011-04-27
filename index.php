@@ -31,6 +31,9 @@ tfoot td {
   font-weight: bold;
   color: #600;
 }
+.discount {
+  font-size: smaller;
+}
 </style>
 <script>
 var snd= new Object;
@@ -62,12 +65,18 @@ function setQuantity(row, qty) {
 }
 function updatePrice(row, price) {
   //XXX validate price
+  if (row.data('price') != price) {
+    row.data('price_changed', 1);
+  }
   row.data('price', price);
   var ext= row.data('quantity') * price;
   $('.ext', row).text(ext.toFixed(2));
 }
 
 function updateName(row, name) {
+  if (row.data('name') != name) {
+    row.data('name_changed', 1);
+  }
   row.data('name', name);
 }
 
@@ -134,10 +143,11 @@ function addItem(item) {
   // otherwise add the row
   else {
     // build name/description
-    var desc = '<span class="name">' + item.name + '</span>';
+    var desc = '<span class="name">' + item.name + '</span><div class="discount">';
     if (item.discount) {
-      desc+= '<br><small>MSRP $' + item.msrp.toFixed(2) + ' / ' + item.discount + '</small>';
+      desc+= 'MSRP $' + item.msrp.toFixed(2) + ' / ' + item.discount;
     }
+    desc+= '</div>';
 
     // add the new row
     row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">1</span></td><td>' + item.code + '</td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
