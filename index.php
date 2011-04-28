@@ -41,10 +41,6 @@ snd.yes= new Audio("./sound/yes.wav");
 snd.no= new Audio("./sound/no.wav");
 snd.maybe= new Audio("./sound/maybe.wav");
 
-$.expr[":"].match = function(obj, index, meta, stack){
-    return (obj.textContent || obj.innerText || $(obj).text() || "") == meta[3];
-}
-
 $.getFocusedElement = function() {
   var elem = document.activeElement;
   return $( elem && ( elem.type || elem.href ) ? elem : [] );
@@ -131,9 +127,32 @@ $('.name').live('dblclick', function() {
   fld.focus().select();
 });
 
+$('.qty').live('dblclick', function() {
+  fld= $('<input type="text" size="2">');
+  fld.val($(this).text());
+
+  fld.bind('keypress blur', function(event) {
+    if (event.type == 'keypress' && event.which != '13') {
+      return true;
+    }
+  
+    qty= parseInt($(this).val());
+    prc= $('<span class="qty">' + qty +  '</span>');
+    setQuantity($(this).closest('tr'), qty);
+    $(this).replaceWith(prc);
+    updateTotal();
+
+    return true;
+  });
+
+  $(this).replaceWith(fld);
+  fld.focus().select();
+});
+
+
 function addItem(item) {
   // check for a matching row
-  var row= $("#items td:match(" + item.code + ")").parent()
+  var row= $("#items tbody tr").filter(function(index) { return $(this).data('code') == item.code; });
 
   // have one? just increment quantity
   if (row.length) {
@@ -150,7 +169,7 @@ function addItem(item) {
     desc+= '</div>';
 
     // add the new row
-    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">1</span></td><td>' + item.code + '</td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
+    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">1</span></td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
     row.data(item);
     setQuantity(row, item.quantity); // so 'over' class gets set
     row.appendTo('#items tbody');
@@ -252,7 +271,7 @@ $(function() {
  <div class="error"></div>
  <table width="80%">
  <thead>
-  <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
+  <tr><th></th><th>Qty</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
   <tr><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
