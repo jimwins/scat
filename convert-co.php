@@ -164,16 +164,15 @@ echo "Loaded ", $db->affected_rows, " transactions.<br>";
 # lines from transactions
 $q= "INSERT
        INTO txn_line (id, txn, line, item, ordered, shipped, allocated)
-     SELECT co.id AS id,
-            tx.id AS txn,
-            IFNULL(co.in_parent_index, 0) AS line,
-            co.id_item AS item,
-            IF(co.type = 1, -1, 1) * co.quantity AS ordered,
+     SELECT id AS id,
+            id_parent AS txn,
+            IFNULL(in_parent_index, 0) AS line,
+            id_item AS item,
+            IF(type = 1, -1, 1) * quantity AS ordered,
             0 AS shipped,
-            IF(co.type = 1, -1, 1) * co.quantity AS allocated
-       FROM co.transaction co
-       JOIN co.transaction tx ON (tx.id = co.id_parent)
-      WHERE co.id_parent IS NOT NULL
+            IF(type = 1, -1, 1) * quantity AS allocated
+       FROM co.transaction
+      WHERE id_parent IS NOT NULL
      ON DUPLICATE KEY
      UPDATE ordered = ordered + VALUES(ordered),
             allocated = allocated + VALUES(allocated)";
