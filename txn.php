@@ -95,6 +95,16 @@ $q= "SELECT
 dump_table($db->query($q));
 dump_query($q);
 
+echo '<h2>Payments</h2>';
+$q= "SELECT processed AS Date,
+            method AS Method,
+            amount AS Amount\$dollar
+       FROM payment
+      WHERE txn = $id
+      ORDER BY processed ASC";
+dump_table($db->query($q));
+dump_query($q);
+
 switch ($type) {
 case 'vendor';
 ?>

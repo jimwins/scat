@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.1.38, for apple-darwin9.5.0 (i386)
+-- MySQL dump 10.13  Distrib 5.5.9, for osx10.6 (i386)
 --
 -- Host: localhost    Database: scat
 -- ------------------------------------------------------
--- Server version	5.1.38-log
+-- Server version	5.5.9
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -66,6 +66,27 @@ CREATE TABLE `item` (
   `deleted` bit(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `payment`
+--
+
+DROP TABLE IF EXISTS `payment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `payment` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `txn` int(10) unsigned NOT NULL,
+  `method` enum('cash','credit','gift','check','discount') NOT NULL,
+  `amount` decimal(9,3) NOT NULL,
+  `cc_txn` varchar(10) DEFAULT NULL,
+  `cc_approval` varchar(30) DEFAULT NULL,
+  `cc_lastfour` varchar(4) DEFAULT NULL,
+  `processed` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `txn` (`txn`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -136,4 +157,4 @@ CREATE TABLE `txn_line` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-02-07 18:13:32
+-- Dump completed on 2011-05-02 22:35:55

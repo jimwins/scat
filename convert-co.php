@@ -101,7 +101,7 @@ echo "Flushed transaction lines.<br>";
 # incomplete transactions
 $q= "INSERT
        INTO txn (id, number, created, type, person)
-     SELECT id AS id,
+     SELECT id + 200000 AS id,
             IFNULL(number, 0) AS number,
             date AS created,
             CASE type
@@ -124,7 +124,7 @@ echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
 $q= "INSERT IGNORE
        INTO txn_line (id, txn, line, item, ordered, shipped, allocated)
      SELECT co.id + 200000 AS id,
-            co.id_parent AS txn,
+            co.id_parent + 200000 AS txn,
             IFNULL(co.in_parent_index, 0) AS line,
             co.id_item AS item,
             IF(co.type = 1, -1, 1) * co.quantity AS ordered,
@@ -138,7 +138,7 @@ echo "Loaded ", $db->affected_rows, " transaction lines from incomplete orders.<
 # basics
 $q= "INSERT
        INTO txn (id, number, created, type, person)
-     SELECT id_request AS id,
+     SELECT id AS id,
             IFNULL(IF(type = 2,
                       SUBSTRING_INDEX(formatted_request_number, '-', -1),
                       number),
@@ -161,8 +161,8 @@ echo "Loaded ", $db->affected_rows, " transactions.<br>";
 # lines from transactions
 $q= "INSERT
        INTO txn_line (id, txn, line, item, ordered, shipped, allocated)
-     SELECT IF(co.id_request, co.id_request + 200000, co.id) AS id,
-            tx.id_request AS txn,
+     SELECT co.id AS id,
+            tx.id AS txn,
             IFNULL(co.in_parent_index, 0) AS line,
             co.id_item AS item,
             IF(co.type = 1, -1, 1) * co.quantity AS ordered,
@@ -177,3 +177,24 @@ $q= "INSERT
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " (or so) transaction lines.<br>";
 
+# payments
+#
+$q= "INSERT IGNORE
+       INTO payment (id, txn, method, amount, processed)
+     SELECT id_payment AS id,
+            id_transaction AS txn,
+            CASE type
+              WHEN 1 THEN 'credit' /* online */
+              WHEN 2 THEN 'credit'
+              WHEN 3 THEN 'credit' /* debit */
+              WHEN 4 THEN 'check'
+              WHEN 5 THEN 'cash'
+              WHEN 6 THEN 'change'
+              WHEN 7 THEN 'gift'
+            END AS method,
+            payment.amount AS amount,
+            date AS processed
+       FROM co.payment_transaction
+       JOIN co.payment ON (id_payment = payment.id)";
+$r= $db->query($q) or die("query failed: ". $db->error);
+echo "Loaded ", $db->affected_rows, " payments.<br>";
