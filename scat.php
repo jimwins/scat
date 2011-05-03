@@ -1,4 +1,9 @@
 <?
+require './config.php';
+
+define('APP_NAME', 'ScatPOS');
+define('VERSION', '0.0.1');
+define('EPS_ApplicationID', '984');
 
 /** Basic functions */
 
@@ -125,10 +130,31 @@ $(document).ready(function()
 <?
 }
 
+if (!defined('DB_SERVER') ||
+    !defined('DB_USER') ||
+    !defined('DB_PASSWORD') ||
+    !defined('DB_SCHEMA')) {
+  head("Scat Configuration");
+  $msg= <<<CONFIG
+<p>You must configure Scat to connect to your database. Create
+<code>config.php</code> and add the following code, configured as appropriate
+for your setup:
+<pre>
+&lt;?
+/* Database configuration */
+define('DB_SERVER', 'localhost');
+define('DB_USER', 'scat');
+define('DB_PASSWORD', 'scat');
+define('DB_SCHEMA', 'scat');
+</pre>
+CONFIG;
+  die($msg);
+}
+
 $db= mysqli_init();
 if (!$db) die("mysqli_init failed");
 
-if (!$db->real_connect("localhost","root","","scat"))
+if (!$db->real_connect(DB_SERVER,DB_USER,DB_PASSWORD,DB_SCHEMA))
   die('connect failed: ' . mysqli_connect_error());
 $db->set_charset('utf8');
 
