@@ -70,7 +70,7 @@ $type= $db->real_escape_string($type);
 $q= "SELECT
             line AS `#\$num`,
             item.code Code\$item,
-            item.name Name,
+            IFNULL(override_name, item.name) Name,
             txn_line.retail_price MSRP\$dollar,
             IF(txn_line.discount_type,
                CASE txn_line.discount_type

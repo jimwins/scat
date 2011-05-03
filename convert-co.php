@@ -124,6 +124,8 @@ echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
 # lines from requests (un-received items)
 #
 # needs the id offset to avoid collisions
+#
+# XXX need to update pricing and names
 $q= "INSERT IGNORE
        INTO txn_line (id, txn, line, item, ordered, shipped, allocated)
      SELECT co.id + 200000 AS id,
@@ -163,7 +165,7 @@ echo "Loaded ", $db->affected_rows, " transactions.<br>";
 
 # lines from transactions
 $q= "INSERT
-       INTO txn_line (id, txn, line, item, ordered, shipped, allocated, taxfree, retail_price, discount_type, discount)
+       INTO txn_line (id, txn, line, item, ordered, shipped, allocated, override_name, retail_price, discount_type, discount, taxfree)
      SELECT id AS id,
             id_parent AS txn,
             IFNULL(in_parent_index, 0) AS line,
@@ -171,10 +173,11 @@ $q= "INSERT
             IF(type = 1, -1, 1) * quantity AS ordered,
             0 AS shipped,
             IF(type = 1, -1, 1) * quantity AS allocated,
-            (SELECT taxfree FROM item WHERE item.id = id_item) taxfree,
+            IF(overrides LIKE '%004name%', SUBSTRING_INDEX(SUBSTRING_INDEX(overrides, '\\\\000\\\\000\\\\000', -1), 'q\\\\003s', 1), NULL) AS override_name,
             (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = tx.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1) retail_price,
             IF(discount_percentage, 'percentage', NULL) AS discount_type,
-            IF(discount_percentage, discount_percentage, NULL) AS discount
+            IF(discount_percentage, discount_percentage, NULL) AS discount,
+            (SELECT taxfree FROM item WHERE item.id = id_item) taxfree
        FROM co.transaction tx
       WHERE id_parent IS NOT NULL
      ON DUPLICATE KEY
