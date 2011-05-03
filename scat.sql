@@ -144,6 +144,10 @@ CREATE TABLE `txn_line` (
   `ordered` int(11) NOT NULL,
   `shipped` int(11) NOT NULL,
   `allocated` int(11) NOT NULL,
+  `retail_price` decimal(9,2) NOT NULL,
+  `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
+  `discount` decimal(9,2) DEFAULT NULL,
+  `taxfree` bit(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`,`line`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -158,4 +162,4 @@ CREATE TABLE `txn_line` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-05-03  0:37:28
+-- Dump completed on 2011-05-03  3:22:50

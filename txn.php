@@ -71,17 +71,17 @@ $q= "SELECT
             line AS `#\$num`,
             item.code Code\$item,
             item.name Name,
-            retail_price MSRP\$dollar,
-            IF(discount_type,
-               CASE discount_type
-                 WHEN 'percentage' THEN ROUND(retail_price * ((100 - discount) / 100), 2)
-                 WHEN 'relative' THEN (retail_price - discount) 
-                 WHEN 'fixed' THEN (discount)
+            txn_line.retail_price MSRP\$dollar,
+            IF(txn_line.discount_type,
+               CASE txn_line.discount_type
+                 WHEN 'percentage' THEN ROUND(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2)
+                 WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
+                 WHEN 'fixed' THEN (txn_line.discount)
                END,
                NULL) Sale\$dollar,
-            CASE discount_type
-              WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
-              WHEN 'relative' THEN CONCAT('$', discount, ' off')
+            CASE txn_line.discount_type
+              WHEN 'percentage' THEN CONCAT(ROUND(txn_line.discount), '% off')
+              WHEN 'relative' THEN CONCAT('$', txn_line.discount, ' off')
             END Discount,
             ordered as Ordered,
             shipped as Shipped,

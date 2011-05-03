@@ -163,21 +163,35 @@ echo "Loaded ", $db->affected_rows, " transactions.<br>";
 
 # lines from transactions
 $q= "INSERT
-       INTO txn_line (id, txn, line, item, ordered, shipped, allocated)
+       INTO txn_line (id, txn, line, item, ordered, shipped, allocated, taxfree, retail_price, discount_type, discount)
      SELECT id AS id,
             id_parent AS txn,
             IFNULL(in_parent_index, 0) AS line,
             id_item AS item,
             IF(type = 1, -1, 1) * quantity AS ordered,
             0 AS shipped,
-            IF(type = 1, -1, 1) * quantity AS allocated
-       FROM co.transaction
+            IF(type = 1, -1, 1) * quantity AS allocated,
+            (SELECT taxfree FROM item WHERE item.id = id_item) taxfree,
+            (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = tx.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1) retail_price,
+            IF(discount_percentage, 'percentage', NULL) AS discount_type,
+            IF(discount_percentage, discount_percentage, NULL) AS discount
+       FROM co.transaction tx
       WHERE id_parent IS NOT NULL
      ON DUPLICATE KEY
      UPDATE ordered = ordered + VALUES(ordered),
             allocated = allocated + VALUES(allocated)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " (or so) transaction lines.<br>";
+
+# figure out discounts
+$q= "UPDATE txn_line, co.transaction tx
+        SET retail_price = IF(retail_price, retail_price, override_price),
+            discount_type = IFNULL(discount_type, IF(retail_price && retail_price != override_price, 'absolute', NULL)),
+            discount = IFNULL(discount, IF(retail_price && retail_price != override_price, override_price, NULL))
+     WHERE txn_line.id = tx.id AND override_price";
+
+$r= $db->query($q) or die("query failed: ". $db->error);
+echo "Updated ", $db->affected_rows, " prices on transaction lines.<br>";
 
 # payments
 #
