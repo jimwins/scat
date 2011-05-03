@@ -274,9 +274,9 @@ $(function() {
   <tr><th></th><th>Qty</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
-  <tr><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
-  <tr><th colspan=4></th><th align="right">Tax (9.75%):</th><td id="tax" class="dollar">0.00</td></tr>
-  <tr><th colspan=4></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
+  <tr><th colspan=3></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
+  <tr><th colspan=3></th><th align="right">Tax (9.75%):</th><td id="tax" class="dollar">0.00</td></tr>
+  <tr><th colspan=3></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
  </tfoot>
  <tbody>
  </tbody>
