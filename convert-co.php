@@ -6,11 +6,13 @@ head("convert");
 # ITEMS
 #
 # load item basics
-$q= "INSERT INTO item (id, code, name, minimum_quantity, active, deleted)
+$q= "INSERT INTO item (id, code, name, minimum_quantity, taxfree, active, deleted)
      SELECT id,
             (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 15 ORDER BY id DESC LIMIT 1) code,
             (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 2 ORDER BY id DESC LIMIT 1) name,
             (SELECT minimum FROM co.stock WHERE id_product = item.id AND stocktype = 1) min,
+            IFNULL((SELECT 0 FROM co.tax_group_item WHERE id_item = id),
+                   1) taxfree,
             (active = 't') active,
             (deleted = 't') deleted
        FROM co.item
@@ -19,6 +21,7 @@ $q= "INSERT INTO item (id, code, name, minimum_quantity, active, deleted)
      UPDATE code = VALUES(code),
             name = VALUES(name),
             minimum_quantity = VALUES(minimum_quantity),
+            taxfree = VALUES(taxfree),
             active = VALUES(active),
             deleted = VALUES(deleted)";
 $r= $db->query($q) or die("query failed: ". $db->error);
