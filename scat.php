@@ -20,6 +20,18 @@ header("content-type: text/html;charset=utf-8");?>
    background: #d2c09f;
    -webkit-box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
   }
+  header a img {
+   border: none;
+   vertical-align: top;
+  }
+  header a {
+    text-decoration: none;
+    color: #339;
+  }
+  header a:hover {
+    text-decoration: underline;
+    color: #c33;
+  }
 
   /* prettier tables */
   table { border-collapse:collapse; }
@@ -99,15 +111,16 @@ $(document).ready(function()
 </head>
 <body>
 <header>
-<a href="./" title="Home"><img src="./icons/house.png" width="16" height="16" alt="Home"></a>
+<a href="./" title="Home"><img src="./icons/house.png" width="16" height="16" alt="Home"> Home</a>
 &nbsp;
-<a href="#" onclick="return false" title="Cart"><img src="./icons/cart.png" width="16" height="16" alt="Cart"></a>
+<?/*<a href="#" onclick="return false" title="Cart"><img src="./icons/cart.png" width="16" height="16" alt="Cart"></a>
 &nbsp;
-<a href="./items.php" title="Items"><img src="./icons/tag_blue.png" width="16" height="16" alt="Items"></a>
+*/?>
+<a href="./items.php" title="Items"><img src="./icons/tag_blue.png" width="16" height="16" alt="Items"> Items</a>
 &nbsp;
-<a href="./txns.php" title="Transactions"><img src="./icons/table.png" width="16" height="16" alt="Transactions"></a>
+<a href="./txns.php" title="Transactions"><img src="./icons/table.png" width="16" height="16" alt="Transactions"> Transactions</a>
 &nbsp;
-<a href="#" onclick="return false" title="Reports"><img src="./icons/report.png" width="16" height="16" alt="Reports"></a>
+<a href="#" onclick="return false" title="Reports"><img src="./icons/report.png" width="16" height="16" alt="Reports"> Reports</a>
 </header>
 <?
 }
