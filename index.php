@@ -282,3 +282,4 @@ $(function() {
  </tbody>
 </table>
 </div>
+<?foot();

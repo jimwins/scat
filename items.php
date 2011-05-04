@@ -56,3 +56,5 @@ $q= "SELECT
 
 dump_table($db->query($q));
 dump_query($q);
+
+foot();

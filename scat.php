@@ -1,4 +1,7 @@
 <?
+/* Start page timer */
+$start_time= microtime();
+
 require './config.php';
 
 define('APP_NAME', 'ScatPOS');
@@ -36,6 +39,17 @@ header("content-type: text/html;charset=utf-8");?>
   header a:hover {
     text-decoration: underline;
     color: #c33;
+  }
+
+  footer {
+    font-size: smaller;
+    text-align: right;
+    color: #666;
+    border-top: 1px solid rgba(0,0,0,0.2);
+    margin-top: 1em;
+  }
+  footer p {
+    margin-top: 0.5em;
   }
 
   /* prettier tables */
@@ -128,6 +142,25 @@ $(document).ready(function()
 <a href="#" onclick="return false" title="Reports"><img src="./icons/report.png" width="16" height="16" alt="Reports"> Reports</a>
 </header>
 <?
+}
+
+function foot() {
+  global $start_time;
+  $finish_time= microtime();
+
+  list($secs, $usecs)= explode(' ', $start_time);
+  $start= $secs + $usecs;
+
+  list($secs, $usecs)= explode(' ', $finish_time);
+  $finish= $secs + $usecs;
+
+  $time= sprintf("%0.3f", $finish - $start);
+
+  echo <<<FOOTER
+<footer>
+ <p class="time">Page generated in $time seconds</p>
+</footer>
+FOOTER;
 }
 
 if (!defined('DB_SERVER') ||

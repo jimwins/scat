@@ -55,10 +55,12 @@ $q= "SELECT
               AS Person\$person,
             SUM(ordered) AS Ordered,
             SUM(shipped) AS Shipped,
-            SUM(allocated) AS Allocated
+            SUM(allocated) AS Allocated,
+            CAST(SUM(amount) AS DECIMAL(9,2)) AS Paid\$dollar
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        LEFT JOIN person ON (txn.person = person.id)
+       LEFT JOIN payment ON (txn.id = payment.txn)
       WHERE $criteria
       GROUP BY txn.id
       ORDER BY created DESC
@@ -66,3 +68,5 @@ $q= "SELECT
 
 dump_table($db->query($q));
 dump_query($q);
+
+foot();
