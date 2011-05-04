@@ -56,11 +56,20 @@ $q= "SELECT
             SUM(ordered) AS Ordered,
             SUM(shipped) AS Shipped,
             SUM(allocated) AS Allocated,
-            CAST(SUM(amount) AS DECIMAL(9,2)) AS Paid\$dollar
+            CAST(SUM(IF(type = 'customer', -1, 1) * allocated *
+                     CASE discount_type
+                       WHEN 'percentage' THEN ROUND(retail_price *
+                                                    ((100 - discount) / 100), 2)
+                       WHEN 'relative' THEN (retail_price - discount) 
+                       WHEN 'fixed' THEN (discount)
+                       ELSE retail_price
+                     END * 1.0975)
+                 AS DECIMAL(9,2)) Total\$dollar,
+            CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
+                 AS DECIMAL(9,2)) AS Paid\$dollar
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        LEFT JOIN person ON (txn.person = person.id)
-       LEFT JOIN payment ON (txn.id = payment.txn)
       WHERE $criteria
       GROUP BY txn.id
       ORDER BY created DESC
