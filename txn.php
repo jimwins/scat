@@ -7,8 +7,12 @@ $id= (int)$_REQUEST['id'];
 
 $type= $_REQUEST['type'];
 $number= (int)$_REQUEST['number'];
+
 if (!$id && $type) {
-  $r= $db->query("SELECT id FROM txn WHERE type = '". $db->real_escape_string($type) ."' AND number = $number");
+  $q= "SELECT id FROM txn
+        WHERE type = '". $db->real_escape_string($type) ."'
+          AND number = $number";
+  $r= $db->query($q);
 
   if (!$r->num_rows)
       die("<h2>No such transaction found.</h2>");
@@ -18,6 +22,34 @@ if (!$id && $type) {
 }
 
 if (!$id) die("no transaction specified.");
+
+$q= "SELECT
+            txn.type AS meta,
+            CONCAT(txn.id, '|', type, '|', txn.number) AS Number\$txn,
+            txn.created AS Created\$date,
+              CONCAT(txn.person, '|', IFNULL(person.company,''),
+                     '|', IFNULL(person.name,''))
+                AS Person\$person,
+            SUM(ordered) AS Ordered,
+            SUM(shipped) AS Shipped,
+            SUM(allocated) AS Allocated,
+            CAST(SUM(IF(type = 'customer', -1, 1) * allocated *
+                     CASE discount_type
+                       WHEN 'percentage' THEN ROUND(retail_price *
+                                                    ((100 - discount) / 100), 2)
+                       WHEN 'relative' THEN (retail_price - discount) 
+                       WHEN 'fixed' THEN (discount)
+                       ELSE retail_price
+                     END * (1 + tax_rate / 100))
+                 AS DECIMAL(9,2)) Total\$dollar,
+            CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
+                 AS DECIMAL(9,2)) AS Paid\$dollar
+       FROM txn
+       LEFT JOIN txn_line ON (txn.id = txn_line.txn)
+       LEFT JOIN person ON (txn.person = person.id)
+      WHERE txn.id = $id";
+
+dump_table($db->query($q));
 
 switch ($type) {
 case 'vendor';
@@ -71,7 +103,7 @@ $q= "SELECT
             line AS `#\$num`,
             item.code Code\$item,
             IFNULL(override_name, item.name) Name,
-            txn_line.retail_price MSRP\$dollar,
+            txn_line.retail_price Price\$dollar,
             IF(txn_line.discount_type,
                CASE txn_line.discount_type
                  WHEN 'percentage' THEN ROUND(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2)
@@ -120,4 +152,3 @@ case 'vendor';
 <?
   break;
 }
-
