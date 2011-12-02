@@ -2,7 +2,7 @@
 /* Start page timer */
 $start_time= microtime();
 
-require './config.php';
+require dirname(__FILE__).'/config.php';
 
 define('APP_NAME', 'ScatPOS');
 define('VERSION', '0.0.1');
