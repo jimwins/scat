@@ -35,8 +35,8 @@ $q= "SELECT
             SUM(allocated) AS Allocated,
             CAST(SUM(IF(type = 'customer', -1, 1) * allocated *
                      CASE discount_type
-                       WHEN 'percentage' THEN ROUND(retail_price *
-                                                    ((100 - discount) / 100), 2)
+                       WHEN 'percentage' THEN retail_price *
+                                              ((100 - discount) / 100)
                        WHEN 'relative' THEN (retail_price - discount) 
                        WHEN 'fixed' THEN (discount)
                        ELSE retail_price
