@@ -59,7 +59,7 @@ $r= $db->query("SET @count = 0");
 $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
             CONCAT(txn, '|', txn.type, '|', txn.number) AS Transaction\$txn,
             CASE type
-              WHEN 'customer' THEN IF(allocated < 0, 'Sale', 'Return')
+              WHEN 'customer' THEN IF(allocated <= 0, 'Sale', 'Return')
               WHEN 'vendor' THEN 'Stock'
               WHEN 'internal' THEN 'Correction'
               ELSE type
