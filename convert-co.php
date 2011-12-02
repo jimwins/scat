@@ -103,7 +103,7 @@ echo "Flushed transaction lines.<br>";
 
 # incomplete transactions
 $q= "INSERT
-       INTO txn (id, number, created, type, person)
+       INTO txn (id, number, created, type, person, tax_rate)
      SELECT id + 200000 AS id,
             IFNULL(number, 0) AS number,
             date AS created,
@@ -112,29 +112,34 @@ $q= "INSERT
               WHEN 2 THEN 'vendor'
               WHEN 3 THEN 'internal'
             END AS type,
-            id_item AS person
+            id_item AS person,
+            (SELECT rate FROM co.metatax WHERE id = metataxstate) AS tax_rate
        FROM co.request
       WHERE id_parent IS NULL
      ON DUPLICATE KEY
      UPDATE
-            person = VALUES(person)";
+            person = VALUES(person),
+            tax_rate = VALUES(tax_rate)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
 
 # lines from requests (un-received items)
 #
 # needs the id offset to avoid collisions
-#
-# XXX need to update pricing and names
-$q= "INSERT IGNORE
-       INTO txn_line (id, txn, line, item, ordered, shipped, allocated)
+$q= "INSERT
+       INTO txn_line (id, txn, line, item, ordered, shipped, allocated, override_name, retail_price, discount_type, discount, taxfree)
      SELECT co.id + 200000 AS id,
             co.id_parent + 200000 AS txn,
             IFNULL(co.in_parent_index, 0) AS line,
             co.id_item AS item,
             IF(co.type = 1, -1, 1) * co.quantity AS ordered,
             IF(co.type = 1, -1, 1) * co.quantity AS shipped, 
-            0 AS allocated
+            0 AS allocated,
+            IF(overrides LIKE '%name%', SUBSTRING_INDEX(SUBSTRING_INDEX(overrides, '012(V', -1), '\\\\012p3', 1), NULL) AS override_name,
+            IF(override_price, override_price, (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = co.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1)) retail_price,
+            IF(discount_percentage, 'percentage', NULL) AS discount_type,
+            IF(discount_percentage, discount_percentage, NULL) AS discount,
+            (SELECT taxfree FROM item WHERE item.id = id_item) taxfree
        FROM co.request co
       WHERE co.id_parent IS NOT NULL";
 $r= $db->query($q) or die("query failed: ". $db->error);
@@ -142,7 +147,7 @@ echo "Loaded ", $db->affected_rows, " transaction lines from incomplete orders.<
 
 # basics
 $q= "INSERT
-       INTO txn (id, number, created, type, person)
+       INTO txn (id, number, created, type, person, tax_rate)
      SELECT id AS id,
             IFNULL(IF(type = 2,
                       SUBSTRING_INDEX(formatted_request_number, '-', -1),
@@ -154,12 +159,14 @@ $q= "INSERT
               WHEN 2 THEN 'vendor'
               WHEN 3 THEN 'internal'
             END AS type,
-            id_item AS person
+            id_item AS person,
+            (SELECT rate FROM co.metatax WHERE id = metataxstate) AS tax_rate
        FROM co.transaction
       WHERE id_parent IS NULL
      ON DUPLICATE KEY
      UPDATE
-            person = VALUES(person)";
+            person = VALUES(person),
+            tax_rate = VALUES(tax_rate)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " transactions.<br>";
 
@@ -189,9 +196,9 @@ echo "Loaded ", $db->affected_rows, " (or so) transaction lines.<br>";
 # figure out discounts
 $q= "UPDATE txn_line, co.transaction tx
         SET retail_price = IF(retail_price, retail_price, override_price),
-            discount_type = IFNULL(discount_type, IF(retail_price && retail_price != override_price, 'absolute', NULL)),
+            discount_type = IFNULL(discount_type, IF(retail_price && retail_price != override_price, 'fixed', NULL)),
             discount = IFNULL(discount, IF(retail_price && retail_price != override_price, override_price, NULL))
-     WHERE txn_line.id = tx.id AND override_price";
+     WHERE txn_line.id = tx.id AND override_price IS NOT NULL";
 
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Updated ", $db->affected_rows, " prices on transaction lines.<br>";

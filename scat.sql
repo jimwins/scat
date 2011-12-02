@@ -125,7 +125,9 @@ CREATE TABLE `txn` (
   `created` datetime NOT NULL,
   `type` enum('internal','vendor','customer') NOT NULL,
   `person` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `tax_rate` decimal(9,3) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `created` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -163,4 +165,4 @@ CREATE TABLE `txn_line` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-05-03  3:28:19
+-- Dump completed on 2011-12-01 20:53:49

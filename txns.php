@@ -22,6 +22,7 @@ if (empty($criteria)) {
   $criteria= join(' AND ', $criteria);
 }
 
+
 ?>
 <form method="get" action="txns.php">
 <select name="type">
@@ -63,7 +64,7 @@ $q= "SELECT
                        WHEN 'relative' THEN (retail_price - discount) 
                        WHEN 'fixed' THEN (discount)
                        ELSE retail_price
-                     END * 1.0975)
+                     END * (1 + tax_rate / 100))
                  AS DECIMAL(9,2)) Total\$dollar,
             CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
                  AS DECIMAL(9,2)) AS Paid\$dollar
