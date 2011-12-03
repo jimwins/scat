@@ -222,9 +222,9 @@ $q= "INSERT IGNORE
               WHEN 6 THEN 'change'
               WHEN 7 THEN 'gift'
             END AS method,
-            payment.amount AS amount,
+            txn.amount AS amount,
             date AS processed
-       FROM co.payment_transaction
+       FROM co.payment_transaction txn
        JOIN co.payment ON (id_payment = payment.id)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " payments.<br>";
