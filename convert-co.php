@@ -113,7 +113,9 @@ $q= "INSERT
               WHEN 3 THEN 'internal'
             END AS type,
             id_item AS person,
-            (SELECT rate FROM co.metatax WHERE id = metataxstate) AS tax_rate
+            IF(has_tax = 't',
+               (SELECT rate FROM co.metatax WHERE id = metataxstate),
+               0) AS tax_rate
        FROM co.request
       WHERE id_parent IS NULL
      ON DUPLICATE KEY
@@ -160,7 +162,9 @@ $q= "INSERT
               WHEN 3 THEN 'internal'
             END AS type,
             id_item AS person,
-            (SELECT rate FROM co.metatax WHERE id = metataxstate) AS tax_rate
+            IF(has_tax = 't',
+               (SELECT rate FROM co.metatax WHERE id = metataxstate),
+               0) AS tax_rate
        FROM co.transaction
       WHERE id_parent IS NULL
      ON DUPLICATE KEY
