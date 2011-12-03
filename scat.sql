@@ -58,7 +58,7 @@ CREATE TABLE `item` (
   `code` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `brand` int(10) unsigned DEFAULT NULL,
-  `retail_price` decimal(9,2) NOT NULL,
+  `retail_price` decimal(9,2) NOT NULL DEFAULT '0.00',
   `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
   `discount` decimal(9,2) DEFAULT NULL,
   `taxfree` tinyint(1) NOT NULL,
