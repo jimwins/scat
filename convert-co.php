@@ -138,7 +138,7 @@ $q= "INSERT
             IF(co.type = 1, -1, 1) * co.quantity AS shipped, 
             0 AS allocated,
             IF(overrides LIKE '%name%', SUBSTRING_INDEX(SUBSTRING_INDEX(overrides, '012(V', -1), '\\\\012p3', 1), NULL) AS override_name,
-            IF(override_price, override_price, (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = co.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1)) retail_price,
+            IFNULL(override_price, (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = co.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1)) retail_price,
             IF(discount_percentage, 'percentage', NULL) AS discount_type,
             IF(discount_percentage, discount_percentage, NULL) AS discount,
             (SELECT taxfree FROM item WHERE item.id = id_item) taxfree
@@ -185,7 +185,7 @@ $q= "INSERT
             0 AS shipped,
             IF(type = 1, -1, 1) * quantity AS allocated,
             IF(overrides LIKE '%004name%', SUBSTRING_INDEX(SUBSTRING_INDEX(overrides, '\\\\000\\\\000\\\\000', -1), 'q\\\\003s', 1), NULL) AS override_name,
-            (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = tx.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1) retail_price,
+            IFNULL(override_price, (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = tx.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1)) retail_price,
             IF(discount_percentage, 'percentage', NULL) AS discount_type,
             IF(discount_percentage, discount_percentage, NULL) AS discount,
             (SELECT taxfree FROM item WHERE item.id = id_item) taxfree
@@ -196,16 +196,6 @@ $q= "INSERT
             allocated = allocated + VALUES(allocated)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " (or so) transaction lines.<br>";
-
-# figure out discounts
-$q= "UPDATE txn_line, co.transaction tx
-        SET retail_price = IF(retail_price, retail_price, override_price),
-            discount_type = IFNULL(discount_type, IF(retail_price && retail_price != override_price, 'fixed', NULL)),
-            discount = IFNULL(discount, IF(retail_price && retail_price != override_price, override_price, NULL))
-     WHERE txn_line.id = tx.id AND override_price IS NOT NULL";
-
-$r= $db->query($q) or die("query failed: ". $db->error);
-echo "Updated ", $db->affected_rows, " prices on transaction lines.<br>";
 
 # payments
 #
