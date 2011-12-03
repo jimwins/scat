@@ -63,8 +63,8 @@ CREATE TABLE `item` (
   `discount` decimal(9,2) DEFAULT NULL,
   `taxfree` tinyint(1) NOT NULL,
   `minimum_quantity` int(10) unsigned NOT NULL,
-  `active` bit(1) DEFAULT NULL,
-  `deleted` bit(1) DEFAULT NULL,
+  `active` tinyint(1) NOT NULL,
+  `deleted` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -106,8 +106,8 @@ CREATE TABLE `person` (
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `tax_id` varchar(255) DEFAULT NULL,
-  `active` bit(1) DEFAULT NULL,
-  `deleted` bit(1) DEFAULT NULL,
+  `active` tinyint(1) NOT NULL,
+  `deleted` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -150,7 +150,7 @@ CREATE TABLE `txn_line` (
   `retail_price` decimal(9,2) NOT NULL,
   `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
   `discount` decimal(9,2) DEFAULT NULL,
-  `taxfree` bit(1) NOT NULL,
+  `taxfree` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`,`line`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -187,4 +187,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-12-01 20:53:49
+-- Dump completed on 2011-12-03  1:09:15
