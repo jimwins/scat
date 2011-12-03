@@ -8,10 +8,10 @@ head("convert");
 # load item basics
 $q= "INSERT INTO item (id, code, name, minimum_quantity, taxfree, active, deleted)
      SELECT id,
-            (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 15 ORDER BY id DESC LIMIT 1) code,
             (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 2 ORDER BY id DESC LIMIT 1) name,
             (SELECT minimum FROM co.stock WHERE id_product = item.id AND stocktype = 1) min,
             IFNULL((SELECT 0 FROM co.tax_group_item WHERE id_item = id),
+            CONCAT(IF(deleted = 't','DEL-',''), IFNULL((SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 15 ORDER BY id DESC LIMIT 1), id)) code,
                    1) taxfree,
             (active = 't') active,
             (deleted = 't') deleted

@@ -23,7 +23,16 @@ if (!$id && $type) {
 
 if (!$id) die("no transaction specified.");
 
-$q= "SELECT
+$q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
+            Ordered, Shipped, Allocated,
+            taxed Taxed\$dollar,
+            untaxed Untaxed\$dollar,
+            CAST(tax_rate AS DECIMAL(9,2)) Tax\$percent,
+            CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
+                 AS DECIMAL(9,2))
+            Total\$dollar,
+            Paid\$dollar
+      FROM (SELECT
             txn.type AS meta,
             CONCAT(txn.id, '|', type, '|', txn.number) AS Number\$txn,
             txn.created AS Created\$date,
@@ -33,23 +42,39 @@ $q= "SELECT
             SUM(ordered) AS Ordered,
             SUM(shipped) AS Shipped,
             SUM(allocated) AS Allocated,
-            CAST(SUM(IF(type = 'customer', -1, 1) * allocated *
-                     CASE discount_type
-                       WHEN 'percentage' THEN retail_price *
-                                              ((100 - discount) / 100)
-                       WHEN 'relative' THEN (retail_price - discount) 
-                       WHEN 'fixed' THEN (discount)
-                       ELSE retail_price
-                     END * (1 + IF(txn_line.taxfree, 0, tax_rate / 100)))
-                 AS DECIMAL(9,2)) Total\$dollar,
+            CAST(ROUND_TO_EVEN(
+              SUM(IF(txn_line.taxfree, 1, 0) *
+                IF(type = 'customer', -1, 1) * allocated *
+                CASE discount_type
+                  WHEN 'percentage' THEN
+                    ROUND_TO_EVEN(retail_price * ((100 - discount) / 100), 2)
+                  WHEN 'relative' THEN (retail_price - discount) 
+                  WHEN 'fixed' THEN (discount)
+                  ELSE retail_price
+                END),
+              2) AS DECIMAL(9,2))
+            untaxed,
+            CAST(ROUND_TO_EVEN(
+              SUM(IF(txn_line.taxfree, 0, 1) *
+                IF(type = 'customer', -1, 1) * allocated *
+                CASE discount_type
+                  WHEN 'percentage' THEN retail_price * ((100 - discount) / 100)
+                  WHEN 'relative' THEN (retail_price - discount) 
+                  WHEN 'fixed' THEN (discount)
+                  ELSE retail_price
+                END),
+              2) AS DECIMAL(9,2))
+            taxed,
+            tax_rate,
             CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
                  AS DECIMAL(9,2)) AS Paid\$dollar
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        LEFT JOIN person ON (txn.person = person.id)
-      WHERE txn.id = $id";
+      WHERE txn.id = $id) t";
 
 dump_table($db->query($q));
+dump_query($q);
 
 switch ($type) {
 case 'vendor';
@@ -106,7 +131,7 @@ $q= "SELECT
             txn_line.retail_price Price\$dollar,
             IF(txn_line.discount_type,
                CASE txn_line.discount_type
-                 WHEN 'percentage' THEN ROUND(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2)
+                 WHEN 'percentage' THEN CAST(ROUND_TO_EVEN(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2) AS DECIMAL(9,2))
                  WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
                  WHEN 'fixed' THEN (txn_line.discount)
                END,

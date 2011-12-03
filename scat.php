@@ -70,6 +70,9 @@ header("content-type: text/html;charset=utf-8");?>
   td.dollar:before {
     content: '$';
   }
+  td.percent:after {
+    content: '%';
+  }
   td.right {
     text-align: right;
   }
