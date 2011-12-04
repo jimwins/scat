@@ -31,7 +31,7 @@ tfoot td {
   font-weight: bold;
   color: #600;
 }
-.discount {
+.code, .discount {
   font-size: smaller;
 }
 </style>
@@ -201,7 +201,7 @@ function addItem(item) {
     desc+= '</div>';
 
     // add the new row
-    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">1</span></td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
+    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">1</span></td><td align="left"><span class="code">' + item.code + '</span></td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
     row.data(item);
     setQuantity(row, item.quantity); // so 'over' class gets set
     row.appendTo('#items tbody');
@@ -320,12 +320,12 @@ $(function() {
  <div class="error"></div>
  <table width="80%">
  <thead>
-  <tr><th></th><th>Qty</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
+  <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
-  <tr><th colspan=3></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
-  <tr><th colspan=3></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="dollar">0.00</td></tr>
-  <tr><th colspan=3></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
+  <tr><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
+  <tr><th colspan=4></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="dollar">0.00</td></tr>
+  <tr><th colspan=4></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
  </tfoot>
  <tbody>
  </tbody>
