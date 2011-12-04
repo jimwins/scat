@@ -233,7 +233,7 @@ function updateTotal() {
 }
 
 $(function() {
-  $('#txn').data('tax_rate', <?=DEFAULT_SALES_TAX?>);
+  $('#txn').data('tax_rate', 0.00);
 
   $(document).keydown(function(event) {
     var el = $.getFocusedElement();
@@ -312,7 +312,7 @@ $(function() {
  </thead>
  <tfoot>
   <tr><th colspan=3></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
-  <tr><th colspan=3></th><th align="right" id="tax_rate">Tax (<span class="val"><?=DEFAULT_SALES_TAX?></span>%):</th><td id="tax" class="dollar">0.00</td></tr>
+  <tr><th colspan=3></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="dollar">0.00</td></tr>
   <tr><th colspan=3></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
  </tfoot>
  <tbody>
