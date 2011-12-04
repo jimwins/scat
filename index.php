@@ -260,27 +260,39 @@ $(function() {
       return false;
     }
 
+    txn= $('#txn').data('txn');
+
     // go find!
     $.ajax({
-      url: "api/item-find.php",
+      url: "api/txn-add-item.php",
       dataType: "json",
-      data: ({ q: q }),
+      data: ({ txn: txn, q: q }),
       success: function(data) {
         if (data.error) {
           snd.no.play();
           $("#items .error").html("<p>" + data.error + "</p>");
           $("#items .error").show();
         } else {
-          if (data.length == 0) {
+          $('#txn').data('txn', data.details.txn);
+          if (data.details.tax_rate) {
+            tax_rate= parseFloat(data.details.tax_rate).toFixed(2);
+            $('#txn').data('tax_rate', tax_rate)
+            prc= $('<span class="val">' + tax_rate +  '</span>');
+            $('#txn #tax_rate .val').replaceWith(prc);
+          }
+          if (data.details.description) {
+            $('#txn #description').text(data.details.description);
+          }
+          if (data.items.length == 0) {
             snd.no.play();
-          } else if (data.length == 1) {
+          } else if (data.items.length == 1) {
             snd.yes.play();
-            addItem(data[0]);
+            addItem(data.items[0]);
           } else {
             snd.maybe.play();
             var choices= $('<div class="choices"/>');
             choices.append('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Skip"></span>');
-            $.each(data, function(i,item) {
+            $.each(data.items, function(i,item) {
               var n= $("<span>" + item.name + "</span>");
               n.click(item, function(event) {
                 addItem(event.data);
@@ -303,7 +315,7 @@ $(function() {
 <input type="submit" value="Find Items">
 </form>
 <div id="txn">
-<h2 id="id">New Sale</h2>
+<h2 id="description">New Sale</h2>
 <div id="items">
  <div class="error"></div>
  <table width="80%">
