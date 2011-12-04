@@ -46,6 +46,16 @@ $.getFocusedElement = function() {
   return $( elem && ( elem.type || elem.href ) ? elem : [] );
 };
 
+// http://stackoverflow.com/a/3109234
+function round_to_even(num, decimalPlaces) {
+  var d = decimalPlaces || 0;
+  var m = Math.pow(10, d);
+  var n = d ? num * m : num;
+  var i = Math.floor(n), f = n - i;
+  var r = (f == 0.5) ? ((i % 2 == 0) ? i : i + 1) : Math.round(n);
+  return d ? r / m : r;
+}
+
 var lastItem;
 
 function setQuantity(row, qty) {
@@ -194,12 +204,15 @@ function updateTotal() {
     total= total + parseFloat($(this).text());
   });
   $('#items #subtotal').text(total.toFixed(2))
-  var tax= total * 0.0975;
+  var tax_rate= $('#txn').data('tax_rate');
+  var tax= round_to_even(total * (tax_rate / 100), 2);
   $('#items #tax').text(tax.toFixed(2))
   $('#items #total').text((total + tax).toFixed(2))
 }
 
 $(function() {
+  $('#txn').data('tax_rate', <?=DEFAULT_SALES_TAX?>);
+
   $(document).keydown(function(event) {
     var el = $.getFocusedElement();
     if (!el.length) {
@@ -267,6 +280,8 @@ $(function() {
 <input type="text" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="<?=htmlspecialchars($q)?>">
 <input type="submit" value="Find Items">
 </form>
+<div id="txn">
+<h2 id="id">New Sale</h2>
 <div id="items">
  <div class="error"></div>
  <table width="80%">
@@ -275,11 +290,12 @@ $(function() {
  </thead>
  <tfoot>
   <tr><th colspan=3></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
-  <tr><th colspan=3></th><th align="right">Tax (9.75%):</th><td id="tax" class="dollar">0.00</td></tr>
+  <tr><th colspan=3></th><th align="right" id="tax_rate">Tax (<span class="val"><?=DEFAULT_SALES_TAX?></span>%):</th><td id="tax" class="dollar">0.00</td></tr>
   <tr><th colspan=3></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
  </tfoot>
  <tbody>
  </tbody>
 </table>
+</div>
 </div>
 <?foot();
