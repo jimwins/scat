@@ -159,6 +159,28 @@ $('.qty').live('dblclick', function() {
   fld.focus().select();
 });
 
+$('#tax_rate').live('dblclick', function() {
+  fld= $('<input type="text" size="2">');
+  fld.val($('#txn').data('tax_rate'));
+
+  fld.bind('keypress blur', function(event) {
+    if (event.type == 'keypress' && event.which != '13') {
+      return true;
+    }
+  
+    tax_rate= parseFloat($(this).val()).toFixed(2);
+    prc= $('<span class="val">' + tax_rate +  '</span>');
+    $('#txn').data('tax_rate', tax_rate);
+    $(this).replaceWith(prc);
+    updateTotal();
+
+    return true;
+  });
+
+  $(this).children('.val').replaceWith(fld);
+  fld.focus().select();
+});
+
 
 function addItem(item) {
   // check for a matching row
