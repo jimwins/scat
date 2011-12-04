@@ -137,11 +137,10 @@ $(document).ready(function()
 </head>
 <body>
 <header>
-<a href="./" title="Home"><img src="./icons/house.png" width="16" height="16" alt="Home"> Home</a>
+<?/*<a href="./" title="New Sale"><img src="./icons/house.png" width="16" height="16" alt="New Sale"> New Sale</a>
+&nbsp;*/?>
+<a href="./" title="New Sale"><img src="./icons/cart.png" width="16" height="16" alt="New Sale"> New Sale</a>
 &nbsp;
-<?/*<a href="#" onclick="return false" title="Cart"><img src="./icons/cart.png" width="16" height="16" alt="Cart"></a>
-&nbsp;
-*/?>
 <a href="./items.php" title="Items"><img src="./icons/tag_blue.png" width="16" height="16" alt="Items"> Items</a>
 &nbsp;
 <a href="./txns.php" title="Transactions"><img src="./icons/table.png" width="16" height="16" alt="Transactions"> Transactions</a>
