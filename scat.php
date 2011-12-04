@@ -17,7 +17,11 @@ header("content-type: text/html;charset=utf-8");?>
 <head>
  <title><?=ashtml($title)?></title>
  <style type="text/css">
-  body { background: #ba9d6c; padding-top: 28px; }
+  body {
+   font-family: "Helvetica Neue", "Helvetica", sans-serif;
+   background: #ba9d6c;
+   padding-top: 28px;
+  }
 
   header {
    width: 100%;
