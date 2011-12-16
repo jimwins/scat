@@ -104,7 +104,7 @@ echo "Flushed transaction lines.<br>";
 # incomplete transactions
 $q= "INSERT
        INTO txn (id, number, created, type, person, tax_rate)
-     SELECT id + 200000 AS id,
+     SELECT id + 300000 AS id,
             IFNULL(number, 0) AS number,
             date AS created,
             CASE type
