@@ -1,0 +1,102 @@
+body {
+ font-family: "Helvetica Neue", "Helvetica", sans-serif;
+ background: #ba9d6c;
+ padding-top: 28px;
+}
+
+header {
+ width: 100%;
+ position: fixed;
+ top: 0;
+ left: 0;
+ padding: 4px 16px;
+ background: #d2c09f;
+ -webkit-box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+}
+header a img {
+ border: none;
+ vertical-align: top;
+}
+header a {
+  text-decoration: none;
+  color: #339;
+}
+header a:hover {
+  text-decoration: underline;
+  color: #c33;
+}
+
+footer {
+  font-size: smaller;
+  text-align: right;
+  color: #666;
+  border-top: 1px solid rgba(0,0,0,0.2);
+  margin-top: 1em;
+}
+footer p {
+  margin-top: 0.5em;
+}
+
+/* prettier tables */
+table { border-collapse:collapse; }
+thead tr { background: rgba(0,0,0,0.2); color: rgba(0,0,0,0.5); }
+tbody tr:nth-child(odd) { background-color:rgba(255,255,255,0.3); }
+tbody tr:nth-child(even) { background-color:rgba(255,255,255,0.2); }
+tbody tr:hover { background:rgba(255,255,255,0.4); }
+th, td { padding:4px 6px; border:2px solid rgba(255,255,255,0.05); }
+td.num {
+  vertical-align:middle;
+  font:small-caps bold x-small sans-serif;
+  text-align: center;
+}
+td.dollar {
+  text-align: right;
+}
+td.dollar:before {
+  content: '$';
+}
+td.percent:after {
+  content: '%';
+}
+td.right {
+  text-align: right;
+}
+
+/* form styling */
+form.rock {
+  border-radius: 10px;
+  -webkit-box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+  background-color: rgba(255,255,255,0.2);
+  padding: 10px 10px;
+}
+
+input[type="text"] {
+  border-radius: 10px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid #cacaca;
+  color: #444;
+  padding: 8px 10px;
+  outline: none;
+}
+input[type="text"]:focus {
+  background: rgba(255,255,255,0.9);
+}
+
+button, input[type="submit"] {
+  border-radius: 10px;
+  background-color: #dedede;
+  background: -webkit-gradient(linear, left top, left bottom,
+                               color-stop(0.0, rgba(255,255,255,0.8)),
+                               color-stop(1.0, rgba(255,255,255,0.3)));
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #484848;
+  font-weight: bold;
+  padding: 8px 10px;
+}
+button:hover, input[type="submit"]:hover {
+  background-color: #dedede;
+  background: -webkit-gradient(linear, left top, left bottom,
+                               color-stop(0.0, rgba(240,240,240,0.8)),
+                               color-stop(1.0, rgba(240,240,240,0.3)));
+  border: 1px solid rgba(240,240,240,0.3);
+}
