@@ -16,9 +16,9 @@ header("content-type: text/html;charset=utf-8");?>
 <html>
 <head>
  <title><?=ashtml($title)?></title>
- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
- <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js"></script>
  <link rel="stylesheet" type="text/css" href="static/screen.css">
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+ <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
  <script>
 $(document).ready(function() 
