@@ -1,25 +1,61 @@
 <?
 require 'scat.php';
+?>
+<?if ($_GET['print']) {?>
+<body onload="window.print()">
+<?}?>
+<style type="text/css">
+body {
+  font:28px Monaco, monospace;
+  text-align:left;
+  color:#000;
+  margin:0;
+  padding:0;
+}
 
-head("transaction");
+header, footer {
+display: none;
+}
+
+#doc_header {
+  margin-bottom: 2em;
+  padding-bottom:1em;
+  border-bottom:2px solid #000;
+  text-align:center;
+}
+#store_name {
+  font-size:2.5em;
+  font-weight:bold;
+  font-family: impact;
+  text-transform: lowercase;
+}
+table#products {font-size:1em; width:100%; margin:2em 0;
+        border-top:2px solid #000; border-bottom:2px solid #000; border-left:0; border-right:0;}
+th {padding:0.2em 0.1em; border-bottom:1px solid #000;}
+.qty {padding:0.2em 0.5em; text-align:right;} /* tr's and th's */
+.price {padding:0.2em 0.1em; white-space:nowrap; text-align:right;}
+.description { font-size: 0.75em; }
+td {padding:0.2em 0.1em; vertical-align:top;}
+tr.sub td {border-top:2px solid #000; border-bottom:2px solid #000;}
+tr.total td {border-top:solid #000 6px; text-align:right; font-weight:;}
+
+#doc_info {text-align:center;}
+#signature {margin:2em 0; padding:5px 0px; text-align:center;}
+#nosignature {margin:2em 0; text-align: center; padding: 5px 0px; }
+#store_footer {margin:2em 0; padding:5px 0px; text-align:center;}
+
+</style>
+<div id="doc_header">
+  <div id="store_name">Raw Materials</div>
+  436 South Main Street<br>
+  Los Angeles, CA 90013<br>
+  (213) 627-7223<br>
+  info@rawmaterialsLA.com<br>
+  http://rawmaterialsLA.com/
+</div>
+<?
 
 $id= (int)$_REQUEST['id'];
-
-$type= $_REQUEST['type'];
-$number= (int)$_REQUEST['number'];
-
-if (!$id && $type) {
-  $q= "SELECT id FROM txn
-        WHERE type = '". $db->real_escape_string($type) ."'
-          AND number = $number";
-  $r= $db->query($q);
-
-  if (!$r->num_rows)
-      die("<h2>No such transaction found.</h2>");
-
-  $row= $r->fetch_row();
-  $id= $row[0];
-}
 
 if (!$id) die("no transaction specified.");
 
@@ -73,95 +109,44 @@ $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
        LEFT JOIN person ON (txn.person = person.id)
       WHERE txn.id = $id) t";
 
-dump_table($db->query($q));
-dump_query($q);
-
-?>
-<button id="receipt">Print Receipt</button>
-<script>
-$("#receipt").live('click', function() {
-  var lpr= $('<iframe id="receipt" src="receipt.php?print=1&amp;id=<?=$id?>"></iframe>').hide();
-  $(this).children("#receipt").remove();
-  $(this).append(lpr);
-});
-</script>
-<?
-
-switch ($type) {
-case 'vendor';
-?>
-<script>
-$.expr[":"].match = function(obj, index, meta, stack){
-  return (obj.textContent || obj.innerText || $(obj).text() || "") == meta[3];
-}
-$(function() {
-  $('#receive #search').focus()
-  $('#receive .submit').click(function() {
-    $('#receive .error').hide(); // hide old error messages
-    var q = $("#receive #search").val();
-    $.ajax({
-      url: "txn-item-receive.php",
-      dataType: "json",
-      data: ({ type: "<?=$type?>", number: "<?=$number?>", search: q }),
-      success: function(data) {
-        if (data.error) {
-          $("#receive .error").html("<p>" + data.error + "</p>");
-          $("#receive .error").show();
-        } else {
-          // update table
-          var row= $(".sortable td.num:match(" + data.line + ")").parent()
-          $(row).children(":eq(6)").text(data.ordered)
-          $(row).children(":eq(7)").text(data.shipped)
-          $(row).children(":eq(8)").text(data.allocated)
-          $("#receive #search").val("");
-        }
-      }
-    });
-    return false;
-  });
-});
-</script>
-<form id="receive" action="txn-item-receive.php" method="post">
- <div class="error" style="display: none"></div>
- <input id="type" type="hidden" name="type" value="<?=ashtml($type)?>">
- <input id="number" type="hidden" name="number" value="<?=ashtml($number)?>">
- <input id="search" type="text" name="search">
- <input class="submit" type="submit" name="Receive">
-</form>
-<?
-  break;
-}
-
-
-$type= $db->real_escape_string($type);
+#dump_table($db->query($q));
 
 $q= "SELECT
-            line AS `#\$num`,
-            item.code Code\$item,
+            ABS(allocated) AS Qty,
             IFNULL(override_name, item.name) Name,
-            txn_line.retail_price Price\$dollar,
             IF(txn_line.discount_type,
                CASE txn_line.discount_type
                  WHEN 'percentage' THEN CAST(ROUND_TO_EVEN(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2) AS DECIMAL(9,2))
                  WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
                  WHEN 'fixed' THEN (txn_line.discount)
                END,
-               NULL) Sale\$dollar,
-            CASE txn_line.discount_type
-              WHEN 'percentage' THEN CONCAT(ROUND(txn_line.discount), '% off')
-              WHEN 'relative' THEN CONCAT('$', txn_line.discount, ' off')
-            END Discount,
-            ordered as Ordered,
-            shipped as Shipped,
-            allocated as Allocated
+               txn_line.retail_price) * ABS(allocated) Price
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        JOIN item ON (txn_line.item = item.id)
       WHERE txn.id = $id
       ORDER BY line ASC";
 
-dump_table($db->query($q));
-dump_query($q);
+$r= $db->query($q);
+
+?>
+<table id="products" cellspacing="0" cellpadding="0">
+ <thead>
+  <tr><th class="qty">QTY</th><th class="left">PRODUCT</th><th class="price">PRICE</th></tr>
+ </thead>
+ <tbody>
+<?
+while ($row= $r->fetch_assoc()) {
+  echo '<tr>',
+       '<td class="qty">', $row['Qty'], '</td>',
+       '<td class="left">', $row['Name'], '</td>',
+       '<td class="price">', $row['Price'], '</td>',
+       "</tr>\n";
+}
+?>
+ </tbody>
+</table>
+<?
 
 if ($type == 'customer') {
   echo '<h2>Payments</h2>';
@@ -174,17 +159,10 @@ if ($type == 'customer') {
   dump_table($db->query($q));
   dump_query($q);
 }
-
-switch ($type) {
-case 'vendor';
 ?>
-<form enctype="multipart/form-data" action="txn-load-mac.php" method="post">
- <input type="hidden" name="type" value="<?=ashtml($type)?>">
- <input type="hidden" name="number" value="<?=ashtml($number)?>">
- <input type="file" name="src">
- <br>
- <input type="submit" name="Import from MacPhersons">
-</form>
-<?
-  break;
-}
+<div id="store_footer">
+Items purchased from stock may be returned in original condition and packaging
+within 30 days with receipt. No returns without original receipt.
+<br><br>
+http://rawmaterialsLA.com/
+</div>
