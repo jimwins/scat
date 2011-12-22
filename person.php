@@ -4,6 +4,42 @@ require 'scat.php';
 head("person");
 
 $id= (int)$_REQUEST['id'];
+$search= $_REQUEST['search'];
+
+?>
+<form method="get" action="person.php">
+<input id="focus" type="text" name="search" value="<?=ashtml($search)?>">
+<input type="submit" value="Find People">
+</form>
+<br>
+<?
+
+if (!empty($search)) {
+  $search= $db->real_escape_string($search);
+
+  $q= "SELECT IF(deleted, 'deleted', '') AS meta,
+              CONCAT(id, '|', IFNULL(company,''),
+                     '|', IFNULL(name,''))
+                AS Person\$person
+         FROM person
+        WHERE name like '%$search%' OR company LIKE '%$search%'
+        ORDER BY company, name";
+
+  $r= $db->query($q)
+    or die($db->error);
+
+  if ($r->num_rows > 1) {
+    dump_table($r);
+  } else {
+    $person= $r->fetch_assoc();
+    $id= (int)$person['Person$person'];
+  }
+}
+
+if (!$id) {
+  foot();
+  exit;
+}
 
 $q= "SELECT name,
             company,

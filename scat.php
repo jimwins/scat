@@ -37,6 +37,8 @@ $(document).ready(function()
 &nbsp;
 <a href="./items.php" title="Items"><img src="./icons/tag_blue.png" width="16" height="16" alt="Items"> Items</a>
 &nbsp;
+<a href="./person.php" title="People"><img src="./icons/group.png" width="16" height="16" alt="People"> People</a>
+&nbsp;
 <a href="./txns.php" title="Transactions"><img src="./icons/table.png" width="16" height="16" alt="Transactions"> Transactions</a>
 &nbsp;
 <a href="#" onclick="return false" title="Reports"><img src="./icons/report.png" width="16" height="16" alt="Reports"> Reports</a>
