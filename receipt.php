@@ -78,7 +78,9 @@ $q= "SELECT meta, Number\$txn,
             CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
                  AS DECIMAL(9,2))
             Total,
-            Paid\$dollar
+            CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
+                 AS DECIMAL(9,2)) - Paid
+            Due
       FROM (SELECT
             txn.type AS meta,
             txn.number,
@@ -115,7 +117,7 @@ $q= "SELECT meta, Number\$txn,
             taxed,
             tax_rate,
             CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
-                 AS DECIMAL(9,2)) AS Paid\$dollar
+                 AS DECIMAL(9,2)) AS Paid
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        LEFT JOIN person ON (txn.person = person.id)
@@ -127,6 +129,18 @@ $details= $r->fetch_assoc();
 $q= "SELECT
             ABS(allocated) AS Qty,
             IFNULL(override_name, item.name) Name,
+            IF(item.discount_type,
+               CASE item.discount_type
+                 WHEN 'percentage' THEN
+                   CONCAT('MSRP $', item.retail_price, ' / ',
+                          'Sale: ', ROUND(item.discount, 0), '%')
+                 WHEN 'relative' THEN
+                   CONCAT('MSRP $', item.retail_price, ' / ',
+                          'Sale: $', item.discount, ' off')
+                 WHEN 'fixed' THEN
+                   CONCAT('MSRP $', item.retail_price)
+               END,
+               '') Description,
             IF(txn_line.discount_type,
                CASE txn_line.discount_type
                  WHEN 'percentage' THEN CAST(ROUND_TO_EVEN(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2) AS DECIMAL(9,2))
@@ -152,7 +166,9 @@ $r= $db->query($q);
 while ($row= $r->fetch_assoc()) {
   echo '<tr>',
        '<td class="qty">', $row['Qty'], '</td>',
-       '<td class="left">', $row['Name'], '</td>',
+       '<td class="left">', $row['Name'],
+       ($row['Description'] ? ('<div class="description">' . $row['Description'] . '</div>') : ''),
+       '</td>',
        '<td class="price">', amount($row['Price']), '</td>',
        "</tr>\n";
 }
@@ -169,22 +185,44 @@ while ($row= $r->fetch_assoc()) {
    <td class="right" colspan="2">Total:</td>
    <td class="price"><?=amount($details['Total'])?></td>
   </tr>
- </tbody>
-</table>
 <?
+$q= "SELECT processed AS Date,
+            method AS Method,
+            amount AS Amount
+       FROM payment
+      WHERE txn = $id
+      ORDER BY processed ASC";
+$r= $db->query($q);
 
-if ($type == 'customer') {
-  echo '<h2>Payments</h2>';
-  $q= "SELECT processed AS Date,
-              method AS Method,
-              amount AS Amount\$dollar
-         FROM payment
-        WHERE txn = $id
-        ORDER BY processed ASC";
-  dump_table($db->query($q));
-  dump_query($q);
+$methods= array(
+  'cash' => 'Cash',
+  'change' => 'Change',
+  'credit' => 'Credit Card',
+  'gift' => 'Gift Card',
+  'check' => 'Check',
+  'discount' => 'Discount',
+);
+
+if ($r->num_rows) {
+  while ($payment= $r->fetch_assoc()) {
+    echo '<tr>',
+         '<td class="right" colspan="2">',
+         $methods[$payment['Method']],
+         ':</td>',
+         '<td class="price">',
+         amount($payment['Amount']),
+         "</td></tr>\n";
+  }
+?>
+  <tr class="total">
+   <td class="right" colspan="2">Total Due:</td>
+   <td class="price"><?=amount($details['Due'])?></td>
+  </tr>
+<?
 }
 ?>
+ </tbody>
+</table>
 <div id="doc_info">
   Invoice <?=ashtml($details['FormattedNumber'])?>
   <br>

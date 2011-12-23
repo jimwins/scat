@@ -167,7 +167,7 @@ function ashtml($t) {
 }
 
 function amount($d) {
-  return ($d < 0 ? '(' : '') . '$' . abs($d) . ($d < 0 ? '(' : '');
+  return ($d < 0 ? '(' : '') . '$' . sprintf("%.2f", abs($d)) . ($d < 0 ? ')' : '');
 }
 
 function dump_query($q) {
