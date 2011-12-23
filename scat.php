@@ -166,6 +166,10 @@ function ashtml($t) {
   return htmlspecialchars($t);
 }
 
+function amount($d) {
+  return ($d < 0 ? '(' : '') . '$' . abs($d) . ($d < 0 ? '(' : '');
+}
+
 function dump_query($q) {
   static $num;
   $num+= 1;

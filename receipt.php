@@ -14,7 +14,14 @@ body {
 }
 
 header, footer {
-display: none;
+  display: none;
+}
+
+.right {
+  text-align: right;
+}
+.left {
+  text-align: left;
 }
 
 #doc_header {
@@ -59,22 +66,27 @@ $id= (int)$_REQUEST['id'];
 
 if (!$id) die("no transaction specified.");
 
-$q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
+$q= "SELECT meta, Number\$txn,
+            DATE_FORMAT(Created\$date, '%b %e, %Y %l:%i %PM') Created,
+            CONCAT(DATE_FORMAT(Created\$date, '%Y-'), number) FormattedNumber,
+            Person\$person,
             Ordered, Shipped, Allocated,
-            taxed Taxed\$dollar,
-            untaxed Untaxed\$dollar,
-            CAST(tax_rate AS DECIMAL(9,2)) Tax\$percent,
+            (taxed + untaxed) Subtotal,
+            CAST(tax_rate AS DECIMAL(9,2)) tax_rate,
+            CAST(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)
+                 AS DECIMAL(9,2)) Tax,
             CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
                  AS DECIMAL(9,2))
-            Total\$dollar,
+            Total,
             Paid\$dollar
       FROM (SELECT
             txn.type AS meta,
+            txn.number,
             CONCAT(txn.id, '|', type, '|', txn.number) AS Number\$txn,
             txn.created AS Created\$date,
-              CONCAT(txn.person, '|', IFNULL(person.company,''),
-                     '|', IFNULL(person.name,''))
-                AS Person\$person,
+            CONCAT(txn.person, '|', IFNULL(person.company,''),
+                   '|', IFNULL(person.name,''))
+              AS Person\$person,
             SUM(ordered) AS Ordered,
             SUM(shipped) AS Shipped,
             SUM(allocated) AS Allocated,
@@ -109,7 +121,8 @@ $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
        LEFT JOIN person ON (txn.person = person.id)
       WHERE txn.id = $id) t";
 
-#dump_table($db->query($q));
+$r= $db->query($q);
+$details= $r->fetch_assoc();
 
 $q= "SELECT
             ABS(allocated) AS Qty,
@@ -140,10 +153,22 @@ while ($row= $r->fetch_assoc()) {
   echo '<tr>',
        '<td class="qty">', $row['Qty'], '</td>',
        '<td class="left">', $row['Name'], '</td>',
-       '<td class="price">', $row['Price'], '</td>',
+       '<td class="price">', amount($row['Price']), '</td>',
        "</tr>\n";
 }
 ?>
+  <tr class="sub">
+   <td class="right" colspan="2">Subtotal:</td>
+   <td class="price"><?=amount($details['Subtotal'])?></td>
+  </tr>
+  <tr>
+   <td class="right" colspan="2">Sales (<?=$details['tax_rate']?>%):</td>
+   <td class="price"><?=amount($details['Tax'])?></td>
+  </tr>
+  <tr class="total">
+   <td class="right" colspan="2">Total:</td>
+   <td class="price"><?=amount($details['Total'])?></td>
+  </tr>
  </tbody>
 </table>
 <?
@@ -160,6 +185,11 @@ if ($type == 'customer') {
   dump_query($q);
 }
 ?>
+<div id="doc_info">
+  Invoice <?=ashtml($details['FormattedNumber'])?>
+  <br>
+  <?=ashtml($details['Created'])?>
+</div>
 <div id="store_footer">
 Items purchased from stock may be returned in original condition and packaging
 within 30 days with receipt. No returns without original receipt.
