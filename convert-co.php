@@ -1,8 +1,33 @@
 <?php
 require 'scat.php';
 
-head("convert");
+if (!$_REQUEST['go']) {
+  head("convert");
+?>
+<script>
+$('#go').live('click', function() {
+  $('#go').attr('disabled', true);
+  var label= $('#go').text();
+  $('#go').text('Converting....');
+  $.getJSON("convert-co.php?callback=?",
+            { go: true },
+            function (data) {
+              $('#result').text('');
+              $('#result').append(data.result);
+              $('#result').slideDown();
+              $('#go').text(label);
+              $('#go').attr('disabled', false);
+            });
+});
+</script>
+<button id="go">Convert Checkout Data</button>
+<div id="result" style="display:none"></div>
+<?
+  foot();
+  exit;
+}
 
+ob_start();
 # ITEMS
 #
 # load item basics
@@ -220,3 +245,8 @@ $q= "INSERT IGNORE
        JOIN co.payment ON (id_payment = payment.id)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " payments.<br>";
+
+$out= ob_get_contents();
+ob_end_clean();
+
+echo generate_jsonp(array("result" => $out));
