@@ -87,52 +87,6 @@ $("#receipt").live('click', function() {
 </script>
 <?
 
-switch ($type) {
-case 'vendor';
-?>
-<script>
-$.expr[":"].match = function(obj, index, meta, stack){
-  return (obj.textContent || obj.innerText || $(obj).text() || "") == meta[3];
-}
-$(function() {
-  $('#receive #search').focus()
-  $('#receive .submit').click(function() {
-    $('#receive .error').hide(); // hide old error messages
-    var q = $("#receive #search").val();
-    $.ajax({
-      url: "txn-item-receive.php",
-      dataType: "json",
-      data: ({ type: "<?=$type?>", number: "<?=$number?>", search: q }),
-      success: function(data) {
-        if (data.error) {
-          $("#receive .error").html("<p>" + data.error + "</p>");
-          $("#receive .error").show();
-        } else {
-          // update table
-          var row= $(".sortable td.num:match(" + data.line + ")").parent()
-          $(row).children(":eq(6)").text(data.ordered)
-          $(row).children(":eq(7)").text(data.shipped)
-          $(row).children(":eq(8)").text(data.allocated)
-          $("#receive #search").val("");
-        }
-      }
-    });
-    return false;
-  });
-});
-</script>
-<form id="receive" action="txn-item-receive.php" method="post">
- <div class="error" style="display: none"></div>
- <input id="type" type="hidden" name="type" value="<?=ashtml($type)?>">
- <input id="number" type="hidden" name="number" value="<?=ashtml($number)?>">
- <input id="search" type="text" name="search">
- <input class="submit" type="submit" name="Receive">
-</form>
-<?
-  break;
-}
-
-
 $type= $db->real_escape_string($type);
 
 $q= "SELECT
@@ -173,18 +127,4 @@ if ($type == 'customer') {
         ORDER BY processed ASC";
   dump_table($db->query($q));
   dump_query($q);
-}
-
-switch ($type) {
-case 'vendor';
-?>
-<form enctype="multipart/form-data" action="txn-load-mac.php" method="post">
- <input type="hidden" name="type" value="<?=ashtml($type)?>">
- <input type="hidden" name="number" value="<?=ashtml($number)?>">
- <input type="file" name="src">
- <br>
- <input type="submit" name="Import from MacPhersons">
-</form>
-<?
-  break;
 }
