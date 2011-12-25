@@ -50,16 +50,19 @@ $page= (int)$_REQUEST['page'];
 $per_page= 50;
 $start= $page * $per_page;
 
-$q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
+$q= "SELECT meta, Number\$txn,
+            Created\$date, Filled\$date,
+            Person\$person,
             Ordered, Allocated,
             CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
                  AS DECIMAL(9,2))
             Total\$dollar,
-            Paid\$dollar
+            Paid\$dollar, Paid\$date
       FROM (SELECT
             txn.type AS meta,
             CONCAT(txn.id, '|', type, '|', txn.number) AS Number\$txn,
             txn.created AS Created\$date,
+            txn.filled AS Filled\$date,
             CONCAT(txn.person, '|', IFNULL(person.company,''),
                    '|', IFNULL(person.name,''))
               AS Person\$person,
@@ -89,7 +92,8 @@ $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
             taxed,
             tax_rate,
             CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
-                 AS DECIMAL(9,2)) AS Paid\$dollar
+                 AS DECIMAL(9,2)) AS Paid\$dollar,
+            txn.paid AS Paid\$date
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        LEFT JOIN person ON (txn.person = person.id)

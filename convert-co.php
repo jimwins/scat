@@ -175,13 +175,14 @@ echo "Loaded ", $db->affected_rows, " transaction lines from incomplete orders.<
 
 # basics
 $q= "INSERT
-       INTO txn (id, number, created, type, person, tax_rate)
+       INTO txn (id, number, created, filled, type, person, tax_rate)
      SELECT id AS id,
             IFNULL(IF(type = 2,
                       SUBSTRING_INDEX(formatted_request_number, '-', -1),
                       number),
                    0) AS number,
             date_request AS created,
+            date AS filled,
             CASE type
               WHEN 1 THEN 'customer'
               WHEN 2 THEN 'vendor'
@@ -195,6 +196,8 @@ $q= "INSERT
       WHERE id_parent IS NULL
      ON DUPLICATE KEY
      UPDATE
+            created = VALUES(created),
+            filled = VALUES(filled),
             person = VALUES(person),
             tax_rate = VALUES(tax_rate)";
 $r= $db->query($q) or die("query failed: ". $db->error);

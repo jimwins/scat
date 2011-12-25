@@ -123,6 +123,8 @@ CREATE TABLE `txn` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `number` int(10) unsigned NOT NULL,
   `created` datetime NOT NULL,
+  `filled` datetime DEFAULT NULL,
+  `paid` datetime DEFAULT NULL,
   `type` enum('internal','vendor','customer') NOT NULL,
   `person` int(10) unsigned DEFAULT NULL,
   `tax_rate` decimal(9,3) NOT NULL,
@@ -186,4 +188,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-12-24 22:05:37
+-- Dump completed on 2011-12-24 22:44:12
