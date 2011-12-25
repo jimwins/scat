@@ -101,10 +101,12 @@ $q= "TRUNCATE txn_line";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Flushed transaction lines.<br>";
 
+$order_offset= 300000;
+
 # incomplete transactions
 $q= "INSERT
        INTO txn (id, number, created, type, person, tax_rate)
-     SELECT id + 300000 AS id,
+     SELECT id + $order_offset AS id,
             IFNULL(number, 0) AS number,
             date AS created,
             CASE type
@@ -130,8 +132,8 @@ echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
 # needs the id offset to avoid collisions
 $q= "INSERT
        INTO txn_line (id, txn, line, item, ordered, shipped, allocated, override_name, retail_price, discount_type, discount, taxfree)
-     SELECT co.id + 200000 AS id,
-            co.id_parent + 200000 AS txn,
+     SELECT co.id + $order_offset AS id,
+            co.id_parent + $order_offset AS txn,
             IFNULL(co.in_parent_index, 0) AS line,
             co.id_item AS item,
             IF(co.type = 1, -1, 1) * co.quantity AS ordered,
