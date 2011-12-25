@@ -70,7 +70,7 @@ $q= "SELECT meta, Number\$txn,
             DATE_FORMAT(Created\$date, '%b %e, %Y %l:%i %PM') Created,
             CONCAT(DATE_FORMAT(Created\$date, '%Y-'), number) FormattedNumber,
             Person\$person,
-            Ordered, Shipped, Allocated,
+            Ordered, Allocated,
             (taxed + untaxed) Subtotal,
             CAST(tax_rate AS DECIMAL(9,2)) tax_rate,
             CAST(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)
@@ -89,8 +89,8 @@ $q= "SELECT meta, Number\$txn,
             CONCAT(txn.person, '|', IFNULL(person.company,''),
                    '|', IFNULL(person.name,''))
               AS Person\$person,
-            SUM(ordered) AS Ordered,
-            SUM(allocated) AS Allocated,
+            SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS Ordered,
+            SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS Allocated,
             CAST(ROUND_TO_EVEN(
               SUM(IF(txn_line.taxfree, 1, 0) *
                 IF(type = 'customer', -1, 1) * allocated *
