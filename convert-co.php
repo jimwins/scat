@@ -156,13 +156,12 @@ echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
 #
 # needs the id offset to avoid collisions
 $q= "INSERT
-       INTO txn_line (id, txn, line, item, ordered, shipped, allocated, override_name, retail_price, discount_type, discount, taxfree)
+       INTO txn_line (id, txn, line, item, ordered, allocated, override_name, retail_price, discount_type, discount, taxfree)
      SELECT co.id + $order_offset AS id,
             co.id_parent + $order_offset AS txn,
             IFNULL(co.in_parent_index, 0) AS line,
             co.id_item AS item,
             IF(co.type = 1, -1, 1) * co.quantity AS ordered,
-            IF(co.type = 1, -1, 1) * co.quantity AS shipped, 
             0 AS allocated,
             IF(overrides LIKE '%name%', SUBSTRING_INDEX(SUBSTRING_INDEX(overrides, '012(V', -1), '\\\\012p3', 1), NULL) AS override_name,
             IFNULL(override_price, (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = co.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1)) retail_price,
@@ -203,13 +202,12 @@ echo "Loaded ", $db->affected_rows, " transactions.<br>";
 
 # lines from transactions
 $q= "INSERT
-       INTO txn_line (id, txn, line, item, ordered, shipped, allocated, override_name, retail_price, discount_type, discount, taxfree)
+       INTO txn_line (id, txn, line, item, ordered, allocated, override_name, retail_price, discount_type, discount, taxfree)
      SELECT id AS id,
             id_parent AS txn,
             IFNULL(in_parent_index, 0) AS line,
             id_item AS item,
             IF(type = 1, -1, 1) * quantity AS ordered,
-            0 AS shipped,
             IF(type = 1, -1, 1) * quantity AS allocated,
             IF(overrides LIKE '%004name%', SUBSTRING_INDEX(SUBSTRING_INDEX(overrides, '\\\\000\\\\000\\\\000', -1), 'q\\\\003s', 1), NULL) AS override_name,
             IFNULL(override_price, (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = tx.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1)) retail_price,

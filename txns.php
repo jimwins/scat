@@ -51,7 +51,7 @@ $per_page= 50;
 $start= $page * $per_page;
 
 $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
-            Ordered, Shipped, Allocated,
+            Ordered, Allocated,
             CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
                  AS DECIMAL(9,2))
             Total\$dollar,
@@ -64,7 +64,6 @@ $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
                    '|', IFNULL(person.name,''))
               AS Person\$person,
             SUM(ordered) AS Ordered,
-            SUM(shipped) AS Shipped,
             SUM(allocated) AS Allocated,
             CAST(ROUND_TO_EVEN(
               SUM(IF(txn_line.taxfree, 1, 0) *

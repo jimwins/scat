@@ -24,7 +24,7 @@ if (!$id && $type) {
 if (!$id) die("no transaction specified.");
 
 $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
-            Ordered, Shipped, Allocated,
+            Ordered, Allocated,
             taxed Taxed\$dollar,
             untaxed Untaxed\$dollar,
             CAST(tax_rate AS DECIMAL(9,2)) Tax\$percent,
@@ -40,7 +40,6 @@ $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
                      '|', IFNULL(person.name,''))
                 AS Person\$person,
             SUM(ordered) AS Ordered,
-            SUM(shipped) AS Shipped,
             SUM(allocated) AS Allocated,
             CAST(ROUND_TO_EVEN(
               SUM(IF(txn_line.taxfree, 1, 0) *

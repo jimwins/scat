@@ -144,7 +144,6 @@ CREATE TABLE `txn_line` (
   `line` int(10) unsigned NOT NULL,
   `item` int(10) unsigned DEFAULT NULL,
   `ordered` int(11) NOT NULL,
-  `shipped` int(11) NOT NULL,
   `allocated` int(11) NOT NULL,
   `override_name` varchar(255) DEFAULT NULL,
   `retail_price` decimal(9,2) NOT NULL,
@@ -187,4 +186,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-12-03  1:09:15
+-- Dump completed on 2011-12-24 22:05:37
