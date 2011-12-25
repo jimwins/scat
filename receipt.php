@@ -90,7 +90,6 @@ $q= "SELECT meta, Number\$txn,
                    '|', IFNULL(person.name,''))
               AS Person\$person,
             SUM(ordered) AS Ordered,
-            SUM(shipped) AS Shipped,
             SUM(allocated) AS Allocated,
             CAST(ROUND_TO_EVEN(
               SUM(IF(txn_line.taxfree, 1, 0) *
