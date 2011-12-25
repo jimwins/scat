@@ -159,6 +159,16 @@ function expand_field($data, $class) {
     return '<a href="item.php?code='.ashtml($data).'">'.ashtml($data).'</a>';
   case '$dollar':
     return amount($data);
+  case '$payment':
+    $desc= array('cash' => 'Cash',
+                 'change' => 'Change',
+                 'credit' => 'Credit Card',
+                 'gift' => 'Gift Card',
+                 'check' => 'Check',
+                 'discount' => 'Discount',
+                 'dwolla' => 'Dwolla',
+                 );
+    return $desc[$data];
   default:
     return ashtml($data);
   }
