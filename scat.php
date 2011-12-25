@@ -95,6 +95,10 @@ $db->set_charset('utf8');
 
 function dump_table($r, $calc = false) {
   $c= $meta= $line= 0;
+  if (!$r) {
+    echo 'Query failed: ', ashtml($GLOBALS['db']->error), '<br>';
+    return;
+  }
   if (!$r->num_rows) {
     echo 'No results.';
     return;
