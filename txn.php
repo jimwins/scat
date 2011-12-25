@@ -73,7 +73,13 @@ $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
        LEFT JOIN person ON (txn.person = person.id)
       WHERE txn.id = $id) t";
 
-dump_table($db->query($q));
+$r= $db->query($q)
+  or die($db->error);
+
+$txn= $r->fetch_assoc();
+
+$r->data_seek(0);
+dump_table($r);
 dump_query($q);
 
 ?>
@@ -117,10 +123,10 @@ $q= "SELECT
 dump_table($db->query($q));
 dump_query($q);
 
-if ($type == 'customer') {
+if (preg_match('/customer/', $txn['Number$txn'])) {
   echo '<h2>Payments</h2>';
   $q= "SELECT processed AS Date,
-              method AS Method,
+              method AS Method\$payment,
               amount AS Amount\$dollar
          FROM payment
         WHERE txn = $id
