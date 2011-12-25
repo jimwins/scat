@@ -22,6 +22,7 @@ if (empty($criteria)) {
   $criteria= join(' AND ', $criteria);
 }
 
+$page= (int)$_REQUEST['page'];
 
 ?>
 <form method="get" action="txns.php">
@@ -46,6 +47,8 @@ if (empty($criteria)) {
 </form>
 <br>
 <?
+$per_page= 50;
+$start= $page * $per_page;
 
 $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
             Ordered, Shipped, Allocated,
@@ -94,9 +97,17 @@ $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
       WHERE $criteria
       GROUP BY txn.id
       ORDER BY created DESC
-      LIMIT 50) t";
+      LIMIT $start, $per_page) t";
 
 dump_table($db->query($q));
+
+# XXX preserve options
+if ($page) {
+  echo '<a href="txns.php?page=', $page - 1, '">&laquo; Previous</a>';
+}
+echo ' &mdash; <a href="txns.php?page=', $page + 1, '">Next &raquo;</a>';
+
+echo '<br>';
 dump_query($q);
 
 foot();
