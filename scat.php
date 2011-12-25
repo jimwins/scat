@@ -157,6 +157,8 @@ function expand_field($data, $class) {
     return '<a href="person.php?id='.ashtml($id).'">'.ashtml($company).($name&&$company?" (":"").ashtml($name).($name&&$company?")":"").'</a>';
   case '$item':
     return '<a href="item.php?code='.ashtml($data).'">'.ashtml($data).'</a>';
+  case '$dollar':
+    return amount($data);
   default:
     return ashtml($data);
   }

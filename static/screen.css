@@ -52,9 +52,6 @@ td.num {
 td.dollar {
   text-align: right;
 }
-td.dollar:before {
-  content: '$';
-}
 td.percent:after {
   content: '%';
 }
