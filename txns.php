@@ -63,8 +63,8 @@ $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
             CONCAT(txn.person, '|', IFNULL(person.company,''),
                    '|', IFNULL(person.name,''))
               AS Person\$person,
-            SUM(ordered) AS Ordered,
-            SUM(allocated) AS Allocated,
+            SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS Ordered,
+            SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS Allocated,
             CAST(ROUND_TO_EVEN(
               SUM(IF(txn_line.taxfree, 1, 0) *
                 IF(type = 'customer', -1, 1) * allocated *

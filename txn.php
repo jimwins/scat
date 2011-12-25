@@ -39,8 +39,8 @@ $q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
               CONCAT(txn.person, '|', IFNULL(person.company,''),
                      '|', IFNULL(person.name,''))
                 AS Person\$person,
-            SUM(ordered) AS Ordered,
-            SUM(allocated) AS Allocated,
+            SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS Ordered,
+            SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS Allocated,
             CAST(ROUND_TO_EVEN(
               SUM(IF(txn_line.taxfree, 1, 0) *
                 IF(type = 'customer', -1, 1) * allocated *
@@ -110,9 +110,8 @@ $q= "SELECT
               WHEN 'percentage' THEN CONCAT(ROUND(txn_line.discount), '% off')
               WHEN 'relative' THEN CONCAT('$', txn_line.discount, ' off')
             END Discount,
-            ordered as Ordered,
-            shipped as Shipped,
-            allocated as Allocated
+            ordered * IF(txn.type = 'customer', -1, 1) as Ordered,
+            allocated * IF(txn.type = 'customer', -1, 1) as Allocated
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        JOIN item ON (txn_line.item = item.id)
