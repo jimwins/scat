@@ -3,9 +3,11 @@ include '../scat.php';
 
 $details= array();
 
+$id= (int)$_REQUEST['id'];
+
 $search= $_REQUEST['q'];
-# XXX should fail with json
-if (!$search) die('no query specified');
+
+if (!$search && !$id) die_jsonp('no query specified');
 
 $details['txn']= $_REQUEST['txn'];
 if (!$details['txn']) {
@@ -77,19 +79,25 @@ if (!$details['txn']) {
   }
 }
 
-$terms= preg_split('/\s+/', $search);
 $criteria= array();
-foreach ($terms as $term) {
-  $term= $db->real_escape_string($term);
-  if (preg_match('/^code:(.+)/i', $term, $dbt)) {
-    $criteria[]= "(item.code LIKE '{$dbt[1]}%')";
-  } else {
-    $criteria[]= "(item.name LIKE '%$term%'
-               OR brand.name LIKE '%$term%'
-               OR item.code LIKE '%$term%'
-               OR barcode.code LIKE '%$term%')";
+
+if ($search) {
+  $terms= preg_split('/\s+/', $search);
+  foreach ($terms as $term) {
+    $term= $db->real_escape_string($term);
+    if (preg_match('/^code:(.+)/i', $term, $dbt)) {
+      $criteria[]= "(item.code LIKE '{$dbt[1]}%')";
+    } else {
+      $criteria[]= "(item.name LIKE '%$term%'
+                 OR brand.name LIKE '%$term%'
+                 OR item.code LIKE '%$term%'
+                 OR barcode.code LIKE '%$term%')";
+    }
   }
+} else {
+  $criteria[]= "(item.id = $id)";
 }
+
 # allow option to include inactive and/or deleted
 if (!$_REQUEST['all']) {
   $criteria[]= "(active AND NOT deleted)";

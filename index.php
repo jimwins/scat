@@ -181,8 +181,39 @@ $('#tax_rate').live('dblclick', function() {
   fld.focus().select();
 });
 
-
 function addItem(item) {
+  $.ajax({
+    url: "api/txn-add-item.php",
+    dataType: "json",
+    data: ({ txn: txn, id: item.id }),
+    success: function(data) {
+      if (data.error) {
+        snd.no.play();
+        $("#items .error").html("<p>" + data.error + "</p>");
+        $("#items .error").show();
+      } else {
+        $('#txn').data('txn', data.details.txn);
+        if (data.details.tax_rate) {
+          tax_rate= parseFloat(data.details.tax_rate).toFixed(2);
+          $('#txn').data('tax_rate', tax_rate)
+          prc= $('<span class="val">' + tax_rate +  '</span>');
+          $('#txn #tax_rate .val').replaceWith(prc);
+        }
+        if (data.details.description) {
+          $('#txn #description').text(data.details.description);
+        }
+        if (data.items.length == 1) {
+          snd.yes.play();
+          addNewItem(data.items[0]);
+        } else {
+          snd.no.play();
+        }
+      }
+    }
+  });
+}
+
+function addNewItem(item) {
   // check for a matching row
   var row= $("#items tbody tr").filter(function(index) { return $(this).data('code') == item.code; });
 
@@ -287,7 +318,7 @@ $(function() {
             snd.no.play();
           } else if (data.items.length == 1) {
             snd.yes.play();
-            addItem(data.items[0]);
+            addNewItem(data.items[0]);
           } else {
             snd.maybe.play();
             var choices= $('<div class="choices"/>');
