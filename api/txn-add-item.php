@@ -98,6 +98,7 @@ if (!$_REQUEST['all']) {
 }
 
 $q= "SELECT
+            item.id id,
             item.code code,
             item.name name,
             brand.name brand,
@@ -128,10 +129,6 @@ if (!$r) {
                         'query' => $q)));
 }
 
-/* if it is just one item, go ahead and add it to the invoice */
-if ($r->num_rows == 1) {
-}
-
 $items= array();
 while ($row= $r->fetch_assoc()) {
   /* force numeric values to numeric type */
@@ -140,6 +137,22 @@ while ($row= $r->fetch_assoc()) {
   $row['stock']= (int)$row['stock'];
   $row['quantity']= (int)$row['quantity'];
   $items[]= $row;
+}
+
+/* if it is just one item, go ahead and add it to the invoice */
+if (count($items) == 1) {
+  $q= "INSERT INTO txn_line (txn, item, ordered, line,
+                             retail_price, discount, discount_type)
+       SELECT $details[txn] AS txn, {$items[0]['id']} AS item, -1 AS ordered,
+              IFNULL((SELECT MAX(line) + 1 FROM txn_line
+                       WHERE txn = $details[txn]), 1) AS line,
+              retail_price, discount, discount_type
+         FROM item WHERE id = {$items[0]['id']}";
+  $r= $db->query($q);
+  if (!$r) {
+    die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                          'query' => $q)));
+  }
 }
 
 echo json_encode(array('details' => $details, 'items' => $items));
