@@ -83,7 +83,8 @@ $payment= $r->fetch_assoc();
  <tr><th>Date</th><td><?=$payment['processed']?></td></tr>
  <tr><th>ID</th><td><?=$payment['id']?></td></tr>
  <tr><th>Card Type</th><td><?=$payment['cc_type']?></td></tr>
- <tr><th>Card Number</th><td><?=str_repeat('X', !strcmp($payment['cc_type'],'AmericanExpress') ? 11 : 12)?><?=$payment['cc_lastfour']?></td></tr>
+ <tr><th>Card Number</th><td><?=str_repeat('#', !strcmp($payment['cc_type'],'AmericanExpress') ? 11 : 12)?><?=$payment['cc_lastfour']?></td></tr>
+ <tr><th>Expiration</th><td>##/##</td></tr>
  <tr><th>Approval</th><td><?=$payment['cc_approval']?></td></tr>
  <tr><th>Amount</th><td>$<?=$payment['amount']?></td></tr>
 </table>
@@ -94,6 +95,8 @@ $payment= $r->fetch_assoc();
   Cardmember agrees to pay total in accordance with agreement governing use of such card.
 </div>
 <div id="doc_info">
+  MERCHANT COPY
+  <br>
   Invoice <?=ashtml($payment['invoice'])?>
   <br>
   <?=ashtml($payment['processed'])?>
