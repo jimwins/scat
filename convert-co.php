@@ -256,6 +256,55 @@ $q= "INSERT IGNORE INTO txn_note (txn, entered, content)
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " notes.<br>";
 
+# figure out paid transactions
+#
+$q= "CREATE TEMPORARY TABLE txn_paid
+     SELECT id,
+            untaxed, taxed, tax_rate,
+            CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
+                 AS DECIMAL(9,2)) total,
+            paid,
+            last_payment
+      FROM (SELECT
+            txn.id,
+            CAST(ROUND_TO_EVEN(
+              SUM(IF(txn_line.taxfree, 1, 0) *
+                IF(type = 'customer', -1, 1) * allocated *
+                CASE discount_type
+                  WHEN 'percentage' THEN retail_price * ((100 - discount) / 100)
+                  WHEN 'relative' THEN (retail_price - discount) 
+                  WHEN 'fixed' THEN (discount)
+                  ELSE retail_price
+                END),
+              2) AS DECIMAL(9,2))
+            untaxed,
+            CAST(ROUND_TO_EVEN(
+              SUM(IF(txn_line.taxfree, 0, 1) *
+                IF(type = 'customer', -1, 1) * allocated *
+                CASE discount_type
+                  WHEN 'percentage' THEN retail_price * ((100 - discount) / 100)
+                  WHEN 'relative' THEN (retail_price - discount) 
+                  WHEN 'fixed' THEN (discount)
+                  ELSE retail_price
+                END),
+              2) AS DECIMAL(9,2))
+            taxed,
+            tax_rate,
+            CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
+                 AS DECIMAL(9,2)) AS paid,
+            (SELECT MAX(processed)
+               FROM payment WHERE payment.txn = txn.id) AS last_payment
+       FROM txn
+       LEFT JOIN txn_line ON (txn.id = txn_line.txn)
+      WHERE type = 'customer'
+      GROUP BY txn.id) t";
+$r= $db->query($q) or die("query failed: ". $db->error);
+
+$q= "UPDATE txn, txn_paid SET txn.paid = last_payment
+      WHERE txn.id = txn_paid.id AND total - txn_paid.paid < 0.02";
+$r= $db->query($q) or die("query failed: ". $db->error);
+echo "Noted ", $db->affected_rows, " payments.<br>";
+
 $out= ob_get_contents();
 ob_end_clean();
 
