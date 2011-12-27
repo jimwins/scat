@@ -25,25 +25,26 @@ if (empty($criteria)) {
 $page= (int)$_REQUEST['page'];
 
 ?>
+<form method="get" action="txn.php">
+<input type="submit" value="Go To">
+<select name="type">
+ <option value="customer">Invoice
+ <option value="vendor">Purchase Order
+ <option value="internal">Internal
+</select>
+<input id="focus" type="text" name="number" value="">
+</form>
+<br>
 <form method="get" action="txns.php">
+<input type="submit" value="Show">
 <select name="type">
  <option value="">Any
  <option value="customer">Invoice
  <option value="vendor">Purchase Order
  <option value="internal">Internal
 </select>
-<input id="focus" type="text" name="q" value="<?=ashtml($q)?>">
-<input type="submit" value="Search">
-</form>
-<br>
-<form method="get" action="txn.php">
-<select name="type">
- <option value="customer">Invoice
- <option value="vendor">Purchase Order
- <option value="internal">Internal
-</select>
-<input type="text" name="number" value="">
-<input type="submit" value="Look Up">
+that includes
+<input type="text" name="q" value="<?=ashtml($q)?>">
 </form>
 <br>
 <?
