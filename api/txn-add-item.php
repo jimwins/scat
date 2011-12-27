@@ -9,49 +9,71 @@ if (!$search) die('no query specified');
 
 $details['txn']= $_REQUEST['txn'];
 if (!$details['txn']) {
-  $q= "START TRANSACTION;";
-  $r= $db->query($q);
-  if (!$r) {
-    die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                          'query' => $q)));
-  }
 
-  $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = 'customer'";
-  $r= $db->query($q);
-  if (!$r) {
-    die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                          'query' => $q)));
-  }
-  $row= $r->fetch_assoc();
-
-  $q= "INSERT INTO txn
-          SET created= NOW(),
-              type = 'customer',
-              number = $row[number],
-              tax_rate = 8.75"; # XXX grab from somewhere
-  $r= $db->query($q);
-  if (!$r) {
-    die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                          'query' => $q)));
-  }
-
-  $q= "SELECT id AS txn,
+  // if there's a transaction with no items yet, hijack it
+  $q= "SELECT txn.id AS txn,
               CONCAT('Sale ', DATE_FORMAT(NOW(), '%Y'), '-', number)
                 AS description,
               created,
               tax_rate
-         FROM txn WHERE id = " . $db->insert_id;
+         FROM txn LEFT JOIN txn_line ON (txn.id = txn)
+         WHERE txn_line.id IS NULL AND type = 'customer'";
   $r= $db->query($q);
   if (!$r) {
     die(json_encode(array('error' => 'Query failed. ' . $db->error,
                           'query' => $q)));
   }
-  $details= $r->fetch_assoc();
 
-  $r= $db->commit();
-  if (!$r) {
-    die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                          'query' => $q)));
+  if ($r->num_rows) {
+    $details= $r->fetch_assoc();
+
+  } else {
+
+    $q= "START TRANSACTION;";
+    $r= $db->query($q);
+    if (!$r) {
+      die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                            'query' => $q)));
+    }
+
+    $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = 'customer'";
+    $r= $db->query($q);
+    if (!$r) {
+      die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                            'query' => $q)));
+    }
+    $row= $r->fetch_assoc();
+
+    $q= "INSERT INTO txn
+            SET created= NOW(),
+                type = 'customer',
+                number = $row[number],
+                tax_rate = 8.75"; # XXX grab from somewhere
+    $r= $db->query($q);
+    if (!$r) {
+      die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                            'query' => $q)));
+    }
+
+    $q= "SELECT id AS txn,
+                CONCAT('Sale ', DATE_FORMAT(NOW(), '%Y'), '-', number)
+                  AS description,
+                created,
+                tax_rate
+           FROM txn WHERE id = " . $db->insert_id;
+    $r= $db->query($q);
+    if (!$r) {
+      die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                            'query' => $q)));
+    }
+    $details= $r->fetch_assoc();
+
+    $r= $db->commit();
+    if (!$r) {
+      die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                            'query' => $q)));
+    }
+
   }
 }
 
