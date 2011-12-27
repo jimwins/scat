@@ -247,6 +247,15 @@ $q= "INSERT IGNORE
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " payments.<br>";
 
+# notes
+#
+$q= "INSERT IGNORE INTO txn_note (txn, entered, content)
+     SELECT id_transaction, date, content
+       FROM co.note_transaction 
+       JOIN co.note ON (note.id = id_note)";
+$r= $db->query($q) or die("query failed: ". $db->error);
+echo "Loaded ", $db->affected_rows, " notes.<br>";
+
 $out= ob_get_contents();
 ob_end_clean();
 
