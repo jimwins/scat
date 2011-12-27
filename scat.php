@@ -118,16 +118,13 @@ function dump_table($r, $calc = false) {
     echo '<th>', strtok($name, '$'), '</th>';
   }
   if ($calc) {
-    echo '<th>', $calc, '<th>';
+    echo '<th>', strtok($calc, '$'), '</th>';
   }
   echo '</tr></thead>';
   echo '<tbody>';
   while ($row= $r->fetch_row()) {
     if ($r->fetch_field_direct(0)->name == 'code')
       $row[0]= '<a href="item.php?code='.$row[0].'">'.$row[0].'</a>';
-    if ($calc) {
-      $row[]= $calc($row);
-    }
     if ($meta) {
       echo '<tr class="', ashtml($row[0]), '">';
     } else {
@@ -140,6 +137,12 @@ function dump_table($r, $calc = false) {
       $class= strlen($row[$i]) ? strchr($name, '$') : '';
       echo '<td', ($class ? ' class="' . ltrim($class, '$'). '"' : ''), '>',
            expand_field($row[$i], $class), '</td>';
+    }
+    if ($calc) {
+      $func= strtok($calc, '$');
+      $class= strchr($calc, '$');
+      echo '<td', ($class ? ' class="' . ltrim($class, '$'). '"' : ''), '>',
+           expand_field($func($row), $class), '</td>';
     }
     echo '</tr>';
   }
@@ -173,6 +176,8 @@ function expand_field($data, $class) {
                  'dwolla' => 'Dwolla',
                  );
     return $desc[$data];
+  case '$html':
+    return $data;
   default:
     return ashtml($data);
   }
