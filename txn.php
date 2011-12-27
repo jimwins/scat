@@ -121,14 +121,19 @@ $q= "SELECT
 dump_table($db->query($q));
 dump_query($q);
 
+function charge_record($row) {
+  return '<a href="charge-record.php?id=' . $row[0] . '">Charge Record</a>';
+}
+
 if (preg_match('/customer/', $txn['Number$txn'])) {
   echo '<h2>Payments</h2>';
-  $q= "SELECT processed AS Date,
+  $q= "SELECT id AS meta,
+              processed AS Date,
               method AS Method\$payment,
               amount AS Amount\$dollar
          FROM payment
         WHERE txn = $id
         ORDER BY processed ASC";
-  dump_table($db->query($q));
+  dump_table($db->query($q), 'charge_record$html');
   dump_query($q);
 }
