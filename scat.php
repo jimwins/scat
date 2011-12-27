@@ -210,3 +210,9 @@ function generate_jsonp($data) {
   header('Content-type: application/javascript; charset=utf-8');
   print sprintf('%s(%s);', $_GET['callback'], json_encode($data));
 }
+
+function die_jsonp($message) {
+  header('Content-type: application/javascript; charset=utf-8');
+  $data= array('error' => $message);
+  die(sprintf('%s(%s);', $_GET['callback'], json_encode($data)));
+}
