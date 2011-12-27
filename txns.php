@@ -15,6 +15,12 @@ if ($q) {
   $criteria[]= "(person.name LIKE '%$q%'
              OR person.company LIKE '%$q%')";
 }
+if ($_REQUEST['unfilled']) {
+  $criteria[]= "txn.filled IS NULL";
+}
+if ($_REQUEST['unpaid']) {
+  $criteria[]= "txn.paid IS NULL";
+}
 
 if (empty($criteria)) {
   $criteria= '1=1';
@@ -45,6 +51,8 @@ $page= (int)$_REQUEST['page'];
 </select>
 that includes
 <input type="text" name="q" value="<?=ashtml($q)?>">
+<label><input type="checkbox" name="unfilled" value="1"> Unfilled</label>
+<label><input type="checkbox" name="unpaid" value="1"> Unpaid</label>
 </form>
 <br>
 <?
