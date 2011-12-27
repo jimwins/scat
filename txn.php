@@ -81,6 +81,23 @@ $r->data_seek(0);
 dump_table($r);
 dump_query($q);
 
+if ($txn['Ordered'] != $txn['Allocated']) {
+?>
+<button id="allocate">Allocate Order</button>
+<script>
+$("#allocate").live('click', function() {
+  $.getJSON("api/txn-allocate.php?callback=?",
+            { txn: <?=$id?>},
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              }
+              $('#allocate').fadeOut();
+            });
+});
+</script>
+<?
+}
 ?>
 <button id="receipt">Print Receipt</button>
 <script>
