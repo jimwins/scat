@@ -137,3 +137,13 @@ if (preg_match('/customer/', $txn['Number$txn'])) {
   dump_table($db->query($q), 'charge_record$html');
   dump_query($q);
 }
+
+echo '<h2>Notes</h2>';
+$q= "SELECT id AS meta,
+            entered AS Date,
+            content AS Note
+       FROM txn_note
+      WHERE txn = $id
+      ORDER BY entered ASC";
+dump_table($db->query($q));
+dump_query($q);
