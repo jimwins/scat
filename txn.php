@@ -109,8 +109,6 @@ $("#receipt").on('click', function() {
 </script>
 <?
 
-$type= $db->real_escape_string($type);
-
 $q= "SELECT
             line AS `#\$num`,
             item.code Code\$item,
