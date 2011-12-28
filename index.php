@@ -58,32 +58,56 @@ function round_to_even(num, decimalPlaces) {
 
 var lastItem;
 
-function setQuantity(row, qty) {
-  $('.qty', row).text(qty);
-  row.data('quantity', qty);
-  var ext= qty * row.data('price');
-  $('.ext', row).text(ext.toFixed(2));
-  if (qty > row.data('stock')) {
-    $('.qty', row).addClass('over');
-  } else {
-    $('.qty', row).removeClass('over');
-  }
+function updateItems(items) {
+  $.each(items, function(i,item) {
+    var row= $("#txn tbody tr:data(line_id=" + item.line_id + ")");
+    row.data('price', item.price);
+    $('.qty', row).text(item.quantity);
+    $('.price', row).text(item.price.toFixed(2));
+    var ext= item.quantity * item.price;
+    $('.ext', row).text(ext.toFixed(2));
+    $('.discount', row).text(item.discount);
+    $('.name', row).text(item.name);
+    if (item.quantity > item.stock) {
+      $('.qty', row).addClass('over');
+    } else {
+      $('.qty', row).removeClass('over');
+    }
+  });
+  updateTotal();
 }
+
+function setQuantity(row, qty) {
+  var txn= $('#txn').data('txn');
+  var line= $(row).data('line_id');
+
+  $.getJSON("api/txn-update-item.php?callback=?",
+            { txn: txn, id: line, quantity: qty },
+            function (data) {
+              updateItems(data.items);
+            });
+}
+
 function updatePrice(row, price) {
-  //XXX validate price
-  if (row.data('price') != price) {
-    row.data('price_changed', 1);
-  }
-  row.data('price', price);
-  var ext= row.data('quantity') * price;
-  $('.ext', row).text(ext.toFixed(2));
+  var txn= $('#txn').data('txn');
+  var line= $(row).data('line_id');
+
+  $.getJSON("api/txn-update-item.php?callback=?",
+            { txn: txn, id: line, price: price },
+            function (data) {
+              updateItems(data.items);
+            });
 }
 
 function updateName(row, name) {
-  if (row.data('name') != name) {
-    row.data('name_changed', 1);
-  }
-  row.data('name', name);
+  var txn= $('#txn').data('txn');
+  var line= $(row).data('line_id');
+
+  $.getJSON("api/txn-update-item.php?callback=?",
+            { txn: txn, id: line, name: name },
+            function (data) {
+              updateItems(data.items);
+            });
 }
 
 function setActiveRow(row) {
@@ -102,12 +126,11 @@ $('.price').live('dblclick', function() {
     if (event.type == 'keypress' && event.which != '13') {
       return true;
     }
-  
-    price= parseFloat($(this).val());
-    prc= $('<span class="price">' + price.toFixed(2) +  '</span>');
-    updatePrice($(this).closest('tr'), price);
+    var row= $(this).closest('tr');
+    var price= $(this).val();
+    var prc= $('<span class="price">Updating</span>');
     $(this).replaceWith(prc);
-    updateTotal();
+    updatePrice(row, price);
 
     return true;
   });
@@ -125,10 +148,11 @@ $('.name').live('dblclick', function() {
       return true;
     }
   
-    name= $(this).val();
-    prc= $('<span class="name">' + name +  '</span>');
-    updateName($(this).closest('tr'), name);
+    var row= $(this).closest('tr');
+    var name= $(this).val();
+    var prc= $('<span class="name">Updating</span>');
     $(this).replaceWith(prc);
+    updateName(row, name);
 
     return true;
   });
@@ -146,11 +170,11 @@ $('.qty').live('dblclick', function() {
       return true;
     }
   
-    qty= parseInt($(this).val());
-    prc= $('<span class="qty">' + qty +  '</span>');
-    setQuantity($(this).closest('tr'), qty);
+    var row= $(this).closest('tr');
+    var qty= $(this).val();
+    var prc= $('<span class="qty">Updating</span>');
     $(this).replaceWith(prc);
-    updateTotal();
+    setQuantity(row, qty);
 
     return true;
   });
@@ -264,6 +288,7 @@ function addNewItem(item) {
     // add the new row
     row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">1</span></td><td align="left"><span class="code">' + item.code + '</span></td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
     row.data(item);
+    // XXX handle this better
     setQuantity(row, item.quantity); // so 'over' class gets set
     row.appendTo('#items tbody');
     row.click(function() { setActiveRow($(this)); });
