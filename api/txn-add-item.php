@@ -161,6 +161,7 @@ if (count($items) == 1) {
     die(json_encode(array('error' => 'Query failed. ' . $db->error,
                           'query' => $q)));
   }
+  $items[0]['line_id']= $db->insert_id;
 }
 
 echo json_encode(array('details' => $details, 'items' => $items));

@@ -21,6 +21,7 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.2.min.js"></script>
+ <script src="js/jquery.data-selector.js"></script>
  <script>
 $(document).ready(function() 
     { 

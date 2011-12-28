@@ -181,6 +181,30 @@ $('#tax_rate').live('dblclick', function() {
   fld.focus().select();
 });
 
+$('.remove').live('click', function() {
+  var txn= $('#txn').data('txn');
+  var id= $(this).closest('tr').data('line_id');
+
+  $.ajax({
+    url: "api/txn-remove-item.php",
+    dataType: "json",
+    data: ({ txn: txn, id: id }),
+    success: function(data) {
+      if (data.error) {
+        $.modal(data.error);
+        return;
+      }
+      var row= $("#txn tbody tr:data(line_id=" + data.removed + ")");
+      if (row.is('.active')) {
+        lastItem= null;
+      }
+      row.remove();
+      updateTotal();
+    }
+  });
+  return false;
+});
+
 function addItem(item) {
   $.ajax({
     url: "api/txn-add-item.php",
@@ -236,14 +260,6 @@ function addNewItem(item) {
     row.data(item);
     setQuantity(row, item.quantity); // so 'over' class gets set
     row.appendTo('#items tbody');
-    $('.remove', row).click(function () {
-      if ($(this).closest('tr').is('.active')) {
-        lastItem= null;
-      }
-      $(this).closest('tr').remove();
-      updateTotal();
-      return false;
-    });
     row.click(function() { setActiveRow($(this)); });
     setActiveRow(row);
   }
