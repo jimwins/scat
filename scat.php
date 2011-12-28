@@ -218,3 +218,8 @@ function die_jsonp($message) {
   $data= array('error' => $message);
   die(sprintf('%s(%s);', $_GET['callback'], json_encode($data)));
 }
+
+function die_query($db, $query) {
+  return die_jsonp(array('error' => 'Query failed. '.  $db->error,
+                         'query' => $q));
+}
