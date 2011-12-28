@@ -62,27 +62,27 @@ function updateItems(items) {
   $.each(items, function(i,item) {
     var row= $("#txn tbody tr:data(line_id=" + item.line_id + ")");
     row.data('price', item.price);
-    $('.qty', row).text(item.quantity);
+    $('.quantity', row).text(item.quantity);
     $('.price', row).text(item.price.toFixed(2));
     var ext= item.quantity * item.price;
     $('.ext', row).text(ext.toFixed(2));
     $('.discount', row).text(item.discount);
     $('.name', row).text(item.name);
     if (item.quantity > item.stock) {
-      $('.qty', row).addClass('over');
+      $('.quantity', row).addClass('over');
     } else {
-      $('.qty', row).removeClass('over');
+      $('.quantity', row).removeClass('over');
     }
   });
   updateTotal();
 }
 
-function setQuantity(row, qty) {
+function setQuantity(row, quantity) {
   var txn= $('#txn').data('txn');
   var line= $(row).data('line_id');
 
   $.getJSON("api/txn-update-item.php?callback=?",
-            { txn: txn, id: line, quantity: qty },
+            { txn: txn, id: line, quantity: quantity },
             function (data) {
               updateItems(data.items);
             });
@@ -161,7 +161,7 @@ $('.name').live('dblclick', function() {
   fld.focus().select();
 });
 
-$('.qty').live('dblclick', function() {
+$('.quantity').live('dblclick', function() {
   fld= $('<input type="text" size="2">');
   fld.val($(this).text());
 
@@ -171,10 +171,10 @@ $('.qty').live('dblclick', function() {
     }
   
     var row= $(this).closest('tr');
-    var qty= $(this).val();
-    var prc= $('<span class="qty">Updating</span>');
+    var quantity= $(this).val();
+    var prc= $('<span class="quantity">Updating</span>');
     $(this).replaceWith(prc);
-    setQuantity(row, qty);
+    setQuantity(row, quantity);
 
     return true;
   });
@@ -286,7 +286,7 @@ function addNewItem(item) {
     desc+= '</div>';
 
     // add the new row
-    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="qty">1</span></td><td align="left"><span class="code">' + item.code + '</span></td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
+    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="quantity">1</span></td><td align="left"><span class="code">' + item.code + '</span></td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
     row.data(item);
     // XXX handle this better
     setQuantity(row, item.quantity); // so 'over' class gets set
