@@ -168,12 +168,18 @@ $('#tax_rate').live('dblclick', function() {
       return true;
     }
   
-    tax_rate= parseFloat($(this).val()).toFixed(2);
-    prc= $('<span class="val">' + tax_rate +  '</span>');
-    $('#txn').data('tax_rate', tax_rate);
-    $(this).replaceWith(prc);
-    updateTotal();
+    var tax_rate= $(this).val();
+    var txn= $('#txn').data('txn');
 
+    $.getJSON("api/txn-update-tax-rate.php?callback=?",
+              { txn: txn, tax_rate: tax_rate},
+              function (data) {
+                // XXX handle error
+                var prc= $('<span class="val">' + data.tax_rate +  '</span>');
+                $('#txn').data('tax_rate', data.tax_rate);
+                $('#tax_rate').children().replaceWith(prc);
+                updateTotal();
+              });
     return true;
   });
 

@@ -50,7 +50,7 @@ if (!$details['txn']) {
             SET created= NOW(),
                 type = 'customer',
                 number = $row[number],
-                tax_rate = 8.75"; # XXX grab from somewhere
+                tax_rate = " . DEFAULT_TAX_RATE;
     $r= $db->query($q);
     if (!$r) {
       die(json_encode(array('error' => 'Query failed. ' . $db->error,
