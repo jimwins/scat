@@ -227,27 +227,21 @@ function addItem(item) {
   });
 }
 
-var protoRow= $('<tr valign="top"><td><a class="remove"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable" align="right"><span class="price"></span></td><td align="right"><span class="ext"></span></td></tr>');
+var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable" align="right"><span class="price"></span></td><td align="right"><span class="ext"></span></td></tr>');
 
 function addNewItem(item) {
-  // check for a matching row
-  var row= $("#items tbody tr").filter(function(index) { return $(this).data('code') == item.code; });
+  var row= $("#items tbody tr:data(line_id=" + item.line_id + ")").first();
 
-  // have one? just increment quantity
-  if (row.length) {
-    updateValue(row, 'quantity', row.data('quantity') + item.quantity);
-    setActiveRow(row);
-  }
-  // otherwise add the row
-  else {
+  if (!row.length) {
     // add the new row
-    var row= protoRow.clone();
-    row.data(item);
-    updateRow(row);
+    row= protoRow.clone();
+    row.on('click', function() { setActiveRow($(this)); });
     row.appendTo('#items tbody');
-    row.click(function() { setActiveRow($(this)); });
-    setActiveRow(row);
   }
+
+  row.data(item);
+  updateRow(row);
+  setActiveRow(row);
 
   updateTotal();
 }

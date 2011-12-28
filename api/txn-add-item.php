@@ -150,19 +150,43 @@ while ($row= $r->fetch_assoc()) {
 
 /* if it is just one item, go ahead and add it to the invoice */
 if (count($items) == 1) {
-  $q= "INSERT INTO txn_line (txn, item, ordered, line,
-                             retail_price, discount, discount_type)
-       SELECT $details[txn] AS txn, {$items[0]['id']} AS item, -1 AS ordered,
-              IFNULL((SELECT MAX(line) + 1 FROM txn_line
-                       WHERE txn = $details[txn]), 1) AS line,
-              retail_price, discount, discount_type
-         FROM item WHERE id = {$items[0]['id']}";
+  // XXX some items should always be added on their own
+
+  $q= "SELECT id, ordered FROM txn_line
+        WHERE txn = $details[txn] AND item = {$items[0]['id']}";
   $r= $db->query($q);
   if (!$r) {
     die(json_encode(array('error' => 'Query failed. ' . $db->error,
                           'query' => $q)));
   }
-  $items[0]['line_id']= $db->insert_id;
+
+  if ($r->num_rows) {
+    $row= $r->fetch_assoc();
+    $items[0]['line_id']= $row['id'];
+    $items[0]['quantity']= -1 * ($row['ordered'] - $items[0]['quantity']);
+
+    $q= "UPDATE txn_line SET ordered = -1 * {$items[0]['quantity']}
+          WHERE id = {$items[0]['line_id']}";
+    $r= $db->query($q);
+    if (!$r) {
+      die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                            'query' => $q)));
+    }
+  } else {
+    $q= "INSERT INTO txn_line (txn, item, ordered, line,
+                               retail_price, discount, discount_type)
+         SELECT $details[txn] AS txn, {$items[0]['id']} AS item, -1 AS ordered,
+                IFNULL((SELECT MAX(line) + 1 FROM txn_line
+                         WHERE txn = $details[txn]), 1) AS line,
+                retail_price, discount, discount_type
+           FROM item WHERE id = {$items[0]['id']}";
+    $r= $db->query($q);
+    if (!$r) {
+      die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                            'query' => $q)));
+    }
+    $items[0]['line_id']= $db->insert_id;
+  }
 }
 
 echo json_encode(array('details' => $details, 'items' => $items));
