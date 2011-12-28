@@ -9,7 +9,7 @@ head("Scat");
   padding: 6px;
   background: rgba(0,0,0,0.1);
   border-radius: 4px;
-  width: 80%;
+  width: 70%;
 }
 .choices span {
   margin-right: 8px;
@@ -33,6 +33,14 @@ tfoot td {
 }
 .code, .discount {
   font-size: smaller;
+}
+
+#orders {
+  width: 22%;
+  float: right;
+  border: 2px solid rgba(0,0,0,0.3);
+  padding: 1em;
+  margin: 0em 0.5em;
 }
 </style>
 <script>
@@ -258,6 +266,42 @@ function updateTotal() {
   $('#items #total').text((total + tax).toFixed(2))
 }
 
+function loadOrder(txn) {
+  // dump existing rows
+  $("#items tbody tr").remove();
+
+  // set transaction data
+  $('#txn').data('txn', txn.txn.id);
+  var tax_rate= parseFloat(txn.txn.tax_rate).toFixed(2);
+  $('#txn').data('tax_rate', tax_rate)
+  var prc= $('<span class="val">' + tax_rate +  '</span>');
+  $('#txn #tax_rate .val').replaceWith(prc);
+  $('#txn #description').text("Sale " + txn.txn.number);
+
+  // load rows
+  $.each(txn.items, function(i, item) {
+    addNewItem(item);
+  });
+}
+
+function showOpenOrders(data) {
+  $.each(data, function(i, txn) {
+    var row= $("<li>" + txn.number + " " + txn.person_name + " (" + txn.ordered + ")</li>");
+    row.click(txn, function(ev) {
+      $.getJSON("api/txn-load.php?callback=?",
+                { id: txn.id },
+                function (data) {
+                  if (data.error) {
+                    $.modal(data.error);
+                  } else {
+                    loadOrder(data);
+                  }
+                });
+    });
+    $('#orders').append(row);
+  });
+}
+
 $(function() {
   $('#txn').data('tax_rate', 0.00);
 
@@ -334,8 +378,20 @@ $(function() {
 
     return false;
   });
+
+  $.getJSON("api/txn-list.php?callback=?",
+            { type: 'customer', unfilled: true },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              } else {
+                showOpenOrders(data);
+              }
+            });
 });
 </script>
+<ul id="orders">
+</ul>
 <form id="lookup" method="get" action="items.php">
 <input type="text" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="<?=htmlspecialchars($q)?>">
 <input type="submit" value="Find Items">
@@ -344,7 +400,7 @@ $(function() {
 <h2 id="description">New Sale</h2>
 <div id="items">
  <div class="error"></div>
- <table width="80%">
+ <table width="70%">
  <thead>
   <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
