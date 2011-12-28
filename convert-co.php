@@ -4,8 +4,9 @@ require 'scat.php';
 if (!$_REQUEST['go']) {
   head("convert");
 ?>
+<button id="go">Convert Checkout Data</button>
 <script>
-$('#go').live('click', function() {
+$('#go').on('click', function() {
   $('#go').attr('disabled', true);
   var label= $('#go').text();
   $('#go').text('Converting....');
@@ -20,7 +21,6 @@ $('#go').live('click', function() {
             });
 });
 </script>
-<button id="go">Convert Checkout Data</button>
 <div id="result" style="display:none"></div>
 <?
   foot();

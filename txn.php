@@ -85,7 +85,7 @@ if ($txn['Ordered'] != $txn['Allocated']) {
 ?>
 <button id="allocate">Allocate Order</button>
 <script>
-$("#allocate").live('click', function() {
+$("#allocate").on('click', function() {
   $.getJSON("api/txn-allocate.php?callback=?",
             { txn: <?=$id?>},
             function (data) {
@@ -101,7 +101,7 @@ $("#allocate").live('click', function() {
 ?>
 <button id="receipt">Print Receipt</button>
 <script>
-$("#receipt").live('click', function() {
+$("#receipt").on('click', function() {
   var lpr= $('<iframe id="receipt" src="receipt.php?print=1&amp;id=<?=$id?>"></iframe>').hide();
   $(this).children("#receipt").remove();
   $(this).append(lpr);
