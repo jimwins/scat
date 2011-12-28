@@ -118,10 +118,11 @@ $q= "SELECT
               WHEN 'fixed' THEN (discount)
               ELSE retail_price
             END price,
-            CASE discount_type
+            IFNULL(CONCAT('MSRP $', retail_price, ' / Sale: ',
+                          CASE discount_type
               WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
               WHEN 'relative' THEN CONCAT('$', discount, ' off')
-            END discount,
+            END), '') discount,
             (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) stock,
             barcode.quantity quantity
        FROM item

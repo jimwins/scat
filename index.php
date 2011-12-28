@@ -61,20 +61,25 @@ var lastItem;
 function updateItems(items) {
   $.each(items, function(i,item) {
     var row= $("#txn tbody tr:data(line_id=" + item.line_id + ")");
-    row.data('price', item.price);
-    $('.quantity', row).text(item.quantity);
-    $('.price', row).text(item.price.toFixed(2));
-    var ext= item.quantity * item.price;
-    $('.ext', row).text(ext.toFixed(2));
-    $('.discount', row).text(item.discount);
-    $('.name', row).text(item.name);
-    if (item.quantity > item.stock) {
-      $('.quantity', row).addClass('over');
-    } else {
-      $('.quantity', row).removeClass('over');
-    }
+    row.data(item);
+    updateRow(row);
   });
   updateTotal();
+}
+
+function updateRow(row) {
+  $('.quantity', row).text(row.data('quantity'));
+  if (row.data('quantity') > row.data('.stock')) {
+    $('.quantity', row).addClass('over');
+  } else {
+    $('.quantity', row).removeClass('over');
+  }
+  $('.code', row).text(row.data('code'));
+  $('.name', row).text(row.data('name'));
+  $('.discount', row).text(row.data('discount'));
+  $('.price', row).text(row.data('price').toFixed(2));
+  var ext= row.data('quantity') * row.data('price');
+  $('.ext', row).text(ext.toFixed(2));
 }
 
 function updateValue(row, key, value) {
@@ -222,6 +227,8 @@ function addItem(item) {
   });
 }
 
+var protoRow= $('<tr valign="top"><td><a class="remove"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable" align="right"><span class="price"></span></td><td align="right"><span class="ext"></span></td></tr>');
+
 function addNewItem(item) {
   // check for a matching row
   var row= $("#items tbody tr").filter(function(index) { return $(this).data('code') == item.code; });
@@ -233,18 +240,10 @@ function addNewItem(item) {
   }
   // otherwise add the row
   else {
-    // build name/description
-    var desc = '<span class="name">' + item.name + '</span><div class="discount">';
-    if (item.discount) {
-      desc+= 'MSRP $' + item.msrp.toFixed(2) + ' / ' + item.discount;
-    }
-    desc+= '</div>';
-
     // add the new row
-    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center" class="editable"><span class="quantity">1</span></td><td align="left"><span class="code">' + item.code + '</span></td><td class="editable">' + desc + '</td><td class="editable" align="right"><span class="price">' + item.price.toFixed(2) + '</span></td><td align="right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
+    var row= protoRow.clone();
     row.data(item);
-    // XXX handle this better
-    updateValue(row, 'quantity', item.quantity); // so 'over' class gets set
+    updateRow(row);
     row.appendTo('#items tbody');
     row.click(function() { setActiveRow($(this)); });
     setActiveRow(row);
