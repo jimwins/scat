@@ -173,11 +173,9 @@ if (count($items) == 1) {
                             'query' => $q)));
     }
   } else {
-    $q= "INSERT INTO txn_line (txn, item, ordered, line,
+    $q= "INSERT INTO txn_line (txn, item, ordered,
                                retail_price, discount, discount_type)
          SELECT $details[txn] AS txn, {$items[0]['id']} AS item, -1 AS ordered,
-                IFNULL((SELECT MAX(line) + 1 FROM txn_line
-                         WHERE txn = $details[txn]), 1) AS line,
                 retail_price, discount, discount_type
            FROM item WHERE id = {$items[0]['id']}";
     $r= $db->query($q);
