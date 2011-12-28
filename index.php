@@ -77,34 +77,15 @@ function updateItems(items) {
   updateTotal();
 }
 
-function setQuantity(row, quantity) {
+function updateValue(row, key, value) {
   var txn= $('#txn').data('txn');
   var line= $(row).data('line_id');
+  
+  var data= { txn: txn, id: line };
+  data[key] = value;
 
   $.getJSON("api/txn-update-item.php?callback=?",
-            { txn: txn, id: line, quantity: quantity },
-            function (data) {
-              updateItems(data.items);
-            });
-}
-
-function updatePrice(row, price) {
-  var txn= $('#txn').data('txn');
-  var line= $(row).data('line_id');
-
-  $.getJSON("api/txn-update-item.php?callback=?",
-            { txn: txn, id: line, price: price },
-            function (data) {
-              updateItems(data.items);
-            });
-}
-
-function updateName(row, name) {
-  var txn= $('#txn').data('txn');
-  var line= $(row).data('line_id');
-
-  $.getJSON("api/txn-update-item.php?callback=?",
-            { txn: txn, id: line, name: name },
+            data,
             function (data) {
               updateItems(data.items);
             });
@@ -118,68 +99,42 @@ function setActiveRow(row) {
   lastItem.addClass('active');
 }
 
-$('.price').live('dblclick', function() {
-  fld= $('<input type="text" size="6">');
-  fld.val($(this).text());
+$('.editable').live('dblclick', function() {
+  var val= $(this).children('span').eq(0);
+  var key= val.attr("class");
+  var fld= $('<input type="text">');
+  fld.val(val.text());
+  fld.attr("class", key);
+  fld.width($(this).width());
+  fld.data('default', fld.val());
 
-  fld.bind('keypress blur', function(event) {
-    if (event.type == 'keypress' && event.which != '13') {
+  fld.on('keyup blur', function(event) {
+    // Handle ESC key
+    if (event.type == 'keyup' && event.which == 27) {
+      var val=$('<span>');
+      val.text($(this).data('default'));
+      val.attr("class", $(this).attr('class'));
+      $(this).replaceWith(val);
+      return false;
+    }
+
+    // Everything else but RETURN just gets passed along
+    if (event.type == 'keyup' && event.which != '13') {
       return true;
     }
-    var row= $(this).closest('tr');
-    var price= $(this).val();
-    var prc= $('<span class="price">Updating</span>');
-    $(this).replaceWith(prc);
-    updatePrice(row, price);
 
-    return true;
+    var row= $(this).closest('tr');
+    var key= $(this).attr('class');
+    var value= $(this).val();
+    var val= $('<span>Updating</span>');
+    val.attr("class", key);
+    $(this).replaceWith(val);
+    updateValue(row, key, value);
+
+    return false;
   });
 
-  $(this).replaceWith(fld);
-  fld.focus().select();
-});
-
-$('.name').live('dblclick', function() {
-  fld= $('<input type="text" size="40">');
-  fld.val($(this).text());
-
-  fld.bind('keypress blur', function(event) {
-    if (event.type == 'keypress' && event.which != '13') {
-      return true;
-    }
-  
-    var row= $(this).closest('tr');
-    var name= $(this).val();
-    var prc= $('<span class="name">Updating</span>');
-    $(this).replaceWith(prc);
-    updateName(row, name);
-
-    return true;
-  });
-
-  $(this).replaceWith(fld);
-  fld.focus().select();
-});
-
-$('.quantity').live('dblclick', function() {
-  fld= $('<input type="text" size="2">');
-  fld.val($(this).text());
-
-  fld.bind('keypress blur', function(event) {
-    if (event.type == 'keypress' && event.which != '13') {
-      return true;
-    }
-  
-    var row= $(this).closest('tr');
-    var quantity= $(this).val();
-    var prc= $('<span class="quantity">Updating</span>');
-    $(this).replaceWith(prc);
-    setQuantity(row, quantity);
-
-    return true;
-  });
-
-  $(this).replaceWith(fld);
+  val.replaceWith(fld);
   fld.focus().select();
 });
 
@@ -273,7 +228,7 @@ function addNewItem(item) {
 
   // have one? just increment quantity
   if (row.length) {
-    setQuantity(row, row.data('quantity') + item.quantity);
+    updateValue(row, 'quantity', row.data('quantity') + item.quantity);
     setActiveRow(row);
   }
   // otherwise add the row
@@ -286,10 +241,10 @@ function addNewItem(item) {
     desc+= '</div>';
 
     // add the new row
-    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center"><span class="quantity">1</span></td><td align="left"><span class="code">' + item.code + '</span></td><td>' + desc + '</td><td class="dollar right"><span class="price">' + item.price.toFixed(2) + '</span></td><td class="dollar right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
+    row= $('<tr valign="top"><td><a class="remove" href="#"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a></td><td align="center" class="editable"><span class="quantity">1</span></td><td align="left"><span class="code">' + item.code + '</span></td><td class="editable">' + desc + '</td><td class="editable" align="right"><span class="price">' + item.price.toFixed(2) + '</span></td><td align="right"><span class="ext">' + item.price.toFixed(2) + '</span></td></tr>');
     row.data(item);
     // XXX handle this better
-    setQuantity(row, item.quantity); // so 'over' class gets set
+    updateValue(row, 'quantity', item.quantity); // so 'over' class gets set
     row.appendTo('#items tbody');
     row.click(function() { setActiveRow($(this)); });
     setActiveRow(row);
@@ -333,7 +288,7 @@ $(function() {
     // short integer and recently scanned? adjust quantity
     if (q.length < 4 && lastItem && parseInt(q) != 0) {
       snd.yes.play();
-      setQuantity(lastItem, parseInt(q));
+      updateValue(lastItem, 'quantity', parseInt(q));
       updateTotal();
       return false;
     }
