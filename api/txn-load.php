@@ -30,7 +30,7 @@ $q= "SELECT id, type,
             taxed, untaxed, tax_rate,
             CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
                  AS DECIMAL(9,2)) total,
-            total_paid
+            IFNULL(total_paid, 0.00) total_paid
       FROM (SELECT
             txn.id, txn.type, txn.number,
             txn.created, txn.filled, txn.paid,
@@ -75,6 +75,7 @@ $r= $db->query($q)
   or die_query($db, $q);
 
 $txn= $r->fetch_assoc();
+$txn['total_paid']= (float)$txn['total_paid'];
 
 $q= "SELECT
             txn_line.id AS line_id, item.code,
