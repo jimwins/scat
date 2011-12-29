@@ -388,8 +388,12 @@ $(function() {
                 showOpenOrders(data);
               }
             });
+  $.modal.defaults.position= [ '25%', '25%' ];
+  $.modal.defaults.overlayClose= true;
+$("#test").click(function() { $.modal("Just testing."); });
 });
 </script>
+<button id="test">Test</button>
 <ul id="orders">
 </ul>
 <form id="lookup" method="get" action="items.php">

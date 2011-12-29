@@ -97,3 +97,13 @@ button:hover, input[type="submit"]:hover {
                                color-stop(1.0, rgba(240,240,240,0.3)));
   border: 1px solid rgba(240,240,240,0.3);
 }
+
+#simplemodal-overlay { 
+  background-color:#000;
+}
+#simplemodal-container {
+  background: #d2c09f;
+  -webkit-box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  padding:12px;
+}
