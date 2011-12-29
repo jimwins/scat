@@ -10,7 +10,7 @@ if (!$txn || !$id) die_jsonp('No transaction or item specified');
 
 if (!empty($_REQUEST['price'])) {
   $price= $_REQUEST['price'];
-  if (preg_match('/^\d*%$/', $price)) {
+  if (preg_match('/^\d*(\/|%)$/', $price)) {
     $discount = (float)$price;
     $discount_type = "'percentage'";
     $price= 'item.retail_price';
@@ -18,7 +18,7 @@ if (!empty($_REQUEST['price'])) {
     $price= (float)$price;
     $discount_type= 'NULL';
     $discount= 'NULL';
-  } elseif (preg_match('/^def$/', $price)) {
+  } elseif (preg_match('/^(def|\.\.\.)$/', $price)) {
     $discount = 'item.discount';
     $discount_type = 'item.discount_type';
     $price= 'item.retail_price';
