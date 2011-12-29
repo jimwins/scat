@@ -73,7 +73,7 @@ $r= $db->query($q)
 $txn= $r->fetch_assoc();
 
 $q= "SELECT
-            txn_line.id, item.code,
+            txn_line.id AS line_id, item.code,
             IFNULL(override_name, item.name) name,
             txn_line.retail_price msrp,
             IF(txn_line.discount_type,
