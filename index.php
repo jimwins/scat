@@ -424,7 +424,7 @@ $(function() {
       $('tbody', $(this).parent()).empty();
     } else {
       $.getJSON("api/txn-list.php?callback=?",
-                { type: 'customer', /*YYYunfilled: true*/ },
+                { type: 'customer', unfilled: true },
                 function (data) {
                   if (data.error) {
                     $.modal(data.error);
