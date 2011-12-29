@@ -66,7 +66,8 @@ function foot() {
 
   echo <<<FOOTER
 <footer>
- <p class="time">Page generated in $time seconds</p>
+ <div id="time">Page generated in $time seconds.</div>
+ <div id="status"></div>
 </footer>
 FOOTER;
 }
