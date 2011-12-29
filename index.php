@@ -27,12 +27,26 @@ tfoot td {
   background-color:rgba(255,255,255,0.5);
   font-weight: bold;
 }
+#total-row {
+  border-bottom: 2px solid black;
+}
 .over {
   font-weight: bold;
   color: #600;
 }
 .code, .discount, .person {
   font-size: smaller;
+}
+.dollar:before {
+  content: '$';
+}
+
+#txn {
+  width: 70%;
+}
+
+#pay {
+float: right;
 }
 
 #sidebar {
@@ -276,7 +290,11 @@ function updateTotal() {
   var tax_rate= $('#txn').data('tax_rate');
   var tax= round_to_even(total * (tax_rate / 100), 2);
   $('#items #tax').text(tax.toFixed(2))
-  $('#items #total').text((total + tax).toFixed(2))
+  total = total + tax;
+  $('#items #total').text(total.toFixed(2))
+  var paid= $('#txn').data('paid');;
+  $('#items #paid').text(paid.toFixed(2))
+  $('#items #due').text((total - paid).toFixed(2))
 }
 
 function loadOrder(txn) {
@@ -285,6 +303,7 @@ function loadOrder(txn) {
 
   // set transaction data
   $('#txn').data('txn', txn.txn.id);
+  $('#txn').data('paid', txn.txn.total_paid)
   var tax_rate= parseFloat(txn.txn.tax_rate).toFixed(2);
   $('#txn').data('tax_rate', tax_rate)
   var prc= $('<span class="val">' + tax_rate +  '</span>');
@@ -305,7 +324,7 @@ function showOpenOrders(data) {
               '<div class="person">' + txn.person_name + '</div>' + '</td>' +
               '<td>' + txn.ordered + '</td></tr>');
     row.click(txn, function(ev) {
-      $("#status").text("Loading sale...");
+      $("#status").text("Loading sale...").show();
       $.getJSON("api/txn-load.php?callback=?",
                 { id: txn.id },
                 function (data) {
@@ -314,7 +333,7 @@ function showOpenOrders(data) {
                   } else {
                     loadOrder(data);
                   }
-                  $("#status").text("Loaded sale.");
+                  $("#status").text("Loaded sale.").fadeOut('slow');
                 });
     });
     $('#sales tbody').append(row);
@@ -405,18 +424,22 @@ $(function() {
       $('tbody', $(this).parent()).empty();
     } else {
       $.getJSON("api/txn-list.php?callback=?",
-                { type: 'customer', unfilled: true },
+                { type: 'customer', /*YYYunfilled: true*/ },
                 function (data) {
                   if (data.error) {
                     $.modal(data.error);
                   } else {
                     showOpenOrders(data);
                   }
-                  $("#status").text("Loaded open sales.");
+                  $("#status").text("Loaded open sales.").fadeOut('slow');
                 });
       $(this).addClass('open');
-      $("#status").text("Loading open sales...");
+      $("#status").text("Loading open sales...").show();
     }
+  });
+
+  $("#pay").click(function() {
+    $.modal($("#payment-types"));
   });
 });
 </script>
@@ -434,18 +457,34 @@ $(function() {
 <input type="text" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="<?=htmlspecialchars($q)?>">
 <input type="submit" value="Find Items">
 </form>
-<div id="txn">
+<div id="txn" class="disabled">
+<button id="pay">Pay</button>
+<div id="payment-types" style="display: none">
+ <button data-value="cash">Cash</button>
+ <button data-value="credit-manual">Credit Card (Manual)</button>
+ <button data-value="gift">Gift Card</button>
+ <button data-value="check">Check</button>
+ <button data-value="discount">Discount</button>
+</div>
+<script>
+$("#payment-types").on("click", "button", function(ev) {
+  $("#status").text("Selected " + $(this).data("value"));
+  $.modal.close();
+});
+</script>
 <h2 id="description">New Sale</h2>
 <div id="items">
  <div class="error"></div>
- <table width="70%">
+ <table width="100%">
  <thead>
   <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
   <tr><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
   <tr><th colspan=4></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="dollar">0.00</td></tr>
-  <tr><th colspan=4></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
+  <tr id="total-row"><th colspan=4></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
+  <tr><th colspan=4></th><th align="right">Paid:</th><td id="paid" class="dollar">0.00</td></tr>
+  <tr><th colspan=4></th><th align="right">Due:</th><td id="due" class="dollar">0.00</td></tr>
  </tfoot>
  <tbody>
  </tbody>
