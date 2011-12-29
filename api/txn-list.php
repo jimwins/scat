@@ -43,7 +43,11 @@ $q= "SELECT id, type,
       FROM (SELECT
             txn.id, txn.type, txn.number,
             txn.created, txn.filled, txn.paid,
-            txn.person, IFNULL(person.name, '') person_name,
+            txn.person,
+            CONCAT(IFNULL(person.name, ''),
+                   IF(person.name AND person.company, ' / ', ''),
+                   IFNULL(person.company, ''))
+                AS person_name,
             SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS ordered,
             SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS allocated,
             CAST(ROUND_TO_EVEN(
