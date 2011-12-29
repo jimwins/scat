@@ -291,6 +291,7 @@ function loadOrder(txn) {
 }
 
 function showOpenOrders(data) {
+  $('#orders tbody').empty();
   $.each(data, function(i, txn) {
     var row=$('<tr><td>' + txn.number + '</td>' +
               '<td>' + Date.parse(txn.created).toString('d MMM HH:mm') +
@@ -389,15 +390,18 @@ $(function() {
   });
 
   // Load open orders
-  $.getJSON("api/txn-list.php?callback=?",
-            { type: 'customer', unfilled: true },
-            function (data) {
-              if (data.error) {
-                $.modal(data.error);
-              } else {
-                showOpenOrders(data);
-              }
-            });
+  $("#orders caption").click(function() {
+    $.getJSON("api/txn-list.php?callback=?",
+              { type: 'customer', unfilled: true },
+              function (data) {
+                if (data.error) {
+                  $.modal(data.error);
+                } else {
+                  showOpenOrders(data);
+                }
+              });
+  });
+  $("#orders caption").click();
 });
 </script>
 <div id="orders">
