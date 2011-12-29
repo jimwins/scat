@@ -31,7 +31,7 @@ tfoot td {
   font-weight: bold;
   color: #600;
 }
-.code, .discount {
+.code, .discount, .person {
   font-size: smaller;
 }
 
@@ -41,6 +41,12 @@ tfoot td {
   border: 2px solid rgba(0,0,0,0.3);
   padding: 1em;
   margin: 0em 0.5em;
+  font-size: smaller;
+}
+#orders caption {
+  font-weight: bold;
+  font-size: larger;
+  padding-bottom: 0.2em;
 }
 </style>
 <script>
@@ -286,7 +292,10 @@ function loadOrder(txn) {
 
 function showOpenOrders(data) {
   $.each(data, function(i, txn) {
-    var row= $("<li>" + txn.number + " " + txn.person_name + " (" + txn.ordered + ")</li>");
+    var row=$('<tr><td>' + txn.number + '</td>' +
+              '<td>' + Date.parse(txn.created).toString('d MMM HH:mm') +
+              '<div class="person">' + txn.person_name + '</div>' + '</td>' +
+              '<td>' + txn.ordered + '</td></tr>');
     row.click(txn, function(ev) {
       $.getJSON("api/txn-load.php?callback=?",
                 { id: txn.id },
@@ -298,7 +307,7 @@ function showOpenOrders(data) {
                   }
                 });
     });
-    $('#orders').append(row);
+    $('#orders tbody').append(row);
   });
 }
 
@@ -391,8 +400,16 @@ $(function() {
             });
 });
 </script>
-<ul id="orders">
-</ul>
+<div id="orders">
+<table width="100%">
+ <caption>Open Sales</caption>
+ <thead>
+  <tr><th>#</th><th>Date/Name</th><th>Items</th></tr>
+ </thead>
+ <tbody>
+ </tbody>
+</table>
+</div>
 <form id="lookup" method="get" action="items.php">
 <input type="text" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="<?=htmlspecialchars($q)?>">
 <input type="submit" value="Find Items">
