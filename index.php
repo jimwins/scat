@@ -305,6 +305,7 @@ function showOpenOrders(data) {
               '<div class="person">' + txn.person_name + '</div>' + '</td>' +
               '<td>' + txn.ordered + '</td></tr>');
     row.click(txn, function(ev) {
+      $("#status").text("Loading sale...");
       $.getJSON("api/txn-load.php?callback=?",
                 { id: txn.id },
                 function (data) {
@@ -313,6 +314,7 @@ function showOpenOrders(data) {
                   } else {
                     loadOrder(data);
                   }
+                  $("#status").text("Loaded sale.");
                 });
     });
     $('#sales tbody').append(row);
@@ -410,8 +412,10 @@ $(function() {
                   } else {
                     showOpenOrders(data);
                   }
+                  $("#status").text("Loaded open sales.");
                 });
       $(this).addClass('open');
+      $("#status").text("Loading open sales...");
     }
   });
 });
