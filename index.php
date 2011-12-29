@@ -35,7 +35,7 @@ tfoot td {
   font-size: smaller;
 }
 
-#orders {
+#sidebar {
   width: 22%;
   float: right;
   border: 2px solid rgba(0,0,0,0.3);
@@ -43,10 +43,17 @@ tfoot td {
   margin: 0em 0.5em;
   font-size: smaller;
 }
-#orders caption {
+#sidebar caption {
   font-weight: bold;
   font-size: larger;
   padding-bottom: 0.2em;
+  text-align: left;
+}
+#sidebar caption:before {
+  content: "\0025B6 ";
+}
+#sidebar caption.open:before {
+  content: "\0025BD ";
 }
 </style>
 <script>
@@ -291,7 +298,7 @@ function loadOrder(txn) {
 }
 
 function showOpenOrders(data) {
-  $('#orders tbody').empty();
+  $('#sales tbody').empty();
   $.each(data, function(i, txn) {
     var row=$('<tr><td>' + txn.number + '</td>' +
               '<td>' + Date.parse(txn.created).toString('d MMM HH:mm') +
@@ -308,7 +315,7 @@ function showOpenOrders(data) {
                   }
                 });
     });
-    $('#orders tbody').append(row);
+    $('#sales tbody').append(row);
   });
 }
 
@@ -389,23 +396,28 @@ $(function() {
     return false;
   });
 
-  // Load open orders
-  $("#orders caption").click(function() {
-    $.getJSON("api/txn-list.php?callback=?",
-              { type: 'customer', unfilled: true },
-              function (data) {
-                if (data.error) {
-                  $.modal(data.error);
-                } else {
-                  showOpenOrders(data);
-                }
-              });
+  // Load open sales
+  $("#sales caption").click(function() {
+    if ($(this).hasClass('open')) {
+      $(this).removeClass('open');
+      $('tbody', $(this).parent()).empty();
+    } else {
+      $.getJSON("api/txn-list.php?callback=?",
+                { type: 'customer', unfilled: true },
+                function (data) {
+                  if (data.error) {
+                    $.modal(data.error);
+                  } else {
+                    showOpenOrders(data);
+                  }
+                });
+      $(this).addClass('open');
+    }
   });
-  $("#orders caption").click();
 });
 </script>
-<div id="orders">
-<table width="100%">
+<div id="sidebar">
+<table id="sales" width="100%">
  <caption>Open Sales</caption>
  <thead>
   <tr><th>#</th><th>Date/Name</th><th>Items</th></tr>
