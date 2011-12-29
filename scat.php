@@ -23,12 +23,15 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/jquery.simplemodal.1.4.2.min.js"></script>
  <script src="js/jquery.data-selector.js"></script>
  <script>
-$(document).ready(function() 
-    { 
-        $(".sortable").tablesorter(); 
-        $("#focus").focus();
-    } 
-); 
+$(document).ready(function() { 
+  // Enable sorted tables
+  $(".sortable").tablesorter(); 
+  // SimpleModal defaults
+  $.modal.defaults.position= [ '25%', '25%' ];
+  $.modal.defaults.overlayClose= true;
+  // Focus the #focus item
+  $("#focus").focus();
+}); 
  </script>
 </head>
 <body>
