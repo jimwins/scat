@@ -85,6 +85,8 @@ CREATE TABLE `payment` (
   `cc_txn` varchar(10) DEFAULT NULL,
   `cc_approval` varchar(30) DEFAULT NULL,
   `cc_lastfour` varchar(4) DEFAULT NULL,
+  `cc_expire` varchar(4) DEFAULT NULL,
+  `cc_type` varchar(32) DEFAULT NULL,
   `processed` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`)
@@ -158,6 +160,22 @@ CREATE TABLE `txn_line` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `txn_note`
+--
+
+DROP TABLE IF EXISTS `txn_note`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `txn_note` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `txn` int(10) unsigned NOT NULL,
+  `entered` datetime NOT NULL,
+  `content` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping routines for database 'scat'
 --
 /*!50003 DROP FUNCTION IF EXISTS `ROUND_TO_EVEN` */;
@@ -188,4 +206,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-12-24 22:44:12
+-- Dump completed on 2011-12-28 23:27:33
