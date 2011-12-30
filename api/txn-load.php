@@ -129,6 +129,7 @@ $r= $db->query($q)
 $payments= array();
 while ($row= $r->fetch_assoc()) {
   /* force numeric values to numeric type */
+  $row['amount']= (float)$row['amount'];
   $payments[]= $row;
 }
 
