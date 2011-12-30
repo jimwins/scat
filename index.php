@@ -526,7 +526,7 @@ $(function() {
  <button data-value="check">Check</button>
  <button data-value="discount">Discount</button>
 </div>
-<div id="pay-cash" class="pay-method" style="display: none">
+<div id="pay-check" class="pay-method" style="display: none">
  <input class="amount" type="text" pattern="\d*">
  <br>
  <button name="pay">Pay</button>
@@ -554,7 +554,7 @@ $("#payment-methods").on("click", "button", function(ev) {
   $.modal($(id), { overlayClose: false });
   $(".amount", id).focus().select();
 });
-$("#pay-cash").on("click", "button[name='cancel']", function(ev) {
+$(".pay-method").on("click", "button[name='cancel']", function(ev) {
   $.modal.close();
 });
 $("#pay-cash").on("click", "button[name='pay']", function (ev) {
@@ -562,6 +562,22 @@ $("#pay-cash").on("click", "button[name='pay']", function (ev) {
   var amount= $("#pay-cash .amount").val();
   $.getJSON("api/txn-add-payment.php?callback=?",
             { id: txn, method: "cash", amount: amount, change: true },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                $.modal.close();
+              }
+            });
+});
+$("#pay-check").on("click", "button[name='pay']", function (ev) {
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-check .amount").val();
+  $.getJSON("api/txn-add-payment.php?callback=?",
+            { id: txn, method: "check", amount: amount, change: false },
             function (data) {
               if (data.error) {
                 alert(data.error);
