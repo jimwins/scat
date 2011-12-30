@@ -53,7 +53,10 @@ tfoot td {
 }
 
 #pay {
-float: right;
+  float: right;
+}
+.pay-method {
+  text-align: center;
 }
 
 #sidebar {
@@ -261,6 +264,7 @@ function addItem(item) {
         if (data.items.length == 1) {
           snd.yes.play();
           addNewItem(data.items[0]);
+          updateTotal();
         } else {
           snd.no.play();
         }
@@ -284,8 +288,6 @@ function addNewItem(item) {
   row.data(item);
   updateRow(row);
   setActiveRow(row);
-
-  updateTotal();
 }
 
 var paymentRow= $('<tr class="payment-row"><th colspan=4></th><th class="payment-method" align="right">Method:</th><td class="payment-amount" align="right">$0.00</td></tr>');
@@ -334,25 +336,32 @@ function updateTotal() {
   }
 }
 
-function loadOrder(txn) {
-  // dump existing rows
-  $("#items tbody tr").remove();
-
+function updateOrderData(txn) {
   // set transaction data
-  $('#txn').data('txn', txn.txn.id);
-  $('#txn').data('paid', txn.txn.total_paid)
-  var tax_rate= parseFloat(txn.txn.tax_rate).toFixed(2);
+  $('#txn').data('txn', txn.id);
+  $('#txn').data('total', txn.total)
+  $('#txn').data('paid', txn.total_paid)
+  var tax_rate= parseFloat(txn.tax_rate).toFixed(2);
   $('#txn').data('tax_rate', tax_rate)
   var prc= $('<span class="val">' + tax_rate +  '</span>');
   $('#txn #tax_rate .val').replaceWith(prc);
-  $('#txn #description').text("Sale " + txn.txn.number);
+  $('#txn #description').text("Sale " + txn.number);
+}
 
-  $('#txn').data('payments', txn.payments);
+function loadOrder(data) {
+  updateOrderData(data.txn)
+
+  $('#txn').data('payments', data.payments);
+
+  // dump existing item rows
+  $("#items tbody tr").remove();
 
   // load rows
-  $.each(txn.items, function(i, item) {
+  $.each(data.items, function(i, item) {
     addNewItem(item);
   });
+
+  updateTotal();
 }
 
 function showOpenOrders(data) {
@@ -450,6 +459,7 @@ $(function() {
           } else if (data.items.length == 1) {
             snd.yes.play();
             addNewItem(data.items[0]);
+            updateTotal();
           } else {
             snd.maybe.play();
             var choices= $('<div class="choices"/>');
@@ -516,14 +526,52 @@ $(function() {
  <button data-value="check">Check</button>
  <button data-value="discount">Discount</button>
 </div>
+<div id="pay-cash" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <button name="pay">Pay</button>
+ <button name="cancel">Cancel</button>
+</div>
 <script>
 $("#pay").on("click", function() {
-  $.modal($("#payment-methods"), { persist: true});
+  var txn= $('#txn').data('txn');
+  $.getJSON("api/txn-allocate.php?callback=?",
+            { txn: txn },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              }
+              $.modal($("#payment-methods"), { persist: true});
+            });
 });
 $("#payment-methods").on("click", "button", function(ev) {
-  var val= $(this).data("value");
-  $("#status").text("Selected " + val);
+  var method= $(this).data("value");
   $.modal.close();
+  var id= "#pay-" + method;
+  // XXX get the value from somewhere real
+  var total= $("#items #total").text();
+  $(".amount", id).val(total);
+  $.modal($(id), { overlayClose: false });
+  $(".amount", id).focus().select();
+});
+$("#pay-cash").on("click", "button[name='cancel']", function(ev) {
+  $.modal.close();
+});
+$("#pay-cash").on("click", "button[name='pay']", function (ev) {
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-cash .amount").val();
+  $.getJSON("api/txn-add-payment.php?callback=?",
+            { id: txn, method: "cash", amount: amount, change: true },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                $.modal.close();
+              }
+            });
 });
 </script>
 <h2 id="description">New Sale</h2>
