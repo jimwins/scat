@@ -491,10 +491,6 @@ $(function() {
       $("#status").text("Loading open sales...").show();
     }
   });
-
-  $("#pay").click(function() {
-    $.modal($("#payment-methods"), { persist: true});
-  });
 });
 </script>
 <div id="sidebar">
@@ -521,6 +517,9 @@ $(function() {
  <button data-value="discount">Discount</button>
 </div>
 <script>
+$("#pay").on("click", function() {
+  $.modal($("#payment-methods"), { persist: true});
+});
 $("#payment-methods").on("click", "button", function(ev) {
   var val= $(this).data("value");
   $("#status").text("Selected " + val);
