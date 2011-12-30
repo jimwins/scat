@@ -74,7 +74,7 @@ $txn= $r->fetch_assoc();
 $txn['total_paid']= (float)$txn['total_paid'];
 
 // if set, allow overpayment and create a 'change' record
-$change= (bool)$_REQUEST['change'];
+$change= (bool)($_REQUEST['change'] != 'false');
 
 // if no change and amount + paid > total, barf
 if (!$change && bccomp(bcadd($amount, $txn['total_paid']), $txn['total']) > 0) {
