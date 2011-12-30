@@ -27,8 +27,15 @@ tfoot td {
   background-color:rgba(255,255,255,0.5);
   font-weight: bold;
 }
-#total-row {
-  border-bottom: 2px solid black;
+#subtotal-row td, #subtotal-row th {
+  border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+#tax-row td, #tax-row th {
+  border-bottom: 4px solid rgba(255,255,255,0.2);
+}
+#due-row td, #due-row th {
+  border-top: 4px solid rgba(255,255,255,0.2);
+  border-bottom: 4px solid rgba(255,255,255,0.2);
 }
 .over {
   font-weight: bold;
@@ -262,7 +269,7 @@ function addItem(item) {
   });
 }
 
-var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable" align="right"><span class="price"></span></td><td align="right"><span class="ext"></span></td></tr>');
+var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable dollar" align="right"><span class="price"></span></td><td align="right" class="dollar"><span class="ext"></span></td></tr>');
 
 function addNewItem(item) {
   var row= $("#items tbody tr:data(line_id=" + item.line_id + ")").first();
@@ -281,6 +288,17 @@ function addNewItem(item) {
   updateTotal();
 }
 
+var paymentRow= $('<tr class="payment-row"><th colspan=4></th><th class="payment-method" align="right">Method:</th><td class="payment-amount" align="right">$0.00</td></tr>');
+
+var paymentMethods= {
+  cash: "Cash",
+  change: "Change",
+  credit: "Credit Card",
+  gift: "Gift Card",
+  check: "Check",
+  discount: "Discount",
+};
+
 function updateTotal() {
   var total= 0;
   $('#items .ext').each(function() {
@@ -292,9 +310,28 @@ function updateTotal() {
   $('#items #tax').text(tax.toFixed(2))
   total = total + tax;
   $('#items #total').text(total.toFixed(2))
+
+  $('.payment-row').remove();
+  $.each($('#txn').data('payments'), function(i, payment) {
+    var row= paymentRow.clone();
+    $('.payment-method', row).text(paymentMethods[payment.method] + ':');
+    var amount= payment.amount;
+    if (amount < 0.0) {
+      amount= '($' + Math.abs(amount).toFixed(2) + ')';
+    } else {
+      amount= '$' + amount.toFixed(2);
+    }
+    $('.payment-amount', row).text(amount);
+    $('#due-row').before(row);
+  });
+
   var paid= $('#txn').data('paid');;
-  $('#items #paid').text(paid.toFixed(2))
-  $('#items #due').text((total - paid).toFixed(2))
+  if (paid > 0) {
+    $('#items #due').text(Math.abs(total - paid).toFixed(2))
+    $('#due-row').show();
+  } else {
+    $('#due-row').hide();
+  }
 }
 
 function loadOrder(txn) {
@@ -309,6 +346,8 @@ function loadOrder(txn) {
   var prc= $('<span class="val">' + tax_rate +  '</span>');
   $('#txn #tax_rate .val').replaceWith(prc);
   $('#txn #description').text("Sale " + txn.txn.number);
+
+  $('#txn').data('payments', txn.payments);
 
   // load rows
   $.each(txn.items, function(i, item) {
@@ -454,7 +493,7 @@ $(function() {
   });
 
   $("#pay").click(function() {
-    $.modal($("#payment-types"));
+    $.modal($("#payment-methods"));
   });
 });
 </script>
@@ -474,7 +513,7 @@ $(function() {
 </form>
 <div id="txn" class="disabled">
 <button id="pay">Pay</button>
-<div id="payment-types" style="display: none">
+<div id="payment-methods" style="display: none">
  <button data-value="cash">Cash</button>
  <button data-value="credit-manual">Credit Card (Manual)</button>
  <button data-value="gift">Gift Card</button>
@@ -482,7 +521,7 @@ $(function() {
  <button data-value="discount">Discount</button>
 </div>
 <script>
-$("#payment-types").on("click", "button", function(ev) {
+$("#payment-methods").on("click", "button", function(ev) {
   $("#status").text("Selected " + $(this).data("value"));
   $.modal.close();
 });
@@ -495,11 +534,10 @@ $("#payment-types").on("click", "button", function(ev) {
   <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
-  <tr><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
-  <tr><th colspan=4></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="dollar">0.00</td></tr>
+  <tr id="subtotal-row"><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
+  <tr id="tax-row"><th colspan=4></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="dollar">0.00</td></tr>
   <tr id="total-row"><th colspan=4></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
-  <tr><th colspan=4></th><th align="right">Paid:</th><td id="paid" class="dollar">0.00</td></tr>
-  <tr><th colspan=4></th><th align="right">Due:</th><td id="due" class="dollar">0.00</td></tr>
+  <tr id="due-row" style="display:none"><th colspan=4></th><th align="right">Due:</th><td id="due" class="dollar">0.00</td></tr>
  </tfoot>
  <tbody>
  </tbody>
