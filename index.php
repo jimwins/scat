@@ -357,6 +357,18 @@ $(function() {
     }
   });
 
+  $(document).bind('keydown', 'meta+p', function(ev) {
+    var txn= $('#txn').data('txn');
+    if (!txn) {
+      $.modal("No sale to print.");
+      return false;
+    }
+    var lpr= $('<iframe id="receipt" src="receipt.php?print=1&amp;id=' + txn + '"></iframe>').hide();
+    $("#receipt").remove();
+    $('body').append(lpr);
+    return false;
+  });
+
   $('#lookup').submit(function() {
     $('#items .error').hide(); // hide old error messages
     $('input[name="q"]', this).focus().select();
