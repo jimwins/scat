@@ -493,7 +493,7 @@ $(function() {
   });
 
   $("#pay").click(function() {
-    $.modal($("#payment-methods"));
+    $.modal($("#payment-methods"), { persist: true});
   });
 });
 </script>
@@ -522,7 +522,8 @@ $(function() {
 </div>
 <script>
 $("#payment-methods").on("click", "button", function(ev) {
-  $("#status").text("Selected " + $(this).data("value"));
+  var val= $(this).data("value");
+  $("#status").text("Selected " + val);
   $.modal.close();
 });
 </script>
