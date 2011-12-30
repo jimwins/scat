@@ -344,6 +344,9 @@ $(function() {
   $('#txn').data('tax_rate', 0.00);
 
   $(document).keydown(function(event) {
+    if (event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) {
+      return true;
+    }
     var el = $.getFocusedElement();
     if (!el.length) {
       var inp= $('input[name="q"]', this);
