@@ -12,6 +12,9 @@ Scat includes the SimpleModal plugin for jQuery:
 Scat includes Datejs, an open-source JavaScript Date library:
   http://www.datejs.com/
 
+Scat includes the jQuery Hotkeys plugin:
+  http://github.com/tzuryby/jquery.hotkeys
+
 Scat includes icons from the Silk icon set by Mark James:
   http://www.famfamfam.com/lab/icons/silk/
 
