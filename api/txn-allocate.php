@@ -6,6 +6,8 @@ $id= (int)$_REQUEST['txn'];
 if (!$id)
   die_jsonp("no transaction specified.");
 
+$txn= txn_load($db, $id);
+
 if ($txn['paid']) {
   die_jsonp("This order is already paid!");
 }
