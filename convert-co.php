@@ -297,11 +297,11 @@ $q= "CREATE TEMPORARY TABLE txn_paid
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
       WHERE type = 'customer'
       GROUP BY txn.id) t";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 
 $q= "UPDATE txn, txn_paid SET txn.paid = last_payment
       WHERE txn.id = txn_paid.id AND total - txn_paid.paid < 0.02";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Noted ", $db->affected_rows, " payments.<br>";
 
 $out= ob_get_contents();
