@@ -142,6 +142,7 @@ function updateValue(row, key, value) {
   $.getJSON("api/txn-update-item.php?callback=?",
             data,
             function (data) {
+              updateOrderData(data.txn);
               updateItems(data.items);
             });
 }
@@ -209,9 +210,9 @@ $('#tax_rate').live('dblclick', function() {
               { txn: txn, tax_rate: tax_rate},
               function (data) {
                 // XXX handle error
-                var prc= $('<span class="val">' + data.tax_rate +  '</span>');
-                $('#txn').data('tax_rate', data.tax_rate);
+                var prc= $('<span class="val"></span>');
                 $('#tax_rate').children().replaceWith(prc);
+                updateOrderData(data.txn);
                 updateTotal();
               });
     return true;
@@ -239,6 +240,7 @@ $('.remove').live('click', function() {
         lastItem= null;
       }
       row.remove();
+      updateOrderData(data.txn);
       updateTotal();
     }
   });
@@ -256,16 +258,7 @@ function addItem(item) {
         $("#items .error").html("<p>" + data.error + "</p>");
         $("#items .error").show();
       } else {
-        $('#txn').data('txn', data.details.txn);
-        if (data.details.tax_rate) {
-          tax_rate= parseFloat(data.details.tax_rate).toFixed(2);
-          $('#txn').data('tax_rate', tax_rate)
-          prc= $('<span class="val">' + tax_rate +  '</span>');
-          $('#txn #tax_rate .val').replaceWith(prc);
-        }
-        if (data.details.description) {
-          $('#txn #description').text(data.details.description);
-        }
+        updateOrderData(data.txn);
         if (data.items.length == 1) {
           snd.yes.play();
           addNewItem(data.items[0]);
@@ -307,15 +300,12 @@ var paymentMethods= {
 };
 
 function updateTotal() {
-  var total= 0;
-  $('#items .ext').each(function() {
-    total= total + parseFloat($(this).text());
-  });
-  $('#items #subtotal').text(total.toFixed(2))
+  var total= $("#txn").data("total");;
+  var subtotal= $("#txn").data("subtotal");;
+  $('#items #subtotal').text(subtotal.toFixed(2))
   var tax_rate= $('#txn').data('tax_rate');
-  var tax= round_to_even(total * (tax_rate / 100), 2);
+  var tax= total - subtotal;
   $('#items #tax').text(tax.toFixed(2))
-  total = total + tax;
   $('#items #total').text(total.toFixed(2))
 
   $('.payment-row').remove();
@@ -344,6 +334,7 @@ function updateTotal() {
 function updateOrderData(txn) {
   // set transaction data
   $('#txn').data('txn', txn.id);
+  $('#txn').data('subtotal', txn.subtotal)
   $('#txn').data('total', txn.total)
   $('#txn').data('paid', txn.total_paid)
   var tax_rate= parseFloat(txn.tax_rate).toFixed(2);
@@ -449,16 +440,7 @@ $(function() {
           $("#items .error").html("<p>" + data.error + "</p>");
           $("#items .error").show();
         } else {
-          $('#txn').data('txn', data.details.txn);
-          if (data.details.tax_rate) {
-            tax_rate= parseFloat(data.details.tax_rate).toFixed(2);
-            $('#txn').data('tax_rate', tax_rate)
-            prc= $('<span class="val">' + tax_rate +  '</span>');
-            $('#txn #tax_rate .val').replaceWith(prc);
-          }
-          if (data.details.description) {
-            $('#txn #description').text(data.details.description);
-          }
+          updateOrderData(data.txn);
           if (data.items.length == 0) {
             snd.no.play();
           } else if (data.items.length == 1) {
@@ -552,9 +534,8 @@ $("#payment-methods").on("click", "button", function(ev) {
   var method= $(this).data("value");
   $.modal.close();
   var id= "#pay-" + method;
-  // XXX get the value from somewhere real
-  var total= $("#items #total").text();
-  $(".amount", id).val(total);
+  var due= ($("#txn").data("total") - $("#txn").data("paid")).toFixed(2);
+  $(".amount", id).val(due);
   $.modal($(id), { overlayClose: false });
   $(".amount", id).focus().select();
 });
