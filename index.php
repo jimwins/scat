@@ -519,19 +519,6 @@ $(function() {
 </form>
 <div id="txn" class="disabled">
 <button id="pay">Pay</button>
-<div id="payment-methods" style="display: none">
- <button data-value="cash">Cash</button>
- <button data-value="credit-manual">Credit Card (Manual)</button>
- <button data-value="gift">Gift Card</button>
- <button data-value="check">Check</button>
- <button data-value="discount">Discount</button>
-</div>
-<div id="pay-check" class="pay-method" style="display: none">
- <input class="amount" type="text" pattern="\d*">
- <br>
- <button name="pay">Pay</button>
- <button name="cancel">Cancel</button>
-</div>
 <script>
 $("#pay").on("click", function() {
   var txn= $('#txn').data('txn');
@@ -544,6 +531,24 @@ $("#pay").on("click", function() {
               $.modal($("#payment-methods"), { persist: true});
             });
 });
+</script>
+<div id="payment-methods" style="display: none">
+ <button data-value="cash">Cash</button>
+<?if ($DEBUG) {?>
+ <button data-value="credit">Credit Card</button>
+<?}?>
+ <button data-value="credit-manual">Credit Card (Manual)</button>
+ <button data-value="gift">Gift Card</button>
+ <button data-value="check">Check</button>
+ <button data-value="discount">Discount</button>
+</div>
+<div id="pay-check" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <button name="pay">Pay</button>
+ <button name="cancel">Cancel</button>
+</div>
+<script>
 $("#payment-methods").on("click", "button", function(ev) {
   var method= $(this).data("value");
   $.modal.close();
