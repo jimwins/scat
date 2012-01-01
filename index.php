@@ -124,7 +124,12 @@ function updateRow(row) {
   $('.discount', row).text(row.data('discount'));
   $('.price', row).text(row.data('price').toFixed(2));
   var ext= row.data('quantity') * row.data('price');
-  $('.ext', row).text(ext.toFixed(2));
+  if (ext < 0.0) {
+    ext= '($' + Math.abs(ext).toFixed(2) + ')';
+  } else {
+    ext= '$' + ext.toFixed(2);
+  }
+  $('.ext', row).text(ext);
 }
 
 function updateValue(row, key, value) {
@@ -273,7 +278,7 @@ function addItem(item) {
   });
 }
 
-var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable dollar" align="right"><span class="price"></span></td><td align="right" class="dollar"><span class="ext"></span></td></tr>');
+var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable dollar" align="right"><span class="price"></span></td><td align="right"><span class="ext"></span></td></tr>');
 
 function addNewItem(item) {
   var row= $("#items tbody tr:data(line_id=" + item.line_id + ")").first();
