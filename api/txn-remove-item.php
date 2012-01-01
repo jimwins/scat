@@ -1,5 +1,6 @@
 <?
 include '../scat.php';
+include '../lib/txn.php';
 
 $details= array();
 
@@ -19,4 +20,6 @@ if (!$db->affected_rows) {
   die(json_encode(array('error' => "Unable to delete line.")));
 }
 
-echo json_encode(array('removed' => $id));
+$txn= txn_load($db, $txn);
+
+echo json_encode(array('txn' => $txn, 'removed' => $id));

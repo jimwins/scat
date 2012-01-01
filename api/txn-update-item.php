@@ -1,12 +1,11 @@
 <?
 include '../scat.php';
+include '../lib/txn.php';
 
-$details= array();
-
-$txn= (int)$_REQUEST['txn'];
+$txn_id= (int)$_REQUEST['txn'];
 $id= (int)$_REQUEST['id'];
 
-if (!$txn || !$id) die_jsonp('No transaction or item specified');
+if (!$txn_id || !$id) die_jsonp('No transaction or item specified');
 
 if (!empty($_REQUEST['price'])) {
   $price= $_REQUEST['price'];
@@ -30,7 +29,7 @@ if (!empty($_REQUEST['price'])) {
           SET txn_line.retail_price = $price,
               txn_line.discount_type = $discount_type,
               txn_line.discount = $discount 
-        WHERE txn = $txn AND txn_line.id = $id AND txn_line.item = item.id";
+        WHERE txn = $txn_id AND txn_line.id = $id AND txn_line.item = item.id";
 
   $r= $db->query($q);
   if (!$r) {
@@ -42,7 +41,7 @@ if (!empty($_REQUEST['quantity'])) {
   $quantity= (int)$_REQUEST['quantity'];
   $q= "UPDATE txn_line
           SET ordered = -1 * $quantity
-        WHERE txn = $txn AND txn_line.id = $id";
+        WHERE txn = $txn_id AND txn_line.id = $id";
 
   $r= $db->query($q);
   if (!$r) {
@@ -54,7 +53,7 @@ if (isset($_REQUEST['name'])) {
   $name= $db->real_escape_string($_REQUEST['name']);
   $q= "UPDATE txn_line
           SET override_name = IF('$name' = '', NULL, '$name')
-        WHERE txn = $txn AND txn_line.id = $id";
+        WHERE txn = $txn_id AND txn_line.id = $id";
 
   $r= $db->query($q);
   if (!$r) {
@@ -80,7 +79,7 @@ $q= "SELECT txn_line.id AS line_id,
             END), '') discount,
             (SELECT SUM(allocated) FROM txn_line WHERE item = txn_line.id) stock
        FROM txn_line
-      WHERE txn = $txn AND txn_line.id = $id";
+      WHERE txn = $txn_id AND txn_line.id = $id";
 
 $r= $db->query($q);
 if (!$r) {
@@ -96,4 +95,6 @@ while ($row= $r->fetch_assoc()) {
   $items[]= $row;
 }
 
-echo generate_jsonp(array('details' => $details, 'items' => $items));
+$txn= txn_load($db, $txn_id);
+
+echo generate_jsonp(array('txn' => $txn, 'items' => $items));

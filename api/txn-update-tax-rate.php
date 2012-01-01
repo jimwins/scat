@@ -1,5 +1,6 @@
 <?
 include '../scat.php';
+include '../lib/txn.php';
 
 $txn= (int)$_REQUEST['txn'];
 if (!$txn)
@@ -14,5 +15,7 @@ $q= "UPDATE txn SET tax_rate = $tax_rate WHERE id = $txn";
 $r= $db->query($q)
   or die_jsonp($db->error);
 
+$txn= txn_load($db, $txn);
+
 generate_jsonp(array("success" => "Updated tax rate.",
-                     "tax_rate" => $tax_rate));
+                     "txn" => $txn));

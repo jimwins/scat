@@ -1,7 +1,6 @@
 <?
 include '../scat.php';
-
-$details= array();
+include '../lib/txn.php';
 
 $id= (int)$_REQUEST['id'];
 
@@ -9,15 +8,10 @@ $search= $_REQUEST['q'];
 
 if (!$search && !$id) die_jsonp('no query specified');
 
-$details['txn']= $_REQUEST['txn'];
-if (!$details['txn']) {
+if (!$id) {
 
   // if there's a transaction with no items yet, hijack it
-  $q= "SELECT txn.id AS txn,
-              CONCAT('Sale ', DATE_FORMAT(NOW(), '%Y'), '-', number)
-                AS description,
-              created,
-              tax_rate
+  $q= "SELECT txn.id
          FROM txn LEFT JOIN txn_line ON (txn.id = txn)
          WHERE txn_line.id IS NULL AND type = 'customer'";
   $r= $db->query($q);
@@ -27,8 +21,8 @@ if (!$details['txn']) {
   }
 
   if ($r->num_rows) {
-    $details= $r->fetch_assoc();
-
+    $row= $r->fetch_assoc();
+    $id= $row['id'];
   } else {
 
     $q= "START TRANSACTION;";
@@ -57,18 +51,7 @@ if (!$details['txn']) {
                             'query' => $q)));
     }
 
-    $q= "SELECT id AS txn,
-                CONCAT('Sale ', DATE_FORMAT(NOW(), '%Y'), '-', number)
-                  AS description,
-                created,
-                tax_rate
-           FROM txn WHERE id = " . $db->insert_id;
-    $r= $db->query($q);
-    if (!$r) {
-      die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                            'query' => $q)));
-    }
-    $details= $r->fetch_assoc();
+    $id= $db->insert_id;
 
     $r= $db->commit();
     if (!$r) {
@@ -153,7 +136,7 @@ if (count($items) == 1) {
   // XXX some items should always be added on their own
 
   $q= "SELECT id, ordered FROM txn_line
-        WHERE txn = $details[txn] AND item = {$items[0]['id']}";
+        WHERE txn = $id AND item = {$items[0]['id']}";
   $r= $db->query($q);
   if (!$r) {
     die(json_encode(array('error' => 'Query failed. ' . $db->error,
@@ -175,7 +158,7 @@ if (count($items) == 1) {
   } else {
     $q= "INSERT INTO txn_line (txn, item, ordered,
                                retail_price, discount, discount_type)
-         SELECT $details[txn] AS txn, {$items[0]['id']} AS item, -1 AS ordered,
+         SELECT $id AS txn, {$items[0]['id']} AS item, -1 AS ordered,
                 retail_price, discount, discount_type
            FROM item WHERE id = {$items[0]['id']}";
     $r= $db->query($q);
@@ -187,4 +170,6 @@ if (count($items) == 1) {
   }
 }
 
-echo json_encode(array('details' => $details, 'items' => $items));
+$txn= txn_load($db, $id);
+
+echo json_encode(array('txn' => $txn, 'items' => $items));
