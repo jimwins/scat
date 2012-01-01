@@ -501,7 +501,7 @@ $(function() {
 </table>
 </div>
 <form id="lookup" method="get" action="items.php">
-<input type="text" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="<?=htmlspecialchars($q)?>">
+<input type="text" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="">
 <input type="submit" value="Find Items">
 </form>
 <div id="txn" class="disabled">
