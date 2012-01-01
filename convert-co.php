@@ -228,7 +228,8 @@ echo "Loaded ", $db->affected_rows, " (or so) transaction lines.<br>";
 $q= "INSERT IGNORE
        INTO payment (id, txn, method, amount, processed)
      SELECT id_payment AS id,
-            id_transaction AS txn,
+            (SELECT id_request FROM co.transaction
+              WHERE id_transaction = transaction.id) AS txn,
             CASE type
               WHEN 1 THEN 'credit' /* online */
               WHEN 2 THEN 'credit'
