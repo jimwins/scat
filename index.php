@@ -475,7 +475,7 @@ $(function() {
       $('tbody', $(this).parent()).empty();
     } else {
       $.getJSON("api/txn-list.php?callback=?",
-                { type: 'customer', unfilled: true },
+                { type: 'customer', unpaid: true },
                 function (data) {
                   if (data.error) {
                     $.modal(data.error);
