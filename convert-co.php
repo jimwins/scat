@@ -178,6 +178,18 @@ $q= "INSERT
 $r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
 
+/*
+ * We have to dump the transaction lines because we're actually squashing
+ * together lines that Checkout kept distinct when parts of a Purchase Order
+ * was received at times. We have mixed feelings about that. (But in our data,
+ * that was only ~37 items and we don't plan on having piecemeal order
+ * receiving in Scat.)
+ */
+
+$q= "TRUNCATE txn_line";
+$r= $db->query($q) or die_query($db, $q);
+echo "Reset transaction lines.<br>";
+
 # lines from transactions
 $q= "INSERT
        INTO txn_line (id, txn, line, item, ordered, allocated, override_name, retail_price, discount_type, discount, taxfree)
@@ -196,8 +208,8 @@ $q= "INSERT
        FROM co.transaction tx
       WHERE id_parent IS NOT NULL
      ON DUPLICATE KEY
-     UPDATE ordered = VALUES(ordered),
-            allocated = VALUES(allocated)";
+     UPDATE ordered = ordered + VALUES(ordered),
+            allocated = allocated + VALUES(allocated)";
 $r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " (or so) transaction lines.<br>";
 
