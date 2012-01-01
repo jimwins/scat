@@ -542,12 +542,6 @@ $("#pay").on("click", function() {
  <button data-value="check">Check</button>
  <button data-value="discount">Discount</button>
 </div>
-<div id="pay-check" class="pay-method" style="display: none">
- <input class="amount" type="text" pattern="\d*">
- <br>
- <button name="pay">Pay</button>
- <button name="cancel">Cancel</button>
-</div>
 <script>
 $("#payment-methods").on("click", "button", function(ev) {
   var method= $(this).data("value");
@@ -562,6 +556,14 @@ $("#payment-methods").on("click", "button", function(ev) {
 $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   $.modal.close();
 });
+</script>
+<div id="pay-cash" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <button name="pay">Pay</button>
+ <button name="cancel">Cancel</button>
+</div>
+<script>
 $("#pay-cash").on("click", "button[name='pay']", function (ev) {
   var txn= $("#txn").data("txn");
   var amount= $("#pay-cash .amount").val();
@@ -578,6 +580,14 @@ $("#pay-cash").on("click", "button[name='pay']", function (ev) {
               }
             });
 });
+</script>
+<div id="pay-check" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <button name="pay">Pay</button>
+ <button name="cancel">Cancel</button>
+</div>
+<script>
 $("#pay-check").on("click", "button[name='pay']", function (ev) {
   var txn= $("#txn").data("txn");
   var amount= $("#pay-check .amount").val();
