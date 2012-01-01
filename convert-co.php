@@ -248,8 +248,8 @@ echo "Loaded ", $db->affected_rows, " payments.<br>";
 
 # notes
 #
-$q= "INSERT IGNORE INTO txn_note (txn, entered, content)
-     SELECT id_transaction, date, content
+$q= "INSERT IGNORE INTO txn_note (id, txn, entered, content)
+     SELECT note.id, id_transaction, date, content
        FROM co.note_transaction 
        JOIN co.note ON (note.id = id_note)";
 $r= $db->query($q) or die("query failed: ". $db->error);
