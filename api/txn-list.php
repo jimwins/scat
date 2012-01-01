@@ -45,7 +45,7 @@ $q= "SELECT id, type,
             txn.created, txn.filled, txn.paid,
             txn.person,
             CONCAT(IFNULL(person.name, ''),
-                   IF(person.name AND person.company, ' / ', ''),
+                   IF(person.name != '' AND person.company != '', ' / ', ''),
                    IFNULL(person.company, ''))
                 AS person_name,
             SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS ordered,
