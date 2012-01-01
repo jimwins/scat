@@ -539,9 +539,6 @@ $("#payment-methods").on("click", "button", function(ev) {
   $.modal($(id), { overlayClose: false });
   $(".amount", id).focus().select();
 });
-$(".pay-method").on("click", "button[name='cancel']", function(ev) {
-  $.modal.close();
-});
 </script>
 <div id="pay-cash" class="pay-method" style="display: none">
  <input class="amount" type="text" pattern="\d*">
@@ -589,6 +586,9 @@ $("#pay-check").on("click", "button[name='pay']", function (ev) {
                 $.modal.close();
               }
             });
+});
+$(".pay-method").on("click", "button[name='cancel']", function(ev) {
+  $.modal.close();
 });
 </script>
 <h2 id="description">New Sale</h2>
