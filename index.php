@@ -515,11 +515,11 @@ $("#pay").on("click", function() {
               if (data.error) {
                 $.modal(data.error);
               }
-              $.modal($("#payment-methods"), { persist: true});
+              $.modal($("#choose-pay-method"), { persist: true});
             });
 });
 </script>
-<div id="payment-methods" style="display: none">
+<div id="choose-pay-method" style="display: none">
  <button data-value="cash">Cash</button>
 <?if ($DEBUG) {?>
  <button data-value="credit">Credit Card</button>
@@ -530,7 +530,7 @@ $("#pay").on("click", function() {
  <button data-value="discount">Discount</button>
 </div>
 <script>
-$("#payment-methods").on("click", "button", function(ev) {
+$("#choose-pay-method").on("click", "button", function(ev) {
   var method= $(this).data("value");
   $.modal.close();
   var id= "#pay-" + method;
