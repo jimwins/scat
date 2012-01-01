@@ -126,12 +126,10 @@ $q= "TRUNCATE txn_line";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Flushed transaction lines.<br>";
 
-$order_offset= 300000;
-
 # incomplete transactions
 $q= "INSERT
        INTO txn (id, number, created, type, person, tax_rate)
-     SELECT id + $order_offset AS id,
+     SELECT id AS id,
             IFNULL(number, 0) AS number,
             date AS created,
             CASE type
@@ -154,11 +152,10 @@ echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
 
 # lines from requests (un-received items)
 #
-# needs the id offset to avoid collisions
 $q= "INSERT
        INTO txn_line (id, txn, line, item, ordered, allocated, override_name, retail_price, discount_type, discount, taxfree)
-     SELECT co.id + $order_offset AS id,
-            co.id_parent + $order_offset AS txn,
+     SELECT co.id AS id,
+            co.id_parent AS txn,
             IFNULL(co.in_parent_index, 0) AS line,
             co.id_item AS item,
             IF(co.type = 1, -1, 1) * co.quantity AS ordered,
@@ -176,7 +173,7 @@ echo "Loaded ", $db->affected_rows, " transaction lines from incomplete orders.<
 # basics
 $q= "INSERT
        INTO txn (id, number, created, filled, type, person, tax_rate)
-     SELECT id AS id,
+     SELECT id_request AS id,
             IFNULL(IF(type = 2,
                       SUBSTRING_INDEX(formatted_request_number, '-', -1),
                       number),
@@ -206,8 +203,9 @@ echo "Loaded ", $db->affected_rows, " transactions.<br>";
 # lines from transactions
 $q= "INSERT
        INTO txn_line (id, txn, line, item, ordered, allocated, override_name, retail_price, discount_type, discount, taxfree)
-     SELECT id AS id,
-            id_parent AS txn,
+     SELECT id_request AS id,
+            (SELECT id_request FROM co.transaction parent
+              WHERE parent.id = tx.id_parent) AS txn,
             IFNULL(in_parent_index, 0) AS line,
             id_item AS item,
             IF(type = 1, -1, 1) * quantity AS ordered,
