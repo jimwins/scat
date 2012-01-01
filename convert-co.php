@@ -122,55 +122,8 @@ echo "Loaded ", $db->affected_rows, " people.<br>";
 
 # TRANSACTIONS
 #
-$q= "TRUNCATE txn_line";
-$r= $db->query($q) or die("query failed: ". $db->error);
-echo "Flushed transaction lines.<br>";
 
-# incomplete transactions
-$q= "INSERT
-       INTO txn (id, number, created, type, person, tax_rate)
-     SELECT id AS id,
-            IFNULL(number, 0) AS number,
-            date AS created,
-            CASE type
-              WHEN 1 THEN 'customer'
-              WHEN 2 THEN 'vendor'
-              WHEN 3 THEN 'internal'
-            END AS type,
-            id_item AS person,
-            IF(has_tax = 't',
-               (SELECT rate FROM co.metatax WHERE id = metataxstate),
-               0) AS tax_rate
-       FROM co.request
-      WHERE id_parent IS NULL
-     ON DUPLICATE KEY
-     UPDATE
-            person = VALUES(person),
-            tax_rate = VALUES(tax_rate)";
-$r= $db->query($q) or die("query failed: ". $db->error);
-echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
-
-# lines from requests (un-received items)
-#
-$q= "INSERT
-       INTO txn_line (id, txn, line, item, ordered, allocated, override_name, retail_price, discount_type, discount, taxfree)
-     SELECT co.id AS id,
-            co.id_parent AS txn,
-            IFNULL(co.in_parent_index, 0) AS line,
-            co.id_item AS item,
-            IF(co.type = 1, -1, 1) * co.quantity AS ordered,
-            0 AS allocated,
-            IF(overrides LIKE '%name%', SUBSTRING_INDEX(SUBSTRING_INDEX(overrides, '012(V', -1), '\\\\012p3', 1), NULL) AS override_name,
-            IFNULL(override_price, (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = co.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1)) retail_price,
-            IF(discount_percentage, 'percentage', NULL) AS discount_type,
-            IF(discount_percentage, discount_percentage, NULL) AS discount,
-            (SELECT taxfree FROM item WHERE item.id = id_item) taxfree
-       FROM co.request co
-      WHERE co.id_parent IS NOT NULL";
-$r= $db->query($q) or die("query failed: ". $db->error);
-echo "Loaded ", $db->affected_rows, " transaction lines from incomplete orders.<br>";
-
-# basics
+# completed transactions
 $q= "INSERT
        INTO txn (id, number, created, filled, type, person, tax_rate)
      SELECT id_request AS id,
@@ -200,6 +153,31 @@ $q= "INSERT
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " transactions.<br>";
 
+# incomplete transactions
+$q= "INSERT
+       INTO txn (id, number, created, type, person, tax_rate)
+     SELECT id AS id,
+            IFNULL(number, 0) AS number,
+            date AS created,
+            CASE type
+              WHEN 1 THEN 'customer'
+              WHEN 2 THEN 'vendor'
+              WHEN 3 THEN 'internal'
+            END AS type,
+            id_item AS person,
+            IF(has_tax = 't',
+               (SELECT rate FROM co.metatax WHERE id = metataxstate),
+               0) AS tax_rate
+       FROM co.request
+      WHERE id_parent IS NULL
+     ON DUPLICATE KEY
+     UPDATE
+            filled = NULL,
+            person = VALUES(person),
+            tax_rate = VALUES(tax_rate)";
+$r= $db->query($q) or die("query failed: ". $db->error);
+echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
+
 # lines from transactions
 $q= "INSERT
        INTO txn_line (id, txn, line, item, ordered, allocated, override_name, retail_price, discount_type, discount, taxfree)
@@ -218,10 +196,32 @@ $q= "INSERT
        FROM co.transaction tx
       WHERE id_parent IS NOT NULL
      ON DUPLICATE KEY
-     UPDATE ordered = ordered + VALUES(ordered),
-            allocated = allocated + VALUES(allocated)";
+     UPDATE ordered = VALUES(ordered),
+            allocated = VALUES(allocated)";
 $r= $db->query($q) or die("query failed: ". $db->error);
 echo "Loaded ", $db->affected_rows, " (or so) transaction lines.<br>";
+
+# lines from requests (un-received items)
+#
+$q= "INSERT
+       INTO txn_line (id, txn, line, item, ordered, allocated, override_name, retail_price, discount_type, discount, taxfree)
+     SELECT co.id AS id,
+            co.id_parent AS txn,
+            IFNULL(co.in_parent_index, 0) AS line,
+            co.id_item AS item,
+            IF(co.type = 1, -1, 1) * co.quantity AS ordered,
+            0 AS allocated,
+            IF(overrides LIKE '%name%', SUBSTRING_INDEX(SUBSTRING_INDEX(overrides, '012(V', -1), '\\\\012p3', 1), NULL) AS override_name,
+            IFNULL(override_price, (SELECT value FROM co.metanumber m WHERE id <= metanumberstate AND m.id_item = co.id_item AND id_metatype = IF(type = 1, 17, 18) ORDER BY id DESC LIMIT 1)) retail_price,
+            IF(discount_percentage, 'percentage', NULL) AS discount_type,
+            IF(discount_percentage, discount_percentage, NULL) AS discount,
+            (SELECT taxfree FROM item WHERE item.id = id_item) taxfree
+       FROM co.request co
+      WHERE co.id_parent IS NOT NULL
+     ON DUPLICATE KEY
+     UPDATE ordered = ordered + VALUES(ordered)";
+$r= $db->query($q) or die("query failed: ". $db->error);
+echo "Loaded ", $db->affected_rows, " transaction lines from incomplete orders.<br>";
 
 # payments
 #
