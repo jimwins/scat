@@ -49,19 +49,19 @@ $q= "INSERT INTO item (id, code, name, minimum_quantity, taxfree, active, delete
             taxfree = VALUES(taxfree),
             active = VALUES(active),
             deleted = VALUES(deleted)";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " items.<br>";
 
 # load brands
 $q= "INSERT IGNORE INTO brand (name)
      SELECT (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 14 ORDER BY id DESC LIMIT 1)
        FROM item";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " brands.<br>";
 
 $q= "UPDATE item SET
        brand = (SELECT id FROM brand WHERE brand.name = (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 14 ORDER BY id DESC LIMIT 1))";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Set brand on ", $db->affected_rows, " rows.<br>";
 
 # load pricing
@@ -70,7 +70,7 @@ $q= "CREATE TEMPORARY TABLE co_pricing
             (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 16 ORDER BY id DESC LIMIT 1) description,
             (SELECT value FROM co.metanumber WHERE id_item = item.id AND id_metatype = 17 ORDER BY id DESC LIMIT 1) price
       FROM item";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 $q= "UPDATE item, co_pricing
         SET retail_price = IF(description IS NULL OR description NOT LIKE 'MSRP%',
                               price,
@@ -82,7 +82,7 @@ $q= "UPDATE item, co_pricing
                          SUBSTRING_INDEX(description,'/ Sale: ',-1),
                          NULL)
       WHERE item.id = co_pricing.id";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Updated pricing on ", $db->affected_rows, " rows.<br>";
 
 # load barcodes
@@ -90,7 +90,7 @@ $q= "INSERT IGNORE INTO barcode (code, item)
      SELECT (SELECT value FROM co.metavalue WHERE id_item = item.id AND id_metatype = 13 ORDER BY id DESC LIMIT 1) AS code,
             id AS item
        FROM item";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " barcodes.<br>";
 
 # PERSONS
@@ -117,7 +117,7 @@ $q= "INSERT INTO person (id, name, company, address, email, phone, tax_id,
             phone = VALUES(phone),
             active = VALUES(active),
             deleted = VALUES(deleted)";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " people.<br>";
 
 # TRANSACTIONS
@@ -150,7 +150,7 @@ $q= "INSERT
             filled = VALUES(filled),
             person = VALUES(person),
             tax_rate = VALUES(tax_rate)";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " transactions.<br>";
 
 # incomplete transactions
@@ -175,7 +175,7 @@ $q= "INSERT
             filled = NULL,
             person = VALUES(person),
             tax_rate = VALUES(tax_rate)";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " incomplete transactions.<br>";
 
 # lines from transactions
@@ -198,7 +198,7 @@ $q= "INSERT
      ON DUPLICATE KEY
      UPDATE ordered = VALUES(ordered),
             allocated = VALUES(allocated)";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " (or so) transaction lines.<br>";
 
 # lines from requests (un-received items)
@@ -220,7 +220,7 @@ $q= "INSERT
       WHERE co.id_parent IS NOT NULL
      ON DUPLICATE KEY
      UPDATE ordered = ordered + VALUES(ordered)";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " transaction lines from incomplete orders.<br>";
 
 # payments
@@ -243,7 +243,7 @@ $q= "INSERT IGNORE
             date AS processed
        FROM co.payment_transaction txn
        JOIN co.payment ON (id_payment = payment.id)";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " payments.<br>";
 
 # notes
@@ -252,7 +252,7 @@ $q= "INSERT IGNORE INTO txn_note (id, txn, entered, content)
      SELECT note.id, id_transaction, date, content
        FROM co.note_transaction 
        JOIN co.note ON (note.id = id_note)";
-$r= $db->query($q) or die("query failed: ". $db->error);
+$r= $db->query($q) or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " notes.<br>";
 
 # figure out paid transactions

@@ -221,13 +221,19 @@ function generate_jsonp($data) {
   print sprintf('%s(%s);', $_GET['callback'], json_encode($data));
 }
 
-function die_jsonp($message) {
+function die_jsonp($data) {
+  if (ob_get_level()) {
+    ob_end_clean();
+  }
+  if (!is_array($data)) {
+    $data= array('error' => $data);
+  }
   header('Content-type: application/javascript; charset=utf-8');
-  $data= array('error' => $message);
   die(sprintf('%s(%s);', $_GET['callback'], json_encode($data)));
 }
 
 function die_query($db, $query) {
-  return die_jsonp(array('error' => 'Query failed. '.  $db->error,
-                         'query' => $q));
+  die_jsonp(array('error' => 'Query failed.',
+                  'explain' =>  $db->error,
+                  'query' => $query));
 }
