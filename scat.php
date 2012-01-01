@@ -2,6 +2,8 @@
 /* Start page timer */
 $start_time= microtime();
 
+/* $DEBUG can be set by config.php, not in request/ */
+$DEBUG= false;
 require dirname(__FILE__).'/config.php';
 
 define('APP_NAME', 'ScatPOS');
