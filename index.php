@@ -617,15 +617,20 @@ $("#pay-cash").on("click", "button[name='pay']", function (ev) {
 <div id="pay-credit-manual" class="pay-method" style="display: none">
  <input class="amount" type="text" pattern="\d*">
  <br>
- <button name="pay">Pay</button>
+ <button name="Visa">Visa</button>
+ <button name="MasterCard">MasterCard</button>
+ <button name="Discover">Discover</button>
+ <button name="AmericanExpress">American Express</button>
  <button name="cancel">Cancel</button>
 </div>
 <script>
-$("#pay-credit-manual").on("click", "button[name='pay']", function (ev) {
+$("#pay-credit-manual").on("click", "button[name!='cancel']", function (ev) {
   var txn= $("#txn").data("txn");
   var amount= $("#pay-credit-manual .amount").val();
+  var cc_type= $(this).attr('name');
   $.getJSON("api/txn-add-payment.php?callback=?",
-            { id: txn, method: "credit", amount: amount, change: false },
+            { id: txn, method: "credit", amount: amount, change: false,
+              cc_type: cc_type },
             function (data) {
               if (data.error) {
                 alert(data.error);

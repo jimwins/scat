@@ -28,11 +28,23 @@ if (!$change && bccomp(bcadd($amount, $txn['total_paid']), $txn['total']) > 0) {
   die_jsonp("Amount is too much.");
 }
 
+$cc_fields= "";
+
+if ($method == 'credit') {
+  $cc= array();
+  foreach(array('cc_txn', 'cc_approval', 'cc_lastfour',
+                'cc_expire', 'cc_type') as $field) {
+    $cc[]= "$field = '" . $db->real_escape_string($_REQUEST[$field]) . "', ";
+  }
+
+  $cc_fields= join('', $cc);
+}
+
 // add payment record
 $q= "INSERT INTO payment
         SET txn = $id, method = '$method', amount = $amount,
+        $cc_fields
         processed = NOW()";
-// XX handle cc fields
 $r= $db->query($q)
   or die_query($db, $q);
 
