@@ -133,16 +133,16 @@ $details= $r->fetch_assoc();
 $q= "SELECT
             ABS(allocated) AS Qty,
             IFNULL(override_name, item.name) Name,
-            IF(item.discount_type,
-               CASE item.discount_type
+            IF(txn_line.discount_type,
+               CASE txn_line.discount_type
                  WHEN 'percentage' THEN
-                   CONCAT('MSRP $', item.retail_price, ' / ',
-                          'Sale: ', ROUND(item.discount, 0), '%')
+                   CONCAT('MSRP $', txn_line.retail_price, ' / ',
+                          'Sale: ', ROUND(txn_line.discount, 0), '%')
                  WHEN 'relative' THEN
-                   CONCAT('MSRP $', item.retail_price, ' / ',
-                          'Sale: $', item.discount, ' off')
+                   CONCAT('MSRP $', txn_line.retail_price, ' / ',
+                          'Sale: $', txn_line.discount, ' off')
                  WHEN 'fixed' THEN
-                   CONCAT('MSRP $', item.retail_price)
+                   CONCAT('MSRP $', txn_line.retail_price)
                END,
                '') Description,
             IF(txn_line.discount_type,
