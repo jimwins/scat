@@ -573,7 +573,7 @@ $("#pay-cash").on("click", "button[name='pay']", function (ev) {
 <script>
 $("#pay-credit-manual").on("click", "button[name='pay']", function (ev) {
   var txn= $("#txn").data("txn");
-  var amount= $("#pay-check .amount").val();
+  var amount= $("#pay-credit-manual .amount").val();
   $.getJSON("api/txn-add-payment.php?callback=?",
             { id: txn, method: "credit", amount: amount, change: false },
             function (data) {
