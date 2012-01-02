@@ -394,6 +394,7 @@ function showOpenOrders(data) {
     });
     $('#sales tbody').append(row);
   });
+  $('#sales').show();
 }
 
 function printReceipt() {
@@ -491,31 +492,44 @@ $(function() {
     return false;
   });
 
-  // Load open sales
-  $("#sales caption").click(function() {
-    if ($(this).hasClass('open')) {
-      $(this).removeClass('open');
-      $('tbody', $(this).parent()).empty();
-    } else {
-      $.getJSON("api/txn-list.php?callback=?",
-                { type: 'customer', unpaid: true },
-                function (data) {
-                  if (data.error) {
-                    $.modal(data.error);
-                  } else {
-                    showOpenOrders(data);
-                  }
-                  $("#status").text("Loaded open sales.").fadeOut('slow');
-                });
-      $(this).addClass('open');
-      $("#status").text("Loading open sales...").show();
-    }
-  });
 });
 </script>
 <div id="sidebar">
-<table id="sales" width="100%">
- <caption>Open Sales</caption>
+<button id="open-orders">Open Orders</button>
+<button id="unpaid-invoices">Unpaid Invoices</button>
+<script>
+$("#open-orders").click(function() {
+  $("#sales").hide();
+  $.getJSON("api/txn-list.php?callback=?",
+            { type: 'customer', unfilled: true },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              } else {
+                showOpenOrders(data);
+              }
+              $("#status").text("Loaded open orders.").fadeOut('slow');
+            });
+  $(this).addClass('open');
+  $("#status").text("Loading open orders...").show();
+});
+$("#unpaid-invoices").click(function() {
+  $("#sales").hide();
+  $.getJSON("api/txn-list.php?callback=?",
+            { type: 'customer', unpaid: true },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              } else {
+                showOpenOrders(data);
+              }
+              $("#status").text("Loaded unpaid invoices.").fadeOut('slow');
+            });
+  $(this).addClass('open');
+  $("#status").text("Loading unpaid invoices...").show();
+});
+</script>
+<table id="sales" width="100%" style="display: none">
  <thead>
   <tr><th>#</th><th>Date/Name</th><th>Items</th></tr>
  </thead>
