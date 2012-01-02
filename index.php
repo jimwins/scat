@@ -492,6 +492,7 @@ $(function() {
     return false;
   });
 
+  $("#open-orders").click();
 });
 </script>
 <div id="sidebar">
