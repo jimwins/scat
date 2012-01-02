@@ -46,6 +46,11 @@ td {padding:0.2em 0.1em; vertical-align:top;}
 tr.sub td {border-top:2px solid #000; border-bottom:2px solid #000;}
 tr.total td {border-top:solid #000 6px; text-align:right; font-weight:;}
 
+.cc-info {font-size:1em; width:100%; margin:2em 0;
+        border-bottom:2px solid #000; border-left:0; border-right:0;}
+.cc-info th { border: none; }
+.cc-info th:after { content: ":" }
+
 #doc_info {text-align:center;}
 #signature {margin:2em 0; padding:5px 0px; text-align:center;}
 #nosignature {margin:2em 0; text-align: center; padding: 5px 0px; }
@@ -222,7 +227,41 @@ if ($r->num_rows) {
 ?>
  </tbody>
 </table>
+<?
+$q= "SELECT id, method, amount, processed,
+            cc_approval, cc_lastfour, cc_expire, cc_type
+       FROM payment
+      WHERE txn = $id
+      ORDER BY processed ASC";
+
+$r= $db->query($q)
+  or die($db->error);
+
+$credit= 0;
+while ($payment= $r->fetch_assoc()) {
+  if ($payment['method'] == 'credit') {
+    $credit++;
+?>
+<table class="cc-info">
+ <tr><th>Date</th><td><?=$payment['processed']?></td></tr>
+ <tr><th>ID</th><td><?=$payment['id']?></td></tr>
+ <tr><th>Card Type</th><td><?=$payment['cc_type']?></td></tr>
+ <tr><th>Card Number</th><td><?=str_repeat('#', !strcmp($payment['cc_type'],'AmericanExpress') ? 11 : 12)?><?=$payment['cc_lastfour']?></td></tr>
+ <tr><th>Expiration</th><td>##/##</td></tr>
+<?if ($payment['cc_approval']) {?>
+ <tr><th>Approval</th><td><?=$payment['cc_approval']?></td></tr>
+<?}?>
+ <tr><th>Amount</th><td><?=amount($payment['amount'])?></td></tr>
+</table>
+<?
+  }
+}
+?>
 <div id="doc_info">
+<?if ($credit) {?>
+  CUSTOMER COPY
+  <br>
+<?}?>
   Invoice <?=ashtml($details['FormattedNumber'])?>
   <br>
   <?=ashtml($details['Created'])?>
