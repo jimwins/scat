@@ -131,7 +131,7 @@ $r= $db->query($q);
 $details= $r->fetch_assoc();
 
 $q= "SELECT
-            ABS(allocated) AS Qty,
+            -1 * allocated AS Qty,
             IFNULL(override_name, item.name) Name,
             IF(txn_line.discount_type,
                CASE txn_line.discount_type
@@ -151,7 +151,7 @@ $q= "SELECT
                  WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
                  WHEN 'fixed' THEN (txn_line.discount)
                END,
-               txn_line.retail_price) * ABS(allocated) Price
+               txn_line.retail_price) * -1 * allocated Price
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        JOIN item ON (txn_line.item = item.id)
