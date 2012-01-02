@@ -503,6 +503,28 @@ $(function() {
  <tbody>
  </tbody>
 </table>
+<br>
+<form id="txn-load">
+ Invoice: <input type="text" name="invoice" size="8">
+ <button>Load</button>
+</form>
+<script>
+$("#txn-load").submit(function() {
+  $.getJSON("api/txn-load.php?callback=?",
+            { type: "customer",
+              number: $("#txn-load input[name='invoice']").val() },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              } else {
+                loadOrder(data);
+              }
+              $("#status").text("Loaded sale.").fadeOut('slow');
+            });
+  return false;
+});
+</script>
+</div>
 </div>
 <form id="lookup" method="get" action="items.php">
 <input type="text" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="">
