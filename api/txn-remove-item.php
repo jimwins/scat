@@ -4,12 +4,17 @@ include '../lib/txn.php';
 
 $details= array();
 
-$txn= (int)$_REQUEST['txn'];
+$txn_id= (int)$_REQUEST['txn'];
 $id= (int)$_REQUEST['id'];
 
-if (!$txn || !$id) die_jsonp('No transaction or item specified');
+if (!$txn_id || !$id) die_jsonp('No transaction or item specified');
 
-$q= "DELETE FROM txn_line WHERE txn = $txn AND id = $id";
+$txn= txn_load($db, $txn_id);
+if ($txn['paid']) {
+  die_jsonp("This order is already paid!");
+}
+
+$q= "DELETE FROM txn_line WHERE txn = $txn_id AND id = $id";
 
 $r= $db->query($q);
 if (!$r) {
@@ -20,6 +25,6 @@ if (!$db->affected_rows) {
   die(json_encode(array('error' => "Unable to delete line.")));
 }
 
-$txn= txn_load($db, $txn);
+$txn= txn_load($db, $txn_id);
 
 echo json_encode(array('txn' => $txn, 'removed' => $id));

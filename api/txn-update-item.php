@@ -7,6 +7,11 @@ $id= (int)$_REQUEST['id'];
 
 if (!$txn_id || !$id) die_jsonp('No transaction or item specified');
 
+$txn= txn_load($db, $txn_id);
+if ($txn['paid']) {
+  die_jsonp("This order is already paid!");
+}
+
 if (!empty($_REQUEST['price'])) {
   $price= $_REQUEST['price'];
   if (preg_match('/^\d*(\/|%)$/', $price)) {

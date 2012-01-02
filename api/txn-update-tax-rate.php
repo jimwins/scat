@@ -2,16 +2,21 @@
 include '../scat.php';
 include '../lib/txn.php';
 
-$txn= (int)$_REQUEST['txn'];
-if (!$txn)
+$txn_id= (int)$_REQUEST['txn'];
+if (!$txn_id)
   die_jsonp("no transaction specified.");
+
+$txn= txn_load($db, $txn_id);
+if ($txn['paid']) {
+  die_jsonp("This order is already paid!");
+}
 
 $tax_rate= (float)$_REQUEST['tax_rate'];
 if (!strcmp($_REQUEST['tax_rate'], 'def')) {
   $tax_rate= DEFAULT_TAX_RATE;
 }
 
-$q= "UPDATE txn SET tax_rate = $tax_rate WHERE id = $txn";
+$q= "UPDATE txn SET tax_rate = $tax_rate WHERE id = $txn_id";
 $r= $db->query($q)
   or die_jsonp($db->error);
 

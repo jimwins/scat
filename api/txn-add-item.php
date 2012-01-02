@@ -63,6 +63,11 @@ if (!$txn_id) {
   }
 }
 
+$txn= txn_load($db, $txn_id);
+if ($txn['paid']) {
+  die_jsonp("This order is already paid!");
+}
+
 $criteria= array();
 
 if ($search) {
