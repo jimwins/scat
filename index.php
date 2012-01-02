@@ -52,7 +52,7 @@ tfoot td {
   width: 70%;
 }
 
-#pay {
+#sale-buttons {
   float: right;
 }
 .pay-method {
@@ -384,6 +384,18 @@ function showOpenOrders(data) {
   });
 }
 
+function printReceipt() {
+  var txn= $('#txn').data('txn');
+  if (!txn) {
+    $.modal("No sale to print.");
+    return false;
+  }
+  var lpr= $('<iframe id="receipt" src="receipt.php?print=1&amp;id=' + txn + '"></iframe>').hide();
+  $("#receipt").remove();
+  $('body').append(lpr);
+  return false;
+}
+
 $(function() {
   $('#txn').data('tax_rate', 0.00);
 
@@ -402,15 +414,7 @@ $(function() {
   });
 
   $(document).bind('keydown', 'meta+p', function(ev) {
-    var txn= $('#txn').data('txn');
-    if (!txn) {
-      $.modal("No sale to print.");
-      return false;
-    }
-    var lpr= $('<iframe id="receipt" src="receipt.php?print=1&amp;id=' + txn + '"></iframe>').hide();
-    $("#receipt").remove();
-    $('body').append(lpr);
-    return false;
+    return printReceipt();
   });
 
   $('#lookup').submit(function() {
@@ -505,8 +509,14 @@ $(function() {
 <input type="submit" value="Find Items">
 </form>
 <div id="txn" class="disabled">
-<button id="pay">Pay</button>
+<div id="sale-buttons">
+  <button id="print">Print</button>
+  <button id="pay">Pay</button>
+</div>
 <script>
+$("#print").on("click", function() {
+  printReceipt();
+});
 $("#pay").on("click", function() {
   var txn= $('#txn').data('txn');
   $.getJSON("api/txn-allocate.php?callback=?",
