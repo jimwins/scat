@@ -55,6 +55,11 @@ tfoot td {
 #sale-buttons {
   float: right;
 }
+
+.payment-buttons {
+  text-align: right;
+}
+
 .pay-method {
   text-align: center;
 }
@@ -288,7 +293,7 @@ function addNewItem(item) {
   setActiveRow(row);
 }
 
-var paymentRow= $('<tr class="payment-row"><th colspan=4></th><th class="payment-method" align="right">Method:</th><td class="payment-amount" align="right">$0.00</td></tr>');
+var paymentRow= $('<tr class="payment-row"><th colspan=4 class="payment-buttons"></th><th class="payment-method" align="right">Method:</th><td class="payment-amount" align="right">$0.00</td></tr>');
 
 var paymentMethods= {
   cash: "Cash",
@@ -311,6 +316,7 @@ function updateTotal() {
   $('.payment-row').remove();
   $.each($('#txn').data('payments'), function(i, payment) {
     var row= paymentRow.clone();
+    row.data(payment);
     $('.payment-method', row).text(paymentMethods[payment.method] + ':');
     var amount= payment.amount;
     if (amount < 0.0) {
@@ -319,6 +325,11 @@ function updateTotal() {
       amount= '$' + amount.toFixed(2);
     }
     $('.payment-amount', row).text(amount);
+
+    if (payment.method == 'credit') {
+      $('.payment-buttons', row).append($('<button name="print">Print</button>'));
+    }
+
     $('#due-row').before(row);
   });
 
@@ -391,6 +402,13 @@ function printReceipt() {
     return false;
   }
   var lpr= $('<iframe id="receipt" src="receipt.php?print=1&amp;id=' + txn + '"></iframe>').hide();
+  $("#receipt").remove();
+  $('body').append(lpr);
+  return false;
+}
+
+function printChargeRecord(id) {
+  var lpr= $('<iframe id="receipt" src="charge-record.php?print=1&amp;id=' + id + '"></iframe>').hide();
   $("#receipt").remove();
   $('body').append(lpr);
   return false;
@@ -735,6 +753,12 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   <tr id="total-row"><th colspan=4></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
   <tr id="due-row" style="display:none"><th colspan=4></th><th align="right">Due:</th><td id="due" class="dollar">0.00</td></tr>
  </tfoot>
+<script>
+$("#items").on("click", ".payment-row button[name='print']", function() {
+  var row= $(this).closest(".payment-row");
+  printChargeRecord(row.data("id"));
+});
+</script>
  <tbody>
  </tbody>
 </table>
