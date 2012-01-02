@@ -588,6 +588,79 @@ $("#pay-credit-manual").on("click", "button[name='pay']", function (ev) {
             });
 });
 </script>
+<div id="pay-gift" class="pay-method" style="display: none">
+ Card: <input class="card" type="text" size="15">
+ <br>
+ <button name="lookup">Check Card</button>
+ <button name="cancel">Cancel</button>
+</div>
+<div id="pay-gift-complete" class="pay-method" style="display: none">
+ <div id="pay-gift-balance"></div>
+ Amount: <input class="amount" type="text" size="20">
+ <br>
+ <button name="pay">Pay</button>
+ <button name="cancel">Cancel</button>
+</div>
+<script>
+$("#pay-gift").on("click", "button[name='lookup']", function (ev) {
+  var txn= $("#txn").data("txn");
+  var card= $("#pay-gift .card").val();
+  if (card == '...') {
+    card= "11111111111"; // Test card.
+  }
+  $.getJSON("<?=GIFT_BACKEND?>/check-balance.php?callback=?",
+            { card: card },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                var due= ($("#txn").data("total") - $("#txn").data("paid"));
+                $('#pay-gift-balance').text("Card has $" +
+                                            data.balance +
+                                            " remaining. Last used " +
+                                            data.latest + '.');
+                var def= due;
+                if (data.balance < due) {
+                  def= data.balance;
+                }
+                if (data.balance - due <= 10.00) {
+                  def= data.balance;
+                }
+                $("#pay-gift-complete .amount").val(def);
+                $.modal.close();
+                $("#pay-gift-complete").data(data);
+                $.modal($("#pay-gift-complete"), { overlayClose: false, persist: true });
+              }
+            });
+});
+$("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-gift-complete .amount").val();
+  var card= $("#pay-gift-complete").data('card');
+  $.getJSON("<?=GIFT_BACKEND?>/add-txn.php?callback=?",
+            { card: card, amount: -amount },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                var balance= $("#pay-gift-complete").data('balance');
+                $.getJSON("api/txn-add-payment.php?callback=?",
+                          { id: txn, method: "gift", amount: amount,
+                            change: (balance - amount <= 10.00) },
+                          function (data) {
+                            if (data.error) {
+                              alert(data.error);
+                            } else {
+                              updateOrderData(data.txn);
+                              $('#txn').data('payments', data.payments);
+                              updateTotal();
+                              $.modal.close();
+                            }
+                          });
+              }
+            });
+});
+</script>
 <div id="pay-check" class="pay-method" style="display: none">
  <input class="amount" type="text" pattern="\d*">
  <br>
