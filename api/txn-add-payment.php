@@ -53,7 +53,7 @@ $payment= $db->insert_id;
 // if amount + paid > total, add change record
 $change_paid= 0.0;
 if (bccomp(bcadd($amount, $txn['total_paid']), $txn['total']) > 0) {
-  $change_paid= $txn['total'] - ($amount + $txn['total_paid']);
+  $change_paid= bcsub($txn['total'],bcadd($amount,$txn['total_paid']));
 
   $q= "INSERT INTO payment
           SET txn = $id, method = 'change', amount = $change_paid,
