@@ -10,56 +10,38 @@ $search= $_REQUEST['q'];
 if (!$search && !$item) die_jsonp('no query specified');
 
 if (!$txn_id) {
-
-  // if there's a transaction with no items yet, hijack it
-  $q= "SELECT txn.id
-         FROM txn LEFT JOIN txn_line ON (txn.id = txn)
-         WHERE txn_line.id IS NULL AND type = 'customer'";
+  $q= "START TRANSACTION;";
   $r= $db->query($q);
   if (!$r) {
     die(json_encode(array('error' => 'Query failed. ' . $db->error,
                           'query' => $q)));
   }
 
-  if ($r->num_rows) {
-    $row= $r->fetch_assoc();
-    $txn_id= $row['id'];
-  } else {
+  $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = 'customer'";
+  $r= $db->query($q);
+  if (!$r) {
+    die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                          'query' => $q)));
+  }
+  $row= $r->fetch_assoc();
 
-    $q= "START TRANSACTION;";
-    $r= $db->query($q);
-    if (!$r) {
-      die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                            'query' => $q)));
-    }
+  $q= "INSERT INTO txn
+          SET created= NOW(),
+              type = 'customer',
+              number = $row[number],
+              tax_rate = " . DEFAULT_TAX_RATE;
+  $r= $db->query($q);
+  if (!$r) {
+    die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                          'query' => $q)));
+  }
 
-    $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = 'customer'";
-    $r= $db->query($q);
-    if (!$r) {
-      die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                            'query' => $q)));
-    }
-    $row= $r->fetch_assoc();
+  $txn_id= $db->insert_id;
 
-    $q= "INSERT INTO txn
-            SET created= NOW(),
-                type = 'customer',
-                number = $row[number],
-                tax_rate = " . DEFAULT_TAX_RATE;
-    $r= $db->query($q);
-    if (!$r) {
-      die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                            'query' => $q)));
-    }
-
-    $txn_id= $db->insert_id;
-
-    $r= $db->commit();
-    if (!$r) {
-      die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                            'query' => $q)));
-    }
-
+  $r= $db->commit();
+  if (!$r) {
+    die(json_encode(array('error' => 'Query failed. ' . $db->error,
+                          'query' => $q)));
   }
 }
 
