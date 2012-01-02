@@ -36,6 +36,8 @@ $q= "INSERT INTO payment
 $r= $db->query($q)
   or die_query($db, $q);
 
+$payment= $db->insert_id;
+
 // if amount + paid > total, add change record
 $change_paid= 0.0;
 if (bccomp(bcadd($amount, $txn['total_paid']), $txn['total']) > 0) {
@@ -75,4 +77,6 @@ while ($row= $r->fetch_assoc()) {
 
 $txn= txn_load($db, $id);
 
-echo generate_jsonp(array('txn' => $txn, 'payments' => $payments));
+echo generate_jsonp(array('payment' => $payment,
+                          'txn' => $txn,
+                          'payments' => $payments));

@@ -634,6 +634,9 @@ $("#pay-credit-manual").on("click", "button[name='pay']", function (ev) {
                 $('#txn').data('payments', data.payments);
                 updateTotal();
                 $.modal.close();
+                if (amount >= 25.00) {
+                  printChargeRecord(data.payment);
+                }
               }
             });
 });
