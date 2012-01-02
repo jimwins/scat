@@ -253,10 +253,11 @@ $('.remove').live('click', function() {
 });
 
 function addItem(item) {
+  var txn= $("#txn").data("txn");
   $.ajax({
     url: "api/txn-add-item.php",
     dataType: "json",
-    data: ({ txn: txn, id: item.id }),
+    data: ({ txn: txn, item: item.id }),
     success: function(data) {
       if (data.error) {
         snd.no.play();

@@ -2,13 +2,14 @@
 include '../scat.php';
 include '../lib/txn.php';
 
-$id= (int)$_REQUEST['id'];
+$txn_id= (int)$_REQUEST['txn'];
 
+$item= (int)$_REQUEST['item'];
 $search= $_REQUEST['q'];
 
-if (!$search && !$id) die_jsonp('no query specified');
+if (!$search && !$item) die_jsonp('no query specified');
 
-if (!$id) {
+if (!$txn_id) {
 
   // if there's a transaction with no items yet, hijack it
   $q= "SELECT txn.id
@@ -22,7 +23,7 @@ if (!$id) {
 
   if ($r->num_rows) {
     $row= $r->fetch_assoc();
-    $id= $row['id'];
+    $txn_id= $row['id'];
   } else {
 
     $q= "START TRANSACTION;";
@@ -51,7 +52,7 @@ if (!$id) {
                             'query' => $q)));
     }
 
-    $id= $db->insert_id;
+    $txn_id= $db->insert_id;
 
     $r= $db->commit();
     if (!$r) {
@@ -78,7 +79,7 @@ if ($search) {
     }
   }
 } else {
-  $criteria[]= "(item.id = $id)";
+  $criteria[]= "(item.id = $item)";
 }
 
 # allow option to include inactive and/or deleted
@@ -136,7 +137,7 @@ if (count($items) == 1) {
   // XXX some items should always be added on their own
 
   $q= "SELECT id, ordered FROM txn_line
-        WHERE txn = $id AND item = {$items[0]['id']}";
+        WHERE txn = $txn_id AND item = {$items[0]['id']}";
   $r= $db->query($q);
   if (!$r) {
     die(json_encode(array('error' => 'Query failed. ' . $db->error,
@@ -158,7 +159,7 @@ if (count($items) == 1) {
   } else {
     $q= "INSERT INTO txn_line (txn, item, ordered,
                                retail_price, discount, discount_type)
-         SELECT $id AS txn, {$items[0]['id']} AS item, -1 AS ordered,
+         SELECT $txn_id AS txn, {$items[0]['id']} AS item, -1 AS ordered,
                 retail_price, discount, discount_type
            FROM item WHERE id = {$items[0]['id']}";
     $r= $db->query($q);
@@ -170,6 +171,6 @@ if (count($items) == 1) {
   }
 }
 
-$txn= txn_load($db, $id);
+$txn= txn_load($db, $txn_id);
 
 echo json_encode(array('txn' => $txn, 'items' => $items));
