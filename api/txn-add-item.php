@@ -12,17 +12,11 @@ if (!$search && !$item) die_jsonp('no query specified');
 if (!$txn_id) {
   $q= "START TRANSACTION;";
   $r= $db->query($q);
-  if (!$r) {
-    die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                          'query' => $q)));
-  }
+  if (!$r) die_query($db, $q);
 
   $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = 'customer'";
   $r= $db->query($q);
-  if (!$r) {
-    die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                          'query' => $q)));
-  }
+  if (!$r) die_query($db, $q);
   $row= $r->fetch_assoc();
 
   $q= "INSERT INTO txn
@@ -31,18 +25,12 @@ if (!$txn_id) {
               number = $row[number],
               tax_rate = " . DEFAULT_TAX_RATE;
   $r= $db->query($q);
-  if (!$r) {
-    die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                          'query' => $q)));
-  }
+  if (!$r) die_query($db, $q);
 
   $txn_id= $db->insert_id;
 
   $r= $db->commit();
-  if (!$r) {
-    die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                          'query' => $q)));
-  }
+  if (!$r) die_query($db, "COMMIT");
 }
 
 $txn= txn_load($db, $txn_id);
@@ -104,10 +92,7 @@ $q= "SELECT
       LIMIT 10";
 
 $r= $db->query($q);
-if (!$r) {
-  die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                        'query' => $q)));
-}
+if (!$r) die_query($db, $q);
 
 $items= array();
 while ($row= $r->fetch_assoc()) {
@@ -126,10 +111,7 @@ if (count($items) == 1) {
   $q= "SELECT id, ordered FROM txn_line
         WHERE txn = $txn_id AND item = {$items[0]['id']}";
   $r= $db->query($q);
-  if (!$r) {
-    die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                          'query' => $q)));
-  }
+  if (!$r) die_query($db, $q);
 
   if ($r->num_rows) {
     $row= $r->fetch_assoc();
@@ -139,10 +121,7 @@ if (count($items) == 1) {
     $q= "UPDATE txn_line SET ordered = -1 * {$items[0]['quantity']}
           WHERE id = {$items[0]['line_id']}";
     $r= $db->query($q);
-    if (!$r) {
-      die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                            'query' => $q)));
-    }
+    if (!$r) die_query($db, $q);
   } else {
     $q= "INSERT INTO txn_line (txn, item, ordered,
                                retail_price, discount, discount_type)
@@ -150,14 +129,11 @@ if (count($items) == 1) {
                 retail_price, discount, discount_type
            FROM item WHERE id = {$items[0]['id']}";
     $r= $db->query($q);
-    if (!$r) {
-      die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                            'query' => $q)));
-    }
+    if (!$r) die_query($db, $q);
     $items[0]['line_id']= $db->insert_id;
   }
 }
 
 $txn= txn_load($db, $txn_id);
 
-echo json_encode(array('txn' => $txn, 'items' => $items));
+echo generate_jsonp(array('txn' => $txn, 'items' => $items));
