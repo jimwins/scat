@@ -530,38 +530,29 @@ $(function() {
 });
 </script>
 <div id="sidebar">
-<button id="open-orders">Open Orders</button>
-<button id="unpaid-invoices">Unpaid Invoices</button>
+<button name="open">Open</button>
+<button name="unpaid">Unpaid</button>
+<button name="recent">Recent</button>
 <script>
-$("#open-orders").click(function() {
+$("#sidebar button").click(function() {
+  var params= {
+    open: { type: 'customer', unfilled: true },
+    unpaid: { type: 'customer', unpaid: true },
+    recent: { type: 'customer', limit: 20 },
+  };
   $("#sales").hide();
   $.getJSON("api/txn-list.php?callback=?",
-            { type: 'customer', unfilled: true },
+            params[$(this).attr('name')],
             function (data) {
               if (data.error) {
                 $.modal(data.error);
               } else {
                 showOpenOrders(data);
               }
-              $("#status").text("Loaded open orders.").fadeOut('slow');
+              $("#status").text("Loaded.").fadeOut('slow');
             });
   $(this).addClass('open');
-  $("#status").text("Loading open orders...").show();
-});
-$("#unpaid-invoices").click(function() {
-  $("#sales").hide();
-  $.getJSON("api/txn-list.php?callback=?",
-            { type: 'customer', unpaid: true },
-            function (data) {
-              if (data.error) {
-                $.modal(data.error);
-              } else {
-                showOpenOrders(data);
-              }
-              $("#status").text("Loaded unpaid invoices.").fadeOut('slow');
-            });
-  $(this).addClass('open');
-  $("#status").text("Loading unpaid invoices...").show();
+  $("#status").text("Loading...").show();
 });
 </script>
 <table id="sales" width="100%" style="display: none">
