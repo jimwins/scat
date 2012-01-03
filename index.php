@@ -445,9 +445,7 @@ $(function() {
 
     // short integer and recently scanned? adjust quantity
     if (q.length < 4 && lastItem && parseInt(q) != 0) {
-      snd.yes.play();
       updateValue(lastItem, 'quantity', parseInt(q));
-      updateTotal();
       return false;
     }
 
@@ -560,7 +558,7 @@ $("#txn-load").submit(function() {
 </script>
 </div>
 </div>
-<form id="lookup" method="get" action="items.php">
+<form id="lookup">
 <input type="text" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="">
 <input type="submit" value="Find Items">
 </form>
