@@ -515,7 +515,7 @@ $(function() {
     return false;
   });
 
-  $("#open-orders").click();
+  $("#sidebar button[name='open']").click();
 
 <?
   $number= (int)$_REQUEST['number'];
