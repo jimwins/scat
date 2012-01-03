@@ -467,7 +467,6 @@ $(function() {
 
   $('#lookup').submit(function(ev) {
     ev.preventDefault();
-    $('#items .error').hide(); // hide old error messages
     $('input[name="q"]', this).focus().select();
 
     var q = $('input[name="q"]', this).val();
@@ -507,7 +506,7 @@ $(function() {
                       });
                       choices.append(n);
                     });
-                    $("#items .error").after(choices);
+                    $("#items").prepend(choices);
                   }
                 }
               });
