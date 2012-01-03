@@ -52,6 +52,13 @@ tfoot td {
   width: 70%;
 }
 
+/* Hide some elements from paid invoices. */
+#txn.paid .remove,
+#txn.paid #pay
+{
+  display: none;
+}
+
 #sale-buttons {
   float: right;
 }
@@ -165,6 +172,11 @@ function setActiveRow(row) {
 }
 
 $('.editable').live('dblclick', function() {
+  // Just stop now if transaction is paid
+  if ($('#txn').hasClass('paid')) {
+    return false;
+  }
+
   var val= $(this).children('span').eq(0);
   var key= val.attr("class");
   var fld= $('<input type="text">');
@@ -347,6 +359,7 @@ function updateOrderData(txn) {
   $('#txn').data('subtotal', txn.subtotal)
   $('#txn').data('total', txn.total)
   $('#txn').data('paid', txn.total_paid)
+  $('#txn').toggleClass('paid', txn.paid != null);
   var tax_rate= parseFloat(txn.tax_rate).toFixed(2);
   $('#txn').data('tax_rate', tax_rate)
   var prc= $('<span class="val">' + tax_rate +  '</span>');
@@ -567,7 +580,7 @@ $("#txn-load").submit(function() {
 <input type="text" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="">
 <input type="submit" value="Find Items">
 </form>
-<div id="txn" class="disabled">
+<div id="txn">
 <div id="sale-buttons">
   <button id="print">Print</button>
   <button id="pay">Pay</button>
