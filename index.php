@@ -142,7 +142,7 @@ function updateItems(items) {
 
 function updateRow(row) {
   $('.quantity', row).text(row.data('quantity'));
-  if (row.data('quantity') > row.data('.stock')) {
+  if (row.data('quantity') > row.data('stock')) {
     $('.quantity', row).addClass('over');
   } else {
     $('.quantity', row).removeClass('over');
