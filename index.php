@@ -254,24 +254,22 @@ $('.remove').live('click', function() {
   var txn= $('#txn').data('txn');
   var id= $(this).closest('tr').data('line_id');
 
-  $.ajax({
-    url: "api/txn-remove-item.php",
-    dataType: "json",
-    data: ({ txn: txn, id: id }),
-    success: function(data) {
-      if (data.error) {
-        $.modal(data.error);
-        return;
-      }
-      var row= $("#txn tbody tr:data(line_id=" + data.removed + ")");
-      if (row.is('.active')) {
-        lastItem= null;
-      }
-      row.remove();
-      updateOrderData(data.txn);
-      updateTotal();
-    }
-  });
+  $.getJSON("api/txn-remove-item.php?callback=?",
+            { txn: txn, id: id },
+            function(data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              var row= $("#txn tbody tr:data(line_id=" + data.removed + ")");
+              if (row.is('.active')) {
+                lastItem= null;
+              }
+              row.remove();
+              updateOrderData(data.txn);
+              updateTotal();
+            });
+
   return false;
 });
 

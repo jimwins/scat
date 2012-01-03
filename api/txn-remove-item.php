@@ -17,14 +17,11 @@ if ($txn['paid']) {
 $q= "DELETE FROM txn_line WHERE txn = $txn_id AND id = $id";
 
 $r= $db->query($q);
-if (!$r) {
-  die(json_encode(array('error' => 'Query failed. ' . $db->error,
-                        'query' => $q)));
-}
+if (!$r) die_query($db, $q);
 if (!$db->affected_rows) {
-  die(json_encode(array('error' => "Unable to delete line.")));
+  die_jsonp("Unable to delete line.");
 }
 
 $txn= txn_load($db, $txn_id);
 
-echo json_encode(array('txn' => $txn, 'removed' => $id));
+echo generate_jsonp(array('txn' => $txn, 'removed' => $id));
