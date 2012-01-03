@@ -52,11 +52,18 @@ tfoot td {
   width: 70%;
 }
 
-/* Hide some elements from paid invoices. */
+/* Hide/show some elements from paid invoices. */
 #txn.paid .remove,
 #txn.paid #pay
 {
   display: none;
+}
+#txn #return {
+  display: none;
+}
+#txn.paid #return
+{
+  display: inline;
 }
 
 #sale-buttons {
@@ -331,6 +338,7 @@ function updateTotal() {
   $('#items #total').text(amount(total));
 
   $('.payment-row').remove();
+
   $.each($('#txn').data('payments'), function(i, payment) {
     var row= paymentRow.clone();
     row.data(payment);
@@ -351,6 +359,7 @@ function updateTotal() {
   } else {
     $('#due-row').hide();
   }
+
 }
 
 function updateOrderData(txn) {
@@ -584,6 +593,7 @@ $("#txn-load").submit(function() {
 <div id="sale-buttons">
   <button id="print">Print</button>
   <button id="pay">Pay</button>
+  <button id="return">Return</button>
 </div>
 <script>
 $("#print").on("click", function() {
@@ -598,6 +608,21 @@ $("#pay").on("click", function() {
                 $.modal(data.error);
               }
               $.modal($("#choose-pay-method"), { persist: true});
+            });
+});
+$("#return").on("click", function() {
+  var txn= $('#txn').data('txn');
+  if (!txn || !confirm("Are you sure you want to create a return?")) {
+    return false;
+  }
+  $.getJSON("api/txn-return.php?callback=?",
+            { txn: txn },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              } else {
+                loadOrder(data);
+              }
             });
 });
 </script>
