@@ -87,6 +87,7 @@ CREATE TABLE `payment` (
   `cc_lastfour` varchar(4) DEFAULT NULL,
   `cc_expire` varchar(4) DEFAULT NULL,
   `cc_type` varchar(32) DEFAULT NULL,
+  `discount` decimal(9,2) DEFAULT NULL,
   `processed` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`)
@@ -206,4 +207,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-12-28 23:27:33
+-- Dump completed on 2012-01-02 23:12:12

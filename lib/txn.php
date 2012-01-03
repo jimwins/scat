@@ -103,3 +103,23 @@ function txn_load_items($db, $id) {
 
   return $items;
 }
+
+function txn_load_payments($db, $id) {
+  $q= "SELECT id, processed, method, amount, discount
+         FROM payment
+        WHERE txn = $id
+        ORDER BY processed ASC";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  $payments= array();
+  while ($row= $r->fetch_assoc()) {
+    /* force numeric values to numeric type */
+    $row['amount']= (float)$row['amount'];
+    $row['discount']= (float)$row['discount'];
+    $payments[]= $row;
+  }
+
+  return $payments;
+}

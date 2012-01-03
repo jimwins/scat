@@ -81,24 +81,6 @@ if (!bccomp($txn['total_paid'], $txn['total'])) {
     or die_query($db, $q);
 }
 
-// generate response including list of payments and header info
-$q= "SELECT id, processed, method, amount
-       FROM payment
-      WHERE txn = $id
-      ORDER BY processed ASC";
-
-$r= $db->query($q)
-  or die_query($db, $q);
-
-$payments= array();
-while ($row= $r->fetch_assoc()) {
-  /* force numeric values to numeric type */
-  $row['amount']= (float)$row['amount'];
-  $payments[]= $row;
-}
-
-$txn= txn_load($db, $id);
-
 echo generate_jsonp(array('payment' => $payment,
-                          'txn' => $txn,
-                          'payments' => $payments));
+                          'txn' => txn_load($db, $id),
+                          'payments' => txn_load_payments($db, $id)));
