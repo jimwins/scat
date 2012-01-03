@@ -348,6 +348,10 @@ function updateTotal() {
     if (payment.method == 'credit') {
       $('.payment-buttons', row).append($('<button name="print">Print</button>'));
     }
+    if (payment.method == 'discount') {
+      $('.payment-buttons', row).append($('<button name="remove">Remove</button>'));
+    }
+
 
     $('#due-row').before(row);
   });
@@ -846,6 +850,20 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 $("#items").on("click", ".payment-row button[name='print']", function() {
   var row= $(this).closest(".payment-row");
   printChargeRecord(row.data("id"));
+});
+$("#items").on("click", ".payment-row button[name='remove']", function() {
+  var row= $(this).closest(".payment-row");
+  $.getJSON("api/txn-remove-payment.php?callback=?",
+            { txn: $("#txn").data("txn"), id: row.data("id") },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              updateOrderData(data.txn);
+              $("#txn").data("payments", data.payments);
+              updateTotal();
+            });
 });
 </script>
  <tbody>
