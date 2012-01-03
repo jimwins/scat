@@ -491,6 +491,13 @@ $(function() {
   });
 
   $("#open-orders").click();
+
+<?
+  $number= (int)$_REQUEST['number'];
+  if ($number) {
+    echo "$('#txn-load input').val($number).parent().submit();";
+  }
+?>
 });
 </script>
 <div id="sidebar">
