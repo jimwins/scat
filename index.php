@@ -277,27 +277,23 @@ $('.remove').live('click', function() {
 
 function addItem(item) {
   var txn= $("#txn").data("txn");
-  $.ajax({
-    url: "api/txn-add-item.php",
-    dataType: "json",
-    data: ({ txn: txn, item: item.id }),
-    success: function(data) {
-      if (data.error) {
-        snd.no.play();
-        $("#items .error").html("<p>" + data.error + "</p>");
-        $("#items .error").show();
-      } else {
-        updateOrderData(data.txn);
-        if (data.items.length == 1) {
-          snd.yes.play();
-          addNewItem(data.items[0]);
-          updateTotal();
-        } else {
-          snd.no.play();
-        }
-      }
-    }
-  });
+  $.getJSON("api/txn-add-item.php?callback=?",
+            { txn: txn, item: item.id },
+            function(data) {
+              if (data.error) {
+                snd.no.play();
+                $.modal(data.error);
+              } else {
+                updateOrderData(data.txn);
+                if (data.items.length == 1) {
+                  snd.yes.play();
+                  addNewItem(data.items[0]);
+                  updateTotal();
+                } else {
+                  snd.no.play();
+                }
+              }
+            });
 }
 
 var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable dollar" align="right"><span class="price"></span></td><td align="right"><span class="ext"></span></td></tr>');
