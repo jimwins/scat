@@ -465,7 +465,8 @@ $(function() {
     return printReceipt();
   });
 
-  $('#lookup').submit(function() {
+  $('#lookup').submit(function(ev) {
+    ev.preventDefault();
     $('#items .error').hide(); // hide old error messages
     $('input[name="q"]', this).focus().select();
 
@@ -576,7 +577,8 @@ $("#unpaid-invoices").click(function() {
  <button>Load</button>
 </form>
 <script>
-$("#txn-load").submit(function() {
+$("#txn-load").submit(function(ev) {
+  ev.preventDefault();
   $.getJSON("api/txn-load.php?callback=?",
             { type: "customer",
               number: $("#txn-load input[name='invoice']").val() },
@@ -655,14 +657,15 @@ $("#choose-pay-method").on("click", "button", function(ev) {
   $(".amount", id).focus().select();
 });
 </script>
-<div id="pay-cash" class="pay-method" style="display: none">
+<form id="pay-cash" class="pay-method" style="display: none">
  <input class="amount" type="text" pattern="\d*">
  <br>
- <button name="pay">Pay</button>
+ <input type="submit" name="Pay">
  <button name="cancel">Cancel</button>
-</div>
+</form>
 <script>
-$("#pay-cash").on("click", "button[name='pay']", function (ev) {
+$("#pay-cash").on("submit", function (ev) {
+  ev.preventDefault();
   var txn= $("#txn").data("txn");
   var amount= $("#pay-cash .amount").val();
   $.getJSON("api/txn-add-payment.php?callback=?",
