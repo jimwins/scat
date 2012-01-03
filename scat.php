@@ -52,8 +52,27 @@ $(document).ready(function() {
 &nbsp;
 <a href="./txns.php" title="Transactions"><img src="./icons/table.png" width="16" height="16" alt="Transactions"> Transactions</a>
 &nbsp;
-<a href="#" onclick="return false" title="Reports"><img src="./icons/report.png" width="16" height="16" alt="Reports"> Reports</a>
+<a href="#" onclick="return false" id="reports" title="Reports"><img src="./icons/report.png" width="16" height="16" alt="Reports"> Reports</a>
 </header>
+<script>
+$("header #reports").on('click', function() {
+  $.getJSON("./api/report-sales.php?callback=?",
+            { days: 7 },
+            function(data) {
+              if (data.error) {
+                $.modal(data.error);
+              } else {
+                var t= $("<table><tr><th>Day<th>Sales</tr>");
+                $.each(data.sales, function(i, sales) {
+                  t.append($('<tr><td>' + sales.day +
+                             '<td align="right">$' + sales.total.toFixed(2) +
+                             '</tr>'));
+                });
+                t.modal();
+              }
+            });
+});
+</script>
 <?
 }
 
