@@ -20,6 +20,16 @@ if (!in_array($method,
 
 $txn= txn_load($db, $id);
 
+// handle % discounts
+if ($method == 'discount') {
+  if (preg_match('!^(/)?\s*(\d+)(%|/)?\s*$!', $amount, $m)) {
+    if ($m[1] || $m[3]) {
+      $amount= round($txn['total'] * $m[2] / 100,
+                     2, PHP_ROUND_HALF_EVEN);
+    }
+  }
+}
+
 // if set, allow overpayment and create a 'change' record
 $change= (bool)($_REQUEST['change'] != 'false');
 

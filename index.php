@@ -800,6 +800,30 @@ $("#pay-check").on("click", "button[name='pay']", function (ev) {
             });
 });
 </script>
+<div id="pay-discount" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <button name="pay">Discount</button>
+ <button name="cancel">Cancel</button>
+</div>
+<script>
+$("#pay-discount").on("click", "button[name='pay']", function (ev) {
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-discount .amount").val();
+  $.getJSON("api/txn-add-payment.php?callback=?",
+            { id: txn, method: "discount", amount: amount, change: false },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                $.modal.close();
+              }
+            });
+});
+</script>
 <script>
 $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   $.modal.close();
