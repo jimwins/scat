@@ -410,7 +410,7 @@ function showOpenOrders(data) {
     row.click(txn, function(ev) {
       $("#status").text("Loading sale...").show();
       $.getJSON("api/txn-load.php?callback=?",
-                { id: txn.id },
+                { id: ev.data.id },
                 function (data) {
                   if (data.error) {
                     $.modal(data.error);

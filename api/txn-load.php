@@ -33,6 +33,8 @@ $q= "SELECT id, entered, content
        FROM txn_note
       WHERE txn = $id
       ORDER BY entered ASC";
+$r= $db->query($q)
+  or die_query($db, $q);
 
 $notes= array();
 while ($row= $r->fetch_assoc()) {
