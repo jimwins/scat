@@ -362,7 +362,7 @@ function updateTotal() {
 
   var paid= $('#txn').data('paid');;
   if (paid > 0) {
-    $('#items #due').text(Math.abs(total - paid).toFixed(2))
+    $('#items #due').text(amount(Math.abs(total - paid)));
     $('#due-row').show();
   } else {
     $('#due-row').hide();
