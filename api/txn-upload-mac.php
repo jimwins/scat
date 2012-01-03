@@ -74,7 +74,9 @@ echo "Loaded ", $db->affected_rows, " items from order.<br>";
 $q= "INSERT INTO txn_line (txn, line, item, ordered, retail_price)
      SELECT $txn_id txn, line,
             (SELECT id FROM item WHERE code = item_no) item,
-            ordered, net FROM macorder";
+            shipped AS ordered, net
+       FROM macorder
+      WHERE shipped";
 $db->query($q)
   or die_query($db, $q);
 
