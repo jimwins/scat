@@ -98,6 +98,22 @@ $("#allocate").on('click', function() {
 </script>
 <?
 }
+if ($txn['meta'] == 'vendor') {
+?>
+<button id="upload">Upload Order</button>
+<form id="upload-form" style="display: none" method="post" enctype="multipart/form-data" action="api/txn-upload-mac.php">
+ <input type="hidden" name="txn" value="<?=$id?>">
+ <input type="file" name="src">
+ <br>
+ <button>Load</button>
+</form>
+<script>
+$("#upload").on('click', function() {
+  $("#upload-form").modal();
+});
+</script>
+<?
+}
 ?>
 <button id="receipt">Print Receipt</button>
 <script>
