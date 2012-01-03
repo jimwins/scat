@@ -106,6 +106,15 @@ function round_to_even(num, decimalPlaces) {
   return d ? r / m : r;
 }
 
+// format number as $3.00 or ($3.00)
+function amount(amount) {
+  if (amount < 0.0) {
+    return '($' + Math.abs(amount).toFixed(2) + ')';
+  } else {
+    return '$' + amount.toFixed(2);
+  }
+}
+
 var lastItem;
 
 function updateItems(items) {
@@ -129,12 +138,7 @@ function updateRow(row) {
   $('.discount', row).text(row.data('discount'));
   $('.price', row).text(row.data('price').toFixed(2));
   var ext= row.data('quantity') * row.data('price');
-  if (ext < 0.0) {
-    ext= '($' + Math.abs(ext).toFixed(2) + ')';
-  } else {
-    ext= '$' + ext.toFixed(2);
-  }
-  $('.ext', row).text(ext);
+  $('.ext', row).text(amount(ext));
 }
 
 function updateValue(row, key, value) {
@@ -306,26 +310,20 @@ var paymentMethods= {
 };
 
 function updateTotal() {
-  var total= $("#txn").data("total");;
-  var subtotal= $("#txn").data("subtotal");;
-  $('#items #subtotal').text(subtotal.toFixed(2))
+  var total= $("#txn").data("total");
+  var subtotal= $("#txn").data("subtotal");
+  $('#items #subtotal').text(amount(subtotal));
   var tax_rate= $('#txn').data('tax_rate');
   var tax= total - subtotal;
-  $('#items #tax').text(tax.toFixed(2))
-  $('#items #total').text(total.toFixed(2))
+  $('#items #tax').text(amount(tax));
+  $('#items #total').text(amount(total));
 
   $('.payment-row').remove();
   $.each($('#txn').data('payments'), function(i, payment) {
     var row= paymentRow.clone();
     row.data(payment);
     $('.payment-method', row).text(paymentMethods[payment.method] + ':');
-    var amount= payment.amount;
-    if (amount < 0.0) {
-      amount= '($' + Math.abs(amount).toFixed(2) + ')';
-    } else {
-      amount= '$' + amount.toFixed(2);
-    }
-    $('.payment-amount', row).text(amount);
+    $('.payment-amount', row).text(amount(payment.amount));
 
     if (payment.method == 'credit') {
       $('.payment-buttons', row).append($('<button name="print">Print</button>'));
@@ -777,10 +775,10 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
-  <tr id="subtotal-row"><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="dollar">0.00</td></tr>
-  <tr id="tax-row"><th colspan=4></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="dollar">0.00</td></tr>
-  <tr id="total-row"><th colspan=4></th><th align="right">Total:</th><td id="total" class="dollar">0.00</td></tr>
-  <tr id="due-row" style="display:none"><th colspan=4></th><th align="right">Due:</th><td id="due" class="dollar">0.00</td></tr>
+  <tr id="subtotal-row"><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="right">$0.00</td></tr>
+  <tr id="tax-row"><th colspan=4></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="right">$0.00</td></tr>
+  <tr id="total-row"><th colspan=4></th><th align="right">Total:</th><td id="total" class="right">$0.00</td></tr>
+  <tr id="due-row" style="display:none"><th colspan=4></th><th align="right">Due:</th><td id="due" class="right">$0.00</td></tr>
  </tfoot>
 <script>
 $("#items").on("click", ".payment-row button[name='print']", function() {
