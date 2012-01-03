@@ -481,40 +481,36 @@ $(function() {
     txn= $('#txn').data('txn');
 
     // go find!
-    $.ajax({
-      url: "api/txn-add-item.php",
-      dataType: "json",
-      data: ({ txn: txn, q: q }),
-      success: function(data) {
-        if (data.error) {
-          snd.no.play();
-          $("#items .error").html("<p>" + data.error + "</p>");
-          $("#items .error").show();
-        } else {
-          updateOrderData(data.txn);
-          if (data.items.length == 0) {
-            snd.no.play();
-          } else if (data.items.length == 1) {
-            snd.yes.play();
-            addNewItem(data.items[0]);
-            updateTotal();
-          } else {
-            snd.maybe.play();
-            var choices= $('<div class="choices"/>');
-            choices.append('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Skip"></span>');
-            $.each(data.items, function(i,item) {
-              var n= $("<span>" + item.name + "</span>");
-              n.click(item, function(event) {
-                addItem(event.data);
-                $(this).parent().remove();
+    $.getJSON("api/txn-add-item.php?callback=?",
+              { txn: txn, q: q },
+              function(data) {
+                if (data.error) {
+                  snd.no.play();
+                  $.modal(data.error);
+                } else {
+                  updateOrderData(data.txn);
+                  if (data.items.length == 0) {
+                    snd.no.play();
+                  } else if (data.items.length == 1) {
+                    snd.yes.play();
+                    addNewItem(data.items[0]);
+                    updateTotal();
+                  } else {
+                    snd.maybe.play();
+                    var choices= $('<div class="choices"/>');
+                    choices.append('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Skip"></span>');
+                    $.each(data.items, function(i,item) {
+                      var n= $("<span>" + item.name + "</span>");
+                      n.click(item, function(event) {
+                        addItem(event.data);
+                        $(this).parent().remove();
+                      });
+                      choices.append(n);
+                    });
+                    $("#items .error").after(choices);
+                  }
+                }
               });
-              choices.append(n);
-            });
-            $("#items .error").after(choices);
-          }
-        }
-      }
-    });
 
     return false;
   });
@@ -833,7 +829,6 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 </script>
 <h2 id="description">New Sale</h2>
 <div id="items">
- <div class="error"></div>
  <table width="100%">
  <thead>
   <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
