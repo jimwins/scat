@@ -342,7 +342,11 @@ function updateTotal() {
   $.each($('#txn').data('payments'), function(i, payment) {
     var row= paymentRow.clone();
     row.data(payment);
-    $('.payment-method', row).text(paymentMethods[payment.method] + ':');
+    if (payment.method == 'discount' && payment.discount) {
+      $('.payment-method', row).text('Discount (' + payment.discount + '%):');
+    } else {
+      $('.payment-method', row).text(paymentMethods[payment.method] + ':');
+    }
     $('.payment-amount', row).text(amount(payment.amount));
 
     if (payment.method == 'credit') {

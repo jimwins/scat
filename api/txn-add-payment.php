@@ -12,6 +12,8 @@ if (!$id)
 $method= $_REQUEST['method'];
 $amount= $_REQUEST['amount'];
 
+$extra_fields= "";
+
 // validate method
 if (!in_array($method,
               array('cash','credit','gift','check','discount'))) {
@@ -26,6 +28,7 @@ if ($method == 'discount') {
     if ($m[1] || $m[3]) {
       $amount= round($txn['total'] * $m[2] / 100,
                      2, PHP_ROUND_HALF_EVEN);
+      $extra_fields= "discount = $m[2],";
     }
   }
 }
@@ -38,8 +41,6 @@ if (!$change && bccomp(bcadd($amount, $txn['total_paid']), $txn['total']) > 0) {
   die_jsonp("Amount is too much.");
 }
 
-$cc_fields= "";
-
 if ($method == 'credit') {
   $cc= array();
   foreach(array('cc_txn', 'cc_approval', 'cc_lastfour',
@@ -47,13 +48,13 @@ if ($method == 'credit') {
     $cc[]= "$field = '" . $db->real_escape_string($_REQUEST[$field]) . "', ";
   }
 
-  $cc_fields= join('', $cc);
+  $extra_fields= join('', $cc);
 }
 
 // add payment record
 $q= "INSERT INTO payment
         SET txn = $id, method = '$method', amount = $amount,
-        $cc_fields
+        $extra_fields
         processed = NOW()";
 $r= $db->query($q)
   or die_query($db, $q);

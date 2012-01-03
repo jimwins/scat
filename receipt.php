@@ -190,9 +190,7 @@ while ($row= $r->fetch_assoc()) {
    <td class="price"><?=amount($details['Total'])?></td>
   </tr>
 <?
-$q= "SELECT processed AS Date,
-            method AS Method,
-            amount AS Amount
+$q= "SELECT processed, method, discount, amount
        FROM payment
       WHERE txn = $id
       ORDER BY processed ASC";
@@ -209,12 +207,17 @@ $methods= array(
 
 if ($r->num_rows) {
   while ($payment= $r->fetch_assoc()) {
+    if ($payment['method'] == 'discount' && $payment['discount']) {
+      $method= sprintf("Discount (%d%%)", $payment['discount']);
+    } else {
+      $method= $methods[$payment['method']];
+    }
     echo '<tr>',
          '<td class="right" colspan="2">',
-         $methods[$payment['Method']],
+         $method,
          ':</td>',
          '<td class="price">',
-         amount($payment['Amount']),
+         amount($payment['amount']),
          "</td></tr>\n";
   }
 ?>
