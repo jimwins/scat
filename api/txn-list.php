@@ -28,7 +28,8 @@ if (empty($criteria)) {
 
 $page= (int)$_REQUEST['page'];
 
-$per_page= 50;
+$per_page= (int)$_REQUEST['limit'];
+if (!$per_page) $per_page= 50;
 $start= $page * $per_page;
 
 $q= "SELECT id, type,
