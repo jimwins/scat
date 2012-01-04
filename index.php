@@ -78,6 +78,16 @@ tfoot td {
   text-align: center;
 }
 
+#txn h2 {
+  margin-bottom: 0;
+}
+#txn h3 {
+  margin: 0 0 0.5em;
+  font-weight: normal;
+  font-size: 1em;
+  color: #333;
+}
+
 #sidebar {
   width: 22%;
   float: right;
@@ -376,6 +386,8 @@ function updateOrderData(txn) {
   var prc= $('<span class="val">' + tax_rate +  '</span>');
   $('#txn #tax_rate .val').replaceWith(prc);
   $('#txn #description').text("Sale " + txn.number);
+  $('#txn').data('person', txn.person)
+  $('#txn #person').text(txn.person_name ? txn.person_name : 'Anonymous');
 }
 
 function loadOrder(data) {
@@ -821,6 +833,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 });
 </script>
 <h2 id="description">New Sale</h2>
+<h3 id="person">Anonymous</h3>
 <div id="items">
  <table width="100%">
  <thead>
