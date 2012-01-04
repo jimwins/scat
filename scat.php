@@ -21,6 +21,7 @@ header("content-type: text/html;charset=utf-8");?>
 <head>
  <title><?=ashtml($title)?></title>
  <link rel="stylesheet" type="text/css" href="static/screen.css">
+ <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">
  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
