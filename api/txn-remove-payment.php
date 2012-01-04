@@ -20,5 +20,5 @@ $q= "DELETE FROM payment WHERE id = $id AND txn = $txn_id";
 $r= $db->query($q)
   or die_query($db, $q);
 
-echo generate_jsonp(array('txn' => txn_load($db, $id),
+echo jsonp(array('txn' => txn_load($db, $id),
                           'payments' => txn_load_payments($db, $id)));

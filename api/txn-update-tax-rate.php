@@ -22,5 +22,4 @@ $r= $db->query($q)
 
 $txn= txn_load($db, $txn);
 
-generate_jsonp(array("success" => "Updated tax rate.",
-                     "txn" => $txn));
+echo jsonp(array("success" => "Updated tax rate.", "txn" => $txn));

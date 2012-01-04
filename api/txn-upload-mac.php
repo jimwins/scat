@@ -88,4 +88,4 @@ $db->commit()
 $out= ob_get_contents();
 ob_end_clean();
 
-echo generate_jsonp(array("result" => $out));
+echo jsonp(array("result" => $out));

@@ -42,7 +42,7 @@ while ($row= $r->fetch_assoc()) {
   $notes[]= $row;
 }
 
-echo generate_jsonp(array('txn' => $txn,
-                          'items' => $items,
-                          'payments' => $payments,
-                          'notes' => $notes));
+echo jsonp(array('txn' => $txn,
+                 'items' => $items,
+                 'payments' => $payments,
+                 'notes' => $notes));

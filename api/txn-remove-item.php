@@ -24,4 +24,4 @@ if (!$db->affected_rows) {
 
 $txn= txn_load($db, $txn_id);
 
-echo generate_jsonp(array('txn' => $txn, 'removed' => $id));
+echo jsonp(array('txn' => $txn, 'removed' => $id));

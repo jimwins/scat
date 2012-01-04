@@ -95,4 +95,4 @@ while ($row= $r->fetch_assoc()) {
   $txn[]= $row;
 }
 
-echo generate_jsonp($txn);
+echo jsonp($txn);

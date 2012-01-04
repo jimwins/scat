@@ -23,6 +23,6 @@ $r= $db->query($q)
 
 $txn= txn_load($db, $id);
 
-generate_jsonp(array("success" => "Allocated all lines.",
-                     "txn" => $txn,
-                     "lines" => $r->num_rows));
+echo jsonp(array("success" => "Allocated all lines.",
+                 "txn" => $txn,
+                 "lines" => $r->num_rows));

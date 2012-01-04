@@ -235,7 +235,7 @@ function dump_query($q) {
 <?
 }
 
-function generate_jsonp($data) {
+function jsonp($data) {
   if (preg_match('/\W/', $_GET['callback'])) {
     // if $_GET['callback'] contains a non-word character,
     // this could be an XSS attack.
@@ -243,7 +243,10 @@ function generate_jsonp($data) {
     exit();
   }
   header('Content-type: application/javascript; charset=utf-8');
-  print sprintf('%s(%s);', $_GET['callback'], json_encode($data));
+  if ($_GET['callback']) {
+    return sprintf('%s(%s);', $_GET['callback'], json_encode($data));
+  }
+  return json_encode($data);
 }
 
 function die_jsonp($data) {

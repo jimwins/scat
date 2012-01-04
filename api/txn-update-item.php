@@ -102,4 +102,4 @@ while ($row= $r->fetch_assoc()) {
 
 $txn= txn_load($db, $txn_id);
 
-echo generate_jsonp(array('txn' => $txn, 'items' => $items));
+echo jsonp(array('txn' => $txn, 'items' => $items));

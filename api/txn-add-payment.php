@@ -82,6 +82,6 @@ if (!bccomp($txn['total_paid'], $txn['total'])) {
     or die_query($db, $q);
 }
 
-echo generate_jsonp(array('payment' => $payment,
-                          'txn' => txn_load($db, $id),
-                          'payments' => txn_load_payments($db, $id)));
+echo jsonp(array('payment' => $payment,
+                 'txn' => txn_load($db, $id),
+                 'payments' => txn_load_payments($db, $id)));

@@ -40,7 +40,7 @@ $r= $db->query($q);
 if (!$r)
   die_query($db, $q);
 
-echo generate_jsonp(array('txn' => txn_load($db, $new_txn_id),
-                          'items' => txn_load_items($db, $new_txn_id),
-                          'payments' => array(),
-                          'notes' => array()));
+echo jsonp(array('txn' => txn_load($db, $new_txn_id),
+                 'items' => txn_load_items($db, $new_txn_id),
+                 'payments' => array(),
+                 'notes' => array()));
