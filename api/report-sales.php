@@ -38,4 +38,4 @@ while ($row= $r->fetch_assoc()) {
   $sales[]= $row;
 }
 
-echo generate_jsonp(array("days" => $days, "sales" => $sales));
+echo jsonp(array("days" => $days, "sales" => $sales));
