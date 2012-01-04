@@ -387,7 +387,7 @@ function updateOrderData(txn) {
   $('#txn #tax_rate .val').replaceWith(prc);
   $('#txn #description').text("Sale " + txn.number);
   $('#txn').data('person', txn.person)
-  $('#txn #person').text(txn.person_name ? txn.person_name : 'Anonymous');
+  $('#txn #person .val').text(txn.person_name ? txn.person_name : 'Anonymous');
 }
 
 function loadOrder(data) {
@@ -833,7 +833,111 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 });
 </script>
 <h2 id="description">New Sale</h2>
-<h3 id="person">Anonymous</h3>
+<h3 id="person"><span class="val">Anonymous</span></h3>
+<script>
+$("#txn #person").on("dblclick", function(ev) {
+  if (typeof $("#txn").data("txn") == "undefined") {
+    return false;
+  }
+
+  var fld= $('<input type="text" size="40">');
+  fld.val($(".val", this).text());
+  fld.data('default', fld.val());
+
+  fld.on('keyup blur', function(event) {
+    // Handle ESC key
+    if (event.type == 'keyup' && event.which == 27) {
+      var val= $(this).data('default');
+      $(this).parent().text(val);
+      $(this).remove();
+      return false;
+    }
+
+    // Everything else but RETURN just gets passed along
+    if (event.type == 'keyup' && event.which != '13') {
+      return true;
+    }
+
+    ev.preventDefault();
+
+    $("#person-create input[name='name']").val($(this).val());
+    $("#person-create").modal();
+
+    var val= $(this).data('default');
+    $(this).parent().text(val);
+    $(this).remove();
+
+    return false;
+  });
+
+  fld.autocomplete({
+    source: "./api/person-list.php?callback=?",
+    minLength: 2,
+    select: function(ev, ui) {
+      $(this).parent().text(ui.item.value);
+      $(this).remove();
+      $.getJSON("api/txn-update-person.php?callback=?",
+                { txn: $(txn).data("txn"), person: ui.item.id },
+                function (data) {
+                  if (data.error) {
+                    $.modal(data.error);
+                    return;
+                  }
+                  updateOrderData(data.txn);
+                });
+    },
+  });
+
+  $(".val", this).empty().append(fld);
+  fld.focus().select();
+});
+</script>
+<form id="person-create" style="display:none">
+ <label>Name: <input type="text" width="60" name="name"></label>
+ <br>
+ <label>Company: <input type="text" width="60" name="company"></label>
+ <br>
+ <label>Email: <input type="text" width="40" name="email"></label>
+ <br>
+ <label>Phone: <input type="text" width="20" name="phone"></label>
+ <br>
+ <input type="submit" name="Create">
+ <button name="cancel">Cancel</button>
+</form>
+<script>
+$('#person-create').on('submit', function(ev) {
+  ev.preventDefault();
+
+  var data= {
+    name: $("input[name='name']", this).val(),
+    company: $("input[name='company']", this).val(),
+    email: $("input[name='email']", this).val(),
+    phone: $("input[name='phone']", this).val(),
+  };
+
+  $.getJSON("api/person-add.php?callback=?",
+            data,
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+                return;
+              }
+              $.getJSON("api/txn-update-person.php?callback=?",
+                        { txn: $(txn).data("txn"), person: data.person },
+                        function (data) {
+                          if (data.error) {
+                            alert(data.error);
+                            return;
+                          }
+                          updateOrderData(data.txn);
+                          $.modal.close();
+                        });
+            });
+});
+$('#person-create').on('click', "button[name='cancel'", function(ev) {
+  $.modal.close();
+});
+</script>
 <div id="items">
  <table width="100%">
  <thead>
