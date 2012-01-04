@@ -844,7 +844,7 @@ $("#txn #person").on("dblclick", function(ev) {
   fld.val($(".val", this).text());
   fld.data('default', fld.val());
 
-  fld.on('keyup blur', function(event) {
+  fld.on('keyup', function(event) {
     // Handle ESC key
     if (event.type == 'keyup' && event.which == 27) {
       var val= $(this).data('default');
