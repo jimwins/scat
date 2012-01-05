@@ -15,6 +15,9 @@ Scat includes Datejs, an open-source JavaScript Date library:
 Scat includes the jQuery Hotkeys plugin:
   http://github.com/tzuryby/jquery.hotkeys
 
+Scat includes the Jeditable jQuery plugin:
+  http://www.appelsiini.net/projects/jeditable
+
 Scat includes icons from the Silk icon set by Mark James:
   http://www.famfamfam.com/lab/icons/silk/
 
