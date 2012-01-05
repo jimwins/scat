@@ -43,7 +43,12 @@ $(document).ready(function() {
  </script>
 </head>
 <body>
+<?if ($GLOBALS['DEBUG']) {?>
+<header class="debug">
+  <span style="float: right; color: #900; padding-right: 100px; font-weight: bold">DEBUG</span>
+<?} else {?>
 <header>
+<?}?>
 <?/*<a href="./" title="New Sale"><img src="./icons/house.png" width="16" height="16" alt="New Sale"> New Sale</a>
 &nbsp;*/?>
 <a href="./" title="New Sale"><img src="./icons/cart.png" width="16" height="16" alt="New Sale"> New Sale</a>
