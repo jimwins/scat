@@ -148,6 +148,9 @@ function dump_table($r, $calc = false) {
     echo '<th>#</th>';
   for ($i= $meta; $i < $r->field_count; $i++) {
     $name= $r->fetch_field_direct($i)->name;
+    $class= strchr($name, '$');
+    if ($class == '$hide')
+      continue;
     echo '<th>', strtok($name, '$'), '</th>';
   }
   if ($calc) {
@@ -168,6 +171,8 @@ function dump_table($r, $calc = false) {
     for ($i= $meta; $i < $r->field_count; $i++) {
       $name= $r->fetch_field_direct($i)->name;
       $class= strlen($row[$i]) ? strchr($name, '$') : '';
+      if ($class == '$hide')
+        continue;
       echo '<td', ($class ? ' class="' . ltrim($class, '$'). '"' : ''), '>',
            expand_field($row[$i], $class), '</td>';
     }
