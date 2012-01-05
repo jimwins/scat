@@ -387,6 +387,7 @@ function updateOrderData(txn) {
   $('#txn').data('total', txn.total)
   $('#txn').data('paid', txn.total_paid)
   $('#txn').toggleClass('paid', txn.paid != null);
+  $('#txn').data('paid_date', txn.paid)
   var tax_rate= parseFloat(txn.tax_rate).toFixed(2);
   $('#txn').data('tax_rate', tax_rate)
   var prc= $('<span class="val">' + tax_rate +  '</span>');
@@ -605,6 +606,8 @@ $("#txn-load").submit(function(ev) {
 </div>
 <script>
 $("#print").on("click", function() {
+  if ($("txn").data("paid_date") != null ||
+      confirm("Invoice isn't paid. Sure you want to print?"))
   printReceipt();
 });
 $("#pay").on("click", function() {
