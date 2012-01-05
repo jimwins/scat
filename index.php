@@ -606,7 +606,7 @@ $("#txn-load").submit(function(ev) {
 </div>
 <script>
 $("#print").on("click", function() {
-  if ($("txn").data("paid_date") != null ||
+  if ($("#txn").data("paid_date") != null ||
       confirm("Invoice isn't paid. Sure you want to print?"))
   printReceipt();
 });
@@ -886,7 +886,7 @@ $("#txn #person").on("dblclick", function(ev) {
       $(this).parent().text(ui.item.value);
       $(this).remove();
       $.getJSON("api/txn-update-person.php?callback=?",
-                { txn: $(txn).data("txn"), person: ui.item.id },
+                { txn: $("#txn").data("txn"), person: ui.item.id },
                 function (data) {
                   if (data.error) {
                     $.modal(data.error);
@@ -932,7 +932,7 @@ $('#person-create').on('submit', function(ev) {
                 return;
               }
               $.getJSON("api/txn-update-person.php?callback=?",
-                        { txn: $(txn).data("txn"), person: data.person },
+                        { txn: $("#txn").data("txn"), person: data.person },
                         function (data) {
                           if (data.error) {
                             alert(data.error);
