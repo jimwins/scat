@@ -202,9 +202,9 @@ $('.editable').live('dblclick', function() {
   fld.width($(this).width());
   fld.data('default', fld.val());
 
-  fld.on('keyup blur', function(event) {
+  fld.on('keyup blur', function(ev) {
     // Handle ESC key
-    if (event.type == 'keyup' && event.which == 27) {
+    if (ev.type == 'keyup' && ev.which == 27) {
       var val=$('<span>');
       val.text($(this).data('default'));
       val.attr("class", $(this).attr('class'));
@@ -213,7 +213,7 @@ $('.editable').live('dblclick', function() {
     }
 
     // Everything else but RETURN just gets passed along
-    if (event.type == 'keyup' && event.which != '13') {
+    if (ev.type == 'keyup' && ev.which != '13') {
       return true;
     }
 
@@ -236,8 +236,8 @@ $('#tax_rate').live('dblclick', function() {
   fld= $('<input type="text" size="2">');
   fld.val($('#txn').data('tax_rate'));
 
-  fld.bind('keypress blur', function(event) {
-    if (event.type == 'keypress' && event.which != '13') {
+  fld.bind('keypress blur', function(ev) {
+    if (ev.type == 'keypress' && ev.which != '13') {
       return true;
     }
   
@@ -453,14 +453,14 @@ function printChargeRecord(id) {
 $(function() {
   $('#txn').data('tax_rate', 0.00);
 
-  $(document).keydown(function(event) {
-    if (event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) {
+  $(document).keydown(function(ev) {
+    if (ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey) {
       return true;
     }
     var el = $.getFocusedElement();
     if (!el.length) {
       var inp= $('input[name="q"]', this);
-      if (event.keyCode != 13) {
+      if (ev.keyCode != 13) {
         inp.val('');
       }
       inp.focus();
@@ -506,8 +506,8 @@ $(function() {
                     choices.append('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Skip"></span>');
                     $.each(data.items, function(i,item) {
                       var n= $("<span>" + item.name + "</span>");
-                      n.click(item, function(event) {
-                        addItem(event.data);
+                      n.click(item, function(ev) {
+                        addItem(ev.data);
                         $(this).parent().remove();
                       });
                       choices.append(n);
@@ -844,9 +844,9 @@ $("#txn #person").on("dblclick", function(ev) {
   fld.val($(".val", this).text());
   fld.data('default', fld.val());
 
-  fld.on('keyup', function(event) {
+  fld.on('keyup', function(ev) {
     // Handle ESC key
-    if (event.type == 'keyup' && event.which == 27) {
+    if (ev.type == 'keyup' && ev.which == 27) {
       var val= $(this).data('default');
       $(this).parent().text(val);
       $(this).remove();
@@ -854,7 +854,7 @@ $("#txn #person").on("dblclick", function(ev) {
     }
 
     // Everything else but RETURN just gets passed along
-    if (event.type == 'keyup' && event.which != '13') {
+    if (ev.type == 'keyup' && ev.which != '13') {
       return true;
     }
 
