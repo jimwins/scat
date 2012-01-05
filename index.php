@@ -110,10 +110,16 @@ tfoot td {
 }
 </style>
 <script>
-var snd= new Object;
-snd.yes= new Audio("./sound/yes.wav");
-snd.no= new Audio("./sound/no.wav");
-snd.maybe= new Audio("./sound/maybe.wav");
+function play(type) {
+  var sounds = {
+    'yes' : 'Pop',
+    'no' : 'Basso',
+    'maybe' : 'Bottle',
+  };
+  if (window.fluid) {
+    window.fluid.playSound(sounds[type]);
+  }
+}
 
 $.getFocusedElement = function() {
   var elem = document.activeElement;
@@ -289,16 +295,16 @@ function addItem(item) {
             { txn: txn, item: item.id },
             function(data) {
               if (data.error) {
-                snd.no.play();
+                play("no");
                 $.modal(data.error);
               } else {
                 updateOrderData(data.txn);
                 if (data.items.length == 1) {
-                  snd.yes.play();
+                  play("yes");
                   addNewItem(data.items[0]);
                   updateTotal();
                 } else {
-                  snd.no.play();
+                  play("no");
                 }
               }
             });
@@ -490,18 +496,18 @@ $(function() {
               { txn: txn, q: q },
               function(data) {
                 if (data.error) {
-                  snd.no.play();
+                  play("no");
                   $.modal(data.error);
                 } else {
                   updateOrderData(data.txn);
                   if (data.items.length == 0) {
-                    snd.no.play();
+                    play("no");
                   } else if (data.items.length == 1) {
-                    snd.yes.play();
+                    play("yes");
                     addNewItem(data.items[0]);
                     updateTotal();
                   } else {
-                    snd.maybe.play();
+                    play("maybe");
                     var choices= $('<div class="choices"/>');
                     choices.append('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Skip"></span>');
                     $.each(data.items, function(i,item) {
