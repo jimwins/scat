@@ -59,6 +59,8 @@ $(document).ready(function() {
 &nbsp;
 <a href="./txns.php" title="Transactions"><img src="./icons/table.png" width="16" height="16" alt="Transactions"> Transactions</a>
 &nbsp;
+<a href="./till.php" title="Till"><img src="./icons/money.png" width="16" height="16" alt="Till"> Till</a>
+&nbsp;
 <a href="#" onclick="return false" id="reports" title="Reports"><img src="./icons/report.png" width="16" height="16" alt="Reports"> Reports</a>
 </header>
 <script>
