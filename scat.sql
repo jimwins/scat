@@ -128,7 +128,7 @@ CREATE TABLE `txn` (
   `created` datetime NOT NULL,
   `filled` datetime DEFAULT NULL,
   `paid` datetime DEFAULT NULL,
-  `type` enum('internal','vendor','customer') NOT NULL,
+  `type` enum('correction','vendor','customer','drawer') NOT NULL,
   `person` int(10) unsigned DEFAULT NULL,
   `tax_rate` decimal(9,3) NOT NULL,
   PRIMARY KEY (`id`),
@@ -208,4 +208,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-01-02 23:12:12
+-- Dump completed on 2012-01-05 20:49:52

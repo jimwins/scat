@@ -61,7 +61,8 @@ $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
             CASE type
               WHEN 'customer' THEN IF(allocated <= 0, 'Sale', 'Return')
               WHEN 'vendor' THEN 'Stock'
-              WHEN 'internal' THEN 'Correction'
+              WHEN 'correction' THEN 'Correction'
+              WHEN 'drawer' THEN 'Till Count'
               ELSE type
             END Type,
             allocated AS Quantity\$right,

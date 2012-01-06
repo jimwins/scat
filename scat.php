@@ -197,7 +197,8 @@ function expand_field($data, $class) {
   switch ($class) {
   case '$txn':
     list($id, $type, $number)= preg_split('/\|/', $data);
-    $desc= array('internal' => 'Transfer',
+    $desc= array('correction' => 'Correction',
+                 'drawer' => 'Till Count',
                  'customer' => 'Invoice',
                  'vendor' => 'Purchase Order');
     if ($type == 'customer') {

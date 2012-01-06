@@ -36,7 +36,8 @@ $page= (int)$_REQUEST['page'];
 <select name="type">
  <option value="customer">Invoice
  <option value="vendor">Purchase Order
- <option value="internal">Internal
+ <option value="correction">Correction
+ <option value="drawer">Till Count
 </select>
 <input id="focus" type="text" name="number" value="">
 </form>
@@ -47,7 +48,8 @@ $page= (int)$_REQUEST['page'];
  <option value="">Any
  <option value="customer">Invoice
  <option value="vendor">Purchase Order
- <option value="internal">Internal
+ <option value="correction">Correction
+ <option value="drawer">Till Count
 </select>
 that includes
 <input type="text" name="q" value="<?=ashtml($q)?>">

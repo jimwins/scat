@@ -136,7 +136,7 @@ $q= "INSERT
             CASE type
               WHEN 1 THEN 'customer'
               WHEN 2 THEN 'vendor'
-              WHEN 3 THEN 'internal'
+              WHEN 3 THEN 'correction'
             END AS type,
             id_item AS person,
             IF(has_tax = 't',
@@ -162,7 +162,7 @@ $q= "INSERT
             CASE type
               WHEN 1 THEN 'customer'
               WHEN 2 THEN 'vendor'
-              WHEN 3 THEN 'internal'
+              WHEN 3 THEN 'correction'
             END AS type,
             id_item AS person,
             IF(has_tax = 't',
