@@ -156,7 +156,8 @@ CREATE TABLE `txn_line` (
   `discount` decimal(9,2) DEFAULT NULL,
   `taxfree` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `txn` (`txn`,`line`)
+  KEY `txn` (`txn`,`line`),
+  KEY `item` (`item`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
