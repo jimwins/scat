@@ -6,7 +6,7 @@ head("search");
 $q= $_GET['q'];
 ?>
 <form method="get" action="<?=$_SERVER['PHP_SELF']?>">
-<input id="focus" type="text" name="q" value="<?=htmlspecialchars($q)?>">
+<input id="focus" type="text" autocomplete="off" name="q" value="<?=htmlspecialchars($q)?>">
 <input type="submit" value="Search">
 </form>
 <br>
