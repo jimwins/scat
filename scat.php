@@ -218,10 +218,12 @@ function expand_field($data, $class) {
     $desc= array('cash' => 'Cash',
                  'change' => 'Change',
                  'credit' => 'Credit Card',
+                 'square' => 'Square',
                  'gift' => 'Gift Card',
                  'check' => 'Check',
-                 'discount' => 'Discount',
                  'dwolla' => 'Dwolla',
+                 'discount' => 'Discount',
+                 'withdrawal' => 'Withdrawal',
                  );
     return $desc[$data];
   case '$html':

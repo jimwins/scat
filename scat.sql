@@ -80,7 +80,7 @@ DROP TABLE IF EXISTS `payment`;
 CREATE TABLE `payment` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `txn` int(10) unsigned NOT NULL,
-  `method` enum('cash','change','credit','square','gift','check','discount') NOT NULL,
+  `method` enum('cash','change','credit','square','gift','check','dwolla','discount','withdrawal') NOT NULL,
   `amount` decimal(9,3) NOT NULL,
   `cc_txn` varchar(10) DEFAULT NULL,
   `cc_approval` varchar(30) DEFAULT NULL,
@@ -208,4 +208,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-01-05 20:49:52
+-- Dump completed on 2012-01-05 21:19:14
