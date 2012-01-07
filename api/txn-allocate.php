@@ -15,14 +15,16 @@ if ($txn['paid']) {
 $q= "UPDATE txn_line SET allocated = ordered WHERE txn = $id";
 $r= $db->query($q)
   or die_jsonp($db->error);
-$lines= $r->num_rows;
+$lines= $db->affected_rows;
 
-$q= "UPDATE txn SET filled = NOW() WHERE id = $id";
-$r= $db->query($q)
-  or die_jsonp($db->error);
+if ($lines) {
+  $q= "UPDATE txn SET filled = NOW() WHERE id = $id";
+  $r= $db->query($q)
+    or die_jsonp($db->error);
+}
 
 $txn= txn_load($db, $id);
 
 echo jsonp(array("success" => "Allocated all lines.",
                  "txn" => $txn,
-                 "lines" => $r->num_rows));
+                 "lines" => $lines));
