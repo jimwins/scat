@@ -36,10 +36,8 @@ if (isset($_REQUEST['price'])) {
               txn_line.discount = $discount 
         WHERE txn = $txn_id AND txn_line.id = $id AND txn_line.item = item.id";
 
-  $r= $db->query($q);
-  if (!$r) {
-    die_jsonp(array('error' => 'Query failed. ' . $db->error, 'query' => $q));
-  }
+  $r= $db->query($q)
+    or die_query($db, $q);
 }
 
 if (!empty($_REQUEST['quantity'])) {
@@ -48,10 +46,8 @@ if (!empty($_REQUEST['quantity'])) {
           SET ordered = -1 * $quantity
         WHERE txn = $txn_id AND txn_line.id = $id";
 
-  $r= $db->query($q);
-  if (!$r) {
-    die_jsonp(array('error' => 'Query failed. ' . $db->error, 'query' => $q));
-  }
+  $r= $db->query($q)
+    or die_query($db, $q);
 }
 
 if (isset($_REQUEST['name'])) {
@@ -60,10 +56,8 @@ if (isset($_REQUEST['name'])) {
           SET override_name = IF('$name' = '', NULL, '$name')
         WHERE txn = $txn_id AND txn_line.id = $id";
 
-  $r= $db->query($q);
-  if (!$r) {
-    die_jsonp(array('error' => 'Query failed. ' . $db->error, 'query' => $q));
-  }
+  $r= $db->query($q)
+    or die_query($db, $q);
 }
 
 $q= "SELECT txn_line.id AS line_id,
@@ -86,10 +80,8 @@ $q= "SELECT txn_line.id AS line_id,
        FROM txn_line
       WHERE txn = $txn_id AND txn_line.id = $id";
 
-$r= $db->query($q);
-if (!$r) {
-  die_jsonp(array('error' => 'Query failed. ' . $db->error, 'query' => $q));
-}
+$r= $db->query($q)
+  or die_query($db, $q);
 
 $items= array();
 while ($row= $r->fetch_assoc()) {
