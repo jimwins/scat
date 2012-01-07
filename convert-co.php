@@ -316,6 +316,50 @@ $q= "UPDATE txn, txn_paid SET txn.paid = last_payment
 $r= $db->query($q) or die_query($db, $q);
 echo "Noted ", $db->affected_rows, " payments.<br>";
 
+# cash drawer
+$q= "INSERT INTO txn (number, created, filled, paid, type, person, tax_rate)
+     SELECT id AS number,
+            date AS created, date AS filled, date AS paid,
+            'drawer' AS type,
+            id_employee AS person,
+            0.0 AS tax_rate
+       FROM co.drawer_state";
+$r= $db->query($q) or die_query($db, $q);
+echo "Noted ", $db->affected_rows, " till counts.<br>";
+
+$q= "INSERT INTO payment (txn, processed, method, amount)
+     SELECT (SELECT id FROM txn
+              WHERE type = 'drawer' AND number = drawer.id)
+            AS txn,
+            date AS processed,
+            'withdrawal' AS method,
+            -deposited AS amount
+       FROM co.drawer_state drawer
+      WHERE deposited";
+$r= $db->query($q) or die_query($db, $q);
+echo "Noted ", $db->affected_rows, " withdrawals.<br>";
+
+# NOTE this query is monstrously slow with our data. ~17 minutes
+$q= "INSERT INTO payment (txn, processed, method, amount)
+     SELECT (SELECT id FROM txn
+              WHERE type = 'drawer' AND number = drawer.id)
+            AS txn,
+            date AS processed,
+            'cash' AS method,
+            counted -
+            (IFNULL((SELECT counted - deposited FROM co.drawer_state
+                      WHERE id = drawer.id - 1), 0) + 
+             IFNULL((SELECT SUM(amount)
+                       FROM co.payment
+                      WHERE id <= paymentstate
+                        AND id > (SELECT paymentstate FROM co.drawer_state
+                                   WHERE id = drawer.id - 1)
+                        AND type IN (5,6)), 0))
+             AS amount
+       FROM co.drawer_state drawer";
+$r= $db->query($q) or die_query($db, $q);
+echo "Noted ", $db->affected_rows, " till corrections.<br>";
+
 $out= ob_get_contents();
 ob_end_clean();
 
