@@ -838,6 +838,7 @@ $("#pay-discount").on("click", "button[name='pay']", function (ev) {
 </script>
 <script>
 $(".pay-method").on("click", "button[name='cancel']", function(ev) {
+  ev.preventDefault();
   $.modal.close();
 });
 </script>
@@ -944,6 +945,7 @@ $('#person-create').on('submit', function(ev) {
             });
 });
 $('#person-create').on('click', "button[name='cancel'", function(ev) {
+  ev.preventDefault();
   $.modal.close();
 });
 </script>
