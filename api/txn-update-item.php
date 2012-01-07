@@ -12,7 +12,7 @@ if ($txn['paid']) {
   die_jsonp("This order is already paid!");
 }
 
-if (!empty($_REQUEST['price'])) {
+if (isset($_REQUEST['price'])) {
   $price= $_REQUEST['price'];
   if (preg_match('/^\d*(\/|%)$/', $price)) {
     $discount = (float)$price;
