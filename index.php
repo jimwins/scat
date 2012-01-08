@@ -370,8 +370,9 @@ function updateTotal() {
     $('#due-row').before(row);
   });
 
+  var paid_date= $('#txn').data('paid_date');;
   var paid= $('#txn').data('paid');;
-  if (paid > 0) {
+  if (paid_date != null) {
     $('#items #due').text(amount(Math.abs(total - paid)));
     $('#due-row').show();
   } else {
