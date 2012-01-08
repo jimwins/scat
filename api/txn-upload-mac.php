@@ -71,6 +71,15 @@ $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " items from order.<br>";
 
+$q= "INSERT IGNORE INTO barcode (item, code, quantity)
+     SELECT (SELECT id FROM item WHERE item_no = code) AS item,
+            REPLACE(REPLACE(barcode, 'e-', ''), 'u-', '') AS code,
+            1 AS quantity
+      FROM macorder";
+$db->query($q)
+  or die_query($db, $q);
+echo "Loaded ", $db->affected_rows, " new barcodes from order.<br>";
+
 $q= "INSERT INTO txn_line (txn, line, item, ordered, retail_price)
      SELECT $txn_id txn, line,
             (SELECT id FROM item WHERE code = item_no) item,
