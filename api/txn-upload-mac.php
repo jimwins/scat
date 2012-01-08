@@ -54,6 +54,12 @@ $db->query($q)
 
 echo "Loaded ", $db->affected_rows, " rows from file.<br>";
 
+$q= "SELECT id FROM brand WHERE name = 'New Item'";
+$r= $db->query($q)
+  or die_query($db, $q);
+$row= $r->fetch_row();
+$new_item= $row[0];
+
 $q= "START TRANSACTION";
 $db->query($q)
   or die_query($db, $q);
@@ -61,7 +67,7 @@ $db->query($q)
 # Make sure we have all the items
 $q= "INSERT IGNORE INTO item (code, brand, name, retail_price, active)
      SELECT item_no AS code,
-            70 AS brand,
+            $new_item AS brand,
             description AS name,
             msrp AS retail_price,
             1 AS active
