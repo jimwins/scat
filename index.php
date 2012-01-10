@@ -238,34 +238,6 @@ $('.editable').live('dblclick', function() {
   fld.focus().select();
 });
 
-$('#tax_rate').live('dblclick', function() {
-  fld= $('<input type="text" size="2">');
-  fld.val($('#txn').data('tax_rate'));
-
-  fld.bind('keypress blur', function(ev) {
-    if (ev.type == 'keypress' && ev.which != '13') {
-      return true;
-    }
-  
-    var tax_rate= $(this).val();
-    var txn= $('#txn').data('txn');
-
-    $.getJSON("api/txn-update-tax-rate.php?callback=?",
-              { txn: txn, tax_rate: tax_rate},
-              function (data) {
-                // XXX handle error
-                var prc= $('<span class="val"></span>');
-                $('#tax_rate').children().replaceWith(prc);
-                updateOrderData(data.txn);
-                updateTotal();
-              });
-    return true;
-  });
-
-  $(this).children('.val').replaceWith(fld);
-  fld.focus().select();
-});
-
 $('.remove').live('click', function() {
   var txn= $('#txn').data('txn');
   var id= $(this).closest('tr').data('line_id');
@@ -391,8 +363,7 @@ function updateOrderData(txn) {
   $('#txn').data('paid_date', txn.paid)
   var tax_rate= parseFloat(txn.tax_rate).toFixed(2);
   $('#txn').data('tax_rate', tax_rate)
-  var prc= $('<span class="val">' + tax_rate +  '</span>');
-  $('#txn #tax_rate .val').replaceWith(prc);
+  $('#txn #tax_rate .val').text(tax_rate);
   $('#txn #description').text("Sale " + txn.number);
   $('#txn').data('person', txn.person)
   $('#txn #person .val').text(txn.person_name ? txn.person_name : 'Anonymous');
@@ -980,6 +951,21 @@ $("#items").on("click", ".payment-row button[name='remove']", function() {
               updateTotal();
             });
 });
+$('#tax_rate .val').editable(function(value, settings) {
+  var txn= $('#txn').data('txn');
+
+  $.getJSON("api/txn-update-tax-rate.php?callback=?",
+            { txn: txn, tax_rate: value },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              updateOrderData(data.txn);
+              updateTotal();
+            });
+  return "...";
+}, { event: 'dblclick', style: 'display: inline' });
 </script>
  <tbody>
  </tbody>
