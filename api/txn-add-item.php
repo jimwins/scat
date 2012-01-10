@@ -124,9 +124,9 @@ if (count($items) == 1) {
     if (!$r) die_query($db, $q);
   } else {
     $q= "INSERT INTO txn_line (txn, item, ordered,
-                               retail_price, discount, discount_type)
+                               retail_price, discount, discount_type, taxfree)
          SELECT $txn_id AS txn, {$items[0]['id']} AS item, -1 AS ordered,
-                retail_price, discount, discount_type
+                retail_price, discount, discount_type, taxfree
            FROM item WHERE id = {$items[0]['id']}";
     $r= $db->query($q);
     if (!$r) die_query($db, $q);
