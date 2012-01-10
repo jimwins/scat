@@ -20,6 +20,6 @@ $q= "UPDATE txn SET tax_rate = $tax_rate WHERE id = $txn_id";
 $r= $db->query($q)
   or die_jsonp($db->error);
 
-$txn= txn_load($db, $txn);
+$txn= txn_load($db, $txn_id);
 
 echo jsonp(array("success" => "Updated tax rate.", "txn" => $txn));
