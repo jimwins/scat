@@ -8,6 +8,8 @@ $start_time= microtime();
 $DEBUG= false;
 require dirname(__FILE__).'/config.php';
 
+require dirname(__FILE__).'/lib/db.php';
+
 define('APP_NAME', 'ScatPOS');
 define('VERSION', '0.0.1');
 define('EPS_ApplicationID', '984');
@@ -126,7 +128,7 @@ CONFIG;
   die($msg);
 }
 
-$db= mysqli_init();
+$db= new ScatDB();
 if (!$db) die("mysqli_init failed");
 
 if (!$db->real_connect(DB_SERVER,DB_USER,DB_PASSWORD,DB_SCHEMA))
