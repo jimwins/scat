@@ -87,6 +87,14 @@ input[type="text"]:focus {
   background: rgba(255,255,255,0.9);
 }
 
+.error input[type="text"] {
+  background: rgba(255,192,192,0.7);
+  border: 1px solid #caa8a8;
+}
+.error input[type="text"]:focus {
+  background: rgba(255,192,192,0.9);
+}
+
 button, input[type="submit"] {
   border-radius: 10px;
   background-color: #dedede;

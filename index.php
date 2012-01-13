@@ -452,6 +452,8 @@ $(function() {
 
   $('#lookup').submit(function(ev) {
     ev.preventDefault();
+    $("#lookup").removeClass("error");
+
     $('input[name="q"]', this).focus().select();
 
     var q = $('input[name="q"]', this).val();
@@ -475,6 +477,7 @@ $(function() {
                   updateOrderData(data.txn);
                   if (data.items.length == 0) {
                     play("no");
+                    $("#lookup").addClass("error");
                   } else if (data.items.length == 1) {
                     play("yes");
                     addNewItem(data.items[0]);
