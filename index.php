@@ -305,6 +305,8 @@ var paymentMethods= {
   cash: "Cash",
   change: "Change",
   credit: "Credit Card",
+  square: "Square",
+  dwolla: "Dwolla",
   gift: "Gift Card",
   check: "Check",
   discount: "Discount",
@@ -618,6 +620,8 @@ $("#return").on("click", function() {
  <button data-value="credit">Credit Card</button>
 <?}?>
  <button data-value="credit-manual">Credit Card (Manual)</button>
+ <button data-value="square">Square</button>
+ <button data-value="dwolla">Dwolla</button>
  <button data-value="gift">Gift Card</button>
  <button data-value="check">Check</button>
  <button data-value="discount">Discount</button>
@@ -690,6 +694,56 @@ $("#pay-credit-manual").on("click", "button", function (ev) {
                 if (amount >= 25.00) {
                   printChargeRecord(data.payment);
                 }
+              }
+            });
+});
+</script>
+<form id="pay-square" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <input type="submit" name="Pay">
+ <button name="cancel">Cancel</button>
+</form>
+<script>
+$("#pay-square").on("submit", function (ev) {
+  ev.preventDefault();
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-square .amount").val();
+  $.getJSON("api/txn-add-payment.php?callback=?",
+            { id: txn, method: "square", amount: amount, change: false },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                $.modal.close();
+              }
+            });
+});
+</script>
+<form id="pay-dwolla" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <input type="submit" name="Pay">
+ <button name="cancel">Cancel</button>
+</form>
+<script>
+$("#pay-dwolla").on("submit", function (ev) {
+  ev.preventDefault();
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-dwolla .amount").val();
+  $.getJSON("api/txn-add-payment.php?callback=?",
+            { id: txn, method: "dwolla", amount: amount, change: false },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                $.modal.close();
               }
             });
 });
