@@ -668,10 +668,14 @@ $("#pay-cash").on("submit", function (ev) {
  <button name="cancel">Cancel</button>
 </div>
 <script>
-$("#pay-credit-manual").on("click", "button[name!='cancel']", function (ev) {
+$("#pay-credit-manual").on("click", "button", function (ev) {
   var txn= $("#txn").data("txn");
   var amount= $("#pay-credit-manual .amount").val();
   var cc_type= $(this).attr('name');
+  if (cc_type == 'cancel') {
+    $.modal.close();
+    return false;
+  }
   $.getJSON("api/txn-add-payment.php?callback=?",
             { id: txn, method: "credit", amount: amount, change: false,
               cc_type: cc_type },
