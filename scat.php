@@ -261,7 +261,7 @@ function jsonp($data) {
     header('HTTP/1.1 400 Bad Request');
     exit();
   }
-  header('Content-type: application/javascript; charset=utf-8');
+  header('Content-type: application/json; charset=utf-8');
   if ($_GET['callback']) {
     return sprintf('%s(%s);', $_GET['callback'], json_encode($data));
   }
