@@ -32,8 +32,9 @@ if (!$_REQUEST['all'])
   $criteria[]= "(active AND NOT deleted)";
 
 $q= "SELECT
+            item.id AS meta,
             item.code Code\$item,
-            item.name Name,
+            item.name Name\$name,
             brand.name Brand,
             retail_price MSRP\$dollar,
             IF(discount_type,
@@ -55,7 +56,28 @@ $q= "SELECT
       WHERE " . join(' AND ', $criteria) . "
    GROUP BY item.id";
 
-dump_table($db->query($q));
+$r= $db->query($q)
+  or die($db->error);
+
+dump_table($r);
+?>
+<script>
+$('tbody tr .name').editable(function(value, settings) {
+  var item= $(this).closest('tr').attr('class');
+
+  $.getJSON("api/item-update.php?callback=?",
+            { item: item, name: value },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              $('.' + data.item.id + ' .name').text(data.item.name);
+            });
+  return "...";
+}, { event: 'dblclick', style: 'display: inline' });
+</script>
+<?
 dump_query($q);
 
 foot();
