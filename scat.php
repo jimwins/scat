@@ -179,7 +179,7 @@ function dump_table($r, $calc = false) {
       echo '<td class="num">', ++$c, '</td>';
     for ($i= $meta; $i < $r->field_count; $i++) {
       $name= $r->fetch_field_direct($i)->name;
-      $class= strlen($row[$i]) ? strchr($name, '$') : '';
+      $class= strchr($name, '$');
       if ($class == '$hide')
         continue;
       echo '<td', ($class ? ' class="' . ltrim($class, '$'). '"' : ''), '>',
