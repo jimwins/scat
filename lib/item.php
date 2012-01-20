@@ -23,7 +23,7 @@ function item_load($db, $id) {
                   AND filled IS NOT NULL
                 ORDER BY filled DESC
                 LIMIT 1) last_net,
-              minimum_quantity min,
+              minimum_quantity,
               GROUP_CONCAT(barcode.code SEPARATOR '|') barcodes
          FROM item
          JOIN brand ON (item.brand = brand.id)
