@@ -35,7 +35,7 @@ $q= "SELECT
             item.id AS meta,
             item.code Code\$item,
             item.name Name\$name,
-            brand.name Brand,
+            brand.name Brand\$brand,
             retail_price MSRP\$dollar,
             IF(discount_type,
                CASE discount_type
@@ -76,6 +76,22 @@ $('tbody tr .name').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline' });
+$('tbody tr .brand').editable(function(value, settings) {
+  var item= $(this).closest('tr').attr('class');
+
+  $.getJSON("api/item-update.php?callback=?",
+            { item: item, brand: value },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              $('.' + data.item.id + ' .name').text(data.item.name);
+              $('.' + data.item.id + ' .brand').text(data.item.brand);
+            });
+  return "...";
+}, { event: 'dblclick', style: 'display: inline', type: 'select', submit: 'OK',
+     loadurl: 'api/brand-list.php' });
 </script>
 <?
 dump_query($q);

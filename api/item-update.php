@@ -14,6 +14,16 @@ if (isset($_REQUEST['name'])) {
     or die_query($db, $q);
 }
 
+if (isset($_REQUEST['brand']) && (int)$_REQUEST['brand']) {
+  $brand= (int) $_REQUEST['brand'];
+  $q= "UPDATE item
+          SET brand = $brand
+        WHERE id = $item_id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+}
+
 $item= item_load($db, $item_id);
 
 echo jsonp(array('item' => $item));
