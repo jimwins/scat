@@ -118,7 +118,7 @@ $("#upload").on('click', function() {
 <button id="receipt">Print Receipt</button>
 <script>
 $("#receipt").on('click', function() {
-  var lpr= $('<iframe id="receipt" src="receipt.php?print=1&amp;id=<?=$id?>"></iframe>').hide();
+  var lpr= $('<iframe id="receipt" src="print/receipt.php?print=1&amp;id=<?=$id?>"></iframe>').hide();
   $(this).children("#receipt").remove();
   $(this).append(lpr);
 });
@@ -153,7 +153,7 @@ dump_table($db->query($q));
 dump_query($q);
 
 function charge_record($row) {
-  return '<a href="charge-record.php?id=' . $row[0] . '">Charge Record</a>';
+  return '<a href="print/charge-record.php?id=' . $row[0] . '">Charge Record</a>';
 }
 
 if (preg_match('/customer/', $txn['Number$txn'])) {

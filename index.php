@@ -418,14 +418,14 @@ function printReceipt() {
     $.modal("No sale to print.");
     return false;
   }
-  var lpr= $('<iframe id="receipt" src="receipt.php?print=1&amp;id=' + txn + '"></iframe>').hide();
+  var lpr= $('<iframe id="receipt" src="print/receipt.php?print=1&amp;id=' + txn + '"></iframe>').hide();
   $("#receipt").remove();
   $('body').append(lpr);
   return false;
 }
 
 function printChargeRecord(id) {
-  var lpr= $('<iframe id="receipt" src="charge-record.php?print=1&amp;id=' + id + '"></iframe>').hide();
+  var lpr= $('<iframe id="receipt" src="print/charge-record.php?print=1&amp;id=' + id + '"></iframe>').hide();
   $("#receipt").remove();
   $('body').append(lpr);
   return false;

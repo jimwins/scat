@@ -1,5 +1,5 @@
 <?
-require 'scat.php';
+require '../scat.php';
 ?>
 <?if ($_GET['print']) {?>
 <body onload="window.print()">
