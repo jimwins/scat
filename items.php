@@ -47,7 +47,7 @@ $q= "SELECT
             CASE discount_type
               WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
               WHEN 'relative' THEN CONCAT('$', discount, ' off')
-            END Discount,
+            END Discount\$discount,
             (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) Stock\$right,
             minimum_quantity Minimum\$right
        FROM item
@@ -92,6 +92,24 @@ $('tbody tr .brand').editable(function(value, settings) {
   return "...";
 }, { event: 'dblclick', style: 'display: inline', type: 'select', submit: 'OK',
      loadurl: 'api/brand-list.php' });
+$('tbody tr .discount').editable(function(value, settings) {
+  var item= $(this).closest('tr').attr('class');
+
+  $.getJSON("api/item-update.php?callback=?",
+            { item: item, discount: value },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              $('.' + data.item.id + ' .name').text(data.item.name);
+              $('.' + data.item.id + ' .brand').text(data.item.brand);
+              $('.' + data.item.id + ' td:nth(4)').text(data.item.retail_price);
+              $('.' + data.item.id + ' td:nth(5)').text(data.item.sale_price);
+              $('.' + data.item.id + ' .discount').text(data.item.discount_label);
+            });
+  return "...";
+}, { event: 'dblclick', style: 'display: inline', placeholder: '', });
 </script>
 <?
 dump_query($q);
