@@ -62,6 +62,14 @@ $r= $db->query($q)
 dump_table($r);
 ?>
 <script>
+function updateItem(item) {
+  $('.' + item.id + ' .name').text(item.name);
+  $('.' + item.id + ' .brand').text(item.brand);
+  $('.' + item.id + ' td:nth(4)').text(item.retail_price);
+  $('.' + item.id + ' td:nth(5)').text(item.sale_price);
+  $('.' + item.id + ' .discount').text(item.discount_label);
+  $('.' + item.id + ' td:nth(8)').text(item.minimum_quantity);
+}
 $('tbody tr .name').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
@@ -72,7 +80,7 @@ $('tbody tr .name').editable(function(value, settings) {
                 $.modal(data.error);
                 return;
               }
-              $('.' + data.item.id + ' .name').text(data.item.name);
+              updateItem(data.item);
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline' });
@@ -86,8 +94,7 @@ $('tbody tr .brand').editable(function(value, settings) {
                 $.modal(data.error);
                 return;
               }
-              $('.' + data.item.id + ' .name').text(data.item.name);
-              $('.' + data.item.id + ' .brand').text(data.item.brand);
+              updateItem(data.item);
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline', type: 'select', submit: 'OK',
@@ -102,11 +109,7 @@ $('tbody tr .discount').editable(function(value, settings) {
                 $.modal(data.error);
                 return;
               }
-              $('.' + data.item.id + ' .name').text(data.item.name);
-              $('.' + data.item.id + ' .brand').text(data.item.brand);
-              $('.' + data.item.id + ' td:nth(4)').text(data.item.retail_price);
-              $('.' + data.item.id + ' td:nth(5)').text(data.item.sale_price);
-              $('.' + data.item.id + ' .discount').text(data.item.discount_label);
+              updateItem(data.item);
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline', placeholder: '', });
