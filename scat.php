@@ -217,6 +217,8 @@ function expand_field($data, $class) {
   case '$item':
     return '<a href="item.php?code='.ashtml($data).'">'.ashtml($data).'</a>';
   case '$dollar':
+    if ($data == null)
+      return $data;
     return amount($data);
   case '$payment':
     $desc= array('cash' => 'Cash',
