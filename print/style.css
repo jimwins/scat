@@ -1,0 +1,51 @@
+/* set some standards
+---------------------*/
+/* preparation for color selection variable */
+b, td[class~="total"] {font-weight:bold;}
+body {font:12px 'Helvetica Neue', Helvetica, Arial, sans-serif; color:#000000; padding:0px;}
+table {border:none;}
+
+/* document header
+------------------*/
+#store_logo {font-family: impact; margin:0 auto 40px auto; display:block;}
+#store_name {font-size:2.5em; font-weight:bold; text-align:center; margin:0 0 40px 0;}
+
+#doc_header {margin:0 0 40px 0;}
+#doc_info {width:40%; float:left;}
+	#doc_name {display:block; font-size:2em; font-weight:bold;}
+#store_info {width:27%; float:left; min-height:6em; background-color:; border-left:1px solid #000; padding-left:5px;}
+#client_info {width:27%; float:left; min-height:6em; background-color:; border-left:1px solid #000; padding-left:5px;}
+
+/* product table
+----------------*/
+#products {width:100%;}
+#products th {font-size:0.9em; padding-bottom:0.2em 0; border-bottom:1px solid #aaa;}
+#products td {padding:0.4em 0; border-top:1px solid #eee;}
+#products tr:first-child td {padding-top:0.4em; border-top:none;}
+#products tr span.serial {font-size:0.75em;}
+#products tr span.code {color:#555;} /* serial */
+.right {text-align:right; padding-left:0.6em;}
+.left, #products tbody td.left {text-align:left; padding-left:0.6em;} /* ? */
+
+#products tr th.price, #products tr td.price {padding-left:0.5em; white-space:nowrap; text-align:right;}
+
+/* document footer
+------------------*/
+#doc_total {margin:20px 0 0 0;}
+#store_employee {float:left; background-color:;}
+
+/* document total
+-----------------*/
+#doc_total table {float:right; text-align:right;}
+#doc_total table tr td {padding:0.4em 0 0.4em 1em;}
+tr.sub td {border-bottom:1px solid #ddd;}
+tr.paid td {border-top:1px solid #ddd;}
+tr.total td {font-size:1.2em; font-weight:bold; border-top:double #aaa;}
+tr.totalheader td {font-size:1.2em; font-weight:bold; text-align:right; border-bottom:single #aaa;}
+
+#received {}
+#onorder {background-color:; margin-right:20px;}
+
+/* store footer
+---------------*/
+#store_footer {width:100%; text-align:center; font-size:0.9em; font-style:italic; margin:4em 0 0 0; padding:1em 0 0 0; border-top:1px solid #eee;}

@@ -424,6 +424,18 @@ function printReceipt() {
   return false;
 }
 
+function printInvoice() {
+  var txn= $('#txn').data('txn');
+  if (!txn) {
+    $.modal("No sale to print.");
+    return false;
+  }
+  var lpr= $('<iframe id="receipt" src="print/invoice.php?print=1&amp;id=' + txn + '"></iframe>').hide();
+  $("#receipt").remove();
+  $('body').append(lpr);
+  return false;
+}
+
 function printChargeRecord(id) {
   var lpr= $('<iframe id="receipt" src="print/charge-record.php?print=1&amp;id=' + id + '"></iframe>').hide();
   $("#receipt").remove();
@@ -577,11 +589,15 @@ $("#txn-load").submit(function(ev) {
 </form>
 <div id="txn">
 <div id="sale-buttons">
+  <button id="invoice">Invoice</button>
   <button id="print">Print</button>
   <button id="pay">Pay</button>
   <button id="return">Return</button>
 </div>
 <script>
+$("#invoice").on("click", function() {
+  printInvoice();
+});
 $("#print").on("click", function() {
   if ($("#txn").data("paid_date") != null ||
       confirm("Invoice isn't paid. Sure you want to print?"))
