@@ -107,13 +107,14 @@ while ($row= $r->fetch_assoc()) {
 /* if it is just one item, go ahead and add it to the invoice */
 if (count($items) == 1) {
   // XXX some items should always be added on their own
+  $unique= preg_match('/^ZZ-(frame|print|univ)/i', $items[0]['code']);
 
   $q= "SELECT id, ordered FROM txn_line
         WHERE txn = $txn_id AND item = {$items[0]['id']}";
   $r= $db->query($q);
   if (!$r) die_query($db, $q);
 
-  if ($r->num_rows) {
+  if (!$unique && $r->num_rows) {
     $row= $r->fetch_assoc();
     $items[0]['line_id']= $row['id'];
     $items[0]['quantity']= -1 * ($row['ordered'] - $items[0]['quantity']);
