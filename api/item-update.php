@@ -24,6 +24,16 @@ if (isset($_REQUEST['brand']) && (int)$_REQUEST['brand']) {
     or die_query($db, $q);
 }
 
+if (isset($_REQUEST['retail_price'])) {
+  $retail_price= $db->real_escape_string($_REQUEST['retail_price']);
+  $q= "UPDATE item
+          SET retail_price = '$retail_price'
+        WHERE id = $item_id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+}
+
 if (isset($_REQUEST['discount'])) {
   $discount= $_REQUEST['discount'];
   if (preg_match('/^(\d*)(\/|%)( off)?$/', $discount, $m)) {

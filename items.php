@@ -109,6 +109,20 @@ $('tbody tr .brand').editable(function(value, settings) {
   return "...";
 }, { event: 'dblclick', style: 'display: inline', type: 'select', submit: 'OK',
      loadurl: 'api/brand-list.php' });
+$('tbody tr td:nth-child(5)').editable(function(value, settings) {
+  var item= $(this).closest('tr').attr('class');
+
+  $.getJSON("api/item-update.php?callback=?",
+            { item: item, retail_price: value },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              updateItem(data.item);
+            });
+  return "...";
+}, { event: 'dblclick', style: 'display: inline', placeholder: '', });
 $('tbody tr .discount').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
