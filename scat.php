@@ -234,9 +234,9 @@ function expand_field($data, $class) {
     return $desc[$data];
   case '$bool':
     if ($data) {
-      return '<img src="icons/accept.png" width="16" height="16">';
+      return '<img data-truth="1" src="icons/accept.png" width="16" height="16">';
     } else {
-      return '<img src="icons/cross.png" width="16" height="16">';
+      return '<img data-truth="0" src="icons/cross.png" width="16" height="16">';
     }
   case '$html':
     return $data;

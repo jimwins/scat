@@ -62,6 +62,16 @@ if (isset($_REQUEST['minimum_quantity'])) {
     or die_query($db, $q);
 }
 
+if (isset($_REQUEST['active'])) {
+  $active= (int)$_REQUEST['active'];
+  $q= "UPDATE item
+          SET active = $active
+        WHERE id = $item_id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+}
+
 $item= item_load($db, $item_id);
 
 echo jsonp(array('item' => $item));

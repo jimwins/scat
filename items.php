@@ -72,6 +72,13 @@ function updateItem(item) {
   $('.' + item.id + ' .discount').text(item.discount_label);
   $('.' + item.id + ' td:nth(7)').text(item.stock);
   $('.' + item.id + ' td:nth(8)').text(item.minimum_quantity);
+  var active= parseInt(item.active);
+  $('.' + item.id + ' td:nth(9) img').data('truth', active);
+  if (active) {
+    $('.' + item.id + ' td:nth(9) img').attr('src', 'icons/accept.png');
+  } else {
+    $('.' + item.id + ' td:nth(9) img').attr('src', 'icons/cross.png');
+  }
 }
 $('tbody tr .name').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
@@ -130,6 +137,21 @@ $('tbody tr td:nth(8)').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline' });
+$('tbody').on('dblclick', 'tr td:nth-child(10)', function(ev) {
+  ev.preventDefault();
+  var item= $(this).closest('tr').attr('class');
+  var val= $("img", this).data('truth');
+
+  $.getJSON("api/item-update.php?callback=?",
+            { item: item, active: parseInt(val) ? 0 : 1 },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              updateItem(data.item);
+            });
+});
 </script>
 <?
 dump_query($q);
