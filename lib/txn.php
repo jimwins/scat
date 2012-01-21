@@ -6,7 +6,8 @@ function txn_load($db, $id) {
               CONCAT(DATE_FORMAT(created, '%Y-'), number) AS formatted_number,
               person, person_name,
               IFNULL(ordered, 0) ordered, allocated,
-              taxed, untaxed, tax_rate,
+              taxed, untaxed,
+              CAST(tax_rate AS DECIMAL(9,2)) tax_rate, 
               taxed + untaxed subtotal,
               CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
                    AS DECIMAL(9,2)) total,
