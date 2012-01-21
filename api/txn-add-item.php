@@ -83,7 +83,7 @@ $q= "SELECT
               WHEN 'relative' THEN CONCAT('$', discount, ' off')
             END), '') discount,
             (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) stock,
-            barcode.quantity quantity
+            IFNULL(barcode.quantity, 1) quantity
        FROM item
   LEFT JOIN brand ON (item.brand = brand.id)
   LEFT JOIN barcode ON (item.id = barcode.item)
