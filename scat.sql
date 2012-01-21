@@ -132,6 +132,7 @@ CREATE TABLE `txn` (
   `person` int(10) unsigned DEFAULT NULL,
   `tax_rate` decimal(9,3) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `type` (`type`,`number`),
   KEY `created` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -208,4 +209,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-01-05 21:19:14
+-- Dump completed on 2012-01-20 22:09:47
