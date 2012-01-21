@@ -232,6 +232,12 @@ function expand_field($data, $class) {
                  'withdrawal' => 'Withdrawal',
                  );
     return $desc[$data];
+  case '$bool':
+    if ($data) {
+      return '<img src="icons/accept.png" width="16" height="16">';
+    } else {
+      return '<img src="icons/cross.png" width="16" height="16">';
+    }
   case '$html':
     return $data;
   default:

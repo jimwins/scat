@@ -50,7 +50,8 @@ $q= "SELECT
               WHEN 'relative' THEN CONCAT('$', discount, ' off')
             END Discount\$discount,
             (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) Stock\$right,
-            minimum_quantity Minimum\$right
+            minimum_quantity Minimum\$right,
+            active Active\$bool
        FROM item
   LEFT JOIN brand ON (item.brand = brand.id)
   LEFT JOIN barcode ON (item.id = barcode.item)
