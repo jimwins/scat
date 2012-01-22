@@ -137,7 +137,7 @@ $('tbody tr .discount').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline', placeholder: '', });
-$('tbody tr td:nth(8)').editable(function(value, settings) {
+$('tbody tr td:nth-child(9)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
   $.getJSON("api/item-update.php?callback=?",
