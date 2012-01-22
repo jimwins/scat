@@ -108,7 +108,7 @@ $('tbody tr .brand').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline', type: 'select', submit: 'OK',
-     loadurl: 'api/brand-list.php' });
+loadurl: 'api/brand-list.php', placeholder: '' });
 $('tbody tr td:nth-child(5)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
