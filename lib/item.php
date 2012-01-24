@@ -27,7 +27,7 @@ function item_load($db, $id) {
               GROUP_CONCAT(barcode.code SEPARATOR '|') barcodes,
               active
          FROM item
-         JOIN brand ON (item.brand = brand.id)
+    LEFT JOIN brand ON (item.brand = brand.id)
     LEFT JOIN barcode ON (item.id = barcode.item)
         WHERE item.id = $id
      GROUP BY item.id";
