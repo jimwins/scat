@@ -137,6 +137,20 @@ $('tbody tr .discount').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline', placeholder: '', });
+$('tbody tr td:nth-child(8)').editable(function(value, settings) {
+  var item= $(this).closest('tr').attr('class');
+
+  $.getJSON("api/item-update.php?callback=?",
+            { item: item, stock: value },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              updateItem(data.item);
+            });
+  return "...";
+}, { event: 'dblclick', style: 'display: inline' });
 $('tbody tr td:nth-child(9)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 

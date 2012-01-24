@@ -4,6 +4,11 @@ include '../lib/item.php';
 
 $item_id= (int)$_REQUEST['item'];
 
+$item= item_load($db, $item_id);
+
+if (!$item)
+  die_jsonp('No such item.');
+
 if (isset($_REQUEST['name'])) {
   $name= $db->real_escape_string($_REQUEST['name']);
   $q= "UPDATE item
@@ -81,6 +86,56 @@ if (isset($_REQUEST['active'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 }
+
+if (isset($_REQUEST['stock'])) {
+  $stock= (int)$_REQUEST['stock'];
+
+  if ($stock != $item['stock']) {
+    $q= "SELECT id
+           FROM txn
+          WHERE type = 'correction'
+            AND DATE(NOW()) = DATE(created)";
+    $txn_id= $db->get_one($q);
+
+    if (!$txn_id) {
+      $q= "SELECT MAX(number) + 1 FROM txn WHERE type = 'correction'";
+      $num= $db->get_one($q);
+
+      $q= "INSERT INTO txn
+              SET type = 'correction',
+                  number = $num,
+                  tax_rate = 0,
+                  created = NOW()";
+      $r= $db->query($q)
+        or die_query($db, $q);
+      $txn_id= $db->insert_id;
+                          
+    }
+
+    $diff= $stock - $item['stock'];
+    if ($stock > $item['stock']) {
+      $cost= 0.00;
+    } else {
+      $q= "SELECT retail_price
+             FROM txn_line JOIN txn ON (txn_line.txn = txn.id)
+            WHERE item = $item_id AND type = 'vendor'
+            ORDER BY created DESC
+            LIMIT 1";
+      $cost= $db->get_one($q);
+    }
+
+    $q= "INSERT INTO txn_line
+            SET txn = $txn_id,
+                item = $item_id,
+                retail_price = $cost,
+                ordered = $diff,
+                allocated = $diff";
+
+    $r= $db->query($q)
+      or die_query($db, $q);
+  }
+}
+
 
 $item= item_load($db, $item_id);
 
