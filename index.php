@@ -88,6 +88,14 @@ tfoot td {
   color: #333;
 }
 
+#notes {
+  width: 100%;
+}
+
+#notes tr {
+  vertical-align: top;
+}
+
 #sidebar {
   width: 22%;
   float: right;
@@ -371,18 +379,36 @@ function updateOrderData(txn) {
   $('#txn #person .val').text(txn.person_name ? txn.person_name : 'Anonymous');
 }
 
+var protoNote= $("<tr><td></td><td></td><td></td></tr>");
+
 function loadOrder(data) {
   updateOrderData(data.txn)
 
   $('#txn').data('payments', data.payments);
 
-  // dump existing item rows
-  $("#items tbody tr").remove();
+  if (data.items != undefined) {
+    $('#txn').data('items', data.items);
 
-  // load rows
-  $.each(data.items, function(i, item) {
-    addNewItem(item);
-  });
+    // dump existing item rows
+    $("#items tbody tr").remove();
+
+    // load rows
+    $.each(data.items, function(i, item) {
+      addNewItem(item);
+    });
+  }
+
+  // update notes
+  if (data.notes != undefined) {
+    $('#txn').data('notes', data.notes);
+    $("#notes tbody tr").remove();
+    $.each(data.notes, function(i, note) {
+      var row= protoNote.clone();
+      $("td:nth(1)", row).text(note.entered);
+      $("td:nth(2)", row).text(note.content);
+      $("#notes tbody").append(row);
+    });
+  }
 
   updateTotal();
 }
@@ -1043,6 +1069,13 @@ $('#tax_rate .val').editable(function(value, settings) {
   return "...";
 }, { event: 'dblclick', style: 'display: inline' });
 </script>
+ <tbody>
+ </tbody>
+</table>
+<table id="notes">
+ <thead>
+  <tr><th style="width: 20px"><img src="icons/note_add.png" width="16" height="16"></th><th style="width: 10em">Date</th><th>Note</th></tr>
+ </thead>
  <tbody>
  </tbody>
 </table>
