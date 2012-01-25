@@ -331,7 +331,19 @@ function updateTotal() {
 
   $('.payment-row').remove();
 
-  $.each($('#txn').data('payments'), function(i, payment) {
+  var paid_date= $('#txn').data('paid_date');
+  var paid= $('#txn').data('paid');
+  if (paid || paid_date != null) {
+    $('#items #due').text(amount(Math.abs(total - paid)));
+    $('#due-row').show();
+  } else {
+    $('#due-row').hide();
+  }
+
+  var payments= $('#txn').data('payments');
+  if (!payments) return;
+
+  $.each(payments, function(i, payment) {
     var row= paymentRow.clone();
     row.data(payment);
     if (payment.method == 'discount' && payment.discount) {
@@ -348,19 +360,8 @@ function updateTotal() {
       $('.payment-buttons', row).append($('<button name="remove">Remove</button>'));
     }
 
-
     $('#due-row').before(row);
   });
-
-  var paid_date= $('#txn').data('paid_date');;
-  var paid= $('#txn').data('paid');;
-  if (paid || paid_date != null) {
-    $('#items #due').text(amount(Math.abs(total - paid)));
-    $('#due-row').show();
-  } else {
-    $('#due-row').hide();
-  }
-
 }
 
 function updateOrderData(txn) {
@@ -384,7 +385,9 @@ var protoNote= $("<tr><td></td><td></td><td></td></tr>");
 function loadOrder(data) {
   updateOrderData(data.txn)
 
-  $('#txn').data('payments', data.payments);
+  if (data.payments != undefined) {
+    $('#txn').data('payments', data.payments);
+  }
 
   if (data.items != undefined) {
     $('#txn').data('items', data.items);
@@ -1079,5 +1082,28 @@ $('#tax_rate .val').editable(function(value, settings) {
  <tbody>
  </tbody>
 </table>
+<form id="add-note" style="display: none">
+  <input type="text" name="note" size="40">
+  <input type="submit" value="Add">
+</form>
+<script>
+$("#notes img").on("click", function(ev) {
+  var txn= $("#txn").data("txn");
+  if (!txn) return;
+  $.modal($("#add-note"));
+});
+$("#add-note").on("submit", function(ev) {
+  ev.preventDefault();
+
+  var txn= $("#txn").data("txn");
+  var note= $('input[name="note"]', this).val();
+  $.getJSON("api/txn-add-note.php?callback=?",
+            { id: txn, note: note},
+            function (data) {
+              loadOrder(data);
+              $.modal.close();
+            });
+});
+</script>
 </div>
 <?foot();
