@@ -124,3 +124,20 @@ function txn_load_payments($db, $id) {
 
   return $payments;
 }
+
+function txn_load_notes($db, $id) {
+  $q= "SELECT id, entered, content
+         FROM txn_note
+        WHERE txn = $id
+        ORDER BY entered ASC";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  $payments= array();
+  while ($row= $r->fetch_assoc()) {
+    $payments[]= $row;
+  }
+
+  return $payments;
+}

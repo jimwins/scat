@@ -29,18 +29,7 @@ $items= txn_load_items($db, $id);
 
 $payments= txn_load_payments($db, $id);
 
-$q= "SELECT id, entered, content
-       FROM txn_note
-      WHERE txn = $id
-      ORDER BY entered ASC";
-$r= $db->query($q)
-  or die_query($db, $q);
-
-$notes= array();
-while ($row= $r->fetch_assoc()) {
-  /* force numeric values to numeric type */
-  $notes[]= $row;
-}
+$notes= txn_load_notes($db, $id);
 
 echo jsonp(array('txn' => $txn,
                  'items' => $items,
