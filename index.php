@@ -508,7 +508,7 @@ $(function() {
                       });
                       choices.append(n);
                     });
-                    $("#items").prepend(choices);
+                    $("#items").before(choices);
                   }
                 }
               });
@@ -998,8 +998,7 @@ $('#person-create').on('click', "button[name='cancel'", function(ev) {
   $.modal.close();
 });
 </script>
-<div id="items">
- <table width="100%">
+<table id="items" width="100%">
  <thead>
   <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
@@ -1047,6 +1046,5 @@ $('#tax_rate .val').editable(function(value, settings) {
  <tbody>
  </tbody>
 </table>
-</div>
 </div>
 <?foot();
