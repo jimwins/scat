@@ -102,8 +102,11 @@ $db->commit()
 
 $q= "SELECT CAST((SUM(shipped) / SUM(ordered)) * 100 AS DECIMAL(9,1))
        FROM macorder";
-$fill_rate= $db->get_one($q);
-echo "Fill rate $fill_rate%.";
+$item_rate= $db->get_one($q);
+$q= "SELECT CAST((SUM(shipped > 0) / SUM(ordered > 0)) * 100 AS DECIMAL(9,1))
+       FROM macorder";
+$sku_rate= $db->get_one($q);
+echo "Fill rate by item: $item_rate%, by SKU: $sku_rate%.";
 
 $out= ob_get_contents();
 ob_end_clean();
