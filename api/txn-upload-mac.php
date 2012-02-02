@@ -95,10 +95,15 @@ $q= "INSERT INTO txn_line (txn, line, item, ordered, retail_price)
 $db->query($q)
   or die_query($db, $q);
 
-echo "Loaded ", $db->affected_rows, " rows into purchase order.";
+echo "Loaded ", $db->affected_rows, " rows into purchase order.<br>";
 
 $db->commit()
   or die_jsonp($db->error);
+
+$q= "SELECT CAST((SUM(shipped) / SUM(ordered)) * 100 AS DECIMAL(9,1))
+       FROM macorder";
+$fill_rate= $db->get_one($q);
+echo "Fill rate $fill_rate%.";
 
 $out= ob_get_contents();
 ob_end_clean();
