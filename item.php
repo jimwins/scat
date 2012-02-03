@@ -65,6 +65,13 @@ $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
               WHEN 'drawer' THEN 'Till Count'
               ELSE type
             END Type,
+            IF(discount_type,
+               CASE discount_type
+                 WHEN 'percentage' THEN ROUND(retail_price * ((100 - discount) / 100), 2)
+                 WHEN 'relative' THEN (retail_price - discount) 
+                 WHEN 'fixed' THEN (discount)
+               END,
+               retail_price) AS Price\$dollar,
             allocated AS Quantity\$right,
             @count := @count + allocated AS Count\$right
        FROM txn_line
