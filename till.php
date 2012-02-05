@@ -65,7 +65,14 @@ if (!empty($count) && !empty($withdrawal)) {
   $row= $r->fetch_row();
   $current= $row[0];
 
-  echo '<div class="error">Till update successful!</div>';
+  ?>
+<div class="error">Till update successful!</div>
+<script>
+  var lpr= $('<iframe id="receipt" src="print/deposit-slip.php?print=1&amp;id=<?=$txn?>"></iframe>').hide();
+  $("#receipt").remove();
+  $('body').append(lpr);
+</script>
+  <?
 }
 ?>
 <form method="post" action="./till.php">
