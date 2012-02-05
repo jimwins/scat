@@ -18,6 +18,9 @@ Scat includes the jQuery Hotkeys plugin:
 Scat includes the Jeditable jQuery plugin:
   http://www.appelsiini.net/projects/jeditable
 
+Scat includes FPDF for PDF generation:
+  http://www.fpdf.org/
+
 Scat includes icons from the Silk icon set by Mark James:
   http://www.famfamfam.com/lab/icons/silk/
 
