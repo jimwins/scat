@@ -21,7 +21,8 @@ $q= "SELECT code Code\$item,
             minimum_quantity AS Order\$order
        FROM item
        LEFT JOIN txn_line ON (item = item.id)
-      WHERE active AND NOT deleted AND code NOT LIKE 'ZZ%'
+      WHERE active AND NOT deleted
+        AND code NOT LIKE 'ZZ%' AND code NOT LIKE 'MAG-%'
       GROUP BY item.id
      HAVING NOT Stock\$right OR Stock\$right < Min\$right
       ORDER BY code
