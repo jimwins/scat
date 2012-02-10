@@ -37,7 +37,8 @@ if ($method == 'discount') {
 $change= (bool)($_REQUEST['change'] != 'false');
 
 // if no change and amount + paid > total, barf
-if (!$change && bccomp(bcadd($amount, $txn['total_paid']), $txn['total']) > 0) {
+if (!$change &&
+    (($txn['total'] >= 0 && bccomp(bcadd($amount, $txn['total_paid']), $txn['total']) > 0) || ($txn['total'] < 0 && bccomp(bcadd($amount, $txn['total_paid']), $txn['total']) < 0))) {
   die_jsonp("Amount is too much.");
 }
 
