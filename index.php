@@ -4,12 +4,15 @@ require 'scat.php';
 head("Scat");
 ?>
 <style>
-.choices {
+.choices, .errors {
   margin: 8px 4px;
   padding: 6px;
   background: rgba(0,0,0,0.1);
   border-radius: 4px;
   width: 70%;
+}
+.errors {
+  background: rgba(64,0,0,0.1);
 }
 .choices span {
   margin-right: 8px;
@@ -17,7 +20,7 @@ head("Scat");
   color: #339;
   cursor:pointer;
 }
-.choices img {
+.choices img, .errors img {
   vertical-align: middle;
 }
 tbody tr.active {
@@ -532,6 +535,10 @@ $(function() {
                   if (data.items.length == 0) {
                     play("no");
                     $("#lookup").addClass("error");
+                    var errors= $('<div class="errors"/>');
+                    errors.text(" Didn't find anything for '" + q + "'.");
+                    errors.prepend('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Remove"></span>');
+                    $("#items").before(errors);
                   } else if (data.items.length == 1) {
                     play("yes");
                     addNewItem(data.items[0]);
