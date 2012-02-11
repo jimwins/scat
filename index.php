@@ -81,7 +81,7 @@ tfoot td {
 #txn h2 {
   margin-bottom: 0;
 }
-#txn h3 {
+#txn #details {
   margin: 0 0 0.5em;
   font-weight: normal;
   font-size: 1em;
@@ -378,6 +378,15 @@ function updateOrderData(txn) {
   $('#txn #description').text("Sale " + txn.number);
   $('#txn').data('person', txn.person)
   $('#txn #person .val').text(txn.person_name ? txn.person_name : 'Anonymous');
+  var format= 'MMM d yyyy h:mmtt';
+  var dates= Date.parse(txn.created).toString(format);
+  if (txn.filled) {
+//    dates = dates + ' / Filled: ' + Date.parse(txn.filled).toString(format);
+  }
+  if (txn.paid) {
+    dates = dates + ' / Paid: ' + Date.parse(txn.paid).toString(format);
+  }
+  $('#txn #dates').text(dates);
 }
 
 var protoNote= $("<tr><td></td><td></td><td></td></tr>");
@@ -920,8 +929,11 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   $.modal.close();
 });
 </script>
+<div id="details">
 <h2 id="description">New Sale</h2>
-<h3 id="person"><span class="val">Anonymous</span></h3>
+<div id="dates"></div>
+<div id="person"><span class="val">Anonymous</span></div>
+</div>
 <script>
 $("#txn #person").on("dblclick", function(ev) {
   if (typeof $("#txn").data("txn") == "undefined") {
