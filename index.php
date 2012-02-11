@@ -57,7 +57,8 @@ tfoot td {
 
 /* Hide/show some elements from paid invoices. */
 #txn.paid .remove,
-#txn.paid #pay
+#txn.paid #pay,
+#txn.paid .choices, #txn.paid .errors
 {
   display: none;
 }
