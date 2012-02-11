@@ -149,6 +149,7 @@ $methods= array(
   'gift' => 'Gift Card',
   'check' => 'Check',
   'discount' => 'Discount',
+  'bad' => 'Bad Debt',
 );
 
 if ($r->num_rows) {

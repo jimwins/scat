@@ -230,6 +230,7 @@ function expand_field($data, $class) {
                  'dwolla' => 'Dwolla',
                  'discount' => 'Discount',
                  'withdrawal' => 'Withdrawal',
+                 'bad' => 'Bad Debt',
                  );
     return $desc[$data];
   case '$bool':

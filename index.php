@@ -323,6 +323,7 @@ var paymentMethods= {
   gift: "Gift Card",
   check: "Check",
   discount: "Discount",
+  bad: "Bad Debt",
 };
 
 function updateTotal() {
@@ -692,6 +693,7 @@ $("#return").on("click", function() {
  <button data-value="gift">Gift Card</button>
  <button data-value="check">Check</button>
  <button data-value="discount">Discount</button>
+ <button data-value="bad-debt">Bad Debt</button>
 </div>
 <script>
 $("#choose-pay-method").on("click", "button", function(ev) {
@@ -924,6 +926,30 @@ $("#pay-discount").on("click", "button[name='pay']", function (ev) {
   var amount= $("#pay-discount .amount").val();
   $.getJSON("api/txn-add-payment.php?callback=?",
             { id: txn, method: "discount", amount: amount, change: false },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                $.modal.close();
+              }
+            });
+});
+</script>
+<div id="pay-bad-debt" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <button name="pay">Pay</button>
+ <button name="cancel">Cancel</button>
+</div>
+<script>
+$("#pay-bad-debt").on("click", "button[name='pay']", function (ev) {
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-bad-debt .amount").val();
+  $.getJSON("api/txn-add-payment.php?callback=?",
+            { id: txn, method: "bad", amount: amount, change: false },
             function (data) {
               if (data.error) {
                 alert(data.error);
