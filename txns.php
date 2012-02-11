@@ -31,17 +31,6 @@ if (empty($criteria)) {
 $page= (int)$_REQUEST['page'];
 
 ?>
-<form method="get" action="txn.php">
-<input type="submit" value="Go To">
-<select name="type">
- <option value="customer">Invoice
- <option value="vendor">Purchase Order
- <option value="correction">Correction
- <option value="drawer">Till Count
-</select>
-<input id="focus" type="text" name="number" value="">
-</form>
-<br>
 <form method="get" action="txns.php">
 <input type="submit" value="Show">
 <select name="type">
