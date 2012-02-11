@@ -10,18 +10,19 @@ head("Scat");
   background: rgba(0,0,0,0.1);
   border-radius: 4px;
   width: 70%;
+  position: relative;
 }
 .errors {
   background: rgba(64,0,0,0.1);
 }
-.choices span {
-  margin-right: 8px;
+.choices ul { margin: 0; padding-left: 1.2em; list-style: circle; }
+.choices li {
   text-decoration: underline;
   color: #339;
   cursor:pointer;
 }
 .choices img, .errors img {
-  vertical-align: middle;
+  position: absolute; bottom: 0.5em; right: 0.5em;
 }
 tbody tr.active {
   background-color:rgba(255,192,192,0.4);
@@ -548,14 +549,16 @@ $(function() {
                     play("maybe");
                     var choices= $('<div class="choices"/>');
                     choices.append('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Skip"></span>');
+                    var list= $('<ul>');
                     $.each(data.items, function(i,item) {
-                      var n= $("<span>" + item.name + "</span>");
+                      var n= $("<li>" + item.name + "</li>");
                       n.click(item, function(ev) {
                         addItem(ev.data);
-                        $(this).parent().remove();
+                        $(this).closest(".choices").remove();
                       });
-                      choices.append(n);
+                      list.append(n);
                     });
+                    choices.append(list);
                     $("#items").before(choices);
                   }
                 }
