@@ -375,7 +375,9 @@ function updateOrderData(txn) {
   var tax_rate= parseFloat(txn.tax_rate).toFixed(2);
   $('#txn').data('tax_rate', tax_rate)
   $('#txn #tax_rate .val').text(tax_rate);
-  $('#txn #description').text("Sale " + txn.number);
+  $('#txn #description').text((txn.total_paid ? "Invoice " : "Sale ") +
+                              Date.parse(txn.created).toString('yyyy') +
+                              '-' + txn.number);
   $('#txn').data('person', txn.person)
   $('#txn #person .val').text(txn.person_name ? txn.person_name : 'Anonymous');
   var format= 'MMM d yyyy h:mmtt';
