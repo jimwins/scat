@@ -568,7 +568,7 @@ $(function() {
     return false;
   });
 
-  $("#sidebar button[name='open']").click();
+  $("#sidebar button[name='unpaid']").click();
 
 <?
   $number= (int)$_REQUEST['number'];
@@ -579,7 +579,6 @@ $(function() {
 });
 </script>
 <div id="sidebar">
-<button name="open">Open</button>
 <button name="unpaid">Unpaid</button>
 <button name="recent">Recent</button>
 <script>
