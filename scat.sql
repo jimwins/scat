@@ -80,7 +80,7 @@ DROP TABLE IF EXISTS `payment`;
 CREATE TABLE `payment` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `txn` int(10) unsigned NOT NULL,
-  `method` enum('cash','change','credit','square','gift','check','dwolla','discount','withdrawal') NOT NULL,
+  `method` enum('cash','change','credit','square','gift','check','dwolla','discount','withdrawal','bad') NOT NULL,
   `amount` decimal(9,3) NOT NULL,
   `cc_txn` varchar(10) DEFAULT NULL,
   `cc_approval` varchar(30) DEFAULT NULL,
