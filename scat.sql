@@ -47,6 +47,21 @@ CREATE TABLE `brand` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `hostedpayment_txn`
+--
+
+DROP TABLE IF EXISTS `hostedpayment_txn`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `hostedpayment_txn` (
+  `txn` int(10) unsigned NOT NULL,
+  `hostedpayment` varchar(255) NOT NULL,
+  `validationcode` varchar(50) NOT NULL,
+  `created` datetime NOT NULL
+) ENGINE=MEMORY DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `item`
 --
 

@@ -701,7 +701,7 @@ $("#choose-pay-method").on("click", "button", function(ev) {
   var id= "#pay-" + method;
   var due= ($("#txn").data("total") - $("#txn").data("paid")).toFixed(2);
   $(".amount", id).val(due);
-  $.modal($(id), { overlayClose: false });
+  $.modal($(id), { persist: true, overlayClose: false });
   $(".amount", id).focus().select();
 });
 </script>
@@ -726,6 +726,42 @@ $("#pay-cash").on("submit", function (ev) {
                 $('#txn').data('payments', data.payments);
                 updateTotal();
                 $.modal.close();
+              }
+            });
+});
+</script>
+<form id="pay-credit" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <input type="submit" value="Swipe">
+ <button name="cancel">Cancel</button>
+</form>
+<script>
+$("#pay-credit").on("submit", function (ev) {
+  ev.preventDefault();
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-credit .amount").val();
+  $.getJSON("api/cc-begin.php?callback=?",
+            { id: txn, amount: amount },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                $.modal.close();
+                $.modal('<iframe src="' + data.url +
+                        '" height=500" width="600" style="border:0">',
+                        {
+                          closeHTML: "",
+                          containerCss: {
+                            backgroundColor: "#fff",
+                            borderColor: "#fff",
+                            height: 500,
+                            padding: 0,
+                            width: 600,
+                          },
+                          position: undefined,
+                          overlayClose: false,
+                        });
               }
             });
 });
