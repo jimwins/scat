@@ -18,11 +18,14 @@ $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = '$type'";
 $number= $db->get_one($q);
 
 $tax_rate= ($type == 'customer') ? DEFAULT_TAX_RATE : 0;
+$person= (int)$_REQUEST['person'];
+if (!$person) $person = 'NULL';
 
 $q= "INSERT INTO txn
         SET created= NOW(),
             type = '$type',
             number = $number,
+            person = $person,
             tax_rate = $tax_rate";
 $r= $db->query($q);
 if (!$r) die_query($db, $q);

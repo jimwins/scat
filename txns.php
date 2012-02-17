@@ -46,6 +46,40 @@ that includes
 <label><input type="checkbox" name="unpaid" value="1"> Unpaid</label>
 </form>
 <br>
+<button id="new-po">New Purchase Order</button>
+<form id="create-po" style="display: none">
+<input type="text" id="person" size="40">
+<br>
+<input type="submit" value="Create">
+</form>
+<script>
+$('#new-po').on('click', function(ev) {
+  $('#create-po').modal({ persist: true });
+});
+$('#create-po #person').autocomplete({
+  source: "./api/person-list.php?callback=?",
+  minLength: 2,
+  select: function(ev, ui) {
+    $(this).data('id', ui.item.id);
+  },
+});
+$('#create-po').on('submit', function(ev) {
+  ev.preventDefault(true);
+
+  var person= $('#person', this).data('id');
+
+  $.modal.close();
+
+  $.getJSON("api/txn-create.php?callback=?",
+            { type: 'vendor', person: person },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              }
+              window.location.reload();
+            });
+});
+</script>
 <?
 $per_page= 50;
 $start= $page * $per_page;
