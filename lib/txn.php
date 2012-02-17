@@ -1,5 +1,17 @@
 <?
 
+function txn_load_full($db, $id) {
+  $txn= txn_load($db, $id);
+  $items= txn_load_items($db, $id);
+  $payments= txn_load_payments($db, $id);
+  $notes= txn_load_notes($db, $id);
+
+  return array('txn' => $txn,
+               'items' => $items,
+               'payments' => $payments,
+               'notes' => $notes);
+}
+
 function txn_load($db, $id) {
   $q= "SELECT id, type,
               number, created, filled, paid,

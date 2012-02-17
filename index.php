@@ -1,5 +1,6 @@
 <?
 require 'scat.php';
+require 'lib/txn.php';
 
 head("Scat");
 ?>
@@ -571,9 +572,16 @@ $(function() {
   $("#sidebar button[name='unpaid']").click();
 
 <?
+  $id= (int)$_REQUEST['id'];
   $number= (int)$_REQUEST['number'];
   if ($number) {
-    echo "$('#txn-load input').val($number).parent().submit();";
+    $q= "SELECT id FROM txn WHERE type = 'customer' AND number = $number";
+    $id= $db->get_one($q);
+  }
+
+  if ($id) {
+    $data= txn_load_full($db, $id);
+    echo 'loadOrder(', json_encode($data), ");\n";
   }
 ?>
 });
