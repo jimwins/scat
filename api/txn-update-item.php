@@ -76,7 +76,7 @@ $q= "SELECT txn_line.id AS line_id,
               WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
               WHEN 'relative' THEN CONCAT('$', discount, ' off')
             END), '') discount,
-            (SELECT SUM(allocated) FROM txn_line WHERE item = txn_line.id) stock
+            (SELECT SUM(allocated) FROM txn_line WHERE item = txn_line.item) stock
        FROM txn_line
       WHERE txn = $txn_id AND txn_line.id = $id";
 
