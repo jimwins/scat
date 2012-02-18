@@ -1,5 +1,6 @@
 <?
 require 'scat.php';
+require 'lib/item.php';
 
 head("item");
 
@@ -27,33 +28,78 @@ if (!$id && $code) {
   $id= $id[0];
 }
 
-$q= "SELECT
-            item.code Code\$item,
-            item.name Name,
-            brand.name Brand,
-            retail_price MSRP\$dollar,
-            IF(discount_type,
-               CASE discount_type
-                 WHEN 'percentage' THEN ROUND(retail_price * ((100 - discount) / 100), 2)
-                 WHEN 'relative' THEN (retail_price - discount) 
-                 WHEN 'fixed' THEN (discount)
-               END,
-               NULL) Sale\$dollar,
-            CASE discount_type
-              WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
-              WHEN 'relative' THEN CONCAT('$', discount, ' off')
-            END Discount,
-            (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) Stock\$right,
-            minimum_quantity Minimum\$right
-       FROM item
-       JOIN brand ON (item.brand = brand.id)
-  LEFT JOIN barcode ON (item.id = barcode.item)
-      WHERE item.id = $id
-   GROUP BY item.id";
+$item= item_load($db, $id);
 
-dump_table($db->query($q));
-#dump_query($q);
+?>
+<script>
+$(function() {
+  loadItem(<?=json_encode($item)?>);
+});
 
+var protoBarcodeRow= $('<tr><td></td><td></td><td>' +
+                       '<img align="right" class="remove" src="icons/delete.png" width="16" height="16">' +
+                       '</td></tr>');
+
+function loadItem(item) {
+  $('#item').data('item', item);
+  var active= parseInt(item.active);
+  if (active) {
+    $('#item #active').attr('src', 'icons/accept.png');
+  } else {
+    $('#item #active').attr('src', 'icons/cross.png');
+  }
+  $('#item #code').text(item.code);
+  $('#item #name').text(item.name);
+  $('#item #brand').text(item.brand);
+  $('#item #msrp').text(amount(item.retail_price));
+  $('#item #sale').text(amount(item.sale_price));
+  $('#item #discount').text(item.discount_label);
+  $('#item #stock').text(item.stock);
+  $('#item #minimum').text(item.minimum_quantity);
+  $('#item #lastnet').text(amount(item.last_net));
+
+  $('#item #barcodes tbody').empty();
+  var barcodes= item.barcodes.split(/,/);
+  $.each(barcodes, function(i, barcode) {
+    var info= barcode.split(/!/);
+    var row= protoBarcodeRow.clone();
+    $('td:nth(0)', row).text(info[0]);
+    $('td:nth(1)', row).text(info[1]);
+    $('#item #barcodes tbody').append(row);
+  });
+}
+</script>
+<style>
+#item th { text-align: right; color: #666; vertical-align: top; }
+#item th:after { content: ':'; }
+#item td { padding-left: 1em; padding-right: 1em; }
+#barcodes tr:nth-child(odd), #barcodes tr:nth-child(even) {
+  background: inherit;
+}
+</style>
+<table id="item">
+ <tr><th>Code</th><td><span id="code"></span><img id="active" align="right" src="icons/accept.png" height="16" width="16"></td></tr>
+ <tr><th>Name</th><td id="name"></td></tr>
+ <tr><th>Brand</th><td id="brand"></td></tr>
+ <tr><th>MSRP</th><td id="msrp"></td></tr>
+ <tr><th>Sale</th><td id="sale"></td></tr>
+ <tr><th>Discount</th><td id="discount"></td></tr>
+ <tr><th>Stock</th><td id="stock"></td></tr>
+ <tr><th>Minimum Stock</th><td id="minimum"></td></tr>
+ <tr><th>Last Net</th><td id="lastnet"></td></tr>
+ <tr>
+  <th>Barcodes</th>
+  <td>
+   <table id="barcodes" width="100%">
+    <tbody></tbody>
+    <tfoot>
+     <tr><td></td><td></td><td id="add-barcode"><img align="right" src="icons/add.png" width="16" height="16"></td></tr>
+    </tfoot>
+   </table>
+  </td>
+ </tr>
+</table>
+<?
 $r= $db->query("SET @count = 0");
 
 $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
