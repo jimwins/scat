@@ -30,7 +30,9 @@ if (isset($_REQUEST['brand']) && (int)$_REQUEST['brand']) {
 }
 
 if (isset($_REQUEST['retail_price'])) {
-  $retail_price= $db->real_escape_string($_REQUEST['retail_price']);
+  $retail_price= preg_replace('/^\\$/', '', $_REQUEST['retail_price']);
+  $retail_price= $db->real_escape_string($retail_price);
+
   $q= "UPDATE item
           SET retail_price = '$retail_price'
         WHERE id = $item_id";
@@ -40,7 +42,8 @@ if (isset($_REQUEST['retail_price'])) {
 }
 
 if (isset($_REQUEST['discount'])) {
-  $discount= $_REQUEST['discount'];
+  $discount= preg_replace('/^\\$/', '', $_REQUEST['discount']);
+  $discount= $db->real_escape_string($discount);
   if (preg_match('/^(\d*)(\/|%)( off)?$/', $discount, $m)) {
     $discount = (float)$m[1];
     $discount_type = "'percentage'";
