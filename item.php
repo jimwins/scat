@@ -91,11 +91,11 @@ function loadItem(item) {
  <tr><th>Last Net</th><td id="last_net"></td></tr>
  <tr>
   <th>Barcodes</th>
-  <td>
-   <table id="barcodes" width="100%">
+  <td style="padding: 0">
+   <table id="barcodes" width="100%" style="padding: 0; margin: 0">
     <tbody></tbody>
     <tfoot>
-     <tr><td></td><td></td><td id="add-barcode"><img align="right" src="icons/add.png" width="16" height="16"></td></tr>
+     <tr><td id="new-barcode" style="width:12em"><img src="icons/add.png" width="16" height="16"></td><td></td><td></td></tr>
     </tfoot>
    </table>
   </td>
@@ -159,6 +159,27 @@ $('#barcodes').on('dblclick', '.remove', function(ev) {
               }
               loadItem(data.item);
             });
+});
+$('#barcodes #new-barcode').editable(function(value, settings) {
+  var item= $('#item').data('item');
+  $.getJSON("api/item-barcode-update.php?callback=?",
+            { item: item.id, code: value },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              loadItem(data.item);
+            });
+  return  $(this).data('original');
+}, {
+  event: 'dblclick',
+  style: 'display: inline',
+  placeholder: '',
+  data: function(value, settings) {
+    $(this).data('original', value);
+    return '';
+  },
 });
 </script>
 <?
