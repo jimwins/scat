@@ -59,14 +59,16 @@ function loadItem(item) {
   $('#item #last_net').text(amount(item.last_net));
 
   $('#item #barcodes tbody').empty();
-  var barcodes= item.barcodes.split(/,/);
-  $.each(barcodes, function(i, barcode) {
-    var info= barcode.split(/!/);
-    var row= protoBarcodeRow.clone();
-    $('td:nth(0)', row).text(info[0]);
-    $('td:nth(1)', row).text(info[1]);
-    $('#item #barcodes tbody').append(row);
-  });
+  if (typeof(item.barcodes) != 'undefined') {
+    var barcodes= item.barcodes.split(/,/);
+    $.each(barcodes, function(i, barcode) {
+      var info= barcode.split(/!/);
+      var row= protoBarcodeRow.clone();
+      $('td:nth(0)', row).text(info[0]);
+      $('td:nth(1)', row).text(info[1]);
+      $('#item #barcodes tbody').append(row);
+    });
+  }
 }
 </script>
 <style>
@@ -142,6 +144,21 @@ $('#item #brand').editable(function(value, settings) {
   loadurl: 'api/brand-list.php',
   placeholder: '',
 });
+$('#barcodes').on('dblclick', '.remove', function(ev) {
+  var item= $('#item').data('item');
+  var row= $(this).closest('tr');
+  var code= $('td:nth(0)', row).text();
+  var qty= $('td:nth(1)', row).text();
+
+  $.getJSON("api/item-barcode-delete.php?callback=?",
+            { item: item.id, code: code },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              loadItem(data.item);
+            });
 });
 </script>
 <?
