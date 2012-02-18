@@ -51,12 +51,12 @@ function loadItem(item) {
   $('#item #code').text(item.code);
   $('#item #name').text(item.name);
   $('#item #brand').text(item.brand);
-  $('#item #msrp').text(amount(item.retail_price));
+  $('#item #retail_price').text(amount(item.retail_price));
   $('#item #sale').text(amount(item.sale_price));
   $('#item #discount').text(item.discount_label);
   $('#item #stock').text(item.stock);
-  $('#item #minimum').text(item.minimum_quantity);
-  $('#item #lastnet').text(amount(item.last_net));
+  $('#item #minimum_quantity').text(item.minimum_quantity);
+  $('#item #last_net').text(amount(item.last_net));
 
   $('#item #barcodes tbody').empty();
   var barcodes= item.barcodes.split(/,/);
@@ -78,15 +78,15 @@ function loadItem(item) {
 }
 </style>
 <table id="item">
- <tr><th>Code</th><td><span id="code"></span><img id="active" align="right" src="icons/accept.png" height="16" width="16"></td></tr>
- <tr><th>Name</th><td id="name"></td></tr>
+ <tr><th>Code</th><td><span id="code" class="editable"></span><img id="active" align="right" src="icons/accept.png" height="16" width="16"></td></tr>
+ <tr><th>Name</th><td id="name" class="editable"></td></tr>
  <tr><th>Brand</th><td id="brand"></td></tr>
- <tr><th>MSRP</th><td id="msrp"></td></tr>
+ <tr><th>MSRP</th><td id="retail_price" class="editable"></td></tr>
  <tr><th>Sale</th><td id="sale"></td></tr>
- <tr><th>Discount</th><td id="discount"></td></tr>
- <tr><th>Stock</th><td id="stock"></td></tr>
- <tr><th>Minimum Stock</th><td id="minimum"></td></tr>
- <tr><th>Last Net</th><td id="lastnet"></td></tr>
+ <tr><th>Discount</th><td id="discount" class="editable"></td></tr>
+ <tr><th>Stock</th><td id="stock" class="editable"></td></tr>
+ <tr><th>Minimum Stock</th><td id="minimum_quantity"></td></tr>
+ <tr><th>Last Net</th><td id="last_net"></td></tr>
  <tr>
   <th>Barcodes</th>
   <td>
@@ -99,6 +99,28 @@ function loadItem(item) {
   </td>
  </tr>
 </table>
+<script>
+$('#item .editable').editable(function(value, settings) {
+  var item= $('#item').data('item');
+  var data= { item: item.id };
+  var key= this.id;
+  data[key] = value;
+
+  $.getJSON("api/item-update.php?callback=?",
+            data,
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              loadItem(data.item);
+            });
+  return "...";
+}, {
+  event: 'dblclick',
+  style: 'display: inline'
+});
+</script>
 <?
 $r= $db->query("SET @count = 0");
 
