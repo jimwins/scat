@@ -2,7 +2,8 @@
 
 function item_load($db, $id) {
   $q= "SELECT
-              item.id, item.code, item.name, brand.name brand,
+              item.id, item.code, item.name,
+              brand.id brand_id, brand.name brand,
               retail_price retail_price,
               IF(discount_type,
                  CASE discount_type
@@ -35,5 +36,12 @@ function item_load($db, $id) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-  return $r->fetch_assoc();
+  $item= $r->fetch_assoc();
+  $item['retail_price']= (float)$item['retail_price'];
+  $item['sale_price']= (float)$item['sale_price'];
+  $item['last_net']= (float)$item['last_net'];
+  $item['minimum_quantity']= (int)$item['minimum_quantity'];
+  $item['stock']= (int)$item['stock'];
+
+  return $item;
 }
