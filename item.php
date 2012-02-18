@@ -118,7 +118,30 @@ $('#item .editable').editable(function(value, settings) {
   return "...";
 }, {
   event: 'dblclick',
-  style: 'display: inline'
+  style: 'display: inline',
+  placeholder: '',
+});
+$('#item #brand').editable(function(value, settings) {
+  var item= $('#item').data('item');
+
+  $.getJSON("api/item-update.php?callback=?",
+            { item: item.id, brand: value },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              loadItem(data.item);
+            });
+  return "...";
+}, {
+  event: 'dblclick',
+  style: 'display: inline',
+  type: 'select',
+  submit: 'OK',
+  loadurl: 'api/brand-list.php',
+  placeholder: '',
+});
 });
 </script>
 <?
