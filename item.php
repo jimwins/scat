@@ -144,6 +144,20 @@ $('#item #brand').editable(function(value, settings) {
   loadurl: 'api/brand-list.php',
   placeholder: '',
 });
+$('#item #active').on('dblclick', function(ev) {
+  ev.preventDefault();
+  var item= $('#item').data('item');
+
+  $.getJSON("api/item-update.php?callback=?",
+            { item: item.id, active: parseInt(item.active) ? 0 : 1 },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              loadItem(data.item);
+            });
+});
 $('#barcodes').on('dblclick', '.remove', function(ev) {
   var item= $('#item').data('item');
   var row= $(this).closest('tr');
