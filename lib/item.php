@@ -25,7 +25,8 @@ function item_load($db, $id) {
                 ORDER BY filled DESC
                 LIMIT 1) last_net,
               minimum_quantity,
-              GROUP_CONCAT(barcode.code SEPARATOR '|') barcodes,
+              GROUP_CONCAT(CONCAT(barcode.code, '!', barcode.quantity)
+                           SEPARATOR ',') barcodes,
               active
          FROM item
     LEFT JOIN brand ON (item.brand = brand.id)
