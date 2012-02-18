@@ -26,7 +26,7 @@ function round_to_even(num, decimalPlaces) {
 
 // format number as $3.00 or ($3.00)
 function amount(amount) {
-  if (typeof(amount) == 'undefined') {
+  if (typeof(amount) == 'undefined' || amount == null) {
     return '';
   }
   if (amount < 0.0) {
