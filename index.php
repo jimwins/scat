@@ -728,9 +728,9 @@ $("#pay-credit").on("submit", function (ev) {
                           containerCss: {
                             backgroundColor: "#fff",
                             borderColor: "#fff",
-                            height: 500,
+                            height: 520,
                             padding: 0,
-                            width: 600,
+                            width: 620,
                           },
                           position: undefined,
                           overlayClose: false,
