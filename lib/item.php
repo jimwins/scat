@@ -39,13 +39,16 @@ function item_load($db, $id) {
 
   $item= $r->fetch_assoc();
 
-  if (!$item) return $item;
-
-  $item['retail_price']= (float)$item['retail_price'];
-  $item['sale_price']= (float)$item['sale_price'];
-  $item['last_net']= (float)$item['last_net'];
-  $item['minimum_quantity']= (int)$item['minimum_quantity'];
-  $item['stock']= (int)$item['stock'];
+  if ($item['retail_price'])
+    $item['retail_price']= (float)$item['retail_price'];
+  if ($item['sale_price'])
+    $item['sale_price']= (float)$item['sale_price'];
+  if ($item['last_net'])
+    $item['last_net']= (float)$item['last_net'];
+  if ($item['minimum_quantity'])
+    $item['minimum_quantity']= (int)$item['minimum_quantity'];
+  if ($item['stock'])
+    $item['stock']= (int)$item['stock'];
 
   return $item;
 }
