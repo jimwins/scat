@@ -38,6 +38,9 @@ function item_load($db, $id) {
     or die_query($db, $q);
 
   $item= $r->fetch_assoc();
+
+  if (!$item) return $item;
+
   $item['retail_price']= (float)$item['retail_price'];
   $item['sale_price']= (float)$item['sale_price'];
   $item['last_net']= (float)$item['last_net'];
