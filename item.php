@@ -87,7 +87,7 @@ function loadItem(item) {
  <tr><th>Sale</th><td id="sale"></td></tr>
  <tr><th>Discount</th><td id="discount" class="editable"></td></tr>
  <tr><th>Stock</th><td id="stock" class="editable"></td></tr>
- <tr><th>Minimum Stock</th><td id="minimum_quantity"></td></tr>
+ <tr><th>Minimum Stock</th><td id="minimum_quantity" class="editable"></td></tr>
  <tr><th>Last Net</th><td id="last_net"></td></tr>
  <tr>
   <th>Barcodes</th>
