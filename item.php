@@ -36,7 +36,7 @@ $(function() {
   loadItem(<?=json_encode($item)?>);
 });
 
-var protoBarcodeRow= $('<tr><td></td><td></td><td>' +
+var protoBarcodeRow= $('<tr><td></td><td class="quantity"></td><td>' +
                        '<img align="right" class="remove" src="icons/delete.png" width="16" height="16">' +
                        '</td></tr>');
 
@@ -66,6 +66,7 @@ function loadItem(item) {
       var row= protoBarcodeRow.clone();
       $('td:nth(0)', row).text(info[0]);
       $('td:nth(1)', row).text(info[1]);
+      $('.quantity', row).editable(editBarcodeQuantity);
       $('#item #barcodes tbody').append(row);
     });
   }
@@ -158,6 +159,21 @@ $('#item #active').on('dblclick', function(ev) {
               loadItem(data.item);
             });
 });
+function editBarcodeQuantity(value, settings) {
+  var item= $('#item').data('item');
+  var row= $(this).closest('tr');
+  var code= $('td:nth(0)', row).text();
+
+  $.getJSON("api/item-barcode-update.php?callback=?",
+            { item: item.id, code: code, quantity: value},
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              loadItem(data.item);
+            });
+}
 $('#barcodes').on('dblclick', '.remove', function(ev) {
   var item= $('#item').data('item');
   var row= $(this).closest('tr');
