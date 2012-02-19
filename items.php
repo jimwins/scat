@@ -5,11 +5,41 @@ head("search");
 
 $q= $_GET['q'];
 ?>
+<div style="float: right">
+ <button id="add-item">Add New Item</button>
+</div>
 <form method="get" action="<?=$_SERVER['PHP_SELF']?>">
 <input id="focus" type="text" autocomplete="off" size="60" name="q" value="<?=htmlspecialchars($q)?>">
 <label><input type="checkbox" value="1" name="all"<?=$_REQUEST['all']?' checked="checked"':''?>> All</label>
 <input type="submit" value="Search">
 </form>
+<form id="add-item-form" style="display: none">
+ <label>Code: <input type="text" name="code"></label>
+ <br>
+ <label>Name: <input type="text" name="name" size="40"></label>
+ <br>
+ <label>Price: <input type="text" name="retail_price" size="8"></label>
+ <br>
+ <input type="submit" value="Add Item">
+</form>
+<script>
+$('#add-item').on('click', function(ev) {
+  $.modal($('#add-item-form'));
+});
+$('#add-item-form').on('submit', function(ev) {
+  ev.preventDefault();
+  var data= $("#add-item-form :input").serializeArray();
+  $.getJSON("api/item-add.php?callback=?",
+            data,
+            function (data) {
+              if (data.error) {
+                alert(data.error + ': ' + data.explain);
+                return;
+              }
+              window.location.href= 'item.php?id=' + data.item.id;
+            });
+});
+</script>
 <br>
 <?
 
