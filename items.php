@@ -97,8 +97,8 @@ dump_table($r);
 function updateItem(item) {
   $('.' + item.id + ' .name').text(item.name);
   $('.' + item.id + ' .brand').text(item.brand);
-  $('.' + item.id + ' td:nth(4)').text(item.retail_price);
-  $('.' + item.id + ' td:nth(5)').text(item.sale_price);
+  $('.' + item.id + ' td:nth(4)').text(amount(item.retail_price));
+  $('.' + item.id + ' td:nth(5)').text(amount(item.sale_price));
   $('.' + item.id + ' .discount').text(item.discount_label);
   $('.' + item.id + ' td:nth(7)').text(item.stock);
   $('.' + item.id + ' td:nth(8)').text(item.minimum_quantity);
