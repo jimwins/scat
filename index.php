@@ -476,6 +476,23 @@ $(function() {
     return printReceipt();
   });
 
+  $(document).bind('keydown', 'meta+shift+backspace', function(ev) {
+    txn= $('#txn').data('txn');
+    if (!txn) {
+      return;
+    }
+    $.getJSON("api/txn-delete?callback=?",
+              { txn: txn },
+              function(data) {
+                if (data.error) {
+                  play("no");
+                  $.modal(data.error);
+                } else {
+                  window.location.href= './';
+                }
+              });
+  });
+
   $('#lookup').submit(function(ev) {
     ev.preventDefault();
     $("#lookup").removeClass("error");
