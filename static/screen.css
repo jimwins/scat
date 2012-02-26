@@ -123,3 +123,12 @@ button:hover, input[type="submit"]:hover {
   border-radius: 10px;
   padding:12px;
 }
+
+@media screen and (max-device-width: 480px) {
+  body {
+    -webkit-text-size-adjust: none;
+    padding: 5px;
+    font-size: 2em;
+  }
+  header, footer { display: none; }
+}
