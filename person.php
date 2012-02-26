@@ -1,5 +1,6 @@
 <?
 require 'scat.php';
+require 'lib/person.php';
 
 head("person");
 
@@ -41,53 +42,83 @@ if (!$id) {
   exit;
 }
 
-$q= "SELECT name,
-            company,
-            address,
-            email,
-            phone,
-            tax_id,
-            active,
-            deleted
-       FROM person
-      WHERE id = $id";
-
-$r= $db->query($q)
-  or die($db->error);
-$person= $r->fetch_assoc();
-
+$person= person_load($db, $id);
 ?>
 <style>
-  .person th { text-align: right; vertical-align: top; color: #777; }
-  .person td { white-space: pre-wrap; }
+  #person th { text-align: right; vertical-align: top; color: #777; }
+  #person td { white-space: pre-wrap; }
   .deleted { text-decoration: line-through; }
 </style>
-<table class="person">
+<script>
+function loadPerson(person) {
+  $('#person').data('person', person);
+  var active= parseInt(person.active);
+  if (active) {
+    $('#person #active').attr('src', 'icons/accept.png');
+  } else {
+    $('#person #active').attr('src', 'icons/cross.png');
+  }
+  $('#person #name').text(person.name);
+  $('#person #company').text(person.company);
+  $('#person #email').text(person.email);
+  $('#person #phone').text(person.phone);
+  $('#person #address').text(person.address);
+  $('#person #tax_id').text(person.tax_id);
+}
+
+$(function() {
+  loadPerson(<?=json_encode($person)?>);
+});
+</script>
+<table id="person">
   <tr class="<?=($person['deleted'] ? 'deleted' : '');?>">
    <th>Name:</th>
-   <td><?=htmlspecialchars($person['name']);?></td>
+   <td><span id="name" class="editable"></span><img id="active" align="right" src="icons/accept.png" height="16" width="16"></td>
   </tr>
   <tr>
    <th>Company:</th>
-   <td><?=htmlspecialchars($person['company']);?></td>
+   <td id="company" class="editable"></td>
   </tr>
   <tr>
    <th>Email:</th>
-   <td><?=htmlspecialchars($person['email']);?></td>
+   <td id="email" class="editable"></td>
   </tr>
   <tr>
    <th>Phone:</th>
-   <td><?=htmlspecialchars($person['phone']);?></td>
+   <td id="phone" class="editable"></td>
   </tr>
   <tr>
    <th>Address:</th>
-   <td><?=htmlspecialchars($person['address']);?></td>
+   <td id="address" class="editable"></td>
   </tr>
   <tr>
    <th>Tax ID:</th>
-   <td><?=htmlspecialchars($person['tax_id']);?></td>
+   <td id="tax_id" class="editable"></td>
   </tr>
 </table>
+<script>
+$('#person .editable').editable(function(value, settings) {
+  var person= $('#person').data('person');
+  var data= { person: person.id };
+  var key= this.id;
+  data[key] = value;
+
+  $.getJSON("api/person-update.php?callback=?",
+            data,
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              loadPerson(data.person);
+            });
+  return "...";
+}, {
+  event: 'dblclick',
+  style: 'display: inline',
+  placeholder: '',
+});
+</script>
 
 <h2>Activity</h2>
 <?
