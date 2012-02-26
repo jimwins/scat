@@ -10,6 +10,7 @@ $search= $_REQUEST['search'];
 ?>
 <form method="get" action="person.php">
 <input id="focus" type="text" name="search" value="<?=ashtml($search)?>">
+<label><input type="checkbox" value="1" name="all"<?=$_REQUEST['all']?' checked="checked"':''?>> All</label>
 <input type="submit" value="Find People">
 </form>
 <br>
@@ -18,13 +19,15 @@ $search= $_REQUEST['search'];
 if (!empty($search)) {
   $search= $db->real_escape_string($search);
 
+  $active= $_REQUEST['all'] ? "" : 'AND active';
+
   $q= "SELECT IF(deleted, 'deleted', '') AS meta,
               CONCAT(id, '|', IFNULL(company,''),
                      '|', IFNULL(name,''))
                 AS Person\$person
          FROM person
         WHERE (name like '%$search%' OR company LIKE '%$search%')
-          AND active
+              $active
         ORDER BY company, name";
 
   $r= $db->query($q)

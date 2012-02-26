@@ -12,6 +12,9 @@ foreach ($terms as $term) {
              OR person.company LIKE '%$term%')";
 }
 
+if (!$_REQUEST['all'])
+  $criteria[]= 'active';
+
 if (empty($criteria)) {
   $criteria= '1=1';
 } else {
