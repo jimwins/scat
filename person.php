@@ -23,7 +23,8 @@ if (!empty($search)) {
                      '|', IFNULL(name,''))
                 AS Person\$person
          FROM person
-        WHERE name like '%$search%' OR company LIKE '%$search%'
+        WHERE (name like '%$search%' OR company LIKE '%$search%')
+          AND active
         ORDER BY company, name";
 
   $r= $db->query($q)
@@ -117,6 +118,20 @@ $('#person .editable').editable(function(value, settings) {
   event: 'dblclick',
   style: 'display: inline',
   placeholder: '',
+});
+$('#person #active').on('dblclick', function(ev) {
+  ev.preventDefault();
+  var person= $('#person').data('person');
+
+  $.getJSON("api/person-update.php?callback=?",
+            { person: person.id, active: parseInt(person.active) ? 0 : 1 },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              loadPerson(data.person);
+            });
 });
 </script>
 
