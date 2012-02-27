@@ -996,7 +996,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 <div id="details">
 <h2 id="description">New Sale</h2>
 <div id="dates"></div>
-<div id="person"><span class="val">Anonymous</span></div>
+<div id="person"><span class="val">Anonymous</span> <img style="vertical-align: text-bottom" id="info-person" src="icons/information.png" width="16" height="16"></div>
 </div>
 <script>
 $("#txn #person").on("dblclick", function(ev) {
@@ -1055,7 +1055,63 @@ $("#txn #person").on("dblclick", function(ev) {
   $(".val", this).empty().append(fld);
   fld.focus().select();
 });
+$("#txn #info-person").on("click", function(ev) {
+  var person= $('#txn').data('person');
+  if (!person)
+    return false;
+  $.getJSON("api/person-load.php?callback=?",
+            { person: person },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+              loadPerson(data.person);
+              $.modal($('#person-info'));
+            });
+});
+function loadPerson(person) {
+  $('#person-info').data('person', person);
+  var active= parseInt(person.active);
+  if (active) {
+    $('#person-info #active').attr('src', 'icons/accept.png');
+  } else {
+    $('#person-info #active').attr('src', 'icons/cross.png');
+  }
+  $('#person-info #name').text(person.name);
+  $('#person-info #company').text(person.company);
+  $('#person-info #email').text(person.email);
+  $('#person-info #phone').text(person.phone);
+  $('#person-info #address').text(person.address);
+  $('#person-info #tax_id').text(person.tax_id);
+}
 </script>
+<table id="person-info" style="display: none">
+  <tr>
+   <th>Name:</th>
+   <td><span id="name"></span></td>
+  </tr>
+  <tr>
+   <th>Company:</th>
+   <td id="company"></td>
+  </tr>
+  <tr>
+   <th>Email:</th>
+   <td id="email"></td>
+  </tr>
+  <tr>
+   <th>Phone:</th>
+   <td id="phone"></td>
+  </tr>
+  <tr>
+   <th>Address:</th>
+   <td id="address"></td>
+  </tr>
+  <tr>
+   <th>Tax ID:</th>
+   <td id="tax_id"></td>
+  </tr>
+</table>
 <form id="person-create" style="display:none">
  <label>Name: <input type="text" width="60" name="name"></label>
  <br>
