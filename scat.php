@@ -76,7 +76,7 @@ $("header #reports").on('click', function() {
               } else {
                 var t= $("<table><tr><th>Day<th>Sales</tr>");
                 $.each(data.sales, function(i, sales) {
-                  t.append($('<tr><td>' + sales.day +
+                  t.append($('<tr><td>' + sales.span +
                              '<td align="right">$' + sales.total.toFixed(2) +
                              '</tr>'));
                 });

@@ -1,30 +1,62 @@
 <?
 include '../scat.php';
 
-$days= (int)$_REQUEST['days'];
-if (!$days) $days= 30;
+$begin= $_REQUEST['begin'];
+$end= $_REQUEST['end'];
 
-$q= "SELECT DATE_FORMAT(filled, '%Y-%m-%d') day,
+if (!$begin) {
+  $days= $_REQUEST['days'];
+  if (!$days) $days= 10;
+  $begin= "NOW() - INTERVAL 10 DAY";
+} else {
+  $begin= "'" . $db->escape($begin) . "'";
+}
+
+if (!$end) {
+  $end= "NOW()";
+} else {
+  $end= "'" . $db->escape($end) . "'";
+}
+
+$span= $_REQUEST['span'];
+switch ($span) {
+case 'month':
+  $format= '%Y-%m';
+  break;
+case 'week':
+  $format= '%X-W%v';
+  break;
+case 'day':
+default:
+  $format= '%Y-%m-%d';
+  break;
+}
+
+$q= "SELECT DATE_FORMAT(filled, '$format') AS span,
             SUM(subtotal) AS total
        FROM (SELECT 
                     filled,
                     CAST(ROUND_TO_EVEN(
                       SUM(IF(type = 'customer', -1, 1) * allocated *
-                              CASE discount_type
+                              CASE txn_line.discount_type
                                 WHEN 'percentage'
-                                  THEN retail_price * ((100 - discount) / 100)
+                                  THEN txn_line.retail_price *
+                                       ((100 - txn_line.discount) / 100)
                                 WHEN 'relative'
-                                  THEN (retail_price - discount) 
+                                  THEN (txn_line.retail_price -
+                                        txn_line.discount) 
                                 WHEN 'fixed'
-                                  THEN (discount)
-                                ELSE retail_price
+                                  THEN (txn_line.discount)
+                                ELSE txn_line.retail_price
                               END), 2) AS DECIMAL(9,2))
                     AS subtotal
                FROM txn
                LEFT JOIN txn_line ON (txn.id = txn_line.txn)
+                    JOIN item ON (txn_line.item = item.id)
               WHERE filled IS NOT NULL
-                AND filled > DATE(NOW()) - INTERVAL $days DAY
+                AND filled BETWEEN $begin AND $end
                 AND type = 'customer'
+                AND code NOT LIKE 'ZZ-gift%'
               GROUP BY txn.id
             ) t
       GROUP BY 1 DESC";
