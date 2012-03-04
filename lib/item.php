@@ -123,10 +123,10 @@ function item_load($db, $id) {
   if ($item['stock'])
     $item['stock']= (int)$item['stock'];
 
-  $barcodes= split(',', $item['barcodes']);
+  $barcodes= explode(',', $item['barcodes']);
   $item['barcode']= array();
   foreach ($barcodes as $barcode) {
-    list($code, $quantity)= split('!', $barcode);
+    list($code, $quantity)= explode('!', $barcode);
     $item['barcode'][$code]= $quantity;
   }
 
