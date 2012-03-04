@@ -1,6 +1,9 @@
 <?
 
-function item_find($db, $q, $all) {
+define('FIND_ALL', 1);
+define('FIND_OR', 2);
+
+function item_find($db, $q, $options) {
   $criteria= array();
 
   $terms= preg_split('/\s+/', $q);
@@ -16,8 +19,10 @@ function item_find($db, $q, $all) {
     }
   }
 
-  if (!$all)
+  if (!($options | FIND_ALL))
     $criteria[]= "(active AND NOT deleted)";
+
+  $sql_criteria= join(($options | FIND_OR) ? ' OR ' : ' AND ', $criteria);
 
   $q= "SELECT
               item.id, item.code, item.name,
@@ -49,7 +54,7 @@ function item_find($db, $q, $all) {
          FROM item
     LEFT JOIN brand ON (item.brand = brand.id)
     LEFT JOIN barcode ON (item.id = barcode.item)
-        WHERE " . join(' AND ', $criteria) . "
+        WHERE $sql_criteria
      GROUP BY item.id";
 
   $r= $db->query($q)

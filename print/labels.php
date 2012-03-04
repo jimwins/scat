@@ -29,7 +29,7 @@ if (!empty($ex)) {
   $having.= join(' AND ', $a);
 }
 
-$items= item_find($db, $in, 0);
+$items= item_find($db, $in, FIND_OR);
 
 $default_height= $height= 1;
 $cols= 3;
