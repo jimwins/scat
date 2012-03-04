@@ -54,7 +54,7 @@ foreach ($items as $item) {
   $by= 0.5 + ($y * $height);
   $vmargin= 0.125;
 
-  if ($x == 0 && $y % 10 == 0) {
+  if ($x == 0 && $y == 0) {
     $pdf->AddPage(); 
 
     if ($_REQUEST['debug']) {
@@ -160,6 +160,9 @@ foreach ($items as $item) {
   if (++$x >= $cols) {
     $x= 0;
     ++$y;
+    if ($y > 9) {
+      $y= 0;
+    }
   }
 }
 
