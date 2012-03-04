@@ -1,16 +1,13 @@
 <?php
-require('fpdf.php');
 
-class PDF_EAN13 extends FPDF
+function EAN13($pdf, $x, $y, $barcode, $h=16, $w=.35)
 {
-function EAN13($x, $y, $barcode, $h=16, $w=.35)
-{
-	$this->Barcode($x,$y,$barcode,$h,$w,13);
+        Barcode($pdf, $x,$y,$barcode,$h,$w,13);
 }
 
-function UPC_A($x, $y, $barcode, $h=16, $w=.35)
+function UPC_A($pdf, $x, $y, $barcode, $h=16, $w=.35)
 {
-	$this->Barcode($x,$y,$barcode,$h,$w,12);
+        Barcode($pdf, $x,$y,$barcode,$h,$w,12);
 }
 
 function GetCheckDigit($barcode)
@@ -38,7 +35,7 @@ function TestCheckDigit($barcode)
 	return ($sum+$barcode[12])%10==0;
 }
 
-function Barcode($x, $y, $barcode, $h, $w, $len)
+function Barcode($pdf, $x, $y, $barcode, $h, $w, $len)
 {
 	//Padding
 	$barcode=str_pad($barcode,$len-1,'0',STR_PAD_LEFT);
@@ -46,9 +43,9 @@ function Barcode($x, $y, $barcode, $h, $w, $len)
 		$barcode='0'.$barcode;
 	//Add or control the check digit
 	if(strlen($barcode)==12)
-		$barcode.=$this->GetCheckDigit($barcode);
-	elseif(!$this->TestCheckDigit($barcode))
-		$this->Error('Incorrect check digit');
+		$barcode.=GetCheckDigit($barcode);
+	elseif(!TestCheckDigit($barcode))
+		$pdf->Error('Incorrect check digit');
 	//Convert digits to bars
 	$codes=array(
 		'A'=>array(
@@ -85,11 +82,12 @@ function Barcode($x, $y, $barcode, $h, $w, $len)
 	for($i=0;$i<strlen($code);$i++)
 	{
 		if($code[$i]=='1')
-			$this->Rect($x+$i*$w,$y,$w,$h,'F');
+			$pdf->Rect($x+$i*$w,$y,$w,$h,'F');
 	}
+        if (0) {
 	//Print text uder barcode
-	$this->SetFont('Arial','',12);
-	$this->Text($x,$y+$h+11/$this->k,substr($barcode,-$len));
-}
+	$pdf->SetFont('Arial','',12);
+	$pdf->Text($x,$y+$h+11/$pdf->k,substr($barcode,-$len));
+        }
 }
 ?>
