@@ -118,7 +118,7 @@ foreach ($items as $item) {
   # write the price
   $pdf->SetFont('Helvetica', 'B');
   $pdf->SetFontSize($basefontsize * 4);
-  $price= '$' . $item['sale_price'];
+  $price= '$' . ($item['sale_price'] ? $item['sale_price'] : $item['retail_price']);
   $pwidth= $pdf->GetStringWidth($price);
   $pdf->Text($bx + ($label_width - $vmargin) - $pwidth,
              $by + (36/72) + $vmargin,
