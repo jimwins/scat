@@ -59,6 +59,14 @@ function item_find($db, $q, $all) {
   while ($item= $r->fetch_assoc()) {
     $item['stock']= (int)$item['stock'];
     $item['minimum_quantity']= (int)$item['minimum_quantity'];
+
+    $barcodes= explode(',', $item['barcodes']);
+    $item['barcode']= array();
+    foreach ($barcodes as $barcode) {
+      list($code, $quantity)= explode('!', $barcode);
+      $item['barcode'][$code]= $quantity;
+    }
+
     $items[]= $item;
   }
 
@@ -114,6 +122,13 @@ function item_load($db, $id) {
     $item['minimum_quantity']= (int)$item['minimum_quantity'];
   if ($item['stock'])
     $item['stock']= (int)$item['stock'];
+
+  $barcodes= split(',', $item['barcodes']);
+  $item['barcode']= array();
+  foreach ($barcodes as $barcode) {
+    list($code, $quantity)= split('!', $barcode);
+    $item['barcode'][$code]= $quantity;
+  }
 
   return $item;
 }
