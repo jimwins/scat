@@ -19,10 +19,10 @@ function item_find($db, $q, $options) {
     }
   }
 
-  if (!($options | FIND_ALL))
-    $criteria[]= "(active AND NOT deleted)";
+  $sql_criteria= join(($options & FIND_OR) ? ' OR ' : ' AND ', $criteria);
 
-  $sql_criteria= join(($options | FIND_OR) ? ' OR ' : ' AND ', $criteria);
+  if (!($options & FIND_ALL))
+    $sql_criteria= "($sql_criteria) AND (active AND NOT deleted)";
 
   $q= "SELECT
               item.id, item.code, item.name,
