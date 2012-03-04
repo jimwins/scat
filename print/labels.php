@@ -126,7 +126,7 @@ foreach ($items as $item) {
 
   # discount? write the info
   $pdf->SetFont('Helvetica', '');
-  if ($item['discount_label']) {
+  if ($item['sale_price']) {
     # Write the MSRP
     $pdf->SetFontSize($basefontsize * 3);
     $pdf->SetTextColor($light);
