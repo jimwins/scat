@@ -4,6 +4,7 @@ include '../scat.php';
 include '../lib/item.php';
 
 include '../lib/fpdf/alphapdf.php';
+include '../lib/fpdf/ean13.php';
 
 $a= array();
 
@@ -82,8 +83,23 @@ foreach ($items as $item) {
   $pdf->SetFontSize($basefontsize);
   $pdf->SetTextColor($light);
   $width= $pdf->GetStringWidth($item['code']);
+
   $pdf->Text($bx + $label_width - $width - $vmargin,
-             $by + $height - $vmargin, $item['code']);
+             $by + $height - $vmargin,
+             $item['code']);
+
+  # write the barcode
+  if ($item['barcode']) {
+    foreach ($item['barcode'] as $code => $quantity) {
+      if ($quantity == 1) {
+        Barcode($pdf,
+                $bx + $vmargin,
+                $by + $height - $vmargin - $basefontsize/72,
+                $code, $basefontsize/72, 1/72, strlen($code));
+        break;
+      }
+    }
+  }
 
   # write the name
   $pdf->SetFontSize($size= $basefontsize * 2);
@@ -95,7 +111,9 @@ foreach ($items as $item) {
     $pdf->SetFontSize(--$size);
     $width= $pdf->GetStringWidth($name);
   }
-  $pdf->Text($bx + $vmargin, $by + $height - $vmargin, $name);
+  $pdf->Text($bx + $vmargin,
+             $by + $vmargin + ($size/72),
+             $name);
 
   # write the price
   $pdf->SetFont('Helvetica', 'B');
@@ -126,14 +144,17 @@ foreach ($items as $item) {
                $by + (36/72) + $vmargin - ($basefontsize * 1)/72);
     $pdf->SetAlpha(1);
 
-    # write the discount
+    // write the discount
+    if (0) {
     $pdf->SetFont('Helvetica', 'B');
     $pdf->SetTextColor(0xcd, 0x6a, 0x21);
     $size= $basefontsize * 2;
     $pdf->SetFontSize($size);
-    $pdf->Text($bx + $vmargin, $by + ($size / 72) + $vmargin,
+    $pdf->Text($bx + $vmargin,
+               $by + (34 / 72) + $vmargin,
                $item['discount_label']);
     $pdf->SetTextColor(0);
+    }
   }
 
   if (++$x >= $cols) {
