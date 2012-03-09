@@ -79,7 +79,7 @@ echo "Loaded ", $db->affected_rows, " items from order.<br>";
 
 $q= "INSERT IGNORE INTO barcode (item, code, quantity)
      SELECT (SELECT id FROM item WHERE item_no = code) AS item,
-            REPLACE(REPLACE(barcode, 'e-', ''), 'u-', '') AS code,
+            REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS code,
             1 AS quantity
       FROM macorder";
 $db->query($q)
