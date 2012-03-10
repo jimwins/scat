@@ -9,6 +9,16 @@ $item= item_load($db, $item_id);
 if (!$item)
   die_jsonp('No such item.');
 
+if (isset($_REQUEST['code'])) {
+  $code= $db->real_escape_string($_REQUEST['code']);
+  $q= "UPDATE item
+          SET code = '$code'
+        WHERE id = $item_id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+}
+
 if (isset($_REQUEST['name'])) {
   $name= $db->real_escape_string($_REQUEST['name']);
   $q= "UPDATE item
