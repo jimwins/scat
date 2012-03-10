@@ -45,7 +45,7 @@ function Barcode($pdf, $x, $y, $barcode, $h, $w, $len)
 	if(strlen($barcode)==12)
 		$barcode.=GetCheckDigit($barcode);
 	elseif(!TestCheckDigit($barcode))
-		$pdf->Error('Incorrect check digit');
+		$pdf->Error('Incorrect check digit on ' . $barcode);
 	//Convert digits to bars
 	$codes=array(
 		'A'=>array(
