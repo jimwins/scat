@@ -8,7 +8,7 @@ $code= $_GET['code'];
 $id= (int)$_GET['id'];
 ?>
 <form method="get" action="items.php">
-<input id="focus" type="text" name="code" value="<?=htmlspecialchars($code)?>">
+<input id="focus" type="text" name="q" value="<?=htmlspecialchars($code)?>">
 <input type="submit" value="Find Items">
 </form>
 <br>
