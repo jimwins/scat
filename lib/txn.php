@@ -14,7 +14,7 @@ function txn_load_full($db, $id) {
 
 function txn_load($db, $id) {
   $q= "SELECT id, type,
-              number, created, filled, paid,
+              number, created, filled, paid, returned_from,
               CONCAT(DATE_FORMAT(created, '%Y-'), number) AS formatted_number,
               person, person_name,
               IFNULL(ordered, 0) ordered, allocated,
@@ -27,6 +27,7 @@ function txn_load($db, $id) {
         FROM (SELECT
               txn.id, txn.type, txn.number,
               txn.created, txn.filled, txn.paid,
+              txn.returned_from,
               txn.person,
               CONCAT(IFNULL(person.name, ''),
                      IF(person.name != '' AND person.company != '', ' / ', ''),
