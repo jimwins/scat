@@ -19,6 +19,7 @@ $q= "INSERT INTO txn
         SET created= NOW(),
             type = 'customer',
             number = $row[number],
+            returned_from = $txn_id,
             tax_rate = " . DEFAULT_TAX_RATE;
 $r= $db->query($q);
 if (!$r)

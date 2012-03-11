@@ -146,6 +146,7 @@ CREATE TABLE `txn` (
   `type` enum('correction','vendor','customer','drawer') NOT NULL,
   `person` int(10) unsigned DEFAULT NULL,
   `tax_rate` decimal(9,3) NOT NULL,
+  `returned_from` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `type` (`type`,`number`),
   KEY `created` (`created`)
