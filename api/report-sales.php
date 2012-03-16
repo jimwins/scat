@@ -7,13 +7,13 @@ $end= $_REQUEST['end'];
 if (!$begin) {
   $days= $_REQUEST['days'];
   if (!$days) $days= 10;
-  $begin= "NOW() - INTERVAL 10 DAY";
+  $begin= "DATE(NOW() - INTERVAL 10 DAY)";
 } else {
   $begin= "'" . $db->escape($begin) . "'";
 }
 
 if (!$end) {
-  $end= "NOW()";
+  $end= "DATE(NOW())";
 } else {
   $end= "'" . $db->escape($end) . "'";
 }
