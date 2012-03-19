@@ -13,7 +13,7 @@ if (!$begin) {
 }
 
 if (!$end) {
-  $end= "DATE(NOW())";
+  $end= "DATE(NOW() + INTERVAL 1 DAY)";
 } else {
   $end= "'" . $db->escape($end) . "'";
 }
