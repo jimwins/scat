@@ -4,22 +4,28 @@ define('FIND_ALL', 1);
 define('FIND_OR', 2);
 
 function item_find($db, $q, $options) {
-  $criteria= array();
+  $andor= array();
+  $not= array();
 
   $terms= preg_split('/\s+/', $q);
   foreach ($terms as $term) {
     $term= $db->real_escape_string($term);
     if (preg_match('/^code:(.+)/i', $term, $dbt)) {
-      $criteria[]= "(item.code LIKE '{$dbt[1]}%')";
+      $andor[]= "(item.code LIKE '{$dbt[1]}%')";
+    } elseif (preg_match('/^-(.+)/i', $term, $dbt)) {
+      $not[]= "(item.code NOT LIKE '{$dbt[1]}%')";
     } else {
-      $criteria[]= "(item.name LIKE '%$term%'
-                 OR brand.name LIKE '%$term%'
-                 OR item.code LIKE '%$term%'
-                 OR barcode.code LIKE '%$term%')";
+      $andor[]= "(item.name LIKE '%$term%'
+               OR brand.name LIKE '%$term%'
+               OR item.code LIKE '%$term%'
+               OR barcode.code LIKE '%$term%')";
     }
   }
 
-  $sql_criteria= join(($options & FIND_OR) ? ' OR ' : ' AND ', $criteria);
+  $sql_criteria= join(($options & FIND_OR) ? ' OR ' : ' AND ', $andor);
+  if (count($not)) {
+    $sql_criteria= "($sql_criteria) AND " . join(' AND ', $not);
+  }
 
   if (!($options & FIND_ALL))
     $sql_criteria= "($sql_criteria) AND (active AND NOT deleted)";
