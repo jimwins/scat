@@ -734,7 +734,7 @@ $("#pay-credit").on("submit", function (ev) {
   var txn= $("#txn").data("txn");
   var amount= $("#pay-credit .amount").val();
   $.getJSON("api/cc-begin.php?callback=?",
-            { id: txn, amount: amount },
+            { id: txn, amount: parseFloat(amount).toFixed(2) },
             function (data) {
               if (data.error) {
                 alert(data.error);
