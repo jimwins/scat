@@ -86,7 +86,7 @@ $payment= $r->fetch_assoc();
  <tr><th>Card Number</th><td><?=str_repeat('#', !strcmp($payment['cc_type'],'AmericanExpress') ? 11 : 12)?><?=$payment['cc_lastfour']?></td></tr>
  <tr><th>Expiration</th><td>##/##</td></tr>
  <tr><th>Approval</th><td><?=$payment['cc_approval']?></td></tr>
- <tr><th>Amount</th><td>$<?=$payment['amount']?></td></tr>
+ <tr><th>Amount</th><td><?=amount($payment['amount'])?></td></tr>
 </table>
 
 <div id="signature">
