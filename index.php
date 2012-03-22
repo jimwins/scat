@@ -338,6 +338,7 @@ function updateTotal() {
 
 function updateOrderData(txn) {
   // set transaction data
+  $('#txn').data('txn_raw', txn);
   $('#txn').data('txn', txn.id);
   $('#txn').data('subtotal', txn.subtotal)
   $('#txn').data('total', txn.total)
@@ -655,6 +656,22 @@ $("#pay").on("click", function() {
                 $.modal(data.error);
               }
               $.modal($("#choose-pay-method"), { persist: true});
+
+              // Show 'Return Credit Card' if it is possible
+              var txn_raw= $('#txn').data('txn_raw');
+              if (txn_raw.returned_from) {
+                $.getJSON("api/txn-load.php?callback=?",
+                          { id: txn_raw.returned_from },
+                          function (data) {
+                            $.each(data.payments, function(i, payment) {
+                              if (payment.method == 'credit' &&
+                                  payment.amount > 0) {
+                                $('#choose-pay-method #credit-refund').show();
+                                $('#pay-credit-refund').data('from', payment.id);
+                              }
+                            });
+                          });
+              }
             });
 });
 $("#return").on("click", function() {
@@ -676,6 +693,7 @@ $("#return").on("click", function() {
 <div id="choose-pay-method" style="display: none">
  <button data-value="cash">Cash</button>
 <?if ($DEBUG) {?>
+ <button id="credit-refund" data-value="credit-refund" style="display: none">Refund Credit Card</button>
  <button data-value="credit">Credit Card</button>
 <?}?>
  <button data-value="credit-manual">Credit Card (Manual)</button>
@@ -710,6 +728,33 @@ $("#pay-cash").on("submit", function (ev) {
   var amount= $("#pay-cash .amount").val();
   $.getJSON("api/txn-add-payment.php?callback=?",
             { id: txn, method: "cash", amount: amount, change: true },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                $.modal.close();
+              }
+            });
+});
+</script>
+<form id="pay-credit-refund" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <input type="submit" value="Refund">
+ <button name="cancel">Cancel</button>
+</form>
+<script>
+$("#pay-credit-refund").on("submit", function (ev) {
+  ev.preventDefault();
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-credit-refund .amount").val();
+  var refund_from= $("#pay-credit-refund").data('from');
+  $.getJSON("api/cc-refund.php?callback=?",
+            { id: txn, amount: parseFloat(amount).toFixed(2),
+              from: refund_from },
             function (data) {
               if (data.error) {
                 alert(data.error);
