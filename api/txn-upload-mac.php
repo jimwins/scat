@@ -19,7 +19,17 @@ if (!$fn)
 
 ob_start();
 
-$q= "CREATE TEMPORARY TABLE macorder (
+$file= fopen($fn, 'r');
+$line= fgets($file);
+fclose($file);
+
+$q= "SELECT id FROM brand WHERE name = 'New Item'";
+$r= $db->query($q)
+  or die_query($db, $q);
+$row= $r->fetch_row();
+$new_item= $row[0];
+
+$q= "CREATE TEMPORARY TABLE vendor_order (
        line int,
        status varchar(255),
        item_no varchar(255),
@@ -45,20 +55,57 @@ $q= "CREATE TEMPORARY TABLE macorder (
 $db->query($q)
   or die_query($db, $q);
 
-$q= "LOAD DATA LOCAL INFILE '$fn'
-     INTO TABLE macorder
-     FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
-     IGNORE 1 LINES";
-$db->query($q)
-  or die_query($db, $q);
+// SLS order?
+if (preg_match('/^linenum,qty/', $line)) {
+  $q= "CREATE TEMPORARY TABLE vendor_order (
+         line int,
+         shipped int,
+         sku varchar(255),
+         cust_item varchar(255),
+         description varchar(255),
+         barcode varchar(255),
+         msrp decimal(9,2),
+         net decimal(9,2),
+         box_no varchar(255),
+         ext decimal(9,2)
+    )";
 
-echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+       INTO TABLE vendor_order
+       FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
+       IGNORE 1 LINES
+       (line, @shipped, sku, cust_item, description, @upc,
+        msrp, net, box_no, ext)
+       SET barcode = REPLACE(@upc, 'UPC->', ''),
+           ordered = @shipped, shipped = @shipped";
+  $db->query($q)
+    or die_query($db, $q);
 
-$q= "SELECT id FROM brand WHERE name = 'New Item'";
-$r= $db->query($q)
-  or die_query($db, $q);
-$row= $r->fetch_row();
-$new_item= $row[0];
+  $q= "UPDATE vendor_order
+          SET item_no = IF(barcode,
+                           IFNULL((SELECT item.code
+                                     FROM item
+                                     JOIN barcode ON barcode.item = item.id
+                                    WHERE vendor_order.barcode = barcode.code
+                                    LIMIT 1),
+                                  sku),
+                           sku)";
+  $db->query($q)
+    or die_query($db, $q);
+
+  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+
+} else {
+
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+       INTO TABLE vendor_order
+       FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
+       IGNORE 1 LINES";
+  $db->query($q)
+    or die_query($db, $q);
+
+  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+}
 
 $q= "START TRANSACTION";
 $db->query($q)
@@ -71,7 +118,7 @@ $q= "INSERT IGNORE INTO item (code, brand, name, retail_price, active)
             description AS name,
             msrp AS retail_price,
             1 AS active
-       FROM macorder
+       FROM vendor_order
       WHERE msrp > 0";
 $db->query($q)
   or die_query($db, $q);
@@ -81,7 +128,7 @@ $q= "INSERT IGNORE INTO barcode (item, code, quantity)
      SELECT (SELECT id FROM item WHERE item_no = code) AS item,
             REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS code,
             1 AS quantity
-      FROM macorder";
+      FROM vendor_order";
 $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " new barcodes from order.<br>";
@@ -90,7 +137,7 @@ $q= "INSERT INTO txn_line (txn, line, item, ordered, retail_price)
      SELECT $txn_id txn, line,
             (SELECT id FROM item WHERE code = item_no) item,
             shipped AS ordered, net
-       FROM macorder
+       FROM vendor_order
       WHERE shipped";
 $db->query($q)
   or die_query($db, $q);
@@ -101,10 +148,10 @@ $db->commit()
   or die_jsonp($db->error);
 
 $q= "SELECT CAST((SUM(shipped) / SUM(ordered)) * 100 AS DECIMAL(9,1))
-       FROM macorder";
+       FROM vendor_order";
 $item_rate= $db->get_one($q);
 $q= "SELECT CAST((SUM(shipped > 0) / SUM(ordered > 0)) * 100 AS DECIMAL(9,1))
-       FROM macorder";
+       FROM vendor_order";
 $sku_rate= $db->get_one($q);
 echo "Fill rate by item: $item_rate%, by SKU: $sku_rate%.";
 
