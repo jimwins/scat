@@ -195,6 +195,30 @@ CREATE TABLE `txn_note` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `vendor_item`
+--
+
+DROP TABLE IF EXISTS `vendor_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `vendor_item` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `vendor` int(10) unsigned NOT NULL,
+  `item` int(10) unsigned DEFAULT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `retail_price` decimal(9,2) NOT NULL,
+  `net_price` decimal(9,2) NOT NULL,
+  `barcode` varchar(20) DEFAULT NULL,
+  `purchase_quantity` int(11) NOT NULL,
+  `category` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `item` (`item`),
+  KEY `vendor` (`vendor`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping routines for database 'scat'
 --
 /*!50003 DROP FUNCTION IF EXISTS `ROUND_TO_EVEN` */;
@@ -225,4 +249,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-01-20 22:09:47
+-- Dump completed on 2012-03-30 13:28:39
