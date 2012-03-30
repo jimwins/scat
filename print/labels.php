@@ -10,25 +10,6 @@ $a= array();
 
 $in= $_REQUEST['in'];
 
-$c= preg_split('/\r?\n/', $in);
-$a= array();
-foreach ($c as $code) {
-  if (trim($code))
-    $a[]= "code LIKE '" . addslashes($code) . "%'";
-}
-$having= join(' OR ', $a);
-$ex= $_REQUEST['ex'];
-if (!empty($ex)) {
-  $having.= ") AND (";
-  $c= preg_split('/\r?\n/', $ex);
-  $a= array();
-  foreach ($c as $code) {
-    if (trim($code))
-      $a[]= "code NOT LIKE '" . addslashes($code) . "%'";
-  }
-  $having.= join(' AND ', $a);
-}
-
 $items= item_find($db, $in, FIND_OR);
 
 $default_height= $height= 1;
