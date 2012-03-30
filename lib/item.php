@@ -61,7 +61,8 @@ function item_find($db, $q, $options) {
     LEFT JOIN brand ON (item.brand = brand.id)
     LEFT JOIN barcode ON (item.id = barcode.item)
         WHERE $sql_criteria
-     GROUP BY item.id";
+     GROUP BY item.id
+     ORDER BY 2";
 
   $r= $db->query($q)
     or die($db->error);
