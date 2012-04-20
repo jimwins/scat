@@ -129,8 +129,12 @@ var lastItem;
 function updateItems(items) {
   $.each(items, function(i,item) {
     var row= $("#txn tbody tr:data(line_id=" + item.line_id + ")");
-    row.data(item);
-    updateRow(row);
+    if (!row.length) {
+      addNewItem(item);
+    } else {
+      row.data(item);
+      updateRow(row);
+    }
   });
   updateTotal();
 }
@@ -251,15 +255,13 @@ function addItem(item) {
               if (data.error) {
                 play("no");
                 $.modal(data.error);
+              } else if (data.matches) {
+                // this shouldn't happen!
+                  play("no");
               } else {
                 updateOrderData(data.txn);
-                if (data.items.length == 1) {
-                  play("yes");
-                  addNewItem(data.items[0]);
-                  updateTotal();
-                } else {
-                  play("no");
-                }
+                updateItems(data.items);
+                updateTotal();
               }
             });
 }
@@ -522,25 +524,20 @@ $(function() {
                 if (data.error) {
                   play("no");
                   $.modal(data.error);
-                } else {
-                  updateOrderData(data.txn);
-                  if (data.items.length == 0) {
+                } else if (data.matches) {
+                  if (data.matches.length == 0) {
                     play("no");
                     $("#lookup").addClass("error");
                     var errors= $('<div class="errors"/>');
                     errors.text(" Didn't find anything for '" + q + "'.");
                     errors.prepend('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Remove"></span>');
                     $("#items").before(errors);
-                  } else if (data.items.length == 1) {
-                    play("yes");
-                    addNewItem(data.items[0]);
-                    updateTotal();
                   } else {
                     play("maybe");
                     var choices= $('<div class="choices"/>');
                     choices.append('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Skip"></span>');
                     var list= $('<ul>');
-                    $.each(data.items, function(i,item) {
+                    $.each(data.matches, function(i,item) {
                       var n= $("<li>" + item.name + "</li>");
                       n.click(item, function(ev) {
                         addItem(ev.data);
@@ -551,6 +548,11 @@ $(function() {
                     choices.append(list);
                     $("#items").before(choices);
                   }
+                } else {
+                  updateOrderData(data.txn);
+                  play("yes");
+                  updateItems(data.items);
+                  updateTotal();
                 }
               });
 

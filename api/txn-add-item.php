@@ -1,6 +1,7 @@
 <?
 include '../scat.php';
 include '../lib/txn.php';
+include '../lib/item.php';
 
 $txn_id= (int)$_REQUEST['txn'];
 
@@ -9,103 +10,49 @@ $search= $_REQUEST['q'];
 
 if (!$search && !$item) die_jsonp('no query specified');
 
-if (!$txn_id) {
-  $q= "START TRANSACTION;";
-  $r= $db->query($q);
-  if (!$r) die_query($db, $q);
-
-  $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = 'customer'";
-  $r= $db->query($q);
-  if (!$r) die_query($db, $q);
-  $row= $r->fetch_assoc();
-
-  $q= "INSERT INTO txn
-          SET created= NOW(),
-              type = 'customer',
-              number = $row[number],
-              tax_rate = " . DEFAULT_TAX_RATE;
-  $r= $db->query($q);
-  if (!$r) die_query($db, $q);
-
-  $txn_id= $db->insert_id;
-
-  $r= $db->commit();
-  if (!$r) die_query($db, "COMMIT");
-}
-
-$txn= txn_load($db, $txn_id);
-if ($txn['paid']) {
-  die_jsonp("This order is already paid!");
-}
-
-$criteria= array();
-
-if ($search) {
-  $terms= preg_split('/\s+/', $search);
-  foreach ($terms as $term) {
-    $term= $db->real_escape_string($term);
-    if (preg_match('/^code:(.+)/i', $term, $dbt)) {
-      $criteria[]= "(item.code LIKE '{$dbt[1]}%')";
-    } else {
-      $criteria[]= "(item.name LIKE '%$term%'
-                 OR brand.name LIKE '%$term%'
-                 OR item.code LIKE '%$term%'
-                 OR barcode.code LIKE '%$term%')";
-    }
+if ($txn_id) {
+  $txn= txn_load($db, $txn_id);
+  if ($txn['paid']) {
+    die_jsonp("This order is already paid!");
   }
-} else {
-  $criteria[]= "(item.id = $item)";
 }
 
-# allow option to include inactive and/or deleted
-if (!$_REQUEST['all']) {
-  $criteria[]= "(active AND NOT deleted)";
-} else {
-  $criteria[]= "(NOT deleted)";
-}
+if (!$search)
+  $search= "item:$item";
 
-$q= "SELECT
-            item.id id,
-            item.code code,
-            item.name name,
-            brand.name brand,
-            retail_price msrp,
-            CASE discount_type
-              WHEN 'percentage' THEN
-                ROUND_TO_EVEN(retail_price * ((100 - discount) / 100), 2)
-              WHEN 'relative' THEN (retail_price - discount) 
-              WHEN 'fixed' THEN (discount)
-              ELSE retail_price
-            END price,
-            IFNULL(CONCAT('MSRP $', retail_price, ' / Sale: ',
-                          CASE discount_type
-              WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
-              WHEN 'relative' THEN CONCAT('$', discount, ' off')
-            END), '') discount,
-            (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) stock,
-            IFNULL(barcode.quantity, 1) quantity
-       FROM item
-  LEFT JOIN brand ON (item.brand = brand.id)
-  LEFT JOIN barcode ON (item.id = barcode.item)
-      WHERE " . join(' AND ', $criteria) . "
-   GROUP BY item.id
-      LIMIT 10";
+$items= item_find($db, $search, $_REQUEST['all'] ? FIND_ALL : 0);
 
-$r= $db->query($q);
-if (!$r) die_query($db, $q);
-
-$items= array();
-while ($row= $r->fetch_assoc()) {
-  /* force numeric values to numeric type */
-  $row['msrp']= (float)$row['msrp'];
-  $row['price']= (float)$row['price'];
-  $row['stock']= (int)$row['stock'];
-  $row['quantity']= (int)$row['quantity'];
-  $items[]= $row;
-}
+// limit ourselves to 10 items
+array_splice($items, 10);
 
 /* if it is just one item, go ahead and add it to the invoice */
 if (count($items) == 1) {
+  if (!$txn_id) {
+    $q= "START TRANSACTION;";
+    $r= $db->query($q);
+    if (!$r) die_query($db, $q);
+
+    $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = 'customer'";
+    $r= $db->query($q);
+    if (!$r) die_query($db, $q);
+    $row= $r->fetch_assoc();
+
+    $q= "INSERT INTO txn
+            SET created= NOW(),
+                type = 'customer',
+                number = $row[number],
+                tax_rate = " . DEFAULT_TAX_RATE;
+    $r= $db->query($q);
+    if (!$r) die_query($db, $q);
+
+    $txn_id= $db->insert_id;
+
+    $r= $db->commit();
+    if (!$r) die_query($db, "COMMIT");
+
+    $txn= txn_load($db, $txn_id);
+  }
+
   // XXX some items should always be added on their own
   $unique= preg_match('/^ZZ-(frame|print|univ)/i', $items[0]['code']);
 
@@ -117,7 +64,8 @@ if (count($items) == 1) {
   if (!$unique && $r->num_rows) {
     $row= $r->fetch_assoc();
     $items[0]['line_id']= $row['id'];
-    $items[0]['quantity']= -1 * ($row['ordered'] - $items[0]['quantity']);
+    // XXX doesn't handle barcode indicating more than one item
+    $items[0]['quantity']= -1 * ($row['ordered'] - 1);
 
     $q= "UPDATE txn_line SET ordered = -1 * {$items[0]['quantity']}
           WHERE id = {$items[0]['line_id']}";
@@ -133,8 +81,13 @@ if (count($items) == 1) {
     if (!$r) die_query($db, $q);
     $items[0]['line_id']= $db->insert_id;
   }
+
+  $txn= txn_load($db, $txn_id);
+  $items= txn_load_items($db, $txn_id);
+
+  echo jsonp(array('txn' => $txn, 'items' => $items));
+} else {
+  echo jsonp(array('matches' => $items));
 }
 
-$txn= txn_load($db, $txn_id);
 
-echo jsonp(array('txn' => $txn, 'items' => $items));

@@ -12,6 +12,8 @@ function item_find($db, $q, $options) {
     $term= $db->real_escape_string($term);
     if (preg_match('/^code:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.code LIKE '{$dbt[1]}%')";
+    } elseif (preg_match('/^item:(.+)/i', $term, $dbt)) {
+      $andor[]= "(item.id = '{$dbt[1]}%')";
     } elseif (preg_match('/^-(.+)/i', $term, $dbt)) {
       $not[]= "(item.code NOT LIKE '{$dbt[1]}%')";
     } else {
