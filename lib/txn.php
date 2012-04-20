@@ -125,7 +125,8 @@ function txn_load_items($db, $id) {
 }
 
 function txn_load_payments($db, $id) {
-  $q= "SELECT id, processed, method, amount, discount
+  $q= "SELECT id, processed, method, amount, discount,
+              cc_txn, cc_approval, cc_lastfour, cc_expire, cc_type
          FROM payment
         WHERE txn = $id
         ORDER BY processed ASC";
