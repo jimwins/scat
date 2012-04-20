@@ -17,7 +17,7 @@ if (isset($_REQUEST['price'])) {
   if (preg_match('/^\d*(\/|%)$/', $price)) {
     $discount = (float)$price;
     $discount_type = "'percentage'";
-    $price= 'item.retail_price';
+    $price= 'IF(item.retail_price, item.retail_price, txn_line.retail_price)';
   } elseif (preg_match('/^\d*\.?\d*$/', $price)) {
     $price= (float)$price;
     $discount_type= 'NULL';
