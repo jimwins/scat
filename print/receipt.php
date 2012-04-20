@@ -88,7 +88,7 @@ foreach ($items as $item) {
        '<td class="left">', $item['name'],
        ($item['discount'] ? ('<div class="description">' . $item['discount'] . '</div>') : ''),
        '</td>',
-       '<td class="price">', amount($item['price']), '</td>',
+       '<td class="price">', amount($item['ext_price']), '</td>',
        "</tr>\n";
 }
 ?>
