@@ -66,37 +66,7 @@ if (isset($_REQUEST['name'])) {
     or die_query($db, $q);
 }
 
-$q= "SELECT txn_line.id AS line_id,
-            IFNULL(override_name,
-                   (SELECT name FROM item WHERE item.id = item)) AS name,
-            ordered * -1 AS quantity,
-            CAST(CASE discount_type
-              WHEN 'percentage' THEN
-                ROUND_TO_EVEN(retail_price * ((100 - discount) / 100), 2)
-              WHEN 'relative' THEN (retail_price - discount) 
-              WHEN 'fixed' THEN (discount)
-              ELSE retail_price
-            END AS DECIMAL(9,2)) price,
-            IFNULL(CONCAT('MSRP $', retail_price, ' / Sale: ',
-                          CASE discount_type
-              WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
-              WHEN 'relative' THEN CONCAT('$', discount, ' off')
-            END), '') discount,
-            (SELECT SUM(allocated) FROM txn_line WHERE item = txn_line.item) stock
-       FROM txn_line
-      WHERE txn = $txn_id AND txn_line.id = $id";
-
-$r= $db->query($q)
-  or die_query($db, $q);
-
-$items= array();
-while ($row= $r->fetch_assoc()) {
-  /* force numeric values to numeric type */
-  $row['price']= (float)$row['price'];
-  $row['quantity']= (int)$row['quantity'];
-  $row['stock']= (int)$row['stock'];
-  $items[]= $row;
-}
+$items= txn_load_items($db, $txn_id);
 
 $txn= txn_load($db, $txn_id);
 
