@@ -160,6 +160,9 @@ function updateValue(row, key, value) {
   $.getJSON("api/txn-update-item.php?callback=?",
             data,
             function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              }
               updateOrderData(data.txn);
               updateItems(data.items);
             });
