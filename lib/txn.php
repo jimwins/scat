@@ -88,11 +88,17 @@ function txn_load_items($db, $id) {
                    WHEN 'fixed' THEN (txn_line.discount)
                  END,
                  txn_line.retail_price) price,
-              IFNULL(CONCAT('MSRP $', txn_line.retail_price, ' / Sale: ',
+              IFNULL(CONCAT(IF(item.retail_price, 'MSRP $', 'List $'),
+                            txn_line.retail_price,
                             CASE txn_line.discount_type
-                WHEN 'percentage' THEN CONCAT(ROUND(txn_line.discount), '% off')
-                WHEN 'relative' THEN CONCAT('$', txn_line.discount, ' off')
-              END), '') discount,
+                            WHEN 'percentage' THEN
+                              CONCAT(' / Sale: ',
+                                     ROUND(txn_line.discount), '% off')
+                            WHEN 'relative' THEN
+                              CONCAT(' / Sale: $', txn_line.discount, ' off')
+                            WHEN 'fixed' THEN
+                              ''
+                            END), '') discount,
               ordered * IF(txn.type = 'customer', -1, 1) AS quantity,
               allocated * IF(txn.type = 'customer', -1, 1) AS allocated,
               (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) AS stock
