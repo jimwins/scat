@@ -518,9 +518,12 @@ $(function() {
     txn= $('#txn').data('txn');
 
     // go find!
-    $.getJSON("api/txn-add-item.php?callback=?",
-              { txn: txn, q: q },
-              function(data) {
+    $.ajax({ type: 'GET',
+             url: "api/txn-add-item.php?callback=?",
+             dataType: 'json',
+             data: { txn: txn, q: q },
+             async: false,
+             success: function(data) {
                 if (data.error) {
                   play("no");
                   $.modal(data.error);
@@ -554,7 +557,7 @@ $(function() {
                   updateItems(data.items);
                   updateTotal();
                 }
-              });
+              }});
 
     return false;
   });
