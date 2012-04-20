@@ -22,6 +22,12 @@ if (isset($_REQUEST['price'])) {
     $price= (float)$price;
     $discount_type= 'NULL';
     $discount= 'NULL';
+  } elseif (preg_match('/^(cost)$/', $price)) {
+    $discount = "(SELECT MIN(net_price)
+                    FROM vendor_item
+                   WHERE vendor_item.item = item.id)";
+    $discount_type = "'fixed'";
+    $price= 'item.retail_price';
   } elseif (preg_match('/^(def|\.\.\.)$/', $price)) {
     $discount = 'item.discount';
     $discount_type = 'item.discount_type';
