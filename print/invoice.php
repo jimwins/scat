@@ -65,44 +65,7 @@ if ($details['person']) {
  <div style="clear:both;"></div>
 </div>
 <?
-$q= "SELECT
-            -1 * allocated AS Qty,
-            IFNULL(override_name, item.name) Name,
-            IF(txn_line.discount_type,
-               CASE txn_line.discount_type
-                 WHEN 'percentage' THEN
-                   CONCAT('MSRP $', txn_line.retail_price, ' / ',
-                          'Sale: ', ROUND(txn_line.discount, 0), '%')
-                 WHEN 'relative' THEN
-                   CONCAT('MSRP $', txn_line.retail_price, ' / ',
-                          'Sale: $', txn_line.discount, ' off')
-                 WHEN 'fixed' THEN
-                   CONCAT('MSRP $', txn_line.retail_price)
-               END,
-               '') Description,
-            IF(txn_line.discount_type,
-               CASE txn_line.discount_type
-                 WHEN 'percentage' THEN CAST(ROUND_TO_EVEN(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2) AS DECIMAL(9,2))
-                 WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
-                 WHEN 'fixed' THEN (txn_line.discount)
-               END,
-               txn_line.retail_price) Price,
-            IF(txn_line.discount_type,
-               CASE txn_line.discount_type
-                 WHEN 'percentage' THEN CAST(ROUND_TO_EVEN(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2) AS DECIMAL(9,2))
-                 WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
-                 WHEN 'fixed' THEN (txn_line.discount)
-               END,
-               txn_line.retail_price) * -1 * allocated Total
-       FROM txn
-       LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-       JOIN item ON (txn_line.item = item.id)
-      WHERE txn.id = $id
-      ORDER BY line ASC";
-
-$r= $db->query($q);
-if (!$r) die($db->error);
-
+$items= txn_load_items($db, $id);
 ?>
 <table id="products" cellspacing="0" cellpadding="0">
  <thead>
@@ -110,14 +73,14 @@ if (!$r) die($db->error);
  </thead>
  <tbody>
 <?
-while ($row= $r->fetch_assoc()) {
+foreach ($items as $item) {
   echo '<tr valign="top">',
-       '<td class="right">', $row['Qty'], '</td>',
-       '<td class="left">', $row['Name'],
-       ($row['Description'] ? ('<div class="description">' . $row['Description'] . '</div>') : ''),
+       '<td class="right">', $item['quantity'], '</td>',
+       '<td class="left">', $item['name'],
+       ($item['discount'] ? ('<div class="description">' . $item['discount'] . '</div>') : ''),
        '</td>',
-       '<td class="right">', amount($row['Price']), '</td>',
-       '<td class="right">', amount($row['Total']), '</td>',
+       '<td class="right">', amount($item['price']), '</td>',
+       '<td class="right">', amount($item['ext_price']), '</td>',
        "</tr>\n";
 }
 ?>
@@ -134,12 +97,6 @@ while ($row= $r->fetch_assoc()) {
    <td class="price"><?=amount($details['total'])?></td>
   </tr>
 <?
-$q= "SELECT processed, method, discount, amount
-       FROM payment
-      WHERE txn = $id
-      ORDER BY processed ASC";
-$r= $db->query($q);
-
 $methods= array(
   'cash' => 'Cash',
   'change' => 'Change',
@@ -152,8 +109,10 @@ $methods= array(
   'bad' => 'Bad Debt',
 );
 
-if ($r->num_rows) {
-  while ($payment= $r->fetch_assoc()) {
+$payments= txn_load_payments($db, $id);
+
+if (count($payments)) {
+  foreach ($payments as $payment) {
     if ($payment['method'] == 'discount' && $payment['discount']) {
       $method= sprintf("Discount (%d%%)", $payment['discount']);
     } else {

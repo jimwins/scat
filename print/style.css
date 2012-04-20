@@ -29,6 +29,8 @@ table {border:none;}
 
 #products tr th.price, #products tr td.price {padding-left:0.5em; white-space:nowrap; text-align:right;}
 
+#products tbody .description { font-size: smaller; }
+
 /* document footer
 ------------------*/
 #doc_total {margin:20px 0 0 0;}
