@@ -119,7 +119,7 @@ $methods= array(
   'bad' => 'Bad Debt',
 );
 
-if (count($payemnts)) {
+if (count($payments)) {
   foreach ($payments as $payment) {
     if ($payment['method'] == 'discount' && $payment['discount']) {
       $method= sprintf("Discount (%d%%)", $payment['discount']);
