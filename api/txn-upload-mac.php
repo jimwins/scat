@@ -133,8 +133,8 @@ $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " new barcodes from order.<br>";
 
-$q= "INSERT INTO txn_line (txn, line, item, ordered, retail_price)
-     SELECT $txn_id txn, line,
+$q= "INSERT INTO txn_line (txn, item, ordered, retail_price)
+     SELECT $txn_id txn,
             (SELECT id FROM item WHERE code = item_no) item,
             shipped AS ordered, net
        FROM vendor_order

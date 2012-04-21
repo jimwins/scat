@@ -114,7 +114,7 @@ function txn_load_items($db, $id) {
          LEFT JOIN txn_line ON (txn.id = txn_line.txn)
          JOIN item ON (txn_line.item = item.id)
         WHERE txn.id = $id
-        ORDER BY line ASC";
+        ORDER BY txn_line.id ASC";
 
   $r= $db->query($q)
     or die_query($db, $q);
