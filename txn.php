@@ -126,7 +126,6 @@ $("#receipt").on('click', function() {
 <?
 
 $q= "SELECT
-            line AS `#\$num`,
             item.code Code\$item,
             IFNULL(override_name, item.name) Name,
             txn_line.retail_price Price\$dollar,
@@ -147,7 +146,7 @@ $q= "SELECT
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
        JOIN item ON (txn_line.item = item.id)
       WHERE txn.id = $id
-      ORDER BY line ASC";
+      ORDER BY txn_line.id ASC";
 
 dump_table($db->query($q));
 dump_query($q);
