@@ -57,19 +57,6 @@ $db->query($q)
 
 // SLS order?
 if (preg_match('/^linenum,qty/', $line)) {
-  $q= "CREATE TEMPORARY TABLE vendor_order (
-         line int,
-         shipped int,
-         sku varchar(255),
-         cust_item varchar(255),
-         description varchar(255),
-         barcode varchar(255),
-         msrp decimal(9,2),
-         net decimal(9,2),
-         box_no varchar(255),
-         ext decimal(9,2)
-    )";
-
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
        FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
