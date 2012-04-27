@@ -82,6 +82,24 @@ if (preg_match('/^linenum,qty/', $line)) {
 
   echo "Loaded ", $db->affected_rows, " rows from file.<br>";
 
+} elseif (preg_match('/^Vendor Name	Assortment Item Number/', $line)) {
+  // MacPherson assortment
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+       INTO TABLE vendor_order
+       FIELDS TERMINATED BY '\t'
+       IGNORE 1 LINES
+       (@vendor_name, @asst_item_no, item_no, @asst_description, @shipped,
+        @change_flag, @change_date, sku, description, unit, msrp, net,
+        @customer, @product_code_type, @product_code, @reno, @elgin, @atlanta,
+        @catalog_code, @purchase_unit, @purchase_qty, cust_item,
+        @pending_msrp, @pending_date, @pending_net, @promo_net, @promo_name,
+        @abc_flag, @vendor, @group_code, @catalog_description)
+       SET ordered = @shipped, shipped = @shipped";
+  $db->query($q)
+    or die_query($db, $q);
+
+  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+
 } else {
 
   $q= "LOAD DATA LOCAL INFILE '$fn'
