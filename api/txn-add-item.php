@@ -64,8 +64,13 @@ if (count($items) == 1) {
   if (!$unique && $r->num_rows) {
     $row= $r->fetch_assoc();
     $items[0]['line_id']= $row['id'];
-    // XXX doesn't handle barcode indicating more than one item
-    $items[0]['quantity']= -1 * ($row['ordered'] - 1);
+
+    /* if found via barcode, we may have better quantity */
+    $quantity= 1;
+    if ($items[0]['barcode'][$search])
+      $quantity= $items[0]['barcode'][$search];
+
+    $items[0]['quantity']= -1 * ($row['ordered'] - $quantity);
 
     $q= "UPDATE txn_line SET ordered = -1 * {$items[0]['quantity']}
           WHERE id = {$items[0]['line_id']}";
