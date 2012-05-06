@@ -100,6 +100,19 @@ if (preg_match('/^linenum,qty/', $line)) {
 
   echo "Loaded ", $db->affected_rows, " rows from file.<br>";
 
+} elseif (preg_match('/^C2F Product #/', $line)) {
+  // C2F
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+       INTO TABLE vendor_order
+       FIELDS TERMINATED BY '\t'
+       LINES TERMINATED BY '\r\n'
+       IGNORE 1 LINES
+       (item_no, @qty, @uom, description, msrp, net, barcode)
+       SET ordered = @qty, shipped = @qty";
+  $db->query($q)
+    or die_query($db, $q);
+
+  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
 } elseif (preg_match('/^,Name,MSRP/', $line)) {
   // CSV
   $q= "LOAD DATA LOCAL INFILE '$fn'
