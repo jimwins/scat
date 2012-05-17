@@ -1,16 +1,7 @@
 <?
 require '../scat.php';
 require '../lib/txn.php';
-?>
-<html>
-<head>
- <title></title>
- <link href="style.css" rel="stylesheet" type="text/css">
-</head>
-<?if ($_GET['print']) {?>
-<body onload="window.print()">
-<?}?>
-<?
+
 $id= (int)$_REQUEST['id'];
 if (!$id) die("No transaction specified.");
 
@@ -18,6 +9,14 @@ date_default_timezone_set('America/Los_Angeles');
 
 $details= txn_load($db, $id);
 ?>
+<html>
+<head>
+ <title><?='I'.ashtml($details['formatted_number'])?></title>
+ <link href="style.css" rel="stylesheet" type="text/css">
+</head>
+<?if ($_GET['print']) {?>
+<body onload="window.print()">
+<?}?>
 <div id="store_name">Raw Materials</div>
 <div id="doc_header">
  <div id="doc_info">
