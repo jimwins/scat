@@ -57,13 +57,6 @@ tfoot td {
   width: 70%;
 }
 
-#choose-pay-method {
-width: 75%;
-}
-#choose-pay-method button {
-display: inline;
-}
-
 /* Hide/show some elements from paid invoices. */
 #txn.paid .remove,
 #txn.paid #pay,
@@ -706,20 +699,31 @@ $("#return").on("click", function() {
             });
 });
 </script>
+<style>
+#choose-pay-method {
+  text-align: center;
+}
+#choose-pay-method .important {
+  font-size: larger;
+  font-weight: bold;
+}
+</style>
 <div id="choose-pay-method" style="display: none">
- <button data-value="cash">Cash</button>
+ <button class="important" data-value="cash">Cash</button>
 <?if ($DEBUG) {?>
- <button id="credit-refund" data-value="credit-refund" style="display: none">Refund Credit Card</button>
- <button data-value="credit">Credit Card</button>
+ <button id="credit-refund" class="important" data-value="credit-refund" style="display: none">Refund Credit Card</button>
+ <button class="important" data-value="credit">Credit Card</button>
 <?}?>
- <button data-value="credit-manual">Credit Card (Manual)</button>
- <button data-value="square">Square</button>
- <button data-value="dwolla">Dwolla</button>
+ <button class="important" data-value="credit-manual">Credit Card (Manual)</button>
+ <br>
  <button data-value="gift">Gift Card</button>
  <button data-value="check">Check</button>
+ <button data-value="square">Square</button>
+ <button data-value="dwolla">Dwolla</button>
+ <br>
  <button data-value="discount">Discount</button>
- <button data-value="bad-debt">Bad Debt</button>
  <button data-value="donation">Donation</button>
+ <button data-value="bad-debt">Bad Debt</button>
 </div>
 <script>
 $("#choose-pay-method").on("click", "button", function(ev) {
