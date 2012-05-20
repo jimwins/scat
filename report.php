@@ -19,7 +19,7 @@ Grouped by:
 <br>
 <table id="report">
  <thead>
-  <tr><th>When</th><th>Sales</th></tr>
+  <tr><th>When</th><th>Subtotal</th><th>Resale</th><th>Tax</th><th>Total</th></tr>
  </thead>
  <tbody>
  </tbody>
@@ -41,6 +41,9 @@ $("#report-params").on('submit', function(ev) {
                 $.each(data.sales, function(i, sales) {
                   t.append($('<tr><td>' + sales.span +
                              '<td align="right">' + amount(sales.total) +
+                             '<td align="right">' + amount(sales.resale) +
+                             '<td align="right">' + amount(sales.tax) +
+                             '<td align="right">' + amount(sales.total_taxed) +
                              '</tr>'));
                 });
               }
