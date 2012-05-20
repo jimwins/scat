@@ -36,17 +36,17 @@ function item_find($db, $q, $options) {
               item.id, item.code, item.name,
               brand.id brand_id, brand.name brand,
               retail_price retail_price,
-              IF(discount_type,
-                 CASE discount_type
-                   WHEN 'percentage' THEN ROUND(retail_price * ((100 - discount) / 100), 2)
-                   WHEN 'relative' THEN (retail_price - discount) 
-                   WHEN 'fixed' THEN (discount)
+              IF(item.discount_type,
+                 CASE item.discount_type
+                   WHEN 'percentage' THEN ROUND(retail_price * ((100 - item.discount) / 100), 2)
+                   WHEN 'relative' THEN (retail_price - item.discount) 
+                   WHEN 'fixed' THEN (item.discount)
                  END,
                  NULL) sale_price,
-              discount_type, discount,
-              CASE discount_type
-                WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
-                WHEN 'relative' THEN CONCAT('$', discount, ' off')
+              item.discount_type, item.discount,
+              CASE item.discount_type
+                WHEN 'percentage' THEN CONCAT(ROUND(item.discount), '% off')
+                WHEN 'relative' THEN CONCAT('$', item.discount, ' off')
               END discount_label,
               (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) stock,
               (SELECT retail_price
@@ -92,17 +92,17 @@ function item_load($db, $id) {
               item.id, item.code, item.name,
               brand.id brand_id, brand.name brand,
               retail_price retail_price,
-              IF(discount_type,
-                 CASE discount_type
-                   WHEN 'percentage' THEN ROUND(retail_price * ((100 - discount) / 100), 2)
-                   WHEN 'relative' THEN (retail_price - discount) 
-                   WHEN 'fixed' THEN (discount)
+              IF(item.discount_type,
+                 CASE item.discount_type
+                   WHEN 'percentage' THEN ROUND(retail_price * ((100 - item.discount) / 100), 2)
+                   WHEN 'relative' THEN (retail_price - item.discount) 
+                   WHEN 'fixed' THEN (item.discount)
                  END,
                  NULL) sale_price,
-              discount_type, discount,
-              CASE discount_type
-                WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
-                WHEN 'relative' THEN CONCAT('$', discount, ' off')
+              item.discount_type, item.discount,
+              CASE item.discount_type
+                WHEN 'percentage' THEN CONCAT(ROUND(item.discount), '% off')
+                WHEN 'relative' THEN CONCAT('$', item.discount, ' off')
               END discount_label,
               (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) stock,
               (SELECT retail_price

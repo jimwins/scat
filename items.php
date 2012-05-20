@@ -68,16 +68,16 @@ $q= "SELECT
             item.name Name\$name,
             brand.name Brand\$brand,
             retail_price MSRP\$dollar,
-            IF(discount_type,
-               CASE discount_type
-                 WHEN 'percentage' THEN ROUND(retail_price * ((100 - discount) / 100), 2)
-                 WHEN 'relative' THEN (retail_price - discount) 
-                 WHEN 'fixed' THEN (discount)
+            IF(item.discount_type,
+               CASE item.discount_type
+                 WHEN 'percentage' THEN ROUND(retail_price * ((100 - item.discount) / 100), 2)
+                 WHEN 'relative' THEN (retail_price - item.discount) 
+                 WHEN 'fixed' THEN (item.discount)
                END,
                NULL) Sale\$dollar,
-            CASE discount_type
-              WHEN 'percentage' THEN CONCAT(ROUND(discount), '% off')
-              WHEN 'relative' THEN CONCAT('$', discount, ' off')
+            CASE item.discount_type
+              WHEN 'percentage' THEN CONCAT(ROUND(item.discount), '% off')
+              WHEN 'relative' THEN CONCAT('$', item.discount, ' off')
             END Discount\$discount,
             (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) Stock\$right,
             minimum_quantity Minimum\$right,
