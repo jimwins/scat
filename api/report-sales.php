@@ -33,30 +33,43 @@ default:
 }
 
 $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
-            SUM(subtotal) AS total
+            SUM(taxed + untaxed) AS total,
+            SUM(IF(tax_rate, 0, taxed + untaxed)) AS resale,
+            SUM(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)) AS tax,
+            SUM(ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed)
+              AS total_taxed
        FROM (SELECT 
                     filled,
                     CAST(ROUND_TO_EVEN(
-                      SUM(IF(type = 'customer', -1, 1) * allocated *
-                              CASE txn_line.discount_type
-                                WHEN 'percentage'
-                                  THEN txn_line.retail_price *
-                                       ((100 - txn_line.discount) / 100)
-                                WHEN 'relative'
-                                  THEN (txn_line.retail_price -
-                                        txn_line.discount) 
-                                WHEN 'fixed'
-                                  THEN (txn_line.discount)
-                                ELSE txn_line.retail_price
-                              END), 2) AS DECIMAL(9,2))
-                    AS subtotal
+                      SUM(IF(txn_line.taxfree, 1, 0) *
+                        IF(type = 'customer', -1, 1) * ordered *
+                        CASE txn_line.discount_type
+                          WHEN 'percentage' THEN txn_line.retail_price * ((100 - txn_line.discount) / 100)
+                          WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
+                          WHEN 'fixed' THEN (txn_line.discount)
+                          ELSE txn_line.retail_price
+                        END),
+                      2) AS DECIMAL(9,2))
+                    AS untaxed,
+                    CAST(ROUND_TO_EVEN(
+                      SUM(IF(txn_line.taxfree, 0, 1) *
+                        IF(type = 'customer', -1, 1) * ordered *
+                        CASE txn_line.discount_type
+                          WHEN 'percentage' THEN txn_line.retail_price * ((100 - txn_line.discount) / 100)
+                          WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
+                          WHEN 'fixed' THEN (txn_line.discount)
+                          ELSE txn_line.retail_price
+                        END),
+                      2) AS DECIMAL(9,2))
+                    AS taxed,
+                    tax_rate
                FROM txn
                LEFT JOIN txn_line ON (txn.id = txn_line.txn)
                     JOIN item ON (txn_line.item = item.id)
               WHERE filled IS NOT NULL
                 AND filled BETWEEN $begin AND $end
                 AND type = 'customer'
-                AND code NOT LIKE 'ZZ-gift%'
+                AND code NOT LIKE 'ZZ-gift%' AND code NOT LIKE 'ZZ-online'
               GROUP BY txn.id
             ) t
       GROUP BY 1 DESC";
@@ -67,6 +80,9 @@ $r= $db->query($q)
 $sales= array();
 while ($row= $r->fetch_assoc()) {
   $row['total']= (float)$row['total'];
+  $row['resale']= (float)$row['resale'];
+  $row['tax']= (float)$row['tax'];
+  $row['total_taxed']= (float)$row['total_taxed'];
   $sales[]= $row;
 }
 
