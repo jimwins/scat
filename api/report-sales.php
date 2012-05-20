@@ -28,7 +28,7 @@ case 'week':
   break;
 case 'day':
 default:
-  $format= '%Y-%m-%d';
+  $format= '%Y-%m-%d %a';
   break;
 }
 
