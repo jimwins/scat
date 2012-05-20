@@ -1003,14 +1003,15 @@ $("#pay-check").on("click", "button[name='pay']", function (ev) {
             });
 });
 </script>
-<div id="pay-discount" class="pay-method" style="display: none">
+<form id="pay-discount" class="pay-method" style="display: none">
  <input class="amount" type="text" pattern="\d*">
  <br>
  <button name="pay">Discount</button>
  <button name="cancel">Cancel</button>
-</div>
+</form>
 <script>
-$("#pay-discount").on("click", "button[name='pay']", function (ev) {
+$("#pay-discount").on("submit", function (ev) {
+  ev.preventDefault();
   var txn= $("#txn").data("txn");
   var amount= $("#pay-discount .amount").val();
   $.getJSON("api/txn-add-payment.php?callback=?",
