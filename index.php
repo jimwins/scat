@@ -57,6 +57,13 @@ tfoot td {
   width: 70%;
 }
 
+#choose-pay-method {
+width: 75%;
+}
+#choose-pay-method button {
+display: inline;
+}
+
 /* Hide/show some elements from paid invoices. */
 #txn.paid .remove,
 #txn.paid #pay,
@@ -295,6 +302,7 @@ var paymentMethods= {
   check: "Check",
   discount: "Discount",
   bad: "Bad Debt",
+  donation: "Donation",
 };
 
 function updateTotal() {
@@ -711,6 +719,7 @@ $("#return").on("click", function() {
  <button data-value="check">Check</button>
  <button data-value="discount">Discount</button>
  <button data-value="bad-debt">Bad Debt</button>
+ <button data-value="donation">Donation</button>
 </div>
 <script>
 $("#choose-pay-method").on("click", "button", function(ev) {
@@ -1030,6 +1039,31 @@ $("#pay-bad-debt").on("click", "button[name='pay']", function (ev) {
   var amount= $("#pay-bad-debt .amount").val();
   $.getJSON("api/txn-add-payment.php?callback=?",
             { id: txn, method: "bad", amount: amount, change: false },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                $.modal.close();
+              }
+            });
+});
+</script>
+<form id="pay-donation" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <button name="pay">Pay</button>
+ <button name="cancel">Cancel</button>
+</form>
+<script>
+$("#pay-donation").on("submit", function (ev) {
+  ev.preventDefault();
+  var txn= $("#txn").data("txn");
+  var amount= $("#pay-donation .amount").val();
+  $.getJSON("api/txn-add-payment.php?callback=?",
+            { id: txn, method: "donation", amount: amount, change: false },
             function (data) {
               if (data.error) {
                 alert(data.error);
