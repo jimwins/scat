@@ -21,6 +21,9 @@ if ($_REQUEST['unfilled']) {
 if ($_REQUEST['unpaid']) {
   $criteria[]= "txn.paid IS NULL";
 }
+if ($_REQUEST['untaxed']) {
+  $criteria[]= "txn.tax_rate = 0";
+}
 
 if (empty($criteria)) {
   $criteria= '1=1';
