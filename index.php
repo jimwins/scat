@@ -433,6 +433,27 @@ function showOpenOrders(data) {
   $('#sales').show();
 }
 
+function txn_add_payment(options) {
+  $.ajax({ type: 'GET',
+           url: "api/txn-add-payment.php?callback=?",
+           dataType: 'json',
+           data: options,
+           async: false,
+           success: function(data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                $.modal.close();
+                if (options.method == 'credit' && options.amount >= 25.00) {
+                  printChargeRecord(data.payment);
+                }
+              }
+           }});
+}
+
 function printReceipt() {
   var txn= $('#txn').data('txn');
   if (!txn) {
@@ -747,18 +768,7 @@ $("#pay-cash").on("submit", function (ev) {
   ev.preventDefault();
   var txn= $("#txn").data("txn");
   var amount= $("#pay-cash .amount").val();
-  $.getJSON("api/txn-add-payment.php?callback=?",
-            { id: txn, method: "cash", amount: amount, change: true },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
-                $.modal.close();
-              }
-            });
+  txn_add_payment({ id: txn, method: "cash", amount: amount, change: true });
 });
 </script>
 <form id="pay-credit-refund" class="pay-method" style="display: none">
@@ -842,22 +852,8 @@ $("#pay-credit-manual").on("click", "button", function (ev) {
     $.modal.close();
     return false;
   }
-  $.getJSON("api/txn-add-payment.php?callback=?",
-            { id: txn, method: "credit", amount: amount, change: false,
-              cc_type: cc_type },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
-                $.modal.close();
-                if (amount >= 25.00) {
-                  printChargeRecord(data.payment);
-                }
-              }
-            });
+  txn_add_payment({ id: txn, method: "credit", amount: amount, change: false,
+                    cc_type: cc_type });
 });
 </script>
 <form id="pay-square" class="pay-method" style="display: none">
@@ -871,18 +867,7 @@ $("#pay-square").on("submit", function (ev) {
   ev.preventDefault();
   var txn= $("#txn").data("txn");
   var amount= $("#pay-square .amount").val();
-  $.getJSON("api/txn-add-payment.php?callback=?",
-            { id: txn, method: "square", amount: amount, change: false },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
-                $.modal.close();
-              }
-            });
+  txn_add_payment({ id: txn, method: "square", amount: amount, change: false });
 });
 </script>
 <form id="pay-dwolla" class="pay-method" style="display: none">
@@ -896,18 +881,7 @@ $("#pay-dwolla").on("submit", function (ev) {
   ev.preventDefault();
   var txn= $("#txn").data("txn");
   var amount= $("#pay-dwolla .amount").val();
-  $.getJSON("api/txn-add-payment.php?callback=?",
-            { id: txn, method: "dwolla", amount: amount, change: false },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
-                $.modal.close();
-              }
-            });
+  txn_add_payment({ id: txn, method: "dwolla", amount: amount, change: false });
 });
 </script>
 <div id="pay-gift" class="pay-method" style="display: none">
@@ -966,19 +940,8 @@ $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
                 alert(data.error);
               } else {
                 var balance= $("#pay-gift-complete").data('balance');
-                $.getJSON("api/txn-add-payment.php?callback=?",
-                          { id: txn, method: "gift", amount: amount,
-                            change: (balance - amount <= 10.00) },
-                          function (data) {
-                            if (data.error) {
-                              alert(data.error);
-                            } else {
-                              updateOrderData(data.txn);
-                              $('#txn').data('payments', data.payments);
-                              updateTotal();
-                              $.modal.close();
-                            }
-                          });
+                txn_add_payment({ id: txn, method: "gift", amount: amount,
+                                  change: (balance - amount <= 10.00) });
               }
             });
 });
@@ -993,18 +956,7 @@ $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
 $("#pay-check").on("click", "button[name='pay']", function (ev) {
   var txn= $("#txn").data("txn");
   var amount= $("#pay-check .amount").val();
-  $.getJSON("api/txn-add-payment.php?callback=?",
-            { id: txn, method: "check", amount: amount, change: false },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
-                $.modal.close();
-              }
-            });
+  txn_add_payment({ id: txn, method: "check", amount: amount, change: false });
 });
 </script>
 <form id="pay-discount" class="pay-method" style="display: none">
@@ -1018,18 +970,9 @@ $("#pay-discount").on("submit", function (ev) {
   ev.preventDefault();
   var txn= $("#txn").data("txn");
   var amount= $("#pay-discount .amount").val();
-  $.getJSON("api/txn-add-payment.php?callback=?",
-            { id: txn, method: "discount", amount: amount, change: false },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
-                $.modal.close();
               }
-            });
+  txn_add_payment({ id: txn, method: "discount",
+                    amount: amount, change: false });
 });
 </script>
 <div id="pay-bad-debt" class="pay-method" style="display: none">
@@ -1042,18 +985,7 @@ $("#pay-discount").on("submit", function (ev) {
 $("#pay-bad-debt").on("click", "button[name='pay']", function (ev) {
   var txn= $("#txn").data("txn");
   var amount= $("#pay-bad-debt .amount").val();
-  $.getJSON("api/txn-add-payment.php?callback=?",
-            { id: txn, method: "bad", amount: amount, change: false },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
-                $.modal.close();
-              }
-            });
+  txn_add_payment({ id: txn, method: "bad", amount: amount, change: false });
 });
 </script>
 <form id="pay-donation" class="pay-method" style="display: none">
@@ -1067,18 +999,8 @@ $("#pay-donation").on("submit", function (ev) {
   ev.preventDefault();
   var txn= $("#txn").data("txn");
   var amount= $("#pay-donation .amount").val();
-  $.getJSON("api/txn-add-payment.php?callback=?",
-            { id: txn, method: "donation", amount: amount, change: false },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
-                $.modal.close();
-              }
-            });
+  txn_add_payment({ id: txn, method: "donation", amount: amount,
+                    change: false });
 });
 </script>
 <script>
