@@ -970,7 +970,6 @@ $("#pay-discount").on("submit", function (ev) {
   ev.preventDefault();
   var txn= $("#txn").data("txn");
   var amount= $("#pay-discount .amount").val();
-              }
   txn_add_payment({ id: txn, method: "discount",
                     amount: amount, change: false });
 });
