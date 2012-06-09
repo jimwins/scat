@@ -888,6 +888,7 @@ $("#pay-dwolla").on("submit", function (ev) {
  Card: <input class="card" type="text" size="15">
  <br>
  <button name="lookup">Check Card</button>
+ <button name="old">Old Card</button>
  <button name="cancel">Cancel</button>
 </div>
 <div id="pay-gift-complete" class="pay-method" style="display: none">
@@ -929,21 +930,33 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
               }
             });
 });
+$("#pay-gift").on("click", "button[name='old']", function (ev) {
+  var due= ($("#txn").data("total") - $("#txn").data("paid"));
+  var def= due;
+  $("#pay-gift-complete .amount").val(def);
+  $.modal.close();
+  $("#pay-gift-complete").data(null);
+  $.modal($("#pay-gift-complete"), { overlayClose: false, persist: true });
+});
 $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
   var txn= $("#txn").data("txn");
   var amount= $("#pay-gift-complete .amount").val();
   var card= $("#pay-gift-complete").data('card');
-  $.getJSON("<?=GIFT_BACKEND?>/add-txn.php?callback=?",
-            { card: card, amount: -amount },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                var balance= $("#pay-gift-complete").data('balance');
-                txn_add_payment({ id: txn, method: "gift", amount: amount,
-                                  change: (balance - amount <= 10.00) });
-              }
-            });
+  if (card) {
+    $.getJSON("<?=GIFT_BACKEND?>/add-txn.php?callback=?",
+              { card: card, amount: -amount },
+              function (data) {
+                if (data.error) {
+                  alert(data.error);
+                } else {
+                  var balance= $("#pay-gift-complete").data('balance');
+                  txn_add_payment({ id: txn, method: "gift", amount: amount,
+                                    change: (balance - amount <= 10.00) });
+                }
+              });
+  } else {
+    txn_add_payment({ id: txn, method: "gift", amount: amount, change: true });
+  }
 });
 </script>
 <div id="pay-check" class="pay-method" style="display: none">
