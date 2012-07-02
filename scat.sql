@@ -124,6 +124,7 @@ CREATE TABLE `person` (
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `tax_id` varchar(255) DEFAULT NULL,
+  `payment_account_id` varchar(50) DEFAULT NULL,
   `active` tinyint(1) NOT NULL,
   `deleted` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)

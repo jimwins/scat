@@ -8,6 +8,7 @@ function person_load($db, $id) {
               email,
               phone,
               tax_id,
+              payment_account_id,
               active,
               deleted
          FROM person
