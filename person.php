@@ -68,6 +68,13 @@ function loadPerson(person) {
   $('#person #phone').text(person.phone);
   $('#person #address').text(person.address);
   $('#person #tax_id').text(person.tax_id);
+  if (person.payment_account_id) {
+    $('#person #payment_account_id #add_payment').hide();
+    $('#person #payment_account_id #remove_payment').show();
+  } else {
+    $('#person #payment_account_id #remove_payment').hide();
+    $('#person #payment_account_id #add_payment').show();
+  }
 }
 
 $(function() {
@@ -98,6 +105,13 @@ $(function() {
   <tr>
    <th>Tax ID:</th>
    <td id="tax_id" class="editable"></td>
+  </tr>
+  <tr>
+   <th>Payment Account ID:</th>
+   <td id="payment_account_id">
+     <button id="add_payment">Store Credit Card</button>
+     <button id="remove_payment" style="display: hide">Remove Stored Card</button>
+   </td>
   </tr>
 </table>
 <script>
@@ -134,6 +148,45 @@ $('#person #active').on('dblclick', function(ev) {
                 return;
               }
               loadPerson(data.person);
+            });
+});
+$('#add_payment').on('click', function(ev) {
+  var person= $('#person').data('person');
+  $.getJSON("api/cc-attach-begin.php?callback=?",
+            { person: person.id },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                $.modal.close();
+                $.modal('<iframe src="' + data.url +
+                        '" height=500" width="600" style="border:0">',
+                        {
+                          closeHTML: "",
+                          containerCss: {
+                            backgroundColor: "#fff",
+                            borderColor: "#fff",
+                            height: 520,
+                            padding: 0,
+                            width: 620,
+                          },
+                          position: undefined,
+                          overlayClose: false,
+                        });
+              }
+            });
+});
+$('#remove_payment').on('click', function(ev) {
+  var person= $('#person').data('person');
+  $.getJSON("api/cc-attach-remove.php?callback=?",
+            { person: person.id },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                loadPerson(data.person);
+                $.modal.close();
+              }
             });
 });
 </script>

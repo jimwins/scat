@@ -706,6 +706,12 @@ $("#pay").on("click", function() {
                             });
                           });
               }
+
+              // Show 'Stored Card' if it is possible
+              var person= $('#txn').data('person_raw');
+              if (person.payment_account_id) {
+                $('#choose-pay-method #credit-stored').show();
+              }
             });
 });
 $("#return").on("click", function() {
@@ -737,6 +743,7 @@ $("#return").on("click", function() {
  <button class="important" data-value="cash">Cash</button>
 <?if ($DEBUG) {?>
  <button id="credit-refund" class="important" data-value="credit-refund" style="display: none">Refund Credit Card</button>
+ <button id="credit-stored" class="important" data-value="credit-stored" style="display: none">Stored Credit Card</button>
  <button class="important" data-value="credit">Credit Card</button>
 <?}?>
  <button class="important" data-value="credit-manual">Credit Card (Manual)</button>
@@ -797,6 +804,36 @@ $("#pay-credit-refund").on("submit", function (ev) {
                 updateOrderData(data.txn);
                 $('#txn').data('payments', data.payments);
                 updateTotal();
+                $.modal.close();
+              }
+            });
+});
+</script>
+<form id="pay-credit-stored" class="pay-method" style="display: none">
+ <input class="amount" type="text" pattern="\d*">
+ <br>
+ <input type="submit" value="Pay">
+ <button name="cancel">Cancel</button>
+</form>
+<script>
+$("#pay-credit-stored").on("submit", function (ev) {
+  ev.preventDefault();
+  var txn= $("#txn").data("txn");
+  var person= $("#txn").data("person");
+  var amount= $("#pay-credit-stored .amount").val();
+  $.getJSON("api/cc-stored.php?callback=?",
+            { id: txn, amount: parseFloat(amount).toFixed(2),
+              person: person },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
+                if (amount > 25.00) {
+                  printChargeRecord(data.payment);
+                }
                 $.modal.close();
               }
             });
