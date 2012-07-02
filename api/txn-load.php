@@ -23,15 +23,4 @@ if (!$id && $type) {
 if (!$id)
   die_jsonp("No transaction specified.");
 
-$txn= txn_load($db, $id);
-
-$items= txn_load_items($db, $id);
-
-$payments= txn_load_payments($db, $id);
-
-$notes= txn_load_notes($db, $id);
-
-echo jsonp(array('txn' => $txn,
-                 'items' => $items,
-                 'payments' => $payments,
-                 'notes' => $notes));
+echo jsonp(txn_load_full($db, $id));
