@@ -23,5 +23,6 @@ $r= $db->query($q)
   or die_query($db, $q);
 
 $txn= txn_load($db, $txn_id);
+$person= person_load($db, $person);
 
-echo jsonp(array("success" => "Updated person.", "txn" => $txn));
+echo jsonp(array("success" => "Updated person.", "txn" => $txn, "person" => $person));
