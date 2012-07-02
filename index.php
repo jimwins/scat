@@ -381,6 +381,10 @@ function loadOrder(data) {
     $('#txn').data('payments', data.payments);
   }
 
+  if (data.person != undefined) {
+    $('#txn').data('person_raw', data.person);
+  }
+
   if (data.items != undefined) {
     $('#txn').data('items', data.items);
 
@@ -1075,7 +1079,7 @@ $("#txn #person").on("dblclick", function(ev) {
                     $.modal(data.error);
                     return;
                   }
-                  updateOrderData(data.txn);
+                  loadOrder(data);
                 });
     },
   });
