@@ -689,7 +689,8 @@ $("#pay").on("click", function() {
               if (data.error) {
                 $.modal(data.error);
               }
-              $.modal($("#choose-pay-method"), { persist: true});
+
+              $('#choose-pay-method .optional').hide();
 
               // Show 'Return Credit Card' if it is possible
               var txn_raw= $('#txn').data('txn_raw');
@@ -699,7 +700,8 @@ $("#pay").on("click", function() {
                           function (data) {
                             $.each(data.payments, function(i, payment) {
                               if (payment.method == 'credit' &&
-                                  payment.amount > 0) {
+                                  payment.amount > 0 &&
+                                  payment.cc_txn != '') {
                                 $('#choose-pay-method #credit-refund').show();
                                 $('#pay-credit-refund').data('from', payment.id);
                               }
@@ -712,6 +714,8 @@ $("#pay").on("click", function() {
               if (person.payment_account_id) {
                 $('#choose-pay-method #credit-stored').show();
               }
+
+              $.modal($("#choose-pay-method"), { persist: true});
             });
 });
 $("#return").on("click", function() {
@@ -734,6 +738,9 @@ $("#return").on("click", function() {
 #choose-pay-method {
   text-align: center;
 }
+#choose-pay-method .optional {
+  display: none;
+}
 #choose-pay-method .important {
   font-size: larger;
   font-weight: bold;
@@ -742,8 +749,8 @@ $("#return").on("click", function() {
 <div id="choose-pay-method" style="display: none">
  <button class="important" data-value="cash">Cash</button>
 <?if ($DEBUG) {?>
- <button id="credit-refund" class="important" data-value="credit-refund" style="display: none">Refund Credit Card</button>
- <button id="credit-stored" class="important" data-value="credit-stored" style="display: none">Stored Credit Card</button>
+ <button id="credit-refund" class="important optional" data-value="credit-refund">Refund Credit Card</button>
+ <button id="credit-stored" class="important optional" data-value="credit-stored">Stored Credit Card</button>
  <button class="important" data-value="credit">Credit Card</button>
 <?}?>
  <button class="important" data-value="credit-manual">Credit Card (Manual)</button>
