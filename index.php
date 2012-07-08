@@ -711,7 +711,7 @@ $("#pay").on("click", function() {
 
               // Show 'Stored Card' if it is possible
               var person= $('#txn').data('person_raw');
-              if (person.payment_account_id) {
+              if (person && person.payment_account_id) {
                 $('#choose-pay-method #credit-stored').show();
               }
 
