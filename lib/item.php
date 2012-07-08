@@ -2,10 +2,12 @@
 
 define('FIND_ALL', 1);
 define('FIND_OR', 2);
+define('FIND_SALES', 4);
 
-function item_find($db, $q, $options) {
+function item_terms_to_sql($db, $q, $options) {
   $andor= array();
   $not= array();
+  $begin= false;
 
   $terms= preg_split('/\s+/', $q);
   foreach ($terms as $term) {
@@ -14,6 +16,8 @@ function item_find($db, $q, $options) {
       $andor[]= "(item.code LIKE '{$dbt[1]}%')";
     } elseif (preg_match('/^item:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.id = '{$dbt[1]}%')";
+    } elseif (preg_match('/^begin:([-0-9]+)/i', $term, $dbt)) {
+      $begin= $dbt[1];
     } elseif (preg_match('/^-(.+)/i', $term, $dbt)) {
       $not[]= "(item.code NOT LIKE '{$dbt[1]}%')";
     } else {
@@ -31,6 +35,24 @@ function item_find($db, $q, $options) {
 
   if (!($options & FIND_ALL))
     $sql_criteria= "($sql_criteria) AND (active AND NOT deleted)";
+
+  return array($sql_criteria, $begin);
+}
+
+function item_find($db, $q, $options) {
+  list($sql_criteria, $begin) = item_terms_to_sql($db, $q, $options);
+
+  $extra= "";
+  if (!$begin) {
+    $begin= date("Y-m-d", time() - 7*24*3600);
+  }
+  if ($options & FIND_SALES) {
+    $extra= "(SELECT SUM(allocated) * -1
+                FROM txn_line JOIN txn ON txn.id = txn_line.txn
+               WHERE txn_line.item = item.id
+                 AND type = 'customer'
+                 AND filled >= '$begin') sold,";
+  }
 
   $q= "SELECT
               item.id, item.code, item.name,
@@ -58,6 +80,7 @@ function item_find($db, $q, $options) {
               minimum_quantity,
               GROUP_CONCAT(CONCAT(barcode.code, '!', barcode.quantity)
                            SEPARATOR ',') barcodes,
+              $extra
               active
          FROM item
     LEFT JOIN brand ON (item.brand = brand.id)
