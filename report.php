@@ -14,11 +14,12 @@ Grouped by:
  <option value="week">Week</span>
  <option value="month">Month</span>
 </select>
-Items: <input name="items" type="text">
+Items: <input id="items" name="items" type="text">
 <input type="submit" value="Show">
 </form>
 <br>
-<table id="report">
+<table id="results-template" style="display: none">
+ <caption><span>All Sales</span><img align="right" onclick="$(this).closest('table').remove(); return false" src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Close"></caption>
  <thead>
   <tr><th>When</th><th>Subtotal</th><th>Resale</th><th>Tax</th><th>Total</th></tr>
  </thead>
@@ -31,14 +32,16 @@ $(function() {
 });
 $("#report-params").on('submit', function(ev) {
   ev.preventDefault();
+  var params= $(this).serializeArray();
   $.getJSON("./api/report-sales.php?callback=?",
-            $(this).serializeArray(),
+            params,
             function(data) {
               if (data.error) {
                 $.modal(data.error);
               } else {
-                var t= $("#report tbody");
-                t.empty();
+                var table= $("#results-template").clone();
+                table.removeAttr('id');
+                var t= $("tbody", table);
                 $.each(data.sales, function(i, sales) {
                   t.append($('<tr><td>' + sales.span +
                              '<td align="right">' + amount(sales.total) +
@@ -47,6 +50,13 @@ $("#report-params").on('submit', function(ev) {
                              '<td align="right">' + amount(sales.total_taxed) +
                              '</tr>'));
                 });
+                var cap= $('#items').val();
+                if (cap) {
+                  $("caption span", table).text(cap);
+                }
+                table.appendTo($("body"));
+                table.show();
+                table.draggable();
               }
             });
 });
