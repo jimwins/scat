@@ -14,6 +14,7 @@ Grouped by:
  <option value="week">Week</span>
  <option value="month">Month</span>
 </select>
+Items: <input name="items" type="text">
 <input type="submit" value="Show">
 </form>
 <br>

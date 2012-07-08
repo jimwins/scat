@@ -1,8 +1,14 @@
 <?
 include '../scat.php';
+include '../lib/item.php';
 
 $begin= $_REQUEST['begin'];
 $end= $_REQUEST['end'];
+
+$items= "1=1";
+if ($_REQUEST['items']) {
+  list($items, $x)= item_terms_to_sql($db, $_REQUEST['items'], FIND_OR);
+}
 
 if (!$begin) {
   $days= $_REQUEST['days'];
@@ -70,6 +76,7 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
                 AND filled BETWEEN $begin AND $end
                 AND type = 'customer'
                 AND code NOT LIKE 'ZZ-gift%' AND code NOT LIKE 'ZZ-online'
+                AND ($items)
               GROUP BY txn.id
             ) t
       GROUP BY 1 DESC";
