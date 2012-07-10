@@ -7,6 +7,7 @@ head("reorder");
 .order { text-align: right; }
 </style>
 <button id="download">Download</button>
+<button id="zero">Zero</button>
 <?
 
 $q= "SELECT code Code\$item,
@@ -47,6 +48,9 @@ $('#download').on('click', function(ev) {
   });
   $("#file").val(tsv);
   $("#post-csv").submit();
+});
+$('#zero').on('click', function(ev) {
+  $('.order').text('0');
 });
 </script>
 <?
