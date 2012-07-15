@@ -29,6 +29,9 @@ function amount(amount) {
   if (typeof(amount) == 'undefined' || amount == null) {
     return '';
   }
+  if (typeof(amount) == 'string') {
+    amount= parseFloat(amount);
+  }
   if (amount < 0.0) {
     return '($' + Math.abs(amount).toFixed(2) + ')';
   } else {
