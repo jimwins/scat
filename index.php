@@ -492,11 +492,11 @@ function printChargeRecord(id) {
 $(function() {
   $('#txn').data('tax_rate', 0.00);
 
-  $.isShifted= false;
+  $.isShifted= 0;
 
   $(document).keydown(function(ev) {
-    if (ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey) {
-      $.isShifted= true;
+    if (ev.keyCode == 16 || ev.keyCode == 17 || ev.keyCode == 18) {
+      $.isShifted++;
       return true;
     }
     var el = $.getFocusedElement();
@@ -510,10 +510,9 @@ $(function() {
   });
 
   $(document).keyup(function(ev) {
-    if (ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey) {
-      return true;
+    if (ev.keyCode == 16 || ev.keyCode == 17 || ev.keyCode == 18) {
+      $.isShifted--;
     }
-    $.isShifted= false;
     return true;
   });
 
