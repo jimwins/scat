@@ -12,4 +12,4 @@ if ($_REQUEST['sales']) $options+= FIND_SALES;
 
 $items= item_find($db, $q, $options);
 
-echo jsonp($items);
+echo jsonp(array('items' => $items));
