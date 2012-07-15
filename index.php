@@ -554,8 +554,12 @@ $(function() {
                     $.modal(data.error);
                     return;
                   }
-                  loadItem(data.items[0]);
-                  $.modal($('#item-info'));
+                  if (data.items.length == 0) {
+                    $.modal("Nothing found.");
+                  } else {
+                    loadItem(data.items[0]);
+                    $.modal($('#item-info'));
+                  }
                 });
       return false;
     }
