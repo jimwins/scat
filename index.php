@@ -492,8 +492,11 @@ function printChargeRecord(id) {
 $(function() {
   $('#txn').data('tax_rate', 0.00);
 
+  $.isShifted= false;
+
   $(document).keydown(function(ev) {
     if (ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey) {
+      $.isShifted= true;
       return true;
     }
     var el = $.getFocusedElement();
@@ -504,6 +507,14 @@ $(function() {
       }
       inp.focus();
     }
+  });
+
+  $(document).keyup(function(ev) {
+    if (ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey) {
+      return true;
+    }
+    $.isShifted= false;
+    return true;
   });
 
   $(document).bind('keydown', 'meta+p', function(ev) {
@@ -534,6 +545,21 @@ $(function() {
     $('input[name="q"]', this).focus().select();
 
     var q = $('input[name="q"]', this).val();
+
+    // If a control/shift/alt key is down, it's a quick lookup
+    if ($.isShifted) {
+      $.getJSON("api/item-find.php?callback=?",
+                { q: q },
+                function (data) {
+                  if (data.error) {
+                    $.modal(data.error);
+                    return;
+                  }
+                  loadItem(data.items[0]);
+                  $.modal($('#item-info'));
+                });
+      return false;
+    }
 
     // short integer and recently scanned? adjust quantity
     if (q.length < 4 && lastItem && parseInt(q) != 0) {
@@ -1188,6 +1214,74 @@ function loadPerson(person) {
    <td id="tax_id"></td>
   </tr>
 </table>
+<table id="item-info" style="display: none">
+  <tr>
+   <th>Code:</th>
+   <td><span id="code"></span></td>
+  </tr>
+  <tr>
+   <th>Name:</th>
+   <td><span id="name"></span></td>
+  </tr>
+  <tr>
+   <th>Brand:</th>
+   <td id="brand"></td>
+  </tr>
+  <tr>
+   <th>MSRP:</th>
+   <td id="retail_price"></td>
+  </tr>
+  <tr>
+   <th>Sale:</th>
+   <td id="sale"></td>
+  </tr>
+  <tr>
+   <th>Discount:</th>
+   <td id="discount"></td>
+  </tr>
+  <tr>
+   <th>Stock:</th>
+   <td id="stock"></td>
+  </tr>
+  <tr>
+   <th>Minimum Stock:</th>
+   <td id="minimum_quantity"></td>
+  </tr>
+</table>
+<script>
+function loadItem(item) {
+  $('#item-info').data('item', item);
+  var active= parseInt(item.active);
+  if (active) {
+    $('#item-info #active').attr('src', 'icons/accept.png');
+  } else {
+    $('#item-info #active').attr('src', 'icons/cross.png');
+  }
+  $('#item-info #code').text(item.code);
+  $('#item-info #name').text(item.name);
+  $('#item-info #brand').text(item.brand);
+  $('#item-info #retail_price').text(amount(item.retail_price));
+  $('#item-info #sale').text(amount(item.sale_price));
+  $('#item-info #discount').text(item.discount_label);
+  $('#item-info #stock').text(item.stock);
+  $('#item-info #minimum_quantity').text(item.minimum_quantity);
+/*
+  $('#item-info #last_net').text(amount(item.last_net));
+  $('#item-info #barcodes tbody').empty();
+  if (typeof(item.barcodes) != 'undefined') {
+    var barcodes= item.barcodes.split(/,/);
+    $.each(barcodes, function(i, barcode) {
+      var info= barcode.split(/!/);
+      var row= protoBarcodeRow.clone();
+      $('td:nth(0)', row).text(info[0]);
+      $('td:nth(1)', row).text(info[1]);
+      $('.quantity', row).editable(editBarcodeQuantity);
+      $('#item-info #barcodes tbody').append(row);
+    });
+  }
+*/
+}
+</script>
 <form id="person-create" style="display:none">
  <label>Name: <input type="text" width="60" name="name"></label>
  <br>
