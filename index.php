@@ -495,7 +495,8 @@ $(function() {
   $.isShifted= 0;
 
   $(document).keydown(function(ev) {
-    if (ev.keyCode == 16 || ev.keyCode == 17 || ev.keyCode == 18) {
+    if (ev.keyCode == 16 || ev.keyCode == 17 || ev.keyCode == 18
+        || ev.keyCode == 91) {
       $.isShifted++;
       return true;
     }
@@ -510,13 +511,17 @@ $(function() {
   });
 
   $(document).keyup(function(ev) {
-    if (ev.keyCode == 16 || ev.keyCode == 17 || ev.keyCode == 18) {
+    if (ev.keyCode == 16 || ev.keyCode == 17 || ev.keyCode == 18
+        || ev.keyCode == 91) {
       $.isShifted--;
     }
     return true;
   });
 
   $(document).bind('keydown', 'meta+p', function(ev) {
+    return printReceipt();
+  });
+  $('input').bind('keydown', 'meta+p', function(ev) {
     return printReceipt();
   });
 
