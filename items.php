@@ -1,5 +1,6 @@
 <?
 require 'scat.php';
+require 'lib/item.php';
 
 head("search");
 
@@ -45,18 +46,14 @@ $('#add-item-form').on('submit', function(ev) {
 
 if (!$q) exit;
 
-$terms= preg_split('/\s+/', $q);
-$criteria= array();
-foreach ($terms as $term) {
-  $term= $db->real_escape_string($term);
-  if (preg_match('/^code:(.+)/i', $term, $dbt)) {
-    $criteria[]= "(item.code LIKE '{$dbt[1]}%')";
-  } else {
-    $criteria[]= "(item.name LIKE '%$term%'
-               OR brand.name LIKE '%$term%'
-               OR item.code LIKE '%$term%'
-               OR barcode.code LIKE '%$term%')";
-  }
+$begin= false;
+
+$options= 0;
+if ($_REQUEST['all'])
+  $options|= FIND_ALL;
+
+list($sql_criteria, $begin) = item_terms_to_sql($db, $q, $options);
+
 }
 # XXX allow option to include inactive and/or deleted
 if (!$_REQUEST['all'])
@@ -85,7 +82,7 @@ $q= "SELECT
        FROM item
   LEFT JOIN brand ON (item.brand = brand.id)
   LEFT JOIN barcode ON (item.id = barcode.item)
-      WHERE " . join(' AND ', $criteria) . "
+      WHERE $sql_criteria
    GROUP BY item.id
    ORDER BY 2";
 
