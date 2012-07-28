@@ -54,6 +54,9 @@ if ($_REQUEST['all'])
 
 list($sql_criteria, $begin) = item_terms_to_sql($db, $q, $options);
 
+$extra= "";
+if (!$begin) {
+  $begin= date("Y-m-d", time() - 90*24*3600);
 }
 # XXX allow option to include inactive and/or deleted
 if (!$_REQUEST['all'])
