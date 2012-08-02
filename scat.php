@@ -3,6 +3,9 @@ error_reporting(E_ALL & ~E_NOTICE);
 
 date_default_timezone_set('America/Los_Angeles');
 
+if (get_magic_quotes_gpc())
+  die("Sorry, you need to disable magic quotes for Scat to work.");
+
 /* Start page timer */
 $start_time= microtime();
 
