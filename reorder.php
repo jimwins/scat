@@ -19,13 +19,19 @@ $q= "SELECT code Code\$item,
               WHERE type = 'customer'
                 AND item = item.id AND filled > NOW() - INTERVAL 3 MONTH)
             AS Last3Months\$right,
+            (SELECT SUM(ordered - allocated)
+               FROM txn_line JOIN txn ON (txn = txn.id)
+              WHERE type = 'vendor'
+                AND item = item.id AND created > NOW() - INTERVAL 3 MONTH)
+            AS Ordered\$hide,
             minimum_quantity AS Order\$order
        FROM item
        LEFT JOIN txn_line ON (item = item.id)
       WHERE active AND NOT deleted
         AND code NOT LIKE 'ZZ%' AND code NOT LIKE 'MAG-%'
       GROUP BY item.id
-     HAVING Stock\$right IS NULL OR NOT Stock\$right OR Stock\$right < Min\$right
+     HAVING (Stock\$right IS NULL OR NOT Stock\$right OR Stock\$right < Min\$right)
+        AND (Ordered\$hide IS NULL OR NOT Ordered\$hide)
       ORDER BY code
       ";
 
