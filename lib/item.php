@@ -41,6 +41,19 @@ function item_terms_to_sql($db, $q, $options) {
   return array($sql_criteria, $begin);
 }
 
+function generate_upc($code) {
+  assert(strlen($code) == 11);
+  $check= 0;
+  foreach (range(0,10) as $digit) {
+    $check+= $code[$digit] * (($digit % 2) ? 1 : 3);
+  }
+
+  $cd= 10 - ($check % 10);
+  if ($cd == 10) $cd= 0;
+
+  return $code.$cd;
+}
+
 function item_find($db, $q, $options) {
   list($sql_criteria, $begin) = item_terms_to_sql($db, $q, $options);
 
@@ -105,6 +118,8 @@ function item_find($db, $q, $options) {
       list($code, $quantity)= explode('!', $barcode);
       $item['barcode'][$code]= $quantity;
     }
+
+    $item['fake_barcode']= generate_upc(sprintf("4004%07d", $item['id']));
 
     $items[]= $item;
   }
