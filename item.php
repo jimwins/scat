@@ -242,3 +242,5 @@ $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
 echo '<h2>History</h2>';
 dump_table($db->query($q));
 dump_query($q);
+
+foot();
