@@ -494,9 +494,9 @@ $(function() {
   $('#txn').data('tax_rate', 0.00);
 
   $(document).keydown(function(ev) {
-    if (ev.keyCode == 16 || ev.keyCode == 17 || ev.keyCode == 18
-        || ev.keyCode == 91) {
-      $.isShifted++;
+    if (ev.keyCode == 16 || ev.keyCode == 17
+        || ev.keyCode == 18 || ev.keyCode == 91
+        || ev.metaKey || ev.altKey || ev.ctrlKey) {
       return true;
     }
     var el = $.getFocusedElement();
