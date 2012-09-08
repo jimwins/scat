@@ -128,6 +128,6 @@ function item_find($db, $q, $options) {
 }
 
 function item_load($db, $id) {
-  $items= item_find($db, "item:$id", 0);
+  $items= item_find($db, "item:$id", FIND_ALL);
   return $items[0];
 }
