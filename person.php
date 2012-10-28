@@ -100,7 +100,7 @@ $(function() {
   </tr>
   <tr>
    <th>Address:</th>
-   <td id="address" class="editable"></td>
+   <td id="address" class="editable_multi"></td>
   </tr>
   <tr>
    <th>Tax ID:</th>
@@ -115,7 +115,8 @@ $(function() {
   </tr>
 </table>
 <script>
-$('#person .editable').editable(function(value, settings) {
+var edit_person= 
+function(value, settings) {
   var person= $('#person').data('person');
   var data= { person: person.id };
   var key= this.id;
@@ -131,10 +132,20 @@ $('#person .editable').editable(function(value, settings) {
               loadPerson(data.person);
             });
   return "...";
-}, {
+}
+$('#person .editable').editable(edit_person,
+{
   event: 'dblclick',
   style: 'display: inline',
   placeholder: '',
+});
+$('#person .editable_multi').editable(edit_person,
+{
+  type: 'textarea',
+  event: 'dblclick',
+  style: 'display: inline',
+  placeholder: '',
+  submit: 'OK',
 });
 $('#person #active').on('dblclick', function(ev) {
   ev.preventDefault();
