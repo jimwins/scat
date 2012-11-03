@@ -135,6 +135,7 @@ if (isset($_REQUEST['stock'])) {
             ORDER BY created DESC
             LIMIT 1";
       $cost= $db->get_one($q);
+      if (!$cost) $cost= 0.00;
     }
 
     $q= "INSERT INTO txn_line
