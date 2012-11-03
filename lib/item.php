@@ -84,6 +84,7 @@ function item_find($db, $q, $options) {
               CASE item.discount_type
                 WHEN 'percentage' THEN CONCAT(ROUND(item.discount), '% off')
                 WHEN 'relative' THEN CONCAT('$', item.discount, ' off')
+                ELSE ''
               END discount_label,
               (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) stock,
               (SELECT retail_price
