@@ -63,6 +63,7 @@ tr.total td {border-top:solid #000 6px; text-align:right; font-weight:;}
   436 South Main Street<br>
   Los Angeles, CA 90013<br>
   (213) 627-7223<br>
+  M-F 11-7, Sat 11-6, Sun 12-5<br>
   info@rawmaterialsLA.com<br>
   http://rawmaterialsLA.com/
 </div>
@@ -176,7 +177,7 @@ foreach ($payments as $payment) {
 </div>
 <div id="store_footer">
 Items purchased from stock may be returned in original condition and packaging
-within 30 days with receipt. No returns without original receipt.
+within 30 days with receipt. Assembled easels are subject to a 20% restocking fee. No returns without original receipt.
 <br><br>
 http://rawmaterialsLA.com/
 </div>
