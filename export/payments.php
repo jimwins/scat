@@ -14,67 +14,20 @@ $r= $db->query($q)
   or die_query($db, $q);
 
 header('Content-Type: text/plain');
-//header('Content-Disposition: attachment; filename="payments.txt"');
+header('Content-Disposition: attachment; filename="payments.txt"');
 
 echo "Journal Number\tDate\tMemo\tAccount Number\tDebit Amount\tCredit Amount\r\n";
 
-$amt= 0.0;
-$memo= '';
-$last= array();
-
-function finish($amt, $last, $memo) {
-    switch ($last['type']) {
-    case 'drawer':
-      $account= '11130';
-      break;
-    case 'customer':
-      $account= '11200';
-      break;
-    default:
-      die("Don't know how to handle $last[type] payment");
-    }
-    echo "\t$last[processed]\t$last[id]: $memo\t$account\t";
-
-    if ($amt < 0) {
-      echo "0\t" . sprintf('%.2f', abs($amt));
-    } else {
-      echo "$amt\t0";
-    }
-
-    echo "\r\n";
-    echo "\r\n";
-}
-
 while ($pay= $r->fetch_assoc()) {
-  if ($last && $last['txn'] != $pay['txn']) {
-    finish($amt, $last, $memo);
-    // end entry
-    $amt= 0.0;
-  }
-  $txn= $pay['txn'];
-  $last= $pay;
+  if ($pay['amount'] == 0)
+    continue;
 
-  switch ($pay['type']) {
-  case 'drawer':
-    $memo= "Till Count $pay[num]";
-    switch ($pay['method']) {
-    case 'cash':
-      $account= "61220";
-      break;
-
-    case 'withdrawal':
-      $account= "11160";
-      break;
-
-    default:
-      die("Don't know how to handle $pay[method] for $pay[type] payment");
-    }
-    break;
-
-  case 'customer':
-    $memo= "Payment for invoice $pay[num]";
-
-    $accts= array(
+  $accts= array(
+                'drawer' => array(
+                  'cash' =>   '61220',
+                  'withdrawal' => '11130',
+                 ),
+                'customer' => array(
                   'cash' =>   '11130',
                   'change' => '11130',
                   'credit' => '11190',
@@ -86,27 +39,46 @@ while ($pay= $r->fetch_assoc()) {
                   'bad'=>     '61900',
                   'donation'=>'63150',
                   'internal'=>'64500',
-                 );
+                 ));
 
-    $account= $accts[$pay['method']];
-    if (!$account) {
-      die("Don't know how to handle $pay[method] for $pay[type] payment");
-    }
+  $debit= $accts[$pay['type']][$pay['method']];
+
+  if (!$debit) {
+    die("Don't know how to handle $pay[method] for $pay[type] payment");
+  }
+
+  switch ($pay['type']) {
+  case 'drawer':
+    $memo= "Till Count $pay[num]";
+    $credit= '11160';
+    break;
+
+  case 'customer':
+    $memo= "Payment for invoice $pay[num]";
+    $credit= '11200';
     break;
 
   default:
     die("Don't know how to handle $pay[type] payment");
   }
-  $amt-= $pay['amount'];
 
-  echo "\t$pay[processed]\t$pay[id]: $memo\t$account\t";
-
+  // debit entry
+  echo "\t$pay[processed]\t$pay[id]: $memo\t$debit\t";
   if ($pay['amount'] < 0) {
     echo "0\t" . substr($pay['amount'], 1);
   } else {
     echo $pay['amount'] . "\t0";
   }
+  echo "\r\n";
+
+  // credit entry
+  echo "\t$pay[processed]\t$pay[id]: $memo\t$credit\t";
+  if ($pay['amount'] < 0) {
+    echo substr($pay['amount'], 1) . "\t0";
+  } else {
+    echo "0\t" . $pay['amount'];
+  }
+  echo "\r\n";
 
   echo "\r\n";
 }
-finish($amt, $last, $memo);
