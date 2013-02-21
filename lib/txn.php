@@ -83,7 +83,7 @@ function txn_load($db, $id) {
 
 function txn_load_items($db, $id) {
   $q= "SELECT
-              txn_line.id AS line_id, item.code,
+              txn_line.id AS line_id, item.code, item.id AS item_id,
               IFNULL(override_name, item.name) name,
               txn_line.retail_price msrp,
               IF(txn_line.discount_type,
@@ -131,6 +131,9 @@ function txn_load_items($db, $id) {
     $row['price']= (float)$row['price'];
     $row['quantity']= (int)$row['quantity'];
     $row['stock']= (int)$row['stock'];
+
+    $row['fake_barcode']= generate_upc(sprintf("4004%07d", $row['item_id']));
+
     $items[]= $row;
   }
 
