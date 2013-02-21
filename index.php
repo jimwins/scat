@@ -542,8 +542,9 @@ $(function() {
     var q = $('input[name="q"]', this).val();
 
     // short integer and recently scanned? adjust quantity
-    if (q.length < 4 && lastItem && parseInt(q) != 0) {
-      updateValue(lastItem, 'quantity', parseInt(q));
+    var val= parseInt(q, 10);
+    if (q.length < 4 && lastItem && val != 0 && !isNaN(val)) {
+      updateValue(lastItem, 'quantity', val);
       return false;
     }
 
