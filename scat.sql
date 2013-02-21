@@ -172,6 +172,7 @@ CREATE TABLE `txn_line` (
   `retail_price` decimal(9,2) NOT NULL,
   `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
   `discount` decimal(9,2) DEFAULT NULL,
+  `discount_manual` tinyint(1) NOT NULL,
   `taxfree` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`,`line`),
