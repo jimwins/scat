@@ -6,9 +6,8 @@ bcscale(2);
 header('Content-Type: text/plain');
 header('Content-Disposition: attachment; filename="sales.txt"');
 
-$begin= '2012-01-01';
-$end= '2013-01-01';
-#$end= '2013-02-01';
+$begin= '2013-01-01';
+$end= '2013-02-01';
 
 $q= "SELECT id, type, created,
             DATE_FORMAT(IF(type = 'customer', paid, created), '%m/%d/%Y') date,

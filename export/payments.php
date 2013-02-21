@@ -1,13 +1,16 @@
 <?php
 require '../scat.php';
 
+$begin= '2013-01-01';
+$end= '2013-02-01';
+
 $q= "SELECT payment.id, method,
             DATE_FORMAT(processed, '%m/%d/%Y') processed,
             cc_type, amount, txn, txn.type,
             CONCAT(YEAR(filled), '-', number) num
        FROM payment
        JOIN txn ON payment.txn = txn.id
-      WHERE processed BETWEEN '2012-01-01' AND '2013-01-01'
+      WHERE processed BETWEEN '$begin' AND '$end'
       ORDER BY 1";
 
 $r= $db->query($q)
