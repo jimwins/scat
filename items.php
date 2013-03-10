@@ -2,6 +2,8 @@
 require 'scat.php';
 require 'lib/item.php';
 
+ob_start();
+
 head("search");
 
 $q= $_GET['q'];
@@ -91,6 +93,14 @@ $q= "SELECT
 
 $r= $db->query($q)
   or die($db->error);
+
+if ($r->num_rows == 1) {
+  $row= $r->fetch_assoc();
+  ob_end_clean();
+  header("Location: item.php?id=" . $row['meta']);
+  exit;
+}
+ob_end_flush();
 
 dump_table($r);
 ?>
