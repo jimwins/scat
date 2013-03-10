@@ -120,7 +120,7 @@ $('#item .editable').editable(function(value, settings) {
             });
   return "...";
 }, {
-  event: 'dblclick',
+  event: 'click',
   style: 'display: inline',
   placeholder: '',
 });
