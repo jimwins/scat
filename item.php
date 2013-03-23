@@ -213,6 +213,21 @@ $('#barcodes #new-barcode').editable(function(value, settings) {
 });
 </script>
 <?
+
+$q= "SELECT company Company,
+            retail_price MSRP\$dollar,
+            net_price Net\$dollar,
+            promo_price Promo\$dollar
+       FROM vendor_item
+       JOIN person ON vendor_item.vendor = person.id
+      WHERE item = $id";
+
+echo '<h2 onclick="$(\'#vendors\').show()">Vendors</h2>';
+echo '<div id="vendors" style="display: none">';
+dump_table($db->query($q));
+dump_query($q);
+echo '</div>';
+
 $r= $db->query("SET @count = 0");
 
 $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
