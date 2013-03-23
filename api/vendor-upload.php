@@ -54,7 +54,8 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     sku VARCHAR(10),
     name VARCHAR(255),
     retail_price DECIMAL(9,2),
-    promo_price DECIMAL(9,2))";
+    promo_price DECIMAL(9,2),
+    PRIMARY KEY (item_no))";
 
   $db->query($q)
     or die_query($db, $q);
