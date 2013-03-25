@@ -19,13 +19,13 @@ $count= $db->get_one("SELECT ABS(SUM(ordered))
                          AND code LIKE 'MXG-%'");
 if ($count >= 50) {
   $q= "UPDATE txn_line, item
-          SET txn_line.discount = 40.0, txn_line.discount_type = 'percentage'
+          SET txn_line.discount = 6.93, txn_line.discount_type = 'fixed'
         WHERE txn = $id AND txn_line.item = item.id AND code LIKE 'MXG-%'";
   $db->query($q)
     or die_query($db, $q);
 } elseif ($count >= 12) {
   $q= "UPDATE txn_line, item
-          SET txn_line.discount = 30.0, txn_line.discount_type = 'percentage'
+          SET txn_line.discount = 7.35, txn_line.discount_type = 'fixed'
         WHERE txn = $id AND txn_line.item = item.id AND code LIKE 'MXG-%'";
   $db->query($q)
     or die_query($db, $q);
