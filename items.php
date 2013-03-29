@@ -12,7 +12,7 @@ $q= $_GET['q'];
  <button id="add-item">Add New Item</button>
 </div>
 <form method="get" action="<?=$_SERVER['PHP_SELF']?>">
-<input id="focus" type="text" autocomplete="off" size="60" name="q" value="<?=htmlspecialchars($q)?>">
+<input id="autofocus" type="text" autocomplete="off" size="60" name="q" value="<?=htmlspecialchars($q)?>">
 <label><input type="checkbox" value="1" name="all"<?=$_REQUEST['all']?' checked="checked"':''?>> All</label>
 <input type="submit" value="Search">
 </form>
