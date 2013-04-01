@@ -20,7 +20,7 @@ $details= txn_load($db, $id);
 <div id="store_name">Raw Materials</div>
 <div id="doc_header">
  <div id="doc_info">
-  <span id="doc_name">Invoice <?=ashtml($details['formatted_number'])?></span>
+  <span id="doc_name"><?=($details['type'] == 'vendor') ? 'PO' : 'Invoice'?> <?=ashtml($details['formatted_number'])?></span>
   <b>Created: <?=ashtml(date('F j, Y g:i A', strtotime($details['created'])))?></b><br>
 <?if ($details['paid']) {?>
   <b>Paid: <?=ashtml(date('F j, Y g:i A', strtotime($details['paid'])))?></b>
@@ -136,9 +136,11 @@ if (count($payments)) {
  </tbody>
 </table>
 <div id="store_footer">
+<?if ($details['type'] != 'vendor') {?>
 Items purchased from stock may be returned in original condition and packaging
 within 30 days with receipt. No returns without original receipt.
 <br><br>
+<?}?>
 http://rawmaterialsLA.com/
 </div>
 
