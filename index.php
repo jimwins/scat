@@ -532,11 +532,11 @@ $(function() {
       return false;
     }
 
-    // _INV-(\d+) is an invoice to load
-    var m= q.match(/^_INV-(\d+)/);
+    // (%V|@)INV-(\d+) is an invoice to load
+    var m= q.match(/^(%V|@)INV-(\d+)/);
     if (m) {
       $.getJSON("api/txn-load.php?callback=?",
-                { type: "customer", id: m[1] },
+                { type: "customer", id: m[2] },
                 function (data) {
                   if (data.error) {
                     $.modal(data.error);

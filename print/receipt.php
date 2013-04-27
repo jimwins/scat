@@ -175,7 +175,7 @@ foreach ($payments as $payment) {
   <br>
   <?=date('F j, Y g:i A', strtotime($txn['created']))?>
   <br><br>
-<span style="font-family: Aatrix3of9Reg; font-size: 2em">*_INV-<?=ashtml($txn['id'])?>*</span>
+<span style="font-family: Aatrix3of9Reg; font-size: 2em">*@INV-<?=ashtml($txn['id'])?>*</span>
 </div>
 <div id="store_footer">
 Items purchased from stock may be returned in original condition and packaging
