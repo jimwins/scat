@@ -181,7 +181,7 @@ function setActiveRow(row) {
   lastItem.addClass('active');
 }
 
-$('.editable').live('dblclick', function() {
+$(document).on('dblclick', '.editable', function() {
   // Just stop now if transaction is paid
   if ($('#txn').hasClass('paid')) {
     return false;
@@ -225,7 +225,7 @@ $('.editable').live('dblclick', function() {
   fld.focus().select();
 });
 
-$('.remove').live('click', function() {
+$(document).on('click', '.remove', function() {
   var txn= $('#txn').data('txn');
   var id= $(this).closest('tr').data('line_id');
 

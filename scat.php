@@ -30,9 +30,12 @@ header("content-type: text/html;charset=utf-8");?>
  <link rel="stylesheet" type="text/css" href="static/screen.css">
  <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/base/jquery-ui.css">
  <script src="js/jquery.min.js"></script>
+<?if ($GLOBALS['DEBUG']) {?>
+ <script src="http://code.jquery.com/jquery-migrate-1.1.1.js"></script>
+<?}?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
- <script src="js/jquery.simplemodal.1.4.2.min.js"></script>
+ <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
  <script src="js/jquery.data-selector.js"></script>
  <script src="js/jquery.hotkeys.js"></script>
  <script src="js/jquery.jeditable.mini.js"></script>
