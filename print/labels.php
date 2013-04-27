@@ -9,6 +9,12 @@ include '../lib/fpdf/ean13.php';
 $a= array();
 
 $in= $_REQUEST['in'];
+$ex= $_REQUEST['ex'];
+
+if ($ex) {
+  $exa= preg_split('/\s+/', $ex);
+  $in.= ' -' . join(' -', $exa);
+}
 
 $items= item_find($db, $in, FIND_OR);
 
