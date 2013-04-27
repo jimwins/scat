@@ -532,6 +532,22 @@ $(function() {
       return false;
     }
 
+    // _INV-(\d+) is an invoice to load
+    var m= q.match(/^_INV-(\d+)/);
+    if (m) {
+      $.getJSON("api/txn-load.php?callback=?",
+                { type: "customer", id: m[1] },
+                function (data) {
+                  if (data.error) {
+                    $.modal(data.error);
+                  } else {
+                    loadOrder(data);
+                  }
+                  $("#status").text("Loaded sale.").fadeOut('slow');
+                });
+      return false;
+    }
+
     txn= $('#txn').data('txn');
 
     // go find!
