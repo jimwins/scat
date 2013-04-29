@@ -26,6 +26,9 @@ if (!$end) {
 
 $span= $_REQUEST['span'];
 switch ($span) {
+case 'all':
+  $format= 'All';
+  break;
 case 'month':
   $format= '%Y-%m';
   break;

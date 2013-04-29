@@ -13,6 +13,7 @@ Grouped by:
  <option value="day">Day</span>
  <option value="week">Week</span>
  <option value="month">Month</span>
+ <option value="all">All</span>
 </select>
 Items: <input id="items" name="items" type="text">
 <input type="submit" value="Show">
