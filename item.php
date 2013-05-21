@@ -89,7 +89,7 @@ function loadItem(item) {
  <tr><th>Discount</th><td id="discount" class="editable"></td></tr>
  <tr><th>Stock</th><td id="stock" class="editable"></td></tr>
  <tr><th>Minimum Stock</th><td id="minimum_quantity" class="editable"></td></tr>
- <tr><th>Last Net</th><td id="last_net"></td></tr>
+ <tr><th onclick="$('#last_net').toggle()">Last Net</th><td id="last_net" style="display:none"></td></tr>
  <tr>
   <th>Barcodes</th>
   <td style="padding: 0">
