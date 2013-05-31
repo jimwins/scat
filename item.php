@@ -81,7 +81,7 @@ function loadItem(item) {
 }
 </style>
 <table id="item">
- <tr><th>Code</th><td><span id="code" class="editable"></span><img id="active" align="right" src="icons/accept.png" height="16" width="16"></td></tr>
+ <tr><th><img id="print" align="left" src="icons/printer.png" height="16" width="16">Code</th><td><span id="code" class="editable"></span><img id="active" align="right" src="icons/accept.png" height="16" width="16"></td></tr>
  <tr><th>Name</th><td id="name" class="editable"></td></tr>
  <tr><th>Brand</th><td id="brand"></td></tr>
  <tr><th>MSRP</th><td id="retail_price" class="editable"></td></tr>
@@ -210,6 +210,19 @@ $('#barcodes #new-barcode').editable(function(value, settings) {
     $(this).data('original', value);
     return '';
   },
+});
+$('#item #print').on('dblclick', function(ev) {
+  ev.preventDefault();
+  var item= $('#item').data('item');
+
+  $.getJSON("print/labels-price.php?callback=?",
+            { id: item.id },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
+            });
 });
 </script>
 <?
