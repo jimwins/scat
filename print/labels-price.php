@@ -34,7 +34,6 @@ $pdf->SetFontSize($size= $basefontsize * 2);
 $pdf->SetTextColor(0);
 
 # write the name
-$pdf->SetFontSize($size= $basefontsize * 2);
 $pdf->SetTextColor(0);
 $name= utf8_decode($item['name']);
 
@@ -46,6 +45,8 @@ while ($width > ($label_width - $vmargin * 2) && $size) {
 $pdf->Text($left_margin + ($label_width - $width) / 2,
            $vmargin + ($size/72),
            $name);
+
+$pdf->SetFontSize($size= $basefontsize * 2);
 
 # write the prices
 $price= 'List Price $' . $item['retail_price'];
