@@ -150,7 +150,7 @@ $q= "INSERT IGNORE INTO item (code, brand, name, retail_price, active)
             msrp AS retail_price,
             1 AS active
        FROM vendor_order
-      WHERE msrp > 0";
+      WHERE msrp > 0 AND unit != 'AS'";
 $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " items from order.<br>";
