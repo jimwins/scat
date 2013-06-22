@@ -155,6 +155,12 @@ $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " items from order.<br>";
 
+# Make sure all the items are active
+$q= "UPDATE item, vendor_order SET active = 1 WHERE item_no = code";
+$db->query($q)
+  or die_query($db, $q);
+echo "Activated ", $db->affected_rows, " items from order.<br>";
+
 $q= "INSERT IGNORE INTO barcode (item, code, quantity)
      SELECT (SELECT id FROM item WHERE item_no = code) AS item,
             REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS code,
