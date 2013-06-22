@@ -39,6 +39,7 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/jquery.data-selector.js"></script>
  <script src="js/jquery.hotkeys.js"></script>
  <script src="js/jquery.jeditable.mini.js"></script>
+ <script src="js/jquery.html5uploader.js"></script>
  <script src="js/date.js"></script>
  <script src="js/scat.js"></script>
  <script>
