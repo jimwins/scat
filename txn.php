@@ -108,6 +108,14 @@ if ($txn['meta'] == 'vendor') {
  <button>Load</button>
 </form>
 <script>
+$("body").html5Uploader({
+  name: 'src',
+  postUrl: 'api/txn-upload-mac.php?txn=<?=$id?>',
+  onSuccess: function(e, file, response) {
+    j= $.parseJSON(response);
+    $.modal(j.result);
+  },
+});
 $("#upload").on('click', function() {
   $("#upload-form").modal();
 });
@@ -177,3 +185,5 @@ $q= "SELECT id AS meta,
       ORDER BY entered ASC";
 dump_table($db->query($q));
 dump_query($q);
+
+foot();
