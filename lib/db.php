@@ -10,4 +10,10 @@ class ScatDB extends mysqli {
     $row= $r->fetch_row();
     return $row[0];
   }
+
+  public function get_one_assoc($q) {
+    $r= $this->query($q);
+    if (!$r || !$r->num_rows) return false;
+    return $r->fetch_assoc();
+  }
 }
