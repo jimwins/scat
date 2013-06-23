@@ -175,7 +175,8 @@ $q= "INSERT INTO txn_line (txn, item, ordered, retail_price)
             (SELECT id FROM item WHERE code = item_no) item,
             shipped AS ordered, net
        FROM vendor_order
-      WHERE shipped";
+      WHERE shipped
+     HAVING item IS NOT NULL";
 $db->query($q)
   or die_query($db, $q);
 
