@@ -31,6 +31,7 @@ $q= "CREATE TEMPORARY TABLE vendor_order (
        line int,
        status varchar(255),
        item_no varchar(255),
+       item int unsigned,
        sku varchar(255),
        cust_item varchar(255),
        description varchar(255),
@@ -125,11 +126,14 @@ if (preg_match('/^linenum,qty/', $line)) {
 
   echo "Loaded ", $db->affected_rows, " rows from file.<br>";
 } else {
-
+  // MacPherson's order
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
        FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
-       IGNORE 1 LINES";
+       IGNORE 1 LINES
+       (line, status, item_no, sku, cust_item, description, ordered,
+        shipped, backordered, msrp, discount, net, unit, ext, barcode,
+        account_no, po_no, order_no, bo_no, invoice_no, box_no)";
   $db->query($q)
     or die_query($db, $q);
 
@@ -153,8 +157,11 @@ $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " items from order.<br>";
 
-# Make sure all the items are active
-$q= "UPDATE item, vendor_order SET active = 1 WHERE item_no = code";
+# Make sure all the items are active and update order with item ids
+$q= "UPDATE item, vendor_order
+        SET item.active = 1,
+            vendor_order.item = item.id
+      WHERE item_no = code";
 $db->query($q)
   or die_query($db, $q);
 echo "Activated ", $db->affected_rows, " items from order.<br>";
@@ -169,14 +176,20 @@ $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " new barcodes from order.<br>";
 
+# Link items to vendor items
+$q= "UPDATE vendor_item, vendor_order
+        SET vendor_item.item = vendor_order.item
+      WHERE vendor_item.code = vendor_order.item_no";
+$db->query($q)
+  or die_query($db, $q);
+echo "Linked ", $db->affected_rows, " items to vendor items.<br>";
+
 # Add items to order
 $q= "INSERT INTO txn_line (txn, item, ordered, retail_price)
-     SELECT $txn_id txn,
-            (SELECT id FROM item WHERE code = item_no) item,
+     SELECT $txn_id txn, item,
             shipped AS ordered, net
        FROM vendor_order
-      WHERE shipped
-     HAVING item IS NOT NULL";
+      WHERE shipped AND item IS NOT NULL";
 $db->query($q)
   or die_query($db, $q);
 
