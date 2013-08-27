@@ -16,4 +16,8 @@ class ScatDB extends mysqli {
     if (!$r || !$r->num_rows) return false;
     return $r->fetch_assoc();
   }
+
+  public function start_transaction() {
+    return $this->query("START TRANSACTION");
+  }
 }
