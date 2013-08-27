@@ -12,6 +12,8 @@ if ($txn['paid']) {
   die_jsonp("This order is already paid!");
 }
 
+$db->start_transaction();
+
 if (isset($_REQUEST['price'])) {
   $price= $_REQUEST['price'];
   if (preg_match('/^\d*(\/|%)$/', $price)) {
@@ -47,7 +49,24 @@ if (isset($_REQUEST['price'])) {
 }
 
 if (!empty($_REQUEST['quantity'])) {
-  $quantity= (int)$_REQUEST['quantity'];
+  /* special case: #/# lets us split line with two quantities */
+  if (preg_match('!^(\d+)/(\d+)$!', $_REQUEST['quantity'], $m)) {
+    $quantity= (int)$m[2] * ($txn['type'] == 'customer' ? -1 : 1);
+
+    $q= "INSERT INTO txn_line (txn, item, ordered, override_name,
+                               retail_price, discount_type, discount,
+                               discount_manual, taxfree)
+         SELECT txn, item, $quantity, override_name,
+                retail_price, discount_type, discount, discount_manual, taxfree
+           FROM txn_line WHERE txn = $txn_id AND txn_line.id = $id";
+    $r= $db->query($q)
+      or die_query($db, $q);
+
+    $quantity= (int)$m[1];
+  } else {
+    $quantity= (int)$_REQUEST['quantity'];
+  }
+
   $q= "UPDATE txn_line
           SET ordered = -1 * $quantity
         WHERE txn = $txn_id AND txn_line.id = $id";
@@ -65,6 +84,9 @@ if (isset($_REQUEST['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 }
+
+$db->commit()
+  or die_query($db, "COMMIT");
 
 $items= txn_load_items($db, $txn_id);
 
