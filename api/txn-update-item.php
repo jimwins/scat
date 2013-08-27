@@ -30,6 +30,10 @@ if (isset($_REQUEST['price'])) {
                    WHERE vendor_item.item = item.id)";
     $discount_type = "'fixed'";
     $price= 'item.retail_price';
+  } elseif (preg_match('/^(msrp)$/', $price)) {
+    $discount = 'NULL';
+    $discount_type = 'NULL';
+    $price= 'item.retail_price';
   } elseif (preg_match('/^(def|\.\.\.)$/', $price)) {
     $discount = 'item.discount';
     $discount_type = 'item.discount_type';
