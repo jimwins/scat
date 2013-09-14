@@ -11,7 +11,7 @@ $item= item_load($db, $id);
 
 if (!$item) die_json("No such item.");
 
-$left_margin= 0.075;
+$left_margin= 0.0775;
 
 $label_width= 2.0 - $left_margin;
 $label_height= 0.75;
@@ -49,11 +49,14 @@ $pdf->Text($left_margin + ($label_width - $width) / 2,
 $pdf->SetFontSize($size= $basefontsize * 2);
 
 # write the prices
-$price= 'List Price $' . $item['retail_price'];
-$pwidth= $pdf->GetStringWidth($price);
-$pdf->Text($left_margin + ($label_width - $pwidth) / 2,
-           ($size / 72) * 2 + 2/72 + $vmargin,
-           $price);
+if ($item['retail_price'] != $item['sale_price']) {
+  $price= 'List Price $' . $item['retail_price'];
+  $pwidth= $pdf->GetStringWidth($price);
+  $pdf->Text($left_margin + ($label_width - $pwidth) / 2,
+             ($size / 72) * 2 + 2/72 + $vmargin,
+             $price);
+}
+
 $price= 'Our Price $' . ($item['sale_price'] ? $item['sale_price'] : $item['retail_price']);
 $pwidth= $pdf->GetStringWidth($price);
 $pdf->Text($left_margin + ($label_width - $pwidth) / 2,
@@ -65,13 +68,21 @@ if ($item['barcode']) {
   foreach ($item['barcode'] as $code => $quantity) {
     if ($quantity == 1) {
       Barcode($pdf,
-              $left_margin + .3,
+              $left_margin + 0.3,
               $label_height - $vmargin - $basefontsize/72,
-              $code, $basefontsize/72, 1/72, strlen($code));
+              $code, $basefontsize/72, /*1/72*/ 0.01, strlen($code));
       break;
     }
   }
 }
+
+# write the code
+$pdf->SetFontSize($basefontsize);
+$width= $pdf->GetStringWidth($item['code']);
+
+$pdf->Text($label_width - $width,
+           $label_height - $vmargin,
+           $item['code']);
 
 $pdf->Rotate(0);
 
