@@ -11,12 +11,12 @@ $item= item_load($db, $id);
 
 if (!$item) die_json("No such item.");
 
-$left_margin= 0.0775;
+$left_margin= 0.08;
 
 $label_width= 2.0 - $left_margin;
 $label_height= 0.75;
 
-$basefontsize= 5;
+$basefontsize= 9;
 $vmargin= 0.075;
 
 $pdf= new AlphaPDF('P', 'in', array($label_width + $left_margin, $label_height));
@@ -30,7 +30,7 @@ $pdf->SetMargins(0, 0);
 $pdf->SetAutoPageBreak(false);
 
 $pdf->SetFont('Helvetica', '');
-$pdf->SetFontSize($size= $basefontsize * 2);
+$pdf->SetFontSize($size= $basefontsize);
 $pdf->SetTextColor(0);
 
 # write the name
@@ -46,7 +46,7 @@ $pdf->Text($left_margin + ($label_width - $width) / 2,
            $vmargin + ($size/72),
            $name);
 
-$pdf->SetFontSize($size= $basefontsize * 2);
+$pdf->SetFontSize($size= $basefontsize);
 
 # write the prices
 if ($item['retail_price'] != $item['sale_price']) {
@@ -70,14 +70,14 @@ if ($item['barcode']) {
       Barcode($pdf,
               $left_margin + 0.3,
               $label_height - $vmargin - $basefontsize/72,
-              $code, $basefontsize/72, /*1/72*/ 0.01, strlen($code));
+              $code, $basefontsize/2/72, 1/72, strlen($code));
       break;
     }
   }
 }
 
 # write the code
-$pdf->SetFontSize($basefontsize);
+$pdf->SetFontSize($basefontsize/2);
 $width= $pdf->GetStringWidth($item['code']);
 
 $pdf->Text($label_width - $width,
