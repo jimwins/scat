@@ -11,15 +11,15 @@ $item= item_load($db, $id);
 
 if (!$item) die_json("No such item.");
 
-$left_margin= 0.125;
+$left_margin= 0.1375;
 
-$label_width= 2.0 - $left_margin;
+$label_width= 2.0;
 $label_height= 0.75;
 
 $basefontsize= 9;
 $vmargin= 0.075;
 
-$pdf= new AlphaPDF('P', 'in', array($label_width + $left_margin, $label_height));
+$pdf= new AlphaPDF('P', 'in', array($label_width, $label_height));
 
 $pdf->SetCompression(true);
 
@@ -38,11 +38,11 @@ $pdf->SetTextColor(0);
 $name= utf8_decode($item['name']);
 
 $width= $pdf->GetStringWidth($name);
-while ($width > ($label_width - $vmargin * 2) && $size) {
+while ($width > ($label_width - $left_margin* 2) && $size) {
   $pdf->SetFontSize(--$size);
   $width= $pdf->GetStringWidth($name);
 }
-$pdf->Text($left_margin + ($label_width - $width) / 2,
+$pdf->Text(($label_width - $width) / 2,
            $vmargin + ($size/72),
            $name);
 
@@ -52,14 +52,14 @@ $pdf->SetFontSize($size= $basefontsize);
 if ($item['retail_price'] != $item['sale_price']) {
   $price= 'List Price $' . $item['retail_price'];
   $pwidth= $pdf->GetStringWidth($price);
-  $pdf->Text($left_margin + ($label_width - $pwidth) / 2,
+  $pdf->Text(($label_width - $pwidth) / 2,
              ($size / 72) * 2 + 2/72 + $vmargin,
              $price);
 }
 
 $price= 'Our Price $' . ($item['sale_price'] ? $item['sale_price'] : $item['retail_price']);
 $pwidth= $pdf->GetStringWidth($price);
-$pdf->Text($left_margin + ($label_width - $pwidth) / 2,
+$pdf->Text(($label_width - $pwidth) / 2,
            ($size / 72) * 3 + 4/72 + $vmargin,
            $price);
 
@@ -80,7 +80,7 @@ if ($item['barcode']) {
 $pdf->SetFontSize($basefontsize/2);
 $width= $pdf->GetStringWidth($item['code']);
 
-$pdf->Text($label_width - $width,
+$pdf->Text($label_width - $width - $left_margin,
            $label_height - $vmargin,
            $item['code']);
 
