@@ -11,7 +11,7 @@ $item= item_load($db, $id);
 
 if (!$item) die_json("No such item.");
 
-$left_margin= 0.1375;
+$left_margin= 0.175;
 
 $label_width= 2.0;
 $label_height= 0.75;
