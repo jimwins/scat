@@ -203,6 +203,20 @@ $('#remove_payment').on('click', function(ev) {
 </script>
 
 <h2>Activity</h2>
+<button id="create-po">Create Purchase Order</button>
+<script>
+$('#create-po').on('click', function(ev) {
+  var person= $('#person').data('person');
+  $.getJSON("api/txn-create.php?callback=?",
+            { type: 'vendor', person: person.id },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+              }
+              window.location= 'txn.php?id=' + data.txn.id;
+            });
+});
+</script>
 <?
 $q= "SELECT meta, Number\$txn, Created\$date,
             Ordered, Allocated,

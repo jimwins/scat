@@ -79,7 +79,7 @@ $('#create-po').on('submit', function(ev) {
               if (data.error) {
                 $.modal(data.error);
               }
-              window.location.reload();
+              window.location= 'txn.php?id=' + data.txn.id;
             });
 });
 </script>
