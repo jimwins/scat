@@ -97,7 +97,7 @@ if ($item['barcode']) {
 $pdf->SetFontSize($basefontsize/2);
 $width= $pdf->GetStringWidth($item['code']);
 
-$pdf->Text($label_width - $width - $left_margin,
+$pdf->Text($label_width - $width - $left_margin - 2/72,
            $label_height - $vmargin,
            $item['code']);
 
