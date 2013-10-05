@@ -104,6 +104,7 @@ ob_end_flush();
 
 dump_table($r);
 ?>
+<button id="print-price-labels">Print Price Labels</button>
 <script>
 function updateItem(item) {
   $('.' + item.id + ' .name').text(item.name);
@@ -219,6 +220,19 @@ $('tbody').on('dblclick', 'tr td:nth-child(10)', function(ev) {
                 return;
               }
               updateItem(data.item);
+            });
+});
+$('#print-price-labels').on('dblclick', function(ev) {
+  ev.preventDefault();
+  var q= $('#autofocus').val();
+
+  $.getJSON("print/labels-price.php?callback=?",
+            { q: q },
+            function (data) {
+              if (data.error) {
+                $.modal(data.error);
+                return;
+              }
             });
 });
 </script>
