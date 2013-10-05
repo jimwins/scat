@@ -74,7 +74,6 @@ class AlphaPDF extends FPDF
                 $this->_out('Q'); 
             $this->angle=$angle; 
             if($angle!=0) 
-
             { 
                 $angle*=M_PI/180; 
                 $c=cos($angle); 
@@ -82,8 +81,17 @@ class AlphaPDF extends FPDF
                 $cx=$x*$this->k; 
                 $cy=($this->h-$y)*$this->k; 
 
-                $this->_out(sprintf('q %.5f %.5f %.5f %.5f %.2f %.2f cm 1 0 0 1 %.2f %.2f cm',$c,$s,-$s,$c,$cx,$cy,-$cx,-$cy));
+                $this->_out(sprintF('q %.5F %.5F %.5F %.5F %.2F %.2F cm 1 0 0 1 %.2F %.2F cm',$c,$s,-$s,$c,$cx,$cy,-$cx,-$cy));
              } 
           } 
+
+        function _endpage() {
+          if ($this->angle != 0)
+          {
+            $this->angle= 0;
+            $this->_out('Q');
+          }
+          parent::_endpage();
+        }
 }
 ?>
