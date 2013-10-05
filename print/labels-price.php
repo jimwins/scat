@@ -11,13 +11,13 @@ $item= item_load($db, $id);
 
 if (!$item) die_json("No such item.");
 
-$left_margin= 0.175;
+$left_margin= 0.2;
 
 $label_width= 2.0;
 $label_height= 0.75;
 
 $basefontsize= 9;
-$vmargin= 0.075;
+$vmargin= 0.1;
 
 $pdf= new AlphaPDF('P', 'in', array($label_width, $label_height));
 
@@ -46,21 +46,32 @@ $pdf->Text(($label_width - $width) / 2,
            $vmargin + ($size/72),
            $name);
 
-$pdf->SetFontSize($size= $basefontsize);
+$pdf->SetFontSize($size= $basefontsize * 2);
 
 # write the prices
 if ($item['retail_price'] != $item['sale_price']) {
-  $price= 'List Price $' . $item['retail_price'];
+  $price= '$' . $item['retail_price'];
   $pwidth= $pdf->GetStringWidth($price);
-  $pdf->Text(($label_width - $pwidth) / 2,
-             ($size / 72) * 2 + 2/72 + $vmargin,
+  $pdf->Text($left_margin + $vmargin,
+             ($label_height / 2) + ($vmargin),
              $price);
+  $pdf->SetDrawColor(0);
+  $pdf->SetAlpha(0.4);
+  $line_width= 6;
+  $pdf->SetLineWidth($line_width/72);
+  $pdf->Line($left_margin,
+             ($label_height / 2) + $vmargin - ($size/72/2 - $line_width/72/2),
+             $left_margin + $pwidth + $vmargin * 2,
+             ($label_height / 2) + $vmargin - ($size/72/2 - $line_width/72/2)
+            );
+  $pdf->SetAlpha(1);
+
 }
 
-$price= 'Our Price $' . ($item['sale_price'] ? $item['sale_price'] : $item['retail_price']);
+$price= '$' . ($item['sale_price'] ? $item['sale_price'] : $item['retail_price']);
 $pwidth= $pdf->GetStringWidth($price);
-$pdf->Text(($label_width - $pwidth) / 2,
-           ($size / 72) * 3 + 4/72 + $vmargin,
+$pdf->Text($label_width - $left_margin - $pwidth,
+           ($label_height / 2) + ($vmargin),
            $price);
 
 # write the barcode
@@ -68,7 +79,7 @@ if ($item['barcode']) {
   foreach ($item['barcode'] as $code => $quantity) {
     if ($quantity == 1) {
       Barcode($pdf,
-              $left_margin + 0.3,
+              $label_width - $left_margin - (1/72 * 97),
               $label_height - $vmargin - $basefontsize/72,
               $code, $basefontsize/2/72, 1/72, strlen($code));
       break;
