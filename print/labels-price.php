@@ -4,7 +4,7 @@ include '../scat.php';
 include '../lib/item.php';
 
 include '../lib/fpdf/alphapdf.php';
-include '../lib/fpdf/ean13.php';
+include '../lib/php-barcode.php';
 
 if ($q= $_REQUEST['q']) {
   $items= item_find($db, $q, 0);
@@ -24,6 +24,8 @@ $label_height= 0.75;
 
 $basefontsize= 9;
 $vmargin= 0.1;
+
+$dummy = new AlphaPDF('P', 'in', array($label_width, $label_height));
 
 $pdf= new AlphaPDF('P', 'in', array($label_width, $label_height));
 
@@ -91,10 +93,19 @@ foreach ($items as $item) {
   if ($item['barcode']) {
     foreach ($item['barcode'] as $code => $quantity) {
       if ($quantity == 1) {
-        Barcode($pdf,
-                $label_width - $left_margin - (1/72 * 97),
-                $label_height - $vmargin - $basefontsize/72,
-                $code, $basefontsize/2/72, 1/72, strlen($code));
+        $types= array(8 => 'ean8', 12 => 'upc', 13 => 'ean13');
+        $type= $types[strlen($code)];
+        if (!$type) $type= 'code39';
+
+        $info= Barcode::fpdf($dummy, '000000',
+                             0, 0, 0, $type, $code, 
+                             (1/72), $basefontsize/2/72);
+
+        Barcode::fpdf($pdf, '000000',
+                      $label_width - $left_margin - $info['width'] / 2 - 2/72,
+                      $label_height - $vmargin - 7/72,
+                      0 /* angle */, $type,
+                      $code, (1/72), $basefontsize/2/72);
         break;
       }
     }
