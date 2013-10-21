@@ -17,6 +17,8 @@ if ($q= $_REQUEST['q']) {
   if (!$items[0]) die_json("No such item.");
 }
 
+$trim= $_REQUEST['trim'];
+
 $left_margin= 0.2;
 
 $label_width= 2.0;
@@ -41,6 +43,9 @@ foreach ($items as $item) {
 
   // write the name
   $name= utf8_decode($item['name']);
+
+  if ($trim)
+    $name= preg_replace("/$trim/i", '', $name);
 
   $width= $pdf->GetStringWidth($name);
   while ($width > ($label_width - $left_margin * 2) && $size) {
