@@ -120,7 +120,7 @@ if (preg_match('/^linenum,qty/', $line)) {
        IGNORE 1 LINES
        (item_no, description, @msrp, @sale, @net, @qty, @ext)
        SET ordered = @qty, shipped = @qty,
-           msrp = substring(@sale, 2), net = substring(@net, 2)";
+           msrp = REPLACE(@sale, '$', ''), net = REPLACE(@sale, '$', '')";
   $db->query($q)
     or die_query($db, $q);
 
