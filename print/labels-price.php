@@ -75,7 +75,7 @@ foreach ($items as $item) {
              $price);
 
   // retail price, if different
-  if ($item['retail_price'] != $item['sale_price']) {
+  if ($item['sale_price']) {
     $price= '$' . $item['retail_price'];
     $pwidth= $pdf->GetStringWidth($price);
     $pdf->Text($left_margin + $vmargin,
