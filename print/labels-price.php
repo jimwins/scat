@@ -95,26 +95,29 @@ foreach ($items as $item) {
   }
 
   // write the barcode
+  $code= $item['fake_barcode'];
   if ($item['barcode']) {
-    foreach ($item['barcode'] as $code => $quantity) {
+    foreach ($item['barcode'] as $barcode => $quantity) {
       if ($quantity == 1) {
-        $types= array(8 => 'ean8', 12 => 'upc', 13 => 'ean13');
-        $type= $types[strlen($code)];
-        if (!$type) $type= 'code39';
-
-        $info= Barcode::fpdf($dummy, '000000',
-                             0, 0, 0, $type, $code, 
-                             (1/72), $basefontsize/2/72);
-
-        Barcode::fpdf($pdf, '000000',
-                      $label_width - $left_margin - $info['width'] / 2 - 2/72,
-                      $label_height - $vmargin - 7/72,
-                      0 /* angle */, $type,
-                      $code, (1/72), $basefontsize/2/72);
+        $code= $barcode;
         break;
       }
     }
   }
+
+  $types= array(8 => 'ean8', 12 => 'upc', 13 => 'ean13');
+  $type= $types[strlen($code)];
+  if (!$type) $type= 'code39';
+
+  $info= Barcode::fpdf($dummy, '000000',
+                       0, 0, 0, $type, $code,
+                       (1/72), $basefontsize/2/72);
+
+  Barcode::fpdf($pdf, '000000',
+                $label_width - $left_margin - $info['width'] / 2 - 2/72,
+                $label_height - $vmargin - 7/72,
+                0 /* angle */, $type,
+                $code, (1/72), $basefontsize/2/72);
 
   // write the code
   $pdf->SetFontSize($size= $basefontsize/2);
