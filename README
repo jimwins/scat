@@ -27,6 +27,9 @@ Scat includes FPDF for PDF generation:
 Scat inclues BarCode Coder Library for barcode generation:
   http://barcode-coder.com/
 
+Scat includes the Knockout JavaScript MVVM library:
+  http://knockoutjs.com/
+
 Scat includes icons from the Silk icon set by Mark James:
   http://www.famfamfam.com/lab/icons/silk/
 
