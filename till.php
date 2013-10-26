@@ -5,11 +5,20 @@ head("till");
 
 $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) FROM payment
       WHERE method IN ('cash','change','withdrawal')";
-$r= $db->query($q)
+$current= $db->get_one($q)
   or die($db->error);
 
-$row= $r->fetch_row();
-$current= $row[0];
+$q= "SELECT created FROM txn
+      WHERE type = 'drawer'
+      ORDER BY id DESC
+      LIMIT 1";
+$last_txn= $db->get_one($q)
+  or die($db->error);
+
+$q= "SELECT COUNT(*)
+       FROM payment
+      WHERE method = 'check' AND processed > '$last_txn'";
+$checks= $db->get_one($q);
 
 $count= $_REQUEST['count'];
 $withdrawal= $_REQUEST['withdrawal'];
@@ -59,11 +68,8 @@ if (!empty($count) && !empty($withdrawal)) {
 
   $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) FROM payment
         WHERE method IN ('cash','change','withdrawal')";
-  $r= $db->query($q)
+  $current= $db->get_one($q)
     or die($db->error);
-
-  $row= $r->fetch_row();
-  $current= $row[0];
 
   ?>
 <div class="error">Till update successful!</div>
@@ -76,12 +82,43 @@ if (!empty($count) && !empty($withdrawal)) {
 }
 ?>
 <form method="post" action="./till.php">
- Count: <input type="text" name="count" value="<?=$current?>">
+ Expected: <input type="text" disabled data-bind="value: expected">
  <br>
- Withdrawal: <input type="text" name="withdrawal" value="0.00">
+ Counted: <input id="focus" type="text" name="count" data-bind="value: current">
  <br>
+ Over/Short: <input type="text" disabled data-bind="value: overshort">
+ <br>
+ Withdrawal: <input type="text" name="withdrawal" data-bind="value: withdraw">
+ <br>
+ Remaining: <input type="text" disabled data-bind="value: remaining">
+ <br>
+ <div data-bind="visible: checks, text: checks_pending"></div>
  <input type="submit" value="Kaching">
 </form>
 
+<script src="lib/knockout/knockout-3.0.0.js"></script>
+<script>
+var tillModel= function(expected, checks) {
+  this.expected= ko.observable(expected);
+  this.current= ko.observable(expected);
+  this.withdraw= ko.observable(0.00);
+  this.checks= ko.observable(checks);
+
+  this.overshort= ko.computed(function() {
+    return (this.current() - this.expected()).toFixed(2);
+  }, this);
+
+  this.remaining= ko.computed(function() {
+    return (this.current() - this.withdraw()).toFixed(2);
+  }, this);
+
+  this.checks_pending= ko.computed(function() {
+    return "(" + this.checks() + " check" + ((this.checks() > 1) ? 's' : '')
+           + " pending)";
+  }, this);
+};
+
+ko.applyBindings(new tillModel(<?=$current.','.(int)$checks?>));
+</script>
 <?
 foot();
