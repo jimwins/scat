@@ -5,6 +5,10 @@ require 'lib/txn.php';
 head("Scat");
 ?>
 <style>
+.admin {
+  display: none;
+}
+
 .choices, .errors {
   margin: 8px 4px;
   padding: 6px;
@@ -334,6 +338,7 @@ function updateTotal() {
 
     if (payment.method == 'credit') {
       $('.payment-buttons', row).append($('<button name="print">Print</button>'));
+      $('.payment-buttons', row).append($('<button class="admin" name="remove">Remove</button>'));
     }
     if (payment.method == 'discount') {
       $('.payment-buttons', row).append($('<button name="remove">Remove</button>'));
@@ -493,6 +498,9 @@ function printChargeRecord(id) {
 $(function() {
   $('#txn').data('tax_rate', 0.00);
 
+  $(document).bind('keydown', 'meta+shift+a', function(ev) {
+    $('.admin').toggle();
+  });
   $(document).bind('keydown', 'meta+p', function(ev) {
     return printReceipt();
   });
@@ -1273,7 +1281,8 @@ $("#items").on("click", ".payment-row button[name='print']", function() {
 $("#items").on("click", ".payment-row button[name='remove']", function() {
   var row= $(this).closest(".payment-row");
   $.getJSON("api/txn-remove-payment.php?callback=?",
-            { txn: $("#txn").data("txn"), id: row.data("id") },
+            { txn: $("#txn").data("txn"), id: row.data("id"),
+              admin: ($(".admin").is(":visible") ? 1 : 0) },
             function (data) {
               if (data.error) {
                 $.modal(data.error);
