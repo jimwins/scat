@@ -338,11 +338,8 @@ function updateTotal() {
 
     if (payment.method == 'credit') {
       $('.payment-buttons', row).append($('<button name="print">Print</button>'));
-      $('.payment-buttons', row).append($('<button class="admin" name="remove">Remove</button>'));
     }
-    if (payment.method == 'discount') {
-      $('.payment-buttons', row).append($('<button name="remove">Remove</button>'));
-    }
+    $('.payment-buttons', row).append($('<button class="admin" name="remove">Remove</button>'));
 
     $('#due-row').before(row);
   });
