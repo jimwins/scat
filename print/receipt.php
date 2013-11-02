@@ -32,10 +32,9 @@ header, footer {
   text-align:center;
 }
 #store_name {
-  font-size:2.5em;
+  font-size:1.5em;
   font-weight:bold;
-  font-family: impact;
-  text-transform: lowercase;
+  font-family: 'Directa Serif';
 }
 table#products {font-size:1em; width:100%; margin:2em 0;
         border-top:2px solid #000; border-bottom:2px solid #000; border-left:0; border-right:0;}
@@ -59,13 +58,13 @@ tr.total td {border-top:solid #000 6px; text-align:right; font-weight:;}
 
 </style>
 <div id="doc_header">
-  <div id="store_name">Raw Materials</div>
+  <div id="store_name">Raw Materials Art Supplies</div>
   436 South Main Street<br>
   Los Angeles, CA 90013<br>
-  (213) 627-7223<br>
+  (800) 729-7060<br>
   M-F 11-7, Sat 11-6, Sun 12-5<br>
-  info@rawmaterialsLA.com<br>
-  http://rawmaterialsLA.com/
+  info@RawMaterialsLA.com<br>
+  http://RawMaterialsLA.com/
 </div>
 <?
 
@@ -181,5 +180,5 @@ foreach ($payments as $payment) {
 Items purchased from stock may be returned in original condition and packaging
 within 30 days with receipt. Assembled easels are subject to a 20% restocking fee. No returns without original receipt.
 <br><br>
-http://rawmaterialsLA.com/
+http://RawMaterialsLA.com/
 </div>

@@ -31,10 +31,9 @@ header, footer {
   text-align:center;
 }
 #store_name {
-  font-size:2.5em;
+  font-size:1.5em;
   font-weight:bold;
-  font-family: impact;
-  text-transform: lowercase;
+  font-family: 'Directa Serif';
 }
 table {font-size:larger; width:100%; padding:2em 0;
         border-bottom:2px solid #000; border-left:0; border-right:0;}
@@ -58,12 +57,12 @@ tr.total td, tr.total th {border-top:solid #000 6px; }
 
 </style>
 <div id="doc_header">
-  <div id="store_name">Raw Materials</div>
+  <div id="store_name">Raw Materials Art Supplies</div>
   436 South Main Street<br>
   Los Angeles, CA 90013<br>
-  (213) 627-7223<br>
-  info@rawmaterialsLA.com<br>
-  http://rawmaterialsLA.com/
+  (800) 729-7060<br>
+  info@RawMaterialsLA.com<br>
+  http://RawMaterialsLA.com/
 </div>
 <div style="font-size: 1.5em; text-align: center">DEPOSIT</div>
 <?

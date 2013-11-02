@@ -17,7 +17,7 @@ $details= txn_load($db, $id);
 <?if ($_GET['print']) {?>
 <body onload="window.print()">
 <?}?>
-<div id="store_name">Raw Materials</div>
+<div id="store_name">Raw Materials Art Supplies</div>
 <div id="doc_header">
  <div id="doc_info">
   <span id="doc_name"><?=($details['type'] == 'vendor') ? 'PO' : 'Invoice'?> <?=ashtml($details['formatted_number'])?></span>
@@ -31,9 +31,9 @@ $details= txn_load($db, $id);
   <b>Raw Materials</b><br>
   436 South Main Street<br>
   Los Angeles, CA 90013<br>
-  (213) 627-7223<br>
-  info@rawmaterialsLA.com<br>
-  http://rawmaterialsLA.com/
+  (800) 729-7060<br>
+  info@RawMaterialsLA.com<br>
+  http://RawMaterialsLA.com/
  </div>
  <div id="client_info">
 <?
@@ -141,6 +141,6 @@ Items purchased from stock may be returned in original condition and packaging
 within 30 days with receipt. No returns without original receipt.
 <br><br>
 <?}?>
-http://rawmaterialsLA.com/
+http://RawMaterialsLA.com/
 </div>
 
