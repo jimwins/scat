@@ -87,6 +87,17 @@ if (count($items) == 1) {
     $items[0]['line_id']= $db->insert_id;
   }
 
+  if ($items[0]['sale_price']) {
+    $sock= socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+    if (@socket_connect($sock, '127.0.0.1', 1888)) {
+      $product= $items[0]['name'];
+      $price= $items[0]['sale_price'];
+      socket_write($sock,
+                   sprintf("\x0d\x0a%-19.19s\x0a\x0d$%18.2f ",
+                           $product, $price));
+    }
+  }
+
   $txn= txn_load($db, $txn_id);
   $items= txn_load_items($db, $txn_id);
 
