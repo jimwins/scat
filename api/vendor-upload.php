@@ -21,6 +21,9 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     retail_price DECIMAL(9,2),
     net_price DECIMAL(9,2),
     promo_price DECIMAL(9,2),
+    pending_msrp DECIMAL(9,2),
+    pending_date VARCHAR(32),
+    pending_net DECIMAL(9,2),
     barcode VARCHAR(32),
     purchase_quantity INT,
     category VARCHAR(64))";
@@ -38,7 +41,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            retail_price, net_price, @customer, @product_code_type,
            barcode, @reno, @elgin, @atl, @catalog_code,
            @purchase_unit, purchase_quantity,
-           @customer_item_no, @pending_msrp, @pending_date, @pending_net,
+           @customer_item_no, pending_msrp, pending_date, pending_net,
            promo_price, @promo_name,
            @abc_flag, @vendor, @group_code, category)";
 
@@ -86,6 +89,33 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   echo jsonp(array("result" => "Updated " . $db->affected_rows . " items."));
 
   exit;
+
+} elseif (preg_match('/^ma-sku/i', $_FILES['src']['name'])) {
+  $q= "CREATE TEMPORARY TABLE macitem (
+    item_no VARCHAR(32),
+    sku VARCHAR(10),
+    name VARCHAR(255),
+    retail_price DECIMAL(9,2),
+    net_price DECIMAL(9,2),
+    promo_price DECIMAL(9,2),
+    barcode VARCHAR(32),
+    purchase_quantity INT,
+    category VARCHAR(64))";
+
+  $db->query($q)
+    or die_query($db, $q);
+
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+            INTO TABLE macitem
+          FIELDS TERMINATED BY ','
+          IGNORE 1 LINES
+          (item_no, name, @retail_price, @l1net, net_price,
+           @upp, @ppc, @weight, barcode, @wt_each,
+           @length, @width, @height, purchase_quantity)
+          SET retail_price = SUBSTRING(@retail_price, 2)";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
 
 } else {
   $q= "CREATE TEMPORARY TABLE macitem (
