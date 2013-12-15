@@ -116,11 +116,11 @@ if (preg_match('/^linenum,qty/', $line)) {
   // CSV
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
-       FIELDS TERMINATED BY ','
+       FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
        IGNORE 1 LINES
-       (item_no, description, @msrp, @sale, @net, @qty, @ext)
+       (item_no, description, @msrp, @sale, @net, @qty, @ext, barcode)
        SET ordered = @qty, shipped = @qty,
-           msrp = REPLACE(@sale, '$', ''), net = REPLACE(@sale, '$', '')";
+           msrp = REPLACE(@msrp, '$', ''), net = REPLACE(@net, '$', '')";
   $db->query($q)
     or die_query($db, $q);
 
