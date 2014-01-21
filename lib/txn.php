@@ -20,7 +20,10 @@ function txn_load_full($db, $id) {
 function txn_load($db, $id) {
   $q= "SELECT id, type,
               number, created, filled, paid, returned_from,
-              CONCAT(DATE_FORMAT(created, '%Y-'), number) AS formatted_number,
+              IF(type = 'vendor' && YEAR(created) > 2013,
+                 CONCAT(SUBSTRING(YEAR(created), 3, 2), number),
+                 CONCAT(DATE_FORMAT(created, '%Y-'), number))
+                AS formatted_number,
               person, person_name,
               IFNULL(ordered, 0) ordered, allocated,
               taxed, untaxed,
