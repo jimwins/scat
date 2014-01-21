@@ -89,17 +89,18 @@ foreach ($items as $item) {
        '<td class="right">', amount($item['ext_price']), '</td>',
        "</tr>\n";
 }
+$span= ($details['type'] == 'vendor') ? 4 : 3;
 ?>
   <tr class="sub">
-   <td class="right" colspan="3">Subtotal:</td>
+   <td class="right" colspan="<?=$span?>">Subtotal:</td>
    <td class="price"><?=amount($details['subtotal'])?></td>
   </tr>
   <tr>
-   <td class="right" colspan="3">Sales Tax (<?=$details['tax_rate']?>%):</td>
+   <td class="right" colspan="<?=$span?>">Sales Tax (<?=$details['tax_rate']?>%):</td>
    <td class="price"><?=amount($details['total'] - $details['subtotal'])?></td>
   </tr>
   <tr class="total">
-   <td class="right" colspan="3">Total:</td>
+   <td class="right" colspan="<?=$span?>">Total:</td>
    <td class="price"><?=amount($details['total'])?></td>
   </tr>
 <?
