@@ -135,7 +135,7 @@ $('tbody tr .name').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'dblclick', style: 'display: inline' });
+}, { event: 'click', style: 'display: inline' });
 $('tbody tr .brand').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
@@ -149,7 +149,7 @@ $('tbody tr .brand').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'dblclick', style: 'display: inline', type: 'select', submit: 'OK',
+}, { event: 'click', style: 'display: inline', type: 'select', submit: 'OK',
 loadurl: 'api/brand-list.php', placeholder: '' });
 $('tbody tr td:nth-child(5)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
@@ -164,7 +164,7 @@ $('tbody tr td:nth-child(5)').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'dblclick', style: 'display: inline', placeholder: '', });
+}, { event: 'click', style: 'display: inline', placeholder: '', });
 $('tbody tr .discount').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
@@ -178,7 +178,7 @@ $('tbody tr .discount').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'dblclick', style: 'display: inline', placeholder: '', });
+}, { event: 'click', style: 'display: inline', placeholder: '', });
 $('tbody tr td:nth-child(8)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
@@ -192,7 +192,7 @@ $('tbody tr td:nth-child(8)').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'dblclick', style: 'display: inline' });
+}, { event: 'click', style: 'display: inline' });
 $('tbody tr td:nth-child(9)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
@@ -206,8 +206,8 @@ $('tbody tr td:nth-child(9)').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'dblclick', style: 'display: inline' });
-$('tbody').on('dblclick', 'tr td:nth-child(10)', function(ev) {
+}, { event: 'click', style: 'display: inline' });
+$('tbody').on('click', 'tr td:nth-child(10)', function(ev) {
   ev.preventDefault();
   var item= $(this).closest('tr').attr('class');
   var val= $("img", this).data('truth');
@@ -222,7 +222,7 @@ $('tbody').on('dblclick', 'tr td:nth-child(10)', function(ev) {
               updateItem(data.item);
             });
 });
-$('#print-price-labels').on('dblclick', function(ev) {
+$('#print-price-labels').on('click', function(ev) {
   ev.preventDefault();
   var q= $('#autofocus').val();
 
