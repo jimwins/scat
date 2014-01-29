@@ -180,3 +180,56 @@ function txn_load_notes($db, $id) {
 
   return $payments;
 }
+
+function txn_apply_discounts($db, $id) {
+  $txn= txn_load($db, $id);
+
+  if (!$txn || $txn['paid']) {
+    // XXX better error handling
+    return false;
+  }
+
+  // XXX store this somewhere else, obviously
+  $discounts= array(
+    'MXG-%'  => array(12 => '6.99', 72 => '5.99'),
+    'MTEX%' => array(12 => '5.99', 72 => '4.99'),
+  );
+
+  foreach ($discounts as $code => $breaks) {
+    $count= $db->get_one("SELECT ABS(SUM(ordered))
+                            FROM txn_line
+                            JOIN item ON txn_line.item = item.id
+                           WHERE txn = $id
+                             AND code LIKE '$code'
+                             AND NOT discount_manual");
+
+    $new_discount= 0;
+
+    foreach ($breaks as $qty => $discount) {
+      if ($count >= $qty && (!$new_discount || $discount < $new_discount)) {
+        $new_discount= $discount;
+      }
+    }
+
+    if ($new_discount) {
+      $q= "UPDATE txn_line, item
+              SET txn_line.discount = $new_discount,
+                  txn_line.discount_type = 'fixed'
+            WHERE txn = $id AND txn_line.item = item.id
+              AND code LIKE '$code'
+              AND NOT discount_manual";
+    } else {
+      $q= "UPDATE txn_line, item
+              SET txn_line.discount = item.discount,
+                  txn_line.discount_type = item.discount_type
+            WHERE txn = $id AND txn_line.item = item.id
+              AND code LIKE '$code'
+              AND NOT discount_manual";
+    }
+
+    $db->query($q)
+      or die_query($db, $q);
+  }
+
+  return true;
+}

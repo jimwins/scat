@@ -6,36 +6,8 @@ $id= (int)$_REQUEST['txn'];
 if (!$id)
   die_jsonp("no transaction specified.");
 
-$txn= txn_load($db, $id);
-
-if ($txn['paid']) {
-  die_jsonp("This order is already paid!");
-}
-
-$count= $db->get_one("SELECT ABS(SUM(ordered))
-                        FROM txn_line
-                        JOIN item ON txn_line.item = item.id
-                       WHERE txn = $id
-                         AND code LIKE 'MXG-%'");
-if ($count >= 50) {
-  $q= "UPDATE txn_line, item
-          SET txn_line.discount = 6.93, txn_line.discount_type = 'fixed'
-        WHERE txn = $id AND txn_line.item = item.id AND code LIKE 'MXG-%'";
-  $db->query($q)
-    or die_query($db, $q);
-} elseif ($count >= 12) {
-  $q= "UPDATE txn_line, item
-          SET txn_line.discount = 7.35, txn_line.discount_type = 'fixed'
-        WHERE txn = $id AND txn_line.item = item.id AND code LIKE 'MXG-%'";
-  $db->query($q)
-    or die_query($db, $q);
-} else {
-  $q= "UPDATE txn_line, item
-          SET txn_line.discount = item.discount,
-              txn_line.discount_type = item.discount_type
-        WHERE txn = $id AND txn_line.item = item.id AND code LIKE 'MXG-%'";
-  $db->query($q)
-    or die_query($db, $q);
+if (!txn_apply_discounts($db, $id)) {
+  die_jsonp("Unable to apply discounts.");
 }
 
 $txn= txn_load_full($db, $id);

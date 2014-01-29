@@ -20,24 +20,35 @@ if (isset($_REQUEST['price'])) {
     $discount = (float)$price;
     $discount_type = "'percentage'";
     $price= 'IF(item.retail_price, item.retail_price, txn_line.retail_price)';
+    $discount_manual= 1;
   } elseif (preg_match('/^\d*\.?\d*$/', $price)) {
-    $price= (float)$price;
-    $discount_type= 'NULL';
-    $discount= 'NULL';
+    if ($txn['type'] == 'vendor') {
+      $price= (float)$price;
+      $discount_type= 'NULL';
+      $discount= 'NULL';
+    } else {
+      $discount= (float)$price;
+      $price= 'IF(item.retail_price, item.retail_price, txn_line.retail_price)';
+      $discount_type= "'fixed'";
+    }
+    $discount_manual= 1;
   } elseif (preg_match('/^(cost)$/', $price)) {
     $discount = "(SELECT MIN(net_price)
                     FROM vendor_item
                    WHERE vendor_item.item = item.id)";
     $discount_type = "'fixed'";
     $price= 'item.retail_price';
+    $discount_manual= 1;
   } elseif (preg_match('/^(msrp)$/', $price)) {
     $discount = 'NULL';
     $discount_type = 'NULL';
     $price= 'item.retail_price';
+    $discount_manual= 1;
   } elseif (preg_match('/^(def|\.\.\.)$/', $price)) {
     $discount = 'item.discount';
     $discount_type = 'item.discount_type';
     $price= 'item.retail_price';
+    $discount_manual= 0;
   } else {
     die_jsonp("Did not understand price.");
   }
@@ -45,7 +56,8 @@ if (isset($_REQUEST['price'])) {
   $q= "UPDATE txn_line, item
           SET txn_line.retail_price = $price,
               txn_line.discount_type = $discount_type,
-              txn_line.discount = $discount 
+              txn_line.discount = $discount,
+              txn_line.discount_manual = $discount_manual
         WHERE txn = $txn_id AND txn_line.id = $id AND txn_line.item = item.id";
 
   $r= $db->query($q)
@@ -88,6 +100,9 @@ if (isset($_REQUEST['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 }
+
+txn_apply_discounts($db, $txn_id)
+  or die_jsonp("Failed to apply discounts.");
 
 $db->commit()
   or die_query($db, "COMMIT");

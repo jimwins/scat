@@ -64,7 +64,6 @@ tfoot td {
 /* Hide/show some elements from paid invoices. */
 #txn.paid .remove,
 #txn.paid #pay,
-#txn.paid #bulk,
 #txn.paid .choices, #txn.paid .errors
 {
   display: none;
@@ -246,6 +245,7 @@ $(document).on('click', '.remove', function() {
               }
               row.remove();
               updateOrderData(data.txn);
+              updateItems(data.items);
               updateTotal();
             });
 
@@ -681,7 +681,6 @@ $("#txn-load").submit(function(ev) {
 <div id="sale-buttons">
   <button id="invoice">Invoice</button>
   <button id="print">Print</button>
-  <button id="bulk">Bulk</button>
   <button id="pay">Pay</button>
   <button id="return">Return</button>
 </div>
@@ -737,18 +736,6 @@ $("#return").on("click", function() {
     return false;
   }
   $.getJSON("api/txn-return.php?callback=?",
-            { txn: txn },
-            function (data) {
-              if (data.error) {
-                $.modal(data.error);
-              } else {
-                loadOrder(data);
-              }
-            });
-});
-$("#bulk").on("click", function() {
-  var txn= $('#txn').data('txn');
-  $.getJSON("api/txn-apply-discounts.php?callback=?",
             { txn: txn },
             function (data) {
               if (data.error) {

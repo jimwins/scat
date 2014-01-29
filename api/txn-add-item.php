@@ -87,6 +87,9 @@ if (count($items) == 1) {
     $items[0]['line_id']= $db->insert_id;
   }
 
+  // XXX error handling
+  txn_apply_discounts($db, $txn_id);
+
   if ($items[0]['sale_price']) {
     $sock= socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
     if (@socket_connect($sock, '127.0.0.1', 1888)) {

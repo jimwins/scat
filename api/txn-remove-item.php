@@ -22,6 +22,10 @@ if (!$db->affected_rows) {
   die_jsonp("Unable to delete line.");
 }
 
-$txn= txn_load($db, $txn_id);
+// XXX error handling
+txn_apply_discounts($db, $txn_id);
 
-echo jsonp(array('txn' => $txn, 'removed' => $id));
+$txn= txn_load_full($db, $txn_id);
+$txn['removed']= $id;
+
+echo jsonp($txn);
