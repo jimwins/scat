@@ -27,9 +27,9 @@ if (isset($_REQUEST['price'])) {
       $discount_type= 'NULL';
       $discount= 'NULL';
     } else {
-      $discount= (float)$price;
-      $price= 'IF(item.retail_price, item.retail_price, txn_line.retail_price)';
-      $discount_type= "'fixed'";
+      $discount= 'IF(item.retail_price, ' . (float)$price . ', NULL)';
+      $discount_type= 'IF(item.retail_price, "fixed", NULL)';
+      $price=    'IF(item.retail_price, item.retail_price, ' . (float)$price . ')';
     }
     $discount_manual= 1;
   } elseif (preg_match('/^(cost)$/', $price)) {
