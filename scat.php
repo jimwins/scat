@@ -27,12 +27,12 @@ header("content-type: text/html;charset=utf-8");?>
 <html>
 <head>
  <title><?=ashtml($title)?></title>
+ <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+ <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
  <link rel="stylesheet" type="text/css" href="static/screen.css">
  <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/base/jquery-ui.css">
  <script src="js/jquery.min.js"></script>
-<?if ($GLOBALS['DEBUG']) {?>
- <script src="http://code.jquery.com/jquery-migrate-1.1.1.js"></script>
-<?}?>
+ <script src="js/bootstrap.min.js"></script>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
@@ -49,6 +49,8 @@ $(document).ready(function() {
   // SimpleModal defaults
   $.modal.defaults.position= [ '25%', '25%' ];
   $.modal.defaults.overlayClose= true;
+  $.modal.defaults.minWidth= 600;
+  $.modal.defaults.minHeight= 200;
   // Focus the #focus item
   $("#focus").focus();
 }); 
@@ -61,8 +63,6 @@ $(document).ready(function() {
 <?} else {?>
 <header>
 <?}?>
-<?/*<a href="./" title="New Sale"><img src="./icons/house.png" width="16" height="16" alt="New Sale"> New Sale</a>
-&nbsp;*/?>
 <a href="./" title="New Sale"><img src="./icons/cart.png" width="16" height="16" alt="New Sale"> New Sale</a>
 &nbsp;
 <a href="./items.php" title="Items"><img src="./icons/tag_blue.png" width="16" height="16" alt="Items"> Items</a>
