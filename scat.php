@@ -31,6 +31,14 @@ header("content-type: text/html;charset=utf-8");?>
  <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
  <link rel="stylesheet" type="text/css" href="static/screen.css">
  <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/base/jquery-ui.css">
+<?if ($GLOBALS['DEBUG']) {?>
+  <link rel="stylesheet" type="text/css" href="css/debug.css">
+<?}?>
+ <style type="text/css">
+   body.page {
+     padding-top: 70px;
+   }
+ </style>
  <script src="js/jquery.min.js"></script>
  <script src="js/bootstrap.min.js"></script>
  <script src="js/jquery-ui.min.js"></script>
@@ -56,27 +64,34 @@ $(document).ready(function() {
 }); 
  </script>
 </head>
-<body>
-<?if ($GLOBALS['DEBUG']) {?>
-<header class="debug">
-  <span style="float: right; color: #900; padding-right: 100px; font-weight: bold">DEBUG</span>
-<?} else {?>
-<header>
-<?}?>
-<a href="./" title="New Sale"><img src="./icons/cart.png" width="16" height="16" alt="New Sale"> New Sale</a>
-&nbsp;
-<a href="./items.php" title="Items"><img src="./icons/tag_blue.png" width="16" height="16" alt="Items"> Items</a>
-&nbsp;
-<a href="./person.php" title="People"><img src="./icons/group.png" width="16" height="16" alt="People"> People</a>
-&nbsp;
-<a href="./txns.php" title="Transactions"><img src="./icons/table.png" width="16" height="16" alt="Transactions"> Transactions</a>
-&nbsp;
-<a href="./till.php" title="Till"><img src="./icons/money.png" width="16" height="16" alt="Till"> Till</a>
-&nbsp;
-<a href="#" onclick="return false" id="reports" title="Reports"><img src="./icons/report.png" width="16" height="16" alt="Reports"> Reports</a>
+<body class="page">
+<header class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <span class="navbar-brand">Scat</span>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul id="navbar" class="nav navbar-nav">
+          <li><a href="./">New Sale</a></li>
+          <li><a href="./items.php">Items</a></li>
+          <li><a href="./person.php">People</a></li>
+          <li><a href="./txns.php">Transactions</a></li>
+          <li><a href="./till.php">Till</a></li>
+          <li><a id="reports" href="./report.php">Reports</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </header>
 <script>
-$("header #reports").on('click', function() {
+$("header #reports").on('click', function(ev) {
+  ev.preventDefault();
   $.getJSON("./api/report-sales.php?callback=?",
             { days: 7 },
             function(data) {
@@ -94,6 +109,9 @@ $("header #reports").on('click', function() {
             });
 });
 </script>
+<?if ($GLOBALS['DEBUG']) {?>
+  <div id="corner-banner">DEBUG</div>
+<?}?>
 <?
 }
 

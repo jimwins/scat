@@ -1,32 +1,7 @@
 body {
- background: #ba9d6c;
+ background: #eee;
  padding-top: 28px;
  padding-bottom: 28px;
-}
-
-header {
- width: 100%;
- position: fixed;
- top: 0;
- left: 0;
- padding: 4px 16px;
- background: #d2c09f;
- -webkit-box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
-}
-header.debug {
-background: #d99;
-}
-header a img {
- border: none;
- vertical-align: top;
-}
-header a {
-  text-decoration: none;
-  color: #339;
-}
-header a:hover {
-  text-decoration: underline;
-  color: #c33;
 }
 
 footer {
@@ -36,7 +11,7 @@ footer {
   bottom: 0;
   font-size: smaller;
   color: #666;
-  background: #d2c09f;
+  background: #ddd;
   border-top: 1px solid rgba(0,0,0,0.2);
   padding: 4px 16px;
 }
@@ -111,17 +86,8 @@ button:hover, input[type="submit"]:hover {
   background-color:#000;
 }
 #simplemodal-container {
-  background: #d2c09f;
+  background: #ddd;
   -webkit-box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
   border-radius: 10px;
   padding:12px;
-}
-
-@media screen and (max-device-width: 480px) {
-  body {
-    -webkit-text-size-adjust: none;
-    padding: 5px;
-    font-size: 2em;
-  }
-  header, footer { display: none; }
 }
