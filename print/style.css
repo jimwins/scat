@@ -13,8 +13,8 @@ table {border:none;}
 #doc_header {margin:0 0 40px 0;}
 #doc_info {width:40%; float:left;}
 	#doc_name {display:block; font-size:2em; font-weight:bold;}
-#store_info {width:27%; float:left; min-height:6em; background-color:; border-left:1px solid #000; padding-left:5px;}
-#client_info {width:27%; float:left; min-height:6em; background-color:; border-left:1px solid #000; padding-left:5px;}
+#store_info {width:27%; float:left; min-height:6em; border-left:1px solid #000; padding-left:5px;}
+#client_info {width:27%; float:left; min-height:6em; border-left:1px solid #000; padding-left:5px;}
 
 /* product table
 ----------------*/
@@ -34,7 +34,7 @@ table {border:none;}
 /* document footer
 ------------------*/
 #doc_total {margin:20px 0 0 0;}
-#store_employee {float:left; background-color:;}
+#store_employee {float:left;}
 
 /* document total
 -----------------*/
@@ -46,7 +46,7 @@ tr.total td {font-size:1.2em; font-weight:bold; border-top:double #aaa;}
 tr.totalheader td {font-size:1.2em; font-weight:bold; text-align:right; border-bottom:single #aaa;}
 
 #received {}
-#onorder {background-color:; margin-right:20px;}
+#onorder {margin-right:20px;}
 
 /* store footer
 ---------------*/
