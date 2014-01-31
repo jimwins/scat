@@ -58,9 +58,9 @@ function loadPerson(person) {
   $('#person').data('person', person);
   var active= parseInt(person.active);
   if (active) {
-    $('#person #active').attr('src', 'icons/accept.png');
+    $('#person #active').removeClass('fa-square-o').addClass('fa-check-square-o');
   } else {
-    $('#person #active').attr('src', 'icons/cross.png');
+    $('#person #active').removeClass('fa-check-square-o').addClass('fa-square-o');
   }
   $('#person #name').text(person.name);
   $('#person #company').text(person.company);
@@ -84,7 +84,7 @@ $(function() {
 <table id="person">
   <tr class="<?=($person['deleted'] ? 'deleted' : '');?>">
    <th>Name:</th>
-   <td><span id="name" class="editable"></span><img id="active" align="right" src="icons/accept.png" height="16" width="16"></td>
+   <td><span id="name" class="editable"></span><i id="active" class="pull-right fa fa-check-square-o"></i></td>
   </tr>
   <tr>
    <th>Company:</th>

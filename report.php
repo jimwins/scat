@@ -20,7 +20,7 @@ Items: <input id="items" name="items" type="text">
 </form>
 <br>
 <table id="results-template" style="display: none">
- <caption><span>All Sales</span><img align="right" onclick="$(this).closest('table').remove(); return false" src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Close"></caption>
+ <caption><span>All Sales</span><button type="button" class="close" align="right" onclick="$(this).closest('table').remove(); return false" title="Close">&times;</button></caption>
  <thead>
   <tr><th>When</th><th>Subtotal</th><th>Resale</th><th>Tax</th><th>Total</th></tr>
  </thead>

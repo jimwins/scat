@@ -37,16 +37,16 @@ $(function() {
 });
 
 var protoBarcodeRow= $('<tr><td></td><td class="quantity"></td><td>' +
-                       '<img align="right" class="remove" src="icons/delete.png" width="16" height="16">' +
+                       '<i class="remove fa fa-minus-square-o"></i>' +
                        '</td></tr>');
 
 function loadItem(item) {
   $('#item').data('item', item);
   var active= parseInt(item.active);
   if (active) {
-    $('#item #active').attr('src', 'icons/accept.png');
+    $('#item #active').removeClass('fa-square-o').addClass('fa-check-square-o');
   } else {
-    $('#item #active').attr('src', 'icons/cross.png');
+    $('#item #active').removeClass('fa-check-square-o').addClass('fa-square-o');
   }
   $('#item #code').text(item.code);
   $('#item #name').text(item.name);
@@ -81,7 +81,7 @@ function loadItem(item) {
 }
 </style>
 <table id="item">
- <tr><th><img id="print" align="left" src="icons/printer.png" height="16" width="16">Code</th><td><span id="code" class="editable"></span><img id="active" align="right" src="icons/accept.png" height="16" width="16"></td></tr>
+ <tr><th><i id="print" class="fa fa-print"></i> Code</th><td><span id="code" class="editable"></span><i id="active" class="pull-right fa fa-check-square-o"></i></td></tr>
  <tr><th>Name</th><td id="name" class="editable"></td></tr>
  <tr><th>Brand</th><td id="brand"></td></tr>
  <tr><th>MSRP</th><td id="retail_price" class="editable"></td></tr>
@@ -96,7 +96,7 @@ function loadItem(item) {
    <table id="barcodes" width="100%" style="padding: 0; margin: 0">
     <tbody></tbody>
     <tfoot>
-     <tr><td id="new-barcode" style="width:12em"><img src="icons/add.png" width="16" height="16"></td><td></td><td></td></tr>
+     <tr><td id="new-barcode" style="width:12em"><i class="fa fa-plus-square-o"></i></td><td></td><td></td></tr>
     </tfoot>
    </table>
   </td>

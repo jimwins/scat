@@ -115,11 +115,11 @@ function updateItem(item) {
   $('.' + item.id + ' td:nth(7)').text(item.stock);
   $('.' + item.id + ' td:nth(8)').text(item.minimum_quantity);
   var active= parseInt(item.active);
-  $('.' + item.id + ' td:nth(9) img').data('truth', active);
+  $('.' + item.id + ' td:nth(9) i').data('truth', active);
   if (active) {
-    $('.' + item.id + ' td:nth(9) img').attr('src', 'icons/accept.png');
+    $('.' + item.id + ' td:nth(9) i').removeClass('fa-square-o').addClass('fa-check-square-o');
   } else {
-    $('.' + item.id + ' td:nth(9) img').attr('src', 'icons/cross.png');
+    $('.' + item.id + ' td:nth(9) i').removeClass('fa-check-square-o').addClass('fa-square-o');
   }
 }
 $('tbody tr .name').editable(function(value, settings) {
@@ -210,7 +210,7 @@ $('tbody tr td:nth-child(9)').editable(function(value, settings) {
 $('tbody').on('click', 'tr td:nth-child(10)', function(ev) {
   ev.preventDefault();
   var item= $(this).closest('tr').attr('class');
-  var val= $("img", this).data('truth');
+  var val= $("i", this).data('truth');
 
   $.getJSON("api/item-update.php?callback=?",
             { item: item, active: parseInt(val) ? 0 : 1 },

@@ -271,7 +271,7 @@ function addItem(item) {
             });
 }
 
-var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><img src="./icons/tag_blue_delete.png" width=16 height=16 alt="Remove"></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable dollar" align="right"><span class="price"></span></td><td align="right"><span class="ext"></span></td></tr>');
+var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><i class="fa fa-trash-o" title="Remove"></i></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable dollar" align="right"><span class="price"></span></td><td align="right"><span class="ext"></span></td></tr>');
 
 function addNewItem(item) {
   var row= $("#items tbody tr:data(line_id=" + item.line_id + ")").first();
@@ -571,12 +571,12 @@ $(function() {
                     $("#lookup").addClass("error");
                     var errors= $('<div class="errors"/>');
                     errors.text(" Didn't find anything for '" + q + "'.");
-                    errors.prepend('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Remove"></span>');
+                    errors.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
                     $("#items").before(errors);
                   } else {
                     play("maybe");
                     var choices= $('<div class="choices"/>');
-                    choices.append('<span onclick="$(this).parent().remove(); return false"><img src="icons/control_eject_blue.png" style="vertical-align:absmiddle" width=16 height=16 alt="Skip"></span>');
+                    choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
                     var list= $('<ul>');
                     $.each(data.matches, function(i,item) {
                       var n= $("<li>" + item.name + "</li>");
@@ -1084,7 +1084,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 <div id="details">
 <h2 id="description">New Sale</h2>
 <div id="dates"></div>
-<div id="person"><span class="val">Anonymous</span> <img style="vertical-align: text-bottom" id="info-person" src="icons/information.png" width="16" height="16"></div>
+<div id="person"><span class="val">Anonymous</span> <i id="info-person" class="fa fa-info-circle"></i></div>
 </div>
 <script>
 $("#txn #person").on("dblclick", function(ev) {
@@ -1161,11 +1161,6 @@ $("#txn #info-person").on("click", function(ev) {
 function loadPerson(person) {
   $('#person-info').data('person', person);
   var active= parseInt(person.active);
-  if (active) {
-    $('#person-info #active').attr('src', 'icons/accept.png');
-  } else {
-    $('#person-info #active').attr('src', 'icons/cross.png');
-  }
   $('#person-info #name').text(person.name);
   $('#person-info #company').text(person.company);
   $('#person-info #email').text(person.email);
@@ -1298,7 +1293,7 @@ $('#tax_rate .val').editable(function(value, settings) {
 </table>
 <table id="notes">
  <thead>
-  <tr><th style="width: 20px"><img src="icons/note_add.png" width="16" height="16"></th><th style="width: 10em">Date</th><th>Note</th></tr>
+  <tr><th style="width: 20px"><i id="add-note-button" class="fa fa-plus-square-o"></i></th><th style="width: 10em">Date</th><th>Note</th></tr>
  </thead>
  <tbody>
  </tbody>
@@ -1308,7 +1303,7 @@ $('#tax_rate .val').editable(function(value, settings) {
   <input type="submit" value="Add">
 </form>
 <script>
-$("#notes img").on("click", function(ev) {
+$("#add-note-button").on("click", function(ev) {
   var txn= $("#txn").data("txn");
   if (!txn) return;
   $.modal($("#add-note"));
