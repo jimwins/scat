@@ -118,7 +118,7 @@ $(function() {
 var edit_person= 
 function(value, settings) {
   var person= $('#person').data('person');
-  var data= { person: person.id };
+  var data= { id: person.id };
   var key= this.id;
   data[key] = value;
 
@@ -152,7 +152,7 @@ $('#person #active').on('dblclick', function(ev) {
   var person= $('#person').data('person');
 
   $.getJSON("api/person-update.php?callback=?",
-            { person: person.id, active: parseInt(person.active) ? 0 : 1 },
+            { id: person.id, active: parseInt(person.active) ? 0 : 1 },
             function (data) {
               if (data.error) {
                 $.modal(data.error);
