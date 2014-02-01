@@ -41,6 +41,8 @@ header("content-type: text/html;charset=utf-8");?>
  </style>
  <script src="js/jquery.min.js"></script>
  <script src="js/bootstrap.min.js"></script>
+ <script src="lib/knockout/knockout-3.0.0.js"></script>
+ <script src="lib/knockout/knockout.mapping-2.4.1.js"></script>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
