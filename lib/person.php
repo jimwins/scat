@@ -3,6 +3,7 @@
 function person_load($db, $id) {
   $q= "SELECT id, 
               name,
+              role,
               company,
               address,
               email,
