@@ -3,7 +3,7 @@ require '../scat.php';
 require '../lib/person.php';
 
 if ($_REQUEST['HostedPaymentStatus'] == 'Cancelled') {
-  echo '<script>parent.$.modal.close();</script>';
+  echo "<script>parent.finishAttachPayment();</script>";
   exit;
 }
 
@@ -27,8 +27,8 @@ if ($_REQUEST['HostedPaymentStatus'] == 'Complete') {
 ?>
 <script>
 var person= <?=json_encode(person_load($db, $id))?>;
+parent.finishAttachPayment();
 parent.loadPerson(person);
-parent.$.modal.close();
 </script>
 <?
     exit;
@@ -37,7 +37,7 @@ parent.$.modal.close();
   }
 }
 ?>
-<button onclick="javascript:parent.$.modal.close()">Close</button>
+<button onclick="javascript:parent.finishAttachPayment()">Close</button>
 <?
 
 echo '<pre>';
