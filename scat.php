@@ -21,7 +21,7 @@ define('EPS_ApplicationID', '984');
 
 /** Basic functions */
 
-function head($title = "Scat") {
+function head($title = "Scat", $allnew= false) {
 header("content-type: text/html;charset=utf-8");?>
 <!DOCTYPE html>
 <html>
@@ -43,6 +43,7 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/bootstrap.min.js"></script>
  <script src="lib/knockout/knockout-3.0.0.js"></script>
  <script src="lib/knockout/knockout.mapping-2.4.1.js"></script>
+<?if (!$allnew) {?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
@@ -64,6 +65,7 @@ $(document).ready(function() {
   // Focus the #focus item
   $("#focus").focus();
 }); 
+<?}?>
  </script>
 </head>
 <body class="page">
