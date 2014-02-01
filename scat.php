@@ -65,8 +65,18 @@ $(document).ready(function() {
   // Focus the #focus item
   $("#focus").focus();
 }); 
-<?}?>
  </script>
+<?} else {?>
+ <script>
+$(document).ready(function() { 
+  // Focus the #focus item
+  $("#focus").focus();
+  // dynamically set active navbar link based on script
+  var page= '<?=basename($_SERVER['SCRIPT_NAME'])?>';
+  $("#navbar a[href='./" + page + "']").parent().addClass('active');
+}); 
+ </script>
+<?}?>
 </head>
 <body class="page">
 <header class="navbar navbar-default navbar-fixed-top" role="navigation">
