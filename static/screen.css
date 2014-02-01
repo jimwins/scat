@@ -41,47 +41,6 @@ td.right {
   text-align: right;
 }
 
-/* form styling */
-
-input[type="text"] {
-  border-radius: 10px;
-  background: rgba(255,255,255,0.7);
-  border: 1px solid #cacaca;
-  color: #444;
-  padding: 8px 10px;
-  outline: none;
-}
-input[type="text"]:focus {
-  background: rgba(255,255,255,0.9);
-}
-
-.error input[type="text"] {
-  background: rgba(255,192,192,0.7);
-  border: 1px solid #caa8a8;
-}
-.error input[type="text"]:focus {
-  background: rgba(255,192,192,0.9);
-}
-
-button, input[type="submit"] {
-  border-radius: 10px;
-  background-color: #dedede;
-  background: -webkit-gradient(linear, left top, left bottom,
-                               color-stop(0.0, rgba(255,255,255,0.8)),
-                               color-stop(1.0, rgba(255,255,255,0.3)));
-  border: 1px solid rgba(255,255,255,0.3);
-  color: #484848;
-  font-weight: bold;
-  padding: 8px 10px;
-}
-button:hover, input[type="submit"]:hover {
-  background-color: #dedede;
-  background: -webkit-gradient(linear, left top, left bottom,
-                               color-stop(0.0, rgba(240,240,240,0.8)),
-                               color-stop(1.0, rgba(240,240,240,0.3)));
-  border: 1px solid rgba(240,240,240,0.3);
-}
-
 #simplemodal-overlay { 
   background-color:#000;
 }
