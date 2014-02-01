@@ -114,6 +114,7 @@ $("header #reports").on('click', function(ev) {
 <?if ($GLOBALS['DEBUG']) {?>
   <div id="corner-banner">DEBUG</div>
 <?}?>
+<div class="container">
 <?
 }
 
@@ -130,6 +131,7 @@ function foot() {
   $time= sprintf("%0.3f", $finish - $start);
 
   echo <<<FOOTER
+</div><!-- .container -->
 <footer>
  <div id="time">Page generated in $time seconds.</div>
  <div id="status">&nbsp;</div>
