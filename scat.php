@@ -74,7 +74,7 @@ $(document).ready(function() {
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <span class="navbar-brand">Scat</span>
+        <span class="navbar-brand"><i class="fa fa-barcode"></i> Scat</span>
       </div>
       <div class="collapse navbar-collapse">
         <ul id="navbar" class="nav navbar-nav">
