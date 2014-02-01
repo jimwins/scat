@@ -2,221 +2,204 @@
 require 'scat.php';
 require 'lib/person.php';
 
-head("person");
+head("Person @ Scat", true);
 
 $id= (int)$_REQUEST['id'];
 $search= $_REQUEST['search'];
 
 ?>
-<form method="get" action="person.php">
-<input id="focus" type="text" name="search" value="<?=ashtml($search)?>">
-<label><input type="checkbox" value="1" name="all"<?=$_REQUEST['all']?' checked="checked"':''?>> All</label>
-<input type="submit" value="Find People">
+<form class="col-sm-10" role="form" method="get" action="person.php">
+  <div class="input-group">
+    <span class="input-group-btn">
+      <input type="submit" class="btn btn-primary" value="Search">
+    </span>
+    <input id="focus" type="text" class="form-control" size="60" name="search" data-bind="value: search" placeholder="Name">
+    <span class="input-group-addon">
+      <label><input type="checkbox" value="1" name="all" data-bind="checked: all"> Include inactive?</label>
+    </span>
+  </div>
 </form>
+<br>
 <br>
 <?
 
+$person= array();
+$activity= array();
+$people= array();
+
 if (!empty($search)) {
-  $search= $db->real_escape_string($search);
+  $search= $db->escape($search);
 
   $active= $_REQUEST['all'] ? "" : 'AND active';
 
   $q= "SELECT IF(deleted, 'deleted', '') AS meta,
-              CONCAT(id, '|', IFNULL(company,''),
-                     '|', IFNULL(name,''))
-                AS Person\$person
+              id, name, company
          FROM person
         WHERE (name like '%$search%' OR company LIKE '%$search%')
               $active
-        ORDER BY company, name";
+        ORDER BY CONCAT(name, company)";
 
   $r= $db->query($q)
     or die($db->error);
 
   if ($r->num_rows > 1) {
-    dump_table($r);
+    while ($row= $r->fetch_row())
+      $people[]= $row;
   } else {
     $person= $r->fetch_assoc();
-    $id= (int)$person['Person$person'];
+    $id= (int)$person['id'];
   }
 }
+?>
+<table class="table table-condensed table-striped table-hover"
+       data-bind="if: people().length">
+ <thead>
+  <tr>
+    <th>#</th>
+    <th>Name</th>
+    <th>Company</th>
+  </tr>
+ </thead>
+ <tbody data-bind="foreach: { data: people, as: 'item' }">
+  <tr>
+   <td><a data-bind="text: $index() + 1,
+                     attr: { href: '?id=' + item[1] }"></a></td>
+   <td><a data-bind="text: item[2], attr: { href: '?id=' + item[1] }"></a></td>
+   <td><a data-bind="text: item[3], attr: { href: '?id=' + item[1] }"></a></td>
+  </tr>
+ </tbody>
+</table>
+<?
 
-if (!$id) {
-  foot();
-  exit;
-}
+if (!$id)
+  goto end;
 
 $person= person_load($db, $id);
 ?>
-<style>
-  #person th { text-align: right; vertical-align: top; color: #777; }
-  #person td { white-space: pre-wrap; }
-  .deleted { text-decoration: line-through; }
-</style>
-<script>
-function loadPerson(person) {
-  $('#person').data('person', person);
-  var active= parseInt(person.active);
-  if (active) {
-    $('#person #active').removeClass('fa-square-o').addClass('fa-check-square-o');
-  } else {
-    $('#person #active').removeClass('fa-check-square-o').addClass('fa-square-o');
-  }
-  $('#person #name').text(person.name);
-  $('#person #company').text(person.company);
-  $('#person #email').text(person.email);
-  $('#person #phone').text(person.phone);
-  $('#person #address').text(person.address);
-  $('#person #tax_id').text(person.tax_id);
-  if (person.payment_account_id) {
-    $('#person #payment_account_id #add_payment').hide();
-    $('#person #payment_account_id #remove_payment').show();
-  } else {
-    $('#person #payment_account_id #remove_payment').hide();
-    $('#person #payment_account_id #add_payment').show();
-  }
-}
+<form class="form-horizontal" role="form"
+      data-bind="submit: savePerson">
+  <div class="form-group">
+    <label for="name" class="col-sm-2 control-label">Name</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="name" placeholder="Name"
+             data-bind="value: person.name">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="role" class="col-sm-2 control-label">Role</label>
+    <div class="col-sm-8">
+      <label class="checkbox-inline">
+        <input type="radio" value="customer"
+               data-bind="checked: person.role"> Customer
+      </label>
+      <label class="checkbox-inline">
+        <input type="radio" value="employee"
+               data-bind="checked: person.role"> Employee
+      </label>
+      <label class="checkbox-inline">
+        <input type="radio" value="vendor"
+               data-bind="checked: person.role"> Vendor
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="company" class="col-sm-2 control-label">Company</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="company" placeholder="Company"
+             data-bind="value: person.company">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="email" class="col-sm-2 control-label">Email</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="email" placeholder="Email"
+             data-bind="value: person.email">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="phone" class="col-sm-2 control-label">Phone</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="phone" placeholder="Phone"
+             data-bind="value: person.phone">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="address" class="col-sm-2 control-label">Address</label>
+    <div class="col-sm-8">
+      <textarea class="form-control" id="address" placeholder="Address"
+             data-bind="value: person.address"></textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="tax_id" class="col-sm-2 control-label">Tax ID</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="tax_id" placeholder="Tax ID"
+             data-bind="value: person.tax_id">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="payment" class="col-sm-2 control-label">Payment</label>
+    <div class="col-sm-8">
+      <button id="attach-payment" type="button" class="btn btn-default"
+              data-loading-text="Processing..."
+              data-bind="click: attachPaymentCard,
+                         text: person.payment_account_id() ?
+                                 'Update Credit Card' : 'Attach Credit Card'">
+        Attach Credit Card
+      </button>
+      <button id="remove-payment" type="button" class="btn btn-danger"
+              data-loading-text="Processing..."
+              data-bind="click: removePaymentCard,
+                         visible: person.payment_account_id()">
+        Remove Credit Card
+      </button>
+    </div>
+  </div>
 
-$(function() {
-  loadPerson(<?=json_encode($person)?>);
-});
-</script>
-<table id="person">
-  <tr class="<?=($person['deleted'] ? 'deleted' : '');?>">
-   <th>Name:</th>
-   <td><span id="name" class="editable"></span><i id="active" class="pull-right fa fa-check-square-o"></i></td>
-  </tr>
+  <div class="form-group" data-bind="visible: changed">
+    <div class="col-sm-offset-2 col-sm-8">
+      <button type="submit" class="btn btn-primary"
+              data-loading-text="Processing...">
+        Save
+      </button>
+    </div>
+  </div>
+</form>
+
+<h2>Activity
+<button id="create-po" class="btn btn-default"
+        data-loading-text="Processing..."
+        data-bind="click: createPurchaseOrder,
+                   visible: person.role() == 'vendor'">
+  Create Purchase Order
+</button></h2>
+
+<table class="table table-condensed table-striped"
+       data-bind="if: activity().length">
+ <thead>
   <tr>
-   <th>Company:</th>
-   <td id="company" class="editable"></td>
+    <th>#</th>
+    <th>Number</th>
+    <th>Created</th>
+    <th>Ordered</th>
+    <th>Allocated</th>
+    <th class="text-right">Total</th>
+    <th class="text-right">Paid</th>
   </tr>
+ </thead>
+ <tbody data-bind="foreach: { data: activity, as: 'action' }">
   <tr>
-   <th>Email:</th>
-   <td id="email" class="editable"></td>
+   <td data-bind="text: $index() + 1"></td>
+   <td data-bind="html: linkTransaction(action[1])"></td>
+   <td data-bind="text: action[2]"></td>
+   <td data-bind="text: action[3]"></td>
+   <td data-bind="text: action[4]"></td>
+   <td data-bind="text: amount(action[5])" class="text-right"></td>
+   <td data-bind="text: amount(action[6])" class="text-right"></td>
   </tr>
-  <tr>
-   <th>Phone:</th>
-   <td id="phone" class="editable"></td>
-  </tr>
-  <tr>
-   <th>Address:</th>
-   <td id="address" class="editable_multi"></td>
-  </tr>
-  <tr>
-   <th>Tax ID:</th>
-   <td id="tax_id" class="editable"></td>
-  </tr>
-  <tr>
-   <th>Payment Account ID:</th>
-   <td id="payment_account_id">
-     <button id="add_payment">Store Credit Card</button>
-     <button id="remove_payment" style="display: hide">Remove Stored Card</button>
-   </td>
-  </tr>
+ </tbody>
 </table>
-<script>
-var edit_person= 
-function(value, settings) {
-  var person= $('#person').data('person');
-  var data= { id: person.id };
-  var key= this.id;
-  data[key] = value;
 
-  $.getJSON("api/person-update.php?callback=?",
-            data,
-            function (data) {
-              if (data.error) {
-                $.modal(data.error);
-                return;
-              }
-              loadPerson(data.person);
-            });
-  return "...";
-}
-$('#person .editable').editable(edit_person,
-{
-  event: 'dblclick',
-  style: 'display: inline',
-  placeholder: '',
-});
-$('#person .editable_multi').editable(edit_person,
-{
-  type: 'textarea',
-  event: 'dblclick',
-  style: 'display: inline',
-  placeholder: '',
-  submit: 'OK',
-});
-$('#person #active').on('dblclick', function(ev) {
-  ev.preventDefault();
-  var person= $('#person').data('person');
-
-  $.getJSON("api/person-update.php?callback=?",
-            { id: person.id, active: parseInt(person.active) ? 0 : 1 },
-            function (data) {
-              if (data.error) {
-                $.modal(data.error);
-                return;
-              }
-              loadPerson(data.person);
-            });
-});
-$('#add_payment').on('click', function(ev) {
-  var person= $('#person').data('person');
-  $.getJSON("api/cc-attach-begin.php?callback=?",
-            { person: person.id },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                $.modal.close();
-                $.modal('<iframe src="' + data.url +
-                        '" height=500" width="600" style="border:0">',
-                        {
-                          closeHTML: "",
-                          containerCss: {
-                            backgroundColor: "#fff",
-                            borderColor: "#fff",
-                            height: 520,
-                            padding: 0,
-                            width: 620,
-                          },
-                          position: undefined,
-                          overlayClose: false,
-                        });
-              }
-            });
-});
-$('#remove_payment').on('click', function(ev) {
-  var person= $('#person').data('person');
-  $.getJSON("api/cc-attach-remove.php?callback=?",
-            { person: person.id },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-              } else {
-                loadPerson(data.person);
-                $.modal.close();
-              }
-            });
-});
-</script>
-
-<h2>Activity</h2>
-<button id="create-po">Create Purchase Order</button>
-<script>
-$('#create-po').on('click', function(ev) {
-  var person= $('#person').data('person');
-  $.getJSON("api/txn-create.php?callback=?",
-            { type: 'vendor', person: person.id },
-            function (data) {
-              if (data.error) {
-                $.modal(data.error);
-              }
-              window.location= 'txn.php?id=' + data.txn.id;
-            });
-});
-</script>
 <?
 $q= "SELECT meta, Number\$txn, Created\$date,
             Ordered, Allocated,
@@ -266,7 +249,110 @@ $q= "SELECT meta, Number\$txn, Created\$date,
       ORDER BY created DESC
       LIMIT 50) t";
 
-dump_table($db->query($q));
-dump_query($q);
+$r= $db->query($q);
+
+if ($r->num_rows) {
+  while ($row= $r->fetch_row()) {
+    $activity[]= $row;
+  }
+}
+
+end:
 
 foot();
+?>
+<script>
+var model= {
+  search: '<?=ashtml($search);?>',
+  all: <?=(int)$all?>,
+  person: <?=json_encode($person);?>,
+  activity: <?=json_encode($activity);?>,
+  people: <?=json_encode($people);?>,
+};
+
+var viewModel= ko.mapping.fromJS(model);
+
+// ghetto change tracking
+viewModel.saved= ko.observable(ko.toJSON(viewModel.person));
+viewModel.changed= ko.computed(function() {
+  return ko.toJSON(viewModel.person) != viewModel.saved();
+});
+
+ko.applyBindings(viewModel);
+
+function attachPaymentCard(place, ev) {
+  $(ev.target).button('loading');
+  $.getJSON("api/cc-attach-begin.php?callback=?",
+            { person: place.person.id(),
+              payment_account_id: place.person.payment_account_id() },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                $('#modal').remove();
+                var modal= $('<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modal" role="dialog"><div class="modal-dialog" style="width: 660px"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">Attach Payment Card</h4></div><div class="modal-body"><iframe src="' + data.url + '" height=500" width="600" style="border:0"><div class="modal-footer"></div></div></div></div>');
+                modal.appendTo('body').modal('show');
+              }
+            });
+}
+
+function finishAttachPayment() {
+  $('#modal').modal('hide')
+             .on('hidden.bs.modal', function() { $(this).remove(); });
+  $('#attach-payment').button('reset');
+}
+
+function removePaymentCard(place, ev) {
+  $(ev.target).button('loading');
+  $.getJSON("api/cc-attach-remove.php?callback=?",
+            { person: place.person.id() },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              } else {
+                $('#remove-payment').button('reset');
+                loadPerson(data.person);
+              }
+            });
+}
+
+function loadPerson(person) {
+  ko.mapping.fromJS({ person: person }, viewModel);
+  viewModel.saved(ko.toJSON(viewModel.person));
+}
+
+function savePerson(place) {
+  $.getJSON("api/person-update.php?callback=?",
+            ko.toJS(this.person),
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+                return;
+              }
+              loadPerson(data.person);
+            });
+}
+
+function createPurchaseOrder(place, ev) {
+  $(ev.target).button('loading');
+  $.getJSON("api/txn-create.php?callback=?",
+            { type: 'vendor', person: place.person.id() },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+              }
+              window.location= 'txn.php?id=' + data.txn.id;
+            });
+}
+
+function linkTransaction(components) {
+  var m= components.split(/\|/);
+  var desc= { correction: 'Correction',
+              drawer: 'Till Count',
+              customer: 'Invoice',
+              vendor: 'Purchase Order' };
+  return '<a href="txn.php?id=' + m[0] + '">'
+         + desc[m[1]] + ' ' + m[2]
+         + '</a>';
+}
+</script>
