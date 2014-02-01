@@ -1,14 +1,14 @@
 /* Place the corner banner */
 #corner-banner {
   position: fixed;
-  left: -65px;
+  right: -60px;
   top: 25px;
   width: 200px;
   padding: 6px 0px;
   z-index: 1030;
 
-  -webkit-transform: rotate(-45deg);  /* Saf3.1+, Chrome */
-  transform: rotate(-45deg);  /* CSS3 (for when it gets supported) */
+  -webkit-transform: rotate(45deg);  /* Saf3.1+, Chrome */
+  transform: rotate(45deg);  /* CSS3 (for when it gets supported) */
   
   box-shadow: rgba(0,0,0, 0.2) 0px 0px 6px;  
 
