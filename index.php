@@ -9,42 +9,11 @@ head("Scat");
   display: none;
 }
 
-.choices, .errors {
-  margin: 8px 4px;
-  padding: 6px;
-  background: rgba(0,0,0,0.1);
-  border-radius: 4px;
-  width: 70%;
-  position: relative;
-}
-.errors {
-  background: rgba(64,0,0,0.1);
-}
 .choices ul { margin: 0; padding-left: 1.2em; list-style: circle; }
 .choices li {
   text-decoration: underline;
   color: #339;
   cursor:pointer;
-}
-.choices img, .errors img {
-  position: absolute; bottom: 0.5em; right: 0.5em;
-}
-tbody tr.active {
-  background-color:rgba(255,192,192,0.4);
-}
-tfoot td {
-  background-color:rgba(255,255,255,0.5);
-  font-weight: bold;
-}
-#subtotal-row td, #subtotal-row th {
-  border-bottom: 2px solid rgba(255,255,255,0.2);
-}
-#tax-row td, #tax-row th {
-  border-bottom: 4px solid rgba(255,255,255,0.2);
-}
-#due-row td, #due-row th {
-  border-top: 4px solid rgba(255,255,255,0.2);
-  border-bottom: 4px solid rgba(255,255,255,0.2);
 }
 .over {
   font-weight: bold;
@@ -55,10 +24,6 @@ tfoot td {
 }
 .dollar:before {
   content: '$';
-}
-
-#txn {
-  width: 70%;
 }
 
 /* Hide/show some elements from paid invoices. */
@@ -76,10 +41,6 @@ tfoot td {
   display: inline;
 }
 
-#sale-buttons {
-  float: right;
-}
-
 .payment-buttons {
   text-align: right;
 }
@@ -91,29 +52,11 @@ tfoot td {
 #txn h2 {
   margin-bottom: 0;
 }
-#txn #details {
-  margin: 0 0 0.5em;
-  font-weight: normal;
-  font-size: 1em;
-  color: #333;
-}
-
-#notes {
-  width: 100%;
-}
 
 #notes tr {
   vertical-align: top;
 }
 
-#sidebar {
-  width: 22%;
-  float: right;
-  border: 2px solid rgba(0,0,0,0.3);
-  padding: 1em;
-  margin: 0em 0.5em;
-  font-size: smaller;
-}
 #sidebar caption {
   font-weight: bold;
   font-size: larger;
@@ -337,9 +280,9 @@ function updateTotal() {
     $('.payment-amount', row).text(amount(payment.amount));
 
     if (payment.method == 'credit') {
-      $('.payment-buttons', row).append($('<button name="print">Print</button>'));
+      $('.payment-buttons', row).append($('<button name="print" class="btn btn-link"><i class="fa fa-print"></i></button>'));
     }
-    $('.payment-buttons', row).append($('<button class="admin" name="remove">Remove</button>'));
+    $('.payment-buttons', row).append($('<button class="admin btn btn-link" name="remove"><i class="fa fa-trash-o"></i></button>'));
 
     $('#due-row').before(row);
   });
@@ -569,13 +512,13 @@ $(function() {
                   if (data.matches.length == 0) {
                     play("no");
                     $("#lookup").addClass("error");
-                    var errors= $('<div class="errors"/>');
+                    var errors= $('<div class="alert alert-danger"/>');
                     errors.text(" Didn't find anything for '" + q + "'.");
                     errors.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
                     $("#items").before(errors);
                   } else {
                     play("maybe");
-                    var choices= $('<div class="choices"/>');
+                    var choices= $('<div class="choices alert alert-warning"/>');
                     choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
                     var list= $('<ul>');
                     $.each(data.matches, function(i,item) {
@@ -617,9 +560,12 @@ $(function() {
 ?>
 });
 </script>
-<div id="sidebar">
-<button name="unpaid">Unpaid</button>
-<button name="recent">Recent</button>
+<div class="row">
+<div class="col-md-3 col-md-push-9 well" id="sidebar">
+  <div>
+    <button class="btn" name="unpaid">Unpaid</button>
+    <button class="btn" name="recent">Recent</button>
+  </div>
 <script>
 $("#sidebar button").click(function() {
   var params= {
@@ -642,7 +588,8 @@ $("#sidebar button").click(function() {
   $("#status").text("Loading...").show();
 });
 </script>
-<table id="sales" width="100%" style="display: none">
+<table class="table table-condensed table-striped"
+       id="sales" style="display: none">
  <thead>
   <tr><th>#</th><th>Date/Name</th><th>Items</th></tr>
  </thead>
@@ -651,8 +598,14 @@ $("#sidebar button").click(function() {
 </table>
 <br>
 <form id="txn-load">
- Invoice: <input type="text" name="invoice" size="8">
- <button>Load</button>
+  <div class="input-group">
+    <input type="text" class="form-control"
+           name="invoice" size="8"
+           placeholder="Invoice">
+    <span class="input-group-btn">
+      <button class="btn btn-default" type="button">Load</button>
+    </span>
+  </div>
 </form>
 <script>
 $("#txn-load").submit(function(ev) {
@@ -672,18 +625,31 @@ $("#txn-load").submit(function(ev) {
 });
 </script>
 </div>
-</div>
-<form id="lookup">
-<input type="text" id="autofocus" name="q" size="100" autocomplete="off" placeholder="Scan item or enter search terms" value="">
-<input type="submit" value="Find Items">
+<div class="col-md-9 col-md-pull-3" id="txn">
+<form class="form form-inline" id="lookup">
+  <div class="input-group">
+    <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
+    <input type="text" class="form-control"
+           id="autofocus" name="q"
+           size="60"
+           autocomplete="off"
+           placeholder="Scan item or enter search terms"
+           value="">
+    <span class="input-group-btn">
+      <input type="submit" class="btn btn-default" value="Find Items">
+    </span>
+  </div>
 </form>
-<div id="txn">
-<div id="sale-buttons">
-  <button id="invoice">Invoice</button>
-  <button id="print">Print</button>
-  <button id="pay">Pay</button>
-  <button id="return">Return</button>
-</div>
+<br>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="row">
+      <div id="sale-buttons" class="col-md-5 col-md-push-7 text-right">
+        <button id="invoice" class="btn btn-default">Invoice</button>
+        <button id="print" class="btn btn-default">Print</button>
+        <button id="pay" class="btn btn-default">Pay</button>
+        <button id="return" class="btn btn-default">Return</button>
+      </div>
 <script>
 $("#invoice").on("click", function() {
   printInvoice();
@@ -1081,11 +1047,17 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   $.modal.close();
 });
 </script>
-<div id="details">
-<h2 id="description">New Sale</h2>
-<div id="dates"></div>
-<div id="person"><span class="val">Anonymous</span> <i id="info-person" class="fa fa-info-circle"></i></div>
-</div>
+      <div id="details" class="col-md-7 col-md-pull-5">
+        <div style="font-size: larger; font-weight: bold"
+             id="description">New Sale</div>
+        <div id="dates"></div>
+        <div id="person">
+          <span class="val">Anonymous</span>
+          <i id="info-person" class="fa fa-info-circle"></i>
+        </div>
+      </div>
+    </div>
+  </div><!-- .panel-heading -->
 <script>
 $("#txn #person").on("dblclick", function(ev) {
   if (typeof $("#txn").data("txn") == "undefined") {
@@ -1242,7 +1214,7 @@ $('#person-create').on('click', "button[name='cancel'", function(ev) {
   $.modal.close();
 });
 </script>
-<table id="items" width="100%">
+<table class="table table-condensed table-striped" id="items">
  <thead>
   <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
@@ -1291,7 +1263,7 @@ $('#tax_rate .val').editable(function(value, settings) {
  <tbody>
  </tbody>
 </table>
-<table id="notes">
+<table id="notes" class="table table-condensed table-striped">
  <thead>
   <tr><th style="width: 20px"><i id="add-note-button" class="fa fa-plus-square-o"></i></th><th style="width: 10em">Date</th><th>Note</th></tr>
  </thead>
@@ -1321,5 +1293,6 @@ $("#add-note").on("submit", function(ev) {
             });
 });
 </script>
+</div>
 </div>
 <?foot();
