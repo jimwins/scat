@@ -44,7 +44,7 @@ th:after { content: ":" }
 .description { font-size: 0.75em; }
 td {padding:0.2em 0.1em; vertical-align:top;}
 tr.sub td {border-top:2px solid #000; border-bottom:2px solid #000;}
-tr.total td {border-top:solid #000 6px; text-align:right; font-weight:;}
+tr.total td {border-top:solid #000 6px; text-align:right;}
 
 #doc_info {text-align:center;}
 #signature {margin:2em 0; padding:5px 0px; text-align:center;}
