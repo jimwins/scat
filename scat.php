@@ -52,7 +52,6 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/jquery.jeditable.mini.js"></script>
  <script src="js/jquery.html5uploader.js"></script>
  <script src="js/date.js"></script>
- <script src="js/scat.js"></script>
  <script>
 $(document).ready(function() { 
   // Enable sorted tables
@@ -77,6 +76,7 @@ $(document).ready(function() {
 }); 
  </script>
 <?}?>
+ <script src="js/scat.js"></script>
 </head>
 <body class="page">
 <header class="navbar navbar-default navbar-fixed-top" role="navigation">
