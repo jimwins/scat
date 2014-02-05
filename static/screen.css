@@ -20,12 +20,6 @@ footer #time {
 }
 
 /* prettier tables */
-table { border-collapse:collapse; }
-thead tr { background: rgba(0,0,0,0.2); color: rgba(0,0,0,0.5); }
-tbody tr:nth-child(odd) { background-color:rgba(255,255,255,0.3); }
-tbody tr:nth-child(even) { background-color:rgba(255,255,255,0.2); }
-tbody tr:hover { background:rgba(255,255,255,0.4); }
-th, td { padding:4px 6px; border:2px solid rgba(255,255,255,0.05); }
 td.num {
   vertical-align:middle;
   font:small-caps bold x-small sans-serif;
