@@ -82,24 +82,23 @@ $(document).ready(function() {
 <header class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <span class="navbar-brand"><i class="fa fa-barcode"></i> Scat</span>
-      </div>
-      <div class="collapse navbar-collapse">
-        <ul id="navbar" class="nav navbar-nav">
-          <li><a href="./">New Sale</a></li>
-          <li><a href="./items.php">Items</a></li>
-          <li><a href="./person.php">People</a></li>
-          <li><a href="./txns.php">Transactions</a></li>
-          <li><a href="./till.php">Till</a></li>
-          <li><a id="reports" href="./report.php">Reports</a></li>
-        </ul>
-      </div>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <span class="navbar-brand"><i class="fa fa-barcode"></i> Scat</span>
+    </div>
+    <div class="collapse navbar-collapse">
+      <ul id="navbar" class="nav navbar-nav">
+        <li><a href="./">New Sale</a></li>
+        <li><a href="./items.php">Items</a></li>
+        <li><a href="./person.php">People</a></li>
+        <li><a href="./txns.php">Transactions</a></li>
+        <li><a href="./till.php">Till</a></li>
+        <li><a id="reports" href="./report.php">Reports</a></li>
+      </ul>
     </div>
   </div>
 </header>
