@@ -56,19 +56,6 @@ head("Scat");
 #notes tr {
   vertical-align: top;
 }
-
-#sidebar caption {
-  font-weight: bold;
-  font-size: larger;
-  padding-bottom: 0.2em;
-  text-align: left;
-}
-#sidebar caption:before {
-  content: "\0025B6 ";
-}
-#sidebar caption.open:before {
-  content: "\0025BD ";
-}
 </style>
 <script>
 var lastItem;
@@ -543,7 +530,7 @@ $(function() {
     return false;
   });
 
-  $("#sidebar button[name='unpaid']").click();
+  $("#sidebar a[id='unpaid']").click();
 
 <?
   $id= (int)$_REQUEST['id'];
@@ -562,20 +549,21 @@ $(function() {
 </script>
 <div class="row">
 <div class="col-md-3 col-md-push-9 well" id="sidebar">
-  <div>
-    <button class="btn" name="unpaid">Unpaid</button>
-    <button class="btn" name="recent">Recent</button>
-  </div>
+  <ul class="nav nav-pills nav-justified">
+    <li class="active"><a id="unpaid">Unpaid</a></li>
+    <li><a id="recent">Recent</a></li>
+  </ul>
 <script>
-$("#sidebar button").click(function() {
+$("#sidebar .nav a").click(function() {
   var params= {
     open: { type: 'customer', unfilled: true },
     unpaid: { type: 'customer', unpaid: true },
     recent: { type: 'customer', limit: 20 },
   };
   $("#sales").hide();
+  $(this).parent().siblings().removeClass('active');
   $.getJSON("api/txn-list.php?callback=?",
-            params[$(this).attr('name')],
+            params[$(this).attr('id')],
             function (data) {
               if (data.error) {
                 $.modal(data.error);
@@ -584,7 +572,7 @@ $("#sidebar button").click(function() {
               }
               $("#status").text("Loaded.").fadeOut('slow');
             });
-  $(this).addClass('open');
+  $(this).parent().addClass('active');
   $("#status").text("Loading...").show();
 });
 </script>
