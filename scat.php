@@ -59,8 +59,6 @@ $(document).ready(function() {
   // SimpleModal defaults
   $.modal.defaults.position= [ '25%', '25%' ];
   $.modal.defaults.overlayClose= true;
-  $.modal.defaults.minWidth= 600;
-  $.modal.defaults.minHeight= 200;
   // Focus the #focus item
   $("#focus").focus();
 }); 

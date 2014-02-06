@@ -37,8 +37,10 @@ td.right {
   background-color:#000;
 }
 #simplemodal-container {
-  background: #ddd;
+  background: #CEB996;
   -webkit-box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
   border-radius: 10px;
-  padding:12px;
+}
+.simplemodal-data {
+  padding: 12px;
 }
