@@ -2,36 +2,91 @@
 require 'scat.php';
 require 'lib/item.php';
 
-head("quick sales");
+head("Item Sales @ Scat");
 
-$q= $_REQUEST['q'];
 ?>
-<form method="get" action="<?=$_SERVER['PHP_SELF']?>">
-<input id="autofocus" type="text" autocomplete="off" size="60" name="q" value="<?=htmlspecialchars($q)?>">
-<label><input type="checkbox" value="1" name="all"<?=$_REQUEST['all']?' checked="checked"':''?>> All</label>
-<input type="submit" value="Search">
+<form id="report-params" class="form-horizontal" role="form"
+      action="<?=$_SERVER['PHP_SELF']?>">
+  <div class="form-group">
+    <label for="datepicker" class="col-sm-2 control-label">
+      Dates
+    </label>
+    <div class="col-sm-10">
+      <div class="input-daterange input-group" id="datepicker">
+        <input type="text" class="form-control" name="begin" />
+        <span class="input-group-addon">to</span>
+        <input type="text" class="form-control" name="end" />
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="items" class="col-sm-2 control-label">
+      Items
+    </label>
+    <div class="col-sm-10">
+      <input id="items" name="items" type="text" class="form-control" style="width: 20em">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <input type="submit" class="btn btn-primary" value="Show">
+    </div>
+  </div>
 </form>
 <?
 
-$options= FIND_OR;
-list($sql_criteria, $begin) = item_terms_to_sql($db, $q, $options);
+$begin= $_REQUEST['begin'];
+$end= $_REQUEST['end'];
 
-$begin= '2012-07-01';
-$end=   '2012-11-01';
+$sql_criteria= "1=1";
+if ($_REQUEST['items']) {
+  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'], FIND_OR);
+}
 
-$q= "select 
+if (!$begin) {
+  $days= $_REQUEST['days'];
+  if (!$days) $days= 10;
+  $begin= "DATE(NOW() - INTERVAL 3 DAY)";
+} else {
+  $begin= "'" . $db->escape($begin) . "'";
+}
+
+if (!$end) {
+  $end= "DATE(NOW() + INTERVAL 1 DAY)";
+} else {
+  $end= "'" . $db->escape($end) . "' + INTERVAL 1 DAY";
+}
+
+$q= "SELECT
             item.id AS meta,
             item.code Code\$item,
             item.name Name\$name,
-              (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) Stock,
-            sum(-1 * allocated) Sold,
-            avg(sale_price(txn_line.retail_price, txn_line.discount_type, txn_line.discount)) AvgPrice\$dollar,
-            SUM(-1 * allocated * sale_price(txn_line.retail_price, txn_line.discount_type, txn_line.discount)) Total\$dollar
-       FROM txn left join txn_line on txn.id = txn_line.txn left join item on txn_line.item = item.id where type = 'customer' and ($sql_criteria) and paid between '$begin' and '$end' group by 1";
+            SUM(-1 * allocated) Sold,
+            AVG(sale_price(txn_line.retail_price, txn_line.discount_type,
+                           txn_line.discount)) AvgPrice\$dollar,
+            SUM(-1 * allocated * sale_price(txn_line.retail_price,
+                                            txn_line.discount_type,
+                                            txn_line.discount)) Total\$dollar
+       FROM txn
+       LEFT JOIN txn_line ON txn.id = txn_line.txn
+       LEFT JOIN item ON txn_line.item = item.id
+      WHERE type = 'customer'
+        AND ($sql_criteria)
+        AND paid BETWEEN $begin AND $end
+      GROUP BY 1
+      ORDER BY 2";
 
 dump_table($db->query($q));
 
 dump_query($q);
 
+foot:
 foot();
-
+?>
+<script>
+$(function() {
+  $('#report-params .input-daterange').datepicker({
+      format: "yyyy-mm-dd",
+      todayHighlight: true
+  });
+});
