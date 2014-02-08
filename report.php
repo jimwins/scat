@@ -1,22 +1,47 @@
 <?
 require 'scat.php';
 
-head("report");
+head("Sales Report @ Scat");
 ?>
-<form id="report-params" class="form-inline" role="form">
-From:
-<input name="begin" class="form-control" type="date">
-to:
-<input name="end" class="form-control" type="date">
-Grouped by:
-<select name="span" class="form-control">
- <option value="day">Day</span>
- <option value="week">Week</span>
- <option value="month">Month</span>
- <option value="all">All</span>
-</select>
-Items: <input id="items" name="items" type="text" class="form-control">
-<input type="submit" class="btn btn-primary" value="Show">
+<form id="report-params" class="form-horizontal" role="form">
+  <div class="form-group">
+    <label for="datepicker" class="col-sm-2 control-label">
+      Dates
+    </label>
+    <div class="col-sm-10">
+      <div class="input-daterange input-group" id="datepicker">
+        <input type="text" class="form-control" name="begin" />
+        <span class="input-group-addon">to</span>
+        <input type="text" class="form-control" name="end" />
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="span" class="col-sm-2 control-label">
+      Grouped by
+    </label>
+    <div class="col-sm-10">
+      <select name="span" class="form-control" style="width: auto">
+        <option value="day">Day</span>
+        <option value="week">Week</span>
+        <option value="month">Month</span>
+        <option value="all">All</span>
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="items" class="col-sm-2 control-label">
+      Items
+    </label>
+    <div class="col-sm-10">
+      <input id="items" name="items" type="text" class="form-control" style="width: 20em">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <input type="submit" class="btn btn-primary" value="Show">
+    </div>
+  </div>
 </form>
 <br>
 <table id="results-template" class="table" style="display: none; width: auto">
@@ -27,9 +52,15 @@ Items: <input id="items" name="items" type="text" class="form-control">
  <tbody>
  </tbody>
 </table>
+<?
+foot();
+?>
 <script>
 $(function() {
-  $('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd' });
+  $('#report-params .input-daterange').datepicker({
+      format: "yyyy-mm-dd",
+      todayHighlight: true
+  });
 });
 $("#report-params").on('submit', function(ev) {
   ev.preventDefault();
@@ -63,5 +94,3 @@ $("#report-params").on('submit', function(ev) {
             });
 });
 </script>
-<?
-foot();
