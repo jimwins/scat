@@ -1,7 +1,7 @@
 <?
 include 'scat.php';
 
-head("Till @ Scat");
+head("Till @ Scat", true);
 
 $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) FROM payment
       WHERE method IN ('cash','change','withdrawal')";

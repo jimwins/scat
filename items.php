@@ -4,7 +4,7 @@ require 'lib/item.php';
 
 ob_start();
 
-head("Items @ Scat");
+head("Items @ Scat", true);
 
 $search= $_GET['search'];
 ?>
@@ -12,26 +12,41 @@ $search= $_GET['search'];
  <button id="add-item" class="btn btn-default">Add New Item</button>
 </div>
 <?include 'item-searchform.php';?>
-<form id="add-item-form" style="display: none">
- <div class="form-group">
-   <label for="code">Code</label>
-   <input type="text" class="form-control" name="code" placeholder="Code">
- </div>
- <div class="form-group">
-   <label for="name">Name</label>
-   <input type="text" class="form-control" name="name" placeholder="Name" size="30">
- </div>
- <div class="form-group">
-   <label for="retail_price">Price</label>
-   <input type="text" class="form-control" name="retail_price" placeholder="$0.00">
- </div>
- <input type="submit" class="btn btn-primary" value="Add Item">
-</form>
+<div id="add-item-form" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Add New Item</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+         <div class="form-group">
+           <label for="code">Code</label>
+           <input type="text" class="form-control"
+                  name="code" placeholder="Code">
+         </div>
+         <div class="form-group">
+           <label for="name">Name</label>
+           <input type="text" class="form-control"
+                  name="name" placeholder="Name" size="30">
+         </div>
+         <div class="form-group">
+           <label for="retail_price">Price</label>
+           <input type="text" class="form-control"
+                  name="retail_price" placeholder="$0.00">
+         </div>
+         <input type="submit" class="btn btn-primary" value="Add Item">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 $('#add-item').on('click', function(ev) {
-  $.modal($('#add-item-form'));
+  $('#add-item-form').modal('show');
 });
-$('#add-item-form').on('submit', function(ev) {
+$('#add-item-form form').on('submit', function(ev) {
   ev.preventDefault();
   var data= $("#add-item-form :input").serializeArray();
   $.getJSON("api/item-add.php?callback=?",
@@ -133,7 +148,7 @@ $('tbody tr .name').editable(function(value, settings) {
             { item: item, name: value },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               updateItem(data.item);
@@ -147,7 +162,7 @@ $('tbody tr .brand').editable(function(value, settings) {
             { item: item, brand: value },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               updateItem(data.item);
@@ -162,7 +177,7 @@ $('tbody tr td:nth-child(5)').editable(function(value, settings) {
             { item: item, retail_price: value },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               updateItem(data.item);
@@ -176,7 +191,7 @@ $('tbody tr .discount').editable(function(value, settings) {
             { item: item, discount: value },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               updateItem(data.item);
@@ -190,7 +205,7 @@ $('tbody tr td:nth-child(8)').editable(function(value, settings) {
             { item: item, stock: value },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               updateItem(data.item);
@@ -204,7 +219,7 @@ $('tbody tr td:nth-child(9)').editable(function(value, settings) {
             { item: item, minimum_quantity: value },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               updateItem(data.item);
@@ -220,7 +235,7 @@ $('tbody').on('click', 'tr td:nth-child(10)', function(ev) {
             { item: item, active: parseInt(val) ? 0 : 1 },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               updateItem(data.item);
@@ -234,7 +249,7 @@ $('#print-price-labels').on('click', function(ev) {
             { q: q },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
             });

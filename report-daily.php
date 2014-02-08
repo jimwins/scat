@@ -1,7 +1,7 @@
 <?
 require 'scat.php';
 
-head("Daily Flow @ Scat");
+head("Daily Flow @ Scat", true);
 
 $q= "SELECT DATE_FORMAT(processed, '%Y-%m-%d %a') AS date,
             method, cc_type, SUM(amount) amount

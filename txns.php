@@ -1,7 +1,7 @@
 <?
 require 'scat.php';
 
-head("Transactions @ Scat");
+head("Transactions @ Scat", true);
 
 $criteria= array();
 

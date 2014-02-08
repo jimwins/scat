@@ -1,7 +1,7 @@
 <?
 require 'scat.php';
 
-head("Sales Report @ Scat");
+head("Sales Report @ Scat", true);
 ?>
 <form id="report-params" class="form-horizontal" role="form">
   <div class="form-group">
@@ -69,7 +69,7 @@ $("#report-params").on('submit', function(ev) {
             params,
             function(data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
               } else {
                 var table= $("#results-template").clone();
                 table.removeAttr('id');

@@ -122,7 +122,7 @@ $('#item #active').on('dblclick', function(ev) {
             { item: item.id, active: parseInt(item.active) ? 0 : 1 },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               loadItem(data.item);
@@ -137,7 +137,7 @@ function editBarcodeQuantity(value, settings) {
             { item: item.id, code: code, quantity: value},
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               loadItem(data.item);
@@ -153,7 +153,7 @@ $('#barcodes').on('dblclick', '.remove', function(ev) {
             { item: item.id, code: code },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               loadItem(data.item);
@@ -165,7 +165,7 @@ $('#barcodes #new-barcode').editable(function(value, settings) {
             { item: item.id, code: value },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
               loadItem(data.item);
@@ -188,7 +188,7 @@ $('#item #print').on('dblclick', function(ev) {
             { id: item.id },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
                 return;
               }
             });

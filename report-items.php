@@ -2,8 +2,7 @@
 require 'scat.php';
 require 'lib/item.php';
 
-head("Item Sales @ Scat");
-
+head("Item Sales @ Scat", true);
 ?>
 <form id="report-params" class="form-horizontal" role="form"
       action="<?=$_SERVER['PHP_SELF']?>">
