@@ -1,7 +1,7 @@
 <?
 require 'scat.php';
 
-head("transactions");
+head("Transactions @ Scat");
 
 $criteria= array();
 
@@ -34,55 +34,25 @@ if (empty($criteria)) {
 $page= (int)$_REQUEST['page'];
 
 ?>
-<form method="get" action="txns.php">
-<input type="submit" value="Show">
-<select name="type">
- <option value="">Any
- <option value="customer">Invoice
- <option value="vendor">Purchase Order
- <option value="correction">Correction
- <option value="drawer">Till Count
-</select>
-that includes
-<input type="text" name="q" value="<?=ashtml($q)?>">
-<label><input type="checkbox" name="unfilled" value="1"> Unfilled</label>
-<label><input type="checkbox" name="unpaid" value="1"> Unpaid</label>
+<form class="form-inline" method="get" action="txns.php">
+  <input type="submit" class="btn btn-primary" value="Show">
+  <select name="type" class="form-control">
+   <option value="">Any
+   <option value="customer">Invoice
+   <option value="vendor">Purchase Order
+   <option value="correction">Correction
+   <option value="drawer">Till Count
+  </select>
+  that includes
+  <input type="text" name="q" value="<?=ashtml($q)?>">
+  <div class="checkbox">
+    <label><input type="checkbox" name="unfilled" value="1"> Unfilled</label>
+  </div>
+  <div class="checkbox">
+    <label><input type="checkbox" name="unpaid" value="1"> Unpaid</label>
+  </div>
 </form>
 <br>
-<button id="new-po">New Purchase Order</button>
-<form id="create-po" style="display: none">
-<input type="text" id="person" size="40">
-<br>
-<input type="submit" value="Create">
-</form>
-<script>
-$('#new-po').on('click', function(ev) {
-  $('#create-po').modal({ persist: true });
-});
-$('#create-po #person').autocomplete({
-  source: "./api/person-list.php?callback=?",
-  minLength: 2,
-  select: function(ev, ui) {
-    $(this).data('id', ui.item.id);
-  },
-});
-$('#create-po').on('submit', function(ev) {
-  ev.preventDefault(true);
-
-  var person= $('#person', this).data('id');
-
-  $.modal.close();
-
-  $.getJSON("api/txn-create.php?callback=?",
-            { type: 'vendor', person: person },
-            function (data) {
-              if (data.error) {
-                $.modal(data.error);
-              }
-              window.location= 'txn.php?id=' + data.txn.id;
-            });
-});
-</script>
 <?
 $per_page= 50;
 $start= $page * $per_page;
