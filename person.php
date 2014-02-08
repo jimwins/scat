@@ -323,7 +323,7 @@ function loadPerson(person) {
 
 function savePerson(place) {
   $.getJSON("api/person-update.php?callback=?",
-            ko.toJS(this.person),
+            ko.mapping.toJS(viewModel.person),
             function (data) {
               if (data.error) {
                 alert(data.error);
