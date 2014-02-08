@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.9, for osx10.6 (i386)
+-- MySQL dump 10.13  Distrib 5.6.11, for osx10.6 (x86_64)
 --
 -- Host: localhost    Database: scat
 -- ------------------------------------------------------
--- Server version	5.5.9
+-- Server version	5.6.11
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -76,10 +76,10 @@ CREATE TABLE `item` (
   `retail_price` decimal(9,2) NOT NULL DEFAULT '0.00',
   `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
   `discount` decimal(9,2) DEFAULT NULL,
-  `taxfree` tinyint(1) NOT NULL,
-  `minimum_quantity` int(10) unsigned NOT NULL,
+  `taxfree` tinyint(4) NOT NULL DEFAULT '0',
+  `minimum_quantity` int(10) unsigned NOT NULL DEFAULT '1',
   `active` tinyint(1) NOT NULL,
-  `deleted` tinyint(1) NOT NULL,
+  `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -118,6 +118,7 @@ DROP TABLE IF EXISTS `person`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `person` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `role` enum('customer','employee','vendor') DEFAULT 'customer',
   `name` varchar(255) DEFAULT NULL,
   `company` varchar(255) DEFAULT NULL,
   `address` text,
@@ -126,7 +127,7 @@ CREATE TABLE `person` (
   `tax_id` varchar(255) DEFAULT NULL,
   `payment_account_id` varchar(50) DEFAULT NULL,
   `active` tinyint(1) NOT NULL,
-  `deleted` tinyint(1) NOT NULL,
+  `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -164,16 +165,16 @@ DROP TABLE IF EXISTS `txn_line`;
 CREATE TABLE `txn_line` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `txn` int(10) unsigned NOT NULL,
-  `line` int(10) unsigned NOT NULL,
+  `line` int(10) unsigned DEFAULT NULL,
   `item` int(10) unsigned DEFAULT NULL,
   `ordered` int(11) NOT NULL,
-  `allocated` int(11) NOT NULL,
+  `allocated` int(11) NOT NULL DEFAULT '0',
   `override_name` varchar(255) DEFAULT NULL,
   `retail_price` decimal(9,2) NOT NULL,
   `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
   `discount` decimal(9,2) DEFAULT NULL,
-  `discount_manual` tinyint(1) NOT NULL,
-  `taxfree` tinyint(1) NOT NULL,
+  `discount_manual` tinyint(4) NOT NULL DEFAULT '0',
+  `taxfree` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`,`line`),
   KEY `item` (`item`)
@@ -211,12 +212,14 @@ CREATE TABLE `vendor_item` (
   `name` varchar(255) DEFAULT NULL,
   `retail_price` decimal(9,2) NOT NULL,
   `net_price` decimal(9,2) NOT NULL,
+  `promo_price` decimal(9,2) DEFAULT NULL,
   `barcode` varchar(20) DEFAULT NULL,
   `purchase_quantity` int(11) NOT NULL,
   `category` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `item` (`item`),
-  KEY `vendor` (`vendor`)
+  KEY `vendor` (`vendor`),
+  KEY `code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -233,9 +236,26 @@ CREATE TABLE `vendor_item` (
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`localhost`*/ /*!50003 FUNCTION `ROUND_TO_EVEN`(value decimal(32,16), places int) RETURNS decimal(32,16)
+CREATE DEFINER=`root`@`localhost` FUNCTION `ROUND_TO_EVEN`(value decimal(32,16), places int) RETURNS decimal(32,16)
 BEGIN  RETURN IF(ABS(value - TRUNCATE(value, places)) * POWER(10, places + 1) = 5            AND NOT CONVERT(TRUNCATE(abs(value) * POWER(10, places), 0),                            UNSIGNED) % 2 = 1,            TRUNCATE(value, places), ROUND(value, places));
-END */;;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `sale_price` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `sale_price`(retail_price decimal(9,2), type char(32), discount decimal(9,2)) RETURNS decimal(9,2)
+BEGIN   RETURN IF(type IS NOT NULL AND type != '',             CASE type             WHEN 'percentage' THEN               CAST(ROUND_TO_EVEN(retail_price * ((100 - discount) / 100), 2) AS DECIMAL(9,2))             WHEN 'relative' THEN               (retail_price - discount)             WHEN 'fixed' THEN               (discount)             END,             retail_price); END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -251,4 +271,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-05-20 13:10:46
+-- Dump completed on 2014-02-07 15:36:25
