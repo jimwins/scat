@@ -99,7 +99,15 @@ $(document).ready(function() {
         <li><a href="./person.php">People</a></li>
         <li><a href="./txns.php">Transactions</a></li>
         <li><a href="./till.php">Till</a></li>
-        <li><a id="reports" href="./report.php">Reports</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a id="reports" href="#">Quick</a></li>
+            <li><a href="report.php">Sales by Date</a></li>
+            <li><a href="report-items.php">Sales by Item</a></li>
+            <li><a href="report-daily.php">Daily Flow</a></li>
+          </ul>
+        </li>
       </ul>
     </div>
   </div>
