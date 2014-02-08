@@ -23,14 +23,11 @@ td.num {
   font:small-caps bold x-small sans-serif;
   text-align: center;
 }
-td.dollar {
-  text-align: right;
+td.dollar, td.right, td.bool {
+  text-align: center;
 }
 td.percent:after {
   content: '%';
-}
-td.right {
-  text-align: right;
 }
 
 #simplemodal-overlay { 
