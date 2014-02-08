@@ -16,7 +16,7 @@ $r= $db->query($q)
 bcscale(2);
 
 ?>
-<table class="sortable">
+<table class="table table-striped sortable" style="width: auto">
 <thead>
  <tr><th>Date</th><th>Cash</th><th>Credit</th><th>Amex</th><th>Other</th></tr>
 </thead>
