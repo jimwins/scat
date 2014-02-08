@@ -1,7 +1,7 @@
 <?
 require 'scat.php';
 
-head("transaction");
+head("Transaction @ Scat", true);
 
 $id= (int)$_REQUEST['id'];
 
@@ -83,14 +83,14 @@ dump_query($q);
 
 if ($txn['Ordered'] != $txn['Allocated']) {
 ?>
-<button id="allocate">Allocate Order</button>
+<button id="allocate" class="btn btn-default">Allocate Order</button>
 <script>
 $("#allocate").on('click', function() {
   $.getJSON("api/txn-allocate.php?callback=?",
             { txn: <?=$id?>},
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                alert(data.error);
               }
               $('#allocate').fadeOut();
             });
@@ -100,30 +100,33 @@ $("#allocate").on('click', function() {
 }
 if ($txn['meta'] == 'vendor') {
 ?>
-<button id="upload">Upload Order</button>
-<form id="upload-form" style="display: none" method="post" enctype="multipart/form-data" action="api/txn-upload-mac.php">
- <input type="hidden" name="txn" value="<?=$id?>">
- <input type="file" name="src">
- <br>
- <button>Load</button>
-</form>
+<div id="upload-status" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Results</h4>
+      </div>
+      <div class="modal-body">
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 $("body").html5Uploader({
   name: 'src',
   postUrl: 'api/txn-upload-mac.php?txn=<?=$id?>',
   onSuccess: function(e, file, response) {
     j= $.parseJSON(response);
-    $.modal(j.result);
+    $('#upload-status .modal-body').append(j.result);
+    $('#upload-status').modal('show');
   },
-});
-$("#upload").on('click', function() {
-  $("#upload-form").modal();
 });
 </script>
 <?
 }
 ?>
-<button id="receipt">Print Receipt</button>
+<button id="receipt" class="btn btn-default">Print Receipt</button>
 <script>
 $("#receipt").on('click', function() {
   var lpr= $('<iframe id="receipt" src="print/receipt.php?print=1&amp;id=<?=$id?>"></iframe>').hide();
