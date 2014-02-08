@@ -29,8 +29,11 @@ header("content-type: text/html;charset=utf-8");?>
  <title><?=ashtml($title)?></title>
  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
  <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+ <link rel="stylesheet" type="text/css" href="css/datepicker3.css">
  <link rel="stylesheet" type="text/css" href="static/screen.css">
- <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/base/jquery-ui.css">
+<?if (!$allnew) {?>
+  <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/base/jquery-ui.css">
+<?}?>
 <?if ($GLOBALS['DEBUG']) {?>
   <link rel="stylesheet" type="text/css" href="css/debug.css">
 <?}?>
@@ -41,6 +44,7 @@ header("content-type: text/html;charset=utf-8");?>
  </style>
  <script src="js/jquery.min.js"></script>
  <script src="js/bootstrap.min.js"></script>
+ <script src="js/bootstrap-datepicker.js"></script>
  <script src="lib/knockout/knockout-3.0.0.js"></script>
  <script src="lib/knockout/knockout.mapping-2.4.1.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
