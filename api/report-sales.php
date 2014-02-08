@@ -21,7 +21,7 @@ if (!$begin) {
 if (!$end) {
   $end= "DATE(NOW() + INTERVAL 1 DAY)";
 } else {
-  $end= "'" . $db->escape($end) . "'";
+  $end= "'" . $db->escape($end) . "' + INTERVAL 1 DAY";
 }
 
 $span= $_REQUEST['span'];
