@@ -1,0 +1,23 @@
+<?
+/* Set to false on a production instance. */
+$DEBUG= true;
+
+/* Database configuration */
+define('DB_SERVER', 'localhost');
+define('DB_USER', 'username');
+define('DB_PASSWORD', 'password');
+define('DB_SCHEMA', 'scat');
+
+define('LABEL_PRINTER', 'DYMO_LabelWriter_450_Turbo');
+
+/* Default values */
+define('DEFAULT_TAX_RATE', 9.00);
+
+/* Define EPS integration */
+define('EPS_URL', '');
+define('EPS_AccountID', '');
+define('EPS_AccountToken', '');
+define('EPS_AcceptorID', '');
+
+/* Printed on till receipts */
+define('BANK_DEPOSIT_INFO', 'My Bank<br>CHECKING<br>#1234567890<br>Scat LLC');
