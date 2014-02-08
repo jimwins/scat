@@ -298,6 +298,7 @@ function amount($d) {
 function dump_query($q) {
   static $num;
   $num+= 1;
+  if (!$GLOBALS['DEBUG']) return;
 ?>
 <button onclick="$('#query_<?=$num?>').toggle('drop')" class="btn btn-default">Show Query</button>
 <pre id="query_<?=$num?>" class="debug" style="display: none"><?=ashtml($q)?></pre>
