@@ -127,11 +127,28 @@ $("header #reports").on('click', function(ev) {
                              '<td align="right">$' + sales.total.toFixed(2) +
                              '</tr>'));
                 });
+<?if ($allnew) {?>
+                $('#quick-report .modal-body').append(t);
+                $('#quick-report').modal('show');
+<?} else {?>
                 t.modal();
+<?}?>
               }
             });
 });
 </script>
+<div id="quick-report" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Quick Report</h4>
+      </div>
+      <div class="modal-body">
+      </div>
+    </div>
+  </div>
+</div>
 <?if ($GLOBALS['DEBUG']) {?>
   <div id="corner-banner">DEBUG</div>
 <?}?>
