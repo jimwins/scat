@@ -3,23 +3,23 @@ require 'scat.php';
 
 head("report");
 ?>
-<form id="report-params">
+<form id="report-params" class="form-inline" role="form">
 From:
-<input name="begin" type="date">
+<input name="begin" class="form-control" type="date">
 to:
-<input name="end" type="date">
+<input name="end" class="form-control" type="date">
 Grouped by:
-<select name="span">
+<select name="span" class="form-control">
  <option value="day">Day</span>
  <option value="week">Week</span>
  <option value="month">Month</span>
  <option value="all">All</span>
 </select>
-Items: <input id="items" name="items" type="text">
-<input type="submit" value="Show">
+Items: <input id="items" name="items" type="text" class="form-control">
+<input type="submit" class="btn btn-primary" value="Show">
 </form>
 <br>
-<table id="results-template" style="display: none">
+<table id="results-template" class="table" style="display: none; width: auto">
  <caption><span>All Sales</span><button type="button" class="close" align="right" onclick="$(this).closest('table').remove(); return false" title="Close">&times;</button></caption>
  <thead>
   <tr><th>When</th><th>Subtotal</th><th>Resale</th><th>Tax</th><th>Total</th></tr>
