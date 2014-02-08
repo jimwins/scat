@@ -299,7 +299,7 @@ function dump_query($q) {
   static $num;
   $num+= 1;
 ?>
-<button onclick="$('#query_<?=$num?>').toggle('drop')">Show Query</button>
+<button onclick="$('#query_<?=$num?>').toggle('drop')" class="btn btn-default">Show Query</button>
 <pre id="query_<?=$num?>" class="debug" style="display: none"><?=ashtml($q)?></pre>
 <?
 }
