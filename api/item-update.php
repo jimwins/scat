@@ -3,6 +3,8 @@ include '../scat.php';
 include '../lib/item.php';
 
 $item_id= (int)$_REQUEST['item'];
+if (!isset($_REQUEST['item']))
+  $item_id= (int)$_REQUEST['id'];
 
 $item= item_load($db, $item_id);
 
