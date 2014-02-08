@@ -1,7 +1,7 @@
 <?
 include 'scat.php';
 
-head("till");
+head("Till @ Scat");
 
 $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) FROM payment
       WHERE method IN ('cash','change','withdrawal')";
@@ -81,22 +81,50 @@ if (!empty($count) && !empty($withdrawal)) {
   <?
 }
 ?>
-<form method="post" action="./till.php">
- Expected: <input type="text" disabled data-bind="value: expected">
- <br>
- Counted: <input id="focus" type="text" name="count" data-bind="value: current">
- <br>
- Over/Short: <input type="text" disabled data-bind="value: overshort">
- <br>
- Withdrawal: <input type="text" name="withdrawal" data-bind="value: withdraw">
- <br>
- Remaining: <input type="text" disabled data-bind="value: remaining">
- <br>
- <div data-bind="visible: checks, text: checks_pending"></div>
- <input type="submit" value="Kaching">
+<form class="form-horizontal" method="post" action="./till.php">
+  <div class="form-group">
+    <label for="expected" class="col-sm-2 control-label">Expected</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" disabled
+             id="expected" data-bind="value: expected">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="counted" class="col-sm-2 control-label">Counted</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control"
+             id="counted" data-bind="value: current">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="overshort" class="col-sm-2 control-label">Over/Short</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" disabled
+             id="overshort" data-bind="value: overshort">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="withdraw" class="col-sm-2 control-label">Withdrawal</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control"
+             id="counted" data-bind="value: withdraw">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="remaining" class="col-sm-2 control-label">Remaining</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" disabled
+             id="remaining" data-bind="value: remaining">
+    </div>
+  </div>
+  <div data-bind="visible: checks, text: checks_pending"></div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-primary">Kaching</button>
+    </div>
+  </div>
 </form>
 
-<script src="lib/knockout/knockout-3.0.0.js"></script>
 <script>
 var tillModel= function(expected, checks) {
   this.expected= ko.observable(expected);
