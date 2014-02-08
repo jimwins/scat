@@ -4,26 +4,28 @@ require 'lib/item.php';
 
 ob_start();
 
-head("search");
+head("Items @ Scat");
 
-$q= $_GET['q'];
+$search= $_GET['search'];
 ?>
 <div style="float: right">
- <button id="add-item">Add New Item</button>
+ <button id="add-item" class="btn btn-default">Add New Item</button>
 </div>
-<form method="get" action="<?=$_SERVER['PHP_SELF']?>">
-<input id="autofocus" type="text" autocomplete="off" size="60" name="q" value="<?=htmlspecialchars($q)?>">
-<label><input type="checkbox" value="1" name="all"<?=$_REQUEST['all']?' checked="checked"':''?>> All</label>
-<input type="submit" value="Search">
-</form>
+<?include 'item-searchform.php';?>
 <form id="add-item-form" style="display: none">
- <label>Code: <input type="text" name="code"></label>
- <br>
- <label>Name: <input type="text" name="name" size="40"></label>
- <br>
- <label>Price: <input type="text" name="retail_price" size="8"></label>
- <br>
- <input type="submit" value="Add Item">
+ <div class="form-group">
+   <label for="code">Code</label>
+   <input type="text" class="form-control" name="code" placeholder="Code">
+ </div>
+ <div class="form-group">
+   <label for="name">Name</label>
+   <input type="text" class="form-control" name="name" placeholder="Name" size="30">
+ </div>
+ <div class="form-group">
+   <label for="retail_price">Price</label>
+   <input type="text" class="form-control" name="retail_price" placeholder="$0.00">
+ </div>
+ <input type="submit" class="btn btn-primary" value="Add Item">
 </form>
 <script>
 $('#add-item').on('click', function(ev) {
@@ -46,7 +48,7 @@ $('#add-item-form').on('submit', function(ev) {
 <br>
 <?
 
-if (!$q) exit;
+if (!$search) exit;
 
 $begin= false;
 
@@ -54,7 +56,7 @@ $options= 0;
 if ($_REQUEST['all'])
   $options|= FIND_ALL;
 
-list($sql_criteria, $begin) = item_terms_to_sql($db, $q, $options);
+list($sql_criteria, $begin) = item_terms_to_sql($db, $search, $options);
 
 $extra= "";
 if (!$begin) {
@@ -104,7 +106,9 @@ ob_end_flush();
 
 dump_table($r);
 ?>
-<button id="print-price-labels">Print Price Labels</button>
+<button id="print-price-labels" class="btn btn-default">
+  Print Price Labels
+</button>
 <script>
 function updateItem(item) {
   $('.' + item.id + ' .name').text(item.name);

@@ -2,17 +2,8 @@
 require 'scat.php';
 require 'lib/item.php';
 
-head("item");
-
 $code= $_GET['code'];
 $id= (int)$_GET['id'];
-?>
-<form method="get" action="items.php">
-<input id="autofocus" type="text" name="q" value="<?=htmlspecialchars($code)?>">
-<input type="submit" value="Find Items">
-</form>
-<br>
-<?
 
 if (!$code && !$id) exit;
 
@@ -30,121 +21,99 @@ if (!$id && $code) {
 
 $item= item_load($db, $id);
 
+head("Item: " . ashtml($item['name']). " @ Scat");
+
+include 'item-searchform.php';
 ?>
+<form class="form-horizontal" role="form"
+      data-bind="submit: saveItem">
+  <div class="form-group">
+    <label for="code" class="col-sm-2 control-label">Code</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="code" placeholder="Code"
+             data-bind="value: item.code">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="name" class="col-sm-2 control-label">Name</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="name" placeholder="Name"
+             data-bind="value: item.name">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="brand" class="col-sm-2 control-label">Brand</label>
+    <div class="col-sm-8">
+      <select class="form-control" id="brand"
+              data-bind="value: selectedBrand, foreach: brands">
+        <option data-bind="text: name, value: id"></option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="retail_price" class="col-sm-2 control-label">MSRP</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="retail_price"
+             placeholder="MSRP"
+             data-bind="value: item.retail_price">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="sale_price" class="col-sm-2 control-label">Sale</label>
+    <div class="col-sm-8">
+      <input type="text" class="disabled form-control" id="sale_price" placeholder="Sale"
+             data-bind="value: item.sale_price" disabled>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="discount" class="col-sm-2 control-label">Discount</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="discount"
+             placeholder="Discount"
+             data-bind="value: item.discount">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="stock" class="col-sm-2 control-label">Stock</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="stock"
+             placeholder="Stock"
+             data-bind="value: item.stock">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="minimum_quantity" class="col-sm-2 control-label">
+      Minimum Quantity
+    </label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="minimum_quantity"
+             placeholder="Minimum Quantity"
+             data-bind="value: item.minimum_quantity">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="barcodes" class="col-sm-2 control-label"><i id="print" class="fa fa-print"></i> Barcodes</label>
+    <div class="col-sm-8">
+      <table id="barcodes" width="100%">
+        <tbody></tbody>
+        <tfoot>
+          <tr><td id="new-barcode" style="width:12em"><i class="fa fa-plus-square-o"></i></td><td></td><td></td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="form-group" data-bind="visible: changed">
+    <div class="col-sm-offset-2 col-sm-8">
+      <button type="submit" class="btn btn-primary"
+              data-loading-text="Processing...">
+        Save
+      </button>
+    </div>
+  </div>
+</form>
 <script>
-$(function() {
-  loadItem(<?=json_encode($item)?>);
-});
-
-var protoBarcodeRow= $('<tr><td></td><td class="quantity"></td><td>' +
-                       '<i class="remove fa fa-minus-square-o"></i>' +
-                       '</td></tr>');
-
-function loadItem(item) {
-  $('#item').data('item', item);
-  var active= parseInt(item.active);
-  if (active) {
-    $('#item #active').removeClass('fa-square-o').addClass('fa-check-square-o');
-  } else {
-    $('#item #active').removeClass('fa-check-square-o').addClass('fa-square-o');
-  }
-  $('#item #code').text(item.code);
-  $('#item #name').text(item.name);
-  $('#item #brand').text(item.brand);
-  $('#item #retail_price').text(amount(item.retail_price));
-  $('#item #sale').text(amount(item.sale_price));
-  $('#item #discount').text(item.discount_label);
-  $('#item #stock').text(item.stock);
-  $('#item #minimum_quantity').text(item.minimum_quantity);
-  $('#item #last_net').text(amount(item.last_net));
-
-  $('#item #barcodes tbody').empty();
-  if (typeof(item.barcodes) != 'undefined') {
-    var barcodes= item.barcodes.split(/,/);
-    $.each(barcodes, function(i, barcode) {
-      var info= barcode.split(/!/);
-      var row= protoBarcodeRow.clone();
-      $('td:nth(0)', row).text(info[0]);
-      $('td:nth(1)', row).text(info[1]);
-      $('.quantity', row).editable(editBarcodeQuantity);
-      $('#item #barcodes tbody').append(row);
-    });
-  }
-}
-</script>
-<style>
-#item th { text-align: right; color: #666; vertical-align: top; }
-#item th:after { content: ':'; }
-#item td { padding-left: 1em; padding-right: 1em; }
-#barcodes tr:nth-child(odd), #barcodes tr:nth-child(even) {
-  background: inherit;
-}
-</style>
-<table id="item">
- <tr><th><i id="print" class="fa fa-print"></i> Code</th><td><span id="code" class="editable"></span><i id="active" class="pull-right fa fa-check-square-o"></i></td></tr>
- <tr><th>Name</th><td id="name" class="editable"></td></tr>
- <tr><th>Brand</th><td id="brand"></td></tr>
- <tr><th>MSRP</th><td id="retail_price" class="editable"></td></tr>
- <tr><th>Sale</th><td id="sale"></td></tr>
- <tr><th>Discount</th><td id="discount" class="editable"></td></tr>
- <tr><th>Stock</th><td id="stock" class="editable"></td></tr>
- <tr><th>Minimum Stock</th><td id="minimum_quantity" class="editable"></td></tr>
- <tr><th onclick="$('#last_net').toggle()">Last Net</th><td id="last_net" style="display:none"></td></tr>
- <tr>
-  <th>Barcodes</th>
-  <td style="padding: 0">
-   <table id="barcodes" width="100%" style="padding: 0; margin: 0">
-    <tbody></tbody>
-    <tfoot>
-     <tr><td id="new-barcode" style="width:12em"><i class="fa fa-plus-square-o"></i></td><td></td><td></td></tr>
-    </tfoot>
-   </table>
-  </td>
- </tr>
-</table>
-<script>
-$('#item .editable').editable(function(value, settings) {
-  var item= $('#item').data('item');
-  var data= { item: item.id };
-  var key= this.id;
-  data[key] = value;
-
-  $.getJSON("api/item-update.php?callback=?",
-            data,
-            function (data) {
-              if (data.error) {
-                $.modal(data.error);
-                return;
-              }
-              loadItem(data.item);
-            });
-  return "...";
-}, {
-  event: 'click',
-  style: 'display: inline',
-  placeholder: '',
-});
-$('#item #brand').editable(function(value, settings) {
-  var item= $('#item').data('item');
-
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item.id, brand: value },
-            function (data) {
-              if (data.error) {
-                $.modal(data.error);
-                return;
-              }
-              loadItem(data.item);
-            });
-  return "...";
-}, {
-  event: 'dblclick',
-  style: 'display: inline',
-  type: 'select',
-  submit: 'OK',
-  loadurl: 'api/brand-list.php',
-  placeholder: '',
-});
 $('#item #active').on('dblclick', function(ev) {
   ev.preventDefault();
   var item= $('#item').data('item');
@@ -235,7 +204,7 @@ $q= "SELECT company Company,
        JOIN person ON vendor_item.vendor = person.id
       WHERE item = $id";
 
-echo '<h2 onclick="$(\'#vendors\').show()">Vendors</h2>';
+echo '<h2 onclick="$(\'#vendors\').toggle()">Vendors</h2>';
 echo '<div id="vendors" style="display: none">';
 dump_table($db->query($q));
 dump_query($q);
@@ -267,8 +236,66 @@ $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
       GROUP BY txn
       ORDER BY created";
 
-echo '<h2>History</h2>';
+echo '<h2 onclick="$(\'#history\').toggle()">History</h2>';
+echo '<div id="history" style="display: none">';
 dump_table($db->query($q));
 dump_query($q);
+echo '</div>';
 
 foot();
+?>
+<script>
+var model= {
+  search: '<?=ashtml($search);?>',
+  all: <?=(int)$all?>,
+  item: <?=json_encode($item);?>,
+  brands: [],
+};
+
+var viewModel= ko.mapping.fromJS(model);
+
+// ghetto change tracking
+viewModel.saved= ko.observable(ko.toJSON(viewModel.item));
+viewModel.changed= ko.computed(function() {
+  return ko.toJSON(viewModel.item) != viewModel.saved();
+});
+
+$.getJSON('api/brand-list.php?verbose=1&callback=?')
+  .done(function (data) {
+    ko.mapping.fromJS({ brands: data }, viewModel);
+    // make sure correct selection is made
+    viewModel.item.brand_id.valueHasMutated();
+  });
+
+viewModel.selectedBrand= ko.computed({
+  read: function () {
+    return this.item.brand_id();
+  },
+  write: function (value) {
+    if (typeof value != 'undefined' && value != '') {
+      this.item.brand_id(value);
+    }
+  },
+  owner: viewModel
+}).extend({ notify: 'always' });
+
+ko.applyBindings(viewModel);
+
+function loadItem(item) {
+  ko.mapping.fromJS({ item: item }, viewModel);
+  viewModel.saved(ko.toJSON(viewModel.item));
+}
+
+function saveItem(place) {
+  $.getJSON("api/item-update.php?callback=?",
+            ko.mapping.toJS(viewModel.item),
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+                return;
+              }
+              loadItem(data.item);
+            });
+}
+
+</script>
