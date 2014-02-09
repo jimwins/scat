@@ -1,13 +1,13 @@
 <?
 include 'scat.php';
 
-head("reorder");
+head("Reorder @ Scat", true);
 ?>
 <style>
 .order { text-align: right; }
 </style>
-<button id="download">Download</button>
-<button id="zero">Zero</button>
+<button id="download" class="btn btn-default">Download</button>
+<button id="zero" class="btn btn-default">Zero</button>
 <?
 
 $q= "SELECT code Code\$item,
