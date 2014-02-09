@@ -85,7 +85,6 @@ $("#report-params").on('submit', function(ev) {
                 var cap= $('#items').val();
                 if (cap) {
                   $("caption span", table).text(cap);
-                  $("caption span", table).editable(function(v,s) { return v; });
                 }
                 table.appendTo($("body"));
                 table.show();
