@@ -1258,7 +1258,7 @@ $('#tax_rate .val').editable(function(value, settings) {
 </table>
 <table id="notes" class="table table-condensed table-striped">
  <thead>
-  <tr><th style="width: 20px"><i id="add-note-button" class="fa fa-plus-square-o"></i></th><th style="width: 10em">Date</th><th>Note</th></tr>
+  <tr><th style="width: 20px"><a id="add-note-button" class="fa fa-plus-square-o"></a></th><th style="width: 10em">Date</th><th>Note</th></tr>
  </thead>
  <tbody>
  </tbody>
