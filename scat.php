@@ -50,7 +50,7 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="lib/knockout/knockout.mapping-2.4.1.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
  <script src="js/jquery.html5uploader.js"></script>
- <script src="js/jquery.jeditable.mini.js"></script>
+ <script src="js/jquery.jeditable.js"></script>
 <?if (!$allnew) {?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
