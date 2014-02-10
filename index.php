@@ -739,8 +739,9 @@ $("#choose-pay-method").on("click", "button", function(ev) {
 </script>
 <form role="form" id="pay-cash" class="pay-method" style="display: none">
  <div class="form-group">
-   <input class="amount" class="form-control" type="text" pattern="\d*">
-  </div>
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
+ </div>
  <input type="submit" class="btn btn-primary" name="Pay">
  <button name="cancel" class="btn btn-default">Cancel</button>
 </form>
@@ -753,8 +754,10 @@ $("#pay-cash").on("submit", function (ev) {
 });
 </script>
 <form id="pay-credit-refund" class="pay-method" style="display: none">
- <input class="amount" type="text" pattern="\d*">
- <br>
+ <div class="form-group">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
+ </div>
  <input type="submit" value="Refund">
  <button name="cancel">Cancel</button>
 </form>
@@ -780,8 +783,10 @@ $("#pay-credit-refund").on("submit", function (ev) {
 });
 </script>
 <form id="pay-credit-stored" class="pay-method" style="display: none">
- <input class="amount" type="text" pattern="\d*">
- <br>
+ <div class="form-group">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
+ </div>
  <input type="submit" value="Pay">
  <button name="cancel">Cancel</button>
 </form>
@@ -810,8 +815,10 @@ $("#pay-credit-stored").on("submit", function (ev) {
 });
 </script>
 <form id="pay-credit" class="pay-method" style="display: none">
- <input class="amount" type="text" pattern="\d*">
- <br>
+ <div class="form-group">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
+ </div>
  <input type="submit" value="Swipe">
  <button name="cancel">Cancel</button>
 </form>
@@ -847,7 +854,8 @@ $("#pay-credit").on("submit", function (ev) {
 </script>
 <div id="pay-credit-manual" class="pay-method" style="display: none">
  <div class="form-group">
-   <input class="amount form-control" type="text" pattern="\d*">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
  </div>
  <button class="btn btn-default" name="Visa">Visa</button>
  <button class="btn btn-default" name="MasterCard">MasterCard</button>
@@ -870,7 +878,8 @@ $("#pay-credit-manual").on("click", "button", function (ev) {
 </script>
 <form id="pay-square" class="pay-method" style="display: none">
  <div class="form-group">
-   <input class="amount form-control" type="text" pattern="\d*">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
  </div>
  <input class="btn btn-default" type="submit" name="Pay">
  <button class="btn btn-default" name="cancel">Cancel</button>
@@ -885,7 +894,8 @@ $("#pay-square").on("submit", function (ev) {
 </script>
 <form id="pay-dwolla" class="pay-method" style="display: none">
  <div class="form-group">
-   <input class="amount form-control" type="text" pattern="\d*">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
  </div>
  <input class="btn btn-default" type="submit" name="Pay">
  <button class="btn btn-default" name="cancel">Cancel</button>
@@ -908,7 +918,8 @@ $("#pay-dwolla").on("submit", function (ev) {
 </div>
 <div id="pay-gift-complete" class="pay-method" style="display: none">
  <div class="form-group">
-   <input class="amount form-control" type="text" pattern="\d*">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
  </div>
  <button class="btn btn-default" name="pay">Pay</button>
  <button class="btn btn-default" name="cancel">Cancel</button>
@@ -976,7 +987,8 @@ $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
 </script>
 <div id="pay-check" class="pay-method" style="display: none">
  <div class="form-group">
-   <input class="amount form-control" type="text" pattern="\d*">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
  </div>
  <button class="btn btn-default" name="pay">Pay</button>
  <button class="btn btn-default" name="cancel">Cancel</button>
@@ -990,7 +1002,8 @@ $("#pay-check").on("click", "button[name='pay']", function (ev) {
 </script>
 <form id="pay-discount" class="pay-method" style="display: none">
  <div class="form-group">
-   <input class="amount form-control" type="text" pattern="\d*">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
  </div>
  <button class="btn btn-default" name="pay">Discount</button>
  <button class="btn btn-default" name="cancel">Cancel</button>
@@ -1006,7 +1019,8 @@ $("#pay-discount").on("submit", function (ev) {
 </script>
 <div id="pay-bad-debt" class="pay-method" style="display: none">
  <div class="form-group">
-   <input class="amount form-control" type="text" pattern="\d*">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
  </div>
  <button class="btn btn-default" name="pay">Pay</button>
  <button class="btn btn-default" name="cancel">Cancel</button>
@@ -1020,7 +1034,8 @@ $("#pay-bad-debt").on("click", "button[name='pay']", function (ev) {
 </script>
 <form id="pay-donation" class="pay-method" style="display: none">
  <div class="form-group">
-   <input class="amount form-control" type="text" pattern="\d*">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="\d*">
  </div>
  <button class="btn btn-default" name="pay">Pay</button>
  <button class="btn btn-default" name="cancel">Cancel</button>
