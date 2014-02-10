@@ -93,7 +93,7 @@ if (!empty($count) && !empty($withdrawal)) {
     <label for="counted" class="col-sm-2 control-label">Counted</label>
     <div class="col-sm-10">
       <input type="text" class="form-control"
-             id="counted" data-bind="value: current">
+             id="counted" name="count" data-bind="value: current">
     </div>
   </div>
   <div class="form-group">
@@ -107,7 +107,7 @@ if (!empty($count) && !empty($withdrawal)) {
     <label for="withdraw" class="col-sm-2 control-label">Withdrawal</label>
     <div class="col-sm-10">
       <input type="text" class="form-control"
-             id="counted" data-bind="value: withdraw">
+             id="withdraw" name="withdrawal" data-bind="value: withdraw">
     </div>
   </div>
   <div class="form-group">
