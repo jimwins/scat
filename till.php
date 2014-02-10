@@ -86,7 +86,7 @@ if (!empty($count) && !empty($withdrawal)) {
     <label for="expected" class="col-sm-2 control-label">Expected</label>
     <div class="col-sm-10">
       <input type="text" class="form-control" disabled
-             id="expected" data-bind="value: expected">
+             id="expected" data-bind="value: amount(expected())">
     </div>
   </div>
   <div class="form-group">
@@ -96,11 +96,11 @@ if (!empty($count) && !empty($withdrawal)) {
              id="counted" name="count" data-bind="value: current">
     </div>
   </div>
-  <div class="form-group">
+  <div class="form-group" data-bind="css: { 'has-error' : overshort() < 0 }">
     <label for="overshort" class="col-sm-2 control-label">Over/Short</label>
     <div class="col-sm-10">
       <input type="text" class="form-control" disabled
-             id="overshort" data-bind="value: overshort">
+             id="overshort" data-bind="value: amount(overshort())">
     </div>
   </div>
   <div class="form-group">
@@ -110,11 +110,11 @@ if (!empty($count) && !empty($withdrawal)) {
              id="withdraw" name="withdrawal" data-bind="value: withdraw">
     </div>
   </div>
-  <div class="form-group">
+  <div class="form-group" data-bind="css: { 'has-error' : remaining() < 0 }">
     <label for="remaining" class="col-sm-2 control-label">Remaining</label>
     <div class="col-sm-10">
       <input type="text" class="form-control" disabled
-             id="remaining" data-bind="value: remaining">
+             id="remaining" data-bind="value: amount(remaining())">
     </div>
   </div>
   <div data-bind="visible: checks, text: checks_pending"></div>
