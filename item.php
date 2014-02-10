@@ -180,7 +180,7 @@ $('#barcodes #new-barcode').editable(function(value, settings) {
     return '';
   },
 });
-$('#item #print').on('dblclick', function(ev) {
+$('#print').on('dblclick', function(ev) {
   ev.preventDefault();
   var item= $('#item').data('item');
 
