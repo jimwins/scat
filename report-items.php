@@ -2,6 +2,26 @@
 require 'scat.php';
 require 'lib/item.php';
 
+$sql_criteria= "1=1";
+if (($items= $_REQUEST['items'])) {
+  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'], FIND_OR);
+}
+
+$begin= $_REQUEST['begin'];
+$end= $_REQUEST['end'];
+
+if (!$begin) {
+  $begin= date('Y-m-d', time() - 3 * 24 * 3600);
+} else {
+  $begin= $db->escape($begin);
+}
+
+if (!$end) {
+  $end= date('Y-m-d', time());
+} else {
+  $end= $db->escape($end);
+}
+
 head("Item Sales @ Scat", true);
 ?>
 <form id="report-params" class="form-horizontal" role="form"
@@ -12,9 +32,11 @@ head("Item Sales @ Scat", true);
     </label>
     <div class="col-sm-10">
       <div class="input-daterange input-group" id="datepicker">
-        <input type="text" class="form-control" name="begin" />
+        <input type="text" class="form-control" name="begin"
+               value="<?=ashtml($begin)?>" />
         <span class="input-group-addon">to</span>
-        <input type="text" class="form-control" name="end" />
+        <input type="text" class="form-control" name="end"
+               value="<?=ashtml($end)?>" />
       </div>
     </div>
   </div>
@@ -23,7 +45,9 @@ head("Item Sales @ Scat", true);
       Items
     </label>
     <div class="col-sm-10">
-      <input id="items" name="items" type="text" class="form-control" style="width: 20em">
+      <input id="items" name="items" type="text"
+             class="form-control" style="width: 20em"
+             value="<?=ashtml($items)?>">
     </div>
   </div>
   <div class="form-group">
@@ -33,28 +57,6 @@ head("Item Sales @ Scat", true);
   </div>
 </form>
 <?
-
-$begin= $_REQUEST['begin'];
-$end= $_REQUEST['end'];
-
-$sql_criteria= "1=1";
-if ($_REQUEST['items']) {
-  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'], FIND_OR);
-}
-
-if (!$begin) {
-  $days= $_REQUEST['days'];
-  if (!$days) $days= 10;
-  $begin= "DATE(NOW() - INTERVAL 3 DAY)";
-} else {
-  $begin= "'" . $db->escape($begin) . "'";
-}
-
-if (!$end) {
-  $end= "DATE(NOW() + INTERVAL 1 DAY)";
-} else {
-  $end= "'" . $db->escape($end) . "' + INTERVAL 1 DAY";
-}
 
 $q= "SELECT
             item.id AS meta,
@@ -69,9 +71,11 @@ $q= "SELECT
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
        LEFT JOIN item ON txn_line.item = item.id
+       LEFT JOIN brand ON item.brand = brand.id
+       LEFT JOIN barcode ON (item.id = barcode.item)
       WHERE type = 'customer'
         AND ($sql_criteria)
-        AND paid BETWEEN $begin AND $end
+        AND paid BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
       GROUP BY 1
       ORDER BY 2";
 
@@ -79,7 +83,6 @@ dump_table($db->query($q));
 
 dump_query($q);
 
-foot:
 foot();
 ?>
 <script>
@@ -89,3 +92,4 @@ $(function() {
       todayHighlight: true
   });
 });
+</script>
