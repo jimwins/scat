@@ -93,7 +93,7 @@ include 'item-searchform.php';
   </div>
 
   <div class="form-group">
-    <label for="barcodes" class="col-sm-2 control-label"><i id="print" class="fa fa-print"></i> Barcodes</label>
+    <label for="barcodes" class="col-sm-2 control-label"><a id="print" class="fa fa-print"></a> Barcodes</label>
     <div class="col-sm-8">
       <table id="barcodes" width="100%">
         <tbody></tbody>
@@ -180,9 +180,9 @@ $('#barcodes #new-barcode').editable(function(value, settings) {
     return '';
   },
 });
-$('#print').on('dblclick', function(ev) {
+$('#print').on('click', function(ev) {
   ev.preventDefault();
-  var item= $('#item').data('item');
+  var item= viewModel.item.id();
 
   $.getJSON("print/labels-price.php?callback=?",
             { id: item.id },
