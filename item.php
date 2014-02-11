@@ -185,7 +185,7 @@ $('#print').on('click', function(ev) {
   var item= viewModel.item.id();
 
   $.getJSON("print/labels-price.php?callback=?",
-            { id: item.id },
+            { id: item },
             function (data) {
               if (data.error) {
                 alert(data.error);
