@@ -31,8 +31,8 @@ if (isset($_REQUEST['name'])) {
     or die_query($db, $q);
 }
 
-if (isset($_REQUEST['brand']) && (int)$_REQUEST['brand']) {
-  $brand= (int) $_REQUEST['brand'];
+if (isset($_REQUEST['brand_id']) && (int)$_REQUEST['brand_id']) {
+  $brand= (int) $_REQUEST['brand_id'];
   $q= "UPDATE item
           SET brand = $brand
         WHERE id = $item_id";
