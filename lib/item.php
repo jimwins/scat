@@ -97,14 +97,16 @@ function item_find($db, $q, $options) {
 
   $items= array();
   while ($item= $r->fetch_assoc()) {
+    $item['active']= (int)$item['active'];
     $item['stock']= (int)$item['stock'];
     $item['minimum_quantity']= (int)$item['minimum_quantity'];
 
     $barcodes= explode(',', $item['barcodes']);
-    $item['barcode']= array();
+    $item['barcode']= $item['barcode_list']= array();
     foreach ($barcodes as $barcode) {
       list($code, $quantity)= explode('!', $barcode);
       $item['barcode'][$code]= $quantity;
+      $item['barcode_list'][]= array('code' => $code, 'quantity' => $quantity);
     }
 
     $item['fake_barcode']= generate_upc(sprintf("4004%07d", $item['id']));

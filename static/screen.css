@@ -23,7 +23,7 @@ td.num {
   font:small-caps bold x-small sans-serif;
   text-align: center;
 }
-td.dollar, td.right, td.bool {
+td.dollar, td.right, td.bool, td.order {
   text-align: center;
 }
 td.percent:after {

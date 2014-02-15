@@ -28,17 +28,21 @@ include 'item-searchform.php';
 <form class="form-horizontal" role="form"
       data-bind="submit: saveItem">
   <div class="form-group">
-    <label for="code" class="col-sm-2 control-label">Code</label>
+    <label for="code" class="col-sm-2 control-label">
+      <a class="text-left fa" id="active"
+         data-bind="css: { 'fa-check-square-o' : item.active(), 'fa-square-o' : !item.active() }"></a>
+      Code
+    </label>
     <div class="col-sm-8">
-      <input type="text" class="form-control" id="code" placeholder="Code"
-             data-bind="value: item.code">
+      <p class="form-control-static"
+         data-bind="jeditable: item.code"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="name" class="col-sm-2 control-label">Name</label>
     <div class="col-sm-8">
-      <input type="text" class="form-control" id="name" placeholder="Name"
-             data-bind="value: item.name">
+      <p class="form-control-static"
+         data-bind="jeditable: item.name"></p>
     </div>
   </div>
   <div class="form-group">
@@ -51,34 +55,31 @@ include 'item-searchform.php';
     </div>
   </div>
   <div class="form-group">
-    <label for="retail_price" class="col-sm-2 control-label">MSRP</label>
+    <label for="retail_price" class="col-sm-2 control-label">List</label>
     <div class="col-sm-8">
-      <input type="text" class="form-control" id="retail_price"
-             placeholder="MSRP"
-             data-bind="value: item.retail_price">
+      <p class="form-control-static"
+         data-bind="jeditable: item.retail_price, jeditableOptions: { ondisplay: amount, data: item.retail_price() }"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="sale_price" class="col-sm-2 control-label">Sale</label>
     <div class="col-sm-8">
-      <input type="text" class="disabled form-control" id="sale_price" placeholder="Sale"
-             data-bind="value: item.sale_price" disabled>
+      <p class="form-control-static"
+         data-bind="text: amount(item.sale_price())"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="discount" class="col-sm-2 control-label">Discount</label>
     <div class="col-sm-8">
-      <input type="text" class="form-control" id="discount"
-             placeholder="Discount"
-             data-bind="value: item.discount">
+      <p class="form-control-static"
+         data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : amount(item.discount()) } , data : item.discount() }"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="stock" class="col-sm-2 control-label">Stock</label>
     <div class="col-sm-8">
-      <input type="text" class="form-control" id="stock"
-             placeholder="Stock"
-             data-bind="value: item.stock">
+      <p class="form-control-static"
+         data-bind="jeditable: item.stock"></p>
     </div>
   </div>
   <div class="form-group">
@@ -86,19 +87,28 @@ include 'item-searchform.php';
       Minimum Quantity
     </label>
     <div class="col-sm-8">
-      <input type="text" class="form-control" id="minimum_quantity"
-             placeholder="Minimum Quantity"
-             data-bind="value: item.minimum_quantity">
+      <p class="form-control-static"
+         data-bind="jeditable: item.minimum_quantity"></p>
     </div>
   </div>
 
   <div class="form-group">
     <label for="barcodes" class="col-sm-2 control-label"><a id="print" class="fa fa-print"></a> Barcodes</label>
     <div class="col-sm-8">
-      <table id="barcodes" width="100%">
-        <tbody></tbody>
+      <table id="barcodes" class="table table-condensed">
+        <tbody data-bind="foreach: item.barcode_list">
+          <tr>
+            <td><span data-bind="click: $parent.removeBarcode"><a class="fa fa-trash-o"></a></span></td>
+            <td><span data-bind="text: $data.code"></span></td>
+            <td><span data-bind="text: $data.quantity"></span></td>
+          </tr>
+        </tbody>
         <tfoot>
-          <tr><td id="new-barcode" style="width:12em"><i class="fa fa-plus-square-o"></i></td><td></td><td></td></tr>
+          <tr>
+            <td id="new-barcode" colspan="3">
+              <a class="fa fa-plus-square-o"></a>
+            </td>
+          </tr>
         </tfoot>
       </table>
     </div>
@@ -114,12 +124,12 @@ include 'item-searchform.php';
   </div>
 </form>
 <script>
-$('#item #active').on('dblclick', function(ev) {
+$('#active').on('click', function(ev) {
   ev.preventDefault();
-  var item= $('#item').data('item');
+  var item= viewModel.item;
 
   $.getJSON("api/item-update.php?callback=?",
-            { item: item.id, active: parseInt(item.active) ? 0 : 1 },
+            { item: item.id(), active: item.active() ? 0 : 1 },
             function (data) {
               if (data.error) {
                 alert(data.error);
@@ -129,7 +139,7 @@ $('#item #active').on('dblclick', function(ev) {
             });
 });
 function editBarcodeQuantity(value, settings) {
-  var item= $('#item').data('item');
+  var item= viewModel.item;
   var row= $(this).closest('tr');
   var code= $('td:nth(0)', row).text();
 
@@ -143,24 +153,8 @@ function editBarcodeQuantity(value, settings) {
               loadItem(data.item);
             });
 }
-$('#barcodes').on('dblclick', '.remove', function(ev) {
-  var item= $('#item').data('item');
-  var row= $(this).closest('tr');
-  var code= $('td:nth(0)', row).text();
-  var qty= $('td:nth(1)', row).text();
-
-  $.getJSON("api/item-barcode-delete.php?callback=?",
-            { item: item.id, code: code },
-            function (data) {
-              if (data.error) {
-                alert(data.error);
-                return;
-              }
-              loadItem(data.item);
-            });
-});
-$('#barcodes #new-barcode').editable(function(value, settings) {
-  var item= $('#item').data('item');
+$('#new-barcode').editable(function(value, settings) {
+  var item= viewModel.item;
   $.getJSON("api/item-barcode-update.php?callback=?",
             { item: item.id, code: value },
             function (data) {
@@ -172,7 +166,7 @@ $('#barcodes #new-barcode').editable(function(value, settings) {
             });
   return  $(this).data('original');
 }, {
-  event: 'dblclick',
+  event: 'click',
   style: 'display: inline',
   placeholder: '',
   data: function(value, settings) {
@@ -197,7 +191,7 @@ $('#print').on('click', function(ev) {
 <?
 
 $q= "SELECT company Company,
-            retail_price MSRP\$dollar,
+            retail_price List\$dollar,
             net_price Net\$dollar,
             promo_price Promo\$dollar
        FROM vendor_item
@@ -278,6 +272,18 @@ viewModel.selectedBrand= ko.computed({
   },
   owner: viewModel
 }).extend({ notify: 'always' });
+
+viewModel.removeBarcode= function(place) {
+  $.getJSON("api/item-barcode-delete.php?callback=?",
+            { item: viewModel.item.id, code: place.code },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+                return;
+              }
+              loadItem(data.item);
+            });
+}
 
 ko.applyBindings(viewModel);
 

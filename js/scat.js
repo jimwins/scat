@@ -56,3 +56,53 @@ $(function() {
     }
   });
 });
+
+// http://blog.fawnanddoug.com/2012/05/inline-editor-custom-binding-for.html
+ko.bindingHandlers.jeditable = {
+  init: function(element, valueAccessor, allBindingsAccessor) {
+    // get the options that were passed in
+    var options = allBindingsAccessor().jeditableOptions || {};
+          
+    // "submit" should be the default onblur action like regular ko controls
+    if (!options.onblur) {
+      options.onblur = 'submit';
+    }
+
+    // set the value on submit and pass the editable the options
+    $(element).editable(function(value, params) {
+      valueAccessor()(value);
+      return value;
+    }, options);
+ 
+    //handle disposal (if KO removes by the template binding)
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+      //$(element).editable("destroy");
+    });
+ 
+  },
+      
+  //update the control when the view model changes
+  update: function(element, valueAccessor, allBindingsAccessor) {
+    // get the options that were passed in
+    var options = allBindingsAccessor().jeditableOptions || {};
+
+    var value = ko.utils.unwrapObservable(valueAccessor());
+    if (options.ondisplay) {
+      value= options.ondisplay(value);
+    }
+    $(element).html(value);
+  }
+};
+
+$.editable.types['text'].plugin= function(settings, original) {
+  $('input', this).addClass('form-control');
+}
+$.editable.types['select'].plugin= function(settings, original) {
+  $('select', this).addClass('form-control');
+}
+$.editable.types['textarea'].plugin= function(settings, original) {
+  $('textarea', this).addClass('form-control');
+}
+
+$.fn.editable.defaults.width  = 'none';
+$.fn.editable.defaults.height = 'none';

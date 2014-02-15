@@ -159,7 +159,7 @@ $('tbody tr .brand').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
   $.getJSON("api/item-update.php?callback=?",
-            { item: item, brand: value },
+            { item: item, brand_id: value },
             function (data) {
               if (data.error) {
                 alert(data.error);
