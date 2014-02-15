@@ -72,7 +72,7 @@ include 'item-searchform.php';
     <label for="discount" class="col-sm-2 control-label">Discount</label>
     <div class="col-sm-8">
       <p class="form-control-static"
-         data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : amount(item.discount()) } , data : item.discount() }"></p>
+         data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : item.discount() ? amount(item.discount()) : '...' } , data : item.discount() }"></p>
     </div>
   </div>
   <div class="form-group">
