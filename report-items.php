@@ -56,6 +56,7 @@ head("Item Sales @ Scat", true);
     </div>
   </div>
 </form>
+<div id="results">
 <?
 
 $q= "SELECT
@@ -82,7 +83,15 @@ $q= "SELECT
 dump_table($db->query($q));
 
 dump_query($q);
-
+?>
+  <button id="download" class="btn btn-default">Download</button>
+</div>
+<form id="post-csv" style="display: none"
+      method="post" action="api/encode-tsv.php">
+  <input type="hidden" name="fn" value="item-sales.txt">
+  <textarea id="file" name="file"></textarea>
+</form>
+<?
 foot();
 ?>
 <script>
@@ -91,5 +100,19 @@ $(function() {
       format: "yyyy-mm-dd",
       todayHighlight: true
   });
+});
+
+$('#download').on('click', function(ev) {
+  var tsv= "Code\tName\tQuantity\r\n";
+  $.each($("#results tr"), function (i, row) {
+    if (i > 0) {
+      tsv += $('td:nth(1) a', row).text() + "\t" +
+             $('td:nth(2)', row).text() + "\t" +
+             $('td:nth(3)', row).text() +
+             "\r\n";
+    }
+  });
+  $("#file").val(tsv);
+  $("#post-csv").submit();
 });
 </script>
