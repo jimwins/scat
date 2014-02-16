@@ -377,6 +377,8 @@ $('#bulk-edit-form form').on('submit', function(ev) {
               $.each(data.items, function (i, item) {
                 updateItem(item);
               });
+              $('#bulk-edit-form form')[0].reset();
+              $('#bulk-edit-form').collapse('hide');
             });
 });
 </script>
