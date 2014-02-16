@@ -68,11 +68,16 @@ ko.bindingHandlers.jeditable = {
       options.onblur = 'submit';
     }
 
+    // allow the editable function to be set as an option
+    if (!options.onupdate) {
+      options.onupdate= function(value, params) {
+        valueAccessor()(value);
+        return value;
+      }
+    }
+
     // set the value on submit and pass the editable the options
-    $(element).editable(function(value, params) {
-      valueAccessor()(value);
-      return value;
-    }, options);
+    $(element).editable(options.onupdate, options);
  
     //handle disposal (if KO removes by the template binding)
     ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
