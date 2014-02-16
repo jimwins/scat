@@ -25,8 +25,7 @@ head("Item: " . ashtml($item['name']). " @ Scat");
 
 include 'item-searchform.php';
 ?>
-<form class="form-horizontal" role="form"
-      data-bind="submit: saveItem">
+<form class="form-horizontal" role="form">
   <div class="form-group">
     <label for="code" class="col-sm-2 control-label">
       <a class="text-left fa" id="active"
@@ -34,31 +33,29 @@ include 'item-searchform.php';
       Code
     </label>
     <div class="col-sm-8">
-      <p class="form-control-static"
-         data-bind="jeditable: item.code"></p>
+      <p class="form-control-static" id="code"
+         data-bind="jeditable: item.code, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="name" class="col-sm-2 control-label">Name</label>
     <div class="col-sm-8">
-      <p class="form-control-static"
-         data-bind="jeditable: item.name"></p>
+      <p class="form-control-static" id="name"
+         data-bind="jeditable: item.name, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="brand" class="col-sm-2 control-label">Brand</label>
     <div class="col-sm-8">
-      <select class="form-control" id="brand"
-              data-bind="value: selectedBrand, foreach: brands">
-        <option data-bind="text: name, value: id"></option>
-      </select>
+      <p class="form-control-static" id="brand_id"
+         data-bind="jeditable: item.brand, jeditableOptions: { type: 'select', submit: 'OK', loadurl: 'api/brand-list.php', onupdate: saveItemProperty, onblur: 'cancel' }"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="retail_price" class="col-sm-2 control-label">List</label>
     <div class="col-sm-8">
-      <p class="form-control-static"
-         data-bind="jeditable: item.retail_price, jeditableOptions: { ondisplay: amount, data: item.retail_price() }"></p>
+      <p class="form-control-static" id="retail_price"
+         data-bind="jeditable: item.retail_price, jeditableOptions: { ondisplay: amount, data: item.retail_price(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
     </div>
   </div>
   <div class="form-group">
@@ -71,15 +68,15 @@ include 'item-searchform.php';
   <div class="form-group">
     <label for="discount" class="col-sm-2 control-label">Discount</label>
     <div class="col-sm-8">
-      <p class="form-control-static"
-         data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : item.discount() ? amount(item.discount()) : '...' } , data : item.discount() }"></p>
+      <p class="form-control-static" id="discount"
+         data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : item.discount() ? amount(item.discount()) : '...' } , data : item.discount(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="stock" class="col-sm-2 control-label">Stock</label>
     <div class="col-sm-8">
-      <p class="form-control-static"
-         data-bind="jeditable: item.stock"></p>
+      <p class="form-control-static" id="stock"
+         data-bind="jeditable: item.stock, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
     </div>
   </div>
   <div class="form-group">
@@ -87,8 +84,8 @@ include 'item-searchform.php';
       Minimum Quantity
     </label>
     <div class="col-sm-8">
-      <p class="form-control-static"
-         data-bind="jeditable: item.minimum_quantity"></p>
+      <p class="form-control-static" id="minimum_quantity"
+         data-bind="jeditable: item.minimum_quantity, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
     </div>
   </div>
 
@@ -111,15 +108,6 @@ include 'item-searchform.php';
           </tr>
         </tfoot>
       </table>
-    </div>
-  </div>
-
-  <div class="form-group" data-bind="visible: changed">
-    <div class="col-sm-offset-2 col-sm-8">
-      <button type="submit" class="btn btn-primary"
-              data-loading-text="Processing...">
-        Save
-      </button>
     </div>
   </div>
 </form>
@@ -248,31 +236,6 @@ var model= {
 
 var viewModel= ko.mapping.fromJS(model);
 
-// ghetto change tracking
-viewModel.saved= ko.observable(ko.toJSON(viewModel.item));
-viewModel.changed= ko.computed(function() {
-  return ko.toJSON(viewModel.item) != viewModel.saved();
-});
-
-$.getJSON('api/brand-list.php?verbose=1&callback=?')
-  .done(function (data) {
-    ko.mapping.fromJS({ brands: data }, viewModel);
-    // make sure correct selection is made
-    viewModel.item.brand_id.valueHasMutated();
-  });
-
-viewModel.selectedBrand= ko.computed({
-  read: function () {
-    return this.item.brand_id();
-  },
-  write: function (value) {
-    if (typeof value != 'undefined' && value != '') {
-      this.item.brand_id(value);
-    }
-  },
-  owner: viewModel
-}).extend({ notify: 'always' });
-
 viewModel.removeBarcode= function(place) {
   $.getJSON("api/item-barcode-delete.php?callback=?",
             { item: viewModel.item.id, code: place.code },
@@ -289,12 +252,16 @@ ko.applyBindings(viewModel);
 
 function loadItem(item) {
   ko.mapping.fromJS({ item: item }, viewModel);
-  viewModel.saved(ko.toJSON(viewModel.item));
 }
 
-function saveItem(place) {
+function saveItemProperty(value, settings) {
+  var item= viewModel.item;
+  var data= { item: item.id() };
+  var key= this.id;
+  data[key]= value;
+
   $.getJSON("api/item-update.php?callback=?",
-            ko.mapping.toJS(viewModel.item),
+            data,
             function (data) {
               if (data.error) {
                 alert(data.error);
@@ -302,6 +269,6 @@ function saveItem(place) {
               }
               loadItem(data.item);
             });
+  return "...";
 }
-
 </script>
