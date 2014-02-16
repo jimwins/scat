@@ -121,6 +121,67 @@ ob_end_flush();
 
 dump_table($r);
 ?>
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion"
+           href="#bulk-edit-form">
+          Bulk Edit
+        </a>
+      </h4>
+    </div>
+    <div id="bulk-edit-form" class="panel-collapse collapse">
+      <div class="panel-body">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label for="brand_id" class="col-sm-2 control-label control-label">
+              Brand
+            </label>
+            <div class="col-sm-10">
+              <select id="brand_id" name="brand_id" class="form-control">
+                <option value=""></option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="retail_price" class="col-sm-2 control-label">
+              List
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="retail_price" class="form-control"
+                     placeholder="$0.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="discount" class="col-sm-2 control-label">
+              Discount
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="discount" class="form-control"
+                     placeholder="$0.00 or 0%">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="minimum_quantity" class="col-sm-2 control-label">
+              Minimum Quantity
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="minimum_quantity" class="form-control"
+                     placeholder="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="col-sm-offset-2 col-sm-10">
+              <button class="btn btn-primary">Submit</button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <button id="print-price-labels" class="btn btn-default">
   Print Price Labels
 </button>
@@ -252,6 +313,70 @@ $('#print-price-labels').on('click', function(ev) {
                 alert(data.error);
                 return;
               }
+            });
+});
+
+$('#bulk-edit-form').on('show.bs.collapse', function () {
+  $.each($("tbody tr"), function (i, row) {
+    var cell= $('td:nth(0)', row);
+    cell.data('num', cell.text());
+    cell.html($('<input type="checkbox" checked>'));
+  });
+  $('thead tr th:nth(0)').html(
+    $('<input type="checkbox" checked>').on('click', function(ev, place) {
+      $.each($("tbody tr input[type='checkbox']"), function (i, row) {
+        row.checked= ev.target.checked;
+      });
+    })
+  );
+
+  if ($('#bulk-edit-form select#brand_id option').length > 2) return;
+
+  $.getJSON("api/brand-list?callback=?",
+            { verbose: 1 },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+                return;
+              }
+              var brand_list= $('#bulk-edit-form select#brand_id');
+              $.each(data, function (i, row) {
+                brand_list.append($('<option>').val(row.id).text(row.name));
+              });
+            });
+});
+$('#bulk-edit-form').on('hide.bs.collapse', function () {
+  $.each($("tbody tr"), function (i, row) {
+    var cell= $('td:nth(0)', row);
+    cell.text(cell.data('num'));
+  });
+  $('thead tr th:nth(0)').text('#');
+});
+
+$('#bulk-edit-form form').on('submit', function(ev) {
+  ev.preventDefault();
+
+  var data= $(this).serializeArray();
+  items= { name: 'items', value: [] };
+
+  $.each($("tbody tr"), function (i, row) {
+    if ($('input[type="checkbox"]', row).is(':checked')) {
+      items.value.push(row.className);
+    }
+  });
+
+  data.push(items);
+
+  $.getJSON("api/item-bulk-update.php?callback=?",
+            data,
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+                return;
+              }
+              $.each(data.items, function (i, item) {
+                updateItem(item);
+              });
             });
 });
 </script>
