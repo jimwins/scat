@@ -179,9 +179,14 @@ $('#print').on('click', function(ev) {
 <?
 
 $q= "SELECT company Company,
+            code Code,
             retail_price List\$dollar,
             net_price Net\$dollar,
-            promo_price Promo\$dollar
+            promo_price Promo\$dollar,
+            CONCAT('$', CAST(vendor_item.net_price / 0.6 AS DECIMAL(9,2)),
+                   ' - ',
+                   '$', CAST(vendor_item.net_price / 0.5 AS DECIMAL(9,2)))
+              AS Sale
        FROM vendor_item
        JOIN person ON vendor_item.vendor = person.id
       WHERE item = $id";
