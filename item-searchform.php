@@ -6,6 +6,7 @@
     <input id="autofocus" type="text" class="form-control" size="60"
            name="search" data-bind="value: search"
            placeholder="Enter keywords or scan barcode"
+           autocorrect="off" autocapitalize="off"
            value="<?=ashtml($_REQUEST['search'])?>">
     <span class="input-group-addon">
       <label>
