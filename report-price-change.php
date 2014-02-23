@@ -62,12 +62,14 @@ $q= "SELECT
             item.id AS meta,
             item.code Code\$item,
             item.name Name\$name,
-            item.retail_price AS Old\$dollar,
-            vendor_item.retail_price AS New\$dollar,
+            item.retail_price AS OldList\$dollar,
+            vendor_item.retail_price AS NewList\$dollar,
+            sale_price(item.retail_price, item.discount_type, item.discount)
+              AS OldSale\$dollar,
             CONCAT('$', CAST(vendor_item.net_price / 0.6 AS DECIMAL(9,2)),
                    ' - ',
                    '$', CAST(vendor_item.net_price / 0.5 AS DECIMAL(9,2)))
-              AS Sale
+              AS NewSale
        FROM item
        LEFT JOIN vendor_item ON item.id = vendor_item.item
        LEFT JOIN brand ON item.brand = brand.id
@@ -78,7 +80,11 @@ $q= "SELECT
       GROUP BY 1
       ORDER BY 2";
 
-dump_table($db->query($q));
+function Change($row) {
+  echo '<a class="price-change" data-id="' . $row[0] . '" data-msrp="' . $row[4] . '"><i class="fa fa-money"></a>';
+}
+
+dump_table($db->query($q), 'Change$right');
 
 dump_query($q);
 ?>
@@ -92,12 +98,71 @@ dump_query($q);
 <?
 foot();
 ?>
+<script type="text/html" id="change-template">
+  <form class="form price-change-form">
+    <input type="hidden" name="id">
+    <div class="form-group">
+      <label for="retail_price" class="control-label">New Retail Price</label>
+      <input type="text" class="form-control" name="retail_price"
+             placeholder="$0.00">
+    </div>
+    <div class="form-group">
+      <label for="discount" class="control-label">New Discount</label>
+      <input type="text" class="form-control" name="discount"
+             placeholder="$0.00 or 0%">
+    </div>
+    <div class="form-group">
+      <label class="control-label">
+        <input type="checkbox" name="print" value="1" checked>
+        Print new label?
+      </label>
+    </div>
+    <input type="submit" class="btn btn-primary" value="Save">
+  </form>
+</script>
 <script>
 $(function() {
   $('#report-params .input-daterange').datepicker({
       format: "yyyy-mm-dd",
       todayHighlight: true
   });
+});
+
+$('.price-change').popover({
+  html: true,
+  placement: 'bottom',
+  content: function(e) {
+    var tmpl= $($('#change-template').html());
+    $('input[name="id"]', tmpl).val($(this).data('id'));
+    $('input[name="retail_price"]', tmpl).val($(this).data('msrp'));
+    return tmpl;
+  },
+});
+
+$('body').on('submit', '.price-change-form', function(ev) {
+  ev.preventDefault();
+  var form= $(this);
+  $.getJSON("api/item-update.php?callback=?",
+            form.serializeArray(),
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+                return;
+              }
+              if ($('input[name="print"]:checked', form).length) {
+                $.getJSON("print/labels-price.php?callback=?",
+                          { id: $('input[name="id"]', form).val() },
+                          function (data) {
+                            if (data.error) {
+                              alert(data.error);
+                              return;
+                            }
+                          });
+              }
+              $(form).parent().parent()
+                     .siblings('.price-change')
+                     .popover('hide');
+            });
 });
 
 $('#download').on('click', function(ev) {
