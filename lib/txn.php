@@ -191,8 +191,8 @@ function txn_apply_discounts($db, $id) {
 
   // XXX store this somewhere else, obviously
   $discounts= array(
-    'MXG-%'  => array(12 => '6.99', 72 => '5.99'),
-    'MTEX%' => array(12 => '5.99', 72 => '4.99'),
+    'MXG-%'  => array(12 => '6.99', 36 => '6.49', 72 => '5.99'),
+    'MTEX%' => array(12 => '5.99', 36 => '5.49', 72 => '4.99'),
   );
 
   foreach ($discounts as $code => $breaks) {
@@ -232,4 +232,133 @@ function txn_apply_discounts($db, $id) {
   }
 
   return true;
+}
+
+class Transaction {
+  private $db;
+  private $data;
+
+  public $id;
+
+  public function __construct($db, $id= null) {
+    $this->db= $db;
+    $this->id= $id;
+
+    if ($id)
+      $this->data= txn_load_full($db, $this->id);
+  }
+
+  public function __set($name, $value) {
+    $this->data['txn'][$name]= $value;
+  }
+
+  public function __get($name) {
+    return $this->data['txn'][$name];
+  }
+
+  public function __isset($name) {
+    return isset($this->data['txn'][$name]);
+  }
+
+  public function __unset($name) {
+    unset($this->data['txn'][$name]);
+  }
+
+  public function canPay($method, $amount) {
+    // only 'gift' and 'cash' allow giving change
+    $change= (($method == 'cash' || $method == 'gift') ? true : false);
+
+    if (!$change &&
+        (($this->total >= 0 &&
+          bccomp(bcadd($amount, $this->total_paid), $this->total) > 0)
+         ||
+         ($this->total < 0 &&
+          bccomp(bcadd($amount, $this->total_paid), $this->total) < 0)))
+    {
+      return false;
+    }
+
+    return true;
+  }
+
+  public function addPayment($method, $amount, $extra) {
+    // only 'gift' and 'change' allow giving change
+    $change= (($method == 'cash' || $method == 'gift') ? true : false);
+
+    if (!$this->canPay($method, $amount)) {
+      throw new Exception("Amount is too much.");
+    }
+
+    $this->db->start_transaction();
+
+    $extra_fields= "";
+    foreach ($extra as $key => $value) {
+      $extra_fields.= "$key = '" . $this->db->escape($value) . "', ";
+    }
+
+    // add payment record
+    $q= "INSERT INTO payment
+            SET txn = {$this->id}, method = '$method', amount = $amount,
+            $extra_fields
+            processed = NOW()";
+    $r= $this->db->query($q)
+      or die_query($this->db, $q);
+
+    $payment= $this->db->insert_id;
+
+    // if total > 0 and amount + paid > total, add change record
+    $change_paid= 0.0;
+    if ($change && $this->total > 0 &&
+        bccomp(bcadd($amount, $this->total_paid), $this->total) > 0) {
+      $change_paid= bcsub($this->total, bcadd($amount, $this->total_paid));
+
+      $q= "INSERT INTO payment
+              SET txn = {$this->id}, method = 'change', amount = $change_paid,
+              processed = NOW()";
+      $r= $this->db->query($q)
+        or die_query($this->db, $q);
+    }
+
+    $this->total_paid= bcadd($this->total_paid, bcadd($amount, $change_paid));
+
+    // if we're all paid up, record that the txn is paid
+    if (!bccomp($this->total_paid, $this->total)) {
+      $q= "UPDATE txn SET paid = NOW() WHERE id = {$this->id}";
+      $r= $this->db->query($q)
+        or die_query($this->db, $q);
+    } elseif ($this->paid) {
+      // we thought we were paid, but now we must not be
+      $q= "UPDATE txn SET paid = NULL WHERE id = {$this->id}";
+      $r= $this->db->query($q)
+        or die_query($this->db, $q);
+    }
+
+    $this->db->commit();
+
+    return $payment;
+  }
+
+  public function removePayment($payment, $override) {
+    if ($this->paid && !$override)
+      throw new Exception("Transaction is fully paid, can't remove payments.");
+
+    $this->db->start_transaction()
+      or die_query($this->db, "START TRANSACTION");
+
+    // add payment record
+    $q= "DELETE FROM payment WHERE id = $payment AND txn = {$this->id}";
+    $r= $this->db->query($q)
+      or die_query($this->db, $q);
+
+    if ($this->paid) {
+      $q= "UPDATE txn SET paid = NULL WHERE id = {$this->id}";
+      $r= $this->db->query($q)
+        or die_query($this->db, $q);
+    }
+
+    $this->db->commit()
+      or die_query($this->db, "COMMIT");
+
+    return true;
+  }
 }
