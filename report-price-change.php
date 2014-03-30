@@ -69,7 +69,9 @@ $q= "SELECT
             CONCAT('$', CAST(vendor_item.net_price / 0.6 AS DECIMAL(9,2)),
                    ' - ',
                    '$', CAST(vendor_item.net_price / 0.5 AS DECIMAL(9,2)))
-              AS NewSale
+              AS NewSale,
+            (SELECT SUM(allocated) FROM txn_line WHERE item = item.id)
+              AS Stock
        FROM item
        LEFT JOIN vendor_item ON item.id = vendor_item.item
        LEFT JOIN brand ON item.brand = brand.id
