@@ -78,7 +78,7 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
               WHERE filled IS NOT NULL
                 AND filled BETWEEN $begin AND $end
                 AND type = 'customer'
-                AND code NOT LIKE 'ZZ-gift%' AND code NOT LIKE 'ZZ-online'
+                AND code NOT LIKE 'ZZ-gift%'
                 AND ($items)
               GROUP BY txn.id
             ) t
