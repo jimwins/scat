@@ -1,8 +1,8 @@
 <?php
 require '../scat.php';
 
-$begin= '2013-01-01';
-$end= '2013-02-01';
+$month= $_REQUEST['month'];
+if (!$month) die("No month given.");
 
 $q= "SELECT payment.id, method,
             DATE_FORMAT(processed, '%m/%d/%Y') processed,
@@ -10,14 +10,14 @@ $q= "SELECT payment.id, method,
             CONCAT(YEAR(filled), '-', number) num
        FROM payment
        JOIN txn ON payment.txn = txn.id
-      WHERE processed BETWEEN '$begin' AND '$end'
+      WHERE processed BETWEEN '$month-01' AND '$month-01' + INTERVAL 1 MONTH
       ORDER BY 1";
 
 $r= $db->query($q)
   or die_query($db, $q);
 
 header('Content-Type: text/plain');
-header('Content-Disposition: attachment; filename="payments.txt"');
+#header('Content-Disposition: attachment; filename="payments.txt"');
 
 echo "Journal Number\tDate\tMemo\tAccount Number\tDebit Amount\tCredit Amount\r\n";
 
@@ -27,24 +27,24 @@ while ($pay= $r->fetch_assoc()) {
 
   $accts= array(
                 'drawer' => array(
-                  'cash' =>   '61220',
-                  'withdrawal' => '11130',
+                  'cash' =>       array('11130', '61220'),
+                  'withdrawal' => array('11130', '11160'),
                  ),
                 'customer' => array(
-                  'cash' =>   '11130',
-                  'change' => '11130',
-                  'credit' => '11190',
-                  'square' => '11180',
-                  'gift' =>   '21700',
-                  'check' =>  '11160',
-                  'dwolla'=>  '11170',
-                  'discount'=>'53000',
-                  'bad'=>     '61900',
-                  'donation'=>'63150',
-                  'internal'=>'64500',
+                  'cash' =>   array('11130', '11200'),
+                  'change' => array('11130', '11200'),
+                  'credit' => array('11190', '11200'),
+                  'square' => array('11180', '11200'),
+                  'gift' =>   array('21700', '11200'),
+                  'check' =>  array('11160', '11200'),
+                  'dwolla'=>  array('11170', '11200'),
+                  'discount'=>array('53000', '11200'),
+                  'bad'=>     array('61900', '11200'),
+                  'donation'=>array('63150', '11200'),
+                  'internal'=>array('64500', '11200'),
                  ));
 
-  $debit= $accts[$pay['type']][$pay['method']];
+  list($debit, $credit)= $accts[$pay['type']][$pay['method']];
 
   if (!$debit) {
     die("Don't know how to handle $pay[method] for $pay[type] payment");
@@ -53,12 +53,10 @@ while ($pay= $r->fetch_assoc()) {
   switch ($pay['type']) {
   case 'drawer':
     $memo= "Till Count $pay[num]";
-    $credit= '11160';
     break;
 
   case 'customer':
     $memo= "Payment for invoice $pay[num]";
-    $credit= '11200';
     break;
 
   default:

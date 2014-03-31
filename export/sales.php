@@ -3,11 +3,10 @@ require '../scat.php';
 
 bcscale(2);
 
-header('Content-Type: text/plain');
-header('Content-Disposition: attachment; filename="sales.txt"');
+$month= $_REQUEST['month'];
+if (!$month) die("No month given.");
 
-$begin= '2013-01-01';
-$end= '2013-02-01';
+$range= "'$month-01' AND '$month-01' + INTERVAL 1 MONTH";
 
 $q= "SELECT id, type, created,
             DATE_FORMAT(IF(type = 'customer', paid, created), '%m/%d/%Y') date,
@@ -49,13 +48,16 @@ $q= "SELECT id, type, created,
             tax_rate
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-      WHERE (type = 'correction' AND created BETWEEN '$begin' AND '$end')
-         OR (type = 'customer'   AND paid    BETWEEN '$begin' AND '$end')
+      WHERE (type = 'correction' AND created BETWEEN $range)
+         OR (type = 'customer'   AND paid    BETWEEN $range)
       GROUP BY txn.id
       ORDER BY id) t";
 
 $r= $db->query($q)
   or die_query($db, $q);
+
+header('Content-Type: text/plain');
+#header('Content-Disposition: attachment; filename="sales.txt"');
 
 echo "Journal Number\tDate\tMemo\tAccount Number\tDebit Amount\tCredit Amount\r\n";
 
