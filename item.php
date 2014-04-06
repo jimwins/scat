@@ -21,7 +21,7 @@ if (!$id && $code) {
 
 $item= item_load($db, $id);
 
-head("Item: " . ashtml($item['name']). " @ Scat");
+head("Item: " . ashtml($item['name']). " @ Scat", true);
 
 include 'item-searchform.php';
 ?>

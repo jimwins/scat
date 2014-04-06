@@ -134,7 +134,7 @@ $("header #reports").on('click', function(ev) {
                              '</tr>'));
                 });
 <?if ($allnew) {?>
-                $('#quick-report .modal-body').append(t);
+                $('#quick-report .modal-body').empty().append(t);
                 $('#quick-report').modal('show');
 <?} else {?>
                 t.modal();
