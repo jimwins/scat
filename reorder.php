@@ -43,7 +43,8 @@ dump_query($q);
 <textarea id="file" name="file"></textarea>
 </form>
 <script>
-$('.order').editable(function (val, settings) { return val; });
+$('.order').editable(function (val, settings) { return val; },
+                     { width: '3em' });
 
 $('#download').on('click', function(ev) {
   var tsv= "code\tqty\r\n";
