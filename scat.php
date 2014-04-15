@@ -301,6 +301,7 @@ function expand_field($data, $class) {
                  'change' => 'Change',
                  'credit' => 'Credit Card',
                  'square' => 'Square',
+                 'stripe' => 'Stripe',
                  'gift' => 'Gift Card',
                  'check' => 'Check',
                  'dwolla' => 'Dwolla',

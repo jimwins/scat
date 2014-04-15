@@ -112,6 +112,7 @@ $methods= array(
   'change' => 'Change',
   'credit' => 'Credit Card',
   'square' => 'Square',
+  'stripe' => 'Stripe',
   'dwolla' => 'Dwolla',
   'gift' => 'Gift Card',
   'check' => 'Check',
