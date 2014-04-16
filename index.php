@@ -200,7 +200,7 @@ function addItem(item) {
             });
 }
 
-var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><i class="fa fa-trash-o" title="Remove"></i></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable dollar" align="right"><span class="price"></span></td><td align="right"><span class="ext"></span></td></tr>');
+var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><i class="fa fa-trash-o" title="Remove"></i></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable dollar" class="right"><span class="price"></span></td><td class="right"><span class="ext"></span></td></tr>');
 
 function addNewItem(item) {
   var row= $("#items tbody tr:data(line_id=" + item.line_id + ")").first();
