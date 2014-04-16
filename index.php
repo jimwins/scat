@@ -84,8 +84,7 @@ function updateRow(row) {
   $('.name', row).text(row.data('name'));
   $('.discount', row).text(row.data('discount'));
   $('.price', row).text(row.data('price').toFixed(2));
-  var ext= row.data('quantity') * row.data('price');
-  $('.ext', row).text(amount(ext));
+  $('.ext', row).text(amount(row.data('ext_price')));
 }
 
 function updateValue(row, key, value) {

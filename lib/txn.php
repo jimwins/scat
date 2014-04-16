@@ -96,14 +96,15 @@ function txn_load_items($db, $id) {
                    WHEN 'fixed' THEN (txn_line.discount)
                  END,
                  txn_line.retail_price) price,
-              IF(txn_line.discount_type,
-                 CASE txn_line.discount_type
-                   WHEN 'percentage' THEN CAST(ROUND_TO_EVEN(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2) AS DECIMAL(9,2))
-                   WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
-                   WHEN 'fixed' THEN (txn_line.discount)
-                 END,
-                 txn_line.retail_price) *
-                (ordered * IF(txn.type = 'customer', -1, 1)) ext_price,
+              (IF(type = 'customer', -1, 1) * ordered *
+               CASE txn_line.discount_type
+                 WHEN 'percentage' THEN txn_line.retail_price *
+                                         ((100 - txn_line.discount) / 100)
+                 WHEN 'relative' THEN (txn_line.retail_price -
+                                       txn_line.discount) 
+                 WHEN 'fixed' THEN (txn_line.discount)
+                 ELSE txn_line.retail_price
+               END) AS ext_price,
               IFNULL(CONCAT(IF(item.retail_price, 'MSRP $', 'List $'),
                             txn_line.retail_price,
                             CASE txn_line.discount_type
