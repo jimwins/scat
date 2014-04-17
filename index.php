@@ -259,7 +259,7 @@ function updateTotal() {
   $.each(payments, function(i, payment) {
     var row= paymentRow.clone();
     row.data(payment);
-    var remove= $('<button class="admin btn btn-link" name="remove"><i class="fa fa-trash-o"></i></button>');
+    var remove= $('<a class="admin" name="remove"><i class="fa fa-trash-o"></i></a>');
     if (payment.method == 'discount' && payment.discount) {
       $('.payment-method', row).text('Discount (' + payment.discount + '%):');
       remove.removeClass('admin');
@@ -269,7 +269,7 @@ function updateTotal() {
     $('.payment-amount', row).text(amount(payment.amount));
 
     if (payment.method == 'credit') {
-      $('.payment-buttons', row).append($('<button name="print" class="btn btn-link"><i class="fa fa-print"></i></button>'));
+      $('.payment-buttons', row).append($('<a name="print"><i class="fa fa-print"></i></a>'));
     }
     $('.payment-buttons', row).append(remove);
 
@@ -1235,11 +1235,11 @@ $('#person-create').on('click', "button[name='cancel'", function(ev) {
   <tr id="due-row" style="display:none"><th colspan=4></th><th align="right">Due:</th><td id="due" class="right">$0.00</td></tr>
  </tfoot>
 <script>
-$("#items").on("click", ".payment-row button[name='print']", function() {
+$("#items").on("click", ".payment-row a[name='print']", function() {
   var row= $(this).closest(".payment-row");
   printChargeRecord(row.data("id"));
 });
-$("#items").on("click", ".payment-row button[name='remove']", function() {
+$("#items").on("click", ".payment-row a[name='remove']", function() {
   var row= $(this).closest(".payment-row");
   $.getJSON("api/txn-remove-payment.php?callback=?",
             { txn: $("#txn").data("txn"), id: row.data("id"),
