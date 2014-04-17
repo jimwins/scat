@@ -427,7 +427,7 @@ function printChargeRecord(id) {
 $(function() {
   $('#txn').data('tax_rate', 0.00);
 
-  $(document).bind('keydown', 'meta+shift+a', function(ev) {
+  $(document).bind('keydown', 'meta+shift+z', function(ev) {
     $('.admin').toggle();
   });
   $(document).bind('keydown', 'meta+p', function(ev) {
