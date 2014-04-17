@@ -259,8 +259,10 @@ function updateTotal() {
   $.each(payments, function(i, payment) {
     var row= paymentRow.clone();
     row.data(payment);
+    var remove= $('<button class="admin btn btn-link" name="remove"><i class="fa fa-trash-o"></i></button>');
     if (payment.method == 'discount' && payment.discount) {
       $('.payment-method', row).text('Discount (' + payment.discount + '%):');
+      remove.removeClass('admin');
     } else {
       $('.payment-method', row).text(paymentMethods[payment.method] + ':');
     }
@@ -269,7 +271,7 @@ function updateTotal() {
     if (payment.method == 'credit') {
       $('.payment-buttons', row).append($('<button name="print" class="btn btn-link"><i class="fa fa-print"></i></button>'));
     }
-    $('.payment-buttons', row).append($('<button class="admin btn btn-link" name="remove"><i class="fa fa-trash-o"></i></button>'));
+    $('.payment-buttons', row).append(remove);
 
     $('#due-row').before(row);
   });
