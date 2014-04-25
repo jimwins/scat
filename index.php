@@ -729,8 +729,7 @@ $("#return").on("click", function() {
  <br>
  <button class="btn btn-default" data-value="gift">Gift Card</button>
  <button class="btn btn-default" data-value="check">Check</button>
- <button class="btn btn-default" data-value="square">Square</button>
- <button class="btn btn-default" data-value="dwolla">Dwolla</button>
+ <button class="btn btn-default" data-value="other">Other</button>
  <br>
  <button class="btn btn-default" data-value="discount">Discount</button>
  <button class="btn btn-default" data-value="donation">Donation</button>
@@ -886,36 +885,27 @@ $("#pay-credit-manual").on("click", "button", function (ev) {
                     cc_type: cc_type });
 });
 </script>
-<form id="pay-square" class="pay-method" style="display: none">
+<form id="pay-other" class="pay-method" style="display: none">
  <div class="form-group">
    <input class="amount form-control input-lg text-center"
           type="text" pattern="\d*">
  </div>
- <input class="btn btn-default" type="submit" name="Pay">
- <button class="btn btn-default" name="cancel">Cancel</button>
+ <button class="btn btn-default" data-value="square">Square</button>
+ <button class="btn btn-default" data-value="stripe">Stripe</button>
+ <button class="btn btn-default" data-value="dwolla">Dwolla</button>
+ <button class="btn btn-default" data-value="cancel">Cancel</button>
 </form>
 <script>
-$("#pay-square").on("submit", function (ev) {
+$("#pay-other").on("click", "button", function (ev) {
   ev.preventDefault();
   var txn= $("#txn").data("txn");
-  var amount= $("#pay-square .amount").val();
-  txn_add_payment({ id: txn, method: "square", amount: amount, change: false });
-});
-</script>
-<form id="pay-dwolla" class="pay-method" style="display: none">
- <div class="form-group">
-   <input class="amount form-control input-lg text-center"
-          type="text" pattern="\d*">
- </div>
- <input class="btn btn-default" type="submit" name="Pay">
- <button class="btn btn-default" name="cancel">Cancel</button>
-</form>
-<script>
-$("#pay-dwolla").on("submit", function (ev) {
-  ev.preventDefault();
-  var txn= $("#txn").data("txn");
-  var amount= $("#pay-dwolla .amount").val();
-  txn_add_payment({ id: txn, method: "dwolla", amount: amount, change: false });
+  var amount= $("#pay-other .amount").val();
+  var method= $(this).data('value');
+  if (method == 'cancel') {
+    $.modal.close();
+    return false;
+  }
+  txn_add_payment({ id: txn, method: method, amount: amount, change: false });
 });
 </script>
 <div id="pay-gift" class="pay-method" style="display: none">
