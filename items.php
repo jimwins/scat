@@ -23,8 +23,16 @@ $search= $_GET['search'];
         <form>
          <div class="form-group">
            <label for="code">Code</label>
-           <input type="text" class="form-control"
-                  name="code" placeholder="Code">
+           <div class="input-group">
+             <input type="text" class="form-control"
+                    name="code" placeholder="Code">
+             <span class="input-group-btn">
+               <button class="btn btn-default" type="button"
+                       id="load" title="Load from Vendor">
+                 <span class="fa fa-upload"></span>
+               </button>
+             </span>
+           </div>
          </div>
          <div class="form-group">
            <label for="name">Name</label>
@@ -36,6 +44,7 @@ $search= $_GET['search'];
            <input type="text" class="form-control"
                   name="retail_price" placeholder="$0.00">
          </div>
+         <input type="hidden" name="barcode" value="">
          <input type="submit" class="btn btn-primary" value="Add Item">
         </form>
       </div>
@@ -45,6 +54,19 @@ $search= $_GET['search'];
 <script>
 $('#add-item').on('click', function(ev) {
   $('#add-item-form').modal('show');
+});
+$('#add-item-form #load').on('click', function(ev) {
+  $.getJSON("api/vendor-item-load.php?callback=?",
+            { code: $('#add-item-form [name="code"]').val() },
+            function (data) {
+              if (data.error) {
+                alert(data.error + ': ' + data.explain);
+                return;
+              }
+              $('#add-item-form [name="name"]').val(data.item.name);
+              $('#add-item-form [name="retail_price"]').val(data.item.retail_price);
+              $('#add-item-form [name="barcode"]').val(data.item.barcode);
+            });
 });
 $('#add-item-form form').on('submit', function(ev) {
   ev.preventDefault();
