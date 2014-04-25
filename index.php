@@ -683,6 +683,9 @@ $("#pay").on("click", function() {
                 $('#choose-pay-method #credit-stored').show();
               }
 
+              $("#choose-pay-method #due").val(amount(txn_raw.total -
+                                                      txn_raw.paid));
+
               $.modal($("#choose-pay-method"), { persist: true});
             });
 });
@@ -711,6 +714,11 @@ $("#return").on("click", function() {
 }
 </style>
 <div id="choose-pay-method" style="display: none">
+ <div class="input-group input-group-lg"
+          style="width: 20em; margin: auto">
+   <span class="input-group-addon">Due:</span>
+   <input type="text" class="form-control" id="due" disabled value="$0.00">
+ </div>
  <button class="btn btn-primary btn-lg" data-value="cash">Cash</button>
 <?if ($DEBUG) {?>
  <button id="credit-refund" class="btn btn-default btn-lg optional" data-value="credit-refund">Refund Credit Card</button>
