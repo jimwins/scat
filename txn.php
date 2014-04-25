@@ -1,5 +1,6 @@
 <?
 require 'scat.php';
+require 'lib/txn.php';
 
 head("Transaction @ Scat", true);
 
@@ -23,82 +24,123 @@ if (!$id && $type) {
 
 if (!$id) die("no transaction specified.");
 
-$q= "SELECT meta, Number\$txn, Created\$date, Person\$person,
-            Ordered, Allocated,
-            taxed Taxed\$dollar,
-            untaxed Untaxed\$dollar,
-            CAST(tax_rate AS DECIMAL(9,2)) Tax\$percent,
-            CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
-                 AS DECIMAL(9,2))
-            Total\$dollar,
-            Paid\$dollar
-      FROM (SELECT
-            txn.type AS meta,
-            CONCAT(txn.id, '|', type, '|', txn.number) AS Number\$txn,
-            txn.created AS Created\$date,
-              CONCAT(txn.person, '|', IFNULL(person.company,''),
-                     '|', IFNULL(person.name,''))
-                AS Person\$person,
-            SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS Ordered,
-            SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS Allocated,
-            CAST(ROUND_TO_EVEN(
-              SUM(IF(txn_line.taxfree, 1, 0) *
-                IF(type = 'customer', -1, 1) * allocated *
-                CASE discount_type
-                  WHEN 'percentage' THEN
-                    ROUND_TO_EVEN(retail_price * ((100 - discount) / 100), 2)
-                  WHEN 'relative' THEN (retail_price - discount) 
-                  WHEN 'fixed' THEN (discount)
-                  ELSE retail_price
-                END),
-              2) AS DECIMAL(9,2))
-            untaxed,
-            CAST(ROUND_TO_EVEN(
-              SUM(IF(txn_line.taxfree, 0, 1) *
-                IF(type = 'customer', -1, 1) * allocated *
-                CASE discount_type
-                  WHEN 'percentage' THEN retail_price * ((100 - discount) / 100)
-                  WHEN 'relative' THEN (retail_price - discount) 
-                  WHEN 'fixed' THEN (discount)
-                  ELSE retail_price
-                END),
-              2) AS DECIMAL(9,2))
-            taxed,
-            tax_rate,
-            CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
-                 AS DECIMAL(9,2)) AS Paid\$dollar
-       FROM txn
-       LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-       LEFT JOIN person ON (txn.person = person.id)
-      WHERE txn.id = $id) t";
+$txn= txn_load_full($db, $id);
 
-$r= $db->query($q)
-  or die($db->error);
-
-$txn= $r->fetch_assoc();
-
-$r->data_seek(0);
-dump_table($r);
-dump_query($q);
-
-if ($txn['Ordered'] != $txn['Allocated']) {
 ?>
-<button id="allocate" class="btn btn-default">Allocate Order</button>
+<form class="form-horizontal" role="form">
+  <div class="form-group">
+    <label for="number" class="col-sm-2 control-label">Number</label>
+    <div class="col-sm-8">
+      <p class="form-control-static" id="formatted_number"
+         data-bind="text: txn.formatted_number"></p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="created" class="col-sm-2 control-label">Created</label>
+    <div class="col-sm-8">
+      <p class="form-control-static" id="formatted_number"
+         data-bind="text: txn.created"></p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="person" class="col-sm-2 control-label">Person</label>
+    <div class="col-sm-8">
+      <p class="form-control-static" id="formatted_number"
+         data-bind="text: txn.person_name"></p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="ordered" class="col-sm-2 control-label">Ordered</label>
+    <div class="col-sm-8">
+      <p class="form-control-static" id="ordered"
+         data-bind="text: txn.ordered"></p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="allocated" class="col-sm-2 control-label">Allocated</label>
+    <div class="col-sm-8">
+      <span class="form-control-static" id="allocated"
+         data-bind="text: txn.allocated"></span>
+      <button class="btn btn-default btn-sm"
+         data-bind="visible: txn.ordered() != txn.allocated(),
+                    click: allocateAll">
+        Allocate
+      </button>
+    </div>
+  </div>
+</form>
+
+<table class="table table-striped table-condensed"
+       data-bind="visible: items()">
+  <thead>
+    <tr>
+      <th class="num">#</th>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Discount</th>
+      <th>Ordered</th>
+      <th>Allocated</th>
+    </tr>
+  </thead>
+  <tbody data-bind="foreach: items">
+    <tr>
+      <td class="num"><span data-bind="text: $index() + 1"></span></td>
+      <td>
+        <a data-bind="text: $data.code,
+                      attr: { href: 'item.php?code=' + $data.code() }">
+        </a>
+      </td>
+      <td><span data-bind="text: $data.name"></span></td>
+      <td><span data-bind="text: amount($data.price())"></span></td>
+      <td><span data-bind="text: $data.discount"></span></td>
+      <td><span data-bind="text: $data.quantity"></span></td>
+      <td>
+        <span data-bind="text: $data.allocated"></span>
+        <button class="btn btn-default btn-xs"
+           data-bind="visible: $data.quantity() != $data.allocated(),
+                      click: $parent.allocateLine">
+          Allocate
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <script>
-$("#allocate").on('click', function() {
+var model= <?=json_encode($txn)?>;
+
+var viewModel= ko.mapping.fromJS(model);
+
+viewModel.allocateAll= function() {
   $.getJSON("api/txn-allocate.php?callback=?",
-            { txn: <?=$id?>},
+            { txn: viewModel.txn.id() },
             function (data) {
               if (data.error) {
                 alert(data.error);
+                return;
               }
-              $('#allocate').fadeOut();
+              ko.mapping.fromJS({ txn: data.txn, items: data.items },
+                                viewModel);
             });
-});
+}
+
+viewModel.allocateLine= function(line) {
+  $.getJSON("api/txn-allocate.php?callback=?",
+            { txn: viewModel.txn.id(), line: line.line_id() },
+            function (data) {
+              if (data.error) {
+                alert(data.error);
+                return;
+              }
+              ko.mapping.fromJS({ txn: data.txn, items: data.items },
+                                viewModel);
+            });
+}
+
+ko.applyBindings(viewModel);
 </script>
 <?
-}
-if ($txn['meta'] == 'vendor') {
+if ($txn['txn']['type'] == 'vendor') {
 ?>
 <div id="upload-status" class="modal fade">
   <div class="modal-dialog">
@@ -125,6 +167,8 @@ $("body").html5Uploader({
 </script>
 <?
 }
+
+if ($txn['meta'] == 'customer') {
 ?>
 <button id="receipt" class="btn btn-default">Print Receipt</button>
 <script>
@@ -135,32 +179,8 @@ $("#receipt").on('click', function() {
 });
 </script>
 <?
+}
 
-$q= "SELECT
-            item.code Code\$item,
-            IFNULL(override_name, item.name) Name,
-            txn_line.retail_price Price\$dollar,
-            IF(txn_line.discount_type,
-               CASE txn_line.discount_type
-                 WHEN 'percentage' THEN CAST(ROUND_TO_EVEN(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2) AS DECIMAL(9,2))
-                 WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
-                 WHEN 'fixed' THEN (txn_line.discount)
-               END,
-               NULL) Sale\$dollar,
-            CASE txn_line.discount_type
-              WHEN 'percentage' THEN CONCAT(ROUND(txn_line.discount), '% off')
-              WHEN 'relative' THEN CONCAT('$', txn_line.discount, ' off')
-            END Discount,
-            ordered * IF(txn.type = 'customer', -1, 1) as Ordered,
-            allocated * IF(txn.type = 'customer', -1, 1) as Allocated
-       FROM txn
-       LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-       JOIN item ON (txn_line.item = item.id)
-      WHERE txn.id = $id
-      ORDER BY txn_line.id ASC";
-
-dump_table($db->query($q));
-dump_query($q);
 
 function charge_record($row) {
   return '<a href="print/charge-record.php?id=' . $row[0] . '">Charge Record</a>';
