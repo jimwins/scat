@@ -97,6 +97,7 @@ $(document).ready(function() {
       <ul id="navbar" class="nav navbar-nav">
         <li><a href="./">New Sale</a></li>
         <li><a href="./items.php">Items</a></li>
+        <li><a href="./custom.php">Custom</a></li>
         <li><a href="./person.php">People</a></li>
         <li><a href="./txns.php">Transactions</a></li>
         <li><a href="./till.php">Till</a></li>
