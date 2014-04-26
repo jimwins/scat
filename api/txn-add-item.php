@@ -2,6 +2,7 @@
 include '../scat.php';
 include '../lib/txn.php';
 include '../lib/item.php';
+include '../lib/pole.php';
 
 $txn_id= (int)$_REQUEST['txn'];
 
@@ -91,14 +92,7 @@ if (count($items) == 1) {
   txn_apply_discounts($db, $txn_id);
 
   if ($items[0]['sale_price']) {
-    $sock= socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-    if (@socket_connect($sock, '127.0.0.1', 1888)) {
-      $product= $items[0]['name'];
-      $price= $items[0]['sale_price'];
-      socket_write($sock,
-                   sprintf("\x0d\x0a%-19.19s\x0a\x0d$%18.2f ",
-                           $product, $price));
-    }
+    pole_display_price($items[0]['name'], $items[0]['sale_price']);
   }
 
   $txn= txn_load($db, $txn_id);
