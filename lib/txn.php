@@ -265,6 +265,14 @@ class Transaction {
     unset($this->data['txn'][$name]);
   }
 
+  public function hasItems() {
+    return !!count($this->data['items']);
+  }
+
+  public function hasPayments() {
+    return !!count($this->data['payments']);
+  }
+
   public function canPay($method, $amount) {
     // only 'gift' and 'cash' allow giving change
     $change= (($method == 'cash' || $method == 'gift') ? true : false);
