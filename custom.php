@@ -22,7 +22,9 @@ head("Custom @ Scat", true);
   <div class="row">
     <div class="col-sm-4">
       <div class="panel panel-default">
-        <div class="panel-heading">Stretch Canvas</div>
+        <div class="panel-heading">
+          <h3 class="panel-title">Stretch Canvas</h3>
+        </div>
         <div class="panel-body">
           <div class="form-group">
             <label for="slim" class="col-sm-6 control-label">
@@ -30,7 +32,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 1.2)">$0.00</p>
+                 data-bind="text: amount(ui() * 1.2)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -41,7 +43,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: (Math.max(w(), h()) > 40)
                                    ? 'Too big!'
-                                   : amount(ui() * 1.5)">$0.00</p>
+                                   : amount(ui() * 1.5)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -50,7 +52,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 1.8)">$0.00</p>
+                 data-bind="text: amount(ui() * 1.8)"></p>
             </div>
           </div> 
         </div>
@@ -58,7 +60,7 @@ head("Custom @ Scat", true);
     </div><!-- /.col-sm-4 -->
     <div class="col-sm-4">
       <div class="panel panel-default">
-        <div class="panel-heading">Print</div>
+        <div class="panel-heading"><h3 class="panel-title">Print</h3></div>
         <div class="panel-body">
           <div class="form-group">
             <label for="photo" class="col-sm-6 control-label">
@@ -66,7 +68,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(Math.max(80, area())/144 * 9.95)">$0.00</p>
+                 data-bind="text: amount(Math.max(80, area())/144 * 9.95)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -75,7 +77,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(Math.max(80, area())/144 * 14.95)">$0.00</p>
+                 data-bind="text: amount(Math.max(80, area())/144 * 14.95)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -84,7 +86,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(Math.max(80, area())/144 * 19.95)">$0.00</p>
+                 data-bind="text: amount(Math.max(80, area())/144 * 19.95)"></p>
             </div>
           </div> 
         </div>
@@ -92,7 +94,7 @@ head("Custom @ Scat", true);
     </div><!-- /.col-sm-4 -->
     <div class="col-sm-4">
       <div class="panel panel-default">
-        <div class="panel-heading">Panel</div>
+        <div class="panel-heading"><h3 class="panel-title">Panel</h3></div>
         <div class="panel-body">
           <div class="form-group">
             <label for="uncradled" class="col-sm-6 control-label">
@@ -100,7 +102,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 0.49)">$0.00</p>
+                 data-bind="text: amount(ui() * 0.49)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -109,7 +111,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 0.79)">$0.00</p>
+                 data-bind="text: amount(ui() * 0.79)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -118,7 +120,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 0.99)">$0.00</p>
+                 data-bind="text: amount(ui() * 0.99)"></p>
             </div>
           </div> 
         </div>
@@ -126,7 +128,7 @@ head("Custom @ Scat", true);
     </div><!-- /.col-sm-4 -->
     <div class="col-sm-4">
       <div class="panel panel-default">
-        <div class="panel-heading">Canvas</div>
+        <div class="panel-heading"><h3 class="panel-title">Canvas</h3></div>
         <div class="panel-body">
           <div class="form-group">
             <label for="slim" class="col-sm-6 control-label">
@@ -134,7 +136,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 0.49)">$0.00</p>
+                 data-bind="text: amount(ui() * 0.49)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -143,7 +145,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 0.75)">$0.00</p>
+                 data-bind="text: amount(ui() * 0.75)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -152,7 +154,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 1.49)">$0.00</p>
+                 data-bind="text: amount(ui() * 1.49)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -161,7 +163,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 1.99)">$0.00</p>
+                 data-bind="text: amount(ui() * 1.99)"></p>
             </div>
           </div> 
         </div>
@@ -169,7 +171,9 @@ head("Custom @ Scat", true);
     </div><!-- /.col-sm-4 -->
     <div class="col-sm-4">
       <div class="panel panel-default">
-        <div class="panel-heading">Floater Frame</div>
+        <div class="panel-heading">
+          <h3 class="panel-title">Floater Frame</h3>
+        </div>
         <div class="panel-body">
           <div class="form-group">
             <label for="slim" class="col-sm-6 control-label">
@@ -177,7 +181,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 0.69)">$0.00</p>
+                 data-bind="text: amount(ui() * 0.69)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -186,7 +190,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 0.89)">$0.00</p>
+                 data-bind="text: amount(ui() * 0.89)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -195,7 +199,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 1.19)">$0.00</p>
+                 data-bind="text: amount(ui() * 1.19)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -204,7 +208,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 1.49)">$0.00</p>
+                 data-bind="text: amount(ui() * 1.49)"></p>
             </div>
           </div> 
         </div>
