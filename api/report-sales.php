@@ -35,6 +35,9 @@ case 'month':
 case 'week':
   $format= '%X-W%v';
   break;
+case 'hour':
+  $format= '%w (%a) %H:00';
+  break;
 case 'day':
 default:
   $format= '%Y-%m-%d %a';
