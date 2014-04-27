@@ -1,66 +1,26 @@
 <?
 include '../scat.php';
+include '../lib/txn.php';
+include '../lib/eps-express.php';
 
 $id= (int)$_REQUEST['id'];
 $amount= $_REQUEST['amount'];
+$partial= (int)$_REQUEST['partial'];
 
 if (!$id || !$amount)
   die_jsonp("Either transaction or amount was not specified.");
+
+$txn= new Transaction($db, $id);
+if (!$txn->canPay('credit', $amount))
+  die_jsonp("Amount is too much.");
 
 $ReturnURL= ($_SERVER['HTTPS'] ? "https://" : "http://") .
             $_SERVER['HTTP_HOST'] .
             dirname($_SERVER['REQUEST_URI']) .
             '/cc-paid.php';
 
-$request= <<<XML
-<?xml version="1.0" standalone="yes"?>
-<TransactionSetup xmlns="https://transaction.elementexpress.com">
- <Application>
-  <ApplicationID>{EPS_ApplicationID}</ApplicationID>
-  <ApplicationName>{APP_NAME}</ApplicationName>
-  <ApplicationVersion>{VERSION}</ApplicationVersion>
- </Application>
- <Credentials>
-  <AccountID>{EPS_AccountID}</AccountID>
-  <AccountToken>{EPS_AccountToken}</AccountToken>
-  <AcceptorID>{EPS_AcceptorID}</AcceptorID>
- </Credentials>
- <Terminal>
-  <TerminalID>1</TerminalID>
-  <TerminalType>1</TerminalType><!-- PointOfSale -->
-  <TerminalEnvironmentCode>2</TerminalEnvironmentCode><!-- LocalAttended -->
-  <CardholderPresentCode>2</CardholderPresentCode><!-- Present -->
-  <CardPresentCode>2</CardPresentCode><!-- Present -->
-  <CVVPresenceCode>0</CVVPresenceCode><!-- Presence -->
-  <TerminalCapabilityCode>5</TerminalCapabilityCode><!-- MagstripReader -->
-  <CardInputCode>0</CardInputCode><!-- Default -->
-  <MotoECICode>1</MotoECICode><!-- NotUsed -->
- </Terminal>
- <TransactionSetup>
-   <Embedded>0</Embedded>
-   <TransactionSetupMethod>1</TransactionSetupMethod><!-- CreditCardSale -->
-   <CompanyName>Raw Materials</CompanyName>
-   <ReturnURL>$ReturnURL</ReturnURL>
-   <AutoReturn>1</AutoReturn>
- </TransactionSetup>
- <Transaction>
-  <TransactionAmount>$amount</TransactionAmount>
-  <ReferenceNumber>$id</ReferenceNumber>
-  <PartialApprovedFlag>0</PartialApprovedFlag>
- </Transaction>
-</TransactionSetup>
-XML;
-$request= preg_replace("/<!-- .+ -->/", "", $request);
-$request= preg_replace("/{(.+?)}/e", "constant('$1')", $request);
-
-$ch= curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://certtransaction.elementexpress.com/");
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
-curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-$response= curl_exec($ch);
-curl_close($ch);
+$eps= new EPS_Express();
+$response= $eps->CreditCardSaleHosted($id, $amount, $partial, $ReturnURL);
 
 $xml= new SimpleXMLElement($response);
 
@@ -79,6 +39,6 @@ $url= "https://certtransaction.hostedpayments.com/?TransactionSetupID=" .
 
 $dom= dom_import_simplexml($xml);
 $dom->ownerDocument->preserveWhiteSpace= false;
-$dom->ownerDocumenut->formatOutput= true;
+$dom->ownerDocument->formatOutput= true;
 
 echo jsonp(array('url' => $url, 'xml' => $dom->ownerDocument->saveXML()));

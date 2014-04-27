@@ -15,35 +15,22 @@ if ($_REQUEST['HostedPaymentStatus'] == 'Complete') {
                         AND validationcode = '$valid'");
 
   // TODO Handle error here.
-
-  $txn= txn_load($db, $id);
+  
+  $txn= new Transaction($db, $id);
 
   $method= 'credit';
   $amount= $_REQUEST['ApprovedAmount'];
 
-  $cc[]= "cc_txn = '" . addslashes($_REQUEST['TransactionID']) . "', ";
-  $cc[]= "cc_approval = '" . addslashes($_REQUEST['ApprovalNumber']) . "', ";
-  $cc[]= "cc_lastfour= '" . addslashes($_REQUEST['LastFour']) . "', ";
-  $cc[]= "cc_type= '" . addslashes($_REQUEST['CardLogo']) . "', ";
-  $extra_fields= join('', $cc);
+  $cc= array();
+  $cc['cc_txn']= $_REQUEST['TransactionID'];
+  $cc['cc_approval']= $_REQUEST['ApprovalNumber'];
+  $cc['cc_lastfour']= $_REQUEST['LastFour'];
+  $cc['cc_type']= $_REQUEST['CardLogo'];
 
-  // add payment record
-  $q= "INSERT INTO payment
-          SET txn = $id, method = '$method', amount = $amount,
-          $extra_fields
-          processed = NOW()";
-  $r= $db->query($q)
-    or die_query($db, $q);
-
-  $payment= $db->insert_id;
-
-  $txn['total_paid'] = bcadd($txn['total_paid'], $amount);
-
-  // if we're all paid up, record that the txn is paid
-  if (!bccomp($txn['total_paid'], $txn['total'])) {
-    $q= "UPDATE txn SET paid = NOW() WHERE id = $id";
-    $r= $db->query($q)
-      or die_query($db, $q);
+  try {
+    $payment= $txn->addPayment($method, $amount, $cc);
+  } catch (Exception $e) {
+    die_jsonp($e->getMessage());
   }
 ?>
 <script>
