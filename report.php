@@ -70,7 +70,7 @@ $("#report-params").on('submit', function(ev) {
             params,
             function(data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               } else {
                 var table= $("#results-template").clone();
                 table.removeAttr('id');

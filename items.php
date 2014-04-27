@@ -60,7 +60,7 @@ $('#add-item-form #load').on('click', function(ev) {
             { code: $('#add-item-form [name="code"]').val() },
             function (data) {
               if (data.error) {
-                alert(data.error + ': ' + data.explain);
+                displayError(data.error);
                 return;
               }
               $('#add-item-form [name="name"]').val(data.item.name);
@@ -75,7 +75,7 @@ $('#add-item-form form').on('submit', function(ev) {
             data,
             function (data) {
               if (data.error) {
-                alert(data.error + ': ' + data.explain);
+                displayError(data);
                 return;
               }
               window.location.href= 'item.php?id=' + data.item.id;
@@ -231,7 +231,7 @@ $('tbody tr .name').editable(function(value, settings) {
             { item: item, name: value },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               updateItem(data.item);
@@ -245,7 +245,7 @@ $('tbody tr .brand').editable(function(value, settings) {
             { item: item, brand_id: value },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               updateItem(data.item);
@@ -260,7 +260,7 @@ $('tbody tr td:nth-child(5)').editable(function(value, settings) {
             { item: item, retail_price: value },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               updateItem(data.item);
@@ -274,7 +274,7 @@ $('tbody tr .discount').editable(function(value, settings) {
             { item: item, discount: value },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               updateItem(data.item);
@@ -288,7 +288,7 @@ $('tbody tr td:nth-child(8)').editable(function(value, settings) {
             { item: item, stock: value },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               updateItem(data.item);
@@ -302,7 +302,7 @@ $('tbody tr td:nth-child(9)').editable(function(value, settings) {
             { item: item, minimum_quantity: value },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               updateItem(data.item);
@@ -318,7 +318,7 @@ $('tbody').on('click', 'tr td:nth-child(10)', function(ev) {
             { item: item, active: parseInt(val) ? 0 : 1 },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               updateItem(data.item);
@@ -332,7 +332,7 @@ $('#print-price-labels').on('click', function(ev) {
             { q: q },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
             });
@@ -358,7 +358,7 @@ $('#bulk-edit-form').on('show.bs.collapse', function () {
             { verbose: 1 },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               var brand_list= $('#bulk-edit-form select#brand_id');
@@ -393,7 +393,7 @@ $('#bulk-edit-form form').on('submit', function(ev) {
             data,
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               $.each(data.items, function (i, item) {

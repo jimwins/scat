@@ -127,7 +127,7 @@ $("header #reports").on('click', function(ev) {
             { days: 7 },
             function(data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               } else {
                 var t= $("<table class='table table-condensed table-striped' style='width: auto'><tr><th>Day<th>Sales</tr>");
                 $.each(data.sales, function(i, sales) {

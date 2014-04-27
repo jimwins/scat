@@ -291,7 +291,7 @@ function attachPaymentCard(place, ev) {
               payment_account_id: place.person.payment_account_id() },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               } else {
                 $('#modal').remove();
                 var modal= $('<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modal" role="dialog"><div class="modal-dialog" style="width: 660px"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">Attach Payment Card</h4></div><div class="modal-body"><iframe src="' + data.url + '" height=500" width="600" style="border:0"><div class="modal-footer"></div></div></div></div>');
@@ -312,7 +312,7 @@ function removePaymentCard(place, ev) {
             { person: place.person.id() },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               } else {
                 $('#remove-payment').button('reset');
                 loadPerson(data.person);
@@ -330,7 +330,7 @@ function savePerson(place) {
             ko.mapping.toJS(viewModel.person),
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               loadPerson(data.person);
@@ -343,7 +343,7 @@ function createPurchaseOrder(place, ev) {
             { type: 'vendor', person: place.person.id() },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               }
               window.location= 'txn.php?id=' + data.txn.id;
             });

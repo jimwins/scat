@@ -98,7 +98,7 @@ function updateValue(row, key, value) {
             data,
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                displayError(data);
               }
               updateOrderData(data.txn);
               updateItems(data.items);
@@ -165,7 +165,7 @@ $(document).on('click', '.remove', function() {
             { txn: txn, id: id },
             function(data) {
               if (data.error) {
-                $.modal(data.error);
+                displayError(data);
                 return;
               }
               var row= $("#txn tbody tr:data(line_id=" + data.removed + ")");
@@ -187,11 +187,10 @@ function addItem(item) {
             { txn: txn, item: item.id },
             function(data) {
               if (data.error) {
-                play("no");
-                $.modal(data.error);
+                displayError(data);
               } else if (data.matches) {
                 // this shouldn't happen!
-                  play("no");
+                play("no");
               } else {
                 updateOrderData(data.txn);
                 updateItems(data.items);
@@ -360,7 +359,7 @@ function showOpenOrders(data) {
                 { id: ev.data.id },
                 function (data) {
                   if (data.error) {
-                    $.modal(data.error);
+                    displayError(data);
                   } else {
                     loadOrder(data);
                   }
@@ -380,7 +379,7 @@ function txn_add_payment(options) {
            async: false,
            success: function(data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               } else {
                 updateOrderData(data.txn);
                 $('#txn').data('payments', data.payments);
@@ -396,7 +395,7 @@ function txn_add_payment(options) {
 function printReceipt() {
   var txn= $('#txn').data('txn');
   if (!txn) {
-    $.modal("No sale to print.");
+    displayError("No sale to print.");
     return false;
   }
   var lpr= $('<iframe id="receipt" src="print/receipt.php?print=1&amp;id=' + txn + '"></iframe>').hide();
@@ -408,7 +407,7 @@ function printReceipt() {
 function printInvoice() {
   var txn= $('#txn').data('txn');
   if (!txn) {
-    $.modal("No sale to print.");
+    displayError("No sale to print.");
     return false;
   }
   var lpr= $('<iframe id="receipt" src="print/invoice.php?print=1&amp;id=' + txn + '"></iframe>').hide();
@@ -446,8 +445,7 @@ $(function() {
               { txn: txn },
               function(data) {
                 if (data.error) {
-                  play("no");
-                  $.modal(data.error);
+                  displayError(data);
                 } else {
                   window.location.href= './';
                 }
@@ -476,7 +474,7 @@ $(function() {
                 { type: "customer", id: m[2] },
                 function (data) {
                   if (data.error) {
-                    $.modal(data.error);
+                    displayError(data);
                   } else {
                     loadOrder(data);
                   }
@@ -495,8 +493,7 @@ $(function() {
              async: false,
              success: function(data) {
                 if (data.error) {
-                  play("no");
-                  $.modal(data.error);
+                  displayError(data);
                 } else if (data.matches) {
                   if (data.matches.length == 0) {
                     play("no");
@@ -568,7 +565,7 @@ $("#sidebar .nav a").click(function() {
             params[$(this).attr('id')],
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                displayError(data);
               } else {
                 showOpenOrders(data);
               }
@@ -605,7 +602,7 @@ $("#txn-load").submit(function(ev) {
               number: $("#txn-load input[name='invoice']").val() },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                displayError(data);
               } else {
                 loadOrder(data);
               }
@@ -655,7 +652,7 @@ $("#pay").on("click", function() {
             { txn: txn },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                displayError(data);
               }
 
               $('#choose-pay-method .optional').hide();
@@ -698,7 +695,7 @@ $("#return").on("click", function() {
             { txn: txn },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                displayError(data);
               } else {
                 loadOrder(data);
               }
@@ -786,7 +783,7 @@ $("#pay-credit-refund").on("submit", function (ev) {
               from: refund_from },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               } else {
                 updateOrderData(data.txn);
                 $('#txn').data('payments', data.payments);
@@ -815,7 +812,7 @@ $("#pay-credit-stored").on("submit", function (ev) {
               person: person },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               } else {
                 updateOrderData(data.txn);
                 $('#txn').data('payments', data.payments);
@@ -845,7 +842,7 @@ $("#pay-credit").on("submit", function (ev) {
             { id: txn, amount: parseFloat(amount).toFixed(2) },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               } else {
                 $.modal.close();
                 $.modal('<iframe src="' + data.url +
@@ -940,7 +937,7 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
             { card: card },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
               } else {
                 var due= ($("#txn").data("total") - $("#txn").data("paid"));
                 $('#pay-gift-balance').text("Card has $" +
@@ -978,7 +975,7 @@ $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
               { card: card, amount: -amount },
               function (data) {
                 if (data.error) {
-                  alert(data.error);
+                  displayError(data);
                 } else {
                   var balance= $("#pay-gift-complete").data('balance');
                   txn_add_payment({ id: txn, method: "gift", amount: amount,
@@ -1117,7 +1114,7 @@ $("#txn #person").on("dblclick", function(ev) {
                 { txn: $("#txn").data("txn"), person: ui.item.id },
                 function (data) {
                   if (data.error) {
-                    $.modal(data.error);
+                    displayError(data);
                     return;
                   }
                   loadOrder(data);
@@ -1136,7 +1133,7 @@ $("#txn #info-person").on("click", function(ev) {
             { person: person },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                displayError(data);
                 return;
               }
               loadPerson(data.person);
@@ -1207,14 +1204,14 @@ $('#person-create').on('submit', function(ev) {
             data,
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               $.getJSON("api/txn-update-person.php?callback=?",
                         { txn: $("#txn").data("txn"), person: data.person },
                         function (data) {
                           if (data.error) {
-                            alert(data.error);
+                            displayError(data);
                             return;
                           }
                           updateOrderData(data.txn);
@@ -1249,7 +1246,7 @@ $("#items").on("click", ".payment-row a[name='remove']", function() {
               admin: ($(".admin").is(":visible") ? 1 : 0) },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                displayError(data);
                 return;
               }
               updateOrderData(data.txn);
@@ -1264,7 +1261,7 @@ $('#tax_rate .val').editable(function(value, settings) {
             { txn: txn, tax_rate: value },
             function (data) {
               if (data.error) {
-                $.modal(data.error);
+                displayError(data);
                 return;
               }
               updateOrderData(data.txn);

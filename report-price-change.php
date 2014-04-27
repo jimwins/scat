@@ -148,7 +148,7 @@ $('body').on('submit', '.price-change-form', function(ev) {
             form.serializeArray(),
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               if ($('input[name="print"]:checked', form).length) {
@@ -156,7 +156,7 @@ $('body').on('submit', '.price-change-form', function(ev) {
                           { id: $('input[name="id"]', form).val() },
                           function (data) {
                             if (data.error) {
-                              alert(data.error);
+                              displayError(data);
                               return;
                             }
                           });
