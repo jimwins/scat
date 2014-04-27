@@ -6,10 +6,12 @@ date_default_timezone_set('America/Los_Angeles');
 if (get_magic_quotes_gpc())
   die("Sorry, you need to disable magic quotes for Scat to work.");
 
+bcscale(2);
+
 /* Start page timer */
 $start_time= microtime();
 
-/* $DEBUG can be set by config.php, not in request/ */
+/* $DEBUG can be set by config.php, not in request */
 $DEBUG= false;
 require dirname(__FILE__).'/config.php';
 

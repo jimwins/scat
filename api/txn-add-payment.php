@@ -16,7 +16,7 @@ $extra_fields= "";
 
 // validate method
 if (!in_array($method,
-              array('cash','credit','square','dwolla','gift','check','discount','bad','donation','internal'))) {
+              array('cash','credit','square','stripe','dwolla','gift','check','discount','bad','donation','internal'))) {
   die_jsonp("Invalid method specified.");
 }
 
