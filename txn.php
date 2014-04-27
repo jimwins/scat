@@ -116,7 +116,7 @@ viewModel.allocateAll= function() {
             { txn: viewModel.txn.id() },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               ko.mapping.fromJS({ txn: data.txn, items: data.items },
@@ -129,7 +129,7 @@ viewModel.allocateLine= function(line) {
             { txn: viewModel.txn.id(), line: line.line_id() },
             function (data) {
               if (data.error) {
-                alert(data.error);
+                displayError(data);
                 return;
               }
               ko.mapping.fromJS({ txn: data.txn, items: data.items },
