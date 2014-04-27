@@ -51,12 +51,13 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/jquery.tablesorter.min.js"></script>
  <script src="js/jquery.html5uploader.js"></script>
  <script src="js/jquery.jeditable.js"></script>
+ <!-- next 3 used in index.php -->
+ <script src="js/jquery.data-selector.js"></script>
+ <script src="js/date.js"></script>
+ <script src="js/jquery.hotkeys.js"></script>
 <?if (!$allnew) {?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
- <script src="js/jquery.data-selector.js"></script>
- <script src="js/jquery.hotkeys.js"></script>
- <script src="js/date.js"></script>
  <script>
 $(document).ready(function() { 
   // Enable sorted tables
