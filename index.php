@@ -714,11 +714,14 @@ $("#return").on("click", function() {
 }
 </style>
 <div id="choose-pay-method" style="display: none">
- <div class="input-group input-group-lg"
-          style="width: 20em; margin: auto">
-   <span class="input-group-addon">Due:</span>
-   <input type="text" class="form-control" id="due" disabled value="$0.00">
- </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="input-group input-group-lg" style="width: 20em; margin: auto">
+        <span class="input-group-addon">Due:</span>
+        <input type="text" class="form-control" id="due" disabled value="$0.00">
+      </div>
+    </div>
+    <div class="panel-body">
  <button class="btn btn-primary btn-lg" data-value="cash">Cash</button>
 <?if ($DEBUG) {?>
  <button id="credit-refund" class="btn btn-default btn-lg optional" data-value="credit-refund">Refund Credit Card</button>
@@ -726,15 +729,17 @@ $("#return").on("click", function() {
  <button class="btn btn-default btn-lg" data-value="credit">Credit Card</button>
 <?}?>
  <button class="btn btn-default btn-lg" data-value="credit-manual">Credit Card (Manual)</button>
- <br>
+ <br><br>
  <button class="btn btn-default" data-value="gift">Gift Card</button>
  <button class="btn btn-default" data-value="check">Check</button>
  <button class="btn btn-default" data-value="other">Other</button>
- <br>
+ <br><br>
  <button class="btn btn-default" data-value="discount">Discount</button>
  <button class="btn btn-default" data-value="donation">Donation</button>
  <button class="btn btn-default" data-value="bad-debt">Bad Debt</button>
-</div>
+    </div><!-- /.panel-body -->
+  </div><!-- /.panel -->
+</div><!-- #choose-pay-method -->
 <script>
 $("#choose-pay-method").on("click", "button", function(ev) {
   var method= $(this).data("value");
