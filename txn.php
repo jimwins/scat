@@ -31,22 +31,25 @@ $txn= txn_load_full($db, $id);
   <div class="form-group">
     <label for="number" class="col-sm-2 control-label">Number</label>
     <div class="col-sm-8">
-      <p class="form-control-static" id="formatted_number"
+      <p class="form-control-static" id="number"
          data-bind="text: txn.formatted_number"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="created" class="col-sm-2 control-label">Created</label>
     <div class="col-sm-8">
-      <p class="form-control-static" id="formatted_number"
+      <p class="form-control-static" id="created"
          data-bind="text: txn.created"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="person" class="col-sm-2 control-label">Person</label>
     <div class="col-sm-8">
-      <p class="form-control-static" id="formatted_number"
-         data-bind="text: txn.person_name"></p>
+      <p class="form-control-static" id="person">
+        <a data-bind="text: txn.person_name, 
+                      attr: { href: 'person.php?id=' + txn.person() }">
+        </a>
+      </p>
     </div>
   </div>
   <div class="form-group">
