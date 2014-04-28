@@ -17,10 +17,13 @@ if ($vendor) {
 .order { text-align: right; }
 </style>
 <button id="download" class="btn btn-default">Download</button>
+<?if ($vendor) {?>
+  <button id="create" class="btn btn-default">Create Order</button>
+<?}?>
 <button id="zero" class="btn btn-default">Zero</button>
 <?
-
-$q= "SELECT code Code\$item,
+$q= "SELECT item.id meta,
+            code Code\$item,
             name Name,
             SUM(allocated) Stock\$right,
             minimum_quantity Min\$right,
@@ -66,6 +69,30 @@ $('#download').on('click', function(ev) {
   });
   $("#file").val(tsv);
   $("#post-csv").submit();
+});
+$('#create').on('click', function(ev) {
+  var order= {};
+  $.each($(".sortable tr"), function (i, row) {
+    if (i > 0 && parseInt($('.order', row).text()) > 0) {
+      order[$(row).attr('data-id')]= $('.order', row).text();
+    }
+  });
+
+  $.getJSON("api/txn-create.php?callback=?",
+            { type: 'vendor', person: <?=$vendor?> },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+              }
+              $.getJSON("api/txn-add-items.php?callback=?",
+                        { txn: data.txn.id, items: order },
+                        function (data) {
+                          if (data.error) {
+                            displayError(data);
+                          }
+                          window.location= 'txn.php?id=' + data.txn.id;
+                        });
+            });
 });
 $('#zero').on('click', function(ev) {
   $('.order').text('0');

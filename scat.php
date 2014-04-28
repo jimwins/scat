@@ -251,7 +251,7 @@ function dump_table($r, $calc = false) {
     if ($r->fetch_field_direct(0)->name == 'code')
       $row[0]= '<a href="item.php?code='.$row[0].'">'.$row[0].'</a>';
     if ($meta) {
-      echo '<tr class="', ashtml($row[0]), '">';
+      echo '<tr class="', ashtml($row[0]), '" data-id="', ashtml($row[0]), '">';
     } else {
       echo '<tr>';
     }
