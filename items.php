@@ -122,6 +122,11 @@ $q= "SELECT
             END Discount\$discount,
             (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) Stock\$right,
             minimum_quantity Minimum\$right,
+            (SELECT -1 * SUM(allocated)
+               FROM txn_line JOIN txn ON (txn = txn.id)
+              WHERE type = 'customer'
+                AND item = item.id AND filled > NOW() - INTERVAL 3 MONTH)
+            AS Last3Months\$right,
             active Active\$bool
        FROM item
   LEFT JOIN brand ON (item.brand = brand.id)
@@ -217,11 +222,11 @@ function updateItem(item) {
   $('.' + item.id + ' td:nth(7)').text(item.stock);
   $('.' + item.id + ' td:nth(8)').text(item.minimum_quantity);
   var active= parseInt(item.active);
-  $('.' + item.id + ' td:nth(9) i').data('truth', active);
+  $('.' + item.id + ' td:nth(10) i').data('truth', active);
   if (active) {
-    $('.' + item.id + ' td:nth(9) i').removeClass('fa-square-o').addClass('fa-check-square-o');
+    $('.' + item.id + ' td:nth(10) i').removeClass('fa-square-o').addClass('fa-check-square-o');
   } else {
-    $('.' + item.id + ' td:nth(9) i').removeClass('fa-check-square-o').addClass('fa-square-o');
+    $('.' + item.id + ' td:nth(10) i').removeClass('fa-check-square-o').addClass('fa-square-o');
   }
 }
 $('tbody tr .name').editable(function(value, settings) {
