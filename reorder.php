@@ -2,6 +2,16 @@
 include 'scat.php';
 
 head("Reorder @ Scat", true);
+
+$extra= '';
+
+$vendor= (int)$_REQUEST['vendor'];
+if ($vendor) {
+  $extra= "AND EXISTS (SELECT id
+                         FROM vendor_item
+                        WHERE vendor = $vendor
+                          AND item = item.id)";
+}
 ?>
 <style>
 .order { text-align: right; }
@@ -29,6 +39,7 @@ $q= "SELECT code Code\$item,
        LEFT JOIN txn_line ON (item = item.id)
       WHERE active AND NOT deleted
         AND code NOT LIKE 'ZZ%' AND code NOT LIKE 'MAG-%'
+        $extra
       GROUP BY item.id
      HAVING (Stock\$right IS NULL OR NOT Stock\$right OR Stock\$right < Min\$right)
         AND (Ordered\$hide IS NULL OR NOT Ordered\$hide)
