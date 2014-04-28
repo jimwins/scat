@@ -170,13 +170,21 @@ $person= person_load($db, $id);
   </div>
 </form>
 
-<h2>Activity
-<button id="create-po" class="btn btn-default"
-        data-loading-text="Processing..."
-        data-bind="click: createPurchaseOrder,
-                   visible: person.role() == 'vendor'">
-  Create Purchase Order
-</button></h2>
+<h2>
+  Activity
+  <button class="btn btn-default"
+          data-loading-text="Processing..."
+          data-bind="click: createPurchaseOrder,
+                     visible: person.role() == 'vendor'">
+    Create Purchase Order
+  </button>
+  <button class="btn btn-default"
+          data-loading-text="Processing..."
+          data-bind="click: reorder,
+                     visible: person.role() == 'vendor'">
+    Reorder
+  </button>
+</h2>
 
 <table class="table table-condensed table-striped"
        data-bind="if: activity().length">
@@ -347,6 +355,11 @@ function createPurchaseOrder(place, ev) {
               }
               window.location= 'txn.php?id=' + data.txn.id;
             });
+}
+
+function reorder(place, ev) {
+  $(ev.target).button('loading');
+  window.location= 'reorder.php?vendor=' + place.person.id();
 }
 
 function linkTransaction(components) {
