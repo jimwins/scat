@@ -681,7 +681,7 @@ $("#pay").on("click", function() {
               }
 
               $("#choose-pay-method #due").val(amount(txn_raw.total -
-                                                      txn_raw.paid));
+                                                      txn_raw.total_paid));
 
               $.modal($("#choose-pay-method"), { persist: true});
             });
