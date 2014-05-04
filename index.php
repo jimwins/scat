@@ -1177,17 +1177,41 @@ function loadPerson(person) {
    <td id="tax_id"></td>
   </tr>
 </table>
-<form id="person-create" style="display:none">
- <label>Name: <input type="text" width="60" name="name"></label>
- <br>
- <label>Company: <input type="text" width="60" name="company"></label>
- <br>
- <label>Email: <input type="text" width="40" name="email"></label>
- <br>
- <label>Phone: <input type="text" width="20" name="phone"></label>
- <br>
- <input type="submit" name="Create">
- <button name="cancel">Cancel</button>
+<form id="person-create" class="form-horizontal" style="display:none">
+  <div class="form-group">
+    <label for="name" class="col-sm-2 control-label">Name</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="name" name="name"
+             placeholder="Name">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="company" class="col-sm-2 control-label">Company</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="company" name="company"
+             placeholder="Company">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="email" class="col-sm-2 control-label">Email</label>
+    <div class="col-sm-10">
+      <input type="email" class="form-control" id="email" name="email"
+             placeholder="Email">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="phone" class="col-sm-2 control-label">Phone</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="phone" name="phone"
+             placeholder="Phone">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button name="cancel" class="btn btn-default">Cancel</button>
+      <input type="submit" class="btn btn-primary" name="Create">
+    </div>
+  </div>
 </form>
 <script>
 $('#person-create').on('submit', function(ev) {
