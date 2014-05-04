@@ -1219,7 +1219,7 @@ $('#person-create').on('submit', function(ev) {
                         });
             });
 });
-$('#person-create').on('click', "button[name='cancel'", function(ev) {
+$('#person-create').on('click', "button[name='cancel']", function(ev) {
   ev.preventDefault();
   $.modal.close();
 });
