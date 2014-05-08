@@ -63,7 +63,7 @@ dump_query($q);
 </form>
 <script>
 $('.order').editable(function (val, settings) { return val; },
-                     { width: '3em' });
+                     { width: '3em', select: true });
 
 $('#download').on('click', function(ev) {
   var tsv= "code\tqty\r\n";
