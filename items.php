@@ -314,7 +314,7 @@ $('tbody tr td:nth-child(9)').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'click', style: 'display: inline' });
-$('tbody').on('click', 'tr td:nth-child(10)', function(ev) {
+$('tbody').on('click', 'tr td:nth-child(11)', function(ev) {
   ev.preventDefault();
   var item= $(this).closest('tr').attr('class');
   var val= $("i", this).data('truth');
