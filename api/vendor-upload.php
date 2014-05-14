@@ -152,12 +152,14 @@ $r= $db->query($q)
   or die_query($db, $q);
 
 $q= "INSERT INTO vendor_item
-            (vendor, item, code, name, retail_price, net_price, promo_price,
+            (vendor, item, code, vendor_sku, name,
+             retail_price, net_price, promo_price,
              barcode, purchase_quantity, category)
      SELECT
             $vendor_id AS vendor,
             0 AS item,
             item_no AS code,
+            sku AS vendor_sku,
             name,
             retail_price,
             net_price,
