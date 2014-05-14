@@ -136,7 +136,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
             INTO TABLE macitem
           FIELDS TERMINATED BY '\t'
           IGNORE 1 LINES
-          (item_no, @cust_sku, name, @vendor_name,
+          (item_no, sku, name, @vendor_name,
            retail_price, net_price, @reg_discount,
            promo_price, @promo_discount,
            barcode, @upc2, @upc2_qty, @upc3, @upc3_qty,
@@ -170,6 +170,8 @@ $q= "INSERT INTO vendor_item
 $r= $db->query($q)
   or die_query($db, $q);
 
+$added= $db->affected_rows;
+
 // Find by code/item_no
 $q= "UPDATE vendor_item
         SET item = IFNULL((SELECT id FROM item
@@ -188,4 +190,4 @@ $q= "UPDATE vendor_item
 $r= $db->query($q)
   or die_query($db, $q);
 
-echo jsonp(array("result" => "Added " . $db->affected_rows . " items."));
+echo jsonp(array("result" => "Added " . $added . " items."));
