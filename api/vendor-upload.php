@@ -137,10 +137,14 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
           FIELDS TERMINATED BY '\t'
           IGNORE 1 LINES
           (item_no, sku, name, @vendor_name,
-           retail_price, net_price, @reg_discount,
-           promo_price, @promo_discount,
+           @retail_price, @net_price, @reg_discount,
+           @promo_price, @promo_discount,
            barcode, @upc2, @upc2_qty, @upc3, @upc3_qty,
-           purchase_quantity, @level1, @level2, @level3, @level4, @level5)";
+           purchase_quantity, @level1, @level2, @level3, @level4, @level5)
+       SET
+           retail_price = REPLACE(@retail_price, '$', ''),
+           net_price = REPLACE(@net_price, '$', ''),
+           promo_price = REPLACE(@promo_price, '$', '')";
 
   $r= $db->query($q)
     or die_query($db, $q);
