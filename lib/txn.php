@@ -193,6 +193,7 @@ function txn_apply_discounts($db, $id) {
   // XXX store this somewhere else, obviously
   $discounts= array(
     'MXG-%'  => array(12 => '6.99', 36 => '6.49', 72 => '5.99'),
+    'MXB-%'  => array(12 => '5.99', 36 => '5.49', 72 => '4.99'),
     'MTEX%' => array(12 => '5.99', 36 => '5.49', 72 => '4.99'),
   );
 
