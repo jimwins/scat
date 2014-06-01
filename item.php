@@ -38,7 +38,13 @@ include 'item-searchform.php';
     </div>
   </div>
   <div class="form-group">
-    <label for="name" class="col-sm-2 control-label">Name</label>
+    <label for="name" class="col-sm-2 control-label">
+      <a data-bind="attr: { href: 'http://rawm.us/' + item.code() }"
+         target="_blank">
+        <i class="fa fa-external-link"></i>
+      </a>
+      Name
+    </label>
     <div class="col-sm-8">
       <p class="form-control-static" id="name"
          data-bind="jeditable: item.name, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
