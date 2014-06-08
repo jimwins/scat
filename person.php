@@ -39,7 +39,9 @@ if (!empty($search)) {
   $q= "SELECT IF(deleted, 'deleted', '') AS meta,
               id, name, company
          FROM person
-        WHERE (name like '%$search%' OR company LIKE '%$search%')
+        WHERE (name like '%$search%' OR
+               company LIKE '%$search%' OR
+               email like '%$search%')
               $active
         ORDER BY CONCAT(name, company)";
 
