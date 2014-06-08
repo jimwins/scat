@@ -2,8 +2,6 @@
 require 'scat.php';
 require 'lib/txn.php';
 
-head("Transaction @ Scat", true);
-
 $id= (int)$_REQUEST['id'];
 
 $type= $_REQUEST['type'];
@@ -25,6 +23,13 @@ if (!$id && $type) {
 if (!$id) die("no transaction specified.");
 
 $txn= txn_load_full($db, $id);
+
+if ($txn['txn']['type'] == 'customer') {
+  header("Location: ./?id=" . $id);
+  exit;
+}
+
+head("Transaction @ Scat", true);
 
 ?>
 <form class="form-horizontal" role="form">
@@ -184,6 +189,23 @@ $("#receipt").on('click', function() {
 <?
 }
 
+if ($txn['txn']['type'] == 'vendor') {
+?>
+<button id="print-product-labels" class="btn btn-default">
+  Print Product Labels
+</button>
+<script>
+$("#print-product-labels").on('click', function() {
+  var lpr= $('<iframe id="receipt" src="print/labels-product.php?print=1&amp;id=<?=$id?>"></iframe>').hide();
+  $(this).children("#receipt").remove();
+  $(this).append(lpr);
+  lpr.on('load', function (ev) {
+    window.frames['receipt'].print()
+  });
+});
+</script>
+<?
+}
 
 function charge_record($row) {
   return '<a href="print/charge-record.php?id=' . $row[0] . '">Charge Record</a>';
