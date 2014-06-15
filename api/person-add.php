@@ -2,17 +2,20 @@
 include '../scat.php';
 
 $name= $_REQUEST['name'];
-if (empty($name))
-  die_jsonp("You need to supply at least a name.");
+$company= $_REQUEST['company'];
+if (empty($name) && empty($company))
+  die_jsonp("You need to supply at least a name or company.");
 
-$q= "SELECT id
-       FROM person
-      WHERE name = '" . $db->real_escape_string($name) . "'";
-$r= $db->query($q)
-  or die_query($db, $q);
+if ($name) {
+  $q= "SELECT id
+         FROM person
+        WHERE name = '" . $db->escape($name) . "'";
+  $r= $db->query($q)
+    or die_query($db, $q);
 
-if ($r->num_rows)
-  die_jsonp("Someone by that name already exists.");
+  if ($r->num_rows)
+    die_jsonp("Someone by that name already exists.");
+}
 
 $list= array();
 foreach(array('name', 'company', 'address',
