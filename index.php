@@ -1208,7 +1208,9 @@ function loadPerson(person) {
   </div>
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
-      <button name="cancel" class="btn btn-default">Cancel</button>
+      <button type="button" name="cancel" class="btn btn-default">
+        Cancel
+      </button>
       <input type="submit" class="btn btn-primary" name="Create">
     </div>
   </div>
