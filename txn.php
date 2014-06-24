@@ -74,6 +74,11 @@ head("Transaction @ Scat", true);
                     click: allocateAll">
         Allocate
       </button>
+      <button class="btn btn-default btn-sm"
+         data-bind="visible: txn.ordered() != txn.allocated(),
+                    click: closeAll">
+        Close
+      </button>
     </div>
   </div>
 </form>
@@ -110,6 +115,11 @@ head("Transaction @ Scat", true);
                       click: $parent.allocateLine">
           Allocate
         </button>
+        <button class="btn btn-default btn-xs"
+           data-bind="visible: $data.quantity() != $data.allocated(),
+                      click: $parent.closeLine">
+          Close
+        </button>
       </td>
     </tr>
   </tbody>
@@ -134,6 +144,32 @@ viewModel.allocateAll= function() {
 
 viewModel.allocateLine= function(line) {
   $.getJSON("api/txn-allocate.php?callback=?",
+            { txn: viewModel.txn.id(), line: line.line_id() },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+              ko.mapping.fromJS({ txn: data.txn, items: data.items },
+                                viewModel);
+            });
+}
+
+viewModel.closeAll= function() {
+  $.getJSON("api/txn-close.php?callback=?",
+            { txn: viewModel.txn.id() },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+              ko.mapping.fromJS({ txn: data.txn, items: data.items },
+                                viewModel);
+            });
+}
+
+viewModel.closeLine= function(line) {
+  $.getJSON("api/txn-close.php?callback=?",
             { txn: viewModel.txn.id(), line: line.line_id() },
             function (data) {
               if (data.error) {
