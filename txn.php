@@ -79,6 +79,11 @@ head("Transaction @ Scat", true);
                     click: closeAll">
         Close
       </button>
+      <button class="btn btn-default btn-sm"
+         data-bind="visible: txn.ordered() == txn.allocated(),
+                    click: openAll">
+        Unallocate
+      </button>
     </div>
   </div>
 </form>
@@ -171,6 +176,19 @@ viewModel.closeAll= function() {
 viewModel.closeLine= function(line) {
   $.getJSON("api/txn-close.php?callback=?",
             { txn: viewModel.txn.id(), line: line.line_id() },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+              ko.mapping.fromJS({ txn: data.txn, items: data.items },
+                                viewModel);
+            });
+}
+
+viewModel.openAll= function() {
+  $.getJSON("api/txn-open.php?callback=?",
+            { txn: viewModel.txn.id() },
             function (data) {
               if (data.error) {
                 displayError(data);
