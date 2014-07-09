@@ -89,7 +89,7 @@ if (preg_match('/^linenum,qty/', $line)) {
        IGNORE 1 LINES
        (@vendor_name, @asst_item_no, item_no, @asst_description, @shipped,
         @change_flag, @change_date, sku, description, unit, msrp, net,
-        @customer, @product_code_type, @product_code, @reno, @elgin, @atlanta,
+        @customer, @product_code_type, barcode, @reno, @elgin, @atlanta,
         @catalog_code, @purchase_unit, @purchase_qty, cust_item,
         @pending_msrp, @pending_date, @pending_net, @promo_net, @promo_name,
         @abc_flag, @vendor, @group_code, @catalog_description)
@@ -171,7 +171,8 @@ $q= "INSERT IGNORE INTO barcode (item, code, quantity)
      SELECT (SELECT id FROM item WHERE item_no = code) AS item,
             REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS code,
             1 AS quantity
-      FROM vendor_order";
+      FROM vendor_order
+     WHERE barcode != ''";
 $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " new barcodes from order.<br>";
