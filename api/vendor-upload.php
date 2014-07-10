@@ -69,8 +69,8 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
             INTO TABLE macitem
           FIELDS TERMINATED BY '\t'
           IGNORE 1 LINES
-          (item_no, sku, @upc, name, @retail_price, @unit,
-           @elgin, @reno, @atlanta,
+          (item_no, sku, name, @retail_price, @unit,
+           @reno, @atlanta,
            @minimum_qty, @sale_discount_pct, @cost_factor, @promo_price)
           SET retail_price = SUBSTRING(@retail_price, 2),
               promo_price = SUBSTRING(@promo_price, 2)";
