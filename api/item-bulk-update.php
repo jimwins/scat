@@ -44,7 +44,7 @@ if (!empty($_REQUEST['discount'])) {
   $props[]= "discount = $discount";
 }
 
-if (!empty($_REQUEST['minimum_quantity'])) {
+if (strlen($_REQUEST['minimum_quantity'])) {
   $minimum_quantity= (int)$_REQUEST['minimum_quantity'];
   $props[]= "minimum_quantity = $minimum_quantity";
 }
