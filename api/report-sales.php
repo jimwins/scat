@@ -7,7 +7,8 @@ $end= $_REQUEST['end'];
 
 $items= "1=1";
 if ($_REQUEST['items']) {
-  list($items, $x)= item_terms_to_sql($db, $_REQUEST['items'], FIND_OR);
+  list($items, $x)= item_terms_to_sql($db, $_REQUEST['items'],
+                                      FIND_OR|FIND_ALL);
 }
 
 if (!$begin) {
