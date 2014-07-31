@@ -210,4 +210,10 @@ echo "Fill rate by item: $item_rate%, by SKU: $sku_rate%.";
 $out= ob_get_contents();
 ob_end_clean();
 
+$db->query("INSERT INTO txn_note
+               SET txn = $txn_id,
+                   entered = NOW(),
+                   content = '" . $db->escape($out) . "'")
+  or die_jsonp($db->error);
+
 echo jsonp(array("result" => $out));
