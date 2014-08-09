@@ -11,6 +11,10 @@ $fn= $_FILES['src']['tmp_name'];
 if (!$fn)
   die_jsonp("No file uploaded");
 
+$file= fopen($fn, 'r');
+$line= fgets($file);
+fclose($file);
+
 ob_start();
 
 if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
@@ -162,9 +166,15 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $db->query($q)
     or die_query($db, $q);
 
+  if (preg_match('/\t/', $line)) {
+    $format= "FIELDS TERMINATED BY '\t'";
+  } else {
+    $format= "FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'";
+  }
+
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE macitem
-          FIELDS TERMINATED BY '\t'
+          $format
           IGNORE 1 LINES
           (item_no, sku, name, @vendor_name,
            @retail_price, @net_price, @reg_discount,
