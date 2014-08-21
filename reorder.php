@@ -12,6 +12,11 @@ if ($vendor) {
                         WHERE vendor = $vendor
                           AND item = item.id)";
 }
+if ((int)$_REQUEST['novendor']) {
+  $extra= "AND NOT EXISTS (SELECT id
+                             FROM vendor_item
+                            WHERE item = item.id)";
+}
 
 $code= $_REQUEST['code'];
 if ($code) {
