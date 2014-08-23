@@ -190,6 +190,11 @@ function txn_apply_discounts($db, $id) {
     return false;
   }
 
+  // Not an error, but we don't do anything
+  if ($txn['type'] != 'customer') {
+    return true;
+  }
+
   // XXX store this somewhere else, obviously
   $discounts= array(
     'MXG-%'  => array(12 => '6.99', 36 => '6.49'), #, 72 => '5.99'),
