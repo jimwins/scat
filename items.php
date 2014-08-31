@@ -271,7 +271,7 @@ $('tbody tr td:nth-child(5)').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'click', style: 'display: inline', placeholder: '', });
+}, { event: 'click', style: 'display: inline', placeholder: '', width: '5em', select: true, });
 $('tbody tr .discount').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
@@ -285,7 +285,7 @@ $('tbody tr .discount').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'click', style: 'display: inline', placeholder: '', });
+}, { event: 'click', style: 'display: inline', placeholder: '', width: '6em', select: true, });
 $('tbody tr td:nth-child(8)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
@@ -299,7 +299,7 @@ $('tbody tr td:nth-child(8)').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'click', style: 'display: inline' });
+}, { event: 'click', style: 'display: inline', width: '3em', select: true });
 $('tbody tr td:nth-child(9)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
@@ -313,7 +313,7 @@ $('tbody tr td:nth-child(9)').editable(function(value, settings) {
               updateItem(data.item);
             });
   return "...";
-}, { event: 'click', style: 'display: inline' });
+}, { event: 'click', style: 'display: inline', width: '3em', select: true });
 $('tbody').on('click', 'tr td:nth-child(11)', function(ev) {
   ev.preventDefault();
   var item= $(this).closest('tr').attr('class');
