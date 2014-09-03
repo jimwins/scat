@@ -91,7 +91,7 @@ if (count($items) == 1) {
   // XXX error handling
   txn_apply_discounts($db, $txn_id);
 
-  if ($items[0]['sale_price']) {
+  if ($txn['type'] == 'customer' && $items[0]['sale_price']) {
     pole_display_price($items[0]['name'], $items[0]['sale_price']);
   }
 
