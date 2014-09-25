@@ -40,7 +40,7 @@ if ($line) {
 
 $txn= txn_load($db, $id);
 
-if ($txn['total']) {
+if ($txn['total'] && $txn['type'] == 'customer') {
   pole_display_price('Total Due', $txn['total']);
 }
 
