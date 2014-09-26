@@ -58,6 +58,35 @@ head("Scat");
 }
 </style>
 <script>
+var Txn = {};
+
+Txn.loadId= function (id) {
+  $.getJSON("api/txn-load.php?callback=?",
+            { type: "customer",
+              id: id },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+              } else {
+                loadOrder(data);
+              }
+              $("#status").text("Loaded sale.").fadeOut('slow');
+            });
+}
+Txn.loadNumber= function(num) {
+  $.getJSON("api/txn-load.php?callback=?",
+            { type: "customer",
+              number: num },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+              } else {
+                loadOrder(data);
+              }
+              $("#status").text("Loaded sale.").fadeOut('slow');
+            });
+}
+
 var lastItem;
 
 function updateItems(items) {
@@ -296,7 +325,7 @@ function updateOrderData(txn) {
   if (txn.returned_from) {
     var btn= $('<button class="btn btn-xs btn-link"><i class="fa fa-reply"></i></button>');
     btn.on('click', function () {
-      loadTxnId(txn.returned_from);
+      Txn.loadId(txn.returned_from);
     });
     $('#txn #description').append(btn);
   }
@@ -602,35 +631,9 @@ $("#sidebar .nav a").click(function() {
   </div>
 </form>
 <script>
-function loadTxnId(id) {
-  $.getJSON("api/txn-load.php?callback=?",
-            { type: "customer",
-              id: id },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                loadOrder(data);
-              }
-              $("#status").text("Loaded sale.").fadeOut('slow');
-            });
-}
-function loadTxnNumber(num) {
-  $.getJSON("api/txn-load.php?callback=?",
-            { type: "customer",
-              number: num },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                loadOrder(data);
-              }
-              $("#status").text("Loaded sale.").fadeOut('slow');
-            });
-}
 $("#txn-load").submit(function(ev) {
   ev.preventDefault();
-  loadTxnNumber($("#txn-load input[name='invoice']").val());
+  Txn.loadNumber($("#txn-load input[name='invoice']").val());
   return false;
 });
 </script>
