@@ -29,7 +29,8 @@ head("Scat");
 /* Hide/show some elements from paid invoices. */
 #txn.paid .remove,
 #txn.paid #pay,
-#txn.paid .choices, #txn.paid .errors
+#txn.paid .choices, #txn.paid .errors,
+#txn.paid #delete
 {
   display: none;
 }
@@ -60,6 +61,18 @@ head("Scat");
 <script>
 var Txn = {};
 
+Txn.delete= function (id) {
+  $.getJSON("api/txn-delete?callback=?",
+            { txn: id },
+            function(data) {
+              if (data.error) {
+                displayError(data);
+              } else {
+                window.location.href= './';
+              }
+            });
+}
+
 Txn.loadId= function (id) {
   $.getJSON("api/txn-load.php?callback=?",
             { type: "customer",
@@ -73,6 +86,7 @@ Txn.loadId= function (id) {
               $("#status").text("Loaded sale.").fadeOut('slow');
             });
 }
+
 Txn.loadNumber= function(num) {
   $.getJSON("api/txn-load.php?callback=?",
             { type: "customer",
@@ -477,15 +491,7 @@ $(function() {
     if (!txn) {
       return;
     }
-    $.getJSON("api/txn-delete?callback=?",
-              { txn: txn },
-              function(data) {
-                if (data.error) {
-                  displayError(data);
-                } else {
-                  window.location.href= './';
-                }
-              });
+    Txn.delete(txn);
   });
 
   $('#lookup').submit(function(ev) {
@@ -660,6 +666,7 @@ $("#txn-load").submit(function(ev) {
       <div id="sale-buttons" class="col-md-5 col-md-push-7 text-right">
         <button id="invoice" class="btn btn-default">Invoice</button>
         <button id="print" class="btn btn-default">Print</button>
+        <button id="delete" class="btn btn-default">Delete</button>
         <button id="pay" class="btn btn-default">Pay</button>
         <button id="return" class="btn btn-default">Return</button>
       </div>
@@ -671,6 +678,10 @@ $("#print").on("click", function() {
   if ($("#txn").data("paid_date") != null ||
       confirm("Invoice isn't paid. Sure you want to print?"))
   printReceipt();
+});
+$("#delete").on("click", function() {
+  var txn= $('#txn').data('txn');
+  Txn.delete(txn);
 });
 $("#pay").on("click", function() {
   var txn= $('#txn').data('txn');
