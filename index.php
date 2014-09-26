@@ -293,6 +293,13 @@ function updateOrderData(txn) {
   $('#txn #description').text(type + ' ' +
                               Date.parse(txn.created).toString('yyyy') +
                               '-' + txn.number);
+  if (txn.returned_from) {
+    var btn= $('<button class="btn btn-xs btn-link"><i class="fa fa-reply"></i></button>');
+    btn.on('click', function () {
+      loadTxnId(txn.returned_from);
+    });
+    $('#txn #description').append(btn);
+  }
   $('#txn').data('person', txn.person)
   $('#txn #person .val').text(txn.person_name ? txn.person_name : 'Anonymous');
   var format= 'MMM d yyyy h:mmtt';
@@ -595,11 +602,10 @@ $("#sidebar .nav a").click(function() {
   </div>
 </form>
 <script>
-$("#txn-load").submit(function(ev) {
-  ev.preventDefault();
+function loadTxnId(id) {
   $.getJSON("api/txn-load.php?callback=?",
             { type: "customer",
-              number: $("#txn-load input[name='invoice']").val() },
+              id: id },
             function (data) {
               if (data.error) {
                 displayError(data);
@@ -608,6 +614,23 @@ $("#txn-load").submit(function(ev) {
               }
               $("#status").text("Loaded sale.").fadeOut('slow');
             });
+}
+function loadTxnNumber(num) {
+  $.getJSON("api/txn-load.php?callback=?",
+            { type: "customer",
+              number: num },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+              } else {
+                loadOrder(data);
+              }
+              $("#status").text("Loaded sale.").fadeOut('slow');
+            });
+}
+$("#txn-load").submit(function(ev) {
+  ev.preventDefault();
+  loadTxnNumber($("#txn-load input[name='invoice']").val());
   return false;
 });
 </script>
