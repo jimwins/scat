@@ -12,7 +12,7 @@ $begin= $_REQUEST['begin'];
 $end= $_REQUEST['end'];
 
 if (!$begin) {
-  $begin= date('Y-m-d', time() - 3 * 24 * 3600);
+  $begin= date('Y-m-d', time());
 } else {
   $begin= $db->escape($begin);
 }
@@ -77,7 +77,7 @@ $q= "SELECT
        LEFT JOIN barcode ON (item.id = barcode.item)
       WHERE type = 'customer'
         AND ($sql_criteria)
-        AND paid BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
+        AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
       GROUP BY 1
       ORDER BY 2";
 
