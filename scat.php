@@ -103,19 +103,22 @@ $(document).ready(function() {
         <li><a href="./custom.php">Custom</a></li>
         <li><a href="./person.php">People</a></li>
         <li><a href="./txns.php">Transactions</a></li>
-        <li><a href="./till.php">Till</a></li>
+        <li><a href="./clock.php">Clock</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a id="reports" href="#">Quick</a></li>
             <li><a href="report.php">Sales by Date</a></li>
             <li><a href="report-items.php">Sales by Item</a></li>
-            <li><a href="report-daily.php">Daily Flow</a></li>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header">Inventory</li>
             <li><a href="reorder.php">Reorder</a></li>
             <li><a href="report-price-change.php">Price Changes</a></li>
             <li><a href="vendor-upload.php">Upload Vendor Data</a></li>
+            <li role="presentation" class="divider"></li>
+            <li role="presentation" class="dropdown-header">Money</li>
+            <li><a href="./till.php">Till</a></li>
+            <li><a href="report-daily.php">Daily Flow</a></li>
           </ul>
         </li>
       </ul>
