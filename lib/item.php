@@ -3,6 +3,7 @@
 define('FIND_ALL', 1);
 define('FIND_OR', 2);
 define('FIND_SALES', 4);
+define('FIND_LIMITED', 8);
 
 function item_terms_to_sql($db, $q, $options) {
   $andor= array();
@@ -23,10 +24,15 @@ function item_terms_to_sql($db, $q, $options) {
     } elseif (preg_match('/^-(.+)/i', $term, $dbt)) {
       $not[]= "(item.code NOT LIKE '{$dbt[1]}%')";
     } else {
-      $andor[]= "(item.name LIKE '%$term%'
-               OR brand.name LIKE '%$term%'
-               OR item.code LIKE '%$term%'
-               OR barcode.code LIKE '%$term%')";
+      if ($options & FIND_LIMITED) {
+        $andor[]= "(item.name LIKE '%$term%'
+                 OR item.code LIKE '%$term%')";
+      } else {
+        $andor[]= "(item.name LIKE '%$term%'
+                 OR brand.name LIKE '%$term%'
+                 OR item.code LIKE '%$term%'
+                 OR barcode.code LIKE '%$term%')";
+      }
     }
   }
 
