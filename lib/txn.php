@@ -199,8 +199,9 @@ function txn_apply_discounts($db, $id) {
   $discounts= array(
     'MXG-%'  => array(12 => '6.99', 36 => '6.49'), #, 72 => '5.99'),
     'MXB-%'  => array(12 => '5.99', 36 => '5.49'), #, 72 => '4.99'),
-    'MTEX%'  => array(12 => '5.99', 36 => '5.49'), #, 72 => '4.99'),
+    'MTEX019%' => array(12 => '8.49', 36 => '7.99'), #, 72 => '4.99'),
     'SKXSDK%'=> array(12 => '2.49'),
+    'DA40286%'=>array(10 => '0.79', 100 => '0.69'),
   );
 
   foreach ($discounts as $code => $breaks) {
