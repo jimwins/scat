@@ -258,7 +258,7 @@ $('tbody tr .brand').editable(function(value, settings) {
   return "...";
 }, { event: 'click', style: 'display: inline', type: 'select', submit: 'OK',
 loadurl: 'api/brand-list.php', placeholder: '' });
-$('tbody tr td:nth-child(5)').editable(function(value, settings) {
+$('tbody tr td:nth(4)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
   $.getJSON("api/item-update.php?callback=?",
@@ -286,7 +286,7 @@ $('tbody tr .discount').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'click', style: 'display: inline', placeholder: '', width: '6em', select: true, });
-$('tbody tr td:nth-child(8)').editable(function(value, settings) {
+$('tbody tr td:nth(7)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
   $.getJSON("api/item-update.php?callback=?",
@@ -300,7 +300,7 @@ $('tbody tr td:nth-child(8)').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'click', style: 'display: inline', width: '3em', select: true });
-$('tbody tr td:nth-child(9)').editable(function(value, settings) {
+$('tbody tr td:nth(8)').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
   $.getJSON("api/item-update.php?callback=?",
