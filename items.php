@@ -91,7 +91,7 @@ $('#add-item-form form').on('submit', function(ev) {
 <?
 
 if (!$search) {
-  $q= "SELECT id, name, search FROM saved_search";
+  $q= "SELECT id, name, search FROM saved_search ORDER BY name";
   $r= $db->query($q);
 
   echo '<ul class="list-group">';
