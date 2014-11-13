@@ -7,6 +7,11 @@ ob_start();
 head("Items @ Scat", true);
 
 $search= $_GET['search'];
+
+if (($saved= (int)$_GET['saved']) && !$search) {
+  $search= $db->get_one("SELECT search FROM saved_search WHERE id = $saved");
+}
+
 ?>
 <div style="float: right">
  <button id="add-item" class="btn btn-default">Add New Item</button>
@@ -85,7 +90,22 @@ $('#add-item-form form').on('submit', function(ev) {
 <br>
 <?
 
-if (!$search) exit;
+if (!$search) {
+  $q= "SELECT id, name, search FROM saved_search";
+  $r= $db->query($q);
+
+  echo '<ul class="list-group">';
+  while ($row= $r->fetch_assoc()) {
+    echo '<li class="list-group-item">',
+         '<a href="items.php?saved=', $row['id'], '" ',
+            'title="', ashtml($row['search']), '">',
+         ashtml($row['name']),
+         '</a></li>';
+  }
+  echo '</ul>';
+
+  goto end;
+}
 
 $begin= false;
 
@@ -413,4 +433,5 @@ $('#bulk-edit-form form').on('submit', function(ev) {
 <?
 dump_query($q);
 
+end:
 foot();
