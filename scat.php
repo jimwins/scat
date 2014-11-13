@@ -265,7 +265,9 @@ function dump_table($r, $calc = false) {
       $class= strchr($name, '$');
       if ($class == '$hide')
         continue;
-      echo '<td', ($class ? ' class="' . ltrim($class, '$'). '"' : ''), '>',
+      echo '<td', ($class ? ' class="' . ltrim($class, '$'). '"' : ''),
+           ($name ? ' id="' . strtolower(strtok($name, '$')). '"' : ''),
+           '>',
            expand_field($row[$i], $class), '</td>';
     }
     if ($calc) {
