@@ -259,7 +259,7 @@ $('tbody tr .brand').editable(function(value, settings) {
   return "...";
 }, { event: 'click', style: 'display: inline', type: 'select', submit: 'OK',
 loadurl: 'api/brand-list.php', placeholder: '' });
-$('tbody tr td:eq(4)').editable(function(value, settings) {
+$('tbody tr td#msrp').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
   $.getJSON("api/item-update.php?callback=?",
@@ -287,7 +287,7 @@ $('tbody tr .discount').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'click', style: 'display: inline', placeholder: '', width: '6em', select: true, });
-$('tbody tr td:eq(7)').editable(function(value, settings) {
+$('tbody tr td#stock').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
   $.getJSON("api/item-update.php?callback=?",
@@ -301,7 +301,7 @@ $('tbody tr td:eq(7)').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'click', style: 'display: inline', width: '3em', select: true });
-$('tbody tr td:eq(8)').editable(function(value, settings) {
+$('tbody tr td#minimum').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
   $.getJSON("api/item-update.php?callback=?",
@@ -315,7 +315,7 @@ $('tbody tr td:eq(8)').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'click', style: 'display: inline', width: '3em', select: true });
-$('tbody').on('click', 'tr td:eq(10)', function(ev) {
+$('tbody').on('click', 'tr td#active', function(ev) {
   ev.preventDefault();
   var item= $(this).closest('tr').attr('class');
   var val= $("i", this).data('truth');
