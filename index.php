@@ -1295,7 +1295,15 @@ $('#person-create').on('click', "button[name='cancel']", function(ev) {
   <tr id="subtotal-row"><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="right">$0.00</td></tr>
   <tr id="tax-row"><th colspan=4></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="right">$0.00</td></tr>
   <tr id="total-row"><th colspan=4></th><th align="right">Total:</th><td id="total" class="right">$0.00</td></tr>
-  <tr id="due-row" style="display:none"><th colspan=4></th><th align="right">Due:</th><td id="due" class="right">$0.00</td></tr>
+  <tr id="due-row" style="display:none">
+   <th colspan="4" style="text-align: right">
+    <a id="lock"><i class="fa fa-lock"></i></a>
+   </th>
+   <th align="right">
+     Due:
+   </th>
+   <td id="due" class="right">$0.00</td>
+  </tr>
  </tfoot>
 <script>
 $("#items").on("click", ".payment-row a[name='print']", function() {
@@ -1332,6 +1340,10 @@ $('#tax_rate .val').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline' });
+$("#lock").on("click", function() {
+  $('.admin').toggle();
+  $('#lock').toggleClass('fa-lock fa-unlock-alt');
+});
 </script>
  <tbody>
  </tbody>
