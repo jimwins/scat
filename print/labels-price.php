@@ -18,6 +18,7 @@ if ($q= $_REQUEST['q']) {
 }
 
 $trim= $_REQUEST['trim'];
+$noprice= (int)$_REQUEST['noprice'];
 
 $left_margin= 0.2;
 
@@ -59,6 +60,8 @@ foreach ($items as $item) {
   // write the prices
   $pdf->SetFontSize($size= $basefontsize * 2);
 
+  if ($noprice) goto noprice;
+
   // figure out the font size
   $price= '$' . max($item['sale_price'], $item['retail_price']);
   $pwidth= $pdf->GetStringWidth($price);
@@ -93,6 +96,8 @@ foreach ($items as $item) {
     $pdf->SetAlpha(1);
 
   }
+
+noprice:
 
   // write the barcode
   $code= $item['fake_barcode'];
