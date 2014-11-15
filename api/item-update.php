@@ -128,24 +128,33 @@ if (isset($_REQUEST['stock'])) {
     }
 
     $diff= $stock - $item['stock'];
-    if ($stock > $item['stock']) {
-      $cost= 0.00;
-    } else {
-      $q= "SELECT retail_price
-             FROM txn_line JOIN txn ON (txn_line.txn = txn.id)
-            WHERE item = $item_id AND type = 'vendor'
-            ORDER BY created DESC
-            LIMIT 1";
-      $cost= $db->get_one($q);
-      if (!$cost) $cost= 0.00;
-    }
+    $cost= 0.00;
 
-    $q= "INSERT INTO txn_line
-            SET txn = $txn_id,
-                item = $item_id,
-                retail_price = $cost,
-                ordered = $diff,
-                allocated = $diff";
+    $q= "SELECT retail_price
+           FROM txn_line JOIN txn ON (txn_line.txn = txn.id)
+          WHERE item = $item_id AND type = 'vendor'
+          ORDER BY created DESC
+          LIMIT 1";
+    $cost= $db->get_one($q);
+    if (!$cost) $cost= 0.00;
+
+    $q= "SELECT id FROM txn_line WHERE txn = $txn_id AND item = $item_id";
+    $txn_line= $db->get_one($q);
+
+    if ($txn_line) {
+      $q= "UPDATE txn_line
+              SET ordered = ordered + $diff,
+                  allocated = allocated + $diff,
+                  retail_price = IF(ordered < 0, $cost, 0.00)
+            WHERE id = $txn_line";
+    } else {
+      $q= "INSERT INTO txn_line
+              SET txn = $txn_id,
+                  item = $item_id,
+                  retail_price = $cost,
+                  ordered = $diff,
+                  allocated = $diff";
+    }
 
     $r= $db->query($q)
       or die_query($db, $q);
