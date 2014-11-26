@@ -258,6 +258,14 @@ $("#print-product-labels").on('click', function() {
   });
 });
 </script>
+<button id="export-order" class="btn btn-default">
+  Export Order
+</button>
+<script>
+$("#export-order").on('click', function() {
+  window.location.href= 'export/txn.php?dl=1&id=<?=$id?>';
+});
+</script>
 <?
 }
 
