@@ -1342,7 +1342,7 @@ $('#tax_rate .val').editable(function(value, settings) {
 }, { event: 'dblclick', style: 'display: inline' });
 $("#lock").on("click", function() {
   $('.admin').toggle();
-  $('#lock').toggleClass('fa-lock fa-unlock-alt');
+  $('#lock i').toggleClass('fa-lock fa-unlock-alt');
 });
 </script>
  <tbody>
