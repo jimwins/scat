@@ -109,16 +109,19 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $db->query($q)
     or die_query($db, $q);
 
-#sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,min_ord_qty
+#sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE macitem
           FIELDS TERMINATED BY ','
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 1 LINES
           (item_no, @cust_sku, name, @vendor_name,
-           retail_price, net_price, @net_discount,
+           retail_price, net_price, @reg_discount,
            promo_price, @promo_discount,
-           barcode, purchase_quantity)
+           barcode, @upc2, @upc2_qty, @upc3, @upc3_qty,
+           purchase_quantity,
+           @level1, @level2, @level3, @level4, @level5,
+           @ltl_only, @add_date)
         SET sku = item_no";
 
   $r= $db->query($q)
