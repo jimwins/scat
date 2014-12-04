@@ -4,9 +4,11 @@ include 'scat.php';
 head("Reorder @ Scat", true);
 
 $extra= $extra_field= '';
+$code_field= "code";
 
 $vendor= (int)$_REQUEST['vendor'];
 if ($vendor) {
+  $code_field= "(SELECT code FROM vendor_item WHERE vendor = $vendor AND item = item.id LIMIT 1)";
   $extra= "AND EXISTS (SELECT id
                          FROM vendor_item
                         WHERE vendor = $vendor
@@ -34,7 +36,7 @@ if ($code) {
 <button id="zero" class="btn btn-default">Zero</button>
 <?
 $q= "SELECT item.id meta,
-            code Code\$item,
+            $code_field Code\$item,
             name Name,
             SUM(allocated) Stock\$right,
             minimum_quantity Min\$right,
