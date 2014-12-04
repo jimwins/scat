@@ -3,7 +3,7 @@ include 'scat.php';
 
 head("Reorder @ Scat", true);
 
-$extra= '';
+$extra= $extra_field= '';
 
 $vendor= (int)$_REQUEST['vendor'];
 if ($vendor) {
@@ -11,6 +11,7 @@ if ($vendor) {
                          FROM vendor_item
                         WHERE vendor = $vendor
                           AND item = item.id)";
+  $extra_field= "(SELECT MIN(IF(promo_price, promo_price, net_price)) FROM vendor_item WHERE item = item.id AND vendor = $vendor) <= (SELECT MIN(IF(promo_price, promo_price, net_price)) FROM vendor_item WHERE item = item.id) Cheapest\$bool, ";
 }
 if ((int)$_REQUEST['novendor']) {
   $extra= "AND NOT EXISTS (SELECT id
@@ -47,6 +48,7 @@ $q= "SELECT item.id meta,
               WHERE type = 'vendor'
                 AND item = item.id AND created > NOW() - INTERVAL 3 MONTH)
             AS Ordered\$hide,
+            $extra_field
             minimum_quantity AS Order\$order
        FROM item
        LEFT JOIN txn_line ON (item = item.id)
