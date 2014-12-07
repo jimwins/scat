@@ -179,11 +179,8 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
             INTO TABLE macitem
           $format
           IGNORE 1 LINES
-          (item_no, sku, name, @vendor_name,
-           @retail_price, @net_price, @reg_discount,
-           @promo_price, @promo_discount,
-           barcode, @upc2, @upc2_qty, @upc3, @upc3_qty,
-           purchase_quantity, @level1, @level2, @level3, @level4, @level5)
+          (item_no, sku, name, @retail_price, @net_price, @promo_price,
+           barcode, purchase_quantity)
        SET
            retail_price = REPLACE(@retail_price, '$', ''),
            net_price = REPLACE(@net_price, '$', ''),
