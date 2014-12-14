@@ -3,7 +3,7 @@ require 'scat.php';
 
 head('Gift Cards');
 ?>
-<form role="form" action="javascript: return false">
+<form role="form">
   <div class="form-group">
     <label for="card">Card</label>
     <input type="text" class="form-control" id="card"
@@ -15,9 +15,10 @@ head('Gift Cards');
            placeholder="$0.00">
   </div>
   <button id="check" type="submit" class="btn btn-primary">Check</button>
-  <button id="activate" class="btn btn-default">Activate</button>
+  <button id="create" class="btn btn-default">Create</button>
   <button id="add" class="btn btn-default">Add</button>
   <button id="spend" class="btn btn-default">Spend</button>
+  <button id="print" class="btn btn-default">Print</button>
 </form>
 <br>
 <div id="result" class="alert alert-success">
@@ -38,20 +39,23 @@ $('#check').on('click', function() {
                 $('#result').append('This card is active, but has no balance.');
               }
             });
+  return false;
 });
-$('#activate').on('click', function() {
-  var card= $('#card').val();
+$('#create').on('click', function() {
   var amount= $('#amount').val();
-  $.getJSON("<?=GIFT_BACKEND?>/activate.php?callback=?",
-            { card: card, balance: amount },
+  $.getJSON("<?=GIFT_BACKEND?>/create.php?callback=?",
+            { balance: amount },
             function (data) {
               $('#result').text('');
               if (data.error) {
                 $('#result').append(data.error);
               } else {
                 $('#result').append(data.success);
+                $('#amount').val(data.balance);
+                $('#card').val(data.card);
               }
             });
+  return false;
 });
 $('#add').on('click', function() {
   var card= $('#card').val();
@@ -66,6 +70,7 @@ $('#add').on('click', function() {
                 $('#result').append(data.success);
               }
             });
+  return false;
 });
 $('#spend').on('click', function() {
   var card= $('#card').val();
@@ -80,7 +85,32 @@ $('#spend').on('click', function() {
                 $('#result').append(data.success);
               }
             });
+  return false;
 });
+$('#print').on('click', function() {
+  var card= $('#card').val();
+  $.getJSON("<?=GIFT_BACKEND?>/check-balance.php?callback=?",
+            { card: card },
+            function (data) {
+              $('#result').text('');
+              if (data.error) {
+                $('#result').append(data.error);
+              } else {
+                printGiftCard(data.card, data.balance, data.latest);
+                $('#result').append('This card is active, but has no balance.');
+              }
+            });
+  return false;
+});
+function printGiftCard(card, balance, issued) {
+  var lpr= $('<iframe id="giftcard" src="print/gift-card.php?card=' + card + '&amp;balance=' + balance + '&amp;issued=' + issued + '"></iframe>').hide();
+  $("#giftcard").remove();
+  lpr.load(function() {
+    this.contentWindow.print();
+  });
+  $('body').append(lpr);
+  return false;
+}
 </script>
 <?
 foot();
