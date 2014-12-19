@@ -49,7 +49,8 @@ $q= "CREATE TEMPORARY TABLE vendor_order (
        order_no varchar(255),
        bo_no varchar(255),
        invoice_no varchar(255),
-       box_no varchar(255))";
+       box_no varchar(255),
+       key (item), key(item_no), key(sku))";
 
 $db->query($q)
   or die_query($db, $q);
