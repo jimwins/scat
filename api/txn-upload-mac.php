@@ -67,18 +67,6 @@ if (preg_match('/^linenum,qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  $q= "UPDATE vendor_order
-          SET item_no = IF(barcode,
-                           IFNULL((SELECT item.code
-                                     FROM item
-                                     JOIN barcode ON barcode.item = item.id
-                                    WHERE vendor_order.barcode = barcode.code
-                                    LIMIT 1),
-                                  sku),
-                           sku)";
-  $db->query($q)
-    or die_query($db, $q);
-
   echo "Loaded ", $db->affected_rows, " rows from file.<br>";
 
 } elseif (preg_match('/^Vendor Name	Assortment Item Number/', $line)) {
@@ -158,6 +146,39 @@ if (preg_match('/^linenum,qty/', $line)) {
 }
 
 $q= "START TRANSACTION";
+#$db->query($q)
+#  or die_query($db, $q);
+
+# Identify vendor items by SKU
+$q= "UPDATE vendor_order, vendor_item
+        SET vendor_order.item = vendor_item.item
+      WHERE vendor_order.sku AND vendor_order.sku IS NOT NULL
+        AND vendor_order.sku = vendor_item.vendor_sku
+        AND vendor = $txn[person]";
+$db->query($q)
+  or die_query($db, $q);
+
+# Identify vendor items by code
+$q= "UPDATE vendor_order, vendor_item
+        SET vendor_order.item = vendor_item.item
+      WHERE NOT vendor_order.item
+        AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
+        AND vendor_order.item_no = vendor_item.code
+        AND vendor = $txn[person]";
+$db->query($q)
+  or die_query($db, $q);
+
+# Identify vendor items by barcode
+$q= "UPDATE vendor_order
+        SET item = IF(barcode,
+                      IFNULL((SELECT item.id
+                                FROM item
+                                JOIN barcode ON barcode.item = item.id
+                               WHERE vendor_order.barcode = barcode.code
+                               LIMIT 1),
+                             0),
+                      0)
+      WHERE NOT item";
 $db->query($q)
   or die_query($db, $q);
 
@@ -169,35 +190,47 @@ $q= "INSERT IGNORE INTO item (code, brand, name, retail_price, active)
             msrp AS retail_price,
             1 AS active
        FROM vendor_order
-      WHERE msrp > 0 AND IFNULL(unit,'') != 'AS'";
+      WHERE NOT item AND msrp > 0 AND IFNULL(unit,'') != 'AS'";
 $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " items from order.<br>";
 
-# Make sure all the items are active and update order with item ids
+if ($db->affected_rows) {
+  # Attach order lines to new items
+  $q= "UPDATE vendor_order, vendor_item
+          SET vendor_order.item = vendor_item.item
+        WHERE NOT vendor_order.item
+          AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
+          AND vendor_order.item_no = vendor_item.code
+          AND vendor = $txn[person]";
+  $db->query($q)
+    or die_query($db, $q);
+}
+
+# Make sure all the items are active
 $q= "UPDATE item, vendor_order
-        SET item.active = 1,
-            vendor_order.item = item.id
-      WHERE item_no = code";
+        SET item.active = 1
+      WHERE vendor_order.item = item.id";
 $db->query($q)
   or die_query($db, $q);
 echo "Activated ", $db->affected_rows, " items from order.<br>";
 
 # Make sure we know all the barcodes
 $q= "INSERT IGNORE INTO barcode (item, code, quantity)
-     SELECT (SELECT id FROM item WHERE item_no = code) AS item,
+     SELECT item,
             REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS code,
             1 AS quantity
       FROM vendor_order
-     WHERE barcode != ''";
+     WHERE item AND barcode != ''";
 $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " new barcodes from order.<br>";
 
-# Link items to vendor items
+# Link items to vendor items if they aren't already
 $q= "UPDATE vendor_item, vendor_order
         SET vendor_item.item = vendor_order.item
-      WHERE vendor_item.code = vendor_order.item_no";
+      WHERE NOT vendor_item.item
+        AND vendor_item.code = vendor_order.item_no";
 $db->query($q)
   or die_query($db, $q);
 echo "Linked ", $db->affected_rows, " items to vendor items.<br>";
