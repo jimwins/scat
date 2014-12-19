@@ -146,8 +146,8 @@ if (preg_match('/^linenum,qty/', $line)) {
 }
 
 $q= "START TRANSACTION";
-#$db->query($q)
-#  or die_query($db, $q);
+$db->query($q)
+  or die_query($db, $q);
 
 # Identify vendor items by SKU
 $q= "UPDATE vendor_order, vendor_item
