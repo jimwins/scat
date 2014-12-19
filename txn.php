@@ -219,7 +219,7 @@ if ($txn['txn']['type'] == 'vendor') {
 <script>
 $("body").html5Uploader({
   name: 'src',
-  postUrl: 'api/txn-upload-mac.php?txn=<?=$id?>',
+  postUrl: 'api/txn-upload-items.php?txn=<?=$id?>',
   onSuccess: function(e, file, response) {
     j= $.parseJSON(response);
     $('#upload-status .modal-body').append(j.result);
