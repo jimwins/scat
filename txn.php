@@ -221,9 +221,18 @@ $("body").html5Uploader({
   name: 'src',
   postUrl: 'api/txn-upload-items.php?txn=<?=$id?>',
   onSuccess: function(e, file, response) {
-    j= $.parseJSON(response);
-    $('#upload-status .modal-body').append(j.result);
+    data= $.parseJSON(response);
+    if (data.error) {
+      displayError(data);
+      return;
+    }
+    ko.mapping.fromJS({ txn: data.txn, items: data.items },
+                      viewModel);
+    $('#upload-status .modal-body').append(data.result);
     $('#upload-status').modal('show');
+  },
+  onServerError: function(e, file) {
+    alert("File upload failed.");
   },
 });
 </script>

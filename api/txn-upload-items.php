@@ -267,4 +267,6 @@ $db->query("INSERT INTO txn_note
                    content = '" . $db->escape($out) . "'")
   or die_jsonp($db->error);
 
-echo jsonp(array("result" => $out));
+$txn= txn_load_full($db, $txn_id);
+$txn['result']= $out;
+echo jsonp($txn);
