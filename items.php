@@ -99,8 +99,8 @@ if (!$search) {
     echo '<li class="list-group-item">',
          '<a href="items.php?saved=', $row['id'], '" ',
             'title="', ashtml($row['search']), '">',
-         ashtml($row['name']),
-         '</a></li>';
+         ashtml($row['name']), '</a>',
+         '</li>';
   }
   echo '</ul>';
 
