@@ -6,7 +6,7 @@ head('Gift Cards');
 <form role="form">
   <div class="form-group">
     <label for="card">Card</label>
-    <input type="text" class="form-control" id="card"
+    <input type="text" class="autofocus form-control" id="card"
            placeholder="Scan or enter card">
   </div>
   <div class="form-group">

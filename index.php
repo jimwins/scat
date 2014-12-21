@@ -648,8 +648,8 @@ $("#txn-load").submit(function(ev) {
 <form class="form form-inline" id="lookup">
   <div class="input-group">
     <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
-    <input type="text" class="form-control"
-           id="autofocus" name="q"
+    <input type="text" class="form-control autofocus"
+           name="q"
            size="60"
            autocomplete="off" autocorrect="off" autocapitalize="off"
            placeholder="Scan item or enter search terms"

@@ -352,7 +352,7 @@ $('tbody').on('click', 'tr td#active', function(ev) {
 });
 $('#print-price-labels').on('click', function(ev) {
   ev.preventDefault();
-  var q= $('#autofocus').val();
+  var q= $('#search').val();
 
   $.getJSON("print/labels-price.php?callback=?",
             { q: q },

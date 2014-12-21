@@ -81,7 +81,7 @@ $(function() {
     }
     var el = $.getFocusedElement();
     if (!el.length) {
-      var inp= $('#autofocus', this);
+      var inp= $('.autofocus', this);
       if (ev.keyCode != 13) {
         inp.val('');
       }
