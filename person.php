@@ -13,8 +13,8 @@ $search= $_REQUEST['search'];
     <span class="input-group-btn">
       <input type="submit" class="btn btn-primary" value="Search">
     </span>
-    <input id="focus" name="search"
-           type="text" class="form-control" size="60"
+    <input name="search"
+           type="text" class="autofocus form-control" size="60"
            autocomplete="off" autocorrect="off" autocapitalize="off"
            data-bind="value: search"
            placeholder="Name">
