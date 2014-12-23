@@ -97,7 +97,7 @@ $('#print').on('click', function() {
                 $('#result').append(data.error);
               } else {
                 printGiftCard(data.card, data.balance, data.latest);
-                $('#result').append('This card is active, but has no balance.');
+                $('#result').append('Card printed showing $' + data.balance + ' balance.');
               }
             });
   return false;
