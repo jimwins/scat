@@ -191,19 +191,18 @@ $q= "INSERT IGNORE INTO item (code, brand, name, retail_price, active)
             msrp AS retail_price,
             1 AS active
        FROM vendor_order
-      WHERE NOT item AND msrp > 0 AND IFNULL(unit,'') != 'AS'";
+      WHERE item IS NULL AND msrp > 0 AND IFNULL(unit,'') != 'AS'";
 $db->query($q)
   or die_query($db, $q);
 echo "Loaded ", $db->affected_rows, " items from order.<br>";
 
 if ($db->affected_rows) {
   # Attach order lines to new items
-  $q= "UPDATE vendor_order, vendor_item
-          SET vendor_order.item = vendor_item.item
-        WHERE NOT vendor_order.item
+  $q= "UPDATE vendor_order, item
+          SET vendor_order.item = item.id
+        WHERE vendor_order.item IS NULL
           AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
-          AND vendor_order.item_no = vendor_item.code
-          AND vendor = $txn[person]";
+          AND vendor_order.item_no = item.code";
   $db->query($q)
     or die_query($db, $q);
 }
