@@ -155,6 +155,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     or die_query($db, $q);
 
 } else {
+  // Generic
   $q= "CREATE TEMPORARY TABLE macitem (
     item_no VARCHAR(32),
     sku VARCHAR(10),
