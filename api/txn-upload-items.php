@@ -27,7 +27,17 @@ $q= "SELECT id FROM brand WHERE name = 'New Item'";
 $new_item= $db->get_one($q)
   or die_query($db, $q);
 
-$q= "CREATE TEMPORARY TABLE vendor_order (
+$temporary= "TEMPORARY";
+
+# On DEBUG server, we leave behind the vendor_order table
+if ($DEBUG) {
+  $q= "DROP TABLE IF EXISTS vendor_order";
+  $db->query($q)
+    or die_query($db, $q);
+  $temporary= "";
+}
+
+$q= "CREATE $temporary TABLE vendor_order (
        line int,
        status varchar(255),
        item_no varchar(255),
