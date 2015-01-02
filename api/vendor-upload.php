@@ -94,7 +94,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 
   exit;
 
-} elseif (preg_match('/^sls/i', $_FILES['src']['name'])) {
+} elseif (preg_match('/^sls_sku,/', $line)) {
   $q= "CREATE TEMPORARY TABLE macitem (
     item_no VARCHAR(32),
     sku VARCHAR(10),
