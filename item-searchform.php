@@ -7,7 +7,7 @@
            id="search" name="search" data-bind="value: search"
            placeholder="Enter keywords or scan barcode"
            autocorrect="off" autocapitalize="off"
-           value="<?=ashtml($_REQUEST['search'])?>">
+           value="<?=ashtml($search)?>">
     <span class="input-group-addon">
       <label>
         <input type="checkbox" value="1" name="all" data-bind="checked: all"

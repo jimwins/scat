@@ -4,13 +4,13 @@ require 'lib/item.php';
 
 ob_start();
 
-head("Items @ Scat", true);
-
 $search= $_GET['search'];
 
 if (($saved= (int)$_GET['saved']) && !$search) {
   $search= $db->get_one("SELECT search FROM saved_search WHERE id = $saved");
 }
+
+head("Items @ Scat", true);
 
 ?>
 <div style="float: right">
