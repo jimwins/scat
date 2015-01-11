@@ -67,13 +67,15 @@ $db->query($q)
 
 // SLS order?
 if (preg_match('/^linenum,qty/', $line)) {
+  // linenum,qty_shipped,sls_sku,cust_item_numb,description,upc,msrp,net_cost,pkg_id,extended_cost
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
        FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
        IGNORE 1 LINES
-       (line, @shipped, sku, cust_item, description, @upc,
+       (line, @shipped, item_no, cust_item, description, @upc,
         msrp, net, box_no, ext)
        SET barcode = REPLACE(@upc, 'UPC->', ''),
+           sku = item_no,
            ordered = @shipped, shipped = @shipped";
   $db->query($q)
     or die_query($db, $q);
@@ -163,7 +165,7 @@ $db->query($q)
 # Identify vendor items by SKU
 $q= "UPDATE vendor_order, vendor_item
         SET vendor_order.item = vendor_item.item
-      WHERE vendor_order.sku AND vendor_order.sku IS NOT NULL
+      WHERE vendor_order.sku != '' AND vendor_order.sku IS NOT NULL
         AND vendor_order.sku = vendor_item.vendor_sku
         AND vendor = $txn[person]";
 $db->query($q)
@@ -172,7 +174,7 @@ $db->query($q)
 # Identify vendor items by code
 $q= "UPDATE vendor_order, vendor_item
         SET vendor_order.item = vendor_item.item
-      WHERE NOT vendor_order.item
+      WHERE (NOT vendor_order.item OR vendor_order.item IS NULL)
         AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
         AND vendor_order.item_no = vendor_item.code
         AND vendor = $txn[person]";
@@ -181,7 +183,7 @@ $db->query($q)
 
 # Identify vendor items by barcode
 $q= "UPDATE vendor_order
-        SET item = IF(barcode,
+        SET item = IF(barcode != '',
                       IFNULL((SELECT item.id
                                 FROM item
                                 JOIN barcode ON barcode.item = item.id
@@ -189,7 +191,7 @@ $q= "UPDATE vendor_order
                                LIMIT 1),
                              0),
                       0)
-      WHERE NOT item";
+      WHERE NOT item OR item IS NULL";
 $db->query($q)
   or die_query($db, $q);
 
