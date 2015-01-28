@@ -194,7 +194,8 @@ $q= "SELECT company Company,
             CONCAT('$', CAST(vendor_item.net_price / 0.6 AS DECIMAL(9,2)),
                    ' - ',
                    '$', CAST(vendor_item.net_price / 0.5 AS DECIMAL(9,2)))
-              AS Sale
+              AS Sale,
+            purchase_quantity AS OrderQuantity
        FROM vendor_item
        JOIN person ON vendor_item.vendor = person.id
       WHERE item = $id";
