@@ -711,12 +711,6 @@ $("#pay").on("click", function() {
                           });
               }
 
-              // Show 'Stored Card' if it is possible
-              var person= $('#txn').data('person_raw');
-              if (person && person.payment_account_id) {
-                $('#choose-pay-method #credit-stored').show();
-              }
-
               $("#choose-pay-method #due").val(amount(txn_raw.total -
                                                       txn_raw.total_paid));
 
@@ -759,7 +753,6 @@ $("#return").on("click", function() {
  <button class="btn btn-primary btn-lg" data-value="cash">Cash</button>
 <?if ($DEBUG) {?>
  <button id="credit-refund" class="btn btn-default btn-lg optional" data-value="credit-refund">Refund Credit Card</button>
- <button id="credit-stored" class="btn btn-default btn-lg optional" data-value="credit-stored">Stored Credit Card</button>
  <button class="btn btn-default btn-lg" data-value="credit">Credit Card</button>
 <?}?>
  <button class="btn btn-default btn-lg" data-value="credit-manual">Credit Card (Manual)</button>
@@ -825,38 +818,6 @@ $("#pay-credit-refund").on("submit", function (ev) {
                 updateOrderData(data.txn);
                 $('#txn').data('payments', data.payments);
                 updateTotal();
-                $.modal.close();
-              }
-            });
-});
-</script>
-<form id="pay-credit-stored" class="pay-method" style="display: none">
- <div class="form-group">
-   <input class="amount form-control input-lg text-center"
-          type="text" pattern="\d*">
- </div>
- <input type="submit" value="Pay">
- <button name="cancel">Cancel</button>
-</form>
-<script>
-$("#pay-credit-stored").on("submit", function (ev) {
-  ev.preventDefault();
-  var txn= $("#txn").data("txn");
-  var person= $("#txn").data("person");
-  var amount= $("#pay-credit-stored .amount").val();
-  $.getJSON("api/cc-stored.php?callback=?",
-            { id: txn, amount: parseFloat(amount).toFixed(2),
-              person: person },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
-                if (amount > 25.00) {
-                  printChargeRecord(data.payment);
-                }
                 $.modal.close();
               }
             });

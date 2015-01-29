@@ -143,24 +143,6 @@ $person= person_load($db, $id);
              data-bind="value: person.tax_id">
     </div>
   </div>
-  <div class="form-group">
-    <label for="payment" class="col-sm-2 control-label">Payment</label>
-    <div class="col-sm-8">
-      <button id="attach-payment" type="button" class="btn btn-default"
-              data-loading-text="Processing..."
-              data-bind="click: attachPaymentCard,
-                         text: person.payment_account_id() ?
-                                 'Update Credit Card' : 'Attach Credit Card'">
-        Attach Credit Card
-      </button>
-      <button id="remove-payment" type="button" class="btn btn-danger"
-              data-loading-text="Processing..."
-              data-bind="click: removePaymentCard,
-                         visible: person.payment_account_id()">
-        Remove Credit Card
-      </button>
-    </div>
-  </div>
 
   <div class="form-group" data-bind="visible: changed">
     <div class="col-sm-offset-2 col-sm-8">
@@ -293,42 +275,6 @@ viewModel.changed= ko.computed(function() {
 });
 
 ko.applyBindings(viewModel);
-
-function attachPaymentCard(place, ev) {
-  $(ev.target).button('loading');
-  $.getJSON("api/cc-attach-begin.php?callback=?",
-            { person: place.person.id(),
-              payment_account_id: place.person.payment_account_id() },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                $('#modal').remove();
-                var modal= $('<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modal" role="dialog"><div class="modal-dialog" style="width: 660px"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">Attach Payment Card</h4></div><div class="modal-body"><iframe src="' + data.url + '" height=500" width="600" style="border:0"><div class="modal-footer"></div></div></div></div>');
-                modal.appendTo('body').modal('show');
-              }
-            });
-}
-
-function finishAttachPayment() {
-  $('#modal').modal('hide')
-             .on('hidden.bs.modal', function() { $(this).remove(); });
-  $('#attach-payment').button('reset');
-}
-
-function removePaymentCard(place, ev) {
-  $(ev.target).button('loading');
-  $.getJSON("api/cc-attach-remove.php?callback=?",
-            { person: place.person.id() },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                $('#remove-payment').button('reset');
-                loadPerson(data.person);
-              }
-            });
-}
 
 function loadPerson(person) {
   ko.mapping.fromJS({ person: person }, viewModel);
