@@ -703,7 +703,7 @@ $("#pay").on("click", function() {
                             $.each(data.payments, function(i, payment) {
                               if (payment.method == 'credit' &&
                                   payment.amount > 0 &&
-                                  payment.cc_txn != '') {
+                                  payment.cc_approval != '') {
                                 $('#choose-pay-method #credit-refund').show();
                                 $('#pay-credit-refund').data('from', payment.id);
                               }
@@ -751,11 +751,10 @@ $("#return").on("click", function() {
     </div>
     <div class="panel-body">
  <button class="btn btn-primary btn-lg" data-value="cash">Cash</button>
-<?if ($DEBUG) {?>
- <button id="credit-refund" class="btn btn-default btn-lg optional" data-value="credit-refund">Refund Credit Card</button>
  <button class="btn btn-default btn-lg" data-value="credit">Credit Card</button>
-<?}?>
- <button class="btn btn-default btn-lg" data-value="credit-manual">Credit Card (Manual)</button>
+ <button id="credit-refund" class="btn btn-default btn-lg optional" data-value="credit-refund">Refund Credit Card</button>
+ <br><br>
+ <button class="btn btn-default" data-value="credit-manual">Credit Card (Manual)</button>
  <br><br>
  <button class="btn btn-default" data-value="gift">Gift Card</button>
  <button class="btn btn-default" data-value="check">Check</button>
@@ -799,8 +798,8 @@ $("#pay-cash").on("submit", function (ev) {
    <input class="amount form-control input-lg text-center"
           type="text" pattern="\d*">
  </div>
- <input type="submit" value="Refund">
- <button name="cancel">Cancel</button>
+ <input class="btn btn-default" type="submit" value="Refund">
+ <button class="btn btn-default" name="cancel">Cancel</button>
 </form>
 <script>
 $("#pay-credit-refund").on("submit", function (ev) {
@@ -808,11 +807,13 @@ $("#pay-credit-refund").on("submit", function (ev) {
   var txn= $("#txn").data("txn");
   var amount= $("#pay-credit-refund .amount").val();
   var refund_from= $("#pay-credit-refund").data('from');
-  $.getJSON("api/cc-refund.php?callback=?",
-            { id: txn, amount: parseFloat(amount).toFixed(2),
+  $.getJSON("api/cc-terminal.php?callback=?",
+            { id: txn, type: 'Return',
+              amount: parseFloat(-1 * amount).toFixed(2),
               from: refund_from },
             function (data) {
               if (data.error) {
+                $.modal.close();
                 displayError(data);
               } else {
                 updateOrderData(data.txn);
@@ -821,6 +822,9 @@ $("#pay-credit-refund").on("submit", function (ev) {
                 $.modal.close();
               }
             });
+  $.modal.close();
+  $("#pay-credit-progress .amount").val(amount);
+  $.modal($("#pay-credit-progress"), { persist: true, overlayClose: false });
 });
 </script>
 <form id="pay-credit" class="pay-method" style="display: none">
@@ -828,37 +832,41 @@ $("#pay-credit-refund").on("submit", function (ev) {
    <input class="amount form-control input-lg text-center"
           type="text" pattern="\d*">
  </div>
- <input type="submit" value="Swipe">
- <button name="cancel">Cancel</button>
+ <input class="btn btn-default" type="submit" value="Start">
+ <button class="btn btn-default" name="cancel">Cancel</button>
 </form>
+<div id="pay-credit-progress" style="display: none">
+ <div class="progress progress-striped active" style="width: 300px; height: 1.5em">
+   <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+     Waiting for terminal&hellip;.
+   </div>
+ </div>
+ <div class="form-group">
+   <input class="amount form-control input-lg text-center"
+          disabled type="text" pattern="\d*">
+ </div>
+</div>
 <script>
 $("#pay-credit").on("submit", function (ev) {
   ev.preventDefault();
   var txn= $("#txn").data("txn");
   var amount= $("#pay-credit .amount").val();
-  $.getJSON("api/cc-begin.php?callback=?",
-            { id: txn, amount: parseFloat(amount).toFixed(2) },
+  $.getJSON("api/cc-terminal.php?callback=?",
+            { id: txn, type: 'Sale', amount: parseFloat(amount).toFixed(2) },
             function (data) {
               if (data.error) {
+                $.modal.close();
                 displayError(data);
               } else {
+                updateOrderData(data.txn);
+                $('#txn').data('payments', data.payments);
+                updateTotal();
                 $.modal.close();
-                $.modal('<iframe src="' + data.url +
-                        '" height=500" width="600" style="border:0">',
-                        {
-                          closeHTML: "",
-                          containerCss: {
-                            backgroundColor: "#fff",
-                            borderColor: "#fff",
-                            height: 520,
-                            padding: 0,
-                            width: 620,
-                          },
-                          position: undefined,
-                          overlayClose: false,
-                        });
               }
             });
+  $.modal.close();
+  $("#pay-credit-progress .amount").val(amount);
+  $.modal($("#pay-credit-progress"), { persist: true, overlayClose: false });
 });
 </script>
 <div id="pay-credit-manual" class="pay-method" style="display: none">
