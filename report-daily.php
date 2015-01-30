@@ -41,7 +41,7 @@ while ($row= $r->fetch_assoc()) {
     $cash= bcadd($cash, $row['amount']);
     break;
   case 'credit':
-    if ($row['cc_type'] == 'AmericanExpress') {
+    if ($row['cc_type'] == 'AmericanExpress' || $row['cc_type'] == 'AMEX') {
       $amex= bcadd($amex, $row['amount']);
     } else {
       $credit= bcadd($credit, $row['amount']);
