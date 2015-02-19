@@ -269,7 +269,7 @@ function dump_table($r, $calc = false) {
       echo '<td', ($class ? ' class="' . ltrim($class, '$'). '"' : ''),
            ($name ? ' id="' . strtolower(strtok($name, '$')). '"' : ''),
            '>',
-           expand_field($row[$i], $class), '</td>';
+           expand_field($row[$i], $class, $meta ? $row[0] : null), '</td>';
     }
     if ($calc) {
       $func= strtok($calc, '$');
@@ -283,7 +283,7 @@ function dump_table($r, $calc = false) {
   echo '</table>';
 }
 
-function expand_field($data, $class) {
+function expand_field($data, $class, $meta = null) {
   switch ($class) {
   case '$txn':
     list($id, $type, $number)= preg_split('/\|/', $data);
@@ -301,7 +301,11 @@ function expand_field($data, $class) {
     if (!$id) return '';
     return '<a href="person.php?id='.ashtml($id).'">'.ashtml($company).($name&&$company?" (":"").ashtml($name).($name&&$company?")":"").'</a>';
   case '$item':
-    return '<a href="item.php?code='.ashtml($data).'">'.ashtml($data).'</a>';
+    if ($meta) {
+      return '<a href="item.php?id='.ashtml($meta).'">'.ashtml($data).'</a>';
+    } else {
+      return '<a href="item.php?code='.ashtml($data).'">'.ashtml($data).'</a>';
+    }
   case '$dollar':
     if ($data == null)
       return $data;
