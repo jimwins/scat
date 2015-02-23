@@ -140,7 +140,7 @@ noprice:
     $width= $pdf->GetStringWidth($brand);
   } while ($width > $max_width && $brand != "");
 
-  $pdf->Text($left_margin,
+  $pdf->Text($left_margin + 2/72,
              $label_height - $vmargin,
              $brand);
 }
