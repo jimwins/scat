@@ -132,6 +132,17 @@ noprice:
              $label_height - $vmargin,
              $item['code']);
 
+  // write the brand
+  $max_width= $label_width - $width - $left_margin - 8/72;
+  $brand= $item['brand']." ";
+  do {
+    $brand= substr($brand, 0, -1);
+    $width= $pdf->GetStringWidth($brand);
+  } while ($width > $max_width && $brand != "");
+
+  $pdf->Text($left_margin,
+             $label_height - $vmargin,
+             $brand);
 }
 
 $tmpfname= tempnam("/tmp", "lab");
