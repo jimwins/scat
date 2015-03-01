@@ -7,6 +7,11 @@ if (($items= $_REQUEST['items'])) {
   list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'], FIND_OR);
 }
 
+$vendor= (int)$_REQUEST['vendor'];
+if ($vendor) {
+  $sql_criteria= "($sql_criteria) AND vendor_item.vendor = $vendor";
+}
+
 $begin= $_REQUEST['begin'];
 $end= $_REQUEST['end'];
 
