@@ -12,39 +12,10 @@ if ($vendor) {
   $sql_criteria= "($sql_criteria) AND vendor_item.vendor = $vendor";
 }
 
-$begin= $_REQUEST['begin'];
-$end= $_REQUEST['end'];
-
-if (!$begin) {
-  $begin= date('Y-m-d', time() - 3 * 24 * 3600);
-} else {
-  $begin= $db->escape($begin);
-}
-
-if (!$end) {
-  $end= date('Y-m-d', time());
-} else {
-  $end= $db->escape($end);
-}
-
 head("Price Increases @ Scat", true);
 ?>
 <form id="report-params" class="form-horizontal" role="form"
       action="<?=$_SERVER['PHP_SELF']?>">
-  <div class="form-group">
-    <label for="datepicker" class="col-sm-2 control-label">
-      Dates
-    </label>
-    <div class="col-sm-10">
-      <div class="input-daterange input-group" id="datepicker">
-        <input type="text" class="form-control" name="begin"
-               value="<?=ashtml($begin)?>" />
-        <span class="input-group-addon">to</span>
-        <input type="text" class="form-control" name="end"
-               value="<?=ashtml($end)?>" />
-      </div>
-    </div>
-  </div>
   <div class="form-group">
     <label for="items" class="col-sm-2 control-label">
       Items
