@@ -195,6 +195,15 @@ $q= "UPDATE vendor_order
 $db->query($q)
   or die_query($db, $q);
 
+# Identify items by code
+$q= "UPDATE vendor_order, item
+        SET vendor_order.item = item.id
+      WHERE (NOT vendor_order.item OR vendor_order.item IS NULL)
+        AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
+        AND vendor_order.item_no = item.code";
+$db->query($q)
+  or die_query($db, $q);
+
 # Make sure we have all the items
 $q= "INSERT IGNORE INTO item (code, brand, name, retail_price, active)
      SELECT item_no AS code,
