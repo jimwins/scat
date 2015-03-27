@@ -68,7 +68,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(Math.max(80, area())/144 * 9.95)"></p>
+                 data-bind="text: amount(Math.max(144, area())/144 * 14.95)"></p>
             </div>
           </div> 
           <div class="form-group">
@@ -77,18 +77,61 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(Math.max(80, area())/144 * 14.95)"></p>
+                 data-bind="text: amount(Math.max(144, area())/144 * 19.95)"></p>
             </div>
           </div> 
+        </div>
+      </div><!-- /.panel -->
+    </div><!-- /.col-sm-4 -->
+    <div class="col-sm-4">
+      <div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title">Print (Castelli)</h3></div>
+        <div class="panel-body">
           <div class="form-group">
-            <label for="premium" class="col-sm-6 control-label">
-              Premium
+            <label for="photo" class="col-sm-6 control-label">
+              Photo
+            </label>
+            <div class="col-sm-6">
+              <p class="form-control-static"
+                 data-bind="text: amount(Math.max(262, area())/144 * 9.95)"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="metallic" class="col-sm-6 control-label">
+              Metallic
+            </label>
+            <div class="col-sm-6">
+              <p class="form-control-static"
+                 data-bind="text: amount(Math.max(80, area())/144 * 13.95)"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="fine" class="col-sm-6 control-label">
+              Fine Art (WC, Smooth)
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
                  data-bind="text: amount(Math.max(80, area())/144 * 19.95)"></p>
             </div>
           </div> 
+          <div class="form-group">
+            <label for="canvas-decor" class="col-sm-6 control-label">
+              Canvas (Decorative)
+            </label>
+            <div class="col-sm-6">
+              <p class="form-control-static"
+                 data-bind="text: amount(Math.max(80, area())/144 * 19.95)"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="canvas-archival" class="col-sm-6 control-label">
+              Canvas (Archival)
+            </label>
+            <div class="col-sm-6">
+              <p class="form-control-static"
+                 data-bind="text: amount(Math.max(80, area())/144 * 24.95)"></p>
+            </div>
+          </div>
         </div>
       </div><!-- /.panel -->
     </div><!-- /.col-sm-4 -->
