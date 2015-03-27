@@ -209,6 +209,15 @@ head("Custom @ Scat", true);
                  data-bind="text: amount(ui() * 1.99)"></p>
             </div>
           </div> 
+          <div class="form-group">
+            <label for="epic" class="col-sm-6 control-label">
+              Epic (10oz)
+            </label>
+            <div class="col-sm-6">
+              <p class="form-control-static"
+                 data-bind="text: amount(ui() * 2.20)"></p>
+            </div>
+          </div>
         </div>
       </div><!-- /.panel -->
     </div><!-- /.col-sm-4 -->
