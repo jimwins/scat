@@ -12,13 +12,13 @@ head("Custom @ Scat", true);
     <div class="col-sm-4">
       <input type="text" class="form-control" id="w" data-bind="value: w">
     </div>
-  </div> 
+  </div>
   <div class="form-group">
     <label for="h" class="col-sm-2 control-label">Height</label>
     <div class="col-sm-4">
       <input type="text" class="form-control" id="h" data-bind="value: h">
     </div>
-  </div> 
+  </div>
   <div class="row">
     <div class="col-sm-4">
       <div class="panel panel-default">
@@ -34,7 +34,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 1.2)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="thick" class="col-sm-6 control-label">
               &frac34;&quot; Flip Stretch
@@ -45,7 +45,7 @@ head("Custom @ Scat", true);
                                    ? 'Too big!'
                                    : amount(ui() * 1.5)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="chunky" class="col-sm-6 control-label">
               1&frac12;&quot; Stretch
@@ -54,7 +54,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 1.8)"></p>
             </div>
-          </div> 
+          </div>
         </div>
       </div><!-- /.panel -->
     </div><!-- /.col-sm-4 -->
@@ -70,7 +70,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(Math.max(144, area())/144 * 14.95)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="fine" class="col-sm-6 control-label">
               Fine Art
@@ -79,7 +79,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(Math.max(144, area())/144 * 19.95)"></p>
             </div>
-          </div> 
+          </div>
         </div>
       </div><!-- /.panel -->
     </div><!-- /.col-sm-4 -->
@@ -113,7 +113,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(Math.max(80, area())/144 * 19.95)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="canvas-decor" class="col-sm-6 control-label">
               Canvas (Decorative)
@@ -147,7 +147,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 0.49)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="thick" class="col-sm-6 control-label">
               Thick
@@ -156,7 +156,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 0.79)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="epic" class="col-sm-6 control-label">
               Epic
@@ -165,7 +165,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 0.99)"></p>
             </div>
-          </div> 
+          </div>
         </div>
       </div><!-- /.panel -->
     </div><!-- /.col-sm-4 -->
@@ -181,7 +181,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 0.49)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="thick" class="col-sm-6 control-label">
               Thick
@@ -190,7 +190,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 0.75)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="chunky" class="col-sm-6 control-label">
               Chunky
@@ -199,7 +199,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 1.49)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="epic" class="col-sm-6 control-label">
               Epic
@@ -208,7 +208,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 1.99)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="epic" class="col-sm-6 control-label">
               Epic (10oz)
@@ -235,7 +235,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 0.69)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="slim-finished" class="col-sm-6 control-label">
               Finished Slim
@@ -244,7 +244,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 0.89)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="thick" class="col-sm-6 control-label">
               Natural Thick
@@ -253,7 +253,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 1.19)"></p>
             </div>
-          </div> 
+          </div>
           <div class="form-group">
             <label for="thick-finished" class="col-sm-6 control-label">
               Finished Thick
@@ -262,7 +262,7 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: amount(ui() * 1.49)"></p>
             </div>
-          </div> 
+          </div>
         </div>
       </div><!-- /.panel -->
     </div><!-- /.col-sm-4 -->
