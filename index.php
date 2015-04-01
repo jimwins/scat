@@ -73,6 +73,13 @@ Txn.delete= function (id) {
             });
 }
 
+Txn.loadData= function (data) {
+  viewModel.load(data);
+  /* Older stuff */
+  loadOrder(data);
+  updateTotal();
+}
+
 Txn.loadId= function (id) {
   $.getJSON("api/txn-load.php?callback=?",
             { type: "customer",
@@ -81,7 +88,7 @@ Txn.loadId= function (id) {
               if (data.error) {
                 displayError(data);
               } else {
-                loadOrder(data);
+                Txn.loadData(data);
               }
               $("#status").text("Loaded sale.").fadeOut('slow');
             });
@@ -95,26 +102,13 @@ Txn.loadNumber= function(num) {
               if (data.error) {
                 displayError(data);
               } else {
-                loadOrder(data);
+                Txn.loadData(data);
               }
               $("#status").text("Loaded sale.").fadeOut('slow');
             });
 }
 
 var lastItem;
-
-function updateItems(items) {
-  $.each(items, function(i,item) {
-    var row= $("#txn tbody tr:data(line_id=" + item.line_id + ")");
-    if (!row.length) {
-      addNewItem(item);
-    } else {
-      row.data(item);
-      updateRow(row);
-    }
-  });
-  updateTotal();
-}
 
 function updateRow(row) {
   $('.quantity', row).text(row.data('quantity'));
@@ -143,8 +137,7 @@ function updateValue(row, key, value) {
               if (data.error) {
                 displayError(data);
               }
-              updateOrderData(data.txn);
-              updateItems(data.items);
+              Txn.loadData(data);
             });
 }
 
@@ -211,14 +204,7 @@ $(document).on('click', '.remove', function() {
                 displayError(data);
                 return;
               }
-              var row= $("#txn tbody tr:data(line_id=" + data.removed + ")");
-              if (row.is('.active')) {
-                lastItem= null;
-              }
-              row.remove();
-              updateOrderData(data.txn);
-              updateItems(data.items);
-              updateTotal();
+              Txn.loadData(data);
             });
 
   return false;
@@ -235,9 +221,7 @@ function addItem(item) {
                 // this shouldn't happen!
                 play("no");
               } else {
-                updateOrderData(data.txn);
-                updateItems(data.items);
-                updateTotal();
+                Txn.loadData(data);
               }
             });
 }
@@ -405,16 +389,7 @@ function showOpenOrders(data) {
               '<td>' + txn.ordered + '</td></tr>');
     row.click(txn, function(ev) {
       $("#status").text("Loading sale...").show();
-      $.getJSON("api/txn-load.php?callback=?",
-                { id: ev.data.id },
-                function (data) {
-                  if (data.error) {
-                    displayError(data);
-                  } else {
-                    loadOrder(data);
-                  }
-                  $("#status").text("Loaded sale.").fadeOut('slow');
-                });
+      Txn.loadId(ev.data.id);
     });
     $('#sales tbody').append(row);
   });
@@ -431,9 +406,7 @@ function txn_add_payment(options) {
               if (data.error) {
                 displayError(data);
               } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
+                Txn.loadData(data);
                 $.modal.close();
                 if (options.method == 'credit' && options.amount >= 25.00) {
                   printChargeRecord(data.payment);
@@ -512,16 +485,7 @@ $(function() {
     // (%V|@)INV-(\d+) is an invoice to load
     var m= q.match(/^(%V|@)INV-(\d+)/);
     if (m) {
-      $.getJSON("api/txn-load.php?callback=?",
-                { type: "customer", id: m[2] },
-                function (data) {
-                  if (data.error) {
-                    displayError(data);
-                  } else {
-                    loadOrder(data);
-                  }
-                  $("#status").text("Loaded sale.").fadeOut('slow');
-                });
+      Txn.loadId(m[2]);
       return false;
     }
 
@@ -561,10 +525,8 @@ $(function() {
                     $("#items").before(choices);
                   }
                 } else {
-                  updateOrderData(data.txn);
                   play("yes");
-                  updateItems(data.items);
-                  updateTotal();
+                  Txn.loadData(data);
                 }
               }});
 
@@ -572,20 +534,6 @@ $(function() {
   });
 
   $("#sidebar a[id='unpaid']").click();
-
-<?
-  $id= (int)$_REQUEST['id'];
-  $number= (int)$_REQUEST['number'];
-  if ($number) {
-    $q= "SELECT id FROM txn WHERE type = 'customer' AND number = $number";
-    $id= $db->get_one($q);
-  }
-
-  if ($id) {
-    $data= txn_load_full($db, $id);
-    echo 'loadOrder(', json_encode($data), ");\n";
-  }
-?>
 });
 </script>
 <div class="row">
@@ -728,7 +676,7 @@ $("#return").on("click", function() {
               if (data.error) {
                 displayError(data);
               } else {
-                loadOrder(data);
+                Txn.loadData(data);
               }
             });
 });
@@ -816,9 +764,7 @@ $("#pay-credit-refund").on("submit", function (ev) {
                 $.modal.close();
                 displayError(data);
               } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
+                Txn.loadData(data);
                 $.modal.close();
               }
             });
@@ -858,9 +804,7 @@ $("#pay-credit").on("submit", function (ev) {
                 $.modal.close();
                 displayError(data);
               } else {
-                updateOrderData(data.txn);
-                $('#txn').data('payments', data.payments);
-                updateTotal();
+                Txn.loadData(data);
                 $.modal.close();
               }
             });
@@ -1123,7 +1067,7 @@ $("#txn #person").on("dblclick", function(ev) {
                     displayError(data);
                     return;
                   }
-                  loadOrder(data);
+                  Txn.loadData(data);
                 });
     },
   });
@@ -1246,7 +1190,7 @@ $('#person-create').on('submit', function(ev) {
                             displayError(data);
                             return;
                           }
-                          updateOrderData(data.txn);
+                          Txn.loadData(data);
                           $.modal.close();
                         });
             });
@@ -1289,9 +1233,7 @@ $("#items").on("click", ".payment-row a[name='remove']", function() {
                 displayError(data);
                 return;
               }
-              updateOrderData(data.txn);
-              $("#txn").data("payments", data.payments);
-              updateTotal();
+              Txn.loadData(data);
             });
 });
 $('#tax_rate .val').editable(function(value, settings) {
@@ -1304,8 +1246,7 @@ $('#tax_rate .val').editable(function(value, settings) {
                 displayError(data);
                 return;
               }
-              updateOrderData(data.txn);
-              updateTotal();
+              Txn.loadData(data);
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline' });
@@ -1342,11 +1283,45 @@ $("#add-note").on("submit", function(ev) {
   $.getJSON("api/txn-add-note.php?callback=?",
             { id: txn, note: note},
             function (data) {
-              loadOrder(data);
+              Txn.loadData(data);
               $.modal.close();
             });
 });
 </script>
 </div>
 </div>
-<?foot();
+<?foot();?>
+<script>
+var model= {
+  txn: {
+    subtotal: 0.00,
+    tax_rate: 0.00,
+    tax: 0.00,
+    total: 0.00,
+    total_paid: 0.00,
+  },
+  items: [],
+};
+
+var viewModel= ko.mapping.fromJS(model);
+
+viewModel.load= function(txn) {
+  ko.mapping.fromJS(txn, viewModel);
+}
+
+ko.applyBindings(viewModel);
+
+<?
+  $id= (int)$_REQUEST['id'];
+  $number= (int)$_REQUEST['number'];
+  if ($number) {
+    $q= "SELECT id FROM txn WHERE type = 'customer' AND number = $number";
+    $id= $db->get_one($q);
+  }
+
+  if ($id) {
+    $data= txn_load_full($db, $id);
+    echo 'Txn.loadData(', json_encode($data), ");\n";
+  }
+?>
+</script>
