@@ -1,3 +1,5 @@
+var Scat= {};
+
 function play(type) {
   var sounds = {
     'yes' : 'Pop',
@@ -38,6 +40,7 @@ function amount(amount) {
     return '$' + amount.toFixed(2);
   }
 }
+Scat.amount= amount;
 
 // display an error message
 function displayError(data) {
