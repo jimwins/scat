@@ -112,9 +112,11 @@ head("Transaction @ Scat", true);
       <td><span data-bind="text: $data.name"></span></td>
       <td><span data-bind="text: amount($data.price())"></span></td>
       <td><span data-bind="text: $data.discount"></span></td>
-      <td><span data-bind="text: $data.quantity"></span></td>
       <td>
-        <span data-bind="text: $data.allocated"></span>
+        <span id="quantity" data-bind="jeditable: $data.quantity, jeditableOptions: { onupdate: $parent.updateLine, line: $data, onblur: 'cancel', width: '3em', select: true }"></span>
+      </td>
+      <td>
+        <span id="allocated" data-bind="jeditable: $data.allocated, jeditableOptions: { onupdate: $parent.updateLine, line: $data, onblur: 'cancel', width: '3em', select: true }"></span>
         <button class="btn btn-default btn-xs"
            data-bind="visible: $data.quantity() != $data.allocated(),
                       click: $parent.allocateLine">
@@ -197,6 +199,23 @@ viewModel.openAll= function() {
               ko.mapping.fromJS({ txn: data.txn, items: data.items },
                                 viewModel);
             });
+}
+
+viewModel.updateLine= function (value, settings) {
+  var data= { txn: viewModel.txn.id(), id: settings.line.line_id() };
+  data[this.id]= value;
+
+  $.getJSON("api/txn-update-item.php?callback=?",
+            data,
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+              ko.mapping.fromJS({ txn: data.txn, items: data.items },
+                                viewModel);
+            });
+  return value;
 }
 
 ko.applyBindings(viewModel);
