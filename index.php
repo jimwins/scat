@@ -295,18 +295,6 @@ function loadOrder(data) {
   if (data.items != undefined) {
     $('#txn').data('items', data.items);
   }
-
-  // update notes
-  if (data.notes != undefined) {
-    $('#txn').data('notes', data.notes);
-    $("#notes tbody tr").remove();
-    $.each(data.notes, function(i, note) {
-      var row= protoNote.clone();
-      $("td:nth(1)", row).text(note.entered);
-      $("td:nth(2)", row).text(note.content);
-      $("#notes tbody").append(row);
-    });
-  }
 }
 
 function showOpenOrders(data) {
@@ -1232,9 +1220,17 @@ $("#lock").on("click", function() {
 </table>
 <table id="notes" class="table table-condensed table-striped">
  <thead>
-  <tr><th style="width: 20px"><a id="add-note-button" class="fa fa-plus-square-o"></a></th><th style="width: 10em">Date</th><th>Note</th></tr>
+  <tr>
+    <th style="width: 20px"><a id="add-note-button" class="fa fa-plus-square-o"></a></th>
+    <th style="width: 10em">Date</th>
+    <th>Note</th></tr>
  </thead>
- <tbody>
+ <tbody data-bind="foreach: notes">
+   <tr>
+     <td>&nbsp;</td>
+     <td data-bind="text: $data.entered"></td>
+     <td data-bind="text: $data.content"></td>
+   </tr>
  </tbody>
 </table>
 <form id="add-note" style="display: none">
@@ -1274,6 +1270,7 @@ var model= {
   },
   items: [],
   payments: [],
+  notes: [],
 };
 
 var viewModel= ko.mapping.fromJS(model);
