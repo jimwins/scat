@@ -95,10 +95,12 @@ if (count($items) == 1) {
     pole_display_price($items[0]['name'], $items[0]['sale_price']);
   }
 
+  $new_line= $items['0']['line_id'];
+
   $txn= txn_load($db, $txn_id);
   $items= txn_load_items($db, $txn_id);
 
-  echo jsonp(array('txn' => $txn, 'items' => $items));
+  echo jsonp(array('txn' => $txn, 'items' => $items, 'new_line' => $new_line));
 } else {
   echo jsonp(array('matches' => $items));
 }

@@ -75,6 +75,9 @@ Txn.delete= function (id) {
 
 Txn.loadData= function (data) {
   viewModel.load(data);
+  if (data.new_line) {
+    setActiveRow($('#items tbody tr[data-line_id=' + data.new_line + ']'));
+  }
   /* Older stuff */
   loadOrder(data);
 }
@@ -109,20 +112,6 @@ Txn.loadNumber= function(num) {
 
 var lastItem;
 
-function updateRow(row) {
-  $('.quantity', row).text(row.data('quantity'));
-  if (row.data('quantity') > row.data('stock')) {
-    $('.quantity', row).parent().addClass('over');
-  } else {
-    $('.quantity', row).parent().removeClass('over');
-  }
-  $('.code', row).text(row.data('code'));
-  $('.name', row).text(row.data('name'));
-  $('.discount', row).text(row.data('discount'));
-  $('.price', row).text(row.data('price').toFixed(2));
-  $('.ext', row).text(amount(row.data('ext_price')));
-}
-
 function updateValue(row, key, value) {
   var txn= $('#txn').data('txn');
   var line= $(row).data('line_id');
@@ -136,6 +125,8 @@ function updateValue(row, key, value) {
               if (data.error) {
                 displayError(data);
               }
+              // Force this to be active line
+              data.new_line= line;
               Txn.loadData(data);
             });
 }
@@ -147,6 +138,10 @@ function setActiveRow(row) {
   lastItem= row;
   lastItem.addClass('active');
 }
+
+$(document).on('click', '#items tbody tr', function() {
+  setActiveRow($(this));
+});
 
 $(document).on('dblclick', '.editable', function() {
   // Just stop now if transaction is paid
@@ -225,23 +220,6 @@ function addItem(item) {
             });
 }
 
-var protoRow= $('<tr class="item" valign="top"><td><a class="remove"><i class="fa fa-trash-o" title="Remove"></i></a><td align="center" class="editable"><span class="quantity"></span></td><td align="left"><span class="code"></span></td><td class="editable"><span class="name"></span><div class="discount"></div></td><td class="editable dollar" class="right"><span class="price"></span></td><td class="right"><span class="ext"></span></td></tr>');
-
-function addNewItem(item) {
-  var row= $("#items tbody tr:data(line_id=" + item.line_id + ")").first();
-
-  if (!row.length) {
-    // add the new row
-    row= protoRow.clone();
-    row.on('click', function() { setActiveRow($(this)); });
-    row.appendTo('#items tbody');
-  }
-
-  row.data(item);
-  updateRow(row);
-  setActiveRow(row);
-}
-
 var paymentMethods= {
   cash: "Cash",
   change: "Change",
@@ -316,14 +294,6 @@ function loadOrder(data) {
 
   if (data.items != undefined) {
     $('#txn').data('items', data.items);
-
-    // dump existing item rows
-    $("#items tbody tr").remove();
-
-    // load rows
-    $.each(data.items, function(i, item) {
-      addNewItem(item);
-    });
   }
 
   // update notes
@@ -1234,8 +1204,31 @@ $("#lock").on("click", function() {
   $('#lock i').toggleClass('fa-lock fa-unlock-alt');
 });
 </script>
- <tbody>
- </tbody>
+  <tbody data-bind="foreach: items">
+    <tr class="item" valign="top"
+        data-bind="attr: { 'data-line_id': $data.line_id }">
+      <td>
+        <a class="remove"><i class="fa fa-trash-o" title="Remove"></i></a>
+      </td>
+      <td align="center" class="editable"
+          data-bind="css: { over: $data.quantity() > $data.stock() }">
+        <span class="quantity" data-bind="text: $data.quantity"></span>
+      </td>
+      <td align="left">
+        <span data-bind="text: $data.code"></span>
+      </td>
+      <td class="editable">
+        <span class="name" data-bind="text: $data.name"></span>
+        <div class="discount" data-bind="text: $data.discount"></div>
+      </td>
+      <td class="editable" class="right">
+        <span class="price" data-bind="text: Scat.amount($data.price())"></span>
+      </td>
+      <td class="right">
+        <span data-bind="text: Scat.amount($data.ext_price())"></span>
+      </td>
+    </tr>
+  </tbody>
 </table>
 <table id="notes" class="table table-condensed table-striped">
  <thead>
