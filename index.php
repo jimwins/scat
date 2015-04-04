@@ -77,7 +77,6 @@ Txn.loadData= function (data) {
   viewModel.load(data);
   /* Older stuff */
   loadOrder(data);
-  updateTotal();
 }
 
 Txn.loadId= function (id) {
@@ -243,8 +242,6 @@ function addNewItem(item) {
   setActiveRow(row);
 }
 
-var paymentRow= $('<tr class="payment-row"><th colspan=4 class="payment-buttons"></th><th class="payment-method" align="right">Method:</th><td class="payment-amount" align="right">$0.00</td></tr>');
-
 var paymentMethods= {
   cash: "Cash",
   change: "Change",
@@ -259,48 +256,12 @@ var paymentMethods= {
   donation: "Donation",
 };
 
-function updateTotal() {
-  var total= $("#txn").data("total");
-  var subtotal= $("#txn").data("subtotal");
-  $('#items #subtotal').text(amount(subtotal));
-  var tax_rate= $('#txn').data('tax_rate');
-  var tax= total - subtotal;
-  $('#items #tax').text(amount(tax));
-  $('#items #total').text(amount(total));
-
-  $('.payment-row').remove();
-
-  var paid_date= $('#txn').data('paid_date');
-  var paid= $('#txn').data('paid');
-  if (paid || paid_date != null) {
-    $('#items #due').text(amount(total - paid));
-    $('#due-row').show();
+function formatMethod(payment) {
+  if (payment.method() == 'discount' && payment.discount()) {
+    return 'Discount (' + payment.discount() + '%):';
   } else {
-    $('#due-row').hide();
+    return paymentMethods[payment.method()] + ':';
   }
-
-  var payments= $('#txn').data('payments');
-  if (!payments) return;
-
-  $.each(payments, function(i, payment) {
-    var row= paymentRow.clone();
-    row.data(payment);
-    var remove= $('<a class="admin" name="remove"><i class="fa fa-trash-o"></i></a>');
-    if (payment.method == 'discount' && payment.discount) {
-      $('.payment-method', row).text('Discount (' + payment.discount + '%):');
-      remove.removeClass('admin');
-    } else {
-      $('.payment-method', row).text(paymentMethods[payment.method] + ':');
-    }
-    $('.payment-amount', row).text(amount(payment.amount));
-
-    if (payment.method == 'credit') {
-      $('.payment-buttons', row).append($('<a name="print"><i class="fa fa-print"></i></a>'));
-    }
-    $('.payment-buttons', row).append(remove);
-
-    $('#due-row').before(row);
-  });
 }
 
 function updateOrderData(txn) {
@@ -376,8 +337,6 @@ function loadOrder(data) {
       $("#notes tbody").append(row);
     });
   }
-
-  updateTotal();
 }
 
 function showOpenOrders(data) {
@@ -1205,18 +1164,38 @@ $('#person-create').on('click', "button[name='cancel']", function(ev) {
   <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
-  <tr id="subtotal-row"><th colspan=4></th><th align="right">Subtotal:</th><td id="subtotal" class="right">$0.00</td></tr>
-  <tr id="tax-row"><th colspan=4></th><th align="right" id="tax_rate">Tax (<span class="val">0.00</span>%):</th><td id="tax" class="right">$0.00</td></tr>
-  <tr id="total-row"><th colspan=4></th><th align="right">Total:</th><td id="total" class="right">$0.00</td></tr>
-  <tr id="due-row" style="display:none">
-   <th colspan="4" style="text-align: right">
-    <a id="lock"><i class="fa fa-lock"></i></a>
-   </th>
-   <th align="right">
-     Due:
-   </th>
-   <td id="due" class="right">$0.00</td>
-  </tr>
+    <tr id="subtotal-row">
+      <th colspan=4></th>
+      <th align="right">Subtotal:</th>
+      <td data-bind="text: amount(txn.subtotal())" class="right">$0.00</td>
+    </tr>
+    <tr id="tax-row">
+      <th colspan=4></th>
+      <th align="right" id="tax_rate">Tax (<span class="val" data-bind="text: txn.tax_rate">0.00</span>%):</th>
+      <td data-bind="text: amount(txn.total() - txn.subtotal())" class="right">$0.00</td>
+    </tr>
+    <tr id="total-row">
+      <th colspan=4></th>
+      <th align="right">Total:</th>
+      <td data-bind="text: amount(txn.total())" class="right">$0.00</td>
+    </tr>
+    <!-- ko foreach: payments -->
+    <tr class="payment-row" data-bind="attr: { 'data-id': $data.id }">
+      <th colspan=4 class="payment-buttons">
+        <a class="admin" name="remove"><i class="fa fa-trash-o"></i></a>
+        <a name="print" data-bind="visible: method() == 'credit'"><i class="fa fa-print"></i></a>
+      </th>
+      <th class="payment-method" align="right" data-bind="text: formatMethod($data)">Method:</th>
+      <td class="right" data-bind="text: Scat.amount($data.amount())">$0.00</td>
+    </tr>
+    <!-- /ko -->
+    <tr id="due-row" data-bind="visible: txn.total() != txn.total_paid()">
+      <th colspan=4 style="text-align: right">
+        <a id="lock"><i class="fa fa-lock"></i></a>
+      </th>
+      <th align="right">Due:</th>
+      <td data-bind="text: amount(txn.total() - txn.total_paid())" class="right">$0.00</td>
+    </tr>
  </tfoot>
 <script>
 $("#items").on("click", ".payment-row a[name='print']", function() {
@@ -1301,6 +1280,7 @@ var model= {
     total_paid: 0.00,
   },
   items: [],
+  payments: [],
 };
 
 var viewModel= ko.mapping.fromJS(model);
