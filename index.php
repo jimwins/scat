@@ -251,9 +251,6 @@ function updateOrderData(txn) {
   $('#txn').data('paid', txn.total_paid)
   $('#txn').toggleClass('paid', txn.paid != null);
   $('#txn').data('paid_date', txn.paid)
-  var tax_rate= parseFloat(txn.tax_rate).toFixed(2);
-  $('#txn').data('tax_rate', tax_rate)
-  $('#txn #tax_rate .val').text(tax_rate);
   var type= (txn.total_paid ? 'Invoice' :
              (txn.returned_from ? 'Return' : 'Sale'));
   $('#txn #description').text(type + ' ' +
@@ -284,16 +281,8 @@ var protoNote= $("<tr><td></td><td></td><td></td></tr>");
 function loadOrder(data) {
   updateOrderData(data.txn)
 
-  if (data.payments != undefined) {
-    $('#txn').data('payments', data.payments);
-  }
-
   if (data.person != undefined) {
     $('#txn').data('person_raw', data.person);
-  }
-
-  if (data.items != undefined) {
-    $('#txn').data('items', data.items);
   }
 }
 
@@ -364,8 +353,6 @@ function printChargeRecord(id) {
 }
 
 $(function() {
-  $('#txn').data('tax_rate', 0.00);
-
   $(document).bind('keydown', 'meta+shift+z', function(ev) {
     $('.admin').toggle();
   });
