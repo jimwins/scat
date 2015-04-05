@@ -13,13 +13,16 @@ function person_load($db, $id) {
               active,
               deleted
          FROM person
-        WHERE id = $id";
+        WHERE id = " . (int)$id;
 
   $r= $db->query($q)
     or die_query($db, $q);
 
-  $person = $r->fetch_assoc();
+  $person= $r->fetch_assoc();
+
+  if (!$person) {
+    return array('id' => 0, 'name' => '');
+  }
 
   return $person;
 }
-

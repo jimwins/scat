@@ -264,7 +264,6 @@ function updateOrderData(txn) {
     $('#txn #description').append(btn);
   }
   $('#txn').data('person', txn.person)
-  $('#txn #person .val').text(txn.person_name ? txn.person_name : 'Anonymous');
   var format= 'MMM d yyyy h:mmtt';
   var dates= Date.parse(txn.created).toString(format);
   if (txn.filled) {
@@ -916,7 +915,8 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
              id="description">New Sale</div>
         <div id="dates"></div>
         <div id="person">
-          <span class="val">Anonymous</span>
+          <span class="val"
+                data-bind="text: person.id() ? person.name() : 'Anonymous'"></span>
           <i id="info-person" class="fa fa-info-circle"></i>
         </div>
       </div>
@@ -1258,6 +1258,10 @@ var model= {
   items: [],
   payments: [],
   notes: [],
+  person: {
+    id: 0,
+    name: '',
+  },
 };
 
 var viewModel= ko.mapping.fromJS(model);
