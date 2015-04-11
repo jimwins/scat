@@ -1134,7 +1134,7 @@ $('#person-create').on('click', "button[name='cancel']", function(ev) {
       <td class="right" data-bind="text: Scat.amount($data.amount())">$0.00</td>
     </tr>
     <!-- /ko -->
-    <tr id="due-row" data-bind="visible: txn.total() != txn.total_paid()">
+    <tr id="due-row" data-bind="visible: txn.total()">
       <th colspan=4 style="text-align: right">
         <a id="lock"><i class="fa fa-lock"></i></a>
       </th>
