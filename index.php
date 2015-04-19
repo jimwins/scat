@@ -62,7 +62,7 @@ head("Scat");
 var Txn = {};
 
 Txn.id= function() {
-  return viewModel.txn.id();
+  return viewModel.txn.id ? viewModel.txn.id() : undefined;
 }
 
 Txn.due= function() {
