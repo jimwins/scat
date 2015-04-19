@@ -61,6 +61,10 @@ head("Scat");
 <script>
 var Txn = {};
 
+Txn.id= function() {
+  return viewModel.txn.id();
+}
+
 Txn.delete= function (id) {
   $.getJSON("api/txn-delete?callback=?",
             { txn: id },
@@ -113,7 +117,7 @@ Txn.loadNumber= function(num) {
 var lastItem;
 
 function updateValue(row, key, value) {
-  var txn= $('#txn').data('txn');
+  var txn= Txn.id();
   var line= $(row).data('line_id');
   
   var data= { txn: txn, id: line };
@@ -188,7 +192,7 @@ $(document).on('dblclick', '.editable', function() {
 });
 
 $(document).on('click', '.remove', function() {
-  var txn= $('#txn').data('txn');
+  var txn= Txn.id();
   var id= $(this).closest('tr').data('line_id');
 
   $.getJSON("api/txn-remove-item.php?callback=?",
@@ -205,7 +209,7 @@ $(document).on('click', '.remove', function() {
 });
 
 function addItem(item) {
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   $.getJSON("api/txn-add-item.php?callback=?",
             { txn: txn, item: item.id },
             function(data) {
@@ -245,7 +249,6 @@ function formatMethod(payment) {
 function updateOrderData(txn) {
   // set transaction data
   $('#txn').data('txn_raw', txn);
-  $('#txn').data('txn', txn.id);
   $('#txn').data('subtotal', txn.subtotal)
   $('#txn').data('total', txn.total)
   $('#txn').data('paid', txn.total_paid)
@@ -321,7 +324,7 @@ function txn_add_payment(options) {
 }
 
 function printReceipt() {
-  var txn= $('#txn').data('txn');
+  var txn= Txn.id();
   if (!txn) {
     displayError("No sale to print.");
     return false;
@@ -333,7 +336,7 @@ function printReceipt() {
 }
 
 function printInvoice() {
-  var txn= $('#txn').data('txn');
+  var txn= Txn.id();
   if (!txn) {
     displayError("No sale to print.");
     return false;
@@ -363,7 +366,7 @@ $(function() {
   });
 
   $(document).bind('keydown', 'meta+shift+backspace', function(ev) {
-    txn= $('#txn').data('txn');
+    var txn= Txn.id();
     if (!txn) {
       return;
     }
@@ -392,7 +395,7 @@ $(function() {
       return false;
     }
 
-    txn= $('#txn').data('txn');
+    var txn= Txn.id();
 
     // go find!
     $.ajax({ type: 'GET',
@@ -531,11 +534,11 @@ $("#print").on("click", function() {
   printReceipt();
 });
 $("#delete").on("click", function() {
-  var txn= $('#txn').data('txn');
+  var txn= Txn.id();
   Txn.delete(txn);
 });
 $("#pay").on("click", function() {
-  var txn= $('#txn').data('txn');
+  var txn= Txn.id();
   $.getJSON("api/txn-allocate.php?callback=?",
             { txn: txn },
             function (data) {
@@ -569,7 +572,7 @@ $("#pay").on("click", function() {
             });
 });
 $("#return").on("click", function() {
-  var txn= $('#txn').data('txn');
+  var txn= Txn.id();
   if (!txn || !confirm("Are you sure you want to create a return?")) {
     return false;
   }
@@ -639,7 +642,7 @@ $("#choose-pay-method").on("click", "button", function(ev) {
 <script>
 $("#pay-cash").on("submit", function (ev) {
   ev.preventDefault();
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-cash .amount").val();
   txn_add_payment({ id: txn, method: "cash", amount: amount, change: true });
 });
@@ -655,7 +658,7 @@ $("#pay-cash").on("submit", function (ev) {
 <script>
 $("#pay-credit-refund").on("submit", function (ev) {
   ev.preventDefault();
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-credit-refund .amount").val();
   var refund_from= $("#pay-credit-refund").data('from');
   $.getJSON("api/cc-terminal.php?callback=?",
@@ -698,7 +701,7 @@ $("#pay-credit-refund").on("submit", function (ev) {
 <script>
 $("#pay-credit").on("submit", function (ev) {
   ev.preventDefault();
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-credit .amount").val();
   $.getJSON("api/cc-terminal.php?callback=?",
             { id: txn, type: 'Sale', amount: parseFloat(amount).toFixed(2) },
@@ -729,7 +732,7 @@ $("#pay-credit").on("submit", function (ev) {
 </div>
 <script>
 $("#pay-credit-manual").on("click", "button", function (ev) {
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-credit-manual .amount").val();
   var cc_type= $(this).attr('name');
   if (cc_type == 'cancel') {
@@ -753,7 +756,7 @@ $("#pay-credit-manual").on("click", "button", function (ev) {
 <script>
 $("#pay-other").on("click", "button", function (ev) {
   ev.preventDefault();
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-other .amount").val();
   var method= $(this).data('value');
   if (method == 'cancel') {
@@ -781,7 +784,7 @@ $("#pay-other").on("click", "button", function (ev) {
 </div>
 <script>
 $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var card= $("#pay-gift .card").val();
   if (card == '...') {
     card= "11111111111"; // Test card.
@@ -820,7 +823,7 @@ $("#pay-gift").on("click", "button[name='old']", function (ev) {
   $.modal($("#pay-gift-complete"), { overlayClose: false, persist: true });
 });
 $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-gift-complete .amount").val();
   var card= $("#pay-gift-complete").data('card');
   if (card) {
@@ -850,7 +853,7 @@ $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
 </div>
 <script>
 $("#pay-check").on("click", "button[name='pay']", function (ev) {
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-check .amount").val();
   txn_add_payment({ id: txn, method: "check", amount: amount, change: false });
 });
@@ -866,7 +869,7 @@ $("#pay-check").on("click", "button[name='pay']", function (ev) {
 <script>
 $("#pay-discount").on("submit", function (ev) {
   ev.preventDefault();
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-discount .amount").val();
   txn_add_payment({ id: txn, method: "discount",
                     amount: amount, change: false });
@@ -882,7 +885,7 @@ $("#pay-discount").on("submit", function (ev) {
 </div>
 <script>
 $("#pay-bad-debt").on("click", "button[name='pay']", function (ev) {
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-bad-debt .amount").val();
   txn_add_payment({ id: txn, method: "bad", amount: amount, change: false });
 });
@@ -898,7 +901,7 @@ $("#pay-bad-debt").on("click", "button[name='pay']", function (ev) {
 <script>
 $("#pay-donation").on("submit", function (ev) {
   ev.preventDefault();
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var amount= $("#pay-donation .amount").val();
   txn_add_payment({ id: txn, method: "donation", amount: amount,
                     change: false });
@@ -924,7 +927,8 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   </div><!-- .panel-heading -->
 <script>
 $("#txn #person").on("dblclick", function(ev) {
-  if (typeof $("#txn").data("txn") == "undefined") {
+  var txn= Txn.id();
+  if (!txn) {
     return false;
   }
 
@@ -962,10 +966,11 @@ $("#txn #person").on("dblclick", function(ev) {
     source: "./api/person-list.php?callback=?",
     minLength: 2,
     select: function(ev, ui) {
+      var txn= Txn.id();
       $(this).parent().text(ui.item.value);
       $(this).remove();
       $.getJSON("api/txn-update-person.php?callback=?",
-                { txn: $("#txn").data("txn"), person: ui.item.id },
+                { txn: txn, person: ui.item.id },
                 function (data) {
                   if (data.error) {
                     displayError(data);
@@ -1087,8 +1092,9 @@ $('#person-create').on('submit', function(ev) {
                 displayError(data);
                 return;
               }
+              var txn= Txn.id();
               $.getJSON("api/txn-update-person.php?callback=?",
-                        { txn: $("#txn").data("txn"), person: data.person },
+                        { txn: txn, person: data.person },
                         function (data) {
                           if (data.error) {
                             displayError(data);
@@ -1148,9 +1154,10 @@ $("#items").on("click", ".payment-row a[name='print']", function() {
   printChargeRecord(row.data("id"));
 });
 $("#items").on("click", ".payment-row a[name='remove']", function() {
+  var txn= Txn.id();
   var row= $(this).closest(".payment-row");
   $.getJSON("api/txn-remove-payment.php?callback=?",
-            { txn: $("#txn").data("txn"), id: row.data("id"),
+            { txn: txn, id: row.data("id"),
               admin: ($(".admin").is(":visible") ? 1 : 0) },
             function (data) {
               if (data.error) {
@@ -1161,7 +1168,7 @@ $("#items").on("click", ".payment-row a[name='remove']", function() {
             });
 });
 $('#tax_rate .val').editable(function(value, settings) {
-  var txn= $('#txn').data('txn');
+  var txn= Txn.id();
 
   $.getJSON("api/txn-update-tax-rate.php?callback=?",
             { txn: txn, tax_rate: value },
@@ -1226,14 +1233,14 @@ $("#lock").on("click", function() {
 </form>
 <script>
 $("#add-note-button").on("click", function(ev) {
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   if (!txn) return;
   $.modal($("#add-note"));
 });
 $("#add-note").on("submit", function(ev) {
   ev.preventDefault();
 
-  var txn= $("#txn").data("txn");
+  var txn= Txn.id();
   var note= $('input[name="note"]', this).val();
   $.getJSON("api/txn-add-note.php?callback=?",
             { id: txn, note: note},
