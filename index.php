@@ -65,6 +65,10 @@ Txn.id= function() {
   return viewModel.txn.id();
 }
 
+Txn.due= function() {
+  return (viewModel.txn.total() - viewModel.txn.paid()).toFixed(2);
+}
+
 Txn.delete= function (id) {
   $.getJSON("api/txn-delete?callback=?",
             { txn: id },
@@ -249,9 +253,6 @@ function formatMethod(payment) {
 function updateOrderData(txn) {
   // set transaction data
   $('#txn').data('txn_raw', txn);
-  $('#txn').data('subtotal', txn.subtotal)
-  $('#txn').data('total', txn.total)
-  $('#txn').data('paid', txn.total_paid)
   $('#txn').toggleClass('paid', txn.paid != null);
   $('#txn').data('paid_date', txn.paid)
   var type= (txn.total_paid ? 'Invoice' :
@@ -625,7 +626,7 @@ $("#choose-pay-method").on("click", "button", function(ev) {
   var method= $(this).data("value");
   $.modal.close();
   var id= "#pay-" + method;
-  var due= ($("#txn").data("total") - $("#txn").data("paid")).toFixed(2);
+  var due= Txn.due();
   $(".amount", id).val(due);
   $.modal($(id), { persist: true, overlayClose: false });
   $(".amount", id).focus().select();
@@ -795,7 +796,7 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
               if (data.error) {
                 displayError(data);
               } else {
-                var due= ($("#txn").data("total") - $("#txn").data("paid"));
+                var due= Txn.due();
                 $('#pay-gift-balance').text("Card has $" +
                                             data.balance +
                                             " remaining. Last used " +
@@ -815,7 +816,7 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
             });
 });
 $("#pay-gift").on("click", "button[name='old']", function (ev) {
-  var due= ($("#txn").data("total") - $("#txn").data("paid"));
+  var due= Txn.due();
   var def= due;
   $("#pay-gift-complete .amount").val(def);
   $.modal.close();
