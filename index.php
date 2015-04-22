@@ -66,7 +66,7 @@ Txn.id= function() {
 }
 
 Txn.due= function() {
-  return (viewModel.txn.total() - viewModel.txn.paid()).toFixed(2);
+  return (viewModel.txn.total() - viewModel.txn.total_paid()).toFixed(2);
 }
 
 Txn.delete= function (id) {
