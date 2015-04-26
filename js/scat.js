@@ -83,7 +83,8 @@ $(function() {
       return true;
     }
     var el = $.getFocusedElement();
-    if (!el.length) {
+    if (!el.length &&
+        !$('#simplemodal-overlay').length && !$('.modal-backdrop').length) {
       var inp= $('.autofocus', this);
       if (ev.keyCode != 13) {
         inp.val('');
