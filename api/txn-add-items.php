@@ -17,7 +17,8 @@ foreach ($_REQUEST['items'] as $item => $qty) {
        SELECT $txn_id AS txn, $item AS item, $qty AS ordered,
               (SELECT net_price
                  FROM vendor_item
-                WHERE item = $item AND vendor = {$txn['person']}), taxfree
+                WHERE item = $item AND vendor = {$txn['person']}
+                ORDER BY id DESC LIMIT 1), taxfree
          FROM item WHERE id = $item";
   $r= $db->query($q);
   if (!$r) die_query($db, $q);
