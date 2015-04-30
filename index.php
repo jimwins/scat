@@ -551,7 +551,8 @@ $("#pay").on("click", function() {
 
               // Show 'Return Credit Card' if it is possible
               var txn_raw= $('#txn').data('txn_raw');
-              if (txn_raw.returned_from) {
+              if (txn_raw.returned_from &&
+                  (txn_raw.total - txn_raw.total_paid < 0)) {
                 $.getJSON("api/txn-load.php?callback=?",
                           { id: txn_raw.returned_from },
                           function (data) {
@@ -560,10 +561,14 @@ $("#pay").on("click", function() {
                                   payment.amount > 0 &&
                                   payment.cc_approval != '') {
                                 $('#choose-pay-method #credit-refund').show();
+                                $('#choose-pay-method #credit-sale').hide();
                                 $('#pay-credit-refund').data('from', payment.id);
                               }
                             });
                           });
+              } else {
+                $('#choose-pay-method #credit-sale').show();
+                $('#choose-pay-method #credit-refund').hide();
               }
 
               $("#choose-pay-method #due").val(amount(txn_raw.total -
@@ -606,7 +611,7 @@ $("#return").on("click", function() {
     </div>
     <div class="panel-body">
  <button class="btn btn-primary btn-lg" data-value="cash">Cash</button>
- <button class="btn btn-default btn-lg" data-value="credit">Credit Card</button>
+ <button id="credit-sale" class="btn btn-default btn-lg" data-value="credit">Credit Card</button>
  <button id="credit-refund" class="btn btn-default btn-lg optional" data-value="credit-refund">Refund Credit Card</button>
  <br><br>
  <button class="btn btn-default" data-value="credit-manual">Credit Card (Manual)</button>
