@@ -261,7 +261,7 @@ $q= "INSERT INTO txn_line (txn, item, ordered, allocated, retail_price)
      SELECT $txn_id txn, item,
             ordered, shipped, net
        FROM vendor_order
-      WHERE (shipped OR backordered) AND item IS NOT NULL";
+      WHERE (shipped OR backordered) AND (item != 0 AND item IS NOT NULL)";
 $db->query($q)
   or die_query($db, $q);
 
