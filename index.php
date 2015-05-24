@@ -444,11 +444,14 @@ $(function() {
 });
 </script>
 <div class="row">
-<div class="col-md-3 col-md-push-9 well" id="sidebar">
+<div class="col-md-3 col-md-push-9" id="sidebar">
+<div class="panel panel-default">
+  <div class="panel-heading">
   <ul class="nav nav-pills nav-justified">
     <li class="active"><a id="unpaid">Unpaid</a></li>
     <li><a id="recent">Recent</a></li>
   </ul>
+  </div>
 <script>
 $("#sidebar .nav a").click(function() {
   var params= {
@@ -480,7 +483,8 @@ $("#sidebar .nav a").click(function() {
  <tbody>
  </tbody>
 </table>
-<br>
+</div>
+<div class="well">
 <form id="txn-load">
   <div class="input-group">
     <input type="text" class="form-control"
@@ -499,6 +503,8 @@ $("#txn-load").submit(function(ev) {
 });
 </script>
 </div>
+</div><!-- /sidebar -->
+
 <div class="col-md-9 col-md-pull-3" id="txn">
 <form class="form form-inline" id="lookup">
   <div class="input-group">
