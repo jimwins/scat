@@ -81,7 +81,7 @@ $q= "SELECT id, type,
        LEFT JOIN person ON (txn.person = person.id)
       WHERE $criteria
       GROUP BY txn.id
-      ORDER BY created DESC
+      ORDER BY id DESC
       LIMIT $start, $per_page) t";
 
 $r= $db->query($q)
