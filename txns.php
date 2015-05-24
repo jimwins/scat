@@ -106,7 +106,7 @@ $q= "SELECT meta, Number\$txn,
        LEFT JOIN person ON (txn.person = person.id)
       WHERE $criteria
       GROUP BY txn.id
-      ORDER BY created DESC
+      ORDER BY txn.id DESC
       LIMIT $start, $per_page) t";
 
 dump_table($db->query($q));
