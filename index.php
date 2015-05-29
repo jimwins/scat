@@ -460,8 +460,13 @@ $(function() {
  </div>
  <div class="panel-footer text-center">
   <div class="btn-group btn-group-lg">
-   <button id="print" type="button" class="btn btn-default">Print</button>
-   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+   <button id="print" type="button" class="btn btn-default"
+           data-bind="enable: txn.id()">
+    Print
+   </button>
+   <button type="button" class="btn btn-default dropdown-toggle" 
+           data-bind="enable: txn.id()"
+           data-toggle="dropdown" aria-expanded="false">
     <span class="caret"></span>
     <span class="sr-only">Toggle Dropdown</span>
    </button>
@@ -471,7 +476,7 @@ $(function() {
    </ul>
   </div>
   <button id="pay" type="button" class="btn btn-lg btn-default"
-          data-bind="enable: txn.id() && txn.due()">
+          data-bind="enable: txn.id() && txn.due() != '$0.00'">
     Pay
   </button>
  </div>
