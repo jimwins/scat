@@ -460,7 +460,7 @@ $(function() {
  </div>
  <div class="panel-footer text-center">
   <div class="btn-group btn-group-lg">
-   <button id="print" type="button" class="btn btn-default"
+   <button id="print" type="button" class="print-button btn btn-default"
            data-bind="enable: txn.id()">
     Print
    </button>
@@ -471,11 +471,11 @@ $(function() {
     <span class="sr-only">Toggle Dropdown</span>
    </button>
    <ul class="dropdown-menu" role="menu">
-    <li><a href="#" id="invoice">Invoice</a></li>
-    <li><a href="#" id="print">Receipt</a></li>
+    <li><a href="#" class="invoice-button" id="invoice">Invoice</a></li>
+    <li><a href="#" class="print-button" id="print">Receipt</a></li>
    </ul>
   </div>
-  <button id="pay" type="button" class="btn btn-lg btn-default"
+  <button id="pay" type="button" class="pay-button btn btn-lg btn-default"
           data-bind="enable: txn.id() && txn.due() != '$0.00'">
     Pay
   </button>
@@ -561,26 +561,26 @@ $("#txn-load").submit(function(ev) {
   <div class="panel-heading">
     <div class="row">
       <div id="sale-buttons" class="col-md-5 col-md-push-7 text-right">
-        <button id="invoice" class="btn btn-default">Invoice</button>
-        <button id="print" class="btn btn-default">Print</button>
-        <button id="delete" class="btn btn-default">Delete</button>
-        <button id="pay" class="btn btn-default">Pay</button>
-        <button id="return" class="btn btn-default">Return</button>
+        <button id="invoice" class="invoice-button btn btn-default">Invoice</button>
+        <button id="print" class="print-button btn btn-default">Print</button>
+        <button id="delete" class="delete-button btn btn-default">Delete</button>
+        <button id="pay" class="pay-button btn btn-default">Pay</button>
+        <button id="return" class="return-button btn btn-default">Return</button>
       </div>
 <script>
-$("#invoice").on("click", function() {
+$(".invoice-button").on("click", function() {
   printInvoice();
 });
-$("#print").on("click", function() {
+$(".print-button").on("click", function() {
   if ($("#txn").data("paid_date") != null ||
       confirm("Invoice isn't paid. Sure you want to print?"))
   printReceipt();
 });
-$("#delete").on("click", function() {
+$(".delete-button").on("click", function() {
   var txn= Txn.id();
   Txn.delete(txn);
 });
-$("#pay").on("click", function() {
+$(".pay-button").on("click", function() {
   var txn= Txn.id();
   $.getJSON("api/txn-allocate.php?callback=?",
             { txn: txn },
@@ -619,7 +619,7 @@ $("#pay").on("click", function() {
               $.modal($("#choose-pay-method"), { persist: true});
             });
 });
-$("#return").on("click", function() {
+$(".return-button").on("click", function() {
   var txn= Txn.id();
   if (!txn || !confirm("Are you sure you want to create a return?")) {
     return false;
