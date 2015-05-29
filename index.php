@@ -82,23 +82,12 @@ Txn.delete= function (id) {
 }
 
 Txn.loadData= function (data) {
-  var id= Txn.id();
   viewModel.load(data);
   if (data.new_line) {
     setActiveRow($('#items tbody tr[data-line_id=' + data.new_line + ']'));
   }
-  if (Txn.id() != id) {
-    window.history.pushState({ previous: id }, viewModel.description(),
-                             "?id=" + Txn.id());
-  }
   /* Older stuff */
   loadOrder(data);
-}
-
-window.onpopstate= function(event) {
-  if (event.state.previous) {
-    Txn.loadId(event.state.previous);
-  }
 }
 
 Txn.loadId= function (id) {
