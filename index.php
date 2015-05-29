@@ -457,6 +457,37 @@ $(function() {
 <div class="row">
 <div class="col-md-3 col-md-push-9" id="sidebar">
 <div class="panel panel-default">
+ <div class="panel-heading">
+  <h3 class="panel-title">
+   <span data-bind="text: description">New Sale</span>
+   <button class="btn btn-xs btn-link"
+           data-bind="visible: txn.returned_from(), click: loadReturnedFrom">
+     <i class="fa fa-reply"></i>
+   </button>
+  </h3>
+ </div> 
+ <div class="panel-body">
+  <h1 class="text-center" style="margin: 0px; padding: 0px" data-bind="text: txn.due()"></h1>
+ </div>
+ <div class="panel-footer text-center">
+  <div class="btn-group btn-group-lg">
+   <button id="print" type="button" class="btn btn-default">Print</button>
+   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+    <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
+   </button>
+   <ul class="dropdown-menu" role="menu">
+    <li><a href="#" id="invoice">Invoice</a></li>
+    <li><a href="#" id="print">Receipt</a></li>
+   </ul>
+  </div>
+  <button id="pay" type="button" class="btn btn-lg btn-default"
+          data-bind="enable: txn.id() && txn.due()">
+    Pay
+  </button>
+ </div>
+</div>
+<div class="panel panel-default">
   <div class="panel-heading">
   <ul class="nav nav-pills nav-justified">
     <li class="active"><a id="unpaid">Unpaid</a></li>
@@ -1279,11 +1310,15 @@ $("#add-note").on("submit", function(ev) {
 <script>
 var model= {
   txn: {
+    id: 0,
     subtotal: 0.00,
     tax_rate: 0.00,
     tax: 0.00,
     total: 0.00,
     total_paid: 0.00,
+    returned_from: 0,
+    created: "2015-01-01 00:00:00",
+    number: 0,
   },
   items: [],
   payments: [],
@@ -1296,8 +1331,24 @@ var model= {
 
 var viewModel= ko.mapping.fromJS(model);
 
+viewModel.description= ko.computed(function() {
+  if (!viewModel.txn.id()) { return "New Sale"; }
+  var type= (viewModel.txn.total_paid() ? 'Invoice' :
+             (viewModel.txn.returned_from() ? 'Return' : 'Sale'));
+  return type + ' ' + Date.parse(viewModel.txn.created()).toString('yyyy') +
+         '-' + viewModel.txn.number();
+}, viewModel);
+
+viewModel.txn.due= ko.computed(function() {
+  return Scat.amount(viewModel.txn.total() - viewModel.txn.total_paid());
+}, viewModel);
+
 viewModel.load= function(txn) {
   ko.mapping.fromJS(txn, viewModel);
+}
+
+viewModel.loadReturnedFrom= function() {
+  Txn.loadId(viewModel.txn.returned_from());
 }
 
 ko.applyBindings(viewModel);
