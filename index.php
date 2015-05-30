@@ -456,7 +456,9 @@ $(function() {
   </h3>
  </div> 
  <div class="panel-body">
-  <h1 class="text-center" style="margin: 0px; padding: 0px" data-bind="text: txn.due()"></h1>
+  <h1 class="text-center" style="margin: 0px; padding: 0px"
+      data-bind="text: Scat.amount(txn.due()), css: { 'text-danger': txn.due() < 0 }">
+  </h1>
  </div>
  <div class="panel-footer text-center">
   <div class="btn-group btn-group-lg">
@@ -476,7 +478,7 @@ $(function() {
    </ul>
   </div>
   <button id="pay" type="button" class="pay-button btn btn-lg btn-default"
-          data-bind="enable: txn.id() && txn.due() != '$0.00'">
+          data-bind="enable: txn.id() && txn.due()">
     Pay
   </button>
  </div>
@@ -1334,7 +1336,7 @@ viewModel.description= ko.computed(function() {
 }, viewModel);
 
 viewModel.txn.due= ko.computed(function() {
-  return Scat.amount(viewModel.txn.total() - viewModel.txn.total_paid());
+  return (viewModel.txn.total() - viewModel.txn.total_paid());
 }, viewModel);
 
 viewModel.load= function(txn) {
