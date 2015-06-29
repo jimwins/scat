@@ -601,9 +601,7 @@ $(".pay-button").on("click", function() {
                           { id: txn_raw.returned_from },
                           function (data) {
                             $.each(data.payments, function(i, payment) {
-                              if (payment.method == 'credit' &&
-                                  payment.amount > 0 &&
-                                  payment.cc_approval != '') {
+                              if (payment.method == 'credit') {
                                 $('#choose-pay-method #credit-refund').show();
                                 $('#choose-pay-method #credit-sale').hide();
                                 $('#pay-credit-refund').data('from', payment.id);
