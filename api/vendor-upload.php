@@ -196,7 +196,8 @@ $q= "DELETE FROM vendor_item WHERE vendor = $vendor_id";
 $r= $db->query($q)
   or die_query($db, $q);
 
-$q= "INSERT INTO vendor_item
+# ignore duplicates
+$q= "INSERT IGNORE INTO vendor_item
             (vendor, item, code, vendor_sku, name,
              retail_price, net_price, promo_price,
              barcode, purchase_quantity, category)
