@@ -127,6 +127,12 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
+  // toss bad barcodes
+  $q= "UPDATE macitem SET barcode = NULL WHERE LENGTH(barcode) < 3";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
 } elseif (preg_match('/^ma-sku/i', $_FILES['src']['name'])) {
   $q= "CREATE TEMPORARY TABLE macitem (
     item_no VARCHAR(32),
