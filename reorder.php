@@ -48,7 +48,7 @@ $q= "SELECT item.id meta,
             (SELECT SUM(ordered - allocated)
                FROM txn_line JOIN txn ON (txn = txn.id)
               WHERE type = 'vendor'
-                AND item = item.id AND created > NOW() - INTERVAL 3 MONTH)
+                AND item = item.id AND created > NOW() - INTERVAL 6 MONTH)
             AS Ordered\$hide,
             $extra_field
             minimum_quantity AS Order\$order
