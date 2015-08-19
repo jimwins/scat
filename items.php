@@ -129,13 +129,8 @@ $q= "SELECT
             item.name Name\$name,
             brand.name Brand\$brand,
             retail_price MSRP\$dollar,
-            IF(item.discount_type,
-               CASE item.discount_type
-                 WHEN 'percentage' THEN ROUND(retail_price * ((100 - item.discount) / 100), 2)
-                 WHEN 'relative' THEN (retail_price - item.discount) 
-                 WHEN 'fixed' THEN (item.discount)
-               END,
-               NULL) Sale\$dollar,
+            sale_price(item.retail_price, item.discount_type, item.discount)
+              Sale\$dollar,
             CASE item.discount_type
               WHEN 'percentage' THEN CONCAT(ROUND(item.discount), '% off')
               WHEN 'relative' THEN CONCAT('$', item.discount, ' off')
