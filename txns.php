@@ -112,6 +112,7 @@ $q= "SELECT meta, Number\$txn,
 
 $r= $db->query($q);
 
+unset($_GET['page']);
 $params= http_build_query($_GET);
 
 ob_start();
