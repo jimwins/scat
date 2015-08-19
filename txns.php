@@ -38,18 +38,24 @@ $page= (int)$_REQUEST['page'];
   <input type="submit" class="btn btn-primary" value="Show">
   <select name="type" class="form-control">
    <option value="">Any
-   <option value="customer">Invoice
-   <option value="vendor">Purchase Order
-   <option value="correction">Correction
-   <option value="drawer">Till Count
+   <option value="customer" <?=($type=="customer")?' selected': ''?>>Invoice
+   <option value="vendor" <?=($type=="vendor")?' selected': ''?>>Purchase Order
+   <option value="correction" <?=($type=="correction")?' selected': ''?>>Correction
+   <option value="drawer" <?=($type=="drawer")?' selected': ''?>>Till Count
   </select>
   that includes
   <input type="text" name="q" value="<?=ashtml($q)?>">
   <div class="checkbox">
-    <label><input type="checkbox" name="unfilled" value="1"> Unfilled</label>
+    <label>
+      <input type="checkbox" name="unfilled" value="1" <?=($_REQUEST['unfilled'])?' checked':''?>>
+      Unfilled
+    </label>
   </div>
   <div class="checkbox">
-    <label><input type="checkbox" name="unpaid" value="1"> Unpaid</label>
+    <label>
+      <input type="checkbox" name="unpaid" value="1" <?=($_REQUEST['unpaid'])?' checked':''?>>
+      Unpaid
+    </label>
   </div>
 </form>
 <br>
