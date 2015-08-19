@@ -25,6 +25,11 @@ if ($_REQUEST['untaxed']) {
   $criteria[]= "txn.tax_rate = 0";
 }
 
+if ($_REQUEST['total']) {
+  $criteria[]= "CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
+                     AS DECIMAL(9,2)) = '" . $db->escape($_REQUEST['total']) . "'";
+}
+
 if (empty($criteria)) {
   $criteria= '1=1';
 } else {
