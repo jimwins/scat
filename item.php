@@ -206,12 +206,16 @@ dump_table($db->query($q));
 dump_query($q);
 echo '</div>';
 
-$r= $db->query("SET @count = 0");
+function RunningTotal($row) {
+  static $count= 0;
+  $count= $count + $row[4];
+  return $count;
+}
 
 $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
             CONCAT(txn, '|', txn.type, '|', txn.number) AS Transaction\$txn,
             CASE type
-              WHEN 'customer' THEN IF(allocated <= 0, 'Sale', 'Return')
+              WHEN 'customer' THEN IF(SUM(allocated) <= 0, 'Sale', 'Return')
               WHEN 'vendor' THEN 'Stock'
               WHEN 'correction' THEN 'Correction'
               WHEN 'drawer' THEN 'Till Count'
@@ -224,8 +228,7 @@ $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
                  WHEN 'fixed' THEN (discount)
                END,
                retail_price) AS Price\$dollar,
-            allocated AS Quantity\$right,
-            @count := @count + allocated AS Count\$right
+            SUM(allocated) AS Quantity\$right
        FROM txn_line
        JOIN txn ON (txn_line.txn = txn.id)
       WHERE item = $id
@@ -234,7 +237,7 @@ $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
 
 echo '<h2 onclick="$(\'#history\').toggle()">History</h2>';
 echo '<div id="history" style="display: none">';
-dump_table($db->query($q));
+dump_table($db->query($q), 'RunningTotal$right');
 dump_query($q);
 echo '</div>';
 
