@@ -109,15 +109,31 @@ $q= "SELECT meta, Number\$txn,
       ORDER BY txn.id DESC
       LIMIT $start, $per_page) t";
 
+$r= $db->query($q);
+
+$params= http_build_query($_GET);
+
+ob_start();
+?>
+<nav>
+  <ul class="pager">
+    <li class="previous <?=($page == 0) ? 'disabled' : ''?>">
+      <a href="txns.php?page=<?=($page - 1) . '&amp;' . ashtml($params)?>"><span aria-hidden="true">&larr;</span> Newer</a>
+    </li>
+
+    <li class="next">
+      <a href="txns.php?page=<?=($page + 1) . '&amp;' . ashtml($params)?>">Older <span aria-hidden="true">&rarr;</span></a>
+    </li>
+  </ul>
+</li>
+<?
+$nav= ob_get_contents();
+ob_end_flush();
+
 dump_table($db->query($q));
 
-# XXX preserve options
-if ($page) {
-  echo '<a href="txns.php?page=', $page - 1, '">&laquo; Previous</a>';
-}
-echo ' &mdash; <a href="txns.php?page=', $page + 1, '">Next &raquo;</a>';
+echo $nav;
 
-echo '<br>';
 dump_query($q);
 
 foot();
