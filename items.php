@@ -228,6 +228,9 @@ dump_table($r);
 <button id="print-price-labels" class="btn btn-default">
   Print Price Labels
 </button>
+<button id="print-price-labels-brush" class="btn btn-default">
+  Print Brush Price Labels
+</button>
 <script>
 function updateItem(item) {
   $('.' + item.id + ' .name').text(item.name);
@@ -350,6 +353,19 @@ $('#print-price-labels').on('click', function(ev) {
   var q= $('#search').val();
 
   $.getJSON("print/labels-price.php?callback=?",
+            { q: q },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+            });
+});
+$('#print-price-labels-brush').on('click', function(ev) {
+  ev.preventDefault();
+  var q= $('#search').val();
+
+  $.getJSON("print/labels-price-brush.php?callback=?",
             { q: q },
             function (data) {
               if (data.error) {
