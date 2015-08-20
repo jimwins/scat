@@ -582,40 +582,37 @@ $(".print-button").on("click", function() {
 
 $(".pay-button").on("click", function() {
   var txn= Txn.id();
-  $.getJSON("api/txn-allocate.php?callback=?",
-            { txn: txn },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              }
+  $.getJSON(
+    "api/txn-allocate.php?callback=?",
+    { txn: txn },
+    function (data) {
+      if (data.error) {
+        displayError(data);
+      }
 
-              $('#choose-pay-method .optional').hide();
+      $.get('ui/pay-choose-method.html').done(function (html) {
+        var panel= $(html);
 
-              // Show 'Return Credit Card' if it is possible
-              var txn_raw= $('#txn').data('txn_raw');
-              if (txn_raw.returned_from &&
-                  (txn_raw.total - txn_raw.total_paid < 0)) {
-                $.getJSON("api/txn-load.php?callback=?",
-                          { id: txn_raw.returned_from },
-                          function (data) {
-                            $.each(data.payments, function(i, payment) {
-                              if (payment.method == 'credit') {
-                                $('#choose-pay-method #credit-refund').show();
-                                $('#choose-pay-method #credit-sale').hide();
-                                $('#pay-credit-refund').data('from', payment.id);
-                              }
-                            });
-                          });
-              } else {
-                $('#choose-pay-method #credit-sale').show();
-                $('#choose-pay-method #credit-refund').hide();
-              }
+        var data= { due: Txn.due() }
+        var dataModel= ko.mapping.fromJS(data);
 
-              $("#choose-pay-method #due").val(amount(txn_raw.total -
-                                                      txn_raw.total_paid));
+        ko.applyBindings(dataModel, panel[0]);
 
-              $.modal($("#choose-pay-method"), { persist: true});
-            });
+        panel.on("click", "button", function(ev) {
+          var method= $(this).data("value");
+          $.modal.close();
+          var id= "#pay-" + method;
+          var due= Txn.due();
+          $(".amount", id).val(due);
+          $.modal($(id), { persist: true, overlayClose: false });
+          $(".amount", id).focus().select();
+        });
+
+        // XXX SimpleModal
+        $.modal(panel);
+      });
+
+    });
 });
 $(".return-button").on("click", function() {
   var txn= Txn.id();
@@ -631,50 +628,6 @@ $(".return-button").on("click", function() {
                 Txn.loadData(data);
               }
             });
-});
-</script>
-<style>
-#choose-pay-method {
-  text-align: center;
-}
-#choose-pay-method .optional {
-  display: none;
-}
-</style>
-<div id="choose-pay-method" style="display: none">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <div class="input-group input-group-lg" style="width: 20em; margin: auto">
-        <span class="input-group-addon">Due:</span>
-        <input type="text" class="form-control" id="due" disabled value="$0.00">
-      </div>
-    </div>
-    <div class="panel-body">
- <button class="btn btn-primary btn-lg" data-value="cash">Cash</button>
- <button id="credit-sale" class="btn btn-default btn-lg" data-value="credit">Credit Card</button>
- <button id="credit-refund" class="btn btn-default btn-lg optional" data-value="credit-refund">Refund Credit Card</button>
- <br><br>
- <button class="btn btn-default" data-value="credit-manual">Credit Card (Manual)</button>
- <br><br>
- <button class="btn btn-default" data-value="gift">Gift Card</button>
- <button class="btn btn-default" data-value="check">Check</button>
- <button class="btn btn-default" data-value="other">Other</button>
- <br><br>
- <button class="btn btn-default" data-value="discount">Discount</button>
- <button class="btn btn-default" data-value="donation">Donation</button>
- <button class="btn btn-default" data-value="bad-debt">Bad Debt</button>
-    </div><!-- /.panel-body -->
-  </div><!-- /.panel -->
-</div><!-- #choose-pay-method -->
-<script>
-$("#choose-pay-method").on("click", "button", function(ev) {
-  var method= $(this).data("value");
-  $.modal.close();
-  var id= "#pay-" + method;
-  var due= Txn.due();
-  $(".amount", id).val(due);
-  $.modal($(id), { persist: true, overlayClose: false });
-  $(".amount", id).focus().select();
 });
 </script>
 <form role="form" id="pay-cash" class="pay-method" style="display: none">
