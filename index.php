@@ -967,7 +967,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
         <div id="dates"></div>
         <div id="person">
           <span class="val"
-                data-bind="text: person.id() ? person.name() : 'Anonymous'"></span>
+                data-bind="text: person.display_name()"></span>
           <i id="info-person" class="fa fa-info-circle"></i>
         </div>
       </div>
@@ -1320,6 +1320,7 @@ var model= {
   person: {
     id: 0,
     name: '',
+    company: '',
   },
 };
 
@@ -1335,6 +1336,16 @@ viewModel.description= ko.computed(function() {
 
 viewModel.txn.due= ko.computed(function() {
   return (viewModel.txn.total() - viewModel.txn.total_paid());
+}, viewModel);
+
+viewModel.person.display_name= ko.computed(function() {
+  var name= viewModel.person.name();
+  if (name && viewModel.person.company()) {
+    name= name + ' / ';
+  }
+  name= name + viewModel.person.company();
+  if (!name) { name= 'Anonymous'; }
+  return name;
 }, viewModel);
 
 viewModel.load= function(txn) {
