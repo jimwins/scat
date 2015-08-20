@@ -118,6 +118,14 @@ Txn.loadNumber= function(num) {
             });
 }
 
+Txn.addNote= function(id, note) {
+  $.getJSON("api/txn-add-note.php?callback=?",
+            { id: id, note: note},
+            function (data) {
+              Txn.loadData(data);
+            });
+}
+
 var lastItem;
 
 function updateValue(row, key, value) {
@@ -1241,12 +1249,10 @@ $("#add-note").on("submit", function(ev) {
 
   var txn= Txn.id();
   var note= $('input[name="note"]', this).val();
-  $.getJSON("api/txn-add-note.php?callback=?",
-            { id: txn, note: note},
-            function (data) {
-              Txn.loadData(data);
-              $.modal.close();
-            });
+
+  Txn.addNote(txn, note);
+
+  $.modal.close();
 });
 </script>
 </div>
