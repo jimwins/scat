@@ -565,7 +565,8 @@ $("#txn-load").submit(function(ev) {
       <div id="sale-buttons" class="col-md-5 col-md-push-7 text-right">
         <button id="invoice" class="invoice-button btn btn-default">Invoice</button>
         <button id="print" class="print-button btn btn-default">Print</button>
-        <button id="delete" class="delete-button btn btn-default">Delete</button>
+        <button id="delete" class="btn btn-default"
+                data-bind="click: deleteTransaction">Delete</button>
         <button id="pay" class="pay-button btn btn-default">Pay</button>
         <button id="return" class="return-button btn btn-default">Return</button>
       </div>
@@ -578,10 +579,7 @@ $(".print-button").on("click", function() {
       confirm("Invoice isn't paid. Sure you want to print?"))
   printReceipt();
 });
-$(".delete-button").on("click", function() {
-  var txn= Txn.id();
-  Txn.delete(txn);
-});
+
 $(".pay-button").on("click", function() {
   var txn= Txn.id();
   $.getJSON("api/txn-allocate.php?callback=?",
@@ -1354,6 +1352,11 @@ viewModel.load= function(txn) {
 
 viewModel.loadReturnedFrom= function() {
   Txn.loadId(viewModel.txn.returned_from());
+}
+
+viewModel.deleteTransaction= function() {
+  var txn= Txn.id();
+  Txn.delete(txn);
 }
 
 ko.applyBindings(viewModel);
