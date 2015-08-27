@@ -3,7 +3,7 @@ include 'scat.php';
 
 head("Reorder @ Scat", true);
 
-$extra= $extra_field= '';
+$extra= $extra_field= $extra_field_name= '';
 $code_field= "code";
 
 $vendor= (int)$_REQUEST['vendor'];
@@ -14,6 +14,7 @@ if ($vendor) {
                         WHERE vendor = $vendor
                           AND item = item.id)";
   $extra_field= "(SELECT MIN(IF(promo_price, promo_price, net_price)) FROM vendor_item WHERE item = item.id AND vendor = $vendor) <= (SELECT MIN(IF(promo_price, promo_price, net_price)) FROM vendor_item WHERE item = item.id) Cheapest\$bool, ";
+  $extra_field_name= "Cheapest\$bool,";
 }
 if ((int)$_REQUEST['novendor']) {
   $extra= "AND NOT EXISTS (SELECT id
@@ -35,32 +36,41 @@ if ($code) {
 <?}?>
 <button id="zero" class="btn btn-default">Zero</button>
 <?
-$q= "SELECT item.id meta,
-            $code_field Code\$item,
-            name Name,
-            SUM(allocated) Stock\$right,
-            minimum_quantity Min\$right,
-            (SELECT -1 * SUM(allocated)
-               FROM txn_line JOIN txn ON (txn = txn.id)
-              WHERE type = 'customer'
-                AND item = item.id AND filled > NOW() - INTERVAL 3 MONTH)
-            AS Last3Months\$right,
-            (SELECT SUM(ordered - allocated)
-               FROM txn_line JOIN txn ON (txn = txn.id)
-              WHERE type = 'vendor'
-                AND item = item.id AND created > NOW() - INTERVAL 6 MONTH)
-            AS Ordered\$hide,
-            $extra_field
-            minimum_quantity AS Order\$order
-       FROM item
-       LEFT JOIN txn_line ON (item = item.id)
-      WHERE active AND NOT deleted
-        AND code NOT LIKE 'ZZ%' AND code NOT LIKE 'MAG-%'
-        $extra
-      GROUP BY item.id
-     HAVING (Stock\$right IS NULL OR NOT Stock\$right OR Stock\$right < Min\$right)
-        AND (Ordered\$hide IS NULL OR NOT Ordered\$hide)
-      ORDER BY code
+
+$q= "SELECT meta, Code\$item, Name, Stock\$right,
+            Min\$right,
+            Last3Months\$right,
+            $extra_field_name
+            Order\$order
+       FROM (SELECT item.id meta,
+                    $code_field Code\$item,
+                    name Name,
+                    SUM(allocated) Stock\$right,
+                    minimum_quantity Min\$right,
+                    (SELECT -1 * SUM(allocated)
+                       FROM txn_line JOIN txn ON (txn = txn.id)
+                      WHERE type = 'customer'
+                        AND txn_line.item = item.id
+                        AND filled > NOW() - INTERVAL 3 MONTH)
+                    AS Last3Months\$right,
+                    (SELECT SUM(ordered - allocated)
+                       FROM txn_line JOIN txn ON (txn = txn.id)
+                      WHERE type = 'vendor'
+                        AND txn_line.item = item.id
+                        AND created > NOW() - INTERVAL 6 MONTH)
+                    AS ordered,
+                    $extra_field
+                    minimum_quantity AS Order\$order
+               FROM item
+               LEFT JOIN txn_line ON (item = item.id)
+              WHERE active AND NOT deleted AND minimum_quantity
+                $extra
+              GROUP BY item.id
+              ORDER BY code) t
+       WHERE (Stock\$right IS NULL OR
+              NOT Stock\$right OR Stock\$right < Min\$right) AND
+             (ordered IS NULL OR NOT ordered)
+       ORDER BY Code\$item
       ";
 
 dump_table($db->query($q));
