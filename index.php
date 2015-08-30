@@ -1294,7 +1294,9 @@ viewModel.person.display_name= ko.computed(function() {
   if (name && viewModel.person.company()) {
     name= name + ' / ';
   }
-  name= name + viewModel.person.company();
+  if (viewModel.person.company()) {
+    name= name + viewModel.person.company();
+  }
   if (!name) { name= 'Anonymous'; }
   return name;
 }, viewModel);
