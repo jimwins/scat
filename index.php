@@ -280,7 +280,6 @@ function formatMethod(payment) {
 
 function updateOrderData(txn) {
   // set transaction data
-  $('#txn').data('paid_date', txn.paid)
   $('#txn').data('person', txn.person)
   var format= 'MMM d yyyy h:mmtt';
   var dates= Date.parse(txn.created).toString(format);
@@ -571,7 +570,7 @@ $(".invoice-button").on("click", function() {
   printInvoice();
 });
 $(".print-button").on("click", function() {
-  if ($("#txn").data("paid_date") != null ||
+  if (viewModel.txn.paid() != null ||
       confirm("Invoice isn't paid. Sure you want to print?"))
   printReceipt();
 });
