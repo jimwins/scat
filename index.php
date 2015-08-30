@@ -280,7 +280,6 @@ function formatMethod(payment) {
 
 function updateOrderData(txn) {
   // set transaction data
-  $('#txn').data('txn_raw', txn);
   $('#txn').toggleClass('paid', txn.paid != null);
   $('#txn').data('paid_date', txn.paid)
   $('#txn').data('person', txn.person)
