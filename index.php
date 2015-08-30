@@ -22,9 +22,6 @@ head("Scat");
 .code, .discount, .person {
   font-size: smaller;
 }
-.dollar:before {
-  content: '$';
-}
 
 /* Hide/show some elements from paid invoices. */
 #txn.paid .remove,
@@ -48,10 +45,6 @@ head("Scat");
 
 .pay-method {
   text-align: center;
-}
-
-#txn h2 {
-  margin-bottom: 0;
 }
 
 #notes tr {
