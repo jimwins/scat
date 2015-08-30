@@ -283,18 +283,6 @@ function updateOrderData(txn) {
   $('#txn').data('txn_raw', txn);
   $('#txn').toggleClass('paid', txn.paid != null);
   $('#txn').data('paid_date', txn.paid)
-  var type= (txn.total_paid ? 'Invoice' :
-             (txn.returned_from ? 'Return' : 'Sale'));
-  $('#txn #description').text(type + ' ' +
-                              Date.parse(txn.created).toString('yyyy') +
-                              '-' + txn.number);
-  if (txn.returned_from) {
-    var btn= $('<button class="btn btn-xs btn-link"><i class="fa fa-reply"></i></button>');
-    btn.on('click', function () {
-      Txn.loadId(txn.returned_from);
-    });
-    $('#txn #description').append(btn);
-  }
   $('#txn').data('person', txn.person)
   var format= 'MMM d yyyy h:mmtt';
   var dates= Date.parse(txn.created).toString(format);
@@ -920,8 +908,14 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 });
 </script>
       <div id="details" class="col-md-7 col-md-pull-5">
-        <div style="font-size: larger; font-weight: bold"
-             id="description">New Sale</div>
+        <div style="font-size: larger; font-weight: bold">
+          <span data-bind="text: description">New Sale</span>
+          <button class="btn btn-xs btn-link"
+                  data-bind="visible: txn.returned_from(),
+                             click: loadReturnedFrom">
+            <i class="fa fa-reply"></i>
+          </button>
+        </div>
         <div id="dates"></div>
         <div id="person">
           <span class="val"
