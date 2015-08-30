@@ -21,7 +21,9 @@ function person_load($db, $id) {
   $person= $r->fetch_assoc();
 
   if (!$person) {
-    return array('id' => 0, 'name' => '', 'company' => '' );
+    while ($field= $r->fetch_field()) {
+      $person[$field->name]= null;
+    }
   }
 
   return $person;
