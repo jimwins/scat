@@ -21,7 +21,7 @@ function person_load($db, $id) {
   $person= $r->fetch_assoc();
 
   if (!$person) {
-    return array('id' => 0, 'name' => '');
+    return array('id' => 0, 'name' => '', 'company' => '' );
   }
 
   return $person;
