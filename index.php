@@ -280,7 +280,6 @@ function formatMethod(payment) {
 
 function updateOrderData(txn) {
   // set transaction data
-  $('#txn').toggleClass('paid', txn.paid != null);
   $('#txn').data('paid_date', txn.paid)
   $('#txn').data('person', txn.person)
   var format= 'MMM d yyyy h:mmtt';
@@ -539,7 +538,8 @@ $("#txn-load").submit(function(ev) {
 </div>
 </div><!-- /sidebar -->
 
-<div class="col-md-9 col-md-pull-3" id="txn">
+<div class="col-md-9 col-md-pull-3" id="txn"
+     data-bind="css: { paid: txn.paid() != null }">
 <form class="form form-inline" id="lookup">
   <div class="input-group">
     <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
@@ -1257,6 +1257,7 @@ var model= {
     returned_from: 0,
     created: "2015-01-01 00:00:00",
     number: 0,
+    paid: null,
   },
   items: [],
   payments: [],
