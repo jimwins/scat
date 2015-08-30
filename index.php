@@ -86,8 +86,6 @@ Txn.loadData= function (data) {
   if (data.new_line) {
     setActiveRow($('#items tbody tr[data-line_id=' + data.new_line + ']'));
   }
-  /* Older stuff */
-  loadOrder(data);
 }
 
 Txn.loadId= function (id) {
@@ -278,29 +276,7 @@ function formatMethod(payment) {
   }
 }
 
-function updateOrderData(txn) {
-  // set transaction data
-  $('#txn').data('person', txn.person)
-  var format= 'MMM d yyyy h:mmtt';
-  var dates= Date.parse(txn.created).toString(format);
-  if (txn.filled) {
-//    dates = dates + ' / Filled: ' + Date.parse(txn.filled).toString(format);
-  }
-  if (txn.paid) {
-    dates = dates + ' / Paid: ' + Date.parse(txn.paid).toString(format);
-  }
-  $('#txn #dates').text(dates);
-}
-
 var protoNote= $("<tr><td></td><td></td><td></td></tr>");
-
-function loadOrder(data) {
-  updateOrderData(data.txn)
-
-  if (data.person != undefined) {
-    $('#txn').data('person_raw', data.person);
-  }
-}
 
 function showOpenOrders(data) {
   $('#sales tbody').empty();
@@ -914,7 +890,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             <i class="fa fa-reply"></i>
           </button>
         </div>
-        <div id="dates"></div>
+        <div data-bind="text: txn.display_dates()"></div>
         <div id="person">
           <span class="val"
                 data-bind="text: person.display_name()"></span>
@@ -983,55 +959,36 @@ $("#txn #person").on("dblclick", function(ev) {
   fld.focus().select();
 });
 $("#txn #info-person").on("click", function(ev) {
-  var person= $('#txn').data('person');
-  if (!person)
+  if (!viewModel.person.id())
     return false;
-  $.getJSON("api/person-load.php?callback=?",
-            { person: person },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              loadPerson(data.person);
-              $.modal($('#person-info'));
-            });
+
+  $.modal($('#person-info'));
 });
-function loadPerson(person) {
-  $('#person-info').data('person', person);
-  var active= parseInt(person.active);
-  $('#person-info #name').text(person.name);
-  $('#person-info #company').text(person.company);
-  $('#person-info #email').text(person.email);
-  $('#person-info #phone').text(person.phone);
-  $('#person-info #address').text(person.address);
-  $('#person-info #tax_id').text(person.tax_id);
-}
 </script>
 <table id="person-info" style="display: none">
   <tr>
    <th>Name:</th>
-   <td><span id="name"></span></td>
+   <td><span data-bind="text: person.name"></span></td>
   </tr>
   <tr>
    <th>Company:</th>
-   <td id="company"></td>
+   <td data-bind="text: person.company"></td>
   </tr>
   <tr>
    <th>Email:</th>
-   <td id="email"></td>
+   <td data-bind="text: person.email"></td>
   </tr>
   <tr>
    <th>Phone:</th>
-   <td id="phone"></td>
+   <td data-bind="text: person.phone"></td>
   </tr>
   <tr>
    <th>Address:</th>
-   <td id="address"></td>
+   <td data-bind="text: person.address"></td>
   </tr>
   <tr>
    <th>Tax ID:</th>
-   <td id="tax_id"></td>
+   <td data-bind="text: person.tax_id"></td>
   </tr>
 </table>
 <form id="person-create" class="form-horizontal" style="display:none">
@@ -1254,9 +1211,10 @@ var model= {
     total: 0.00,
     total_paid: 0.00,
     returned_from: 0,
-    created: "2015-01-01 00:00:00",
-    number: 0,
+    created: null,
+    filled: null,
     paid: null,
+    number: 0,
   },
   items: [],
   payments: [],
@@ -1265,13 +1223,17 @@ var model= {
     id: 0,
     name: '',
     company: '',
+    email: '',
+    phone: '',
+    address: '',
+    tax_id: '',
   },
 };
 
 var viewModel= ko.mapping.fromJS(model);
 
 viewModel.description= ko.computed(function() {
-  if (!viewModel.txn.id()) { return "New Sale"; }
+  if (!viewModel.txn.created()) { return "New Sale"; }
   var type= (viewModel.txn.total_paid() ? 'Invoice' :
              (viewModel.txn.returned_from() ? 'Return' : 'Sale'));
   return type + ' ' + Date.parse(viewModel.txn.created()).toString('yyyy') +
@@ -1292,6 +1254,21 @@ viewModel.person.display_name= ko.computed(function() {
   }
   if (!name) { name= 'Anonymous'; }
   return name;
+}, viewModel);
+
+viewModel.txn.display_dates= ko.computed(function() {
+  if (!viewModel.txn.created()) { return ""; }
+  var format= 'MMM d yyyy h:mmtt';
+  var dates= Date.parse(viewModel.txn.created()).toString(format);
+/*
+  if (viewModel.txn.filled()) {
+    dates = dates + ' / Filled: ' + Date.parse(viewModel.txn.filled()).toString(format);
+  }
+*/
+  if (viewModel.txn.paid()) {
+    dates = dates + ' / Paid: ' + Date.parse(viewModel.txn.paid()).toString(format);
+  }
+  return dates;
 }, viewModel);
 
 viewModel.load= function(txn) {
