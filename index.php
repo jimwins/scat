@@ -1222,7 +1222,7 @@ $("#lock").on("click", function() {
 <table id="notes" class="table table-condensed table-striped">
  <thead>
   <tr>
-    <th style="width: 20px"><a id="add-note-button" class="fa fa-plus-square-o"></a></th>
+    <th style="width: 20px"><a data-bind="click: displayAddNote" class="fa fa-plus-square-o"></a></th>
     <th style="width: 10em">Date</th>
     <th>Note</th></tr>
  </thead>
@@ -1239,11 +1239,6 @@ $("#lock").on("click", function() {
   <input type="submit" value="Add">
 </form>
 <script>
-$("#add-note-button").on("click", function(ev) {
-  var txn= Txn.id();
-  if (!txn) return;
-  $.modal($("#add-note"));
-});
 $("#add-note").on("submit", function(ev) {
   ev.preventDefault();
 
@@ -1316,6 +1311,12 @@ viewModel.loadReturnedFrom= function() {
 viewModel.deleteTransaction= function() {
   var txn= Txn.id();
   Txn.delete(txn);
+}
+
+viewModel.displayAddNote= function() {
+  var txn= Txn.id();
+  if (!txn) return;
+  $.modal($("#add-note"));
 }
 
 ko.applyBindings(viewModel);
