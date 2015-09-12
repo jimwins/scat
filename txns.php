@@ -30,6 +30,10 @@ if ($_REQUEST['total']) {
                      AS DECIMAL(9,2)) = '" . $db->escape($_REQUEST['total']) . "'";
 }
 
+if ($_REQUEST['date']) {
+  $criteria[]= "DATE(created) = DATE('" . $db->escape($_REQUEST['date']) . "')";
+}
+
 if (empty($criteria)) {
   $criteria= '1=1';
 } else {
