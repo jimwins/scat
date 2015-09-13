@@ -136,6 +136,33 @@ Txn.addPayment= function (id, options) {
            }});
 }
 
+Txn.addItem= function (txn, item) {
+  $.getJSON("api/txn-add-item.php?callback=?",
+            { txn: txn, item: item.id },
+            function(data) {
+              if (data.error) {
+                displayError(data);
+              } else if (data.matches) {
+                // this shouldn't happen!
+                play("no");
+              } else {
+                Txn.loadData(data);
+              }
+            });
+}
+
+Txn.removeItem= function (id, item) {
+  $.getJSON("api/txn-remove-item.php?callback=?",
+            { txn: id, id: item },
+            function(data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+              Txn.loadData(data);
+            });
+};
+
 var lastItem;
 
 function updateValue(row, key, value) {
@@ -212,39 +239,6 @@ $(document).on('dblclick', '.editable', function() {
   val.replaceWith(fld);
   fld.focus().select();
 });
-
-$(document).on('click', '.remove', function() {
-  var txn= Txn.id();
-  var id= $(this).closest('tr').data('line_id');
-
-  $.getJSON("api/txn-remove-item.php?callback=?",
-            { txn: txn, id: id },
-            function(data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              Txn.loadData(data);
-            });
-
-  return false;
-});
-
-function addItem(item) {
-  var txn= Txn.id();
-  $.getJSON("api/txn-add-item.php?callback=?",
-            { txn: txn, item: item.id },
-            function(data) {
-              if (data.error) {
-                displayError(data);
-              } else if (data.matches) {
-                // this shouldn't happen!
-                play("no");
-              } else {
-                Txn.loadData(data);
-              }
-            });
-}
 
 var paymentMethods= {
   cash: "Cash",
@@ -385,7 +379,7 @@ $(function() {
                     $.each(data.matches, function(i,item) {
                       var n= $("<li>" + item.name + "</li>");
                       n.click(item, function(ev) {
-                        addItem(ev.data);
+                        Txn.addItem(Txn.id(), ev.data);
                         $(this).closest(".choices").remove();
                       });
                       list.append(n);
@@ -1137,7 +1131,10 @@ $("#lock").on("click", function() {
     <tr class="item" valign="top"
         data-bind="attr: { 'data-line_id': $data.line_id }">
       <td>
-        <a class="remove"><i class="fa fa-trash-o" title="Remove"></i></a>
+        <a class="remove"
+           data-bind="click: $parent.removeItem">
+          <i class="fa fa-trash-o" title="Remove"></i>
+        </a>
       </td>
       <td align="center" class="editable"
           data-bind="css: { over: $data.quantity() > $data.stock() }">
@@ -1280,6 +1277,12 @@ viewModel.displayAddNote= function() {
   var txn= Txn.id();
   if (!txn) return;
   $.modal($("#add-note"));
+}
+
+viewModel.removeItem= function(item) {
+  var txn= Txn.id();
+  if (!txn) return;
+  Txn.removeItem(txn, item.line_id());
 }
 
 ko.applyBindings(viewModel);
