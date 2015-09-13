@@ -157,6 +157,7 @@ $r= $db->query($q)
 if ($r->num_rows == 1) {
   $row= $r->fetch_assoc();
   ob_end_clean();
+  // XXX preserve search parameters
   header("Location: item.php?id=" . $row['meta']);
   exit;
 }
