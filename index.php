@@ -958,7 +958,7 @@ $("#txn #info-person").on("click", function(ev) {
   $.modal($('#person-info'), { persist: true });
 });
 </script>
-<table id="person-info" style="display: none">
+<table id="person-info" style="display: none; width: auto" class="table table-condensed">
   <tr>
    <th>Name:</th>
    <td><span data-bind="text: person.name"></span></td>
