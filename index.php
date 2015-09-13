@@ -9,7 +9,6 @@ head("Scat");
   display: none;
 }
 
-.choices ul { margin: 0; padding-left: 1.2em; list-style: circle; }
 .choices li {
   text-decoration: underline;
   color: #339;
