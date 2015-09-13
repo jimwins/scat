@@ -8,12 +8,13 @@
            placeholder="Enter keywords or scan barcode"
            autocorrect="off" autocapitalize="off"
            value="<?=ashtml($search)?>">
-    <span class="input-group-addon">
+    <span class="input-group-addon checkbox">
       <label>
         <input type="checkbox" value="1" name="all" data-bind="checked: all"
                <?=(int)$_REQUEST['all'] ? 'checked' : ''?>>
-          Include inactive?
-        </label>
+          <span class="hidden-xs">Include inactive?</span>
+          <span class="visible-xs">All?</span>
+      </label>
     </span>
 <?if ($_REQUEST['search']) {?>
     <span class="input-group-btn">
@@ -57,5 +58,4 @@ $('#save').on('click', function(ev) {
 <?}?>
   </div>
 </form>
-<br>
 <br>

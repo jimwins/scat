@@ -12,8 +12,9 @@ if (($saved= (int)$_GET['saved']) && !$search) {
 
 head("Items @ Scat", true);
 
+// XXX can't add items on phone for now
 ?>
-<div style="float: right">
+<div class="hidden-xs" style="float: right">
  <button id="add-item" class="btn btn-default">Add New Item</button>
 </div>
 <?include 'item-searchform.php';?>
