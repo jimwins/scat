@@ -955,7 +955,7 @@ $("#txn #info-person").on("click", function(ev) {
   if (!viewModel.person.id())
     return false;
 
-  $.modal($('#person-info'));
+  $.modal($('#person-info'), { persist: true });
 });
 </script>
 <table id="person-info" style="display: none">
