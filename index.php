@@ -1080,9 +1080,12 @@ $('#person-create').on('click', "button[name='cancel']", function(ev) {
     <tr class="payment-row" data-bind="attr: { 'data-id': $data.id }">
       <th colspan=4 class="payment-buttons">
         <a class="admin" name="remove"><i class="fa fa-trash-o"></i></a>
-        <a name="print" data-bind="visible: method() == 'credit'"><i class="fa fa-print"></i></a>
+        <a name="print" data-bind="visible: method() == 'credit'">
+          <i class="fa fa-print"></i>
+        </a>
       </th>
-      <th class="payment-method" align="right" data-bind="text: formatMethod($data)">Method:</th>
+      <th class="payment-method" align="right"
+          data-bind="text: formatMethod($data)">Method:</th>
       <td class="right" data-bind="text: Scat.amount($data.amount())">$0.00</td>
     </tr>
     <!-- /ko -->
@@ -1091,7 +1094,10 @@ $('#person-create').on('click', "button[name='cancel']", function(ev) {
         <a id="lock"><i class="fa fa-lock"></i></a>
       </th>
       <th align="right">Due:</th>
-      <td data-bind="text: amount(txn.total() - txn.total_paid())" class="right">$0.00</td>
+      <td data-bind="text: amount(txn.total() - txn.total_paid())"
+          class="right">
+        $0.00
+      </td>
     </tr>
  </tfoot>
 <script>
@@ -1164,7 +1170,9 @@ $("#lock").on("click", function() {
 <table id="notes" class="table table-condensed table-striped">
  <thead>
   <tr>
-    <th style="width: 20px"><a data-bind="click: displayAddNote" class="fa fa-plus-square-o"></a></th>
+    <th style="width: 20px">
+      <a data-bind="click: displayAddNote" class="fa fa-plus-square-o"></a>
+    </th>
     <th style="width: 10em">Date</th>
     <th>Note</th></tr>
  </thead>
