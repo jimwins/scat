@@ -413,7 +413,8 @@ $(function() {
  </div> 
  <div class="panel-body">
   <h1 class="text-center" style="margin: 0px; padding: 0px"
-      data-bind="text: Scat.amount(txn.due()), css: { 'text-danger': txn.due() < 0 }">
+      data-bind="text: Scat.amount(txn.due()),
+                 css: { 'text-danger': txn.due() < 0 }">
   </h1>
  </div>
  <div class="panel-footer text-center">
@@ -520,12 +521,16 @@ $("#txn-load").submit(function(ev) {
   <div class="panel-heading">
     <div class="row">
       <div id="sale-buttons" class="col-md-5 col-md-push-7 text-right">
-        <button id="invoice" class="invoice-button btn btn-default">Invoice</button>
+        <button id="invoice" class="invoice-button btn btn-default">
+          Invoice
+        </button>
         <button id="print" class="print-button btn btn-default">Print</button>
         <button id="delete" class="btn btn-default"
                 data-bind="click: deleteTransaction">Delete</button>
         <button id="pay" class="pay-button btn btn-default">Pay</button>
-        <button id="return" class="return-button btn btn-default">Return</button>
+        <button id="return" class="return-button btn btn-default">
+          Return
+        </button>
       </div>
 <script>
 $(".invoice-button").on("click", function() {
