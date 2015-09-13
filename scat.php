@@ -99,9 +99,14 @@ $(document).ready(function() {
     <div class="collapse navbar-collapse">
       <ul id="navbar" class="nav navbar-nav">
         <li><a href="./">New Sale</a></li>
-        <li><a href="./gift-card.php">Gift Cards</a></li>
         <li><a href="./items.php">Items</a></li>
-        <li><a href="./custom.php">Custom</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Extras <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="./gift-card.php">Gift Cards</a></li>
+            <li><a href="./custom.php">Custom</a></li>
+          </ul>
+        </li>
         <li><a href="./person.php">People</a></li>
         <li><a href="./txns.php">Transactions</a></li>
         <li><a href="./clock.php">Clock</a></li>
