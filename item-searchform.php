@@ -35,6 +35,10 @@ $('#save').on('click', function(ev) {
 
   if (!saved) {
     data.name= prompt("Save search as:");
+
+    if (!data.name) {
+      return;
+    }
   } else {
     data.id= saved;
   }
