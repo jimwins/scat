@@ -100,13 +100,9 @@ $(document).ready(function() {
       <ul id="navbar" class="nav navbar-nav">
         <li><a href="./">New Sale</a></li>
         <li><a href="./items.php">Items</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Extras <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li><a href="./gift-card.php">Gift Cards</a></li>
-            <li><a href="./custom.php">Custom</a></li>
-          </ul>
-        </li>
+        <!-- Hide Gift Cards menu on tablet for size reasons -->
+        <li class="hidden-sm"><a href="./gift-card.php">Gift Cards</a></li>
+        <li><a href="./custom.php">Custom</a></li>
         <li><a href="./person.php">People</a></li>
         <li><a href="./txns.php">Transactions</a></li>
         <li><a href="./clock.php">Clock</a></li>
