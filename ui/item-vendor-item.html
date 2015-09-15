@@ -1,0 +1,82 @@
+<div class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <form class="modal-content" data-bind="submit: saveItem" role="form">
+
+      <div class="modal-header">
+        <button type="button" class="close"
+                data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+          Vendor Item
+        </h4>
+      </div>
+
+      <div id="accordion" class="modal-body">
+
+        <div class="alert alert-danger" data-bind="visible: error">
+          <strong>Error!</strong> <span data-bind="text: error"></span>
+        </div>
+
+        <div id="content" class="collapse in">
+          <div class="form-group">
+            <label for="vendor">Vendor</label>
+            <select class="form-control" id="vendor"
+                    data-bind="value: selectedVendor, options: vendors,
+                               optionsCaption: 'Select...',
+                               optionsText: 'value', optionsValue: 'id'">
+              <option data-bind="text: value, value: id"></option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="name">SKU</label>
+            <input type="text" class="form-control" id="vendor_sku"
+                      data-bind="value: vendor_sku">
+          </div>
+
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name"
+                      data-bind="value: name">
+          </div>
+
+          <div class="form-group">
+            <label for="retail_price">Retail Price</label>
+            <input type="text" class="form-control" id="retail_price"
+                   data-bind="value: retail_price">
+          </div>
+
+          <div class="form-group">
+            <label for="net_price">Net Price</label>
+            <input type="text" class="form-control" id="net_price"
+                   data-bind="value: net_price">
+          </div>
+
+          <div class="form-group">
+            <label for="promo_price">Promo Price</label>
+            <input type="text" class="form-control" id="promo_price"
+                   data-bind="value: promo_price">
+          </div>
+
+          <div class="form-group">
+            <label for="purchase_qty">Purchase Quantity</label>
+            <input type="text" class="form-control" id="purchase_qty"
+                   data-bind="value: purchase_qty">
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <input type="hidden" name="parent" data-bind="value: parent">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" class="btn btn-primary">
+          Save
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

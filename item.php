@@ -204,6 +204,7 @@ echo '<h2 onclick="$(\'#vendors\').toggle()">Vendors</h2>';
 echo '<div id="vendors" style="display: none">';
 dump_table($db->query($q));
 dump_query($q);
+echo '<button id="add-vendor" class="btn btn-default">Add Vendor Item</a>';
 echo '</div>';
 
 function RunningTotal($row) {
@@ -283,4 +284,52 @@ function saveItemProperty(value, settings) {
             });
   return "...";
 }
+
+$('#add-vendor').on('click', function() {
+  $.get('ui/item-vendor-item.html').done(function (html) {
+    var panel= $(html);
+
+    var vendor_item= { vendor: 0, vendor_sku: '', name: '',
+                       retail_price: 0.00, net_price: 0.00,
+                       promo_price: '', purchase_qty: 1,
+                       vendors: [], error: '' };
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    $.getJSON('api/person-list.php?callback=?',
+              { role: 'vendor' })
+      .done(function (data) {
+        ko.mapping.fromJS({ vendors: data }, itemModel);
+      })
+      .fail(function (jqxhr, textStatus, error) {
+        var data= $.parseJSON(jqxhr.responseText);
+        vendor_item.error(textStatus + ', ' + error + ': ' + data.text)
+      });
+
+
+    itemModel= ko.mapping.fromJS(vendor_item);
+
+    itemModel.saveItem= function(place, ev) {
+      1;
+    }
+
+    itemModel.selectedVendor= ko.computed({
+      read: function () {
+        return this.vendor();
+      },
+      write: function (value) {
+        if (typeof value != 'undefined' && value != '') {
+          this.vendor(value);
+        }
+      },
+      owner: itemModel
+    }).extend({ notify: 'always' });
+ 
+
+    ko.applyBindings(itemModel, panel[0]);
+    panel.appendTo($('body')).modal();
+  });
+});
 </script>
