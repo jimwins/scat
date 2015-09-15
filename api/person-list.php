@@ -15,6 +15,10 @@ foreach ($terms as $term) {
 if (!$_REQUEST['all'])
   $criteria[]= 'active';
 
+if (($type= $_REQUEST['role'])) {
+  $criteria[]= "person.role = '" . $db->escape($type) . "'";
+}
+
 if (empty($criteria)) {
   $criteria= '1=1';
 } else {
