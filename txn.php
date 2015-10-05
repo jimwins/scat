@@ -157,8 +157,10 @@ viewModel.allocateLine= function(line) {
                 displayError(data);
                 return;
               }
+              var top= document.documentElement.scrollTop || document.body.scrollTop;
               ko.mapping.fromJS({ txn: data.txn, items: data.items },
                                 viewModel);
+              document.documentElement.scrollTop= document.body.scrollTop= top;
             });
 }
 
@@ -183,8 +185,10 @@ viewModel.closeLine= function(line) {
                 displayError(data);
                 return;
               }
+              var top= document.documentElement.scrollTop || document.body.scrollTop;
               ko.mapping.fromJS({ txn: data.txn, items: data.items },
                                 viewModel);
+              document.documentElement.scrollTop= document.body.scrollTop= top;
             });
 }
 
