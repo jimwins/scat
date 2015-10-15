@@ -60,16 +60,18 @@ $q= "SELECT meta, Code\$item, Name, Stock\$right,
                         AND created > NOW() - INTERVAL 6 MONTH)
                     AS ordered,
                     $extra_field
-                    minimum_quantity AS Order\$order
+                    IF(minimum_quantity > minimum_quantity - SUM(allocated),
+                       minimum_quantity,
+                       minimum_quantity - SUM(allocated))
+                      AS Order\$order
                FROM item
                LEFT JOIN txn_line ON (item = item.id)
-              WHERE active AND NOT deleted AND minimum_quantity
+              WHERE active AND NOT deleted
                 $extra
               GROUP BY item.id
               ORDER BY code) t
-       WHERE (Stock\$right IS NULL OR
-              NOT Stock\$right OR Stock\$right < Min\$right) AND
-             (ordered IS NULL OR NOT ordered)
+       WHERE (ordered IS NULL OR NOT ordered) AND
+             IFNULL(Stock\$right, 0) < Min\$right
        ORDER BY Code\$item
       ";
 
