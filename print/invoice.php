@@ -8,10 +8,13 @@ if (!$id) die("No transaction specified.");
 date_default_timezone_set('America/Los_Angeles');
 
 $details= txn_load($db, $id);
+
+$fn= (($details['type'] == 'vendor') ? 'PO' : 'I') .
+     $details['formatted_number'];
 ?>
 <html>
 <head>
- <title><?='I'.ashtml($details['formatted_number'])?></title>
+ <title><?=ashtml($fn)?></title>
  <link href="style.css" rel="stylesheet" type="text/css">
 </head>
 <?if ($_GET['print']) {?>
