@@ -62,7 +62,7 @@ $q= "SELECT meta, Code\$item, Name, Stock\$right,
                     $extra_field
                     IF(minimum_quantity > minimum_quantity - SUM(allocated),
                        minimum_quantity,
-                       minimum_quantity - SUM(allocated))
+                       minimum_quantity - IFNULL(SUM(allocated), 0))
                       AS Order\$order
                FROM item
                LEFT JOIN txn_line ON (item = item.id)
