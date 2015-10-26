@@ -137,7 +137,7 @@ $q= "SELECT
               WHEN 'relative' THEN CONCAT('$', item.discount, ' off')
               ELSE ''
             END Discount\$discount,
-            (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) Stock\$right,
+            IFNULL((SELECT SUM(allocated) FROM txn_line WHERE item = item.id), 0) Stock\$right,
             minimum_quantity Minimum\$right,
             (SELECT -1 * SUM(allocated)
                FROM txn_line JOIN txn ON (txn = txn.id)
