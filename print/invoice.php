@@ -114,6 +114,7 @@ $methods= array(
   'square' => 'Square',
   'stripe' => 'Stripe',
   'dwolla' => 'Dwolla',
+  'paypal' => 'PayPal',
   'gift' => 'Gift Card',
   'check' => 'Check',
   'discount' => 'Discount',

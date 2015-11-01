@@ -39,6 +39,7 @@ while ($pay= $r->fetch_assoc()) {
                   'gift' =>   array('21700', '11200'),
                   'check' =>  array('11160', '11200'),
                   'dwolla'=>  array('11172', '11200'),
+                  'paypal'=>  array('11170', '11200'),
                   'discount'=>array('53000', '11200'),
                   'bad'=>     array('61900', '11200'),
                   'donation'=>array('63150', '11200'),

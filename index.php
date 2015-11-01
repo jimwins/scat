@@ -247,6 +247,7 @@ var paymentMethods= {
   square: "Square",
   stripe: "Stripe",
   dwolla: "Dwolla",
+  paypal: "PayPal",
   gift: "Gift Card",
   check: "Check",
   discount: "Discount",
@@ -712,6 +713,7 @@ $("#pay-credit-manual").on("click", "button", function (ev) {
  <button class="btn btn-default" data-value="square">Square</button>
  <button class="btn btn-default" data-value="stripe">Stripe</button>
  <button class="btn btn-default" data-value="dwolla">Dwolla</button>
+ <button class="btn btn-default" data-value="paypal">PayPal</button>
  <button class="btn btn-default" data-value="cancel">Cancel</button>
 </form>
 <script>
