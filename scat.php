@@ -17,8 +17,6 @@ require dirname(__FILE__).'/config.php';
 
 require dirname(__FILE__).'/lib/db.php';
 
-require dirname(__FILE__).'/vendor/autoload.php';
-
 define('APP_NAME', 'ScatPOS');
 define('VERSION', '0.6.0');
 define('EPS_ApplicationID', '984');
