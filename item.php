@@ -23,7 +23,7 @@ $item= item_load($db, $id);
 
 $search= "";
 
-head("Item: " . ashtml($item['name']). " @ Scat", true);
+head("Item: " . $item['name']. " @ Scat", true);
 
 include 'item-searchform.php';
 ?>
