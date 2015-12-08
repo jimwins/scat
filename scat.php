@@ -35,7 +35,7 @@ header("content-type: text/html;charset=utf-8");?>
  <link rel="stylesheet" type="text/css" href="css/datepicker3.css">
  <link rel="stylesheet" type="text/css" href="static/screen.css">
 <?if (!$allnew) {?>
-  <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/base/jquery-ui.css">
+  <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
 <?}?>
 <?if ($GLOBALS['DEBUG']) {?>
   <link rel="stylesheet" type="text/css" href="css/debug.css">
