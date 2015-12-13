@@ -133,6 +133,40 @@ CREATE TABLE `person` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `timeclock`
+--
+
+DROP TABLE IF EXISTS `timeclock`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `timeclock` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `person` int(10) unsigned NOT NULL,
+  `start` datetime NOT NULL,
+  `end` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `timeclock_audit`
+--
+
+DROP TABLE IF EXISTS `timeclock_audit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `timeclock_audit` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `entry` int(10) unsigned DEFAULT NULL,
+  `before_start` datetime DEFAULT NULL,
+  `after_start` datetime DEFAULT NULL,
+  `before_end` datetime DEFAULT NULL,
+  `after_end` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `txn`
 --
 
