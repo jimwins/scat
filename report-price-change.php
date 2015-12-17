@@ -39,12 +39,12 @@ $q= "SELECT
             item.code Code\$item,
             item.name Name\$name,
             item.retail_price AS OldList\$dollar,
-            vendor_item.retail_price AS NewList\$dollar,
+            MAX(vendor_item.retail_price) AS NewList\$dollar,
             sale_price(item.retail_price, item.discount_type, item.discount)
               AS OldSale\$dollar,
-            CONCAT('$', CAST(vendor_item.net_price / 0.6 AS DECIMAL(9,2)),
+            CONCAT('$', CAST(MAX(vendor_item.net_price) / 0.6 AS DECIMAL(9,2)),
                    ' - ',
-                   '$', CAST(vendor_item.net_price / 0.5 AS DECIMAL(9,2)))
+                   '$', CAST(MAX(vendor_item.net_price) / 0.5 AS DECIMAL(9,2)))
               AS NewSale,
             (SELECT SUM(allocated) FROM txn_line WHERE item = item.id)
               AS Stock
