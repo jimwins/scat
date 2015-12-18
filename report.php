@@ -25,6 +25,7 @@ head("Sales Report @ Scat", true);
         <option value="day">Day</span>
         <option value="week">Week</span>
         <option value="month">Month</span>
+        <option value="year">Year</span>
         <option value="hour">Day/Hour</span>
         <option value="all">All</span>
       </select>

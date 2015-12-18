@@ -30,6 +30,9 @@ switch ($span) {
 case 'all':
   $format= 'All';
   break;
+case 'year':
+  $format= '%Y';
+  break;
 case 'month':
   $format= '%Y-%m';
   break;
