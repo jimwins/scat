@@ -37,10 +37,20 @@ if (!$end) {
     </div>
   </div>
 </form>
+
+<table class="table table-striped table-condensed" style="width: 60%">
+  <tr>
+    <th>Date</th>
+    <th>In</th>
+    <th>Out</th>
+    <th>Regular</th>
+    <th>OT</th>
+  </tr>
 <?
 
 $q= "SELECT name,
             DATE(start) day,
+            TIME(start) start, TIME(end) end,
             LEAST(8, TIMESTAMPDIFF(second, start, end) / 3600) regular,
             GREATEST(0, TIMESTAMPDIFF(second, start, end) / 3600 - 8) overtime
        FROM timeclock
@@ -50,6 +60,42 @@ $q= "SELECT name,
 
 $r= $db->query($q);
 
-dump_table($r);
+$latest= "";
+$regular= $ot= 0;
 
+while ($row= $r->fetch_assoc()) {
+
+  if ($row['name'] != $latest) {
+    if ($latest) {
+      echo '<tr><td colspan="3"></td><td>', $regular, '</td><td>', $ot, '</td></tr>';
+    }
+    echo '<tr><th colspan="5">', ashtml($row['name']), '</th></tr>';
+
+    $latest= $name;
+    $regular= $ot= 0;
+
+    $latest= $row['name'];
+  }
+
+  $regular+= $row['regular'];
+  $ot+= $row['overtime'];
+
+  echo '<tr><td>',
+       '&nbsp; &nbsp;', date('l, F j', strtotime($row['day'])),
+       '</td><td>',
+       $row['start'],
+       '</td><td>',
+       $row['end'],
+       '</td><td>',
+       $row['regular'],
+       '</td><td>',
+       $row['overtime'],
+       '</td></tr>';
+}
+
+echo '<tr><td colspan="3"></td><td>', $regular, '</td><td>', $ot, '</td></tr>';
+
+?>
+</table>
+<?
 foot();
