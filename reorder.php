@@ -57,7 +57,7 @@ $q= "SELECT meta, Code\$item, Name, Stock\$right,
                        FROM txn_line JOIN txn ON (txn = txn.id)
                       WHERE type = 'vendor'
                         AND txn_line.item = item.id
-                        AND created > NOW() - INTERVAL 6 MONTH)
+                        AND created > NOW() - INTERVAL 12 MONTH)
                     AS ordered,
                     $extra_field
                     IF(minimum_quantity > minimum_quantity - SUM(allocated),
