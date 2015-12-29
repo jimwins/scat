@@ -760,9 +760,9 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
                 displayError(data);
               } else {
                 var due= Txn.due();
-                $('#pay-gift-balance').text("Card has $" +
+                $('#pay-gift-balance').text("Balance: $" +
                                             data.balance +
-                                            " remaining. Last used " +
+                                            ", Last used " +
                                             data.latest + '.');
                 var def= due;
                 if (parseFloat(data.balance) < due) {
