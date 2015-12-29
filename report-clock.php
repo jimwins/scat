@@ -99,3 +99,12 @@ echo '<tr><td colspan="3"></td><td>', $regular, '</td><td>', $ot, '</td></tr>';
 </table>
 <?
 foot();
+?>
+<script>
+$(function() {
+  $('#report-params .input-daterange').datepicker({
+      format: "yyyy-mm-dd",
+      todayHighlight: true
+  });
+});
+</script>
