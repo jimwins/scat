@@ -738,6 +738,7 @@ $("#pay-other").on("click", "button", function (ev) {
  <button class="btn btn-default" name="cancel">Cancel</button>
 </div>
 <div id="pay-gift-complete" class="pay-method" style="display: none">
+ <p class="small" id="pay-gift-balance"></p>
  <div class="form-group">
    <input class="amount form-control input-lg text-center"
           type="text" pattern="\d*">
@@ -764,7 +765,7 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
                                             " remaining. Last used " +
                                             data.latest + '.');
                 var def= due;
-                if (data.balance < due) {
+                if (parseFloat(data.balance) < due) {
                   def= data.balance;
                 }
                 if (data.balance - due <= 10.00) {
