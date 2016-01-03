@@ -39,6 +39,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 
   $q= "LOAD DATA LOCAL INFILE 'zip://$fn#$base.txt'
             INTO TABLE macitem
+          CHARACTER SET 'latin1'
           FIELDS TERMINATED BY '\t'
           IGNORE 1 LINES
           (@changed, @change_date, item_no, sku, name, @unit_of_sale,
