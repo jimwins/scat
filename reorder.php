@@ -97,10 +97,10 @@ $('#download').on('click', function(ev) {
   $("#post-csv").submit();
 });
 $('#create').on('click', function(ev) {
-  var order= {};
+  var order= [];
   $.each($(".sortable tr"), function (i, row) {
     if (i > 0 && parseInt($('.order', row).text()) > 0) {
-      order[$(row).attr('data-id')]= $('.order', row).text();
+      order.push([ $(row).attr('data-id'), $('.order', row).text() ]);
     }
   });
 

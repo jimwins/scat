@@ -12,14 +12,14 @@ if ($txn_id) {
   }
 }
 
-foreach ($_REQUEST['items'] as $item => $qty) {
+foreach ($_REQUEST['items'] as $item) {
   $q= "INSERT INTO txn_line (txn, item, ordered, retail_price, taxfree)
-       SELECT $txn_id AS txn, $item AS item, $qty AS ordered,
+       SELECT $txn_id AS txn, $item[0] AS item, $item[1] AS ordered,
               (SELECT net_price
                  FROM vendor_item
-                WHERE item = $item AND vendor = {$txn['person']}
+                WHERE item = $item[0] AND vendor = {$txn['person']}
                 ORDER BY id DESC LIMIT 1), taxfree
-         FROM item WHERE id = $item";
+         FROM item WHERE id = $item[0]";
   $r= $db->query($q);
   if (!$r) die_query($db, $q);
 }
