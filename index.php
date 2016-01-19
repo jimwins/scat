@@ -9,10 +9,20 @@ head("Scat");
   display: none;
 }
 
-.choices li {
-  text-decoration: underline;
+.choices {
+  max-height: 300px;
+  overflow: scroll;
+}
+
+.choices tr.stocked {
   color: #339;
+}
+
+.choices tr {
   cursor:pointer;
+}
+.choices tr:hover {
+  text-decoration: underline;
 }
 .over {
   font-weight: bold;
@@ -376,9 +386,14 @@ $(function() {
                     play("maybe");
                     var choices= $('<div class="choices alert alert-warning"/>');
                     choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
-                    var list= $('<ul>');
+                    var list= $('<table class="table table-condensed" style="width: 95%;">');
                     $.each(data.matches, function(i,item) {
-                      var n= $("<li>" + item.name + "</li>");
+                      var n= $("<tr" + (item.stock > 0 ? " class='stocked'" : "") + ">" +
+                               "<td>" + item.name + "</td>" +
+                               "<td>" + item.brand + "</td>" +
+                               "<td align='right'>" + (item.sale_price ? ("<s>" + amount(item.retail_price) + "</s>") : "") + "</td>" +
+                               "<td align='right'>" + amount(item.sale_price ? item.sale_price : item.retail_price) + "</td>" +
+                               "</tr>");
                       n.click(item, function(ev) {
                         Txn.addItem(Txn.id(), ev.data);
                         $(this).closest(".choices").remove();

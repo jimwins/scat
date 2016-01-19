@@ -23,9 +23,6 @@ if (!$search)
 
 $items= item_find($db, $search, $_REQUEST['all'] ? FIND_ALL : 0);
 
-// limit ourselves to 10 items
-array_splice($items, 10);
-
 /* if it is just one item, go ahead and add it to the invoice */
 if (count($items) == 1) {
   if (!$txn_id) {
@@ -102,7 +99,14 @@ if (count($items) == 1) {
 
   echo jsonp(array('txn' => $txn, 'items' => $items, 'new_line' => $new_line));
 } else {
-  echo jsonp(array('matches' => $items));
+
+  $total= count($items);
+
+  // limit ourselves to 250 items
+  $page= (int)$_REQUEST['page'];
+  $items= array_slice($items, $page * 250, 250);
+
+  echo jsonp(array('total' => $total, 'page' => $page, 'matches' => $items));
 }
 
 
