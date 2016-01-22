@@ -18,12 +18,12 @@ bcscale(2);
 ?>
 <table class="table table-striped sortable" style="width: auto">
 <thead>
- <tr><th>Date</th><th>Cash</th><th>Credit</th><th>Amex</th><th>Other</th></tr>
+ <tr><th>Date</th><th>Cash</th><th>Credit</th><th>Amex</th><th>Other</th><th>Total</th></tr>
 </thead>
 <tbody>
 <?
 $day= null;
-$cash= $credit= $amex= $other= 0.00;
+$total= $cash= $credit= $amex= $other= 0.00;
 while ($row= $r->fetch_assoc()) {
   if ($row['date'] != $day && $day) {
     echo '<tr><td>',
@@ -31,7 +31,8 @@ while ($row= $r->fetch_assoc()) {
          amount($cash), '</td><td align="right">',
          amount($credit), '</td><td align="right">',
          amount($amex), '</td><td align="right">',
-         amount($other), "</td></tr>\n";
+         amount($other), '</td><td align="right">',
+         amount($total), "</td></tr>\n";
     $cash= $credit= $amex= $other= 0.00;
   }
 
@@ -52,6 +53,7 @@ while ($row= $r->fetch_assoc()) {
   default:
     $other= bcadd($other, $row['amount']);
   }
+  $total= bcadd($total, $row['amount']);
 
   $day= $row['date'];
 }
