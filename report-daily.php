@@ -33,7 +33,7 @@ while ($row= $r->fetch_assoc()) {
          amount($amex), '</td><td align="right">',
          amount($other), '</td><td align="right">',
          amount($total), "</td></tr>\n";
-    $cash= $credit= $amex= $other= 0.00;
+    $total= $cash= $credit= $amex= $other= 0.00;
   }
 
   switch ($row['method']) {
