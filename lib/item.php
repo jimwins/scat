@@ -23,6 +23,12 @@ function item_terms_to_sql($db, $q, $options) {
       $begin= $dbt[1];
     } elseif (preg_match('/^-(.+)/i', $term, $dbt)) {
       $not[]= "(item.code NOT LIKE '{$dbt[1]}%')";
+    } elseif (preg_match('/^name:(.+)/i', $term, $dbt)) {
+      $andor[]= "(item.name LIKE '%{$dbt[1]}%')";
+    } elseif (preg_match('/^msrp:(.+)/i', $term, $dbt)) {
+      $andor[]= "(item.retail_price = '{$dbt[1]}')";
+    } elseif (preg_match('/^min:(.+)/i', $term, $dbt)) {
+      $andor[]= "(item.minimum_quantity = '{$dbt[1]}')";
     } else {
       if ($options & FIND_LIMITED) {
         $andor[]= "(item.name LIKE '%$term%'
