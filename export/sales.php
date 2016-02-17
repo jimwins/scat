@@ -74,7 +74,7 @@ $account= array(
                 'framing'    => '41300',
                 'printing'   => '41400',
                 'online'     => '42100',
-                'class'      => '42100',
+                'class'      => '42200',
                 'freight'    => '45000',
                 'location'   => '47000',
                 // cost of sales
