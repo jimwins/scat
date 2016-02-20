@@ -814,6 +814,7 @@ $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
                 } else {
                   var balance= $("#pay-gift-complete").data('balance');
                   Txn.addPayment(txn, { method: "gift", amount: amount,
+                                        card: card,
                                         change: (balance - amount <= 10.00) });
                 }
               });

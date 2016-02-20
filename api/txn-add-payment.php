@@ -31,11 +31,19 @@ if ($method == 'discount') {
   }
 }
 
+// handle extra credit-card details
 if ($method == 'credit') {
   $cc= array();
   foreach(array('cc_txn', 'cc_approval', 'cc_lastfour',
                 'cc_expire', 'cc_type') as $field) {
     $extra[$field]= $_REQUEST[$field];
+  }
+}
+
+// remember gift card number
+if ($method == 'gift') {
+  if ($_REQUEST['card']) {
+    $extra['cc_approval']= $_REQUEST['card'];
   }
 }
 
