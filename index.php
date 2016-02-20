@@ -432,6 +432,10 @@ $(function() {
       data-bind="text: Scat.amount(txn.due()),
                  css: { 'text-danger': txn.due() < 0 }">
   </h1>
+  <h4 class="text-center text-success" style="margin: 0px; padding: 0px"
+      data-bind="visible: txn.change(),
+                 text: 'Change: ' + Scat.amount(txn.change())">
+  </h4>
  </div>
  <div class="panel-footer text-center">
   <div class="btn-group btn-group-lg">
@@ -1263,6 +1267,17 @@ viewModel.description= ko.computed(function() {
 
 viewModel.txn.due= ko.computed(function() {
   return (viewModel.txn.total() - viewModel.txn.total_paid());
+}, viewModel);
+
+viewModel.txn.change= ko.computed(function() {
+  var change= 0.00;
+  var len= viewModel.payments().length;
+  for (var i= 0; i < len; i++) {
+    if (viewModel.payments()[i].method() == 'change') {
+      change+= viewModel.payments()[i].amount();
+    }
+  }
+  return -1 * change;
 }, viewModel);
 
 viewModel.person.display_name= ko.computed(function() {
