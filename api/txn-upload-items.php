@@ -143,6 +143,31 @@ if (preg_match('/^linenum,qty/', $line)) {
     or die_query($db, $q);
 
   echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+} elseif (preg_match('/^code\tqty/', $line)) {
+  // Order file
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+       INTO TABLE vendor_order
+       FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
+       IGNORE 1 LINES
+       (item_no, @qty)
+       SET ordered = @qty, shipped = @qty";
+  $db->query($q)
+    or die_query($db, $q);
+
+  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+
+  // Need to get price, item info from vendor info
+  $q= "UPDATE vendor_order, vendor_item
+          SET vendor_order.item = vendor_item.item,
+              msrp = vendor_item.retail_price,
+              net = vendor_item.net_price
+        WHERE vendor_order.item_no = vendor_item.code
+          AND vendor = $txn[person]";
+  $db->query($q)
+    or die_query($db, $q);
+
+  echo "Updated ", $db->affected_rows, " rows from vendor info.<br>";
+
 } else {
   // MacPherson's order
   $q= "LOAD DATA LOCAL INFILE '$fn'
