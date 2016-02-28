@@ -1,0 +1,4 @@
+#!/bin/sh
+mysqldump --routines --no-data scat | \
+  sed -e 's/ AUTO_INCREMENT=[0-9]*//' \
+  > scat.sql

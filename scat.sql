@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.6.11, for osx10.6 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.10, for osx10.9 (x86_64)
 --
 -- Host: localhost    Database: scat
 -- ------------------------------------------------------
--- Server version	5.6.11
+-- Server version	5.7.10
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -41,24 +41,27 @@ DROP TABLE IF EXISTS `brand`;
 CREATE TABLE `brand` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `hostedpayment_txn`
+-- Table structure for table `cc_trace`
 --
 
-DROP TABLE IF EXISTS `hostedpayment_txn`;
+DROP TABLE IF EXISTS `cc_trace`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `hostedpayment_txn` (
-  `txn` int(10) unsigned NOT NULL,
-  `hostedpayment` varchar(255) NOT NULL,
-  `validationcode` varchar(50) NOT NULL,
-  `created` datetime NOT NULL
-) ENGINE=MEMORY DEFAULT CHARSET=utf8;
+CREATE TABLE `cc_trace` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `traced` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `request` mediumblob,
+  `response` mediumblob,
+  `info` mediumblob,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -70,8 +73,10 @@ DROP TABLE IF EXISTS `item`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `item` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `product` int(10) unsigned NOT NULL DEFAULT '0',
   `code` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `short_name` varchar(255) DEFAULT NULL,
   `brand` int(10) unsigned DEFAULT NULL,
   `retail_price` decimal(9,2) NOT NULL DEFAULT '0.00',
   `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
@@ -81,7 +86,8 @@ CREATE TABLE `item` (
   `active` tinyint(1) NOT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`)
+  UNIQUE KEY `code` (`code`),
+  KEY `product` (`product`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -133,6 +139,49 @@ CREATE TABLE `person` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `product`
+--
+
+DROP TABLE IF EXISTS `product`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `product` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `department` int(10) unsigned DEFAULT NULL,
+  `brand` int(10) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text,
+  `slug` varchar(255) NOT NULL,
+  `image` varchar(255) NOT NULL DEFAULT '',
+  `from_item_no` varchar(255) DEFAULT NULL,
+  `added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `inactive` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `department` (`department`,`brand`,`slug`),
+  KEY `from_item_no` (`from_item_no`),
+  KEY `name` (`name`),
+  FULLTEXT KEY `full` (`name`,`description`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `saved_search`
+--
+
+DROP TABLE IF EXISTS `saved_search`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `saved_search` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `search` varchar(255) NOT NULL,
+  `last_checked` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `timeclock`
 --
 
@@ -145,7 +194,7 @@ CREATE TABLE `timeclock` (
   `start` datetime NOT NULL,
   `end` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -163,7 +212,7 @@ CREATE TABLE `timeclock_audit` (
   `before_end` datetime DEFAULT NULL,
   `after_end` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -183,6 +232,7 @@ CREATE TABLE `txn` (
   `person` int(10) unsigned DEFAULT NULL,
   `tax_rate` decimal(9,3) NOT NULL,
   `returned_from` int(10) unsigned DEFAULT NULL,
+  `special_order` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `type` (`type`,`number`),
   KEY `created` (`created`)
@@ -243,6 +293,7 @@ CREATE TABLE `vendor_item` (
   `vendor` int(10) unsigned NOT NULL,
   `item` int(10) unsigned DEFAULT NULL,
   `code` varchar(255) DEFAULT NULL,
+  `vendor_sku` varchar(255) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `retail_price` decimal(9,2) NOT NULL,
   `net_price` decimal(9,2) NOT NULL,
@@ -251,9 +302,11 @@ CREATE TABLE `vendor_item` (
   `purchase_quantity` int(11) NOT NULL,
   `category` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `vendor_2` (`vendor`,`code`),
   KEY `item` (`item`),
   KEY `vendor` (`vendor`),
-  KEY `code` (`code`)
+  KEY `code` (`code`),
+  KEY `vendor_sku` (`vendor_sku`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -305,4 +358,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-02-07 15:36:25
+-- Dump completed on 2016-02-27 16:34:20
