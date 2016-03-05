@@ -367,14 +367,18 @@ $('#print-price-labels-brush').on('click', function(ev) {
   ev.preventDefault();
   var q= $('#search').val();
 
-  $.getJSON("print/labels-price-brush.php?callback=?",
-            { q: q },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-            });
+  var trim= window.prompt("Please enter the part of the name to trim from the labels", "");
+
+  if (trim != null) {
+    $.getJSON("print/labels-price-brush.php?callback=?",
+              { q: q, trim: trim },
+              function (data) {
+                if (data.error) {
+                  displayError(data);
+                  return;
+                }
+              });
+  }
 });
 
 $('#bulk-edit-form').on('show.bs.collapse', function () {
