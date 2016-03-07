@@ -264,11 +264,11 @@ viewModel.removeBarcode= function(place) {
 }
 
 viewModel.mergeItem= function(place) {
-  var to= window.prompt("Please enter the item to merge this one into.", "");
+  var code= window.prompt("Please enter the item to merge this one into.", "");
 
-  if (to != null) {
+  if (code) {
     $.getJSON("api/item-merge.php?callback=?",
-              { from: viewModel.item.id, to: to },
+              { from: viewModel.item.id, to: code },
               function (data) {
                 if (data.error) {
                   displayError(data);
