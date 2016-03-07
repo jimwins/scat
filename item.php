@@ -237,6 +237,8 @@ dump_table($db->query($q), 'RunningTotal$right');
 dump_query($q);
 echo '</div>';
 
+echo '<button type="button" class="btn btn-default" data-bind="click: mergeItem">Merge</button>';
+
 foot();
 ?>
 <script>
@@ -259,6 +261,22 @@ viewModel.removeBarcode= function(place) {
               }
               loadItem(data.item);
             });
+}
+
+viewModel.mergeItem= function(place) {
+  var to= window.prompt("Please enter the item to merge this one into.", "");
+
+  if (to != null) {
+    $.getJSON("api/item-merge.php?callback=?",
+              { from: viewModel.item.id, to: to },
+              function (data) {
+                if (data.error) {
+                  displayError(data);
+                  return;
+                }
+                loadItem(data.item);
+              });
+  }
 }
 
 ko.applyBindings(viewModel);
