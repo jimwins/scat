@@ -13,8 +13,8 @@ if ($vendor > 0) {
                          FROM vendor_item
                         WHERE vendor = $vendor
                           AND item = item.id)";
-  $extra_field= "(SELECT MIN(IF(promo_price, promo_price, net_price)) FROM vendor_item WHERE item = item.id AND vendor = $vendor) <= (SELECT MIN(IF(promo_price, promo_price, net_price)) FROM vendor_item WHERE item = item.id) Cheapest\$bool, ";
-  $extra_field_name= "Cheapest\$bool,";
+  $extra_field= "(SELECT MIN(IF(promo_price, promo_price, net_price)) FROM vendor_item WHERE item = item.id AND vendor = $vendor) - (SELECT MIN(IF(promo_price, promo_price, net_price)) FROM vendor_item WHERE item = item.id AND vendor != $vendor) Cheapest\$trool, ";
+  $extra_field_name= "Cheapest\$trool,";
 } else if ($vendor < 0) {
   // No vendor
   $extra= "AND NOT EXISTS (SELECT id

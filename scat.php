@@ -332,6 +332,14 @@ function expand_field($data, $class, $meta = null) {
     } else {
       return '<i data-truth="0" class="fa fa-square-o"></i>';
     }
+  case '$trool':
+    if ($data < 0 || $data === null) {
+      return '<i data-truth="1" class="fa fa-check-square-o"></i>';
+    } elseif ($data == 0) {
+      return '<i data-truth="1" class="fa fa-minus-square-o"></i>';
+    } else {
+      return '<i data-truth="0" class="fa fa-square-o"></i>';
+    }
   case '$html':
     return $data;
   default:
