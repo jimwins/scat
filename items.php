@@ -369,7 +369,7 @@ $('#print-price-labels-brush').on('click', function(ev) {
 
   var trim= window.prompt("Please enter the part of the name to trim from the labels", "");
 
-  if (trim != null) {
+  if (trim) {
     $.getJSON("print/labels-price-brush.php?callback=?",
               { q: q, trim: trim },
               function (data) {
