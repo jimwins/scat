@@ -224,6 +224,7 @@ function txn_apply_discounts($db, $id) {
               SET txn_line.discount = $new_discount,
                   txn_line.discount_type = 'fixed'
             WHERE txn = $id AND txn_line.item = item.id
+              AND txn_line.discount > $new_discount
               AND code LIKE '$code'
               AND NOT discount_manual";
     } else {
