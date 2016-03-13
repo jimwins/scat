@@ -44,6 +44,12 @@ head("Vendor Upload @ Scat");
   </div>
   <button class="btn btn-primary">Upload</button>
 </form>
+<br>
+<div class="well">
+  <p>
+    File format: item_no, sku, name, retail_price, net_price, promo_price, barcode, purchase_quantity
+  </p>
+</div>
 <script>
 $('#upload-form #vendor').autocomplete({
   source: "./api/person-list.php?callback=?",
