@@ -190,9 +190,9 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
           (item_no, sku, name, @retail_price, @net_price, @promo_price,
            barcode, purchase_quantity)
        SET
-           retail_price = REPLACE(@retail_price, '$', ''),
-           net_price = REPLACE(@net_price, '$', ''),
-           promo_price = REPLACE(@promo_price, '$', '')";
+           retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
+           net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
+           promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', '')";
 
   $r= $db->query($q)
     or die_query($db, $q);
