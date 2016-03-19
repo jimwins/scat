@@ -181,6 +181,17 @@ if (preg_match('/^linenum,qty/', $line)) {
     or die_query($db, $q);
 
   echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+
+  /* Fix quantities on backorders */
+  $q= "SELECT SUM(shipped + backordered)
+         FROM vendor_order
+        WHERE IFNULL(unit,'') != 'AS'";
+  $ordered= $db->get_one($q);
+
+  if (!$ordered) {
+    $db->query("UPDATE vendor_order SET backordered = ordered")
+      or die_query($db, $q);
+  }
 }
 
 $q= "START TRANSACTION";
