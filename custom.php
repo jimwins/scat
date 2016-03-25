@@ -188,7 +188,9 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
-                 data-bind="text: amount(ui() * 0.75)"></p>
+                 data-bind="text: (Math.max(w(), h()) > 40)
+                                   ? 'Too big!'
+                                   : amount(ui() * 0.75)"></p>
             </div>
           </div>
           <div class="form-group">
