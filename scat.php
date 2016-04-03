@@ -112,6 +112,7 @@ $(document).ready(function() {
             <li><a id="reports" href="#">Quick</a></li>
             <li><a href="report.php">Sales by Date</a></li>
             <li><a href="report-items.php">Sales by Item</a></li>
+            <li><a href="report-clock.php">Clock</a></li>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header">Inventory</li>
             <li><a href="reorder.php">Reorder</a></li>
