@@ -327,5 +327,20 @@ $q= "SELECT id AS meta,
       ORDER BY entered ASC";
 dump_table($db->query($q));
 dump_query($q);
+?>
+<div id="dropoverlay" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 3000; background: rgba(0,0,0,0.5); display: none">
+  <div style="width: 80%; height: 80%; margin: 10%; padding: 10%; position: fixed; top: 0; left: 0; border: 3px dashed white; border-radius: 25px;">
+    <h1 style="color: #fff">Drop file here.</h1>
+  </div>
+</div>
+<script>
+$('body').on('dragbetterenter', function () {
+  $('#dropoverlay').show();
+});
+$('body').on('dragbetterleave', function () {
+  $('#dropoverlay').hide();
+});
 
+</script>
+<?
 foot();
