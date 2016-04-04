@@ -27,6 +27,9 @@ Scat includes the jQuery Hotkeys plugin:
 Scat includes the Jeditable jQuery plugin:
   http://www.appelsiini.net/projects/jeditable
 
+Scat includes the jquery.dragbetter plugin:
+  https://github.com/lolmaus/jquery.dragbetter
+
 Scat includes Keypress:
   http://dmauro.github.io/Keypress/
 

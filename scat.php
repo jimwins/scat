@@ -53,6 +53,7 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/jquery.tablesorter.min.js"></script>
  <script src="js/jquery.html5uploader.js"></script>
  <script src="js/jquery.jeditable.js"></script>
+ <script src="js/jquery.dragbetter.js"></script>
 <?if (!$allnew) {?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
