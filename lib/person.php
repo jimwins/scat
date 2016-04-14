@@ -29,8 +29,11 @@ function person_load($db, $id) {
   return $person;
 }
 
-function person_load_activity($db, $id) {
+function person_load_activity($db, $id, $page= 0) {
   $id= (int)$id;
+
+  $page_size= 50;
+  $offset= $page * $page_size;
 
   $q= "SELECT meta, Number\$txn, Created\$date,
               Ordered, Allocated,
@@ -68,7 +71,7 @@ function person_load_activity($db, $id) {
         WHERE person = $id
         GROUP BY txn.id
         ORDER BY created DESC
-        LIMIT 50) t";
+        LIMIT $offset, 50) t";
 
   $r= $db->query($q);
 

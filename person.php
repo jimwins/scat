@@ -170,6 +170,28 @@ $person= person_load($db, $id);
   </button>
 </h2>
 
+<div data-bind="visible: loading()" class="progress progress-striped active" style="height: 1.5em">
+  <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+    Loading&hellip;.
+  </div>
+</div>
+
+<nav data-bind="if: !loading()">
+  <ul class="pager">
+    <li class="previous" data-bind="css: { disabled: activity_page() == 0 }">
+      <a href="#" data-bind="click: function(data, event) { loadActivity(person.id(), activity_page() - 1) }"><span aria-hidden="true">&larr;</span> Newer</a>
+    </li>
+
+    <span>
+      Page <!--ko text: activity_page() + 1 --><!--/ko--> of ?
+    </span>
+
+    <li class="next" data-bind="css: { enabled: !loading() }">
+      <a href="#" data-bind="click: function(data, event) { loadActivity(person.id(), activity_page() + 1) }">Older <span aria-hidden="true">&rarr;</span></a>
+    </li>
+  </ul>
+</li>
+
 <table class="table table-condensed table-striped"
        data-bind="if: activity().length">
  <thead>
@@ -208,6 +230,8 @@ var model= {
   all: <?=(int)$all?>,
   person: <?=json_encode($person);?>,
   activity: [],
+  activity_page: 0,
+  loading: 1,
   people: <?=json_encode($people);?>,
 };
 
@@ -221,15 +245,22 @@ viewModel.changed= ko.computed(function() {
 
 ko.applyBindings(viewModel);
 
-$.getJSON('api/person-load-activity.php?callback=?',
-          { person: <?=$id?> })
-  .done(function (data) {
-    ko.mapping.fromJS(data, viewModel);
-  })
-  .fail(function (jqhxr, textStatus, error) {
-    var data= $.parseJSON(jqxhr.responseText);
-    alert(textStatus + ', ' + error + ': ' + data.text);
-  });
+function loadActivity(person, page) {
+  viewModel.loading(1);
+  $.getJSON('api/person-load-activity.php?callback=?',
+            { person: person, page: page })
+    .done(function (data) {
+      ko.mapping.fromJS(data, viewModel);
+      viewModel.loading(0);
+    })
+    .fail(function (jqhxr, textStatus, error) {
+      viewModel.loading(0);
+      var data= $.parseJSON(jqxhr.responseText);
+      alert(textStatus + ', ' + error + ': ' + data.text);
+    });
+}
+
+loadActivity(<?=$id?>, 0);
 
 function loadPerson(person) {
   ko.mapping.fromJS({ person: person }, viewModel);
