@@ -83,8 +83,9 @@ if (!empty($_REQUEST['quantity'])) {
     $quantity= (int)$_REQUEST['quantity'];
   }
 
+  $mul= ($txn['type'] == 'customer' ? -1 : 1);
   $q= "UPDATE txn_line
-          SET ordered = -1 * $quantity
+          SET ordered = $mul * $quantity
         WHERE txn = $txn_id AND txn_line.id = $id";
 
   $r= $db->query($q)
