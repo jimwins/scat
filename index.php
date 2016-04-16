@@ -393,7 +393,7 @@ $(function() {
 
     $('input[name="q"]', this).focus().select();
 
-    var q = $('input[name="q"]', this).val();
+    var q= $('input[name="q"]', this).val();
 
     // short integer and recently scanned? adjust quantity
     var val= parseInt(q, 10);
