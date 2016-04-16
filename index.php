@@ -529,12 +529,29 @@ $("#txn-load").submit(function(ev) {
     <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
     <input type="text" class="form-control autofocus"
            name="q"
-           size="60"
            autocomplete="off" autocorrect="off" autocapitalize="off"
            placeholder="Scan item or enter search terms"
            value="">
     <span class="input-group-btn">
       <input type="submit" class="btn btn-default" value="Find Items">
+      <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle"
+                data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+          Custom <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-GIFTCARD'); }">Gift Card</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-FRAME'); }">Custom Frame</a></li>
+          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-STRETCH'); }">Canvas Stretch</a></li>
+          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-PRINT'); }">Digital Print</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-FLOAT'); }">Floater Frame</a></li>
+          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-CANVAS'); }">Canvas</a></li>
+          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-PANEL'); }">Wood Panel</a></li>
+        </ul>
+      </div>
     </span>
   </div>
 </form>
