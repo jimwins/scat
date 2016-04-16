@@ -173,6 +173,52 @@ Txn.removeItem= function (id, item) {
             });
 };
 
+Txn.findAndAddItem= function(q) {
+  // go find!
+  $.ajax({ type: 'GET',
+           url: "api/txn-add-item.php?callback=?",
+           dataType: 'json',
+           data: { txn: Txn.id(), q: q },
+           async: false,
+           success: function(data) {
+              if (data.error) {
+                displayError(data);
+              } else if (data.matches) {
+                if (data.matches.length == 0) {
+                  play("no");
+                  $("#lookup").addClass("error");
+                  var errors= $('<div class="alert alert-danger"/>');
+                  errors.text(" Didn't find anything for '" + q + "'.");
+                  errors.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
+                  $("#items").before(errors);
+                } else {
+                  play("maybe");
+                  var choices= $('<div class="choices alert alert-warning"/>');
+                  choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
+                  var list= $('<table class="table table-condensed" style="width: 95%;">');
+                  $.each(data.matches, function(i,item) {
+                    var n= $("<tr" + (item.stock > 0 ? " class='stocked'" : "") + ">" +
+                             "<td>" + item.name + "</td>" +
+                             "<td>" + item.brand + "</td>" +
+                             "<td align='right'>" + (item.sale_price ? ("<s>" + amount(item.retail_price) + "</s>") : "") + "</td>" +
+                             "<td align='right'>" + amount(item.sale_price ? item.sale_price : item.retail_price) + "</td>" +
+                             "</tr>");
+                    n.click(item, function(ev) {
+                      Txn.addItem(Txn.id(), ev.data);
+                      $(this).closest(".choices").remove();
+                    });
+                    list.append(n);
+                  });
+                  choices.append(list);
+                  $("#items").before(choices);
+                }
+              } else {
+                play("yes");
+                Txn.loadData(data);
+              }
+            }});
+};
+
 var lastItem;
 
 function updateValue(row, key, value) {
@@ -363,51 +409,7 @@ $(function() {
       return false;
     }
 
-    var txn= Txn.id();
-
-    // go find!
-    $.ajax({ type: 'GET',
-             url: "api/txn-add-item.php?callback=?",
-             dataType: 'json',
-             data: { txn: txn, q: q },
-             async: false,
-             success: function(data) {
-                if (data.error) {
-                  displayError(data);
-                } else if (data.matches) {
-                  if (data.matches.length == 0) {
-                    play("no");
-                    $("#lookup").addClass("error");
-                    var errors= $('<div class="alert alert-danger"/>');
-                    errors.text(" Didn't find anything for '" + q + "'.");
-                    errors.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
-                    $("#items").before(errors);
-                  } else {
-                    play("maybe");
-                    var choices= $('<div class="choices alert alert-warning"/>');
-                    choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
-                    var list= $('<table class="table table-condensed" style="width: 95%;">');
-                    $.each(data.matches, function(i,item) {
-                      var n= $("<tr" + (item.stock > 0 ? " class='stocked'" : "") + ">" +
-                               "<td>" + item.name + "</td>" +
-                               "<td>" + item.brand + "</td>" +
-                               "<td align='right'>" + (item.sale_price ? ("<s>" + amount(item.retail_price) + "</s>") : "") + "</td>" +
-                               "<td align='right'>" + amount(item.sale_price ? item.sale_price : item.retail_price) + "</td>" +
-                               "</tr>");
-                      n.click(item, function(ev) {
-                        Txn.addItem(Txn.id(), ev.data);
-                        $(this).closest(".choices").remove();
-                      });
-                      list.append(n);
-                    });
-                    choices.append(list);
-                    $("#items").before(choices);
-                  }
-                } else {
-                  play("yes");
-                  Txn.loadData(data);
-                }
-              }});
+    Txn.findAndAddItem(q);
 
     return false;
   });
