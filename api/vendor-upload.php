@@ -180,7 +180,6 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $db->query($q)
     or die_query($db, $q);
 
-#sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date
 #Manufacturer	BrandName	SubBrand	AlvinItem#	Description	New	UoM	Alvin SRP	RegularMultiplier	RegularNet	CurrentMultiplier	CurrentNetPrice	CurrentPriceSource	SaleStarted	SaleExpiration	Buying Quantity (BQ)	DropShip	UPC or EAN	Weight	Length	Width	Height	Ship Truck	CountryofOrigin	HarmonizedCode	DropShipDiscount	CatalogPage	VendorItemNumber
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE macitem
@@ -200,6 +199,46 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            @country_of_origin, @harmonized_code, @drop_ship_discount,
            @catalog_page, @vendor_item_number)
         SET sku = item_no";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  // toss bad barcodes
+  $q= "UPDATE macitem SET barcode = NULL WHERE LENGTH(barcode) < 3";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+
+} elseif (preg_match('/C2F Pricer/', $line)) {
+  // C2F Pricer
+  //
+  $q= "CREATE TEMPORARY TABLE macitem (
+    item_no VARCHAR(32),
+    sku VARCHAR(10),
+    name VARCHAR(255),
+    retail_price DECIMAL(9,2),
+    net_price DECIMAL(9,2),
+    promo_price DECIMAL(9,2),
+    barcode VARCHAR(32),
+    purchase_quantity INT,
+    category VARCHAR(64))";
+
+  $db->query($q)
+    or die_query($db, $q);
+
+#Cat Desc,Prefix,Prod,Descrip,Unitstock,Mult,Status,Nonstockty,UPC,EAN,Effectdt,NewRetail,EffPrice1,EffQtyPrice,Retail,DealerNet,Qtybrk,QtyPrice,CaseQty,CasePrice 
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+            INTO TABLE macitem
+          FIELDS TERMINATED BY ','
+          OPTIONALLY ENCLOSED BY '\"'
+          IGNORE 3 LINES
+          (@category, @prefix, item_no, name,
+           @uom, purchase_quantity, @status, @nonstockty,
+           @upc, @ean, @effectdt, @newretail, @effprice1, @effqtyprice,
+           retail_price, net_price, @qty_brk, @qty_price, @case_qty,
+           @case_price)
+        SET sku = item_no, barcode= IF(@upc != '', @upc, @ean)";
 
   $r= $db->query($q)
     or die_query($db, $q);
