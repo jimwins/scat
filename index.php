@@ -1037,7 +1037,7 @@ function displayPerson(person) {
                   if (person.id) {
                     viewModel.load(data);
                   } else {
-                    Txn.updatePerson(txn, data.person);
+                    Txn.updatePerson(Txn.id(), data.person);
                   }
                   $(place).closest('.modal').modal('hide');
                 });
