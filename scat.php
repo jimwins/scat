@@ -66,8 +66,8 @@ $(document).ready(function() {
   // Enable sorted tables
   $(".sortable").tablesorter(); 
   // SimpleModal defaults
-  $.modal.defaults.position= [ '25%', '25%' ];
-  $.modal.defaults.overlayClose= true;
+  $.smodal.defaults.position= [ '25%', '25%' ];
+  $.smodal.defaults.overlayClose= true;
   // Focus the #focus item
   $("#focus").focus();
 }); 
@@ -144,12 +144,8 @@ $("header #reports").on('click', function(ev) {
                              '<td align="right">$' + sales.total.toFixed(2) +
                              '</tr>'));
                 });
-<?if ($allnew) {?>
                 $('#quick-report .modal-body').empty().append(t);
                 $('#quick-report').modal('show');
-<?} else {?>
-                t.modal();
-<?}?>
               }
             });
 });

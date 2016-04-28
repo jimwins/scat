@@ -138,7 +138,7 @@ Txn.addPayment= function (id, options) {
                 displayError(data);
               } else {
                 Txn.loadData(data);
-                $.modal.close();
+                $.smodal.close();
                 if (options.method == 'credit' && options.amount >= 25.00) {
                   printChargeRecord(data.payment);
                 }
@@ -601,16 +601,16 @@ $(".pay-button").on("click", function() {
 
         panel.on("click", "button", function(ev) {
           var method= $(this).data("value");
-          $.modal.close();
+          $.smodal.close();
           var id= "#pay-" + method;
           var due= Txn.due();
           $(".amount", id).val(due);
-          $.modal($(id), { persist: true, overlayClose: false });
+          $.smodal($(id), { persist: true, overlayClose: false });
           $(".amount", id).focus().select();
         });
 
         // XXX SimpleModal
-        $.modal(panel);
+        $.smodal(panel);
       });
 
     });
@@ -667,16 +667,16 @@ $("#pay-credit-refund").on("submit", function (ev) {
               from: refund_from },
             function (data) {
               if (data.error) {
-                $.modal.close();
+                $.smodal.close();
                 displayError(data);
               } else {
                 Txn.loadData(data);
-                $.modal.close();
+                $.smodal.close();
               }
             });
-  $.modal.close();
+  $.smodal.close();
   $("#pay-credit-progress .amount").val(amount);
-  $.modal($("#pay-credit-progress"), { persist: true, overlayClose: false });
+  $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false });
 });
 </script>
 <form id="pay-credit" class="pay-method" style="display: none">
@@ -707,16 +707,16 @@ $("#pay-credit").on("submit", function (ev) {
             { id: txn, type: 'Sale', amount: parseFloat(amount).toFixed(2) },
             function (data) {
               if (data.error) {
-                $.modal.close();
+                $.smodal.close();
                 displayError(data);
               } else {
                 Txn.loadData(data);
-                $.modal.close();
+                $.smodal.close();
               }
             });
-  $.modal.close();
+  $.smodal.close();
   $("#pay-credit-progress .amount").val(amount);
-  $.modal($("#pay-credit-progress"), { persist: true, overlayClose: false });
+  $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false });
 });
 </script>
 <div id="pay-credit-manual" class="pay-method" style="display: none">
@@ -736,7 +736,7 @@ $("#pay-credit-manual").on("click", "button", function (ev) {
   var amount= $("#pay-credit-manual .amount").val();
   var cc_type= $(this).attr('name');
   if (cc_type == 'cancel') {
-    $.modal.close();
+    $.smodal.close();
     return false;
   }
   Txn.addPayment(txn, { method: "credit", amount: amount, change: false,
@@ -761,7 +761,7 @@ $("#pay-other").on("click", "button", function (ev) {
   var amount= $("#pay-other .amount").val();
   var method= $(this).data('value');
   if (method == 'cancel') {
-    $.modal.close();
+    $.smodal.close();
     return false;
   }
   Txn.addPayment(txn, { method: method, amount: amount, change: false });
@@ -810,9 +810,9 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
                   def= data.balance;
                 }
                 $("#pay-gift-complete .amount").val(def);
-                $.modal.close();
+                $.smodal.close();
                 $("#pay-gift-complete").data(data);
-                $.modal($("#pay-gift-complete"), { overlayClose: false, persist: true });
+                $.smodal($("#pay-gift-complete"), { overlayClose: false, persist: true });
               }
             });
 });
@@ -820,9 +820,9 @@ $("#pay-gift").on("click", "button[name='old']", function (ev) {
   var due= Txn.due();
   var def= due;
   $("#pay-gift-complete .amount").val(def);
-  $.modal.close();
+  $.smodal.close();
   $("#pay-gift-complete").data(null);
-  $.modal($("#pay-gift-complete"), { overlayClose: false, persist: true });
+  $.smodal($("#pay-gift-complete"), { overlayClose: false, persist: true });
 });
 $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
   var txn= Txn.id();
@@ -911,7 +911,7 @@ $("#pay-donation").on("submit", function (ev) {
 <script>
 $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   ev.preventDefault();
-  $.modal.close();
+  $.smodal.close();
 });
 </script>
       <div id="details" class="col-md-7 col-md-pull-5">
@@ -1239,7 +1239,7 @@ $("#add-note").on("submit", function(ev) {
 
   Txn.addNote(txn, note);
 
-  $.modal.close();
+  $.smodal.close();
 });
 </script>
 </div>
@@ -1342,7 +1342,7 @@ viewModel.deleteTransaction= function() {
 viewModel.displayAddNote= function() {
   var txn= Txn.id();
   if (!txn) return;
-  $.modal($("#add-note"));
+  $.smodal($("#add-note"));
 }
 
 viewModel.removeItem= function(item) {
