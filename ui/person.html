@@ -1,0 +1,66 @@
+<div class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <form class="modal-content" data-bind="submit: savePerson" role="form">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+          Person
+        </h4>
+      </div>
+
+      <div id="accordion" class="modal-body">
+
+        <div class="alert alert-danger" data-bind="visible: error">
+          <strong>Error!</strong> <span data-bind="text: error"></span>
+        </div>
+
+        <div id="content" class="collapse in">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name"
+                      data-bind="value: name">
+          </div>
+          <div class="form-group">
+            <label for="company">Company</label>
+            <input type="text" class="form-control" id="company"
+                   data-bind="value: company">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" class="form-control" id="email"
+                   data-bind="value: email">
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="text" class="form-control" id="phone"
+                   data-bind="value: phone">
+          </div>
+          <div class="form-group">
+            <label for="tax_id">Tax ID</label>
+            <input type="text" class="form-control" id="tax_id"
+                   data-bind="value: tax_id">
+          </div>
+
+          <div class="form-group">
+            <label for="address">Address</label>
+            <textarea class="form-control" rows="3" id="address"
+                      data-bind="value: address">
+            </textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" class="btn btn-primary">
+          Save changes
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

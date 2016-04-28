@@ -219,6 +219,18 @@ Txn.findAndAddItem= function(q) {
             }});
 };
 
+Txn.updatePerson= function (txn, person) {
+  $.getJSON("api/txn-update-person.php?callback=?",
+            { txn: txn, person: person },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+              Txn.loadData(data);
+            });
+}
+
 var lastItem;
 
 function updateValue(row, key, value) {
@@ -959,8 +971,17 @@ $("#txn #person").on("dblclick", function(ev) {
 
     ev.preventDefault();
 
-    $("#person-create input[name='name']").val($(this).val());
-    $("#person-create").modal();
+    var person= {
+      id: 0,
+      name: $(this).val(),
+      company: '',
+      email: '',
+      phone: '',
+      address: '',
+      tax_id: '',
+    };
+
+    displayPerson(person);
 
     var val= $(this).data('default');
     $(this).parent().text(val);
@@ -976,127 +997,57 @@ $("#txn #person").on("dblclick", function(ev) {
       var txn= Txn.id();
       $(this).parent().text(ui.item.value);
       $(this).remove();
-      $.getJSON("api/txn-update-person.php?callback=?",
-                { txn: txn, person: ui.item.id },
-                function (data) {
-                  if (data.error) {
-                    displayError(data);
-                    return;
-                  }
-                  Txn.loadData(data);
-                });
+      Txn.updatePerson(txn, ui.item.id);
     },
   });
 
   $(".val", this).empty().append(fld);
   fld.focus().select();
 });
+
 $("#txn #info-person").on("click", function(ev) {
   if (!viewModel.person.id())
     return false;
 
-  $.modal($('#person-info'), { persist: true });
+  displayPerson(ko.mapping.toJS(viewModel.person));
 });
-</script>
-<table id="person-info" style="display: none; width: auto" class="table table-condensed">
-  <tr>
-   <th>Name:</th>
-   <td><span data-bind="text: person.name"></span></td>
-  </tr>
-  <tr>
-   <th>Company:</th>
-   <td data-bind="text: person.company"></td>
-  </tr>
-  <tr>
-   <th>Email:</th>
-   <td data-bind="text: person.email"></td>
-  </tr>
-  <tr>
-   <th>Phone:</th>
-   <td data-bind="text: person.phone"></td>
-  </tr>
-  <tr>
-   <th>Address:</th>
-   <td data-bind="text: person.address"></td>
-  </tr>
-  <tr>
-   <th>Tax ID:</th>
-   <td data-bind="text: person.tax_id"></td>
-  </tr>
-</table>
-<form id="person-create" class="form-horizontal" style="display:none">
-  <div class="form-group">
-    <label for="name" class="col-sm-2 control-label">Name</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="name" name="name"
-             placeholder="Name">
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="company" class="col-sm-2 control-label">Company</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="company" name="company"
-             placeholder="Company">
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="email" class="col-sm-2 control-label">Email</label>
-    <div class="col-sm-10">
-      <input type="email" class="form-control" id="email" name="email"
-             placeholder="Email">
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="phone" class="col-sm-2 control-label">Phone</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="phone" name="phone"
-             placeholder="Phone">
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-      <button type="button" name="cancel" class="btn btn-default">
-        Cancel
-      </button>
-      <input type="submit" class="btn btn-primary" name="Create">
-    </div>
-  </div>
-</form>
-<script>
-$('#person-create').on('submit', function(ev) {
-  ev.preventDefault();
 
-  var data= {
-    name: $("input[name='name']", this).val(),
-    company: $("input[name='company']", this).val(),
-    email: $("input[name='email']", this).val(),
-    phone: $("input[name='phone']", this).val(),
-  };
+function displayPerson(person) {
+  $.ajax({ url: 'ui/person.html', cache: false }).done(function (html) {
+    var panel= $(html);
 
-  $.getJSON("api/person-add.php?callback=?",
-            data,
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              var txn= Txn.id();
-              $.getJSON("api/txn-update-person.php?callback=?",
-                        { txn: txn, person: data.person },
-                        function (data) {
-                          if (data.error) {
-                            displayError(data);
-                            return;
-                          }
-                          Txn.loadData(data);
-                          $.modal.close();
-                        });
-            });
-});
-$('#person-create').on('click', "button[name='cancel']", function(ev) {
-  ev.preventDefault();
-  $.modal.close();
-});
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    person.error= '';
+
+    personModel= ko.mapping.fromJS(person);
+
+    personModel.savePerson= function(place, ev) {
+      var person= ko.mapping.toJS(personModel);
+      $.getJSON(person.id ? "api/person-update.php?callback=?" :
+                            "api/person-add.php?callback=?",
+                person,
+                function (data) {
+                  if (data.error) {
+                    displayError(data);
+                    return;
+                  }
+                  if (person.id) {
+                    viewModel.load(data);
+                  } else {
+                    Txn.updatePerson(txn, data.person);
+                  }
+                  $(place).closest('.modal').modal('hide');
+                });
+    }
+
+    ko.applyBindings(personModel, panel[0]);
+
+    panel.appendTo($('body')).modal();
+  });
+}
 </script>
 <table class="table table-condensed table-striped" id="items">
  <thead>
