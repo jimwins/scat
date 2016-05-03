@@ -21,7 +21,7 @@ if (isset($_REQUEST['price'])) {
     $discount_type = "'percentage'";
     $price= 'IF(item.retail_price, item.retail_price, txn_line.retail_price)';
     $discount_manual= 1;
-  } elseif (preg_match('/^\$?(\d*\.?\d*)$/', $price, $m)) {
+  } elseif (preg_match('/^\$?(-?\d*\.?\d*)$/', $price, $m)) {
     if ($txn['type'] == 'vendor') {
       $price= (float)$m[1];
       $discount_type= 'NULL';
