@@ -249,10 +249,14 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
           (@x, @sn, @pk_sort, @sku_sort, @y,
            sku, @gr, @size, @description,
            @x1, @x2, @x3, @x4, @x5, @x6, @x7, @x8,
-           retail_price, net_price, promo_price, @units, purchase_quantity,
+           @retail_price, @net_price, @promo_price,
+           @units, purchase_quantity,
            @weight, barcode, @freight, @dim_weight,
            @est_freight, @est_freight_case)
         SET item_no = CONCAT('MA', sku),
+            retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
+            net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
+            promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', ''),
             name = IF(@size, CONCAT(@size, ' ', @description), @description)";
 
   $r= $db->query($q)
