@@ -136,33 +136,6 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-} elseif (preg_match('/^ma-sku/i', $_FILES['src']['name'])) {
-  $q= "CREATE TEMPORARY TABLE macitem (
-    item_no VARCHAR(32),
-    sku VARCHAR(10),
-    name VARCHAR(255),
-    retail_price DECIMAL(9,2),
-    net_price DECIMAL(9,2),
-    promo_price DECIMAL(9,2),
-    barcode VARCHAR(32),
-    purchase_quantity INT,
-    category VARCHAR(64))";
-
-  $db->query($q)
-    or die_query($db, $q);
-
-  $q= "LOAD DATA LOCAL INFILE '$fn'
-            INTO TABLE macitem
-          FIELDS TERMINATED BY ','
-          IGNORE 1 LINES
-          (item_no, name, @retail_price, @l1net, net_price,
-           @upp, @ppc, @weight, barcode, @wt_each,
-           @length, @width, @height, purchase_quantity)
-          SET retail_price = SUBSTRING(@retail_price, 2)";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-
 } elseif (preg_match('/Alvin SRP/', $line)) {
   // Alvin Account Pricing Report
   //
@@ -249,6 +222,53 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
+
+} elseif (preg_match('/Golden Ratio/', $line)) {
+  // Masterpiece
+  //
+  $q= "CREATE TEMPORARY TABLE macitem (
+    item_no VARCHAR(32),
+    sku VARCHAR(10),
+    name VARCHAR(255),
+    retail_price DECIMAL(9,2),
+    net_price DECIMAL(9,2),
+    promo_price DECIMAL(9,2),
+    barcode VARCHAR(32),
+    purchase_quantity INT,
+    category VARCHAR(64))";
+
+  $db->query($q)
+    or die_query($db, $q);
+
+#,SN,PK Sort,SKU Sort,,SKU,Golden Ratio,Size,Item Description,,,,,,,,,2016 Retail,Under $500 Net Order,Net $500 Order,Units Per Pkg,Pkgs Per Box,Weight,UPC,Freight Status,DIM. Weight,Est. Freight EACH,Est. Freight CASE
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+            INTO TABLE macitem
+          FIELDS TERMINATED BY ','
+          OPTIONALLY ENCLOSED BY '\"'
+          IGNORE 1 LINES
+          (@x, @sn, @pk_sort, @sku_sort, @y,
+           sku, @gr, @size,
+           name,
+           @x1, @x2, @x3, @x4, @x5, @x6, @x7, @x8,
+           retail_price, net_price, promo_price, @units, purchase_quantity,
+           @weight, barcode, @freight, @dim_weight,
+           @est_freight, @est_freight_case)
+        SET item_no = CONCAT('MA', sku)";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  // toss bad barcodes
+  $q= "UPDATE macitem SET barcode = NULL WHERE LENGTH(barcode) < 3";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  // toss junk from header lines
+  $q= "DELETE FROM macitem WHERE purchase_quantity = 0";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
 
 } else {
   // Generic
