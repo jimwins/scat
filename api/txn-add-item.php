@@ -30,7 +30,8 @@ if (count($items) == 1) {
     $r= $db->query($q);
     if (!$r) die_query($db, $q);
 
-    $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = 'customer'";
+    $q= "SELECT 1 + IFNULL(MAX(number),0) AS number
+           FROM txn WHERE type = 'customer'";
     $r= $db->query($q);
     if (!$r) die_query($db, $q);
     $row= $r->fetch_assoc();
