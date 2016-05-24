@@ -385,7 +385,10 @@ function die_jsonp($data) {
     $data= array('error' => $data);
   }
   header('Content-type: application/javascript; charset=utf-8');
-  die(sprintf('%s(%s);', $_GET['callback'], json_encode($data)));
+  if ($_GET['callback']) {
+    die(sprintf('%s(%s);', $_GET['callback'], json_encode($data)));
+  }
+  die(json_encode($data));
 }
 
 function die_query($db, $query) {
