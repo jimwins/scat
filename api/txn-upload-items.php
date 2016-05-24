@@ -172,6 +172,7 @@ if (preg_match('/^linenum,qty/', $line)) {
   // MacPherson's order
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
+       CHARACTER SET 'latin1'
        FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
        IGNORE 1 LINES
        (line, status, item_no, sku, cust_item, description, ordered,
