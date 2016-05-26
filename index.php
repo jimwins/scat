@@ -32,22 +32,6 @@ head("Scat");
   font-size: smaller;
 }
 
-/* Hide/show some elements from paid invoices. */
-#txn.paid .remove,
-#txn.paid #pay,
-#txn.paid .choices, #txn.paid .errors,
-#txn.paid #delete
-{
-  display: none;
-}
-#txn #return {
-  display: none;
-}
-#txn.paid #return
-{
-  display: inline;
-}
-
 .payment-buttons {
   text-align: right;
 }
@@ -451,7 +435,7 @@ $(function() {
                  text: 'Change: ' + Scat.amount(txn.change())">
   </h4>
  </div>
- <div class="panel-footer text-center">
+ <div class="panel-footer">
   <div class="btn-group btn-group-lg">
    <button id="print" type="button" class="print-button btn btn-default"
            data-bind="enable: txn.id()">
@@ -571,17 +555,39 @@ $("#txn-load").submit(function(ev) {
 <div class="panel panel-default">
   <div class="panel-heading">
     <div class="row">
-      <div id="sale-buttons" class="col-md-5 col-md-push-7 text-right">
-        <button id="invoice" class="invoice-button btn btn-default">
-          Invoice
-        </button>
-        <button id="print" class="print-button btn btn-default">Print</button>
-        <button id="delete" class="btn btn-default"
-                data-bind="click: deleteTransaction">Delete</button>
-        <button id="pay" class="pay-button btn btn-default">Pay</button>
-        <button id="return" class="return-button btn btn-default">
-          Return
-        </button>
+      <div id="sale-buttons" class="col-md-5 col-md-push-7">
+        <div class="pull-right">
+          <div class="btn-group btn-group">
+           <button id="print" type="button" class="print-button btn btn-default"
+                   data-bind="enable: txn.id()">
+            Print
+           </button>
+           <button type="button" class="btn btn-default dropdown-toggle" 
+                   data-bind="enable: txn.id()"
+                   data-toggle="dropdown" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+           </button>
+           <ul class="dropdown-menu">
+            <li><a href="#" class="invoice-button" id="invoice">Invoice</a></li>
+            <li><a href="#" class="print-button" id="print">Receipt</a></li>
+           </ul>
+          </div>
+          <button id="delete" class="btn btn-default"
+                  data-bind="enable: txn.id() && items().length == 0,
+                             click: deleteTransaction">
+            Delete
+          </button>
+          <button id="pay" class="pay-button btn btn-default"
+                  data-bind="enable: txn.id() && txn.due(),
+                             visible: !txn.paid()">
+            Pay
+          </button>
+          <button id="return" class="return-button btn btn-default"
+                  data-bind="visible: txn.id() && txn.paid()">
+            Return
+          </button>
+        </div>
       </div>
 <script>
 $(".invoice-button").on("click", function() {
