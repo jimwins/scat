@@ -17,7 +17,7 @@ function txn_load_full($db, $id) {
 
 function txn_load($db, $id) {
   $q= "SELECT id, type,
-              number, created, filled, paid, returned_from,
+              number, created, filled, paid, returned_from, special_order,
               IF(type = 'vendor' && YEAR(created) > 2013,
                  CONCAT(SUBSTRING(YEAR(created), 3, 2), number),
                  CONCAT(DATE_FORMAT(created, '%Y-'), number))
@@ -33,7 +33,7 @@ function txn_load($db, $id) {
         FROM (SELECT
               txn.id, txn.type, txn.number,
               txn.created, txn.filled, txn.paid,
-              txn.returned_from,
+              txn.returned_from, txn.special_order,
               txn.person,
               CONCAT(IFNULL(person.name, ''),
                      IF(person.name != '' AND person.company != '', ' / ', ''),
@@ -78,6 +78,7 @@ function txn_load($db, $id) {
   $txn['subtotal']= (float)$txn['subtotal'];
   $txn['total']= (float)$txn['total'];
   $txn['total_paid']= (float)$txn['total_paid'];
+  $txn['special_order']= (int)$txn['special_order'];
 
   return $txn;
 }
