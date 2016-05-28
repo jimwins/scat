@@ -92,6 +92,18 @@ if (!empty($_REQUEST['quantity'])) {
     or die_query($db, $q);
 }
 
+if (isset($_REQUEST['allocated'])) {
+  $allocated= (int)$_REQUEST['allocated'];
+
+  $mul= ($txn['type'] == 'customer' ? -1 : 1);
+  $q= "UPDATE txn_line
+          SET allocated = $mul * $allocated
+        WHERE txn = $txn_id AND txn_line.id = $id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+}
+
 if (isset($_REQUEST['name'])) {
   $name= $db->real_escape_string($_REQUEST['name']);
   $q= "UPDATE txn_line

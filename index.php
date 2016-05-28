@@ -653,6 +653,8 @@ $(".pay-button").on("click", function() {
           displayError(data);
         }
 
+        Txn.loadData(data);
+
         Txn.choosePayMethod();
       });
     } else {
@@ -1086,27 +1088,28 @@ function displayPerson(person) {
 </script>
 <table class="table table-condensed table-striped" id="items">
  <thead>
-  <tr><th></th><th>Qty</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
+  <tr><th></th><th>Qty</th><th data-bind="visible: txn.special_order">Fill</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
  </thead>
  <tfoot>
     <tr id="subtotal-row">
-      <th colspan=4></th>
+      <th data-bind="attr: { colspan: txn.special_order() ? 5 : 4 }"></th>
       <th align="right">Subtotal:</th>
       <td data-bind="text: amount(txn.subtotal())" class="right">$0.00</td>
     </tr>
     <tr id="tax-row">
-      <th colspan=4></th>
+      <th data-bind="attr: { colspan: txn.special_order() ? 5 : 4 }"></th>
       <th align="right" id="tax_rate">Tax (<span class="val" data-bind="text: txn.tax_rate">0.00</span>%):</th>
       <td data-bind="text: amount(txn.total() - txn.subtotal())" class="right">$0.00</td>
     </tr>
     <tr id="total-row">
-      <th colspan=4></th>
+      <th data-bind="attr: { colspan: txn.special_order() ? 5 : 4 }"></th>
       <th align="right">Total:</th>
       <td data-bind="text: amount(txn.total())" class="right">$0.00</td>
     </tr>
     <!-- ko foreach: payments -->
     <tr class="payment-row" data-bind="attr: { 'data-id': $data.id }">
-      <th colspan=4 class="payment-buttons">
+      <th data-bind="attr: { colspan: txn.special_order() ? 5 : 4 }"
+          class="payment-buttons">
         <a class="admin" name="remove"><i class="fa fa-trash-o"></i></a>
         <a name="print" data-bind="visible: method() == 'credit'">
           <i class="fa fa-print"></i>
@@ -1118,7 +1121,8 @@ function displayPerson(person) {
     </tr>
     <!-- /ko -->
     <tr id="due-row" data-bind="visible: txn.total()">
-      <th colspan=4 style="text-align: right">
+      <th data-bind="attr: { colspan: txn.special_order() ? 5 : 4 }"
+          style="text-align: right">
         <a id="lock"><i class="fa fa-lock"></i></a>
       </th>
       <th align="right">Due:</th>
@@ -1178,6 +1182,11 @@ $("#lock").on("click", function() {
       <td align="center" class="editable"
           data-bind="css: { over: $data.quantity() > $data.stock() }">
         <span class="quantity" data-bind="text: $data.quantity"></span>
+      </td>
+      <td align="center" class="editable"
+          data-bind="visible: $parent.txn.special_order(),
+                     css: { over: $data.allocated() > $data.quantity() }">
+        <span class="allocated" data-bind="text: $data.allocated"></span>
       </td>
       <td align="left">
         <span data-bind="text: $data.code"></span>
