@@ -1108,7 +1108,7 @@ function displayPerson(person) {
     </tr>
     <!-- ko foreach: payments -->
     <tr class="payment-row" data-bind="attr: { 'data-id': $data.id }">
-      <th data-bind="attr: { colspan: txn.special_order() ? 5 : 4 }"
+      <th data-bind="attr: { colspan: $parent.txn.special_order() ? 5 : 4 }"
           class="payment-buttons">
         <a class="admin" name="remove"><i class="fa fa-trash-o"></i></a>
         <a name="print" data-bind="visible: method() == 'credit'">
