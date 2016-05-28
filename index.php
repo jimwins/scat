@@ -555,9 +555,16 @@ $("#txn-load").submit(function(ev) {
 <div class="panel panel-default">
   <div class="panel-heading">
     <div class="row">
-      <div id="sale-buttons" class="col-md-5 col-md-push-7">
+      <div id="sale-buttons" class="col-md-6 col-md-push-6">
         <div class="pull-right">
-          <div class="btn-group btn-group">
+          <button id="notes" type="button" class="notes-button btn btn-default"
+                  data-bind="enable: txn.id(), click: showNotes">
+           Notes
+           <span class="badge"
+                 data-bind="text: notes().length, visible: notes().length">
+           </span>
+          </button>
+          <div class="btn-group">
            <button id="print" type="button" class="print-button btn btn-default"
                    data-bind="enable: txn.id()">
             Print
@@ -932,7 +939,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   $.smodal.close();
 });
 </script>
-      <div id="details" class="col-md-7 col-md-pull-5">
+      <div id="details" class="col-md-6 col-md-pull-6">
         <div style="font-size: larger; font-weight: bold">
           <span data-bind="text: description">New Sale</span>
           <button class="btn btn-xs btn-link"
@@ -1166,39 +1173,6 @@ $("#lock").on("click", function() {
     </tr>
   </tbody>
 </table>
-<table id="notes" class="table table-condensed table-striped">
- <thead>
-  <tr>
-    <th style="width: 20px">
-      <a data-bind="click: displayAddNote" class="fa fa-plus-square-o"></a>
-    </th>
-    <th style="width: 10em">Date</th>
-    <th>Note</th></tr>
- </thead>
- <tbody data-bind="foreach: notes">
-   <tr>
-     <td>&nbsp;</td>
-     <td data-bind="text: $data.entered"></td>
-     <td data-bind="text: $data.content"></td>
-   </tr>
- </tbody>
-</table>
-<form id="add-note" style="display: none">
-  <input type="text" name="note" size="40">
-  <input type="submit" value="Add">
-</form>
-<script>
-$("#add-note").on("submit", function(ev) {
-  ev.preventDefault();
-
-  var txn= Txn.id();
-  var note= $('input[name="note"]', this).val();
-
-  Txn.addNote(txn, note);
-
-  $.smodal.close();
-});
-</script>
 </div>
 </div>
 <?foot();?>
@@ -1276,10 +1250,10 @@ viewModel.txn.display_dates= ko.computed(function() {
   if (viewModel.txn.filled()) {
     dates = dates + ' / Filled: ' + Date.parse(viewModel.txn.filled()).toString(format);
   }
-*/
   if (viewModel.txn.paid()) {
     dates = dates + ' / Paid: ' + Date.parse(viewModel.txn.paid()).toString(format);
   }
+*/
   return dates;
 }, viewModel);
 
@@ -1296,10 +1270,35 @@ viewModel.deleteTransaction= function() {
   Txn.delete(txn);
 }
 
-viewModel.displayAddNote= function() {
-  var txn= Txn.id();
-  if (!txn) return;
-  $.smodal($("#add-note"));
+viewModel.showNotes= function() {
+  $.ajax({ url: 'ui/show-notes.html', cache: false }).done(function (html) {
+    var panel= $(html);
+
+    var data= { notes: viewModel.notes() }
+    var dataModel= ko.mapping.fromJS(data);
+
+    dataModel.addNote= function(place, ev) {
+      var txn= Txn.id();
+      var note= $('input[name="note"]', place).val();
+
+      Txn.addNote(txn, note);
+
+      $(place).closest('.modal').modal('hide');
+    }
+
+    ko.applyBindings(dataModel, panel[0]);
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+    panel.on('shown.bs.modal', function() {
+      $('input[name="note"]', this).focus();
+    });
+
+
+    panel.appendTo($('body')).modal();
+    $('input[name="note"]', panel).focus();
+  });
 }
 
 viewModel.removeItem= function(item) {

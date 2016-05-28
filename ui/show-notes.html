@@ -1,0 +1,39 @@
+<div class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+          Notes
+        </h4>
+      </div>
+
+      <div class="modal-body">
+
+        <dl class="dl-horizontal">
+          <!-- ko foreach: notes -->
+          <dt data-bind="text: $data.entered"></dt>
+          <dd data-bind="text: $data.content"></dd>
+          <!-- /ko -->
+        </dl>
+
+      </div>
+
+      <form class="modal-footer form-inline"
+            data-bind="submit: addNote" role="form">
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" class="form-control"
+                   name="note"
+                   placeholder="Enter your comment...">
+            <div class="input-group-btn">
+              <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
