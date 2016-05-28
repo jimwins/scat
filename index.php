@@ -453,7 +453,7 @@ $(function() {
    </ul>
   </div>
   <button id="pay" type="button" class="pay-button btn btn-lg btn-default"
-          data-bind="enable: txn.id() && txn.due()">
+          data-bind="enable: txn.id() && !txn.paid()">
     Pay
   </button>
  </div>
@@ -579,7 +579,7 @@ $("#txn-load").submit(function(ev) {
             Delete
           </button>
           <button id="pay" class="pay-button btn btn-default"
-                  data-bind="enable: txn.id() && txn.due(),
+                  data-bind="enable: txn.id() && !txn.paid(),
                              visible: !txn.paid()">
             Pay
           </button>
