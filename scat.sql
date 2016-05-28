@@ -254,6 +254,7 @@ CREATE TABLE `txn_line` (
   `ordered` int(11) NOT NULL,
   `allocated` int(11) NOT NULL DEFAULT '0',
   `override_name` varchar(255) DEFAULT NULL,
+  `data` mediumblob,
   `retail_price` decimal(9,2) NOT NULL,
   `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
   `discount` decimal(9,2) DEFAULT NULL,
@@ -376,4 +377,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-02-27 16:34:20
+-- Dump completed on 2016-05-28 16:46:43

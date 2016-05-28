@@ -114,6 +114,17 @@ if (isset($_REQUEST['name'])) {
     or die_query($db, $q);
 }
 
+if (isset($_REQUEST['data'])) {
+  $data= $db->real_escape_string(json_encode($_REQUEST['data']));
+
+  $q= "UPDATE txn_line
+          SET data = IF('$data' = '', NULL, '$data')
+        WHERE txn = $txn_id AND txn_line.id = $id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+}
+
 txn_apply_discounts($db, $txn_id)
   or die_jsonp("Failed to apply discounts.");
 
