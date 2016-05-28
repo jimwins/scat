@@ -213,6 +213,23 @@ Txn.updatePerson= function (txn, person) {
             });
 }
 
+Txn.isSpecialOrder = function() {
+  return viewModel.txn.special_order ?
+           viewModel.txn.special_order() : undefined;
+}
+
+Txn.setSpecialOrder= function(txn, special) {
+  $.getJSON("api/txn-update.php?callback=?",
+            { txn: txn, special_order: special ? 1 : 0 },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+              Txn.loadData(data);
+            });
+}
+
 var lastItem;
 
 function updateValue(row, key, value) {
@@ -936,7 +953,9 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 </script>
       <div id="details" class="col-md-6 col-md-pull-6">
         <div style="font-size: larger; font-weight: bold">
-          <span data-bind="text: description">New Sale</span>
+          <span data-bind="text: description, click: toggleSpecialOrder">
+            New Sale
+          </span>
           <button class="btn btn-xs btn-link"
                   data-bind="visible: txn.returned_from(),
                              click: loadReturnedFrom">
@@ -1185,6 +1204,7 @@ var model= {
     filled: null,
     paid: null,
     number: 0,
+    special_order: 0,
   },
   items: [],
   payments: [],
@@ -1204,8 +1224,9 @@ var viewModel= ko.mapping.fromJS(model);
 
 viewModel.description= ko.computed(function() {
   if (!viewModel.txn.created()) { return "New Sale"; }
-  var type= (viewModel.txn.total_paid() ? 'Invoice' :
-             (viewModel.txn.returned_from() ? 'Return' : 'Sale'));
+  var type= (viewModel.txn.special_order() ? 'Special Order':
+             (viewModel.txn.total_paid() ? 'Invoice' :
+              (viewModel.txn.returned_from() ? 'Return' : 'Sale')));
   return type + ' ' + Date.parse(viewModel.txn.created()).toString('yyyy') +
          '-' + viewModel.txn.number();
 }, viewModel);
@@ -1300,6 +1321,12 @@ viewModel.removeItem= function(item) {
   var txn= Txn.id();
   if (!txn) return;
   Txn.removeItem(txn, item.line_id());
+}
+
+viewModel.toggleSpecialOrder= function(item) {
+  var txn= Txn.id();
+  if (!txn) return;
+  Txn.setSpecialOrder(txn, !Txn.isSpecialOrder());
 }
 
 ko.applyBindings(viewModel);
