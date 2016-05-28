@@ -84,7 +84,6 @@ Txn.loadId= function (id) {
               } else {
                 Txn.loadData(data);
               }
-              $("#status").text("Loaded sale.").fadeOut('slow');
             });
 }
 
@@ -98,7 +97,6 @@ Txn.loadNumber= function(num) {
               } else {
                 Txn.loadData(data);
               }
-              $("#status").text("Loaded sale.").fadeOut('slow');
             });
 }
 
@@ -325,7 +323,6 @@ function showOpenOrders(data) {
               '<div class="person">' + txn.person_name + '</div>' + '</td>' +
               '<td>' + txn.ordered + '</td></tr>');
     row.click(txn, function(ev) {
-      $("#status").text("Loading sale...").show();
       Txn.loadId(ev.data.id);
     });
     $('#sales tbody').append(row);
@@ -482,10 +479,8 @@ $("#sidebar .nav a").click(function() {
               } else {
                 showOpenOrders(data);
               }
-              $("#status").text("Loaded.").fadeOut('slow');
             });
   $(this).parent().addClass('active');
-  $("#status").text("Loading...").show();
 });
 </script>
 <table class="table table-condensed table-striped"
