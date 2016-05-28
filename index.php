@@ -230,6 +230,30 @@ Txn.setSpecialOrder= function(txn, special) {
             });
 }
 
+Txn.choosePayMethod= function() {
+  $.get('ui/pay-choose-method.html').done(function (html) {
+    var panel= $(html);
+
+    var data= { due: Txn.due() }
+    var dataModel= ko.mapping.fromJS(data);
+
+    ko.applyBindings(dataModel, panel[0]);
+
+    panel.on("click", "button", function(ev) {
+      var method= $(this).data("value");
+      $.smodal.close();
+      var id= "#pay-" + method;
+      var due= Txn.due();
+      $(".amount", id).val(due);
+      $.smodal($(id), { persist: true, overlayClose: false });
+      $(".amount", id).focus().select();
+    });
+
+    // XXX SimpleModal
+    $.smodal(panel);
+  });
+}
+
 var lastItem;
 
 function updateValue(row, key, value) {
@@ -620,38 +644,22 @@ $(".print-button").on("click", function() {
 
 $(".pay-button").on("click", function() {
   var txn= Txn.id();
-  $.getJSON(
-    "api/txn-allocate.php?callback=?",
-    { txn: txn },
-    function (data) {
-      if (data.error) {
-        displayError(data);
-      }
+  if (!Txn.isSpecialOrder()) {
+    $.getJSON(
+      "api/txn-allocate.php?callback=?",
+      { txn: txn },
+      function (data) {
+        if (data.error) {
+          displayError(data);
+        }
 
-      $.get('ui/pay-choose-method.html').done(function (html) {
-        var panel= $(html);
-
-        var data= { due: Txn.due() }
-        var dataModel= ko.mapping.fromJS(data);
-
-        ko.applyBindings(dataModel, panel[0]);
-
-        panel.on("click", "button", function(ev) {
-          var method= $(this).data("value");
-          $.smodal.close();
-          var id= "#pay-" + method;
-          var due= Txn.due();
-          $(".amount", id).val(due);
-          $.smodal($(id), { persist: true, overlayClose: false });
-          $(".amount", id).focus().select();
-        });
-
-        // XXX SimpleModal
-        $.smodal(panel);
+        Txn.choosePayMethod();
       });
-
-    });
+    } else {
+      Txn.choosePayMethod();
+    }
 });
+
 $(".return-button").on("click", function() {
   var txn= Txn.id();
   if (!txn || !confirm("Are you sure you want to create a return?")) {
