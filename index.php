@@ -448,7 +448,7 @@ $(function() {
     return false;
   });
 
-  $("#sidebar a[id='unpaid']").click();
+  $("#sidebar a[id='active']").click();
 });
 </script>
 <div class="row">
@@ -499,14 +499,14 @@ $(function() {
 <div class="panel panel-default">
   <div class="panel-heading">
   <ul class="nav nav-pills nav-justified">
-    <li class="active"><a id="unpaid">Unpaid</a></li>
+    <li class="active"><a id="active">Active</a></li>
     <li><a id="recent">Recent</a></li>
   </ul>
   </div>
 <script>
 $("#sidebar .nav a").click(function() {
   var params= {
-    open: { type: 'customer', unfilled: true },
+    active: { type: 'customer', active: true },
     unpaid: { type: 'customer', unpaid: true },
     recent: { type: 'customer', limit: 20 },
   };
