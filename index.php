@@ -354,23 +354,6 @@ function formatMethod(payment) {
   }
 }
 
-var protoNote= $("<tr><td></td><td></td><td></td></tr>");
-
-function showOpenOrders(data) {
-  $('#sales tbody').empty();
-  $.each(data, function(i, txn) {
-    var row=$('<tr><td>' + txn.number + '</td>' +
-              '<td>' + Date.parse(txn.created).toString('d MMM HH:mm') +
-              '<div class="person">' + txn.person_name + '</div>' + '</td>' +
-              '<td>' + txn.ordered + '</td></tr>');
-    row.click(txn, function(ev) {
-      Txn.loadId(ev.data.id);
-    });
-    $('#sales tbody').append(row);
-  });
-  $('#sales').show();
-}
-
 function printReceipt() {
   var txn= Txn.id();
   if (!txn) {
@@ -510,7 +493,6 @@ $("#sidebar .nav a").click(function() {
     unpaid: { type: 'customer', unpaid: true },
     recent: { type: 'customer', limit: 20 },
   };
-  $("#sales").hide();
   $(this).parent().siblings().removeClass('active');
   $.getJSON("api/txn-list.php?callback=?",
             params[$(this).attr('id')],
@@ -518,18 +500,28 @@ $("#sidebar .nav a").click(function() {
               if (data.error) {
                 displayError(data);
               } else {
-                showOpenOrders(data);
+                ko.mapping.fromJS({ orders: data }, viewModel);
               }
             });
   $(this).parent().addClass('active');
 });
 </script>
 <table class="table table-condensed table-striped"
-       id="sales" style="display: none">
+       id="sales">
  <thead>
   <tr><th>#</th><th>Date/Name</th><th>Items</th></tr>
  </thead>
  <tbody>
+  <!-- ko foreach: orders -->
+  <tr data-bind="click: $parent.loadOrder">
+    <td data-bind="text: $data.number"></td>
+    <td>
+      <span data-bind="text: Date.parse($data.created()).toString('d MMM HH:mm')"></span>
+      <div class="person" data-bind="text: $data.person_name()"></div>
+    </td>
+    <td data-bind="text: $data.ordered"></td>
+  </tr>
+  <!-- /ko -->
  </tbody>
 </table>
 </div>
@@ -1234,6 +1226,7 @@ var model= {
     address: '',
     tax_id: '',
   },
+  orders: [],
 };
 
 var viewModel= ko.mapping.fromJS(model);
@@ -1341,6 +1334,10 @@ viewModel.toggleSpecialOrder= function(item) {
   var txn= Txn.id();
   if (!txn) return;
   Txn.setSpecialOrder(txn, !Txn.isSpecialOrder());
+}
+
+viewModel.loadOrder= function(order) {
+  Txn.loadId(order.id());
 }
 
 ko.applyBindings(viewModel);
