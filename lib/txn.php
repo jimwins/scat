@@ -252,7 +252,7 @@ function txn_update_filled($db, $txn_id) {
   /* If everything is allocated, flag txn as filled. */
   $q= "SELECT COUNT(*)
          FROM txn_line
-        WHERE txn = $txn_id AND ordered = allocated";
+        WHERE txn = $txn_id AND ordered != allocated";
 
   $unfilled= $db->get_one($q);
 
