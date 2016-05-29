@@ -256,7 +256,7 @@ function txn_update_filled($db, $txn_id) {
 
   $unfilled= $db->get_one($q);
 
-  $q= "UPDATE txn SET filled = IF($unfilled, NULL, NOW()) WHERE txn = $txn_id";
+  $q= "UPDATE txn SET filled = IF($unfilled, NULL, NOW()) WHERE id = $txn_id";
   $r= $db->query($q)
     or die_query($db, $q);
 
