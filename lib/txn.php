@@ -188,7 +188,7 @@ function txn_load_notes($db, $id) {
 function txn_apply_discounts($db, $id) {
   $txn= txn_load($db, $id);
 
-  if (!$txn || $txn['paid']) {
+  if (!$txn) {
     // XXX better error handling
     return false;
   }
@@ -244,6 +244,21 @@ function txn_apply_discounts($db, $id) {
     $db->query($q)
       or die_query($db, $q);
   }
+
+  return true;
+}
+
+function txn_update_filled($db, $txn_id) {
+  /* If everything is allocated, flag txn as filled. */
+  $q= "SELECT COUNT(*)
+         FROM txn_line
+        WHERE txn = $txn_id AND ordered = allocated";
+
+  $unfilled= $db->get_one($q);
+
+  $q= "UPDATE txn SET filled = IF($unfilled, NULL, NOW())";
+  $r= $db->query($q)
+    or die_query($db, $q);
 
   return true;
 }

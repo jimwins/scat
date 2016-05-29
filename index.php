@@ -288,8 +288,8 @@ $(document).on('click', '#items tbody tr', function() {
 });
 
 $(document).on('dblclick', '.editable', function() {
-  // Just stop now if transaction is paid
-  if ($('#txn').hasClass('paid')) {
+  // Just stop now if transaction is closed
+  if (viewModel.txn.paid() !== null && viewModel.txn.filled() !== null) {
     return false;
   }
 
@@ -554,8 +554,7 @@ $("#txn-load").submit(function(ev) {
 </div>
 </div><!-- /sidebar -->
 
-<div class="col-md-9 col-md-pull-3" id="txn"
-     data-bind="css: { paid: txn.paid() != null }">
+<div class="col-md-9 col-md-pull-3" id="txn">
 <form class="form form-inline" id="lookup">
   <div class="input-group">
     <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
@@ -1279,14 +1278,12 @@ viewModel.txn.display_dates= ko.computed(function() {
   if (!viewModel.txn.created()) { return ""; }
   var format= 'MMM d yyyy h:mmtt';
   var dates= Date.parse(viewModel.txn.created()).toString(format);
-/*
   if (viewModel.txn.filled()) {
     dates = dates + ' / Filled: ' + Date.parse(viewModel.txn.filled()).toString(format);
   }
   if (viewModel.txn.paid()) {
     dates = dates + ' / Paid: ' + Date.parse(viewModel.txn.paid()).toString(format);
   }
-*/
   return dates;
 }, viewModel);
 

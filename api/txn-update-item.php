@@ -8,8 +8,8 @@ $id= (int)$_REQUEST['id'];
 if (!$txn_id || !$id) die_jsonp('No transaction or item specified');
 
 $txn= txn_load($db, $txn_id);
-if ($txn['paid']) {
-  die_jsonp("This order is already paid!");
+if ($txn['paid'] && $txn['filled']) {
+  die_jsonp("This order is already closed!");
 }
 
 $db->start_transaction();
@@ -127,6 +127,9 @@ if (isset($_REQUEST['data'])) {
 
 txn_apply_discounts($db, $txn_id)
   or die_jsonp("Failed to apply discounts.");
+
+txn_update_filled($db, $txn_id)
+  or die_jsonp("Failed to figure out if order is filled.");
 
 $db->commit()
   or die_query($db, "COMMIT");
