@@ -41,7 +41,29 @@ $r= $db->query($q);
 if (!$r)
   die_query($db, $q);
 
-echo jsonp(array('txn' => txn_load($db, $new_txn_id),
-                 'items' => txn_load_items($db, $new_txn_id),
-                 'payments' => array(),
-                 'notes' => array()));
+// Check for discounts, and adjust prices as necessary
+$q= "SELECT SUM(discount) FROM payment WHERE txn = $txn_id";
+
+$discount= $db->get_one($q);
+
+if ($discount) {
+  $q= "UPDATE txn_line
+          SET discount_type = 'fixed',
+              discount = sale_price(retail_price, discount_type, discount) *
+                         (1 - $discount / 100)
+        WHERE txn = $new_txn_id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  if ($db->affected_rows) {
+    $q= "INSERT INTO txn_note
+            SET txn = $new_txn_id, entered = NOW(),
+                content = 'Applied extra $discount% discount to items from original purchase.'";
+
+    $r= $db->query($q)
+      or die_query($db, $q);
+  }
+}
+
+echo jsonp(txn_load_full($db, $new_txn_id));
