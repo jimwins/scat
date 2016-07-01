@@ -100,10 +100,10 @@ if (count($items) == 1) {
 
   $new_line= $items['0']['line_id'];
 
-  $txn= txn_load($db, $txn_id);
-  $items= txn_load_items($db, $txn_id);
+  $ret= txn_load_full($db, $txn_id);
+  $ret['new_line']= $new_line;
 
-  echo jsonp(array('txn' => $txn, 'items' => $items, 'new_line' => $new_line));
+  echo jsonp($ret);
 } else {
 
   $total= count($items);

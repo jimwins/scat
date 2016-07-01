@@ -134,8 +134,4 @@ txn_update_filled($db, $txn_id)
 $db->commit()
   or die_query($db, "COMMIT");
 
-$items= txn_load_items($db, $txn_id);
-
-$txn= txn_load($db, $txn_id);
-
-echo jsonp(array('txn' => $txn, 'items' => $items));
+echo jsonp(txn_load_full($db, $txn_id));
