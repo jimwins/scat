@@ -245,6 +245,21 @@ function txn_apply_discounts($db, $id) {
       or die_query($db, $q);
   }
 
+  $payments= txn_load_payments($db, $id);
+  foreach ($payments as $payment) {
+    if ($payment['method'] == 'discount' && $payment['discount']) {
+      // Reload the txn so we have updated total
+      $txn= txn_load($db, $id);
+
+      $q= "UPDATE payment
+              SET amount = ($payment[discount] / 100) * $txn[total]
+            WHERE id = $payment[id]";
+
+      $db->query($q)
+        or die_query($db, $q);
+    }
+  }
+
   return true;
 }
 
