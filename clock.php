@@ -2,24 +2,6 @@
 include 'scat.php';
 
 head("Clock @ Scat", true);
-
-$q= "SELECT id, name,
-            (SELECT start
-               FROM timeclock
-              WHERE person = person.id
-                AND end IS NULL
-              ORDER BY id DESC
-              LIMIT 1) AS punched
-       FROM person
-      WHERE active AND role = 'employee'
-      ORDER BY name";
-
-$r= $db->query($q);
-
-$people= array();
-while ($person= $r->fetch_assoc()) {
-  $people[]= $person;
-}
 ?>
 <div class="row">
   <div class="col-sm-offset-3 col-sm-6">
@@ -43,7 +25,7 @@ foot();
 ?>
 <script>
 var model= {
-  people: <?=json_encode($people);?>,
+  people: [],
 };
 
 var viewModel= ko.mapping.fromJS(model);
@@ -71,6 +53,20 @@ function punch(place, ev) {
                 .fadeToggle();
             });
 }
+
+function reload() {
+  $.getJSON("api/clock-load.php?callback=?",
+            { },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+              ko.mapping.fromJS(data, viewModel);
+            });
+}
+
+$(window).on('focus load', function (ev, target) { reload() });
 
 ko.applyBindings(viewModel);
 
