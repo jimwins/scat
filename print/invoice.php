@@ -8,6 +8,7 @@ if (!$id) die("No transaction specified.");
 date_default_timezone_set('America/Los_Angeles');
 
 $details= txn_load($db, $id);
+$notes= txn_load_notes($db, $id);
 
 $fn= (($details['type'] == 'vendor') ? 'PO' : 'I') .
      $details['formatted_number'];
@@ -60,6 +61,13 @@ if ($details['person']) {
   }
   if ($person['email']) {
     echo 'Email: ', ashtml($person['email']), '<br>';
+  }
+}
+if (count($notes)) {
+  foreach ($notes as $note) {
+    if (preg_match('/^PO /', $note['content'])) {
+      echo ashtml($note['content']), '<br>';
+    }
   }
 }
 ?>
