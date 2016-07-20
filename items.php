@@ -101,6 +101,8 @@ if (!$search) {
          '<a href="items.php?saved=', $row['id'], '" ',
             'title="', ashtml($row['search']), '">',
          ashtml($row['name']), '</a>',
+         '<a class="pull-right" href="report-performance.php?saved=', $row['id'], '">',
+         '<i class="fa fa-bar-chart"></i></a>',
          '</li>';
   }
   echo '</ul>';
