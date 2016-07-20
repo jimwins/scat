@@ -194,7 +194,7 @@ if (!defined('DB_SERVER') ||
     !defined('DB_USER') ||
     !defined('DB_PASSWORD') ||
     !defined('DB_SCHEMA')) {
-  head("Scat Configuration");
+  head("Scat Configuration", true);
   $msg= <<<CONFIG
 <p>You must configure Scat to connect to your database. Create
 <code>config.php</code> and add the following code, configured as appropriate

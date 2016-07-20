@@ -1,7 +1,7 @@
 <?
 require 'scat.php';
 
-head('Gift Cards');
+head('Gift Cards', true);
 ?>
 <form role="form">
   <div class="form-group">

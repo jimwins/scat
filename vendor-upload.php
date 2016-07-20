@@ -1,6 +1,7 @@
 <?
 include 'scat.php';
 
+// not using new head() yet because of autocomplete
 head("Vendor Upload @ Scat");
 ?>
 <style>
