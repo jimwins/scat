@@ -48,7 +48,7 @@ if (!$end) {
   </tr>
 <?
 
-$q= "SELECT name,
+$q= "SELECT name, timeclock.id,
             DATE(start) day,
             TIME(start) start, TIME(end) end,
             LEAST(8, TIMESTAMPDIFF(second, start, end) / 3600) regular,
@@ -80,11 +80,11 @@ while ($row= $r->fetch_assoc()) {
   $regular+= $row['regular'];
   $ot+= $row['overtime'];
 
-  echo '<tr><td>',
+  echo '<tr data-id="', $row['id'], '" data-date="', $row['day'], '"><td>',
        '&nbsp; &nbsp;', date('l, F j', strtotime($row['day'])),
-       '</td><td>',
+       '</td><td class="time" data-type="start">',
        $row['start'],
-       '</td><td>',
+       '</td><td class="time" data-type="end">',
        $row['end'],
        '</td><td>',
        $row['regular'],
@@ -102,9 +102,24 @@ foot();
 ?>
 <script>
 $(function() {
+
+  $('.time').editable(function (val, settings) {
+    var type= $(this).data('type');
+    var id= $(this).parent().data('id');
+    $.getJSON("api/clock-edit.php?callback=?",
+              { id: id, type: type, time: val },
+              function (data) {
+                if (data.error) {
+                  displayError(data);
+                }
+              });
+    return '...';
+  }, { select: true });
+
   $('#report-params .input-daterange').datepicker({
       format: "yyyy-mm-dd",
       todayHighlight: true
   });
+
 });
 </script>
