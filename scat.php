@@ -142,7 +142,7 @@ $("header #reports").on('click', function(ev) {
                 var t= $("<table class='table table-condensed table-striped' style='width: auto'><tr><th>Day<th>Sales</tr>");
                 $.each(data.sales, function(i, sales) {
                   t.append($('<tr><td>' + sales.span +
-                             '<td align="right">$' + sales.total.toFixed(2) +
+                             '<td align="right">' + amount(sales.total.toFixed(2)) +
                              '</tr>'));
                 });
                 $('#quick-report .modal-body').empty().append(t);
