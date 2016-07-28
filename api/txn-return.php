@@ -15,11 +15,13 @@ if (!$r)
   die_query($db, $q);
 $row= $r->fetch_assoc();
 
+$person= $txn['person'] ? $txn['person'] : 'NULL';
+
 $q= "INSERT INTO txn
         SET created= NOW(),
             type = 'customer',
             number = $row[number],
-            person = $txn[person],
+            person = $person,
             returned_from = $txn_id,
             tax_rate = " . DEFAULT_TAX_RATE;
 $r= $db->query($q);
