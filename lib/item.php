@@ -77,7 +77,7 @@ function item_find($db, $q, $options) {
               retail_price retail_price,
               IF(item.discount_type,
                  CASE item.discount_type
-                   WHEN 'percentage' THEN ROUND(retail_price * ((100 - item.discount) / 100), 2)
+                   WHEN 'percentage' THEN ROUND_TO_EVEN(retail_price * ((100 - item.discount) / 100), 2)
                    WHEN 'relative' THEN (retail_price - item.discount) 
                    WHEN 'fixed' THEN (item.discount)
                  END,
