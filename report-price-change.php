@@ -17,14 +17,6 @@ head("Price Increases @ Scat", true);
 <form id="report-params" class="form-horizontal" role="form"
       action="<?=$_SERVER['PHP_SELF']?>">
   <div class="form-group">
-    <label for="items" class="col-sm-1 control-label">
-      Items
-    </label>
-    <div class="col-sm-4">
-      <input id="items" name="items" type="text"
-             class="form-control" style="width: 20em"
-             value="<?=ashtml($items)?>">
-    </div>
     <label for="vendor" class="col-sm-1 control-label">
       Vendor
     </label>
@@ -44,6 +36,14 @@ while ($row= $r->fetch_assoc()) {
 }
 ?>
       </select>
+    </div>
+    <label for="items" class="col-sm-1 control-label">
+      Items
+    </label>
+    <div class="col-sm-4">
+      <input id="items" name="items" type="text"
+             class="form-control" style="width: 20em"
+             value="<?=ashtml($items)?>">
     </div>
     <div class="col-sm-2">
       <input type="submit" class="btn btn-primary" value="Show">
