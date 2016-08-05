@@ -25,6 +25,21 @@ head("Price Increases @ Scat", true);
              class="form-control" style="width: 20em"
              value="<?=ashtml($items)?>">
     </div>
+    <select class="form-control" name="vendor">
+      <option value="">All vendors</option>
+<?
+$q= "SELECT id, company FROM person WHERE role = 'vendor' ORDER BY company";
+$r= $db->query($q);
+
+while ($row= $r->fetch_assoc()) {
+  echo '<option value="', $row['id'], '"',
+       ($row['id'] == $vendor) ? ' selected' : '',
+       '>',
+       ashtml($row['company']),
+       '</option>';
+}
+?>
+    </select>
   </div>
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
