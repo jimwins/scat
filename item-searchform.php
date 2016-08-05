@@ -33,7 +33,7 @@ $('#save').on('click', function(ev) {
 
   data.search= $("input[name='search']").val();
 
-  saved= $(ev.target).data('saved');
+  saved= $('#save').data('saved');
 
   if (!saved) {
     data.name= prompt("Save search as:");
@@ -56,6 +56,8 @@ $('#save').on('click', function(ev) {
             });
 });
 </script>
+<?} else {?>
+  <input type="hidden" name="saved" value="<?=(int)$saved?>">
 <?}?>
   </div>
 </form>

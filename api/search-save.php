@@ -7,7 +7,7 @@ $search= $_REQUEST['search'];
 
 if ($id) {
   $q= "UPDATE saved_search
-          SET search = '" . $db->escape($name) . "'
+          SET search = '" . $db->escape($search) . "'
         WHERE id = $id";
 } else {
   $q= "INSERT INTO saved_search
