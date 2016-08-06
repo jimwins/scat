@@ -301,11 +301,12 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
           $format
           IGNORE 1 LINES
           (item_no, sku, name, @retail_price, @net_price, @promo_price,
-           barcode, purchase_quantity)
+           @barcode, purchase_quantity)
        SET
            retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
            net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
-           promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', '')";
+           promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', ''),
+           barcode = REPLACE(@barcode, '-', '')";
 
   $r= $db->query($q)
     or die_query($db, $q);
