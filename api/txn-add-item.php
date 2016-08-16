@@ -53,7 +53,7 @@ if (count($items) == 1) {
   }
 
   // XXX some items should always be added on their own
-  $unique= preg_match('/^ZZ-(frame|print|univ|canvas)/i', $items[0]['code']);
+  $unique= preg_match('/^ZZ-(frame|print|univ|canvas|stretch|float|panel)/i', $items[0]['code']);
 
   $q= "SELECT id, ordered FROM txn_line
         WHERE txn = $txn_id AND item = {$items[0]['id']}";
