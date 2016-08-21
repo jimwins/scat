@@ -474,7 +474,8 @@ $(function() {
    </ul>
   </div>
   <button id="pay" type="button" class="pay-button btn btn-lg btn-default"
-          data-bind="enable: txn.id() && !txn.paid()">
+          data-bind="visible: txn.type() != 'vendor',
+                     enable: txn.id() && !txn.paid()">
     Pay
   </button>
  </div>
@@ -614,7 +615,7 @@ $("#txn-load").submit(function(ev) {
           </button>
           <button id="pay" class="pay-button btn btn-default"
                   data-bind="enable: txn.id() && !txn.paid(),
-                             visible: !txn.paid()">
+                             visible: !txn.paid() && txn.type() != 'vendor'">
             Pay
           </button>
           <button id="return" class="return-button btn btn-default"
@@ -1214,6 +1215,7 @@ var model= {
     number: 0,
     formatted_number: 0,
     special_order: 0,
+    type: '',
   },
   items: [],
   payments: [],
