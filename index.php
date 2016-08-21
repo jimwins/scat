@@ -1212,6 +1212,7 @@ var model= {
     filled: null,
     paid: null,
     number: 0,
+    formatted_number: 0,
     special_order: 0,
   },
   items: [],
@@ -1233,11 +1234,11 @@ var viewModel= ko.mapping.fromJS(model);
 
 viewModel.description= ko.computed(function() {
   if (!viewModel.txn.created()) { return "New Sale"; }
-  var type= (viewModel.txn.special_order() ? 'Special Order':
-             (viewModel.txn.total_paid() ? 'Invoice' :
-              (viewModel.txn.returned_from() ? 'Return' : 'Sale')));
-  return type + ' ' + Date.parse(viewModel.txn.created()).toString('yyyy') +
-         '-' + viewModel.txn.number();
+  var type= (viewModel.txn.type() == 'vendor' ? 'PO' :
+             (viewModel.txn.special_order() ? 'Special Order' :
+              (viewModel.txn.total_paid() ? 'Invoice' :
+               (viewModel.txn.returned_from() ? 'Return' : 'Sale'))));
+  return type + ' ' + viewModel.txn.formatted_number();
 }, viewModel);
 
 viewModel.txn.due= ko.computed(function() {
