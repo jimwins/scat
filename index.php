@@ -254,6 +254,19 @@ Txn.choosePayMethod= function() {
   });
 }
 
+Txn.allocate= function(txn) {
+  $.getJSON(
+    "api/txn-allocate.php?callback=?",
+    { txn: txn },
+    function (data) {
+      if (data.error) {
+        displayError(data);
+      }
+
+      Txn.loadData(data);
+    });
+}
+
 var lastItem;
 
 function updateValue(row, key, value) {
@@ -477,6 +490,12 @@ $(function() {
           data-bind="visible: txn.type() != 'vendor',
                      enable: txn.id() && !txn.paid()">
     Pay
+  </button>
+  <button type="button" class="btn btn-lg btn-default"
+          data-bind="visible: txn.type() == 'vendor',
+                     enable: txn.filled() === null,
+                     click: allocateTransaction">
+    Fill
   </button>
  </div>
 </div>
