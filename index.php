@@ -1080,7 +1080,17 @@ function displayPerson(person) {
 </script>
 <table class="table table-condensed table-striped" id="items">
  <thead>
-  <tr><th></th><th>Qty</th><th data-bind="visible: txn.special_order">Fill</th><th>Code</th><th width="50%">Name</th><th>Price</th><th>Ext</th></tr>
+  <tr>
+    <th></th>
+    <th>Qty</th>
+    <th data-bind="visible: txn.special_order() || txn.type() == 'vendor'">
+      Fill
+    </th>
+    <th>Code</th>
+    <th width="50%">Name</th>
+    <th>Price</th>
+    <th>Ext</th>
+  </tr>
  </thead>
  <tfoot>
     <tr id="subtotal-row">
@@ -1176,7 +1186,8 @@ $("#lock").on("click", function() {
         <span class="quantity" data-bind="text: $data.quantity"></span>
       </td>
       <td align="center" class="editable"
-          data-bind="visible: $parent.txn.special_order(),
+          data-bind="visible: $parent.txn.special_order() ||
+                              $parent.txn.type() == 'vendor',
                      css: { over: $data.allocated() > $data.quantity() }">
         <span class="allocated" data-bind="text: $data.allocated"></span>
       </td>
