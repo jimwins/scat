@@ -1102,7 +1102,7 @@ function displayPerson(person) {
   <tr>
     <th></th>
     <th>Qty</th>
-    <th data-bind="visible: showAllocated">
+    <th data-bind="visible: showAllocated()">
       Fill
     </th>
     <th>Code</th>
@@ -1205,7 +1205,7 @@ $("#lock").on("click", function() {
         <span class="quantity" data-bind="text: $data.quantity"></span>
       </td>
       <td align="center" class="editable"
-          data-bind="visible: $parent.showAllocated,
+          data-bind="visible: $parent.showAllocated(),
                      css: { over: $data.allocated() > $data.quantity() }">
         <span class="allocated" data-bind="text: $data.allocated"></span>
       </td>
