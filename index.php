@@ -1396,4 +1396,19 @@ ko.applyBindings(viewModel);
     echo 'Txn.loadData(', json_encode($data), ");\n";
   }
 ?>
+$("body").html5Uploader({
+  name: 'src',
+  postUrl: 'api/txn-upload-items.php?txn=' + Txn.id(),
+  onSuccess: function(e, file, response) {
+    data= $.parseJSON(response);
+    if (data.error) {
+      displayError(data);
+      return;
+    }
+    Txn.loadData(data);
+  },
+  onServerError: function(e, file) {
+    alert("File upload failed.");
+  },
+});
 </script>
