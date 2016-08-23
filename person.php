@@ -298,11 +298,15 @@ function reorder(place, ev) {
 
 function linkTransaction(components) {
   var m= components.split(/\|/);
+  var base= { correction: 'txn.php',
+              drawer: 'txn.php',
+              customer: './',
+              vendor: './' };
   var desc= { correction: 'Correction',
               drawer: 'Till Count',
               customer: 'Invoice',
               vendor: 'Purchase Order' };
-  return '<a href="txn.php?id=' + m[0] + '">'
+  return '<a href="' + base[m[1]] + '?id=' + m[0] + '">'
          + desc[m[1]] + ' ' + m[2]
          + '</a>';
 }
