@@ -205,21 +205,24 @@ function txn_apply_discounts($db, $id) {
     'MTEX014%' => array(12 => '6.49', 36 => '5.99'), #, 72 => '4.99'),
     'MTEX019%' => array(12 => '8.25', 36 => '7.49'), #, 72 => '6.99'),
     'SKXSDK%'=> array(12 => '2.49'),
+    '^TB56[56].*'=> array('r' => 'R', 12 => '2.79'),
     'DA40286%'=>array(10 => '0.79', 100 => '0.69'),
     'CHP%' => array(12 => '2.50'),
   );
 
   foreach ($discounts as $code => $breaks) {
+    $r= isset($breaks['r']) ? $breaks['r'] : '';
     $count= $db->get_one("SELECT ABS(SUM(ordered))
                             FROM txn_line
                             JOIN item ON txn_line.item = item.id
                            WHERE txn = $id
-                             AND code LIKE '$code'
+                             AND code {$r}LIKE '$code'
                              AND NOT discount_manual");
 
     $new_discount= 0;
 
     foreach ($breaks as $qty => $discount) {
+      if ($qty == 'r') continue;
       if ($count >= $qty && (!$new_discount || $discount < $new_discount)) {
         $new_discount= $discount;
       }
