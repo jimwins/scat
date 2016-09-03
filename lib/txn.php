@@ -205,25 +205,26 @@ function txn_apply_discounts($db, $id) {
     'MTEX014%' => array(12 => '6.49', 36 => '5.99'), #, 72 => '4.99'),
     'MTEX019%' => array(12 => '8.25', 36 => '7.49'), #, 72 => '6.99'),
     'SKXSDK%'=> array(12 => '2.49'),
-    '^TB56[56].*'=> array('r' => 'R', 12 => '2.79'),
+    '^TB56[56].*'=> array('type' => 'RLIKE', 12 => '2.69'),
     'DA40286%'=>array(10 => '0.79', 100 => '0.69'),
     'CHP%' => array(12 => '2.50'),
   );
 
   foreach ($discounts as $code => $breaks) {
-    $r= isset($breaks['r']) ? $breaks['r'] : '';
+    $like= isset($breaks['type']) ? $breaks['type'] : 'LIKE';
     $count= $db->get_one("SELECT ABS(SUM(ordered))
                             FROM txn_line
                             JOIN item ON txn_line.item = item.id
                            WHERE txn = $id
-                             AND code {$r}LIKE '$code'
+                             AND code $like '$code'
                              AND NOT discount_manual");
 
     $new_discount= 0;
 
     foreach ($breaks as $qty => $discount) {
-      if ($qty == 'r') continue;
-      if ($count >= $qty && (!$new_discount || $discount < $new_discount)) {
+      if ($qty != 'type' &&
+          $count >= $qty &&
+          (!$new_discount || $discount < $new_discount)) {
         $new_discount= $discount;
       }
     }
@@ -234,14 +235,14 @@ function txn_apply_discounts($db, $id) {
                   txn_line.discount_type = 'fixed'
             WHERE txn = $id AND txn_line.item = item.id
               AND txn_line.discount > $new_discount
-              AND code LIKE '$code'
+              AND code $like '$code'
               AND NOT discount_manual";
     } else {
       $q= "UPDATE txn_line, item
               SET txn_line.discount = item.discount,
                   txn_line.discount_type = item.discount_type
             WHERE txn = $id AND txn_line.item = item.id
-              AND code LIKE '$code'
+              AND code $like '$code'
               AND NOT discount_manual";
     }
 
