@@ -94,7 +94,7 @@ $q= "SELECT meta, Code\$item, Name, Stock\$right,
                       AS Order\$order
                FROM item
                LEFT JOIN txn_line ON (item = item.id)
-              WHERE active AND NOT deleted
+              WHERE inventoried AND active AND NOT deleted
                 $extra
               GROUP BY item.id
               ORDER BY code) t
