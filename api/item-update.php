@@ -92,6 +92,16 @@ if (isset($_REQUEST['minimum_quantity'])) {
     or die_query($db, $q);
 }
 
+if (isset($_REQUEST['purchase_quantity'])) {
+  $purchase_quantity= (int)$_REQUEST['purchase_quantity'];
+  $q= "UPDATE item
+          SET purchase_quantity = $purchase_quantity
+        WHERE id = $item_id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+}
+
 if (isset($_REQUEST['active'])) {
   $active= (int)$_REQUEST['active'];
   $q= "UPDATE item

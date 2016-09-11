@@ -83,6 +83,7 @@ CREATE TABLE `item` (
   `discount` decimal(9,2) DEFAULT NULL,
   `taxfree` tinyint(4) NOT NULL DEFAULT '0',
   `minimum_quantity` int(10) unsigned NOT NULL DEFAULT '1',
+  `purchase_quantity` int(10) unsigned NOT NULL DEFAULT '1',
   `active` tinyint(1) NOT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),

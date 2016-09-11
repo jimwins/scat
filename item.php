@@ -96,6 +96,15 @@ include 'item-searchform.php';
          data-bind="jeditable: item.minimum_quantity, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
     </div>
   </div>
+  <div class="form-group">
+    <label for="purchase_quantity" class="col-sm-2 control-label">
+      Purchase Quantity
+    </label>
+    <div class="col-sm-8">
+      <p class="form-control-static" id="purchase_quantity"
+         data-bind="jeditable: item.purchase_quantity, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+    </div>
+  </div>
 
   <div class="form-group">
     <label for="barcodes" class="col-sm-2 control-label"><a id="print" class="fa fa-print"></a> Barcodes</label>

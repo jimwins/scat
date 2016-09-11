@@ -90,7 +90,7 @@ function item_find($db, $q, $options) {
                   AND filled IS NOT NULL
                 ORDER BY filled DESC
                 LIMIT 1) last_net,
-              minimum_quantity,
+              minimum_quantity, purchase_quantity,
               GROUP_CONCAT(CONCAT(barcode.code, '!', barcode.quantity)
                            SEPARATOR ',') barcodes,
               $extra
@@ -110,6 +110,7 @@ function item_find($db, $q, $options) {
     $item['active']= (int)$item['active'];
     $item['stock']= (int)$item['stock'];
     $item['minimum_quantity']= (int)$item['minimum_quantity'];
+    $item['purchase_quantity']= (int)$item['purchase_quantity'];
 
     $barcodes= explode(',', $item['barcodes']);
     $item['barcode']= $item['barcode_list']= array();
