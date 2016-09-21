@@ -14,7 +14,10 @@
         <dl class="dl-horizontal">
           <!-- ko foreach: notes -->
           <dt data-bind="text: $data.entered"></dt>
-          <dd data-bind="text: $data.content"></dd>
+          <dd>
+            <span data-bind="visible: $data.public()"><i class="fa fa-comment" aria-hidden="true"></i></span>
+            <span data-bind="text: $data.content"></span>
+          </dd>
           <!-- /ko -->
         </dl>
 
@@ -31,6 +34,11 @@
               <button type="submit" class="btn btn-primary">Add</button>
             </div>
           </div>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" name="public" value="1"> Public?
+          </label>
         </div>
       </form>
 

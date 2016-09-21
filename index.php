@@ -100,9 +100,9 @@ Txn.loadNumber= function(num) {
             });
 }
 
-Txn.addNote= function(id, note) {
+Txn.addNote= function(id, note, pub) {
   $.getJSON("api/txn-add-note.php?callback=?",
-            { id: id, note: note},
+            { id: id, note: note, public: pub },
             function (data) {
               Txn.loadData(data);
             });
@@ -1340,8 +1340,9 @@ viewModel.showNotes= function() {
     dataModel.addNote= function(place, ev) {
       var txn= Txn.id();
       var note= $('input[name="note"]', place).val();
+      var pub= $('input[name="public"]', place).is(':checked') ? 1 : 0;
 
-      Txn.addNote(txn, note);
+      Txn.addNote(txn, note, pub);
 
       $(place).closest('.modal').modal('hide');
     }

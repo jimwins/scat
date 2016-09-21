@@ -169,7 +169,7 @@ function txn_load_payments($db, $id) {
 }
 
 function txn_load_notes($db, $id) {
-  $q= "SELECT id, entered, content
+  $q= "SELECT id, entered, content, public
          FROM txn_note
         WHERE txn = $id
         ORDER BY entered ASC";
@@ -177,12 +177,13 @@ function txn_load_notes($db, $id) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-  $payments= array();
+  $notes= array();
   while ($row= $r->fetch_assoc()) {
-    $payments[]= $row;
+    $row['public']= (int)$row['public'];
+    $notes[]= $row;
   }
 
-  return $payments;
+  return $notes;
 }
 
 function txn_apply_discounts($db, $id) {
