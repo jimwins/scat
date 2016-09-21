@@ -156,6 +156,16 @@ if (count($payments)) {
 ?>
  </tbody>
 </table>
+<?
+if (count($notes)) {
+  foreach ($notes as $note) {
+    if ($note['public']) {
+      echo '<p>', ashtml($note['content']),
+           ' <small>(', ashtml($note['entered']), ')</small></p>';
+    }
+  }
+}
+?>
 <div id="store_footer">
 <?if ($details['type'] != 'vendor') {?>
 Items purchased from stock may be returned in original condition and packaging
