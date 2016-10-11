@@ -102,7 +102,7 @@ $q= "SELECT SUM(minimum_quantity *
                 sale_price(item.retail_price, item.discount_type,
                            item.discount))
        FROM item
-      WHERE ($sql_criteria)";
+      WHERE ($sql_criteria) AND active";
 
 $ideal= $db->get_one($q);
 ?>
