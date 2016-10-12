@@ -332,7 +332,7 @@ $(document).on('dblclick', '.editable', function() {
     var row= $(this).closest('tr');
     var key= $(this).attr('class');
     var value= $(this).val();
-    var val= $('<span>Updating</span>');
+    var val= $('<span><i class="fa fa-spinner fa-spin"></i></span>');
     val.attr("class", key);
     $(this).replaceWith(val);
     updateValue(row, key, value);
