@@ -107,7 +107,7 @@ include 'item-searchform.php';
   </div>
 
   <div class="form-group">
-    <label for="barcodes" class="col-sm-2 control-label"><a id="print" class="fa fa-print"></a> Barcodes</label>
+    <label for="barcodes" class="col-sm-2 control-label">Barcodes</label>
     <div class="col-sm-8">
       <table id="barcodes" class="table table-condensed">
         <tbody data-bind="foreach: item.barcode_list">
@@ -119,8 +119,34 @@ include 'item-searchform.php';
         </tbody>
         <tfoot>
           <tr>
-            <td id="new-barcode" colspan="3">
-              <a class="fa fa-plus-square-o"></a>
+            <td colspan="3">
+              <button id="new-barcode" class="btn btn-default">
+                <i class="fa fa-barcode"></i> New
+              </button>
+              <div class="btn-group">
+                <button type="button" class="btn btn-default"
+                        data-bind="click: printBarcode">
+                  <i class="fa fa-print"></i> Print
+                </button>
+                <button type="button" class="btn btn-default dropdown-toggle"
+                        data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                  <span class="caret"></span>
+                  <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a data-bind="click: printBarcode" data-multiple="1">
+                      Multiple
+                    </a>
+                  </li>
+                  <li>
+                    <a data-bind="click: printBarcode" data-noprice="1">
+                      No price
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </td>
           </tr>
         </tfoot>
@@ -172,25 +198,12 @@ $('#new-barcode').editable(function(value, settings) {
   return  $(this).data('original');
 }, {
   event: 'click',
-  style: 'display: inline',
+  cssclass: 'form-inline',
   placeholder: '',
   data: function(value, settings) {
     $(this).data('original', value);
     return '';
   },
-});
-$('#print').on('click', function(ev) {
-  ev.preventDefault();
-  var item= viewModel.item.id();
-
-  $.getJSON("print/labels-price.php?callback=?",
-            { id: item },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-            });
 });
 </script>
 <?
@@ -256,9 +269,30 @@ var model= {
   all: <?=(int)$all?>,
   item: <?=json_encode($item);?>,
   brands: [],
+
 };
 
 var viewModel= ko.mapping.fromJS(model);
+
+viewModel.printBarcode= function(place, ev) {
+  var item= viewModel.item.id();
+
+  var noprice= $(ev.target).data('noprice') || 0;
+
+  var qty= 1;
+  if ($(ev.target).data('multiple')) {
+    qty= window.prompt("How many?", "");
+  }
+
+  $.getJSON("print/labels-price.php?callback=?",
+            { id: item, noprice: noprice, quantity: qty },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+            });
+}
 
 viewModel.removeBarcode= function(place) {
   $.getJSON("api/item-barcode-delete.php?callback=?",
