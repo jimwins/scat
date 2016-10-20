@@ -15,6 +15,11 @@ if ($q= $_REQUEST['q']) {
   $items= array(item_load($db, $id));
 
   if (!$items[0]) die_json("No such item.");
+
+  $qty= (int)$_REQUEST['quantity'];
+  if ($qty) {
+    $items= array_pad($items, $qty, $items[0]);
+  }
 }
 
 $trim= $_REQUEST['trim'];
