@@ -1185,7 +1185,7 @@ $('#tax_rate .val').editable(function(value, settings) {
               Txn.loadData(data);
             });
   return "...";
-}, { event: 'dblclick', style: 'display: inline' });
+}, { event: 'dblclick', style: 'display: inline', width: '4em' });
 $("#lock").on("click", function() {
   $('.admin').toggle();
   $('#lock i').toggleClass('fa-lock fa-unlock-alt');
