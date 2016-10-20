@@ -31,10 +31,11 @@ if (isset($_REQUEST['name'])) {
     or die_query($db, $q);
 }
 
-if (isset($_REQUEST['brand_id']) && (int)$_REQUEST['brand_id']) {
-  $brand= (int) $_REQUEST['brand_id'];
+// Workaround for jEditable sorting: id may be prefixed with _
+$brand_id= isset($_REQUEST['brand_id']) ? ltrim($_REQUEST['brand_id'], '_') : 0;
+if ((int)$brand_id) {
   $q= "UPDATE item
-          SET brand = $brand
+          SET brand = $brand_id
         WHERE id = $item_id";
 
   $r= $db->query($q)

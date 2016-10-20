@@ -12,7 +12,8 @@ while ($row= $r->fetch_row()) {
   if ($verbose) {
     $brands[]= array('id' => $row[0], 'name' => $row[1]);
   } else {
-    $brands[$row[0]]= $row[1];
+    // Workaround for jEditable sorting: prefix id with _
+    $brands['_'.$row[0]]= $row[1];
   }
 }
 
