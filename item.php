@@ -309,7 +309,7 @@ function saveItemProperty(value, settings) {
               }
               loadItem(data.item);
             });
-  return "...";
+  return '<span><i class="fa fa-spinner fa-spin"></i></span>';
 }
 
 $('#add-vendor').on('click', function() {
