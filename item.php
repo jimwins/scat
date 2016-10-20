@@ -56,7 +56,7 @@ include 'item-searchform.php';
     <label for="brand" class="col-sm-2 control-label">Brand</label>
     <div class="col-sm-8">
       <p class="form-control-static" id="brand_id"
-         data-bind="jeditable: item.brand, jeditableOptions: { type: 'select', submit: 'OK', loadurl: 'api/brand-list.php', onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+         data-bind="jeditable: item.brand, jeditableOptions: { type: 'select', submit: 'OK', loadurl: 'api/brand-list.php', onupdate: saveItemProperty, onblur: 'cancel', cssclass: 'form-inline' }"></p>
     </div>
   </div>
   <div class="form-group">
