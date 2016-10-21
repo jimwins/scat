@@ -342,6 +342,8 @@ function saveItemProperty(value, settings) {
   var key= this.id;
   data[key]= value;
 
+  item[key]("\0"); // force knockout to update this observable when item updated
+
   $.getJSON("api/item-update.php?callback=?",
             data,
             function (data) {
