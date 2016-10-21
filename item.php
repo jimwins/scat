@@ -117,9 +117,9 @@ include 'item-searchform.php';
       <table id="barcodes" class="table table-condensed">
         <tbody data-bind="foreach: item.barcode_list">
           <tr>
-            <td><span data-bind="click: $parent.removeBarcode"><a class="fa fa-trash-o"></a></span></td>
             <td><span data-bind="text: $data.code"></span></td>
             <td><span data-bind="text: $data.quantity"></span></td>
+            <td><button type="button" class="btn btn-default btn-xs" data-bind="click: $parent.removeBarcode"><i class="fa fa-trash-o"></i></button></td>
           </tr>
         </tbody>
         <tfoot>
