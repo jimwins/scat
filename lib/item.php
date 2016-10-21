@@ -117,6 +117,7 @@ function item_find($db, $q, $options) {
     $item['barcode']= $item['barcode_list']= array();
     foreach ($barcodes as $barcode) {
       list($code, $quantity)= explode('!', $barcode);
+      if (!strlen($code)) continue;
       $item['barcode'][$code]= $quantity;
       $item['barcode_list'][]= array('code' => $code, 'quantity' => $quantity);
     }
