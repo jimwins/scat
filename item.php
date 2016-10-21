@@ -281,8 +281,11 @@ viewModel.printBarcode= function(place, ev) {
 
   var qty= 1;
   if ($(ev.target).data('multiple')) {
-    qty= window.prompt("How many?", "");
+    qty= window.prompt("How many?", "1");
   }
+
+  if (!qty)
+    return;
 
   $.getJSON("print/labels-price.php?callback=?",
             { id: item, noprice: noprice, quantity: qty },
