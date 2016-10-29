@@ -76,6 +76,8 @@ $(document).ready(function() {
 <?} else {?>
  <script>
 $(document).ready(function() { 
+  // Enable sorted tables
+  $(".sortable").tablesorter(); 
   // Focus the #focus item
   $("#focus").focus();
   // dynamically set active navbar link based on script
