@@ -110,6 +110,17 @@ $("#report-params").on('submit', function(ev) {
                   {
                     labels: [ "Date", "Sales" ],
                     fillGraph: true,
+                    yAxisLabelWidth: 60,
+                    axes: {
+                      y: {
+                        valueFormatter: function (y) {
+                          return amount(y);
+                        },
+                        axisLabelFormatter: function (y) {
+                          return amount(y);
+                        },
+                      },
+                    },
                 });
                 table.udraggable({ handle: '.panel-heading' });
               }
