@@ -31,7 +31,7 @@ header("content-type: text/html;charset=utf-8");?>
  <title><?=ashtml($title)?></title>
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
- <link rel="stylesheet" type="text/css" href="extern/font-awesome-4.6.3/css/font-awesome.min.css">
+ <link rel="stylesheet" type="text/css" href="extern/font-awesome-4.7.0/css/font-awesome.min.css">
  <link rel="stylesheet" type="text/css" href="css/datepicker3.css">
  <link rel="stylesheet" type="text/css" href="static/screen.css">
 <?if (!$allnew) {?>
