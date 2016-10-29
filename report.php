@@ -46,14 +46,23 @@ head("Sales Report @ Scat", true);
   </div>
 </form>
 <br>
-<table id="results-template" class="table" style="display: none; width: auto">
- <caption><span>All Sales</span><button type="button" class="close" align="right" onclick="$(this).closest('table').remove(); return false" title="Close">&times;</button></caption>
- <thead>
-  <tr><th>When</th><th>Subtotal</th><th>Resale</th><th>Tax</th><th>Total</th></tr>
- </thead>
- <tbody>
- </tbody>
-</table>
+<div id="results-template" class="panel panel-default"
+     style="display: none; width: auto">
+  <div class="panel-heading">
+    <button type="button" class="close" data-dismiss="panel"
+            onclick="$(this).closest('.panel').remove(); return false"
+            title="Close">&times;</button>
+    <h3 class="panel-title">All Sales</h3>
+  </div>
+  <table class="table">
+   <thead>
+    <tr><th>When</th><th>Subtotal</th><th>Resale</th><th>Tax</th><th>Total</th></tr>
+   </thead>
+   <tbody>
+   </tbody>
+  </table>
+  </div>
+</div>
 <?
 foot();
 ?>
@@ -86,11 +95,11 @@ $("#report-params").on('submit', function(ev) {
                 });
                 var cap= $('#items').val();
                 if (cap) {
-                  $("caption span", table).text(cap);
+                  $(".panel-title", table).text(cap);
                 }
                 table.appendTo($("body"));
                 table.show();
-                table.draggable();
+                table.udraggable({ handle: '.panel-heading' });
               }
             });
 });
