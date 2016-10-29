@@ -53,7 +53,8 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
             SUM(IF(tax_rate, 0, taxed + untaxed)) AS resale,
             SUM(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)) AS tax,
             SUM(ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed)
-              AS total_taxed
+              AS total_taxed,
+            MIN(DATE(filled)) AS raw_date
        FROM (SELECT 
                     filled,
                     CAST(ROUND_TO_EVEN(

@@ -54,6 +54,9 @@ head("Sales Report @ Scat", true);
             title="Close">&times;</button>
     <h3 class="panel-title">All Sales</h3>
   </div>
+  <div class="panel-body">
+    <div class="graph"></div>
+  </div>
   <table class="table">
    <thead>
     <tr><th>When</th><th>Subtotal</th><th>Resale</th><th>Tax</th><th>Total</th></tr>
@@ -85,6 +88,7 @@ $("#report-params").on('submit', function(ev) {
                 var table= $("#results-template").clone();
                 table.removeAttr('id');
                 var t= $("tbody", table);
+                var gdata= [];
                 $.each(data.sales, function(i, sales) {
                   t.append($('<tr><td>' + sales.span +
                              '<td align="right">' + amount(sales.total) +
@@ -92,6 +96,7 @@ $("#report-params").on('submit', function(ev) {
                              '<td align="right">' + amount(sales.tax) +
                              '<td align="right">' + amount(sales.total_taxed) +
                              '</tr>'));
+                  gdata.unshift([ new Date(sales.raw_date), sales.total ]);
                 });
                 var cap= $('#items').val();
                 if (cap) {
@@ -99,6 +104,13 @@ $("#report-params").on('submit', function(ev) {
                 }
                 table.appendTo($("body"));
                 table.show();
+                var graph= new Dygraph(
+                  $('.graph', table)[0],
+                  gdata,
+                  {
+                    labels: [ "Date", "Sales" ],
+                    fillGraph: true,
+                });
                 table.udraggable({ handle: '.panel-heading' });
               }
             });
