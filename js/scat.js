@@ -64,6 +64,9 @@ function displayError(data) {
 
     modal.appendTo($('body')).modal();
 
+    // Remove our current focus to avoid stacking errors
+    document.activeElement.blur();
+
     return;
   }
 
