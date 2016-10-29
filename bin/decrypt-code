@@ -1,0 +1,14 @@
+#!/usr/bin/php
+<?php
+
+include basename(__FILENAME__) . '/../config.php';
+include basename(__FILENAME__) . '/../lib/cryptor.php';
+
+$file= $_SERVER['argv'][1];
+
+if (!$file || !file_exists($file))
+  die("usage: {$_SERVER['argv'][0]} file\n");
+
+$enc= file_get_contents($file);
+
+echo Cryptor::Decrypt($enc, SCAT_ENCRYPTION_KEY);

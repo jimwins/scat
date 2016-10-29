@@ -416,3 +416,10 @@ function generate_upc($code) {
   return $code.$cd;
 }
 
+require 'lib/cryptor.php';
+
+function include_encrypted($file) {
+  $enc= file_get_contents($file);
+  $dec= Cryptor::Decrypt($enc, SCAT_ENCRYPTION_KEY);
+  eval('?>' . $dec);
+}

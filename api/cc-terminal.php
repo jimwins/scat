@@ -1,7 +1,8 @@
 <?
 include '../scat.php';
 include '../lib/txn.php';
-include '../lib/cc-terminal.php';
+
+include_encrypted('../lib/cc-terminal.phpc');
 
 $id= (int)$_REQUEST['id'];
 $type= $_REQUEST['type'];
