@@ -39,10 +39,6 @@ head("Scat");
 .pay-method {
   text-align: center;
 }
-
-#notes tr {
-  vertical-align: top;
-}
 </style>
 <script>
 var Txn = {};
