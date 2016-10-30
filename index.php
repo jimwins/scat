@@ -398,14 +398,6 @@ $(function() {
     return printReceipt();
   });
 
-  $(document).bind('keydown', 'meta+shift+backspace', function(ev) {
-    var txn= Txn.id();
-    if (!txn) {
-      return;
-    }
-    Txn.delete(txn);
-  });
-
   $('#lookup').submit(function(ev) {
     ev.preventDefault();
     $("#lookup").removeClass("error");
