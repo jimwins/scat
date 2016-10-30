@@ -39,8 +39,8 @@ head("Scat");
 <script>
 var Txn = {};
 
-Txn.callAndLoad= function (func, args) {
-  return Scat.api(func, args)
+Txn.callAndLoad= function (func, args, opts) {
+  return Scat.api(func, args, opts)
               .done(function (data) {
                 Txn.loadData(data);
               });
@@ -82,22 +82,14 @@ Txn.addNote= function(id, note, pub) {
 
 Txn.addPayment= function (id, options) {
   options.id= id;
-  $.ajax({ type: 'GET',
-           url: "api/txn-add-payment.php?callback=?",
-           dataType: 'json',
-           data: options,
-           async: false,
-           success: function(data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                Txn.loadData(data);
-                $.smodal.close();
-                if (options.method == 'credit' && options.amount >= 25.00) {
-                  printChargeRecord(data.payment);
-                }
-              }
-           }});
+  Txn.callAndLoad('txn-add-payment', options,
+                  { type: 'GET', async: false })
+      .done(function (data) {
+        $.smodal.close();
+        if (options.method == 'credit' && options.amount >= 25.00) {
+          printChargeRecord(data.payment);
+        }
+      });
 }
 
 Txn.addItem= function (txn, item) {
@@ -118,48 +110,43 @@ Txn.removeItem= function (id, item) {
 
 Txn.findAndAddItem= function(q) {
   // go find!
-  $.ajax({ type: 'GET',
-           url: "api/txn-add-item.php?callback=?",
-           dataType: 'json',
-           data: { txn: Txn.id(), q: q },
-           async: false,
-           success: function(data) {
-              if (data.error) {
-                displayError(data);
-              } else if (data.matches) {
-                if (data.matches.length == 0) {
-                  play("no");
-                  $("#lookup").addClass("error");
-                  var errors= $('<div class="alert alert-danger"/>');
-                  errors.text(" Didn't find anything for '" + q + "'.");
-                  errors.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
-                  $("#items").before(errors);
-                } else {
-                  play("maybe");
-                  var choices= $('<div class="choices alert alert-warning"/>');
-                  choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
-                  var list= $('<table class="table table-condensed" style="width: 95%;">');
-                  $.each(data.matches, function(i,item) {
-                    var n= $("<tr" + (item.stock > 0 ? " class='stocked'" : "") + ">" +
-                             "<td>" + item.name + "</td>" +
-                             "<td>" + item.brand + "</td>" +
-                             "<td align='right'>" + (item.sale_price ? ("<s>" + amount(item.retail_price) + "</s>") : "") + "</td>" +
-                             "<td align='right'>" + amount(item.sale_price ? item.sale_price : item.retail_price) + "</td>" +
-                             "</tr>");
-                    n.click(item, function(ev) {
-                      Txn.addItem(Txn.id(), ev.data);
-                      $(this).closest(".choices").remove();
-                    });
-                    list.append(n);
-                  });
-                  choices.append(list);
-                  $("#items").before(choices);
-                }
-              } else {
-                play("yes");
-                Txn.loadData(data);
-              }
-            }});
+  Scat.api('txn-add-item', { txn: Txn.id(), q: q },
+           { type: 'GET', async: false })
+      .done(function (data) {
+        if (data.matches) {
+          if (data.matches.length == 0) {
+            play("no");
+            $("#lookup").addClass("error");
+            var errors= $('<div class="alert alert-danger"/>');
+            errors.text(" Didn't find anything for '" + q + "'.");
+            errors.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
+            $("#items").before(errors);
+          } else {
+            play("maybe");
+            var choices= $('<div class="choices alert alert-warning"/>');
+            choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
+            var list= $('<table class="table table-condensed" style="width: 95%;">');
+            $.each(data.matches, function(i,item) {
+              var n= $("<tr" + (item.stock > 0 ? " class='stocked'" : "") + ">" +
+                       "<td>" + item.name + "</td>" +
+                       "<td>" + item.brand + "</td>" +
+                       "<td align='right'>" + (item.sale_price ? ("<s>" + amount(item.retail_price) + "</s>") : "") + "</td>" +
+                       "<td align='right'>" + amount(item.sale_price ? item.sale_price : item.retail_price) + "</td>" +
+                       "</tr>");
+              n.click(item, function(ev) {
+                Txn.addItem(Txn.id(), ev.data);
+                $(this).closest(".choices").remove();
+              });
+              list.append(n);
+            });
+            choices.append(list);
+            $("#items").before(choices);
+          }
+        } else {
+          play("yes");
+          Txn.loadData(data);
+        }
+      });
 };
 
 Txn.updatePerson= function (txn, person) {
@@ -433,15 +420,10 @@ $("#sidebar .nav a").click(function() {
     recent: { type: 'customer', limit: 20 },
   };
   $(this).parent().siblings().removeClass('active');
-  $.getJSON("api/txn-list.php?callback=?",
-            params[$(this).attr('id')],
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                ko.mapping.fromJS({ orders: data }, viewModel);
-              }
-            });
+  Scat.api("txn-list", params[$(this).attr('id')])
+      .done(function (data) {
+        ko.mapping.fromJS({ orders: data }, viewModel);
+      });
   $(this).parent().addClass('active');
 });
 </script>
@@ -622,20 +604,13 @@ $("#pay-credit-refund").on("submit", function (ev) {
   var txn= Txn.id();
   var amount= $("#pay-credit-refund .amount").val();
   var refund_from= $("#pay-credit-refund").data('from');
-  $.getJSON("api/cc-terminal.php?callback=?",
-            { id: txn, type: 'Return',
-              amount: parseFloat(-1 * amount).toFixed(2),
-              from: refund_from },
-            function (data) {
-              if (data.error) {
-                $.smodal.close();
-                displayError(data);
-              } else {
-                Txn.loadData(data);
-                $.smodal.close();
-              }
-            });
-  $.smodal.close();
+  Txn.callAndLoad('cc-terminal',
+                  { id: txn, type: 'Return',
+                    amount: parseFloat(-1 * amount).toFixed(2),
+                    from: refund_from })
+      .always(function (data) {
+        $.smodal.close();
+      });
   $("#pay-credit-progress .amount").val(amount);
   $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false });
 });
@@ -664,17 +639,12 @@ $("#pay-credit").on("submit", function (ev) {
   ev.preventDefault();
   var txn= Txn.id();
   var amount= $("#pay-credit .amount").val();
-  $.getJSON("api/cc-terminal.php?callback=?",
-            { id: txn, type: 'Sale', amount: parseFloat(amount).toFixed(2) },
-            function (data) {
-              if (data.error) {
-                $.smodal.close();
-                displayError(data);
-              } else {
-                Txn.loadData(data);
-                $.smodal.close();
-              }
-            });
+  Txn.callAndLoad('cc-terminal',
+                  { id: txn, type: 'Sale',
+                    amount: parseFloat(amount).toFixed(2) })
+      .always(function (data) {
+        $.smodal.close();
+      });
   $.smodal.close();
   $("#pay-credit-progress .amount").val(amount);
   $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false });
@@ -977,21 +947,15 @@ function displayPerson(person) {
 
     personModel.savePerson= function(place, ev) {
       var person= ko.mapping.toJS(personModel);
-      $.getJSON(person.id ? "api/person-update.php?callback=?" :
-                            "api/person-add.php?callback=?",
-                person,
-                function (data) {
-                  if (data.error) {
-                    displayError(data);
-                    return;
-                  }
-                  if (person.id) {
-                    viewModel.load(data);
-                  } else {
-                    Txn.updatePerson(Txn.id(), data.person);
-                  }
-                  $(place).closest('.modal').modal('hide');
-                });
+      Scat.api(person.id ? 'person-update' : 'person-add', person)
+          .done(function (data) {
+            if (person.id) {
+              viewModel.load(data);
+            } else {
+              Txn.updatePerson(Txn.id(), data.person);
+            }
+            $(place).closest('.modal').modal('hide');
+          });
     }
 
     ko.applyBindings(personModel, panel[0]);
