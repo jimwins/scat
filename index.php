@@ -39,6 +39,13 @@ head("Scat");
 <script>
 var Txn = {};
 
+Txn.callAndLoad= function (func, args) {
+  return Scat.api(func, args)
+              .done(function (data) {
+                Txn.loadData(data);
+              });
+}
+
 Txn.id= function() {
   return viewModel.txn.id ? viewModel.txn.id() : undefined;
 }
@@ -48,15 +55,10 @@ Txn.due= function() {
 }
 
 Txn.delete= function (id) {
-  $.getJSON("api/txn-delete?callback=?",
-            { txn: id },
-            function(data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                window.location.href= './';
-              }
-            });
+  Scat.api('txn-delete', { txn: id })
+      .done(function(data) {
+        window.location.href= './';
+      });
 }
 
 Txn.loadData= function (data) {
@@ -67,37 +69,15 @@ Txn.loadData= function (data) {
 }
 
 Txn.loadId= function (id) {
-  $.getJSON("api/txn-load.php?callback=?",
-            { type: "customer",
-              id: id },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                Txn.loadData(data);
-              }
-            });
+  Txn.callAndLoad('txn-load', { type: 'customer', id: id });
 }
 
 Txn.loadNumber= function(num) {
-  $.getJSON("api/txn-load.php?callback=?",
-            { type: "customer",
-              number: num },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                Txn.loadData(data);
-              }
-            });
+  Txn.callAndLoad('txn-load', { type: 'customer', number: num });
 }
 
 Txn.addNote= function(id, note, pub) {
-  $.getJSON("api/txn-add-note.php?callback=?",
-            { id: id, note: note, public: pub },
-            function (data) {
-              Txn.loadData(data);
-            });
+  Txn.callAndLoad('txn-add-note', { id: id, note: note, public: pub });
 }
 
 Txn.addPayment= function (id, options) {
@@ -121,30 +101,19 @@ Txn.addPayment= function (id, options) {
 }
 
 Txn.addItem= function (txn, item) {
-  $.getJSON("api/txn-add-item.php?callback=?",
-            { txn: txn, item: item.id },
-            function(data) {
-              if (data.error) {
-                displayError(data);
-              } else if (data.matches) {
-                // this shouldn't happen!
-                play("no");
-              } else {
-                Txn.loadData(data);
-              }
-            });
+  Scat.api('txn-add-item', { txn: txn, item: item.id })
+      .done(function (data) {
+        if (data.matches) {
+          // this shouldn't happen!
+          play("no");
+        } else {
+          Txn.loadData(data);
+        }
+      });
 }
 
 Txn.removeItem= function (id, item) {
-  $.getJSON("api/txn-remove-item.php?callback=?",
-            { txn: id, id: item },
-            function(data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              Txn.loadData(data);
-            });
+  Txn.callAndLoad('txn-remove-item', { txn: id, id: item });
 };
 
 Txn.findAndAddItem= function(q) {
@@ -194,15 +163,7 @@ Txn.findAndAddItem= function(q) {
 };
 
 Txn.updatePerson= function (txn, person) {
-  $.getJSON("api/txn-update-person.php?callback=?",
-            { txn: txn, person: person },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              Txn.loadData(data);
-            });
+  Txn.callAndLoad('txn-update-person', { txn: txn, person: person });
 }
 
 Txn.isSpecialOrder = function() {
@@ -211,15 +172,7 @@ Txn.isSpecialOrder = function() {
 }
 
 Txn.setSpecialOrder= function(txn, special) {
-  $.getJSON("api/txn-update.php?callback=?",
-            { txn: txn, special_order: special ? 1 : 0 },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              Txn.loadData(data);
-            });
+  Txn.callAndLoad('txn-update', { txn: txn, special_order: special ? 1 : 0 });
 }
 
 Txn.choosePayMethod= function() {
@@ -247,16 +200,7 @@ Txn.choosePayMethod= function() {
 }
 
 Txn.allocate= function(txn) {
-  $.getJSON(
-    "api/txn-allocate.php?callback=?",
-    { txn: txn },
-    function (data) {
-      if (data.error) {
-        displayError(data);
-      }
-
-      Txn.loadData(data);
-    });
+  Txn.callAndLoad('txn-allocate', { txn: txn });
 }
 
 var lastItem;
@@ -268,16 +212,10 @@ function updateValue(row, key, value) {
   var data= { txn: txn, id: line };
   data[key] = value;
 
-  $.getJSON("api/txn-update-item.php?callback=?",
-            data,
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              }
-              // Force this to be active line
-              data.new_line= line;
-              Txn.loadData(data);
-            });
+  Txn.callAndLoad('txn-update-item', data)
+      .done(function (data) {
+        setActiveRow($('#items tbody tr[data-line_id=' + line + ']'));
+      });
 }
 
 function setActiveRow(row) {
@@ -637,18 +575,10 @@ $(".print-button").on("click", function() {
 $(".pay-button").on("click", function() {
   var txn= Txn.id();
   if (!Txn.isSpecialOrder()) {
-    $.getJSON(
-      "api/txn-allocate.php?callback=?",
-      { txn: txn },
-      function (data) {
-        if (data.error) {
-          displayError(data);
-        }
-
-        Txn.loadData(data);
-
-        Txn.choosePayMethod();
-      });
+    Txn.callAndLoad('txn-allocate', { txn: txn })
+        .done(function (data) {
+          Txn.choosePayMethod();
+        });
     } else {
       Txn.choosePayMethod();
     }
@@ -659,15 +589,7 @@ $(".return-button").on("click", function() {
   if (!txn || !confirm("Are you sure you want to create a return?")) {
     return false;
   }
-  $.getJSON("api/txn-return.php?callback=?",
-            { txn: txn },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                Txn.loadData(data);
-              }
-            });
+  Txn.callAndLoad('txn-return', { txn: txn });
 });
 </script>
 <form role="form" id="pay-cash" class="pay-method" style="display: none">
@@ -1149,29 +1071,15 @@ $("#items").on("click", ".payment-row a[name='print']", function() {
 $("#items").on("click", ".payment-row a[name='remove']", function() {
   var txn= Txn.id();
   var row= $(this).closest(".payment-row");
-  $.getJSON("api/txn-remove-payment.php?callback=?",
-            { txn: txn, id: row.data("id"),
-              admin: (viewModel.showAdmin() ? 1 : 0) },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              Txn.loadData(data);
-            });
+  Txn.callAndLoad('txn-remove-payment',
+                  { txn: txn, id: row.data("id"),
+                    admin: (viewModel.showAdmin() ? 1 : 0) });
 });
 $('#tax_rate .val').editable(function(value, settings) {
   var txn= Txn.id();
 
-  $.getJSON("api/txn-update-tax-rate.php?callback=?",
-            { txn: txn, tax_rate: value },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              Txn.loadData(data);
-            });
+  Txn.callAndLoad('txn-update-tax-rate', { txn: txn, tax_rate: value });
+
   return "...";
 }, { event: 'dblclick', style: 'display: inline', width: '4em' });
 </script>
