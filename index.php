@@ -5,10 +5,6 @@ require 'lib/txn.php';
 head("Scat");
 ?>
 <style>
-.admin {
-  display: none;
-}
-
 .choices {
   max-height: 300px;
   overflow: scroll;
@@ -395,9 +391,6 @@ function printChargeRecord(id) {
 }
 
 $(function() {
-  $(document).bind('keydown', 'meta+shift+z', function(ev) {
-    $('.admin').toggle();
-  });
   $(document).bind('keydown', 'meta+p', function(ev) {
     return printReceipt();
   });
@@ -1127,7 +1120,9 @@ function displayPerson(person) {
     <tr class="payment-row" data-bind="attr: { 'data-id': $data.id }">
       <th data-bind="attr: { colspan: $parent.showAllocated() ? 5 : 4 }"
           class="payment-buttons">
-        <a class="admin" name="remove"><i class="fa fa-trash-o"></i></a>
+        <a data-bind="visible: $parent.showAdmin()" name="remove">
+          <i class="fa fa-trash-o"></i>
+        </a>
         <a name="print" data-bind="visible: method() == 'credit'">
           <i class="fa fa-print"></i>
         </a>
@@ -1140,7 +1135,12 @@ function displayPerson(person) {
     <tr id="due-row" data-bind="visible: txn.total()">
       <th data-bind="attr: { colspan: showAllocated() ? 5 : 4 }"
           style="text-align: right">
-        <a id="lock"><i class="fa fa-lock"></i></a>
+        <a id="lock" data-bind="visible: payments().length,
+                                click: function () { showAdmin(!showAdmin()) }">
+          <i data-bind="css: { fa: true,
+                               'fa-lock': !showAdmin(),
+                               'fa-unlock-alt': showAdmin() }"></i>
+        </a>
       </th>
       <th align="right">Due:</th>
       <td data-bind="text: amount(txn.total() - txn.total_paid())"
@@ -1159,7 +1159,7 @@ $("#items").on("click", ".payment-row a[name='remove']", function() {
   var row= $(this).closest(".payment-row");
   $.getJSON("api/txn-remove-payment.php?callback=?",
             { txn: txn, id: row.data("id"),
-              admin: ($(".admin").is(":visible") ? 1 : 0) },
+              admin: (viewModel.showAdmin() ? 1 : 0) },
             function (data) {
               if (data.error) {
                 displayError(data);
@@ -1182,10 +1182,6 @@ $('#tax_rate .val').editable(function(value, settings) {
             });
   return "...";
 }, { event: 'dblclick', style: 'display: inline', width: '4em' });
-$("#lock").on("click", function() {
-  $('.admin').toggle();
-  $('#lock i').toggleClass('fa-lock fa-unlock-alt');
-});
 </script>
   <tbody data-bind="foreach: items">
     <tr class="item" valign="top"
@@ -1255,6 +1251,7 @@ var model= {
     tax_id: '',
   },
   orders: [],
+  showAdmin: false,
 };
 
 var viewModel= ko.mapping.fromJS(model);
