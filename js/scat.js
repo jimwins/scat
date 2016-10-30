@@ -4,7 +4,7 @@ var Scat= {};
  * Call the server API, handle basic errors
  */
 
-Scat.api= function (func, args) {
+Scat.api= function (func, args, opts) {
   var url= 'api/' + func + '.php?callback=?';
 
   // http://stackoverflow.com/a/5175170
@@ -25,7 +25,8 @@ Scat.api= function (func, args) {
   }
 
   // XXX use .ajax here and allow caller to supply more options
-  var jqXHR= $.getJSON(url, args);
+  var jqXHR= $.ajax($.extend({ dataType: "json", url: url, data: args },
+                             opts));
 
   return validated(jqXHR, function(data) {
     if (data.error) {
