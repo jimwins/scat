@@ -274,6 +274,7 @@ var paymentMethods= {
   discount: "Discount",
   bad: "Bad Debt",
   donation: "Donation",
+  withdrawal: "Withdrawal",
 };
 
 function formatMethod(payment) {
