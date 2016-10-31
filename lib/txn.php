@@ -208,6 +208,7 @@ function txn_apply_discounts($db, $id) {
     'SKXSDK%'=> array(12 => '2.49'),
     '^TB56[56].*'=> array('type' => 'RLIKE', 12 => '2.69'),
     'DA40286%'=>array(10 => '0.79', 100 => '0.69'),
+    '^DA(1600|6032).*'=> array('type' => 'RLIKE', 12 => 5.99),
     'CHP%' => array(12 => '2.99'),
   );
 
