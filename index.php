@@ -993,7 +993,8 @@ function displayPerson(person) {
         <a data-bind="visible: $parent.showAdmin()" name="remove">
           <i class="fa fa-trash-o"></i>
         </a>
-        <a name="print" data-bind="visible: method() == 'credit'">
+        <a data-bind="visible: method() == 'credit',
+                      click: function (data) { printChargeRecord(data.id()) }">
           <i class="fa fa-print"></i>
         </a>
       </th>
@@ -1020,10 +1021,6 @@ function displayPerson(person) {
     </tr>
  </tfoot>
 <script>
-$("#items").on("click", ".payment-row a[name='print']", function() {
-  var row= $(this).closest(".payment-row");
-  printChargeRecord(row.data("id"));
-});
 $("#items").on("click", ".payment-row a[name='remove']", function() {
   var txn= Txn.id();
   var row= $(this).closest(".payment-row");
