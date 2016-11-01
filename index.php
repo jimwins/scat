@@ -389,8 +389,8 @@ $(function() {
     <span class="sr-only">Toggle Dropdown</span>
    </button>
    <ul class="dropdown-menu" role="menu">
-    <li><a href="#" class="invoice-button" id="invoice">Invoice</a></li>
-    <li><a href="#" class="print-button" id="print">Receipt</a></li>
+    <li><a data-bind="click: printInvoice">Invoice</a></li>
+    <li><a data-bind="click: printReceipt">Receipt</a></li>
    </ul>
   </div>
   <button id="pay" type="button" class="pay-button btn btn-lg btn-default"
@@ -525,8 +525,8 @@ $("#txn-load").submit(function(ev) {
             <span class="sr-only">Toggle Dropdown</span>
            </button>
            <ul class="dropdown-menu">
-            <li><a href="#" class="invoice-button" id="invoice">Invoice</a></li>
-            <li><a href="#" class="print-button" id="print">Receipt</a></li>
+            <li><a data-bind="click: printInvoice">Invoice</a></li>
+            <li><a data-bind="click: printReceipt">Receipt</a></li>
            </ul>
           </div>
           <button id="delete" class="btn btn-default"
@@ -546,15 +546,6 @@ $("#txn-load").submit(function(ev) {
         </div>
       </div>
 <script>
-$(".invoice-button").on("click", function() {
-  printInvoice();
-});
-$(".print-button").on("click", function() {
-  if (viewModel.txn.paid() != null ||
-      confirm("Invoice isn't paid. Sure you want to print?"))
-  printReceipt();
-});
-
 $(".pay-button").on("click", function() {
   var txn= Txn.id();
   if (!Txn.isSpecialOrder()) {
