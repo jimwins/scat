@@ -85,14 +85,9 @@ if (isset($_REQUEST['discount'])) {
 
 if (isset($_REQUEST['minimum_quantity'])) {
   $minimum_quantity= (int)$_REQUEST['minimum_quantity'];
-  $inventoried= 1;
-  if ($minimum_quantity < 0) {
-    $inventoried= 0;
-    $minimum_quantity= 0;
-  }
 
   $q= "UPDATE item
-          SET inventoried= $inventoried, minimum_quantity= $minimum_quantity
+          SET minimum_quantity= $minimum_quantity
         WHERE id = $item_id";
 
   $r= $db->query($q)

@@ -89,12 +89,7 @@ include 'item-searchform.php';
   </div>
   <div class="form-group">
     <label for="minimum_quantity" class="col-sm-2 control-label">
-      <!-- ko if: item.inventoried() -->
       Minimum Quantity
-      <!-- /ko -->
-      <!-- ko if: !item.inventoried() -->
-      Not Inventoried
-      <!-- /ko -->
     </label>
     <div class="col-sm-8">
       <p class="form-control-static" id="minimum_quantity"
