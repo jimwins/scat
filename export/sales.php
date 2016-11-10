@@ -79,6 +79,7 @@ $account= array(
                 'location'   => '47000',
                 // cost of sales
                 'costofgoods'=> '51100',
+                'loyalty'    => '53000',
                 // shrink
                 'shrink'     => '61900',
                );
@@ -162,6 +163,10 @@ while ($sale= $r->fetch_assoc()) {
         $category= 'class';
       } elseif (preg_match('/^ZZ-gift/i', $line['code'])) {
         $category= 'gift';
+      } elseif (preg_match('/^ZZ-loyalty/i', $line['code'])) {
+        $category= 'loyalty';
+      } elseif (preg_match('/^ZZ-shipping/i', $line['code'])) {
+        $category= 'freight';
       }
 
       $sales[$category]= bcadd($sales[$category], $line['price']);
