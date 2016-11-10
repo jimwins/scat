@@ -2,7 +2,7 @@
 require '../scat.php';
 
 $month= $_REQUEST['month'];
-if (!$month) die("No month given.");
+if (!$month) die("ERROR: No month given.");
 
 $q= "SELECT payment.id, method,
             DATE_FORMAT(processed, '%m/%d/%Y') processed,
@@ -49,7 +49,7 @@ while ($pay= $r->fetch_assoc()) {
   list($debit, $credit)= $accts[$pay['type']][$pay['method']];
 
   if (!$debit) {
-    die("Don't know how to handle $pay[method] for $pay[type] payment");
+    die("ERROR: Don't know how to handle $pay[method] for $pay[type] payment");
   }
 
   switch ($pay['type']) {
@@ -62,7 +62,7 @@ while ($pay= $r->fetch_assoc()) {
     break;
 
   default:
-    die("Don't know how to handle $pay[type] payment");
+    die("ERROR: Don't know how to handle $pay[type] payment");
   }
 
   // debit entry

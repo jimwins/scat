@@ -4,7 +4,7 @@ require '../scat.php';
 bcscale(2);
 
 $month= $_REQUEST['month'];
-if (!$month) die("No month given.");
+if (!$month) die("ERROR: No month given.");
 
 $range= "'$month-01' AND '$month-01' + INTERVAL 1 MONTH";
 
@@ -193,7 +193,7 @@ while ($sale= $r->fetch_assoc()) {
     break;
 
   default:
-    die("Unable to handle transaction type '$sale[type]'");
+    die("ERROR: Unable to handle transaction type '$sale[type]'");
   }
 
   echo "\r\n";
