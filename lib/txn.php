@@ -201,10 +201,10 @@ function txn_apply_discounts($db, $id) {
 
   // XXX store this somewhere else, obviously
   $discounts= array(
-    'MXG-%'  => array(12 => '6.79', 36 => '6.49'), #, 72 => '5.99'),
-    'MXB-%'  => array(12 => '5.99', 36 => '5.49'), #, 72 => '4.99'),
-    'MTEX014%' => array(12 => '6.49', 36 => '5.99'), #, 72 => '4.99'),
-    'MTEX019%' => array(12 => '8.25', 36 => '7.49'), #, 72 => '6.99'),
+    'MXG-%'  => array(12 => '6.79', 36 => '6.49', 72 => '5.99,SO'),
+    'MXB-%'  => array(12 => '5.99', 36 => '5.49', 72 => '4.99,SO'),
+    'MTEX014%' => array(12 => '6.49', 36 => '5.99', 72 => '4.99,SO'),
+    'MTEX019%' => array(12 => '8.25', 36 => '7.49', 72 => '6.99,SO'),
     'SKXSDK%'=> array(12 => '2.49'),
     '^TB56[56].*'=> array('type' => 'RLIKE', 12 => '2.69'),
     'DA40286%'=>array(10 => '0.79', 100 => '0.69'),
@@ -224,8 +224,10 @@ function txn_apply_discounts($db, $id) {
     $new_discount= 0;
 
     foreach ($breaks as $qty => $discount) {
+      list($discount, $flags)= explode(',', $discount);
       if ($qty != 'type' &&
           $count >= $qty &&
+          ($flags != 'SO' || $txn['special_order']) &&
           (!$new_discount || $discount < $new_discount)) {
         $new_discount= $discount;
       }
@@ -236,7 +238,6 @@ function txn_apply_discounts($db, $id) {
               SET txn_line.discount = $new_discount,
                   txn_line.discount_type = 'fixed'
             WHERE txn = $id AND txn_line.item = item.id
-              AND txn_line.discount > $new_discount
               AND code $like '$code'
               AND NOT discount_manual";
     } else {
