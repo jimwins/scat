@@ -379,7 +379,7 @@ $(function() {
  <div class="panel-footer">
   <div class="btn-group btn-group-lg">
    <button id="print" type="button" class="print-button btn btn-default"
-           data-bind="enable: txn.id()">
+           data-bind="enable: txn.id(), click: printReceipt">
     Print
    </button>
    <button type="button" class="btn btn-default dropdown-toggle" 
@@ -515,7 +515,7 @@ $("#txn-load").submit(function(ev) {
           </button>
           <div class="btn-group">
            <button id="print" type="button" class="print-button btn btn-default"
-                   data-bind="enable: txn.id()">
+                   data-bind="enable: txn.id(), click: printReceipt">
             Print
            </button>
            <button type="button" class="btn btn-default dropdown-toggle" 
