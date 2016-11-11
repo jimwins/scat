@@ -62,9 +62,9 @@ tr.total td {border-top:solid #000 6px; text-align:right; font-weight:;}
   436 South Main Street<br>
   Los Angeles, CA 90013<br>
   (800) 729-7060<br>
-  M-F 11-7, Sat 11-6, Sun 12-5<br>
+  M-F 10-7, Sat 11-6, Sun 12-5<br>
   info@RawMaterialsLA.com<br>
-  http://RawMaterialsLA.com/
+  https://RawMaterialsLA.com/
 </div>
 <?
 
