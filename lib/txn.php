@@ -117,7 +117,8 @@ function txn_load_items($db, $id) {
                             END), '') discount,
               ordered * IF(txn.type = 'customer', -1, 1) AS quantity,
               allocated * IF(txn.type = 'customer', -1, 1) AS allocated,
-              (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) AS stock
+              (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) AS stock,
+              purchase_quantity
          FROM txn
          LEFT JOIN txn_line ON (txn.id = txn_line.txn)
          JOIN item ON (txn_line.item = item.id)
