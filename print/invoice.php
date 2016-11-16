@@ -139,7 +139,7 @@ if (count($payments)) {
       $method= $methods[$payment['method']];
     }
     echo '<tr>',
-         '<td class="right" colspan="3">',
+         '<td class="right" colspan="', $span, '">',
          $method,
          ':</td>',
          '<td class="price">',
@@ -148,7 +148,7 @@ if (count($payments)) {
   }
 ?>
   <tr class="total">
-   <td class="right" colspan="3">Total Due:</td>
+   <td class="right" colspan="<?=$span?>">Total Due:</td>
    <td class="price"><?=amount($details['total'] - $details['total_paid'])?></td>
   </tr>
 <?
