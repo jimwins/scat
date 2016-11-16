@@ -163,7 +163,7 @@ Txn.setSpecialOrder= function(txn, special) {
 }
 
 Txn.choosePayMethod= function() {
-  Scat.dialog('pay-choose-method').done(function (html) {
+  $.get('ui/pay-choose-method.html').done(function (html) {
     var panel= $(html);
 
     var data= { due: Txn.due() }
@@ -603,7 +603,6 @@ $("#pay-credit-refund").on("submit", function (ev) {
       .always(function (data) {
         $.smodal.close();
       });
-  $.smodal.close();
   $("#pay-credit-progress .amount").val(amount);
   $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false });
 });
@@ -927,7 +926,7 @@ $("#txn #info-person").on("click", function(ev) {
 });
 
 function displayPerson(person) {
-  Scat.dialog('person').done(function (html) {
+  $.ajax({ url: 'ui/person.html', cache: false }).done(function (html) {
     var panel= $(html);
 
     panel.on('hidden.bs.modal', function() {
@@ -1178,7 +1177,7 @@ viewModel.allocateTransaction= function() {
 }
 
 viewModel.showNotes= function() {
-  Scat.dialog('show-notes').done(function (html) {
+  $.ajax({ url: 'ui/show-notes.html', cache: false }).done(function (html) {
     var panel= $(html);
 
     var data= { notes: viewModel.notes() }
