@@ -603,6 +603,7 @@ $("#pay-credit-refund").on("submit", function (ev) {
       .always(function (data) {
         $.smodal.close();
       });
+  $.smodal.close();
   $("#pay-credit-progress .amount").val(amount);
   $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false });
 });
