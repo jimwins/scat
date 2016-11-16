@@ -18,12 +18,12 @@ bcscale(2);
 ?>
 <table class="table table-striped sortable" style="width: auto">
 <thead>
- <tr><th>Date</th><th>Cash</th><th>Credit</th><th>Amex</th><th>Other</th><th>Total</th></tr>
+ <tr><th>Date</th><th>Cash</th><th>Credit</th><th>Amex</th><th>Check</th><th>Other</th><th>Total</th></tr>
 </thead>
 <tbody>
 <?
 $day= null;
-$total= $cash= $credit= $amex= $other= 0.00;
+$total= $cash= $credit= $amex= $check= $other= 0.00;
 while ($row= $r->fetch_assoc()) {
   if ($row['date'] != $day && $day) {
     echo '<tr><td>',
@@ -31,9 +31,10 @@ while ($row= $r->fetch_assoc()) {
          amount($cash), '</td><td align="right">',
          amount($credit), '</td><td align="right">',
          amount($amex), '</td><td align="right">',
+         amount($check), '</td><td align="right">',
          amount($other), '</td><td align="right">',
          amount($total), "</td></tr>\n";
-    $total= $cash= $credit= $amex= $other= 0.00;
+    $total= $cash= $credit= $amex= $check= $other= 0.00;
   }
 
   switch ($row['method']) {
@@ -47,6 +48,9 @@ while ($row= $r->fetch_assoc()) {
     } else {
       $credit= bcadd($credit, $row['amount']);
     }
+    break;
+  case 'check':
+    $check= bcadd($cash, $row['amount']);
     break;
   case 'withdrawal':
     break;
