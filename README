@@ -51,4 +51,7 @@ Scat inclues BarCode Coder Library for barcode generation:
 Scat includes the Knockout JavaScript MVVM library:
   http://knockoutjs.com/
 
+Scat uses PHPExcel for reading and writing Excel spreadsheets:
+  https://github.com/PHPOffice/PHPExcel
+
 See the LICENSE file for licensing information.
