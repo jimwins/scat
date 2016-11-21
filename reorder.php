@@ -105,12 +105,17 @@ $q= "SELECT meta, Code\$item, Name, Stock\$right,
 
 dump_table($db->query($q));
 ?>
-<button id="download" class="btn btn-default">Download</button>
+<button id="download" class="btn btn-default">Download TSV</button>
+<button id="download-xls" class="btn btn-default">Download XLS</button>
 <?if ($vendor > 0) {?>
   <button id="create" class="btn btn-default">Create Order</button>
 <?}?>
 <form id="post-csv" style="display: none"
       method="post" action="api/encode-tsv.php">
+<textarea id="file" name="file"></textarea>
+</form>
+<form id="post-xls" style="display: none"
+      method="post" action="api/encode-xls.php">
 <textarea id="file" name="file"></textarea>
 </form>
 <script>
@@ -124,8 +129,18 @@ $('#download').on('click', function(ev) {
       tsv += $('.item a', row).text() + "\t" + $('.order', row).text() + "\r\n";
     }
   });
-  $("#file").val(tsv);
+  $("#post-csv #file").val(tsv);
   $("#post-csv").submit();
+});
+$('#download-xls').on('click', function(ev) {
+  var tsv= "code\tqty\r\n";
+  $.each($(".sortable tr"), function (i, row) {
+    if (i > 0 && parseInt($('.order', row).text()) > 0) {
+      tsv += $('.item a', row).text() + "\t" + $('.order', row).text() + "\r\n";
+    }
+  });
+  $("#post-xls #file").val(tsv);
+  $("#post-xls").submit();
 });
 $('#create').on('click', function(ev) {
   var order= [];
