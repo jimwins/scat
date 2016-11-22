@@ -50,7 +50,7 @@ while ($row= $r->fetch_assoc()) {
     }
     break;
   case 'check':
-    $check= bcadd($cash, $row['amount']);
+    $check= bcadd($check, $row['amount']);
     break;
   case 'withdrawal':
     break;
