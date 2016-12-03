@@ -92,7 +92,7 @@ $items= txn_load_items($db, $id);
 foreach ($items as $item) {
   echo '<tr valign="top">',
        '<td class="right">', $item['quantity'], '</td>',
-       (($details['type'] == 'vendor' || $item['purchase_quantity']) ? '<td class="left">' . $item['code'] . '</td>' : '<td></td>'),
+       ($item['purchase_quantity'] ? '<td class="left">' . $item['code'] . '</td>' : '<td></td>'),
        '<td class="left">', $item['name'],
        ($item['discount'] ? ('<div class="description">' . $item['discount'] . '</div>') : ''),
        '</td>',
