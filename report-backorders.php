@@ -10,7 +10,8 @@ $q= "SELECT txn.id AS txn, created,
                CONCAT(DATE_FORMAT(created, '%Y-'), number))
               AS formatted_number,
             person.id AS person, person.company AS person_name,
-            item.id AS item, item.code, item.name AS item_name,
+            item.id AS item, item.code,
+            IFNULL(override_name, item.name) AS item_name, data,
             ordered, allocated
        FROM txn
        JOIN txn_line ON txn.id = txn_line.txn
