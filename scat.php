@@ -297,7 +297,7 @@ function expand_field($data, $class, $meta = null) {
                  'customer' => 'Invoice',
                  'vendor' => 'Purchase Order');
     if ($type == 'customer' || $type == 'vendor') {
-      return '<a href="./?number='.ashtml($number).'">'.$desc[$type].' '.ashtml($number).'</a>';
+      return '<a href="./?id='.ashtml($id).'">'.$desc[$type].' '.ashtml($number).'</a>';
     } else {
       return '<a href="txn.php?id='.ashtml($id).'">'.$desc[$type].' '.ashtml($number).'</a>';
     }
