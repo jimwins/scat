@@ -190,6 +190,10 @@ Txn.allocate= function(txn) {
   Txn.callAndLoad('txn-allocate', { txn: txn });
 }
 
+Txn.reopenAllocated= function(txn) {
+  Txn.callAndLoad('txn-open', { txn: txn });
+}
+
 var lastItem;
 
 function updateValue(row, key, value) {
@@ -399,10 +403,16 @@ $(function() {
     Pay
   </button>
   <button type="button" class="btn btn-lg btn-default"
-          data-bind="visible: txn.type() == 'vendor',
-                     enable: txn.filled() === null,
+          data-bind="visible: txn.type() == 'vendor' &&
+                             txn.filled() === null,
                      click: allocateTransaction">
     Fill
+  </button>
+  <button type="button" class="btn btn-lg btn-default"
+          data-bind="visible: txn.type() == 'vendor' &&
+                             txn.filled() != null,
+                     click: reopenAllocated">
+    Reopen
   </button>
  </div>
 </div>
@@ -1175,6 +1185,11 @@ viewModel.deleteTransaction= function() {
 viewModel.allocateTransaction= function() {
   var txn= Txn.id();
   Txn.allocate(txn);
+}
+
+viewModel.reopenAllocated= function() {
+  var txn= Txn.id();
+  Txn.reopenAllocated(txn);
 }
 
 viewModel.showNotes= function() {
