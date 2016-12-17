@@ -7,7 +7,7 @@ function pole_display_price($label, $price) {
                                                           'usec' => 0));
   if (@socket_connect($sock, '127.0.0.1', 1888)) {
     socket_write($sock,
-                 sprintf("\x1f\x0d\x0a%-19.19s\x0a\x0d$%18.2f ",
+                 sprintf("\x0a\x0d%-19.19s\x0a\x0d$%18.2f ",
                          $label, $price));
   }
 }
