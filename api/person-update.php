@@ -9,8 +9,12 @@ $person= person_load($db, $person_id);
 if (!$person)
   die_jsonp('No such person.');
 
+if ($_REQUEST['phone']) {
+  $_REQUEST['loyalty_number']= preg_replace('/[^\d]/', '', $_REQUEST['phone']);
+}
+
 foreach (array('name', 'role', 'company', 'email',
-               'phone', 'tax_id', 'address') as $key) {
+               'phone', 'loyalty_number', 'tax_id', 'address') as $key) {
   if (isset($_REQUEST[$key])) {
     $value= $db->real_escape_string($_REQUEST[$key]);
     $q= "UPDATE person SET $key = '$value' WHERE id = $person_id";

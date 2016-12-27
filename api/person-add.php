@@ -23,6 +23,10 @@ foreach(array('name', 'company', 'address',
   $list[]= "$field = '" . $db->real_escape_string($_REQUEST[$field]) . "', ";
 }
 
+if ($list['phone']) {
+  $list['loyalty_number']= preg_replace('/[^\d]/', '', $list['phone']);
+}
+
 $fields= join('', $list);
 
 // add payment record

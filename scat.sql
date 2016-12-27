@@ -131,11 +131,13 @@ CREATE TABLE `person` (
   `address` text,
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
+  `loyalty_number` varchar(32) DEFAULT NULL,
   `tax_id` varchar(255) DEFAULT NULL,
   `payment_account_id` varchar(50) DEFAULT NULL,
   `active` tinyint(1) NOT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `loyalty_number` (`loyalty_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -379,4 +381,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-05-28 16:46:43
+-- Dump completed on 2016-12-27 14:49:17
