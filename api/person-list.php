@@ -9,7 +9,10 @@ $terms= preg_split('/\s+/', $term);
 foreach ($terms as $term) {
   $term= $db->real_escape_string($term);
   $criteria[]= "(person.name LIKE '%$term%'
-             OR person.company LIKE '%$term%')";
+             OR person.company LIKE '%$term%'
+             OR person.email LIKE '%$term%'
+             OR person.loyalty_number LIKE '%$term%'
+             OR person.phone LIKE '%$term%')";
 }
 
 if (!$_REQUEST['all'])
