@@ -149,6 +149,10 @@ Txn.findAndAddItem= function(q) {
       });
 };
 
+Txn.removePerson= function (txn) {
+  Txn.callAndLoad('txn-remove-person', { txn: txn });
+}
+
 Txn.updatePerson= function (txn, person) {
   Txn.callAndLoad('txn-update-person', { txn: txn, person: person });
 }
@@ -860,113 +864,20 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
           </button>
         </div>
         <div data-bind="text: txn.display_dates()"></div>
-        <div id="person">
-          <span class="val"
-                data-bind="text: person.display_name()"></span>
-          <i id="info-person" class="fa fa-info-circle"></i>
+        <div>
+          <a data-bind="click: changePerson">
+            <i class="fa fa-user-o"></i>
+            <span class="val"
+                  data-bind="text: person.display_name()"></span>
+          </a>
+          <a data-bind="if: person.id(), click: removePerson">
+            <i class="fa fa-trash-o"></i>
+          </a>
         </div>
       </div>
     </div>
   </div><!-- .panel-heading -->
-<script>
-$("#txn #person").on("dblclick", function(ev) {
-  var txn= Txn.id();
-  if (!txn) {
-    return false;
-  }
 
-  var fld= $('<input type="text" size="40">');
-  fld.val($(".val", this).text());
-  fld.data('default', fld.val());
-
-  fld.on('keyup', function(ev) {
-    // Handle ESC key
-    if (ev.type == 'keyup' && ev.which == 27) {
-      var val= $(this).data('default');
-      $(this).parent().text(val);
-      $(this).remove();
-      return false;
-    }
-
-    // Everything else but RETURN just gets passed along
-    if (ev.type == 'keyup' && ev.which != '13') {
-      return true;
-    }
-
-    ev.preventDefault();
-
-    var person= {
-      id: 0,
-      name: $(this).val(),
-      company: '',
-      email: '',
-      phone: '',
-      address: '',
-      tax_id: '',
-    };
-
-    displayPerson(person);
-
-    var val= $(this).data('default');
-    $(this).parent().text(val);
-    $(this).remove();
-
-    return false;
-  });
-
-  fld.autocomplete({
-    source: "./api/person-list.php?callback=?",
-    minLength: 2,
-    select: function(ev, ui) {
-      var txn= Txn.id();
-      $(this).parent().text(ui.item.value);
-      $(this).remove();
-      Txn.updatePerson(txn, ui.item.id);
-    },
-  });
-
-  $(".val", this).empty().append(fld);
-  fld.focus().select();
-});
-
-$("#txn #info-person").on("click", function(ev) {
-  if (!viewModel.person.id())
-    return false;
-
-  displayPerson(ko.mapping.toJS(viewModel.person));
-});
-
-function displayPerson(person) {
-  $.ajax({ url: 'ui/person.html', cache: false }).done(function (html) {
-    var panel= $(html);
-
-    panel.on('hidden.bs.modal', function() {
-      $(this).remove();
-    });
-
-    person.error= '';
-
-    personModel= ko.mapping.fromJS(person);
-
-    personModel.savePerson= function(place, ev) {
-      var person= ko.mapping.toJS(personModel);
-      Scat.api(person.id ? 'person-update' : 'person-add', person)
-          .done(function (data) {
-            if (person.id) {
-              viewModel.load(data);
-            } else {
-              Txn.updatePerson(Txn.id(), data.person);
-            }
-            $(place).closest('.modal').modal('hide');
-          });
-    }
-
-    ko.applyBindings(personModel, panel[0]);
-
-    panel.appendTo($('body')).modal();
-  });
-}
-</script>
 <table class="table table-condensed table-striped" id="items">
  <thead>
   <tr>
@@ -1242,6 +1153,102 @@ viewModel.loadOrder= function(order) {
 
 viewModel.showAllocated= function() {
   return (viewModel.txn.special_order() || viewModel.txn.type() == 'vendor');
+}
+
+viewModel.changePerson= function(data, event) {
+  if (this.person.id()) {
+    return displayPerson(this.person);
+  }
+
+  Scat.dialog('find-person').done(function (html) {
+    var panel= $(html);
+
+    panel.on('shown.bs.modal', function() {
+      $("#search", this).focus();
+    });
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    var model= { error: '', search: '' };
+
+    var personModel= ko.mapping.fromJS(model);
+    personModel.people= ko.observableArray();
+
+    ko.computed(function() {
+      var search= this.search();
+
+      if (search.length < 2) {
+        return;
+      }
+
+      Scat.api('person-list', { term: search })
+          .done(function (data) {
+            personModel.people(data);
+          });
+    }, personModel);
+
+    personModel.selectPerson= function(place, ev) {
+      Txn.updatePerson(Txn.id(), place.id);
+      panel.modal('hide');
+    }
+
+    personModel.createPerson= function(place, ev) {
+      $(place).closest('.modal').modal('hide');
+
+      var person= {
+        id: 0,
+        name: this.search(),
+        company: '',
+        email: '',
+        phone: '',
+        address: '',
+        tax_id: '',
+      };
+
+      displayPerson(person);
+    }
+
+    ko.applyBindings(personModel, panel[0]);
+
+    panel.appendTo($('body')).modal();
+  });
+}
+
+viewModel.removePerson= function(data, event) {
+  Txn.removePerson(Txn.id());
+}
+
+function displayPerson(person) {
+  Scat.dialog('person').done(function (html) {
+    var panel= $(html);
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    person.error= '';
+
+    personModel= ko.mapping.fromJS(person);
+
+    personModel.savePerson= function(place, ev) {
+      var person= ko.mapping.toJS(personModel);
+      Scat.api(person.id ? 'person-update' : 'person-add', person)
+          .done(function (data) {
+            if (person.id) {
+              viewModel.load(data);
+            } else {
+              Txn.updatePerson(Txn.id(), data.person);
+            }
+            $(place).closest('.modal').modal('hide');
+          });
+    }
+
+    ko.applyBindings(personModel, panel[0]);
+
+    panel.appendTo($('body')).modal();
+  });
 }
 
 ko.applyBindings(viewModel);

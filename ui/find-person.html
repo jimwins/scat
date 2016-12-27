@@ -1,0 +1,47 @@
+<div class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <form class="modal-content" data-bind="submit: createPerson" role="form">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+          Person
+        </h4>
+      </div>
+
+      <div id="accordion" class="modal-body">
+
+        <div class="alert alert-danger" data-bind="visible: error">
+          <strong>Error!</strong> <span data-bind="text: error"></span>
+        </div>
+
+        <div id="content" class="collapse in">
+          <div class="form-group">
+            <label for="search">Search</label>
+            <input type="text" class="form-control" id="search"
+                   autocomplete="off" autocorrect="off" autocapitalize="off"
+                   data-bind="textInput: search">
+          </div>
+      </div>
+
+      <ul class="list-group" data-bind="if: people().length"
+          style="max-height: 30em; overflow: scroll">
+        <!--ko foreach: people -->
+          <li class="list-group-item"
+              data-bind="click: $parent.selectPerson, text: $data.value"></li>
+        <!--/ko -->
+      </ul>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" class="btn btn-primary">
+          Create
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
