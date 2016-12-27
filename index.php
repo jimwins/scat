@@ -163,7 +163,7 @@ Txn.setSpecialOrder= function(txn, special) {
 }
 
 Txn.choosePayMethod= function() {
-  $.get('ui/pay-choose-method.html').done(function (html) {
+  Scat.dialog('pay-choose-method').done(function (html) {
     var panel= $(html);
 
     var data= { due: Txn.due() }
@@ -1193,7 +1193,7 @@ viewModel.reopenAllocated= function() {
 }
 
 viewModel.showNotes= function() {
-  $.ajax({ url: 'ui/show-notes.html', cache: false }).done(function (html) {
+  Scat.dialog('show-notes').done(function (html) {
     var panel= $(html);
 
     var data= { notes: viewModel.notes() }
