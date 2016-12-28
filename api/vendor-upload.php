@@ -53,48 +53,6 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-} elseif (preg_match('/\.zip$/i', $_FILES['src']['name'])) {
-
-  /* Update pricing from Mac */
-
-  $q= "CREATE TEMPORARY TABLE macitem (
-    item_no VARCHAR(32),
-    sku VARCHAR(10),
-    name VARCHAR(255),
-    retail_price DECIMAL(9,2),
-    promo_price DECIMAL(9,2),
-    PRIMARY KEY (item_no))";
-
-  $db->query($q)
-    or die_query($db, $q);
-
-  $base= basename($_FILES['src']['name'], '.zip');
-
-  $q= "LOAD DATA LOCAL INFILE 'zip://$fn#$base.txt'
-            INTO TABLE macitem
-          FIELDS TERMINATED BY '\t'
-          IGNORE 1 LINES
-          (item_no, sku, name, @retail_price, @unit,
-           @reno, @atlanta,
-           @minimum_qty, @sale_discount_pct, @cost_factor, @promo_price)
-          SET retail_price = SUBSTRING(@retail_price, 2),
-              promo_price = SUBSTRING(@promo_price, 2)";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-
-  // Find by barcode
-  $q= "UPDATE vendor_item, macitem
-          SET vendor_item.promo_price = macitem.promo_price
-        WHERE vendor = $vendor_id AND vendor_item.code = macitem.item_no
-          AND macitem.promo_price";
-  $r= $db->query($q)
-    or die_query($db, $q);
-
-  echo jsonp(array("result" => "Updated " . $db->affected_rows . " items."));
-
-  exit;
-
 } elseif (preg_match('/^sls_sku,/', $line)) {
   // SLS
   //
