@@ -217,6 +217,7 @@ $q= "SELECT company Company,
                    ' - ',
                    '$', CAST(vendor_item.net_price / 0.5 AS DECIMAL(9,2)))
               AS Sale,
+            special_order AS SpecialOrder\$bool,
             purchase_quantity AS OrderQuantity
        FROM vendor_item
        JOIN person ON vendor_item.vendor = person.id

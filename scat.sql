@@ -305,6 +305,7 @@ CREATE TABLE `vendor_item` (
   `promo_price` decimal(9,2) DEFAULT NULL,
   `barcode` varchar(20) DEFAULT NULL,
   `purchase_quantity` int(11) NOT NULL,
+  `special_order` tinyint(1) DEFAULT NULL,
   `category` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `vendor_2` (`vendor`,`code`),

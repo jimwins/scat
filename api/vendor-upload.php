@@ -30,6 +30,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     pending_net DECIMAL(9,2),
     barcode VARCHAR(32),
     purchase_quantity INT,
+    abc_flag CHAR(3),
     category VARCHAR(64))";
 
   $db->query($q)
@@ -48,7 +49,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            @purchase_unit, purchase_quantity,
            @customer_item_no, pending_msrp, pending_date, pending_net,
            promo_price, @promo_name,
-           @abc_flag, @vendor, @group_code, category)";
+           abc_flag, @vendor, @group_code, category)";
 
   $r= $db->query($q)
     or die_query($db, $q);
@@ -65,6 +66,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     promo_price DECIMAL(9,2),
     barcode VARCHAR(32),
     purchase_quantity INT,
+    abc_flag CHAR(3),
     category VARCHAR(64))";
 
   $db->query($q)
@@ -106,6 +108,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     promo_price DECIMAL(9,2),
     barcode VARCHAR(32),
     purchase_quantity INT,
+    abc_flag CHAR(3),
     category VARCHAR(64))";
 
   $db->query($q)
@@ -153,6 +156,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     promo_price DECIMAL(9,2),
     barcode VARCHAR(32),
     purchase_quantity INT,
+    abc_flag CHAR(3),
     category VARCHAR(64))";
 
   $db->query($q)
@@ -193,6 +197,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     promo_price DECIMAL(9,2),
     barcode VARCHAR(32),
     purchase_quantity INT,
+    abc_flag CHAR(3),
     category VARCHAR(64))";
 
   $db->query($q)
@@ -243,6 +248,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     promo_price DECIMAL(9,2),
     barcode VARCHAR(32),
     purchase_quantity INT,
+    abc_flag CHAR(3),
     category VARCHAR(64))";
 
   $db->query($q)
@@ -279,7 +285,7 @@ $r= $db->query($q)
 $q= "INSERT IGNORE INTO vendor_item
             (vendor, item, code, vendor_sku, name,
              retail_price, net_price, promo_price,
-             barcode, purchase_quantity, category)
+             barcode, purchase_quantity, category, special_order)
      SELECT
             $vendor_id AS vendor,
             0 AS item,
@@ -291,7 +297,8 @@ $q= "INSERT IGNORE INTO vendor_item
             promo_price,
             REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS barcode,
             purchase_quantity,
-            category
+            category,
+            IF(abc_flag = 'S', 1, 0) AS special_order
        FROM macitem";
 
 $r= $db->query($q)
