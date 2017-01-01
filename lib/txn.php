@@ -44,23 +44,13 @@ function txn_load($db, $id) {
               CAST(ROUND_TO_EVEN(
                 SUM(IF(txn_line.taxfree, 1, 0) *
                   IF(type = 'customer', -1, 1) * ordered *
-                  CASE discount_type
-                    WHEN 'percentage' THEN retail_price * ((100 - discount) / 100)
-                    WHEN 'relative' THEN (retail_price - discount) 
-                    WHEN 'fixed' THEN (discount)
-                    ELSE retail_price
-                  END),
+                  sale_price(retail_price, discount_type, discount)),
                 2) AS DECIMAL(9,2))
               untaxed,
               CAST(ROUND_TO_EVEN(
                 SUM(IF(txn_line.taxfree, 0, 1) *
                   IF(type = 'customer', -1, 1) * ordered *
-                  CASE discount_type
-                    WHEN 'percentage' THEN retail_price * ((100 - discount) / 100)
-                    WHEN 'relative' THEN (retail_price - discount) 
-                    WHEN 'fixed' THEN (discount)
-                    ELSE retail_price
-                  END),
+                  sale_price(retail_price, discount_type, discount)),
                 2) AS DECIMAL(9,2))
               taxed,
               tax_rate,
@@ -88,22 +78,11 @@ function txn_load_items($db, $id) {
               txn_line.id AS line_id, item.code, item.id AS item_id,
               IFNULL(override_name, item.name) name, data,
               txn_line.retail_price msrp,
-              IF(txn_line.discount_type,
-                 CASE txn_line.discount_type
-                   WHEN 'percentage' THEN CAST(ROUND_TO_EVEN(txn_line.retail_price * ((100 - txn_line.discount) / 100), 2) AS DECIMAL(9,2))
-                   WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
-                   WHEN 'fixed' THEN (txn_line.discount)
-                 END,
-                 txn_line.retail_price) price,
+              sale_price(txn_line.retail_price, txn_line.discount_type,
+                         txn_line.discount) price,
               (IF(type = 'customer', -1, 1) * ordered *
-               CASE txn_line.discount_type
-                 WHEN 'percentage' THEN txn_line.retail_price *
-                                         ((100 - txn_line.discount) / 100)
-                 WHEN 'relative' THEN (txn_line.retail_price -
-                                       txn_line.discount) 
-                 WHEN 'fixed' THEN (txn_line.discount)
-                 ELSE txn_line.retail_price
-               END) AS ext_price,
+               sale_price(txn_line.retail_price, txn_line.discount_type,
+                          txn_line.discount)) AS ext_price,
               IFNULL(CONCAT(IF(item.retail_price, 'MSRP $', 'List $'),
                             txn_line.retail_price,
                             CASE txn_line.discount_type

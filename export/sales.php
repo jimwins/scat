@@ -26,23 +26,13 @@ $q= "SELECT id, type, created,
             CAST(ROUND_TO_EVEN(
               SUM(IF(txn_line.taxfree, 1, 0) *
                 IF(type = 'customer', -1, 1) * allocated *
-                CASE discount_type
-                  WHEN 'percentage' THEN retail_price * ((100 - discount) / 100)
-                  WHEN 'relative' THEN (retail_price - discount) 
-                  WHEN 'fixed' THEN (discount)
-                  ELSE retail_price
-                END),
+                sale_price(retail_price, discount_type, discount)),
               2) AS DECIMAL(9,2))
             untaxed,
             CAST(ROUND_TO_EVEN(
               SUM(IF(txn_line.taxfree, 0, 1) *
                 IF(type = 'customer', -1, 1) * allocated *
-                CASE discount_type
-                  WHEN 'percentage' THEN retail_price * ((100 - discount) / 100)
-                  WHEN 'relative' THEN (retail_price - discount) 
-                  WHEN 'fixed' THEN (discount)
-                  ELSE retail_price
-                END),
+                sale_price(retail_price, discount_type, discount)),
               2) AS DECIMAL(9,2))
             taxed,
             tax_rate

@@ -60,23 +60,17 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
                     CAST(ROUND_TO_EVEN(
                       SUM(IF(txn_line.taxfree, 1, 0) *
                         IF(type = 'customer', -1, 1) * ordered *
-                        CASE txn_line.discount_type
-                          WHEN 'percentage' THEN txn_line.retail_price * ((100 - txn_line.discount) / 100)
-                          WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
-                          WHEN 'fixed' THEN (txn_line.discount)
-                          ELSE txn_line.retail_price
-                        END),
+                        sale_price(txn_line.retail_price,
+                                   txn_line.discount_type,
+                                   txn_line.discount)),
                       2) AS DECIMAL(9,2))
                     AS untaxed,
                     CAST(ROUND_TO_EVEN(
                       SUM(IF(txn_line.taxfree, 0, 1) *
                         IF(type = 'customer', -1, 1) * ordered *
-                        CASE txn_line.discount_type
-                          WHEN 'percentage' THEN txn_line.retail_price * ((100 - txn_line.discount) / 100)
-                          WHEN 'relative' THEN (txn_line.retail_price - txn_line.discount) 
-                          WHEN 'fixed' THEN (txn_line.discount)
-                          ELSE txn_line.retail_price
-                        END),
+                        sale_price(txn_line.retail_price,
+                                   txn_line.discount_type,
+                                   txn_line.discount)),
                       2) AS DECIMAL(9,2))
                     AS taxed,
                     tax_rate
