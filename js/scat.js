@@ -20,7 +20,7 @@ Scat.api= function (func, args, opts) {
         }
     }
 
-    jqXHR.success(validate);
+    jqXHR.done(validate);
     return def;
   }
 
