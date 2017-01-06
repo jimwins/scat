@@ -57,12 +57,12 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/jquery.dragbetter.js"></script>
  <script src="js/jquery.event.ue.js"></script>
  <script src="js/jquery.udraggable.js"></script>
+ <script src="components/moment/min/moment.min.js"></script>
 <?if (!$allnew) {?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
  <!-- next 3 used in index.php -->
  <script src="js/jquery.data-selector.js"></script>
- <script src="js/date.js"></script>
  <script src="js/jquery.hotkeys.js"></script>
  <script>
 $(document).ready(function() { 

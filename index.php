@@ -452,7 +452,7 @@ $("#sidebar .nav a").click(function() {
   <tr data-bind="click: $parent.loadOrder">
     <td data-bind="text: $data.number"></td>
     <td>
-      <span data-bind="text: Date.parse($data.created()).toString('d MMM HH:mm')"></span>
+      <span data-bind="text: moment($data.created()).format('d MMM HH:mm')"></span>
       <div class="person" data-bind="text: $data.person_name()"></div>
     </td>
     <td data-bind="text: $data.ordered"></td>
@@ -1069,13 +1069,12 @@ viewModel.person.display_name= ko.computed(function() {
 
 viewModel.txn.display_dates= ko.computed(function() {
   if (!viewModel.txn.created()) { return ""; }
-  var format= 'MMM d yyyy h:mmtt';
-  var dates= Date.parse(viewModel.txn.created()).toString(format);
+  var dates= moment(viewModel.txn.created()).calendar()
   if (viewModel.txn.filled()) {
-    dates = dates + ' / Filled: ' + Date.parse(viewModel.txn.filled()).toString(format);
+    dates = dates + ' / Filled: ' + moment(viewModel.txn.filled()).calendar();
   }
   if (viewModel.txn.paid()) {
-    dates = dates + ' / Paid: ' + Date.parse(viewModel.txn.paid()).toString(format);
+    dates = dates + ' / Paid: ' + moment(viewModel.txn.paid()).calendar();
   }
   return dates;
 }, viewModel);

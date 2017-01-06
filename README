@@ -18,9 +18,6 @@ Scat includes bootstrap-datepicker.js:
 Scat includes the SimpleModal plugin for jQuery:
   http://www.ericmmartin.com/projects/simplemodal/
 
-Scat includes Datejs, an open-source JavaScript Date library:
-  http://www.datejs.com/
-
 Scat includes the jQuery Hotkeys plugin:
   http://github.com/tzuryby/jquery.hotkeys
 
