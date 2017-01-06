@@ -33,7 +33,7 @@ header("content-type: text/html;charset=utf-8");?>
  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
  <link rel="stylesheet" type="text/css" href="components/font-awesome/css/font-awesome.min.css">
  <link rel="stylesheet" type="text/css" href="css/datepicker3.css">
- <link rel="stylesheet" type="text/css" href="static/screen.css">
+ <link rel="stylesheet" type="text/css" href="css/scat.css">
 <?if (!$allnew) {?>
   <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
 <?}?>
