@@ -6,8 +6,6 @@ if (preg_match('/^([-A-Za-z0-9_])+\\.([A-Za-z0-9]+)$/', $_REQUEST['fn'])) {
   $fn= $_REQUEST['fn'];
 }
 
-require '../extern/PHPExcel-1.8.1/Classes/PHPExcel.php';
-
 $xls= new PHPExcel();
 
 $xls->setActiveSheetIndex(0);
