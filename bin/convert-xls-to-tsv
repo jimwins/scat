@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+require dirname(__FILE__).'/../vendor/autoload.php';
+
+$fn= $argv[1];
+
+$xls= PHPExcel_IOFactory::load($fn);
+
+$sheet= $xls->getActiveSheet();
+
+foreach ($sheet->getRowIterator() as $row) {
+  $cells= $row->getCellIterator();
+  $cells->setIterateOnlyExistingCells(FALSE);
+  foreach ($cells as $cell) {
+    echo $cell->getValue(), "\t";
+  }
+  echo "\n";
+}
