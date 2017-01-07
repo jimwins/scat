@@ -154,6 +154,13 @@ Txn.removePerson= function (txn) {
 }
 
 Txn.updatePerson= function (txn, person) {
+  if (!txn) {
+    Scat.api("txn-create", { type: 'customer' })
+        .done(function (data) {
+          Txn.updatePerson(data.txn.id, person);
+        });
+    return;
+  }
   Txn.callAndLoad('txn-update-person', { txn: txn, person: person });
 }
 
