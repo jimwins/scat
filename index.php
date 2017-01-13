@@ -459,7 +459,7 @@ $("#sidebar .nav a").click(function() {
   <tr data-bind="click: $parent.loadOrder">
     <td data-bind="text: $data.number"></td>
     <td>
-      <span data-bind="text: moment($data.created()).format('d MMM HH:mm')"></span>
+      <span data-bind="text: moment($data.created()).format('D MMM HH:mm')"></span>
       <div class="person" data-bind="text: $data.person_name()"></div>
     </td>
     <td data-bind="text: $data.ordered"></td>
