@@ -105,7 +105,7 @@ $('#print').on('click', function() {
 function printGiftCard(card, balance, issued) {
   var lpr= $('<iframe id="giftcard" src="print/gift-card.php?card=' + card + '&amp;balance=' + balance + '&amp;issued=' + issued + '"></iframe>').hide();
   $("#giftcard").remove();
-  lpr.load(function() {
+  lpr.on("load", function() {
     this.contentWindow.print();
   });
   $('body').append(lpr);
