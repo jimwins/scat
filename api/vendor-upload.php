@@ -54,7 +54,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-} elseif (preg_match('/^sls_sku,/', $line)) {
+} elseif (preg_match('/^sls_sku(,|\t)/', $line, $m)) {
   // SLS
   //
   $q= "CREATE TEMPORARY TABLE macitem (
@@ -75,7 +75,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 #sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE macitem
-          FIELDS TERMINATED BY ','
+          FIELDS TERMINATED BY '$m[1]'
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 1 LINES
           (item_no, @cust_sku, name, @vendor_name,
