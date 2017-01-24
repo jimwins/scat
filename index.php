@@ -870,7 +870,17 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             <i class="fa fa-reply"></i>
           </button>
         </div>
-        <div data-bind="text: txn.display_dates()"></div>
+        <div data-bind="if: txn.created()">
+          <span data-bind="text: moment(txn.created()).calendar()"></span>
+          <span data-bind="css: { 'text-muted': !txn.filled() },
+                           attr: { title: txn.filled() ? moment(txn.filled()).format('MMMM D YYYY h:mm:ss a') : '' }">
+            <i class="fa fa-shopping-basket"></i>
+          </span>
+          <span data-bind="css: { 'text-muted': !txn.paid() },
+                           attr: { title: txn.paid() ? moment(txn.paid()).format('MMMM D YYYY h:mm:ss a') : '' }">
+            <i class="fa fa-money"></i>
+          </span>
+        </div>
         <div>
           <a data-bind="click: changePerson">
             <i class="fa fa-user-o"></i>
