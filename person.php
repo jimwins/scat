@@ -32,16 +32,20 @@ $activity= array();
 $people= array();
 
 if (!empty($search)) {
-  $search= $db->escape($search);
+  $term= $db->escape($search);
 
   $active= $_REQUEST['all'] ? "" : 'AND active';
+
+  $criteria= "(person.name LIKE '%$term%'
+             OR person.company LIKE '%$term%'
+             OR person.email LIKE '%$term%'
+             OR person.loyalty_number LIKE '%$term%'
+             OR person.phone LIKE '%$term%')";
 
   $q= "SELECT IF(deleted, 'deleted', '') AS meta,
               id, name, company
          FROM person
-        WHERE (name like '%$search%' OR
-               company LIKE '%$search%' OR
-               email like '%$search%')
+        WHERE $criteria
               $active
         ORDER BY CONCAT(name, company)";
 
