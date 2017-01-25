@@ -400,9 +400,7 @@ class Transaction {
     }
 
     // remove loyalty records
-    $q= "DELETE FROM loyalty WHERE txn_id = {$this->id}";
-    $r= $this->db->query($q)
-      or die_query($this->db, $q);
+    $this->clearLoyalty();
 
     $this->db->commit()
       or die_query($this->db, "COMMIT");
@@ -425,6 +423,15 @@ class Transaction {
                 processed = NOW(),
                 note = 'Pt Earned',
                 points = $points";
+    // XXX throw an exception on failure
+    $r= $this->db->query($q)
+        or die_query($this->db, $q);
+  }
+
+  public function clearLoyalty() {
+    $q= "DELETE FROM loyalty
+          WHERE txn_id = {$this->id}";
+    // XXX throw an exception on failure
     $r= $this->db->query($q)
         or die_query($this->db, $q);
   }

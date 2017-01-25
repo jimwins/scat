@@ -6,7 +6,9 @@ $txn_id= (int)$_REQUEST['txn'];
 if (!$txn_id)
   die_jsonp("No transaction specified.");
 
-$txn= txn_load($db, $txn_id);
+$db->start_transaction();
+
+$txn= new Transaction($db, $txn_id);
 
 $person= (int)$_REQUEST['person'];
 if (!$person)
@@ -18,9 +20,19 @@ $r= $db->query($q)
 if (!$r->num_rows)
   die_jsonp("No such person.");
 
+if ($txn->paid)
+  $txn->clearLoyalty();
+
 $q= "UPDATE txn SET person = $person WHERE id = $txn_id";
 $r= $db->query($q)
   or die_query($db, $q);
+
+$txn->person= $person;
+
+if ($txn->paid)
+  $txn->rewardLoyalty();
+
+$db->commit();
 
 $txn= txn_load($db, $txn_id);
 $person= person_load($db, $person);
