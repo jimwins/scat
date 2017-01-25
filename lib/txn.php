@@ -366,6 +366,9 @@ class Transaction {
       $q= "UPDATE txn SET paid = NOW() WHERE id = {$this->id}";
       $r= $this->db->query($q)
         or die_query($this->db, $q);
+
+      $this->rewardLoyalty();
+
     } elseif ($this->paid) {
       // we thought we were paid, but now we must not be
       $q= "UPDATE txn SET paid = NULL WHERE id = {$this->id}";
@@ -385,7 +388,7 @@ class Transaction {
     $this->db->start_transaction()
       or die_query($this->db, "START TRANSACTION");
 
-    // add payment record
+    // remove payment record
     $q= "DELETE FROM payment WHERE id = $payment AND txn = {$this->id}";
     $r= $this->db->query($q)
       or die_query($this->db, $q);
@@ -396,9 +399,33 @@ class Transaction {
         or die_query($this->db, $q);
     }
 
+    // remove loyalty records
+    $q= "DELETE FROM loyalty WHERE txn_id = {$this->id}";
+    $r= $this->db->query($q)
+      or die_query($this->db, $q);
+
     $this->db->commit()
       or die_query($this->db, "COMMIT");
 
     return true;
+  }
+
+  public function rewardLoyalty() {
+    // No person? No loyalty.
+    if (!$this->person)
+      return;
+
+    // Use rewards
+
+    // Award new points
+    $points= (int)$this->subtotal;
+    $q= "INSERT INTO loyalty
+            SET txn_id= {$this->id},
+                person_id = {$this->person},
+                processed = NOW(),
+                note = 'Pt Earned',
+                points = $points";
+    $r= $this->db->query($q)
+        or die_query($this->db, $q);
   }
 }
