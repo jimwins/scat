@@ -887,7 +887,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             <span class="val"
                   data-bind="text: person.display_name()"></span>
           </a>
-          <a data-bind="if: person.id()">
+          <a data-bind="if: person.id(), click: showPoints">
             <i class="fa fa-star"></i>
             <span data-bind="text: person.points_available()"></span>
           </a>
@@ -1270,6 +1270,35 @@ function displayPerson(person) {
             $(place).closest('.modal').modal('hide');
           });
     }
+
+    ko.applyBindings(personModel, panel[0]);
+
+    panel.appendTo($('body')).modal();
+  });
+}
+
+viewModel.showPoints= function(data, event) {
+  Scat.dialog('points').done(function (html) {
+    var panel= $(html);
+
+    panel.on('shown.bs.modal', function() {
+      $("#search", this).focus();
+    });
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    var model= {
+    };
+
+    var personModel= ko.mapping.fromJS(model);
+    personModel.activity= ko.observableArray();
+
+    Scat.api('person-load-loyalty', { person: data.person.id() })
+        .done(function (data) {
+          personModel.activity(data.activity);
+        });
 
     ko.applyBindings(personModel, panel[0]);
 

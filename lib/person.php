@@ -78,3 +78,23 @@ function person_load_activity($db, $id, $page= 0) {
 
   return $activity;
 }
+
+function person_load_loyalty($db, $id) {
+  $id= (int)$id;
+
+  $loyalty= array();
+
+  $q= "SELECT processed, points, note
+         FROM loyalty
+        WHERE person_id = $id";
+
+  $r= $db->query($q);
+
+  if ($r->num_rows) {
+    while ($row= $r->fetch_assoc()) {
+      $loyalty[]= $row;
+    }
+  }
+
+  return $loyalty;
+}
