@@ -11,7 +11,9 @@ function person_load($db, $id) {
               tax_id,
               payment_account_id,
               active,
-              deleted
+              deleted,
+              (SELECT SUM(points) FROM loyalty WHERE person_id = person.id AND DATE(processed) < DATE(NOW())) points_available,
+              (SELECT SUM(points) FROM loyalty WHERE person_id = person.id AND DATE(processed) = DATE(NOW())) points_pending
          FROM person
         WHERE id = " . (int)$id;
 
