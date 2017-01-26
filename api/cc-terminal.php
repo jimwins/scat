@@ -27,16 +27,18 @@ try {
 
   $payment= $txn->addPayment('credit', $amount, $extra);
 
-  $q= "INSERT INTO cc_trace (request, response, info)
-            VALUES ('" . $db->escape($cc->raw_request) . "',
+  $q= "INSERT INTO cc_trace (txn_id, request, response, info)
+            VALUES ($id,
+                    '" . $db->escape($cc->raw_request) . "',
                     '" . $db->escape($cc->raw_response) . "',
                     '" . $db->escape($cc->raw_curlinfo) . "')";
   $db->query($q) or die_query($db, $q);
 
 } catch (Exception $e) {
 
-  $q= "INSERT INTO cc_trace (request, response, info)
-            VALUES ('" . $db->escape($cc->raw_request) . "',
+  $q= "INSERT INTO cc_trace (txn_id, request, response, info)
+            VALUES ($id,
+                    '" . $db->escape($cc->raw_request) . "',
                     '" . $db->escape($cc->raw_response) . "',
                     '" . $db->escape($cc->raw_curlinfo) . "')";
   $db->query($q) or die_query($db, $q);
