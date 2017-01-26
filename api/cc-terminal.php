@@ -27,8 +27,8 @@ try {
 
   $payment= $txn->addPayment('credit', $amount, $extra);
 
-  $q= "INSERT INTO cc_trace (txn_id, request, response, info)
-            VALUES ($id,
+  $q= "INSERT INTO cc_trace (txn_id, payment_id, request, response, info)
+            VALUES ($id, $payment,
                     '" . $db->escape($cc->raw_request) . "',
                     '" . $db->escape($cc->raw_response) . "',
                     '" . $db->escape($cc->raw_curlinfo) . "')";

@@ -58,6 +58,7 @@ CREATE TABLE `cc_trace` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `traced` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `txn_id` int(10) unsigned DEFAULT NULL,
+  `payment_id` int(10) unsigned DEFAULT NULL,
   `request` mediumblob,
   `response` mediumblob,
   `info` mediumblob,
