@@ -409,6 +409,8 @@ class Transaction {
   }
 
   public function rewardLoyalty() {
+    if (!defined('LOYALTY')) return;
+
     // No person? No loyalty.
     if (!$this->person)
       return;
@@ -429,6 +431,8 @@ class Transaction {
   }
 
   public function clearLoyalty() {
+    if (!defined('LOYALTY')) return;
+
     $q= "DELETE FROM loyalty
           WHERE txn_id = {$this->id}";
     // XXX throw an exception on failure
