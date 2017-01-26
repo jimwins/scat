@@ -13,7 +13,7 @@ if ($_REQUEST['phone']) {
   $_REQUEST['loyalty_number']= preg_replace('/[^\d]/', '', $_REQUEST['phone']);
 }
 
-foreach (array('name', 'role', 'company', 'email',
+foreach (array('name', 'role', 'company', 'email', 'notes',
                'phone', 'loyalty_number', 'tax_id', 'address') as $key) {
   if (isset($_REQUEST[$key])) {
     $value= $db->real_escape_string($_REQUEST[$key]);

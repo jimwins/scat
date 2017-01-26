@@ -121,16 +121,28 @@ $person= person_load($db, $id);
   </div>
   <div class="form-group">
     <label for="email" class="col-sm-2 control-label">Email</label>
-    <div class="col-sm-8">
+    <div class="col-sm-6">
       <input type="text" class="form-control" id="email" placeholder="Email"
              data-bind="value: person.email">
+    </div>
+    <div class="col-sm-4 checkbox disabled">
+      <label>
+        Email OK?
+        <input type="checkbox" id="email_ok" data-bind="value: person.email_ok" disabled>
+      </label>
     </div>
   </div>
   <div class="form-group">
     <label for="phone" class="col-sm-2 control-label">Phone</label>
-    <div class="col-sm-8">
+    <div class="col-sm-6">
       <input type="text" class="form-control" id="phone" placeholder="Phone"
              data-bind="value: person.phone">
+    </div>
+    <div class="col-sm-4 checkbox disabled">
+      <label>
+        SMS OK?
+        <input type="checkbox" id="sms_ok" data-bind="value: person.sms_ok" disabled>
+      </label>
     </div>
   </div>
   <div class="form-group">
@@ -138,6 +150,13 @@ $person= person_load($db, $id);
     <div class="col-sm-8">
       <textarea class="form-control" id="address" placeholder="Address"
              data-bind="value: person.address"></textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="notes" class="col-sm-2 control-label">Notes</label>
+    <div class="col-sm-8">
+      <textarea class="form-control" id="notes" placeholder="Notes"
+             data-bind="value: person.notes"></textarea>
     </div>
   </div>
   <div class="form-group">
