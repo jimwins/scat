@@ -68,9 +68,11 @@ Txn.loadData= function (data) {
     setActiveRow($('#items tbody tr[data-line_id=' + data.new_line + ']'));
   }
   if (Txn.due() != 0.00 &&
-      viewModel.person.id() != oldperson &&
-      viewModel.person.id()) {
-    Txn.showAvailableRewards(viewModel.person.id());
+      viewModel.person.id() != oldperson) {
+    $(".choices.loyalty").remove();
+    if (viewModel.person.id()) {
+      Txn.showAvailableRewards(viewModel.person.id());
+    }
   }
 }
 
