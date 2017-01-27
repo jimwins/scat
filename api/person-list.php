@@ -32,7 +32,8 @@ $q= "SELECT id,
             CONCAT(IFNULL(name, ''),
                    IF(name != '' AND company != '', ' / ', ''),
                    IFNULL(company, ''))
-                AS value 
+                AS value,
+            loyalty_number
        FROM person
       WHERE $criteria
       ORDER BY value";
@@ -42,7 +43,7 @@ $r= $db->query($q)
 
 $list= array();
 while ($row= $r->fetch_assoc()) {
-  /* force numeric values to numeric type */
+  if (!$row['value']) $row['value']= $row['loyalty_number'];
   $list[]= $row;
 }
 
