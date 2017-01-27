@@ -419,6 +419,8 @@ class Transaction {
 
     // Award new points
     $points= (int)$this->subtotal;
+    if ($points == 0 && $this->subtotal > 0) $points= 1;
+
     $q= "INSERT INTO loyalty
             SET txn_id= {$this->id},
                 person_id = {$this->person},
