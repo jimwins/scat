@@ -417,6 +417,20 @@ class Transaction {
 
     // Use rewards
 
+    $q= "INSERT INTO loyalty (txn_id, person_id, processed, note, points)
+         SELECT {$this->id} txn_id,
+                {$this->person} person_id,
+                NOW() processed,
+                name note,
+                cost * allocated points
+           FROM loyalty_reward
+           JOIN txn_line ON loyalty_reward.item_id = txn_line.item
+           JOIN item ON txn_line.item = item.id
+          WHERE txn = {$this->id}";
+    // XXX throw an exception on failure
+    $r= $this->db->query($q)
+        or die_query($this->db, $q);
+
     // Award new points
     $points= (int)$this->subtotal;
     if ($points == 0 && $this->subtotal > 0) $points= 1;
