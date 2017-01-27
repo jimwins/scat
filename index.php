@@ -174,6 +174,8 @@ Txn.updatePerson= function (txn, person) {
 Txn.showAvailableRewards= function(person) {
   Scat.api("loyalty-available", { person: person })
       .done(function (data) {
+        if (!data.rewards.length) return;
+
         var choices= $('<div class="choices loyalty alert alert-warning"/>');
         choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
         var list= $('<table class="table table-condensed" style="width: 95%;">');
