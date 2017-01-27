@@ -17,8 +17,16 @@ function person_load($db, $id) {
               notes,
               active,
               deleted,
-              (SELECT SUM(points) FROM loyalty WHERE person_id = person.id AND DATE(processed) < DATE(NOW())) points_available,
-              (SELECT SUM(points) FROM loyalty WHERE person_id = person.id AND DATE(processed) = DATE(NOW())) points_pending
+              (SELECT SUM(points)
+                 FROM loyalty
+                WHERE person_id = person.id
+                  AND (points < 0 OR
+                       DATE(processed) < DATE(NOW()))) points_available,
+              (SELECT SUM(points)
+                 FROM loyalty
+                WHERE person_id = person.id
+                  AND (points > 0 AND
+                       DATE(processed) = DATE(NOW()))) points_pending
          FROM person
         WHERE id = " . (int)$id;
 
