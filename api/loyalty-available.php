@@ -11,10 +11,12 @@ if (!$person) {
   die_jsonp("No such person.");
 }
 
+$points= (int)$person['points_available']; // might be NULL
+
 $q= "SELECT item_id, cost, code, name, retail_price
        FROM loyalty_reward
        JOIN item ON item.id = item_id
-      WHERE cost <= {$person['points_available']}
+      WHERE cost <= $points
       ORDER BY cost DESC";
 
 $r= $db->query($q)
