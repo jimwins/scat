@@ -9,6 +9,7 @@ function person_load($db, $id) {
               email,
               email_ok,
               phone,
+              loyalty_number,
               sms_ok,
               tax_id,
               payment_account_id,
