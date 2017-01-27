@@ -1134,18 +1134,6 @@ viewModel.person.display_name= ko.computed(function() {
   return name;
 }, viewModel);
 
-viewModel.txn.display_dates= ko.computed(function() {
-  if (!viewModel.txn.created()) { return ""; }
-  var dates= moment(viewModel.txn.created()).calendar()
-  if (viewModel.txn.filled()) {
-    dates = dates + ' / Filled: ' + moment(viewModel.txn.filled()).calendar();
-  }
-  if (viewModel.txn.paid()) {
-    dates = dates + ' / Paid: ' + moment(viewModel.txn.paid()).calendar();
-  }
-  return dates;
-}, viewModel);
-
 viewModel.load= function(txn) {
   ko.mapping.fromJS(txn, viewModel);
 }
