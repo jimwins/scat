@@ -62,9 +62,15 @@ Txn.delete= function (id) {
 }
 
 Txn.loadData= function (data) {
+  var oldperson= viewModel.person.id();
   viewModel.load(data);
   if (data.new_line) {
     setActiveRow($('#items tbody tr[data-line_id=' + data.new_line + ']'));
+  }
+  if (Txn.due() != 0.00 &&
+      viewModel.person.id() != oldperson &&
+      viewModel.person.id()) {
+    Txn.showAvailableRewards(viewModel.person.id());
   }
 }
 
@@ -151,6 +157,7 @@ Txn.findAndAddItem= function(q) {
 
 Txn.removePerson= function (txn) {
   Txn.callAndLoad('txn-remove-person', { txn: txn });
+  $(".choices.loyalty").remove();
 }
 
 Txn.updatePerson= function (txn, person) {
@@ -162,6 +169,29 @@ Txn.updatePerson= function (txn, person) {
     return;
   }
   Txn.callAndLoad('txn-update-person', { txn: txn, person: person });
+}
+
+Txn.showAvailableRewards= function(person) {
+  Scat.api("loyalty-available", { person: person })
+      .done(function (data) {
+        var choices= $('<div class="choices loyalty alert alert-warning"/>');
+        choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
+        var list= $('<table class="table table-condensed" style="width: 95%;">');
+        $.each(data.rewards, function(i,item) {
+          var n= $("<tr class='stocked'>" +
+                   "<td>" + item.name + "</td>" +
+                   "<td align='right'>" + item.cost + " pts</td>" +
+                   "<td align='right'>" + amount(item.retail_price) + "</td>" +
+                   "</tr>");
+          n.click({ id: item.item_id }, function(ev) {
+            Txn.addItem(Txn.id(), ev.data);
+            $(this).closest(".choices").remove();
+          });
+          list.append(n);
+        });
+        choices.append(list);
+        $("#items").before(choices);
+      });
 }
 
 Txn.isSpecialOrder = function() {

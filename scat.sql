@@ -113,6 +113,21 @@ CREATE TABLE `loyalty` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `loyalty_reward`
+--
+
+DROP TABLE IF EXISTS `loyalty_reward`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `loyalty_reward` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `cost` int(11) NOT NULL DEFAULT '0',
+  `item_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `payment`
 --
 
@@ -433,4 +448,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-12-27 14:49:17
+-- Dump completed on 2017-01-26 16:43:03
