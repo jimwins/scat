@@ -86,7 +86,8 @@ $q= "SELECT meta, Number\$txn,
             txn.created AS Created\$date,
             txn.filled AS Filled\$date,
             CONCAT(txn.person, '|', IFNULL(person.company,''),
-                   '|', IFNULL(person.name,''))
+                   '|', IFNULL(person.name,''),
+                   '|', IFNULL(person.loyalty_number,''))
               AS Person\$person,
             SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS Ordered,
             SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS Allocated,

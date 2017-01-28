@@ -303,8 +303,9 @@ function expand_field($data, $class, $meta = null) {
       return '<a href="txn.php?id='.ashtml($id).'">'.$desc[$type].' '.ashtml($number).'</a>';
     }
   case '$person':
-    list($id, $company, $name)= preg_split('/\|/', $data, 3);
+    list($id, $company, $name, $loyalty)= preg_split('/\|/', $data, 4);
     if (!$id) return '';
+    if (!$company && !$name) $name= format_phone($loyalty);
     return '<a href="person.php?id='.ashtml($id).'">'.ashtml($company).($name&&$company?" (":"").ashtml($name).($name&&$company?")":"").'</a>';
   case '$item':
     if ($meta) {
