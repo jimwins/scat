@@ -47,18 +47,6 @@ function person_load($db, $id) {
   return $person;
 }
 
-function format_phone($phone) {
-  try {
-    $phoneUtil= \libphonenumber\PhoneNumberUtil::getInstance();
-    $num= $phoneUtil->parse($phone, 'US');
-    return $phoneUtil->format($num,
-                              \libphonenumber\PhoneNumberFormat::NATIONAL);
-  } catch (Exception $e) {
-    // Punt!
-    return $phone;
-  }
-}
-
 function person_load_activity($db, $id, $page= 0) {
   $id= (int)$id;
 

@@ -417,6 +417,18 @@ function generate_upc($code) {
   return $code.$cd;
 }
 
+function format_phone($phone) {
+  try {
+    $phoneUtil= \libphonenumber\PhoneNumberUtil::getInstance();
+    $num= $phoneUtil->parse($phone, 'US');
+    return $phoneUtil->format($num,
+                              \libphonenumber\PhoneNumberFormat::NATIONAL);
+  } catch (Exception $e) {
+    // Punt!
+    return $phone;
+  }
+}
+
 require 'lib/cryptor.php';
 
 function include_encrypted($file) {
