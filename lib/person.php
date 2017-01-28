@@ -39,6 +39,7 @@ function person_load($db, $id) {
     while ($field= $r->fetch_field()) {
       $person[$field->name]= null;
     }
+    $person['pretty_phone']= null;
   } else {
     $person['pretty_phone']= format_phone($person['loyalty_number']);
   }
