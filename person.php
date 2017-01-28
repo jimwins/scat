@@ -113,6 +113,19 @@ $person= person_load($db, $id);
     </div>
   </div>
   <div class="form-group">
+    <label for="points" class="col-sm-2 control-label">Points</label>
+    <div class="col-sm-4" data-bind="if: person.points_available()">
+      <p class="form-control-static"
+         data-bind="text: 'Available: ' + person.points_available()">
+      </p>
+    </div>
+    <div class="col-sm-4" data-bind="if: person.points_pending()">
+      <p class="form-control-static"
+         data-bind="text: 'Pending: ' + person.points_pending().toString()">
+      </p>
+    </div>
+  </div>
+  <div class="form-group">
     <label for="company" class="col-sm-2 control-label">Company</label>
     <div class="col-sm-8">
       <input type="text" class="form-control" id="company" placeholder="Company"
