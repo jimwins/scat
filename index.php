@@ -1251,12 +1251,14 @@ viewModel.changePerson= function(data, event) {
     personModel.createPerson= function(place, ev) {
       $(place).closest('.modal').modal('hide');
 
+      var s= this.search();
+
       var person= {
         id: 0,
-        name: this.search(),
+        name: s.match(/[^\d]/) ? s : '',
         company: '',
         email: '',
-        phone: '',
+        phone: !s.match(/[^\d]/) ? s : '',
         address: '',
         tax_id: '',
       };
