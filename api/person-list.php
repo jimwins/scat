@@ -1,5 +1,6 @@
 <?
 include '../scat.php';
+include '../lib/person.php';
 
 $criteria= array();
 
@@ -43,7 +44,7 @@ $r= $db->query($q)
 
 $list= array();
 while ($row= $r->fetch_assoc()) {
-  if (!$row['value']) $row['value']= $row['loyalty_number'];
+  if (!$row['value']) $row['value']= format_phone($row['loyalty_number']);
   $list[]= $row;
 }
 
