@@ -1,5 +1,6 @@
 <?
 include '../scat.php';
+include '../lib/person.php';
 
 $criteria= array();
 
@@ -38,7 +39,7 @@ $start= $page * $per_page;
 $q= "SELECT id, type,
             number, created, filled, paid,
             CONCAT(DATE_FORMAT(created, '%Y-'), number) AS formatted_number,
-            person, person_name,
+            person, person_name, loyalty_number,
             IFNULL(ordered, 0) ordered, allocated,
             taxed, untaxed, tax_rate,
             CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
@@ -52,6 +53,7 @@ $q= "SELECT id, type,
                    IF(person.name != '' AND person.company != '', ' / ', ''),
                    IFNULL(person.company, ''))
                 AS person_name,
+            loyalty_number,
             SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS ordered,
             SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS allocated,
             CAST(ROUND_TO_EVEN(
@@ -85,6 +87,9 @@ while ($row= $r->fetch_assoc()) {
   /* force numeric values to numeric type */
   $row['total']= (float)$row['total'];
   $row['total_paid']= (float)$row['total_paid'];
+  if (!$row['person_name']) {
+    $row['person_name']= format_phone($row['loyalty_number']);
+  }
   $txn[]= $row;
 }
 

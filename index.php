@@ -1084,6 +1084,7 @@ var model= {
     address: '',
     tax_id: '',
     loyalty_number: '',
+    pretty_phone: '',
     points_available: 0,
     points_pending: 0,
   },
@@ -1125,10 +1126,8 @@ viewModel.person.display_name= ko.computed(function() {
   if (viewModel.person.company()) {
     name= name + viewModel.person.company();
   }
-  if (!name && viewModel.person.loyalty_number()) {
-    var num= viewModel.person.loyalty_number();
-    name= '(' + num.substring(0, 3) + ') ' +
-          num.substring(3,6) + '-' + num.substring(6);
+  if (!name && viewModel.person.pretty_phone()) {
+    name= viewModel.person.pretty_phone();
   }
   if (!name) { name= 'Anonymous'; }
   return name;

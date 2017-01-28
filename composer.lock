@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7a494176dd6688d6ff3693eebe6b7482",
-    "content-hash": "89d7847f9b7e7347ed98bfd5ac3dfa6f",
+    "hash": "dadd35dc7ba6f444ea666b559c4cf087",
+    "content-hash": "a3a62caf6c312c4f466025c12af15533",
     "packages": [
         {
             "name": "components/font-awesome",
@@ -81,6 +81,117 @@
             "description": "jQuery JavaScript Library",
             "homepage": "http://jquery.com",
             "time": "2016-09-23 06:06:29"
+        },
+        {
+            "name": "giggsey/libphonenumber-for-php",
+            "version": "8.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/giggsey/libphonenumber-for-php.git",
+                "reference": "ba82f4f7e9bb9509e6bcddd42e07bebf6f6b2e92"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/ba82f4f7e9bb9509e6bcddd42e07bebf6f6b2e92",
+                "reference": "ba82f4f7e9bb9509e6bcddd42e07bebf6f6b2e92",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "giggsey/locale": "^1.0",
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "pear/pear-core-minimal": "^1.9",
+                "pear/pear_exception": "^1.0",
+                "pear/versioncontrol_git": "dev-master",
+                "phing/phing": "^2.7",
+                "phpunit/phpunit": "^4.8|^5.0",
+                "satooshi/php-coveralls": "^1.0",
+                "symfony/console": "^2.8|^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "8.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "libphonenumber\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Joshua Gigg",
+                    "email": "giggsey@gmail.com",
+                    "homepage": "https://giggsey.com/"
+                }
+            ],
+            "description": "PHP Port of Google's libphonenumber",
+            "homepage": "https://github.com/giggsey/libphonenumber-for-php",
+            "keywords": [
+                "geocoding",
+                "geolocation",
+                "libphonenumber",
+                "mobile",
+                "phonenumber",
+                "validation"
+            ],
+            "time": "2017-01-25 11:07:04"
+        },
+        {
+            "name": "giggsey/locale",
+            "version": "1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/giggsey/Locale.git",
+                "reference": "8238764fa3f2c5bd8bdf981e2e019401d49229e3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/giggsey/Locale/zipball/8238764fa3f2c5bd8bdf981e2e019401d49229e3",
+                "reference": "8238764fa3f2c5bd8bdf981e2e019401d49229e3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "pear/pear-core-minimal": "^1.9",
+                "pear/pear_exception": "^1.0",
+                "pear/versioncontrol_git": "dev-master",
+                "phing/phing": "~2.7",
+                "phpunit/phpunit": "^4.8|^5.0",
+                "satooshi/php-coveralls": "^1.0",
+                "symfony/console": "^2.8|^3.0",
+                "symfony/filesystem": "^2.8|^3.0",
+                "symfony/finder": "^2.8|^3.0",
+                "symfony/process": "^2.8|^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Giggsey\\Locale\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joshua Gigg",
+                    "email": "giggsey@gmail.com",
+                    "homepage": "http://giggsey.com/"
+                }
+            ],
+            "description": "Locale functions required by libphonenumber-for-php",
+            "time": "2016-10-24 20:49:55"
         },
         {
             "name": "kriswallsmith/assetic",

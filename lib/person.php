@@ -39,9 +39,23 @@ function person_load($db, $id) {
     while ($field= $r->fetch_field()) {
       $person[$field->name]= null;
     }
+  } else {
+    $person['pretty_phone']= format_phone($person['loyalty_number']);
   }
 
   return $person;
+}
+
+function format_phone($phone) {
+  try {
+    $phoneUtil= \libphonenumber\PhoneNumberUtil::getInstance();
+    $num= $phoneUtil->parse($phone, 'US');
+    return $phoneUtil->format($num,
+                              \libphonenumber\PhoneNumberFormat::NATIONAL);
+  } catch (Exception $e) {
+    // Punt!
+    return $phone;
+  }
 }
 
 function person_load_activity($db, $id, $page= 0) {
