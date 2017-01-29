@@ -32,50 +32,30 @@ $activity= array();
 $people= array();
 
 if (!empty($search)) {
-  $term= $db->escape($search);
+  $people= person_find($db, $search);
 
-  $active= $_REQUEST['all'] ? "" : 'AND active';
-
-  $criteria= "(person.name LIKE '%$term%'
-             OR person.company LIKE '%$term%'
-             OR person.email LIKE '%$term%'
-             OR person.loyalty_number LIKE '%$term%'
-             OR person.phone LIKE '%$term%')";
-
-  $q= "SELECT IF(deleted, 'deleted', '') AS meta,
-              id, name, company
-         FROM person
-        WHERE $criteria
-              $active
-        ORDER BY CONCAT(name, company)";
-
-  $r= $db->query($q)
-    or die($db->error);
-
-  if ($r->num_rows > 1) {
-    while ($row= $r->fetch_row())
-      $people[]= $row;
-  } else {
-    $person= $r->fetch_assoc();
+  if (count($people) == 1) {
+    $person= $people[0];
     $id= (int)$person['id'];
   }
 }
 ?>
 <table class="table table-condensed table-striped table-hover"
-       data-bind="if: people().length">
+       data-bind="if: people().length && !person.id()">
  <thead>
   <tr>
     <th>#</th>
     <th>Name</th>
     <th>Company</th>
+    <th>Phone</th>
   </tr>
  </thead>
- <tbody data-bind="foreach: { data: people, as: 'item' }">
-  <tr>
-   <td><a data-bind="text: $index() + 1,
-                     attr: { href: '?id=' + item[1] }"></a></td>
-   <td><a data-bind="text: item[2], attr: { href: '?id=' + item[1] }"></a></td>
-   <td><a data-bind="text: item[3], attr: { href: '?id=' + item[1] }"></a></td>
+ <tbody data-bind="foreach: people">
+  <tr data-bind="click: function(d, e) { window.location.href= 'person.php?id=' + $data.id() }">
+   <td data-bind="text: $index() + 1"></td>
+   <td data-bind="text: $data.name"></td>
+   <td data-bind="text: $data.company"></td>
+   <td data-bind="text: $data.pretty_phone"></td>
   </tr>
  </tbody>
 </table>
