@@ -204,6 +204,12 @@ $person= person_load($db, $id);
                      visible: person.role() == 'vendor'">
     Reorder
   </button>
+  <button class="btn btn-default"
+          id="upload-items"
+          data-loading-text="Processing..."
+          data-bind="click: uploadItems, visible: person.role() == 'vendor'">
+    Upload Items
+  </Button>
 </h2>
 
 <div data-bind="visible: loading()" class="progress progress-striped active" style="height: 1.5em">
@@ -331,6 +337,48 @@ function reorder(place, ev) {
   $(ev.target).button('loading');
   window.location= 'reorder.php?vendor=' + place.person.id();
 }
+
+function uploadItems(place, ev) {
+  displayError("Just drag & drop a file on this window.");
+}
+
+$("body").html5Uploader({
+  name: 'src',
+  postUrl: 'api/vendor-upload.php?vendor=<?=$id?>',
+  onClientLoadStart: function (e, file, response) {
+    $('#upload-items')
+      .html('<i class="fa fa-spinner fa-spin"></i> Reading...');
+  },
+  onServerLoadStart: function (e, file, response) {
+    $('#upload-items')
+      .html('<i class="fa fa-spinner fa-spin"></i> Uploading...');
+  },
+  onServerLoad: function (e, file, response) {
+    $('#upload-items')
+      .html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+  },
+  onSuccess: function(e, file, response) {
+    data= $.parseJSON(response);
+    if (data.error) {
+      displayError(data);
+      return;
+    }
+    displayError({ title: "Upload Successful", error: data.result });
+    $('#upload-items')
+      .html('Upload Items');
+  },
+  onServerError: function(e, file) {
+    displayError("File upload failed.");
+    $('#upload-items')
+      .html($('Upload Items'));
+  },
+});
+$('body').on('dragbetterenter', function () {
+  $('#upload-items').addClass("active btn-success");
+});
+$('body').on('dragbetterleave', function () {
+  $('#upload-items').removeClass("active btn-success");
+});
 
 function linkTransaction(components) {
   var m= components.split(/\|/);
