@@ -112,7 +112,7 @@ $person= person_load($db, $id);
       </label>
     </div>
   </div>
-  <div class="form-group">
+  <div class="form-group" data-bind="if: person.role() != 'vendor'">
     <label for="points" class="col-sm-2 control-label">Points</label>
     <div class="col-sm-4" data-bind="if: person.points_available()">
       <p class="form-control-static"
