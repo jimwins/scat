@@ -43,7 +43,7 @@ function person_find($db, $q, $options= null) {
                        DATE(processed) = DATE(NOW()))) points_pending
          FROM person
         WHERE $sql_criteria
-        ORDER BY name, company, loyalty_number";
+        ORDER BY company, name, loyalty_number";
 
   $r= $db->query($q)
     or die_query($db, $q);
