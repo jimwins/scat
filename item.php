@@ -389,7 +389,7 @@ function saveItemProperty(value, settings) {
 }
 
 $('#add-vendor').on('click', function() {
-  $.get('ui/item-vendor-item.html').done(function (html) {
+  Scat.dialog('item-vendor-item').done(function (html) {
     var panel= $(html);
 
     var vendor_item= { vendor: 0, vendor_sku: '', name: '',

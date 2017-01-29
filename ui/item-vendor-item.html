@@ -20,10 +20,11 @@
           <div class="form-group">
             <label for="vendor">Vendor</label>
             <select class="form-control" id="vendor"
-                    data-bind="value: selectedVendor, options: vendors,
-                               optionsCaption: 'Select...',
-                               optionsText: 'value', optionsValue: 'id'">
-              <option data-bind="text: value, value: id"></option>
+                    data-bind="options: vendors,
+                               optionsText: 'company',
+                               optionsValue: 'id',
+                               value: selectedVendor,
+                               optionsCaption: 'Select...'">
             </select>
           </div>
 
