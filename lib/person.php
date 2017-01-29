@@ -1,22 +1,36 @@
 <?
 
-function person_load($db, $id) {
-  $q= "SELECT id, 
-              name,
-              role,
-              company,
+define('PERSON_FIND_EMPTY', 1);
+
+function person_find($db, $q, $options= null) {
+  $criteria= array("active AND NOT deleted");
+
+  $terms= preg_split('/\s+/', trim($q));
+  foreach ($terms as $term) {
+    if (preg_match('/id:(\d+)/', $term, $m)) {
+      $criteria[]= "(person.id = $m[1])";
+    } else if (preg_match('/role:(.+)/', $term, $m)) {
+      $role= $db->escape($m[1]);
+      $criteria[]= "(person.role = '$role')";
+    } else {
+      $term= $db->escape($term);
+      $criteria[]= "(person.name LIKE '%$term%'
+                 OR person.company LIKE '%$term%'
+                 OR person.email LIKE '%$term%'
+                 OR person.loyalty_number LIKE '%$term%'
+                 OR person.phone LIKE '%$term%')";
+    }
+  }
+
+  $sql_criteria= join(' AND ', $criteria);
+
+  $q= "SELECT id, name, role, company,
               address,
-              email,
-              email_ok,
-              phone,
-              loyalty_number,
-              sms_ok,
-              tax_id,
-              payment_account_id,
-              birthday,
-              notes,
-              active,
-              deleted,
+              email, email_ok,
+              phone, loyalty_number, sms_ok,
+              tax_id, payment_account_id,
+              birthday, notes,
+              active, deleted,
               (SELECT SUM(points)
                  FROM loyalty
                 WHERE person_id = person.id
@@ -28,23 +42,34 @@ function person_load($db, $id) {
                   AND (points > 0 AND
                        DATE(processed) = DATE(NOW()))) points_pending
          FROM person
-        WHERE id = " . (int)$id;
+        WHERE $sql_criteria
+        ORDER BY name, company, loyalty_number";
 
   $r= $db->query($q)
     or die_query($db, $q);
 
-  $person= $r->fetch_assoc();
+  $people= array();
 
-  if (!$person) {
+  while ($person= $r->fetch_assoc()) {
+    $person['pretty_phone']= format_phone($person['loyalty_number']);
+    $people[]= $person;
+  }
+
+  if (!$people && ($options & PERSON_FIND_EMPTY)) {
     while ($field= $r->fetch_field()) {
       $person[$field->name]= null;
     }
     $person['pretty_phone']= null;
-  } else {
-    $person['pretty_phone']= format_phone($person['loyalty_number']);
+    return array($person);
   }
 
-  return $person;
+  return $people;
+}
+
+function person_load($db, $id, $options= null) {
+  $people= person_find($db, "id:$id", $options);
+
+  return $people[0];
 }
 
 function person_load_activity($db, $id, $page= 0) {

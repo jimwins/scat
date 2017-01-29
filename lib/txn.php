@@ -6,7 +6,7 @@ function txn_load_full($db, $id) {
   $items= txn_load_items($db, $id);
   $payments= txn_load_payments($db, $id);
   $notes= txn_load_notes($db, $id);
-  $person= person_load($db, $txn['person']);
+  $person= person_load($db, $txn['person'], PERSON_FIND_EMPTY);
 
   return array('txn' => $txn,
                'items' => $items,
