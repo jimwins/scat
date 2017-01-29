@@ -339,7 +339,7 @@ function reorder(place, ev) {
 }
 
 function uploadItems(place, ev) {
-  displayError("Just drag & drop a file on this window.");
+  displayError("Just drag & drop a file on this window.<br><br>File format: item_no, sku, name, retail_price, net_price, promo_price, barcode, purchase_quantity");
 }
 
 $("body").html5Uploader({
