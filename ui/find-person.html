@@ -24,9 +24,9 @@
           </div>
       </div>
 
-      <div style="max-height: 30em; overflow: scroll; overflow-y: visible">
-        <table class="table" data-bind="if: people().length"
-               style="max-height: 30em; overflow: scroll">
+      <div data-bind="if: people().length"
+           style="max-height: 30em; overflow: scroll; overflow-y: visible">
+        <table class="table table-hover table-condensed">
           <tbody data-bind="foreach: people">
             <tr data-bind="click: $parent.selectPerson">
               <td class="col-xs-4" data-bind="text: $data.name"></td>
