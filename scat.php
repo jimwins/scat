@@ -125,7 +125,6 @@ $(document).ready(function() {
             <li><a href="reorder.php">Reorder</a></li>
             <li><a href="report-backorders.php">Backorders</a></li>
             <li><a href="report-price-change.php">Price Changes</a></li>
-            <li><a href="vendor-upload.php">Upload Vendor Data</a></li>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header">Money</li>
             <li><a href="./till.php">Till</a></li>
