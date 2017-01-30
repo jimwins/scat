@@ -1279,6 +1279,10 @@ function displayPerson(person) {
   Scat.dialog('person').done(function (html) {
     var panel= $(html);
 
+    panel.on('shown.bs.modal', function() {
+      $(".initial-focus", this).focus();
+    });
+
     panel.on('hidden.bs.modal', function() {
       $(this).remove();
     });
