@@ -1254,10 +1254,10 @@ viewModel.changePerson= function(data, event) {
 
       var person= {
         id: 0,
-        name: (s.match(/[^\d]/) && !s.match(/@/)) ? s : '',
+        name: (s.match(/[^-\d() ]/) && !s.match(/@/)) ? s : '',
         company: '',
         email: s.match(/@/) ? s : '',
-        phone: !s.match(/[^\d]/) ? s : '',
+        phone: !s.match(/[^-\d() ]/) ? s : '',
         address: '',
         tax_id: '',
       };
