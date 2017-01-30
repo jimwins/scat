@@ -1254,9 +1254,9 @@ viewModel.changePerson= function(data, event) {
 
       var person= {
         id: 0,
-        name: s.match(/[^\d]/) ? s : '',
+        name: (s.match(/[^\d]/) && !s.match(/@/)) ? s : '',
         company: '',
-        email: '',
+        email: s.match(/@/) ? s : '',
         phone: !s.match(/[^\d]/) ? s : '',
         address: '',
         tax_id: '',
