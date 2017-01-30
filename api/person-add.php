@@ -4,7 +4,7 @@ include '../scat.php';
 $name= $_REQUEST['name'];
 $company= $_REQUEST['company'];
 $phone= $_REQUEST['phone'];
-if (empty($name) && empty($company))
+if (empty($name) && empty($company) && empty($phone))
   die_jsonp("You need to supply at least a name, company, or phone number.");
 
 $list= array();
