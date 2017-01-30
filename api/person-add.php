@@ -13,8 +13,10 @@ foreach(array('name', 'company', 'address',
   $list[]= "$field = '" . $db->escape($_REQUEST[$field]) . "', ";
 }
 
-if ($list['phone']) {
-  $list['loyalty_number']= preg_replace('/[^\d]/', '', $list['phone']);
+if ($_REQUEST['phone']) {
+  $list[]= "loyalty_number = '" .
+           preg_replace('/[^\d]/', '', $_REQUEST['phone']) .
+           "', ";
 }
 
 $fields= join('', $list);
