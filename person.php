@@ -41,7 +41,7 @@ if (!empty($search)) {
 }
 ?>
 <table class="table table-condensed table-striped table-hover"
-       data-bind="if: people().length && !person.id()">
+       data-bind="if: people().length && !person.id">
  <thead>
   <tr>
     <th>#</th>
