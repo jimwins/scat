@@ -83,7 +83,8 @@ function item_find($db, $q, $options) {
                 WHEN 'relative' THEN CONCAT('$', item.discount, ' off')
                 ELSE ''
               END discount_label,
-              (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) stock,
+              (SELECT IFNULL(SUM(allocated),0) FROM txn_line
+                WHERE item = item.id) stock,
               (SELECT retail_price
                  FROM txn_line JOIN txn ON (txn_line.txn = txn.id)
                 WHERE txn_line.item = item.id AND txn.type = 'vendor'
@@ -100,7 +101,7 @@ function item_find($db, $q, $options) {
     LEFT JOIN barcode ON (item.id = barcode.item)
         WHERE $sql_criteria
      GROUP BY item.id
-     ORDER BY 2";
+     ORDER BY !(stock > 0), 2";
 
   $r= $db->query($q)
     or die($db->error);
