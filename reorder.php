@@ -6,6 +6,8 @@ head("Reorder @ Scat", true);
 $extra= $extra_field= $extra_field_name= '';
 $code_field= "code";
 
+$all= (int)$_REQUEST['all'];
+
 $vendor= (int)$_REQUEST['vendor'];
 if ($vendor > 0) {
   $code_field= "(SELECT code FROM vendor_item WHERE vendor = $vendor AND item = item.id LIMIT 1)";
@@ -57,6 +59,13 @@ while ($row= $r->fetch_assoc()) {
     <input type="text" class="form-control" name="code" placeholder="Code"
            value="<?=ashtml($code)?>">
   </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="all" value="1"
+       <?=($all ? 'checked="checked"' : '')?>>
+      All?
+    </label>
+  </div>
   <button type="submit" class="btn btn-primary">Limit</button>
 </form>
 
@@ -64,7 +73,9 @@ while ($row= $r->fetch_assoc()) {
   <button id="zero" class="btn btn-default">Zero</button>
 </div>
 <?
-
+$criteria= ($all ? '1=1'
+                 : '(ordered IS NULL OR NOT ordered)
+                    AND IFNULL(Stock$right, 0) < Min$right');
 $q= "SELECT meta, Code\$item, Name, Stock\$right,
             Min\$right,
             Last3Months\$right,
@@ -98,8 +109,7 @@ $q= "SELECT meta, Code\$item, Name, Stock\$right,
                 $extra
               GROUP BY item.id
               ORDER BY code) t
-       WHERE (ordered IS NULL OR NOT ordered) AND
-             IFNULL(Stock\$right, 0) < Min\$right
+       WHERE $criteria
        ORDER BY Code\$item
       ";
 
