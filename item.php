@@ -157,7 +157,7 @@ include 'item-searchform.php';
 <script>
 $('#active').on('click', function(ev) {
   ev.preventDefault();
-  var item= viewModel.item;
+  var item= itemModel.item;
 
   $.getJSON("api/item-update.php?callback=?",
             { item: item.id(), active: item.active() ? 0 : 1 },
@@ -170,7 +170,7 @@ $('#active').on('click', function(ev) {
             });
 });
 function editBarcodeQuantity(value, settings) {
-  var item= viewModel.item;
+  var item= itemModel.item;
   var row= $(this).closest('tr');
   var code= $('td:nth(0)', row).text();
 
@@ -185,7 +185,7 @@ function editBarcodeQuantity(value, settings) {
             });
 }
 $('#new-barcode').editable(function(value, settings) {
-  var item= viewModel.item;
+  var item= itemModel.item;
   $.getJSON("api/item-barcode-update.php?callback=?",
             { item: item.id, code: value },
             function (data) {
@@ -309,10 +309,10 @@ var model= {
 
 };
 
-var viewModel= ko.mapping.fromJS(model);
+var itemModel= ko.mapping.fromJS(model);
 
-viewModel.printBarcode= function(place, ev) {
-  var item= viewModel.item.id();
+itemModel.printBarcode= function(place, ev) {
+  var item= itemModel.item.id();
 
   var noprice= $(ev.target).data('noprice') || 0;
 
@@ -334,9 +334,9 @@ viewModel.printBarcode= function(place, ev) {
             });
 }
 
-viewModel.removeBarcode= function(place) {
+itemModel.removeBarcode= function(place) {
   $.getJSON("api/item-barcode-delete.php?callback=?",
-            { item: viewModel.item.id, code: place.code },
+            { item: itemModel.item.id, code: place.code },
             function (data) {
               if (data.error) {
                 displayError(data);
@@ -346,12 +346,12 @@ viewModel.removeBarcode= function(place) {
             });
 }
 
-viewModel.mergeItem= function(place) {
+itemModel.mergeItem= function(place) {
   var code= window.prompt("Please enter the item to merge this one into.", "");
 
   if (code) {
     $.getJSON("api/item-merge.php?callback=?",
-              { from: viewModel.item.id, to: code },
+              { from: itemModel.item.id, to: code },
               function (data) {
                 if (data.error) {
                   displayError(data);
@@ -362,14 +362,14 @@ viewModel.mergeItem= function(place) {
   }
 }
 
-ko.applyBindings(viewModel);
+ko.applyBindings(itemModel);
 
 function loadItem(item) {
-  ko.mapping.fromJS({ item: item }, viewModel);
+  ko.mapping.fromJS({ item: item }, itemModel);
 }
 
 function saveItemProperty(value, settings) {
-  var item= viewModel.item;
+  var item= itemModel.item;
   var data= { item: item.id() };
   var key= this.id;
   data[key]= value;
