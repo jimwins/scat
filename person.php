@@ -275,7 +275,7 @@ function loadActivity(person, page) {
       ko.mapping.fromJS(data, viewModel);
       viewModel.loading(0);
     })
-    .fail(function (jqhxr, textStatus, error) {
+    .fail(function (jqxhr, textStatus, error) {
       viewModel.loading(0);
       var data= $.parseJSON(jqxhr.responseText);
       alert(textStatus + ', ' + error + ': ' + data.text);
