@@ -208,27 +208,69 @@ $('#new-barcode').editable(function(value, settings) {
 </script>
 <?
 
-$q= "SELECT company Company,
-            code Code,
-            retail_price List\$dollar,
-            net_price Net\$dollar,
-            promo_price Promo\$dollar,
+$q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
+            code, vendor_sku, vendor_item.name,
+            retail_price, net_price, promo_price,
             CONCAT('$', CAST(vendor_item.net_price / 0.6 AS DECIMAL(9,2)),
                    ' - ',
                    '$', CAST(vendor_item.net_price / 0.5 AS DECIMAL(9,2)))
-              AS Sale,
-            special_order AS SpecialOrder\$bool,
-            purchase_quantity AS OrderQuantity
+              AS sale_range,
+            special_order,
+            purchase_quantity
        FROM vendor_item
        JOIN person ON vendor_item.vendor = person.id
       WHERE item = $id";
 
-echo '<h2 onclick="$(\'#vendors\').toggle()">Vendors</h2>';
-echo '<div id="vendors" style="display: none">';
-dump_table($db->query($q));
-dump_query($q);
-echo '<button id="add-vendor" class="btn btn-default">Add Vendor Item</a>';
-echo '</div>';
+$r= $db->query($q)
+  or die_query($db, $q);
+
+$vendor_items= array();
+while ($row= $r->fetch_assoc()) {
+  $vendor_items[]= $row;
+}
+?>
+<h2 onclick="$('#vendors').toggle()">Vendors</h2>
+<table id="vendors" style="display: none"
+       class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th class="num">#</th>
+      <th>Company</th>
+      <th>Code</th>
+      <th>List</th>
+      <th>Net</th>
+      <th>Promo</th>
+      <th>Sale</th>
+      <th>Special?</th>
+      <th>Quantity</th>
+    </tr>
+  </thead>
+  <tfoot>
+    <tr>
+      <td colspan="9">
+        <button class="btn btn-primary" data-bind="click: editVendorItem">
+          Add Vendor Item
+        </button>
+      </td>
+    </tr>
+  </tfoot>
+  <tbody data-bind="foreach: vendor_items">
+    <tr data-bind="click: $parent.editVendorItem">
+      <td class="num" data-bind="text: $index() + 1"></td>
+      <td data-bind="text: $data.vendor_name"></td>
+      <td data-bind="text: $data.code"></td>
+      <td data-bind="text: amount($data.retail_price())"></td>
+      <td data-bind="text: amount($data.net_price())"></td>
+      <td data-bind="text: amount($data.promo_price())"></td>
+      <td data-bind="text: $data.sale_range"></td>
+      <td><i class="fa" data-bind="css: { 'fa-check-square-o': $data.special_order(), 'fa-square-o': !$data.special_order() }"></i></td>
+      <td data-bind="text: $data.purchase_quantity"></td>
+    </tr>
+  </tbody>
+</table>
+<div id="vendors" style="display: none">
+</div>
+<?
 
 function RunningTotal($row) {
   static $count= 0;
@@ -305,6 +347,7 @@ var model= {
   search: '<?=ashtml($search);?>',
   all: <?=(int)$all?>,
   item: <?=json_encode($item);?>,
+  vendor_items: <?=json_encode($vendor_items);?>,
   brands: [],
 
 };
@@ -362,6 +405,69 @@ itemModel.mergeItem= function(place) {
   }
 }
 
+itemModel.editVendorItem= function(item) {
+  Scat.dialog('item-vendor-item').done(function (html) {
+    var panel= $(html);
+
+    var vendorItem= item.vendor_sku ? ko.mapping.toJS(item) :
+                    { id: 0, vendor: 0, item: item.item.id(),
+                      vendor_sku: item.item.code(), name: item.item.name(),
+                      retail_price: item.item.retail_price(),
+                      net_price: 0.00, promo_price: null,
+                      purchase_quantity: 1};
+
+    vendorItem.vendors= [];
+    vendorItem.error= '';
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    $.getJSON('api/person-list.php?callback=?',
+              { role: 'vendor' })
+      .done(function (data) {
+        ko.mapping.fromJS({ vendors: data }, vendorItemModel);
+        vendorItemModel.vendor.valueHasMutated();
+      })
+      .fail(function (jqxhr, textStatus, error) {
+        var data= $.parseJSON(jqxhr.responseText);
+        vendor_item.error(textStatus + ', ' + error + ': ' + data.text)
+      });
+
+
+    vendorItemModel= ko.mapping.fromJS(vendorItem);
+
+    vendorItemModel.saveItem= function(place, ev) {
+      var vendorItem= ko.mapping.toJS(vendorItemModel);
+      delete vendorItem.vendors;
+      delete vendorItem.error;
+
+      Scat.api(vendorItem.id ? 'vendor-item-update' : 'vendor-item-add',
+               vendorItem)
+          .done(function (data) {
+            // XXX reload vendor items
+            $(place).closest('.modal').modal('hide');
+          });
+    }
+
+    vendorItemModel.selectedVendor= ko.computed({
+      read: function () {
+        return this.vendor();
+      },
+      write: function (value) {
+        if (typeof value != 'undefined' && value != '') {
+          this.vendor(value);
+        }
+      },
+      owner: vendorItemModel
+    }).extend({ notify: 'always' });
+ 
+
+    ko.applyBindings(vendorItemModel, panel[0]);
+    panel.appendTo($('body')).modal();
+  });
+}
+
 ko.applyBindings(itemModel);
 
 function loadItem(item) {
@@ -387,52 +493,4 @@ function saveItemProperty(value, settings) {
             });
   return '<span><i class="fa fa-spinner fa-spin"></i></span>';
 }
-
-$('#add-vendor').on('click', function() {
-  Scat.dialog('item-vendor-item').done(function (html) {
-    var panel= $(html);
-
-    var vendor_item= { vendor: 0, vendor_sku: '', name: '',
-                       retail_price: 0.00, net_price: 0.00,
-                       promo_price: '', purchase_qty: 1,
-                       vendors: [], error: '' };
-
-    panel.on('hidden.bs.modal', function() {
-      $(this).remove();
-    });
-
-    $.getJSON('api/person-list.php?callback=?',
-              { role: 'vendor' })
-      .done(function (data) {
-        ko.mapping.fromJS({ vendors: data }, itemModel);
-      })
-      .fail(function (jqxhr, textStatus, error) {
-        var data= $.parseJSON(jqxhr.responseText);
-        vendor_item.error(textStatus + ', ' + error + ': ' + data.text)
-      });
-
-
-    itemModel= ko.mapping.fromJS(vendor_item);
-
-    itemModel.saveItem= function(place, ev) {
-      1;
-    }
-
-    itemModel.selectedVendor= ko.computed({
-      read: function () {
-        return this.vendor();
-      },
-      write: function (value) {
-        if (typeof value != 'undefined' && value != '') {
-          this.vendor(value);
-        }
-      },
-      owner: itemModel
-    }).extend({ notify: 'always' });
- 
-
-    ko.applyBindings(itemModel, panel[0]);
-    panel.appendTo($('body')).modal();
-  });
-});
 </script>
