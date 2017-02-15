@@ -1019,7 +1019,8 @@ $('#tax_rate .val').editable(function(value, settings) {
 </script>
   <tbody data-bind="foreach: items">
     <tr class="item" valign="top"
-        data-bind="attr: { 'data-line_id': $data.line_id }">
+        data-bind="attr: { 'data-line_id': $data.line_id },
+                   css: { danger: $parent.txn.type() == 'vendor' && $data.quantity() != $data.allocated() }">
       <td>
         <a class="remove"
            data-bind="click: $parent.removeItem">
@@ -1027,7 +1028,7 @@ $('#tax_rate .val').editable(function(value, settings) {
         </a>
       </td>
       <td align="center" class="editable"
-          data-bind="css: { over: $data.quantity() > $data.stock() }">
+          data-bind="css: { over: $parent.txn.type() != 'vendor' && $data.quantity() > $data.stock() }">
         <span class="quantity" data-bind="text: $data.quantity"></span>
       </td>
       <td align="center" class="editable"
