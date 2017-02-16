@@ -1121,6 +1121,9 @@ viewModel.txn.change= ko.computed(function() {
 
 viewModel.person.display_name= ko.computed(function() {
   var name= viewModel.person.name();
+  if (name === null) {
+    name= '';
+  }
   if (name && viewModel.person.company()) {
     name= name + ' / ';
   }
