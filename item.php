@@ -263,7 +263,7 @@ while ($row= $r->fetch_assoc()) {
       <td data-bind="text: amount($data.net_price())"></td>
       <td data-bind="text: amount($data.promo_price())"></td>
       <td data-bind="text: $data.sale_range"></td>
-      <td><i class="fa" data-bind="css: { 'fa-check-square-o': $data.special_order(), 'fa-square-o': !$data.special_order() }"></i></td>
+      <td><i class="fa" data-bind="css: { 'fa-check-square-o': $data.special_order() == '1', 'fa-square-o': $data.special_order() == '0' }"></i></td>
       <td data-bind="text: $data.purchase_quantity"></td>
     </tr>
   </tbody>
