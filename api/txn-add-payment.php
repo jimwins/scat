@@ -53,6 +53,4 @@ try {
   die_jsonp($e->getMessage());
 }
 
-echo jsonp(array('payment' => $payment,
-                 'txn' => txn_load($db, $id),
-                 'payments' => txn_load_payments($db, $id)));
+echo jsonp(txn_load_full($db, $id));
