@@ -108,7 +108,8 @@ CREATE TABLE `loyalty` (
   `txn_id` int(10) unsigned NOT NULL DEFAULT '0',
   `processed` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `note` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `person_id` (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -277,7 +278,8 @@ CREATE TABLE `txn` (
   `special_order` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `type` (`type`,`number`),
-  KEY `created` (`created`)
+  KEY `created` (`created`),
+  KEY `person` (`person`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
