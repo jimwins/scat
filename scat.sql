@@ -176,6 +176,8 @@ CREATE TABLE `person` (
   `payment_account_id` varchar(50) DEFAULT NULL,
   `active` tinyint(1) NOT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
+  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `loyalty_number` (`loyalty_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -450,4 +452,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-26 16:43:03
+-- Dump completed on 2017-02-20 18:52:55
