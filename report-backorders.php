@@ -4,10 +4,10 @@ require 'lib/item.php';
 
 head("Backorders @ Scat", true);
 
-$q= "SELECT txn.id AS txn, created,
-            IF(type = 'vendor' && YEAR(created) > 2013,
-               CONCAT(SUBSTRING(YEAR(created), 3, 2), number),
-               CONCAT(DATE_FORMAT(created, '%Y-'), number))
+$q= "SELECT txn.id AS txn, txn.created,
+            IF(type = 'vendor' && YEAR(txn.created) > 2013,
+               CONCAT(SUBSTRING(YEAR(txn.created), 3, 2), number),
+               CONCAT(DATE_FORMAT(txn.created, '%Y-'), number))
               AS formatted_number,
             person.id AS person, person.company AS person_name,
             item.id AS item, item.code,
