@@ -72,15 +72,11 @@ elseif (preg_match('/json$/', $name)) {
     $sms= $data['reachable_sms'] ? 1 : 0;
     $email_ok= $data['reachable_email'] ? 1 : 0;
 
+    $created= strtotime($data['created_at']);
+
     $q= "UPDATE person
-            SET birthday = IF('{$data['birthday']}' != '',
-                              '{$data['birthday']}',
-                              NULL),
-                email = IF(email != '', email, '$email'),
-                name = IF(name != '', name, '$name'),
-                notes = '$notes',
-                sms_ok = $sms,
-                email_ok = $email_ok
+            SET 
+                created = FROM_UNIXTIME('$created')
           WHERE loyalty_number = '{$data['phone']}'";
     $db->query($q)
       or die_query($db, $q);
