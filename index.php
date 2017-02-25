@@ -926,8 +926,9 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             <span data-bind="text: person.points_available()"></span>
           </a>
           <span data-bind="if: person.id() && person.points_pending() > 0">
-            <i class="fa fa-star-o"></i>
+            + <i class="fa fa-star-o"></i>
             <span data-bind="text: person.points_pending()"></span>
+            = <span data-bind="text: parseInt(person.points_available(), 10) + parseInt(person.points_pending(), 10)"></span>
           </span>
           <a data-bind="if: person.id(), click: removePerson">
             <i class="fa fa-trash-o"></i>
