@@ -52,6 +52,8 @@ function person_find($db, $q, $options= null) {
 
   while ($person= $r->fetch_assoc()) {
     $person['pretty_phone']= format_phone($person['loyalty_number']);
+    $person['points_available']= (int)$person['points_available'];
+    $person['points_pending']= (int)$person['points_pending'];
     $people[]= $person;
   }
 
