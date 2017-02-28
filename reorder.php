@@ -160,21 +160,14 @@ $('#create').on('click', function(ev) {
     }
   });
 
-  $.getJSON("api/txn-create.php?callback=?",
-            { type: 'vendor', person: <?=$vendor?> },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              }
-              $.getJSON("api/txn-add-items.php?callback=?",
-                        { txn: data.txn.id, items: order },
-                        function (data) {
-                          if (data.error) {
-                            displayError(data);
-                          }
-                          window.location= './?id=' + data.txn.id;
-                        });
+  Scat.api("txn-create", { type: 'vendor', person: <?=$vendor?> })
+      .done(function (data) {
+        Scat.api("txn-add-items", { txn: data.txn.id, items: order },
+                 { method: 'POST' })
+            .done(function(data) {
+              window.location= './?id=' + data.txn.id;
             });
+      });
 });
 $('#zero').on('click', function(ev) {
   $('.order').text('0');
