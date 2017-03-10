@@ -51,6 +51,13 @@ tr.total td {border-top:solid #000 6px; text-align:right; font-weight:;}
 .cc-info th { border: none; }
 .cc-info th:after { content: ":" }
 
+#loyalty {
+  text-align: center;
+  margin: 1em 2em;
+  padding: 1em;
+  border: 2px solid black;
+}
+
 #doc_info {text-align:center;}
 #signature {margin:2em 0; padding:5px 0px; text-align:center;}
 #nosignature {margin:2em 0; text-align: center; padding: 5px 0px; }
@@ -73,8 +80,12 @@ $id= (int)$_REQUEST['id'];
 if (!$id) die("No transaction specified.");
 
 $txn= txn_load($db, $id);
-
 $items= txn_load_items($db, $id);
+$person= person_load($db, $txn['person']);
+
+function pts($num) {
+  return sprintf("%d point%s", $num, $num > 1 ? 's' : '');
+}
 ?>
 <table id="products" cellspacing="0" cellpadding="0">
  <thead>
@@ -167,6 +178,24 @@ foreach ($payments as $payment) {
   }
 }
 ?>
+
+<div id="loyalty">
+<?if ($person['id']) {
+    $points= (int)$txn['subtotal'];
+    if ($points == 0 && $txn['subtotal'] > 0) $points= 1;
+  ?>
+  You earned <?=pts($points)?> with this purchase.
+  <br><br>
+  That means you have <?=pts($person['points_pending'] + $person['points_available'])?> to redeem towards rewards tomorrow!
+<?} else {?>
+  Earn store credit by signing up for our rewards program!
+  <br><br>
+  https://rawm.us/rewards
+  <br><br>
+  Code: <?=sprintf("%08X %08X", strtotime($txn['created']), $txn['id'])?>
+<?}?>
+</div>
+
 <div id="doc_info">
 <?if ($credit) {?>
   CUSTOMER COPY
