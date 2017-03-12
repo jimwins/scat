@@ -144,12 +144,12 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     or die_query($db, $q);
 
 
-} elseif (preg_match('/C2F Pricer/', $line)) {
+} elseif (preg_match('/C2F Price/', $line)) {
   // C2F Pricer
   //
   $q= "CREATE TEMPORARY TABLE macitem (
-    item_no VARCHAR(32),
-    sku VARCHAR(10),
+    item_no VARCHAR(255),
+    sku VARCHAR(255),
     name VARCHAR(255),
     retail_price DECIMAL(9,2),
     net_price DECIMAL(9,2),
@@ -169,11 +169,13 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 3 LINES
           (@category, @prefix, item_no, name,
-           @uom, purchase_quantity, @status, @nonstockty,
+           @uom, @purchase_quantity, @status, @nonstockty,
            @upc, @ean, @effectdt, @newretail, @effprice1, @effqtyprice,
-           retail_price, net_price, @qty_brk, @qty_price, @case_qty,
+           retail_price, @net_price, @qty_brk, @qty_price, @case_qty,
            @case_price)
-        SET sku = item_no, barcode= IF(@upc != '', @upc, @ean)";
+        SET sku = item_no, barcode= IF(@upc != '', @upc, @ean),
+            net_price = IF(@qty_price, @qty_price, @net_price),
+            purchase_quantity = IF(@qty_brk, @qty_brk, @purchase_quantity)";
 
   $r= $db->query($q)
     or die_query($db, $q);
