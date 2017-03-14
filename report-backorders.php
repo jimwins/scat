@@ -43,7 +43,7 @@ while ($row= $r->fetch_assoc()) {
 ?>
   <tr class="active">
     <td colspan="5">
-      <a href="txn.php?id=<?=$row['txn']?>"><?=$row['formatted_number']?></a>
+      <a href="./?id=<?=$row['txn']?>"><?=$row['formatted_number']?></a>
   /    <?=$row['created']?>
   /    <a href="person.php?id=<?=$row['person']?>"><?=ashtml($row['person_name'])?></a>
     </td>
