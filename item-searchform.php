@@ -3,7 +3,7 @@
     <span class="input-group-btn">
       <input type="submit" class="btn btn-primary" value="Search">
     </span>
-    <input type="text" class="autofocus form-control" size="60"
+    <input type="search" class="autofocus form-control" size="60"
            id="search" name="search" data-bind="value: search"
            placeholder="Enter keywords or scan barcode"
            autocorrect="off" autocapitalize="off"

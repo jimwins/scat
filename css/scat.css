@@ -30,6 +30,11 @@ td.percent:after {
   content: '%';
 }
 
+/* Fix layout of type="search" inputs */
+input[type=search]::-webkit-search-cancel-button {
+  -webkit-appearance: searchfield-cancel-button;
+}
+
 #simplesmodal-overlay { 
   background-color:#000;
 }
