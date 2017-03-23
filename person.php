@@ -309,7 +309,7 @@ function createPurchaseOrder(place, ev) {
               if (data.error) {
                 displayError(data);
               }
-              window.location= 'txn.php?id=' + data.txn.id;
+              window.location= './?id=' + data.txn.id;
             });
 }
 
