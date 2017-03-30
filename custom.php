@@ -10,19 +10,19 @@ head("Custom @ Scat", true);
   <div class="form-group">
     <label for="w" class="col-sm-2 control-label">Width</label>
     <div class="col-sm-4">
-      <input type="text" class="form-control" id="w" data-bind="value: w">
+      <input type="text" class="form-control" id="w" data-bind="textInput: w">
     </div>
     <div class="col-sm-2">
-      <p class="form-control-static" data-bind="text: w_in"></p>
+      <p class="form-control-static" data-bind="text: w_in() + ' in'"></p>
     </div>
   </div>
   <div class="form-group">
     <label for="h" class="col-sm-2 control-label">Height</label>
     <div class="col-sm-4">
-      <input type="text" class="form-control" id="h" data-bind="value: h">
+      <input type="text" class="form-control" id="h" data-bind="textInput: h">
     </div>
     <div class="col-sm-2">
-      <p class="form-control-static" data-bind="text: h_in"></p>
+      <p class="form-control-static" data-bind="text: h_in() + ' in'"></p>
     </div>
   </div>
   <div class="row">
@@ -262,14 +262,14 @@ function CalcModel() {
 
   self.w_in= ko.computed(function() {
     if (self.w().match(/cm/)) {
-      return (parseFloat(self.w()) / 2.54);
+      return (parseFloat(self.w()) / 2.54).toFixed(3);
     }
     return parseFloat(self.w());
   });
 
   self.h_in= ko.computed(function() {
     if (self.h().match(/cm/)) {
-      return (parseFloat(self.h()) / 2.54);
+      return (parseFloat(self.h()) / 2.54).toFixed(3);
     }
     return parseFloat(self.h());
   });
