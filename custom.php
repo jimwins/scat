@@ -276,11 +276,11 @@ function CalcModel() {
 
 
   self.ui= ko.computed(function() {
-    return self.w_in() + self.h_in();
+    return parseFloat(self.w_in()) + parseFloat(self.h_in());
   });
 
   self.area= ko.computed(function() {
-    return self.w_in() * self.h_in();
+    return parseFloat(self.w_in()) * parseFloat(self.h_in());
   });
 };
 
