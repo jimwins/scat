@@ -938,6 +938,11 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
     </div>
   </div><!-- .panel-heading -->
 
+<div data-bind="visible: person.notes().length"
+     class="person-notes alert alert-danger">
+  <p data-bind="text: person.notes" style="white-space: pre-line"></p>
+</div>
+
 <table class="table table-condensed table-striped" id="items">
  <thead>
   <tr>
@@ -1087,6 +1092,7 @@ var model= {
     tax_id: '',
     loyalty_number: '',
     pretty_phone: '',
+    notes: '',
     points_available: 0,
     points_pending: 0,
   },
