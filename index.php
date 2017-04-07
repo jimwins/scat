@@ -940,7 +940,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
     </div>
   </div><!-- .panel-heading -->
 
-<div data-bind="visible: person.notes().length"
+<div data-bind="visible: person.notes() !== null && person.notes().length"
      class="person-notes alert alert-danger">
   <p data-bind="text: person.notes" style="white-space: pre-line"></p>
 </div>
