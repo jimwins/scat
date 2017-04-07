@@ -31,16 +31,19 @@ function person_find($db, $q, $options= null) {
               tax_id, payment_account_id,
               birthday, notes,
               active, deleted,
-              (SELECT SUM(points)
-                 FROM loyalty
-                WHERE person_id = person.id
-                  AND (points < 0 OR
-                       DATE(processed) < DATE(NOW()))) points_available,
-              (SELECT SUM(points)
-                 FROM loyalty
-                WHERE person_id = person.id
-                  AND (points > 0 AND
-                       DATE(processed) = DATE(NOW()))) points_pending
+              suppress_loyalty,
+              IF(suppress_loyalty, 0, 
+                 (SELECT SUM(points)
+                    FROM loyalty
+                   WHERE person_id = person.id
+                     AND (points < 0 OR
+                          DATE(processed) < DATE(NOW())))) points_available,
+              if (suppress_loyalty, 0,
+                  (SELECT SUM(points)
+                     FROM loyalty
+                    WHERE person_id = person.id
+                      AND (points > 0 AND
+                           DATE(processed) = DATE(NOW())))) points_pending
          FROM person
         WHERE $sql_criteria
         ORDER BY company, name, loyalty_number";
@@ -54,6 +57,7 @@ function person_find($db, $q, $options= null) {
     $person['pretty_phone']= format_phone($person['loyalty_number']);
     $person['points_available']= (int)$person['points_available'];
     $person['points_pending']= (int)$person['points_pending'];
+    $person['suppress_loyalty']= (int)$person['suppress_loyalty'];
     $people[]= $person;
   }
 

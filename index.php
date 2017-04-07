@@ -921,11 +921,13 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             <span class="val"
                   data-bind="text: person.display_name()"></span>
           </a>
-          <a data-bind="if: person.id(), click: showPoints">
+          <a data-bind="if: person.id() && !person.suppress_loyalty(),
+                        click: showPoints">
             <i class="fa fa-star"></i>
             <span data-bind="text: person.points_available()"></span>
           </a>
-          <span data-bind="if: person.id() && person.points_pending() > 0">
+          <span data-bind="if: person.id() && !person.suppress_loyalty() &&
+                           person.points_pending() > 0">
             + <i class="fa fa-star-o"></i>
             <span data-bind="text: person.points_pending()"></span>
             = <span data-bind="text: person.points_available() + person.points_pending()"></span>
@@ -1095,6 +1097,7 @@ var model= {
     notes: '',
     points_available: 0,
     points_pending: 0,
+    suppress_loyalty: 0,
   },
   orders: [],
   showAdmin: false,

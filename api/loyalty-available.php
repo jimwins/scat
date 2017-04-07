@@ -11,6 +11,11 @@ if (!$person) {
   die_jsonp("No such person.");
 }
 
+if ($person['suppress_loyalty']) {
+  echo jsonp(array("rewards" => array()));
+  exit;
+}
+
 $points= (int)$person['points_available']; // might be NULL
 
 $q= "SELECT item_id, cost, code, name, retail_price

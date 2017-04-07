@@ -168,6 +168,7 @@ CREATE TABLE `person` (
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `loyalty_number` varchar(32) DEFAULT NULL,
+  `suppress_loyalty` tinyint(4) NOT NULL DEFAULT '0',
   `sms_ok` tinyint(1) DEFAULT '0',
   `email_ok` tinyint(1) DEFAULT '0',
   `birthday` date DEFAULT NULL,
@@ -452,4 +453,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-20 18:52:55
+-- Dump completed on 2017-04-06 17:16:51
