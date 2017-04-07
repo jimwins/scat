@@ -179,6 +179,7 @@ foreach ($payments as $payment) {
 }
 ?>
 
+<?if (!$person['suppress_loyalty']) {?>
 <div id="loyalty">
 <?if ($person['id']) {
     $points= (int)$txn['subtotal'];
@@ -195,6 +196,7 @@ foreach ($payments as $payment) {
   Code: <?=sprintf("%08X %08X", strtotime($txn['created']), $txn['id'])?>
 <?}?>
 </div>
+<?}?>
 
 <div id="doc_info">
 <?if ($credit) {?>
