@@ -13,6 +13,9 @@
         "components/jquery": "^3.1",
         "components/font-awesome": "^4.7",
         "phpoffice/phpexcel": "^1.8",
-        "giggsey/libphonenumber-for-php": "^8.1"
+        "giggsey/libphonenumber-for-php": "^8.1",
+        "guzzlehttp/guzzle": "^6.2",
+        "php-http/guzzle6-adapter": "^1.1",
+        "sparkpost/sparkpost": "^2.0"
     }
 }
