@@ -358,6 +358,19 @@ function printInvoice() {
   return false;
 }
 
+function emailInvoice() {
+  var txn= Txn.id();
+  if (!txn) {
+    displayError("No sale to email.");
+    return false;
+  }
+  Scat.api("txn-email-invoice", { txn: txn })
+      .done(function (data) {
+        displayError("Invoice emailed.");
+      });
+  return false;
+}
+
 function printChargeRecord(id) {
   var lpr= $('<iframe id="receipt" src="print/charge-record.php?print=1&amp;id=' + id + '"></iframe>').hide();
   $("#receipt").remove();
@@ -440,6 +453,7 @@ $(function() {
    <ul class="dropdown-menu" role="menu">
     <li><a data-bind="click: printInvoice">Invoice</a></li>
     <li><a data-bind="click: printReceipt">Receipt</a></li>
+    <li><a data-bind="click: emailInvoice">Email</a></li>
    </ul>
   </div>
   <button id="pay" type="button" class="pay-button btn btn-lg btn-default"
@@ -582,6 +596,7 @@ $("#txn-load").submit(function(ev) {
            <ul class="dropdown-menu">
             <li><a data-bind="click: printInvoice">Invoice</a></li>
             <li><a data-bind="click: printReceipt">Receipt</a></li>
+            <li><a data-bind="click: emailInvoice">Email</a></li>
            </ul>
           </div>
           <button id="delete" class="btn btn-default"
