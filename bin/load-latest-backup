@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+LATEST=`find "$BACKUP_PATH" -name 'scat-*.gz' | sort | tail -1`
+
+if [ -z "$LATEST" ]; then exit; fi
+
+gzcat "$LATEST" | mysql scat
+
+./bin/push-prices-to-website "$ORDURE/update-pricing" "$ORDURE_PASS"
