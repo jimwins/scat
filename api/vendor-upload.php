@@ -144,7 +144,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     or die_query($db, $q);
 
 
-} elseif (preg_match('/C2F Price/', $line)) {
+} elseif (preg_match('/C2F Pricer/', $line)) {
   // C2F Pricer
   //
   $q= "CREATE TEMPORARY TABLE macitem (
@@ -159,13 +159,15 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     abc_flag CHAR(3),
     category VARCHAR(64))";
 
+  $sep= preg_match("/,/", $line) ? "," : "\t";
+
   $db->query($q)
     or die_query($db, $q);
 
 #Cat Desc,Prefix,Prod,Descrip,Unitstock,Mult,Status,Nonstockty,UPC,EAN,Effectdt,NewRetail,EffPrice1,EffQtyPrice,Retail,DealerNet,Qtybrk,QtyPrice,CaseQty,CasePrice 
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE macitem
-          FIELDS TERMINATED BY ','
+          FIELDS TERMINATED BY '$sep'
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 3 LINES
           (@category, @prefix, item_no, name,
