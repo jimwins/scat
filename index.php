@@ -453,7 +453,9 @@ $(function() {
    <ul class="dropdown-menu" role="menu">
     <li><a data-bind="click: printInvoice">Invoice</a></li>
     <li><a data-bind="click: printReceipt">Receipt</a></li>
-    <li><a data-bind="click: emailInvoice">Email</a></li>
+    <li data-bind="css: { 'disabled': person.email() == '' }">
+      <a data-bind="click: emailInvoice">Email</a>
+    </li>
    </ul>
   </div>
   <button id="pay" type="button" class="pay-button btn btn-lg btn-default"
@@ -596,7 +598,9 @@ $("#txn-load").submit(function(ev) {
            <ul class="dropdown-menu">
             <li><a data-bind="click: printInvoice">Invoice</a></li>
             <li><a data-bind="click: printReceipt">Receipt</a></li>
-            <li><a data-bind="click: emailInvoice">Email</a></li>
+            <li data-bind="css: { 'disabled': person.email() == '' }">
+              <a data-bind="click: emailInvoice">Email</a>
+            </li>
            </ul>
           </div>
           <button id="delete" class="btn btn-default"
