@@ -269,20 +269,21 @@ ko.applyBindings(viewModel);
 
 function loadActivity(person, page) {
   viewModel.loading(1);
-  $.getJSON('api/person-load-activity.php?callback=?',
-            { person: person, page: page })
-    .done(function (data) {
-      ko.mapping.fromJS(data, viewModel);
-      viewModel.loading(0);
-    })
-    .fail(function (jqxhr, textStatus, error) {
-      viewModel.loading(0);
-      var data= $.parseJSON(jqxhr.responseText);
-      alert(textStatus + ', ' + error + ': ' + data.text);
-    });
+  Scat.api('person-load-activity', { person: person, page: page })
+      .done(function (data) {
+        ko.mapping.fromJS(data, viewModel);
+        viewModel.loading(0);
+      })
+      .fail(function (jqxhr, textStatus, error) {
+        viewModel.loading(0);
+        var data= $.parseJSON(jqxhr.responseText);
+        alert(textStatus + ', ' + error + ': ' + data.text);
+      });
 }
 
-loadActivity(<?=$id?>, 0);
+if (viewModel.person.id()) {
+  loadActivity(viewModel.person.id(), 0);
+}
 
 function loadPerson(person) {
   ko.mapping.fromJS({ person: person }, viewModel);
@@ -290,25 +291,16 @@ function loadPerson(person) {
 }
 
 function savePerson(place) {
-  $.getJSON("api/person-update.php?callback=?",
-            ko.mapping.toJS(viewModel.person),
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
+  Scat.api('person-update', ko.mapping.toJS(viewModel.person))
+      .done(function (data) {
               loadPerson(data.person);
             });
 }
 
 function createPurchaseOrder(place, ev) {
   $(ev.target).button('loading');
-  $.getJSON("api/txn-create.php?callback=?",
-            { type: 'vendor', person: place.person.id() },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              }
+  Scat.api('txn-create', { type: 'vendor', person: place.person.id() })
+      .done(function (data) {
               window.location= './?id=' + data.txn.id;
             });
 }
@@ -374,4 +366,5 @@ function linkTransaction(components) {
          + desc[m[1]] + ' ' + m[2]
          + '</a>';
 }
+
 </script>
