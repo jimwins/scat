@@ -240,6 +240,10 @@ $person= person_load($db, $id);
  </tbody>
 </table>
 
+<button type="button" class="btn btn-default" data-bind="click: mergePerson">
+  Merge
+</button>
+
 <?
 
 end:
@@ -264,6 +268,17 @@ viewModel.saved= ko.observable(ko.toJSON(viewModel.person));
 viewModel.changed= ko.computed(function() {
   return ko.toJSON(viewModel.person) != viewModel.saved();
 });
+
+viewModel.mergePerson= function (place) {
+  var code= window.prompt("Please enter the person to merge this one into.", "");
+
+  if (code) {
+    Scat.api('person-merge', { from: viewModel.person.id(), to: code })
+        .done(function (data) {
+          loadPerson(data.person);
+        });
+  }
+}
 
 ko.applyBindings(viewModel);
 
