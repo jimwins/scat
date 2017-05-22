@@ -65,6 +65,12 @@ if (!$id)
   goto end;
 
 $person= person_load($db, $id);
+
+if (!$person) {
+  echo '<div class="alert alert-danger">No such person.</div>';
+  goto end;
+}
+
 ?>
 <form class="form-horizontal" role="form"
       data-bind="submit: savePerson">
