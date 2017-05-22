@@ -117,6 +117,10 @@ function person_load_activity($db, $id, $page= 0) {
 
   $r= $db->query($q);
 
+  if (!$r) return;
+
+  $activity= array();
+
   if ($r->num_rows) {
     while ($row= $r->fetch_row()) {
       $activity[]= $row;
