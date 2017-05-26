@@ -24,7 +24,6 @@ Scat.api= function (func, args, opts) {
     return def;
   }
 
-  // XXX use .ajax here and allow caller to supply more options
   var jqXHR= $.ajax($.extend({ dataType: "json", url: url, data: args },
                              opts));
 
