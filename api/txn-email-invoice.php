@@ -81,7 +81,7 @@ $promise= $sparky->transmissions->post([
 try {
   $response= $promise->wait();
 
-  echo json_encode(array("message" => "Email sent."));
+  echo jsonp(array("message" => "Email sent."));
 } catch (\Exception $e) {
   error_log(sprintf("SparkPost failure: %s (%s)",
                     $e->getMessage(), $e->getCode()));

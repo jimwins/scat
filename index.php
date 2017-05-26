@@ -366,7 +366,7 @@ function emailInvoice() {
   }
   Scat.api("txn-email-invoice", { txn: txn })
       .done(function (data) {
-        displayError("Invoice emailed.");
+        displayError({ title: "Success!", error: "Invoice emailed." });
       });
   return false;
 }
