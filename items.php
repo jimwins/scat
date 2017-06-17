@@ -152,7 +152,7 @@ $q= "SELECT
   LEFT JOIN barcode ON (item.id = barcode.item)
       WHERE $sql_criteria
    GROUP BY item.id
-   ORDER BY 2";
+   ORDER BY (Minimum\$right > 0 OR Stock\$right > 0) DESC, 2";
 
 $r= $db->query($q)
   or die($db->error);
