@@ -38,7 +38,7 @@ $data= array(
 
 foreach ($txn->items as $item) {
   $data['items'][]= array(
-    'quantity' => $item['ordered'],
+    'quantity' => $item['quantity'],
     'code' => $item['code'],
     'name' => $item['name'],
     'detail' => $item['discount'],
