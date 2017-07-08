@@ -24,7 +24,7 @@ head("Scat");
   font-weight: bold;
   color: #600;
 }
-.code, .discount, .person {
+.code, .discount, #sales .person {
   font-size: smaller;
 }
 
@@ -63,16 +63,28 @@ Txn.delete= function (id) {
 
 Txn.loadData= function (data) {
   var oldperson= viewModel.person.id();
+  var oldtxn= viewModel.txn.id();
+
   viewModel.load(data);
-  if (data.new_line) {
-    setActiveRow($('#items tbody tr[data-line_id=' + data.new_line + ']'));
-  }
-  if (Txn.due() != 0.00 &&
-      viewModel.person.id() != oldperson) {
-    $(".choices.loyalty").remove();
+
+  var txn= viewModel.txn.id();
+
+  /* Do stuff if this is a new person. */
+  if (!viewModel.txn.paid() && viewModel.person.id() != oldperson) {
+    /* Show loyalty rewards */
     if (viewModel.person.id()) {
       Txn.showAvailableRewards(viewModel.person.id());
     }
+
+    /* Ask about tax */
+    if (viewModel.person.tax_id()) {
+      Txn.askAboutTaxExemption(viewModel.person.id());
+    }
+  }
+
+
+  if (data.new_line) {
+    setActiveRow($('#items tbody tr[data-line_id=' + data.new_line + ']'));
   }
 }
 
@@ -159,7 +171,7 @@ Txn.findAndAddItem= function(q) {
 
 Txn.removePerson= function (txn) {
   Txn.callAndLoad('txn-remove-person', { txn: txn });
-  $(".choices.loyalty").remove();
+  $(".choices.person").remove();
 }
 
 Txn.updatePerson= function (txn, person) {
@@ -174,11 +186,12 @@ Txn.updatePerson= function (txn, person) {
 }
 
 Txn.showAvailableRewards= function(person) {
+  $(".choices.loyalty").remove();
   Scat.api("loyalty-available", { person: person })
       .done(function (data) {
         if (!data.rewards.length) return;
 
-        var choices= $('<div class="choices loyalty alert alert-warning"/>');
+        var choices= $('<div class="choices person loyalty alert alert-warning"/>');
         choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
         var list= $('<table class="table table-condensed" style="width: 95%;">');
         $.each(data.rewards, function(i,item) {
@@ -196,6 +209,17 @@ Txn.showAvailableRewards= function(person) {
         choices.append(list);
         $("#items").before(choices);
       });
+}
+
+Txn.askAboutTaxExemption= function(person) {
+  if (viewModel.txn.tax_rate() != 0.00) {
+    var choices= $('<div class="choices person alert alert-warning"/>');
+    choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
+    choices.append('<p><strong>Resale certificate on file.</strong> Are these items being purchased for resale? (Tax will not be collected.)<p>');
+    choices.append($('<button class="btn btn-small btn-default">No</button>').click({}, function(ev) { $(this).closest('.choices').remove(); }));
+    choices.append($('<button class="btn btn-small btn-primary">Yes</button>').click({}, function(ev) { Txn.callAndLoad('txn-update-tax-rate', { txn: Txn.id(), tax_rate: 0.0 }); $(this).closest('.choices').remove(); }));
+    $("#items").before(choices);
+  }
 }
 
 Txn.isSpecialOrder = function() {
