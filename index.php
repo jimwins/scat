@@ -1345,8 +1345,16 @@ function displayPerson(person) {
     });
 
     person.error= '';
+    person.tax_id_status= '';
 
     personModel= ko.mapping.fromJS(person);
+
+    personModel.verifyTaxId= function(place, ev) {
+      Scat.api('verify-ca-resale', { number: personModel.tax_id() })
+          .done(function (data) {
+            personModel.tax_id_status(data.status);
+          });
+    }
 
     personModel.savePerson= function(place, ev) {
       var person= ko.mapping.toJS(personModel);
