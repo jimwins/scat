@@ -32,7 +32,7 @@ header("content-type: text/html;charset=utf-8");?>
 <head>
  <title><?=ashtml($title)?></title>
  <meta name="viewport" content="width=device-width, initial-scale=1">
- <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+ <link rel="stylesheet" type="text/css" href="extern/bootstrap/css/bootstrap.min.css">
  <link rel="stylesheet" type="text/css" href="components/font-awesome/css/font-awesome.min.css">
  <link rel="stylesheet" type="text/css" href="css/datepicker3.css">
  <link rel="stylesheet" type="text/css" href="css/scat.css">
@@ -48,7 +48,7 @@ header("content-type: text/html;charset=utf-8");?>
    }
  </style>
  <script src="components/jquery/jquery.min.js"></script>
- <script src="js/bootstrap.min.js"></script>
+ <script src="extern/bootstrap/js/bootstrap.min.js"></script>
  <script src="js/bootstrap-datepicker.js"></script>
  <script src="lib/knockout/knockout-3.4.1.js"></script>
  <script src="lib/knockout/knockout.mapping-2.4.1.js"></script>

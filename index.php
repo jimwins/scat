@@ -571,7 +571,7 @@ $("#txn-load").submit(function(ev) {
            name="q"
            autocomplete="off" autocorrect="off" autocapitalize="off"
            placeholder="Scan item or enter search terms"
-           value="">
+           value="" size="200">
     <span class="input-group-btn">
       <input type="submit" class="btn btn-default" value="Find Items">
       <div class="btn-group">
