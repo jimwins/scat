@@ -172,6 +172,9 @@ foreach ($payments as $payment) {
 <?if ($payment['cc_approval']) {?>
  <tr><th>Approval</th><td><?=$payment['cc_approval']?></td></tr>
 <?}?>
+<?if ($payment['cc_txn']) {?>
+ <tr><th>Ref #</th><td><?=$payment['cc_txn']?></td></tr>
+<?}?>
  <tr><th>Amount</th><td><?=amount($payment['amount'])?></td></tr>
 </table>
 <?
