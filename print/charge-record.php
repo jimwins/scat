@@ -68,7 +68,7 @@ $id= (int)$_REQUEST['id'];
 if (!$id) die("no payment specified.");
 
 $q= "SELECT payment.id, CAST(amount AS DECIMAL(9,2)) amount,
-            cc_approval, cc_lastfour, cc_expire, cc_type, processed,
+            cc_approval, cc_lastfour, cc_expire, cc_type, cc_sign, processed,
             CONCAT(DATE_FORMAT(txn.created, '%Y'), '-', number) AS invoice
        FROM payment
        JOIN txn ON (txn.id = txn)
@@ -91,7 +91,12 @@ $payment= $r->fetch_assoc();
 
 <div id="signature">
   <br>
-  <div style="font-size: 2em; padding-top: 2em; padding-bottom: 0.25em; margin-bottom: 0.25em; border-bottom: 4px solid black; text-align: left; page-break-before: always;">&times;</div>
+  <div style="font-size: 2em; padding-top: 2em; padding-bottom: 0.25em; margin-bottom: 0.25em; border-bottom: 4px solid black; text-align: left; page-break-before: always;">
+    &times;
+<?if ($payment['cc_sign']) {?>
+    <img style="width: 50%" src="data:image/x-ms-bmp;base64,<?=$payment['cc_sign']?>">
+<?}?>
+  </div>
   Cardmember agrees to pay total in accordance with agreement governing use of such card.
 </div>
 <div id="doc_info">

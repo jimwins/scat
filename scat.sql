@@ -140,11 +140,14 @@ CREATE TABLE `payment` (
   `txn` int(10) unsigned NOT NULL,
   `method` enum('cash','change','credit','square','stripe','gift','check','dwolla','paypal','discount','withdrawal','bad','donation','internal') NOT NULL,
   `amount` decimal(9,3) NOT NULL,
-  `cc_txn` varchar(10) DEFAULT NULL,
+  `cc_txn` varchar(32) DEFAULT NULL,
+  `cc_refid` varchar(32) DEFAULT NULL,
   `cc_approval` varchar(30) DEFAULT NULL,
   `cc_lastfour` varchar(4) DEFAULT NULL,
   `cc_expire` varchar(4) DEFAULT NULL,
   `cc_type` varchar(32) DEFAULT NULL,
+  `cc_sign` mediumblob,
+  `cc_receipt` mediumblob,
   `discount` decimal(9,2) DEFAULT NULL,
   `processed` datetime NOT NULL,
   PRIMARY KEY (`id`),
@@ -453,4 +456,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-04-06 17:16:51
+-- Dump completed on 2017-07-12 18:42:07

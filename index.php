@@ -112,6 +112,17 @@ Txn.addPayment= function (id, options) {
       });
 }
 
+Txn.voidPayment= function (payment_id) {
+  if (!confirm("Are you sure you want to void this payment?")) {
+    return;
+  }
+
+  Txn.callAndLoad('cc-void-payment',
+                  { id: Txn.id(), payment_id: payment_id })
+     .done(function (data) {
+     });
+}
+
 Txn.addItem= function (txn, item) {
   Scat.api('txn-add-item', { txn: txn, item: item.id })
       .done(function (data) {
@@ -1028,6 +1039,10 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
         <a data-bind="visible: method() == 'credit',
                       click: function (data) { printChargeRecord(data.id()) }">
           <i class="fa fa-print"></i>
+        </a>
+        <a data-bind="visible: method() == 'credit',
+                      click: function (data) { Txn.voidPayment(data.id()) }">
+          <i class="fa fa-undo"></i>
         </a>
       </th>
       <th class="payment-method" align="right"
