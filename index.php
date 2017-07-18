@@ -1339,6 +1339,11 @@ viewModel.changePerson= function(data, event) {
 
     ko.applyBindings(personModel, panel[0]);
 
+    Scat.api('person-list-recent', { })
+        .done(function (data) {
+          personModel.people(data);
+        });
+
     panel.appendTo($('body')).modal();
   });
 }
