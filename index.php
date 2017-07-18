@@ -1304,7 +1304,7 @@ viewModel.changePerson= function(data, event) {
     ko.computed(function() {
       var search= this.search();
 
-      if (search.length < 2) {
+      if (search.length < 3) {
         return;
       }
 
