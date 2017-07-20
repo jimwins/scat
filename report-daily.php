@@ -18,7 +18,7 @@ bcscale(2);
 ?>
 <table class="table table-striped sortable" style="width: auto">
 <thead>
- <tr><th>Date</th><th>Cash</th><th>Credit</th><th>Amex</th><th>Check</th><th>Other</th><th>Total</th></tr>
+ <tr><th>Date</th><th>Cash</th><th>Credit</th><th>Check</th><th>Other</th><th>Total</th></tr>
 </thead>
 <tbody>
 <?
@@ -30,11 +30,10 @@ while ($row= $r->fetch_assoc()) {
          ashtml($day), '</td><td align="right">',
          amount($cash), '</td><td align="right">',
          amount($credit), '</td><td align="right">',
-         amount($amex), '</td><td align="right">',
          amount($check), '</td><td align="right">',
          amount($other), '</td><td align="right">',
          amount($total), "</td></tr>\n";
-    $total= $cash= $credit= $amex= $check= $other= 0.00;
+    $total= $cash= $credit= $check= $other= 0.00;
   }
 
   switch ($row['method']) {
@@ -43,11 +42,7 @@ while ($row= $r->fetch_assoc()) {
     $cash= bcadd($cash, $row['amount']);
     break;
   case 'credit':
-    if ($row['cc_type'] == 'AmericanExpress' || $row['cc_type'] == 'AMEX') {
-      $amex= bcadd($amex, $row['amount']);
-    } else {
-      $credit= bcadd($credit, $row['amount']);
-    }
+    $credit= bcadd($credit, $row['amount']);
     break;
   case 'check':
     $check= bcadd($check, $row['amount']);
