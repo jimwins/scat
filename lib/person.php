@@ -18,7 +18,8 @@ function person_find($db, $q, $options= null) {
                  OR person.company LIKE '%$term%'
                  OR person.email LIKE '%$term%'
                  OR person.loyalty_number LIKE '%$term%'
-                 OR person.phone LIKE '%$term%')";
+                 OR person.phone LIKE '%$term%'
+                 OR person.notes LIKE '%$term%')";
     }
   }
 
