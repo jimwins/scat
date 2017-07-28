@@ -897,7 +897,7 @@ $("#pay-check").on("click", "button[name='pay']", function (ev) {
 <form id="pay-discount" class="pay-method" style="display: none">
  <div class="form-group">
    <input class="amount form-control input-lg text-center"
-          type="text" pattern="[.0-9]*">
+          type="text" pattern="[/%.0-9]*">
  </div>
  <button class="btn btn-default" name="pay">Discount</button>
  <button class="btn btn-default" name="cancel">Cancel</button>
