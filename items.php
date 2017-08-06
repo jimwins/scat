@@ -229,12 +229,30 @@ dump_table($r);
   </div>
 </div>
 
-<button id="print-price-labels" class="btn btn-default">
-  Print Price Labels
-</button>
-<button id="print-price-labels-brush" class="btn btn-default">
-  Print Brush Price Labels
-</button>
+<div class="btn-group">
+  <button type="button" class="btn btn-default"
+          id="print-price-labels">
+    <i class="fa fa-print"></i> Print Price Labels
+  </button>
+  <button type="button" class="btn btn-default dropdown-toggle"
+          data-toggle="dropdown" aria-haspopup="true"
+          aria-expanded="false">
+    <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
+  </button>
+  <ul class="dropdown-menu">
+    <li>
+      <a id="print-price-labels-brush">
+        Half-size price labels
+      </a>
+    </li>
+    <li>
+      <a id="print-price-labels-noprice">
+        No price
+      </a>
+    </li>
+  </ul>
+</div>
 <script>
 function updateItem(item) {
   $('.' + item.id + ' .name').text(item.name);
@@ -358,6 +376,19 @@ $('#print-price-labels').on('click', function(ev) {
 
   $.getJSON("print/labels-price.php?callback=?",
             { q: q },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+            });
+});
+$('#print-price-labels-noprice').on('click', function(ev) {
+  ev.preventDefault();
+  var q= $('#search').val();
+
+  $.getJSON("print/labels-price.php?callback=?",
+            { q: q, noprice: 1 },
             function (data) {
               if (data.error) {
                 displayError(data);
