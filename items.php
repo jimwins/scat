@@ -465,19 +465,14 @@ $('#bulk-edit-form form').on('submit', function(ev) {
 
   data.push(items);
 
-  $.getJSON("api/item-bulk-update.php?callback=?",
-            data,
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              $.each(data.items, function (i, item) {
-                updateItem(item);
-              });
-              $('#bulk-edit-form form')[0].reset();
-              $('#bulk-edit-form').collapse('hide');
-            });
+  Scat.api('item-bulk-update', data, { method: 'POST' })
+      .done(function (data) {
+        $.each(data.items, function (i, item) {
+          updateItem(item);
+        });
+        $('#bulk-edit-form form')[0].reset();
+        $('#bulk-edit-form').collapse('hide');
+      });
 });
 </script>
 <?
