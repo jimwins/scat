@@ -190,6 +190,21 @@ if (preg_match('/^linenum,qty/', $line)) {
 
   echo "Updated ", $db->affected_rows, " rows from vendor info.<br>";
 
+} elseif (($json= json_decode(file_get_contents($fn)))) {
+  // JSON
+  foreach ($json->items as $item) {
+    $q= "INSERT INTO vendor_order
+            SET item_no = '" . $db->escape($item->code) . "',
+                description = '" . $db->escape($item->name) . "',
+                ordered = -" . (int)$item->quantity . ",
+                shipped = -" . (int)$item->quantity . ",
+                msrp = '" . $db->escape($item->retail_price) . "',
+                net = '" . $db->escape($item->sale_price) . "'";
+    // XXX handle vendor vs. non-vendor for quantity
+    $db->query($q)
+      or die_query($db, $q);
+  }
+
 } else {
   // MacPherson's order
   $q= "LOAD DATA LOCAL INFILE '$fn'
