@@ -1441,7 +1441,7 @@ ko.applyBindings(viewModel);
 ?>
 $("body").html5Uploader({
   name: 'src',
-  postUrl: 'api/txn-upload-items.php?txn=' + Txn.id(),
+  postUrl: function() { return 'api/txn-upload-items.php?txn=' + Txn.id() },
   onSuccess: function(e, file, response) {
     data= $.parseJSON(response);
     if (data.error) {

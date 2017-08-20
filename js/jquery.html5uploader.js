@@ -127,7 +127,12 @@
                     settings.onSuccess(e, file, xmlHttpRequest.responseText);
                 }
             };
-            xmlHttpRequest.open("POST", settings.postUrl, true);
+
+            var url= ($.isFunction(settings.postUrl) ?
+                      settings.postUrl() :
+                      settings.postUrl);
+
+            xmlHttpRequest.open("POST", url, true);
 
             if (file.getAsBinary) { // Firefox
 
