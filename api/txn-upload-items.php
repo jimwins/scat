@@ -9,9 +9,6 @@ if (!$txn_id)
 
 $txn= txn_load($db, $txn_id);
 
-if ($txn['type'] != 'vendor')
-  die_jsonp("That's not a vendor transaction!");
-
 $fn= $_FILES['src']['tmp_name'];
 
 if (!$fn)
@@ -274,6 +271,14 @@ $q= "UPDATE vendor_order, barcode
         AND vendor_order.barcode = barcode.code";
 $db->query($q)
   or die_query($db, $q);
+
+# For non-vendor orders, fail if we didn't recognize all items
+if ($txn['type'] != 'vendor') {
+  if ($db->get_one("SELECT COUNT(*) FROM vendor_order
+                     WHERE (NOT item OR item IS NULL")) {
+    die_jsonp("Not all items available for order!");
+  }
+}
 
 # Make sure we have all the items
 $q= "INSERT IGNORE INTO item (code, brand, name, retail_price, active)
