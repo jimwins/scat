@@ -82,9 +82,10 @@ if (preg_match('/^linenum,qty/', $line)) {
 // C2F order (CSV)
 } elseif (preg_match('/^LineNumber/', $line)) {
   //LineNumber,ProductID,ProductDesc,UOM,UPC_EAN,QtyOrdered,QtyShipped,QtyBackOrdered,RetailPrice,UnitAmt
+  $sep= preg_match("/,/", $line) ? "," : "\t";
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
-       FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
+       FIELDS TERMINATED BY '$sep' OPTIONALLY ENCLOSED BY '\"'
        IGNORE 1 LINES
        (line, item_no, description, status, @upc,
         ordered, shipped, @backordered, msrp, net)
