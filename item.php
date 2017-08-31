@@ -332,7 +332,6 @@ $data.= "]";
 <div class="container">
   <div id="sales-chart" style="width: 100%; height: 300px"></div>
 </div>
-</div>
 <script>
 var graph= new Dygraph(
   document.querySelector('#sales-chart'),
