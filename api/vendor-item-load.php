@@ -14,6 +14,15 @@ if ($code) {
 if (!$id)
   die_jsonp("No item specified.");
 
-$item= $db->get_one_assoc("SELECT * FROM vendor_item WHERE id = $id");
+$q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
+            code, vendor_sku, vendor_item.name,
+            retail_price, net_price, promo_price,
+            special_order,
+            purchase_quantity
+       FROM vendor_item
+       JOIN person ON vendor_item.vendor = person.id
+      WHERE vendor_item.id = $id";
 
-echo jsonp(array('item' => $item));
+$vendor_item= $db->get_one_assoc($q);
+
+echo jsonp(array('item' => $vendor_item));

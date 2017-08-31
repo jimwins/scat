@@ -456,8 +456,17 @@ itemModel.editVendorItem= function(item) {
       Scat.api(vendorItem.id ? 'vendor-item-update' : 'vendor-item-add',
                vendorItem)
           .done(function (data) {
-            // XXX reload vendor items
             $(place).closest('.modal').modal('hide');
+            if (data.vendor_item) {
+              for (var i= 0; i < itemModel.vendor_items().length; i++) {
+                if (data.vendor_item.id === itemModel.vendor_items()[i].id()) {
+                  ko.mapping.fromJS(data.vendor_item, {},
+                                    itemModel.vendor_items()[i]);
+                  return;
+                }
+              }
+              itemModel.vendor_items.push(ko.mapping.fromJS(data.vendor_item));
+            }
           });
     }
 

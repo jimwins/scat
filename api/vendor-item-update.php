@@ -26,7 +26,15 @@ foreach(array('item', 'vendor', 'code', 'vendor_sku', 'name',
 
 $db->commit();
 
-$vendor_item= $db->get_one_assoc("SELECT * FROM vendor_item
-                                   WHERE id = $vendor_item_id");
+$q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
+            code, vendor_sku, vendor_item.name,
+            retail_price, net_price, promo_price,
+            special_order,
+            purchase_quantity
+       FROM vendor_item
+       JOIN person ON vendor_item.vendor = person.id
+      WHERE vendor_item.id = $vendor_item_id";
+
+$vendor_item= $db->get_one_assoc($q);
 
 echo jsonp(array('vendor_item' => $vendor_item));
