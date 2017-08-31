@@ -229,9 +229,15 @@ while ($row= $r->fetch_assoc()) {
   $vendor_items[]= $row;
 }
 ?>
-<h2 onclick="$('#vendors').toggle()">Vendors</h2>
-<table id="vendors" style="display: none"
-       class="table table-striped table-hover">
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="vendorsHeader">
+      <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" href="#vendors" aria-expanded="false" aria-controls="vendors">
+        <h4 class="panel-title">Vendors</h4>
+      </a>
+    </div>
+    <div id="vendors" class="panel-collapse collapse" role="tabpanel" aria-labelledby="vendorsHeader">
+<table id="vendors" class="table table-striped table-hover">
   <thead>
     <tr>
       <th class="num">#</th>
@@ -268,8 +274,15 @@ while ($row= $r->fetch_assoc()) {
     </tr>
   </tbody>
 </table>
-<div id="vendors" style="display: none">
-</div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="historyHeader">
+      <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" href="#history" aria-expanded="false" aria-controls="history">
+        <h4 class="panel-title">History</h4>
+      </a>
+    </div>
+    <div id="history" class="panel-collapse collapse collapsed" role="tabpanel" aria-labelledby="historyHeader">
 <?
 
 function RunningTotal($row) {
@@ -296,11 +309,13 @@ $q= "SELECT DATE_FORMAT(created, '%a, %b %e %Y %H:%i') Date,
       GROUP BY txn
       ORDER BY created";
 
-echo '<h2 onclick="$(\'#history\').toggle()">History</h2>';
-echo '<div id="history" style="display: none">';
 dump_table($db->query($q), 'RunningTotal$right');
 dump_query($q);
-echo '</div>';
+?>
+    </div>
+  </div>
+</div>
+<?
 
 $q= "SELECT DATE(created) AS x,
             SUM(ABS(allocated)) AS y
