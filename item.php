@@ -211,10 +211,6 @@ $('#new-barcode').editable(function(value, settings) {
 $q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
             code, vendor_sku, vendor_item.name,
             retail_price, net_price, promo_price,
-            CONCAT('$', CAST(vendor_item.net_price / 0.6 AS DECIMAL(9,2)),
-                   ' - ',
-                   '$', CAST(vendor_item.net_price / 0.5 AS DECIMAL(9,2)))
-              AS sale_range,
             special_order,
             purchase_quantity
        FROM vendor_item
@@ -268,7 +264,7 @@ while ($row= $r->fetch_assoc()) {
       <td data-bind="text: amount($data.retail_price())"></td>
       <td data-bind="text: amount($data.net_price())"></td>
       <td data-bind="text: amount($data.promo_price())"></td>
-      <td data-bind="text: $data.sale_range"></td>
+      <td data-bind="text: amount($data.net_price() / 0.6) + ' - ' + amount($data.net_price() / 0.5)"></td>
       <td><i class="fa" data-bind="css: { 'fa-check-square-o': $data.special_order() == '1', 'fa-square-o': $data.special_order() == '0' }"></i></td>
       <td data-bind="text: $data.purchase_quantity"></td>
     </tr>
