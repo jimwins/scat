@@ -955,6 +955,16 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             <span data-bind="text: person.points_pending()"></span>
             = <span data-bind="text: person.points_available() + person.points_pending()"></span>
           </span>
+          <span data-bind="if: person.id() && !person.suppress_loyalty() &&
+                           txn.due() > 0 && txn.subtotal()">
+            <span data-bind="if: loyaltyPointsUsed()">
+              - <i class="fa fa-star"></i>
+              <span data-bind="text: loyaltyPointsUsed()"></span>
+            </span>
+            + <i class="fa fa-star-o"></i>
+            <span data-bind="text: Math.max(1, Math.floor(txn.subtotal()))"></span>
+            = <span data-bind="text: person.points_available() + person.points_pending() + Math.max(1, Math.floor(txn.subtotal())) - loyaltyPointsUsed()"></span>
+          </span>
           <a data-bind="if: person.id(), click: removePerson">
             <i class="fa fa-trash-o"></i>
           </a>
@@ -969,7 +979,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 </div>
 
 <div class="choices person loyalty alert alert-warning"
-     data-bind="visible: person.rewards().length > 0 && Txn.due() > 0.00 && !usingReward()">
+     data-bind="visible: person.rewards().length > 0 && Txn.due() > 0.00 && !loyaltyPointsUsed()">
   <button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>
   <table class="table table-condensed" style="width: 95%">
     <tbody data-bind="foreach: person.rewards">
@@ -1340,15 +1350,16 @@ viewModel.removePerson= function(data, event) {
 }
 
 // O(items * rewards)
-viewModel.usingReward= function() {
+viewModel.loyaltyPointsUsed= function() {
   if (viewModel.person.rewards().length) {
-    return viewModel.person.rewards().find(function (reward) {
+    var r= viewModel.person.rewards().find(function (reward) {
       return viewModel.items().find(function (item) {
-                                   return (item.item_id() == reward.id())
-                                 });
+                                      return (item.item_id() == reward.id())
+             });
     });
+    return (r ? r.cost() : 0);
   }
-  return false;
+  return 0;
 }
 
 function displayPerson(person) {
