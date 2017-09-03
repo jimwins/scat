@@ -59,6 +59,8 @@ function person_find($db, $q, $options= null) {
     $person['points_available']= (int)$person['points_available'];
     $person['points_pending']= (int)$person['points_pending'];
     $person['suppress_loyalty']= (int)$person['suppress_loyalty'];
+    $person['rewards']= available_loyalty_items($db,
+                                                $person['points_available']);
     $people[]= $person;
   }
 
@@ -149,4 +151,24 @@ function person_load_loyalty($db, $id) {
   }
 
   return $loyalty;
+}
+
+function available_loyalty_items($db, $points) {
+  $q= "SELECT item_id AS id, cost, code, name, retail_price
+        FROM loyalty_reward
+        JOIN item ON item.id = item_id
+       WHERE cost <= $points
+       ORDER BY cost DESC";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  $rewards= array();
+  while ($row= $r->fetch_assoc()) {
+    $row['cost']= (int)$row['cost'];
+    $row['retail_price']= (float)$row['retail_price'];
+    $rewards[]= $row;
+  }
+
+  return $rewards;
 }

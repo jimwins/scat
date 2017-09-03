@@ -71,11 +71,6 @@ Txn.loadData= function (data) {
 
   /* Do stuff if this is a new person. */
   if (!viewModel.txn.paid() && viewModel.person.id() != oldperson) {
-    /* Show loyalty rewards */
-    if (viewModel.person.id()) {
-      Txn.showAvailableRewards(viewModel.person.id());
-    }
-
     /* Ask about tax */
     if (viewModel.person.tax_id()) {
       Txn.askAboutTaxExemption(viewModel.person.id());
@@ -194,32 +189,6 @@ Txn.updatePerson= function (txn, person) {
     return;
   }
   Txn.callAndLoad('txn-update-person', { txn: txn, person: person });
-}
-
-Txn.showAvailableRewards= function(person) {
-  $(".choices.loyalty").remove();
-  Scat.api("loyalty-available", { person: person })
-      .done(function (data) {
-        if (!data.rewards.length) return;
-
-        var choices= $('<div class="choices person loyalty alert alert-warning"/>');
-        choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
-        var list= $('<table class="table table-condensed" style="width: 95%;">');
-        $.each(data.rewards, function(i,item) {
-          var n= $("<tr class='stocked'>" +
-                   "<td>" + item.name + "</td>" +
-                   "<td align='right'>" + item.cost + " pts</td>" +
-                   "<td align='right'>" + amount(item.retail_price) + "</td>" +
-                   "</tr>");
-          n.click({ id: item.item_id }, function(ev) {
-            Txn.addItem(Txn.id(), ev.data);
-            $(this).closest(".choices").remove();
-          });
-          list.append(n);
-        });
-        choices.append(list);
-        $("#items").before(choices);
-      });
 }
 
 Txn.askAboutTaxExemption= function(person) {
@@ -999,6 +968,23 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   <p data-bind="text: person.notes" style="white-space: pre-line"></p>
 </div>
 
+<div class="choices person loyalty alert alert-warning"
+     data-bind="visible: person.rewards().length > 0 && Txn.due() > 0.00 && !usingReward()">
+  <button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>
+  <table class="table table-condensed" style="width: 95%">
+    <tbody data-bind="foreach: person.rewards">
+      <tr data-bind="css: { stocked: $data.retail_price() +
+                                     $root.txn.subtotal() > 0.00 },
+                     click: function (data) { Txn.addItem(Txn.id(), data) }">
+        <td data-bind="text: $data.name">Reward Name</td>
+        <td align="right"><span data-bind="text: $data.cost">#</span> pts</td>
+        <td align="right"
+            data-bind="text: Scat.amount($data.retail_price())">$0.00</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <table class="table table-condensed table-striped" id="items">
  <thead>
   <tr>
@@ -1156,6 +1142,7 @@ var model= {
     points_available: 0,
     points_pending: 0,
     suppress_loyalty: 0,
+    rewards: [],
   },
   orders: [],
   showAdmin: false,
@@ -1350,6 +1337,18 @@ viewModel.changePerson= function(data, event) {
 
 viewModel.removePerson= function(data, event) {
   Txn.removePerson(Txn.id());
+}
+
+// O(items * rewards)
+viewModel.usingReward= function() {
+  if (viewModel.person.rewards().length) {
+    return viewModel.person.rewards().find(function (reward) {
+      return viewModel.items().find(function (item) {
+                                   return (item.item_id() == reward.id())
+                                 });
+    });
+  }
+  return false;
 }
 
 function displayPerson(person) {
