@@ -51,9 +51,9 @@ $discount= $db->get_one($q);
 
 if ($discount) {
   $q= "UPDATE txn_line
-          SET discount_type = 'fixed',
-              discount = sale_price(retail_price, discount_type, discount) *
-                         (1 - $discount / 100)
+          SET discount = sale_price(retail_price, discount_type, discount) *
+                         (1 - $discount / 100),
+              discount_type = 'fixed'
         WHERE txn = $new_txn_id";
 
   $r= $db->query($q)
