@@ -458,6 +458,9 @@ $q= "SELECT
 
 dump_table($db->query($q));
 ?>
+      <div class="panel-footer text-center">
+        <a class="btn btn-default" href="report-items.php?begin=<?=$date?>&end=<?=$date?>">See All</a>
+      </div>
     </div>
   </div>
 </div>
