@@ -239,8 +239,7 @@ var hourlySalesChart= new Chart(document.getElementById('hourly-sales-chart'), {
         </h3>
       </div>
       <div class="panel-body">
-        <div class="chart-container"
-             style="position: relative; height: 100%; width: 100%">
+        <div class="chart-container" style="position: relative">
           <canvas id="daily-sales-chart"></canvas>
         </div>
       </div>
@@ -306,8 +305,7 @@ var dailySalesChart= new Chart(document.getElementById('daily-sales-chart'), {
         </h3>
       </div>
       <div class="panel-body">
-        <div class="chart-container"
-             style="position: relative; height: 100%; width: 100%">
+        <div class="chart-container" style="position: relative">
           <canvas id="comparison-chart"></canvas>
         </div>
       </div>
