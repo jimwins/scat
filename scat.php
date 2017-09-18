@@ -119,6 +119,7 @@ $(document).ready(function() {
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a id="reports" href="#">Quick</a></li>
+            <li><a href="report-summary.php">Daily Summary</a></li>
             <li><a href="report.php">Sales by Date</a></li>
             <li><a href="report-items.php">Sales by Item</a></li>
             <li><a href="report-clock.php">Clock</a></li>
