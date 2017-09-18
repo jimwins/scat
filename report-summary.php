@@ -196,7 +196,9 @@ var options= {
     xAxes: [{
       type: 'time',
       time: {
-        unit: 'hour'
+        unit: 'hour',
+        min: '<?=$date?> 09:30',
+        max: '<?=$date?> 19:30'
       },
       gridLines: {
         offsetGridLines: true
