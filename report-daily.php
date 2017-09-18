@@ -13,8 +13,6 @@ $q= "SELECT DATE_FORMAT(processed, '%Y-%m-%d %a') AS date,
 $r= $db->query($q)
   or die($db->error);
 
-bcscale(2);
-
 ?>
 <table class="table table-striped sortable" style="width: auto">
 <thead>
