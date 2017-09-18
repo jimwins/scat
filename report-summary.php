@@ -211,6 +211,7 @@ var options= {
     }]
   },
   tooltips: {
+    intersect: false,
     callbacks: {
       label: function (tooltipItem, data) {
         return amount(tooltipItem.yLabel);
@@ -277,6 +278,7 @@ var options= {
     }]
   },
   tooltips: {
+    intersect: false,
     callbacks: {
       label: function (tooltipItem, data) {
         return amount(tooltipItem.yLabel);
