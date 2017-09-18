@@ -268,6 +268,9 @@ var options= {
       type: 'time',
       time: {
         unit: 'day'
+      },
+      gridLines: {
+        offsetGridLines: true
       }
     }],
     yAxes: [{
