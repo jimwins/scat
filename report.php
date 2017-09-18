@@ -55,7 +55,9 @@ head("Sales Report @ Scat", true);
     <h3 class="panel-title">All Sales</h3>
   </div>
   <div class="panel-body">
-    <div class="graph"></div>
+    <div class="chart-container" style="position: relative">
+      <canvas class="graph"></canvas>
+    </div>
   </div>
   <table class="table">
    <thead>
@@ -96,7 +98,7 @@ $("#report-params").on('submit', function(ev) {
                              '<td align="right">' + amount(sales.tax) +
                              '<td align="right">' + amount(sales.total_taxed) +
                              '</tr>'));
-                  gdata.unshift([ new Date(sales.raw_date), sales.total ]);
+                  gdata.unshift({ x: sales.raw_date, y: sales.total });
                 });
                 var cap= $('#items').val();
                 if (cap) {
@@ -104,24 +106,49 @@ $("#report-params").on('submit', function(ev) {
                 }
                 table.appendTo($("body"));
                 table.show();
-                var graph= new Dygraph(
-                  $('.graph', table)[0],
-                  gdata,
-                  {
-                    labels: [ "Date", "Sales" ],
-                    fillGraph: true,
-                    yAxisLabelWidth: 60,
-                    axes: {
-                      y: {
-                        valueFormatter: function (y) {
-                          return amount(y);
-                        },
-                        axisLabelFormatter: function (y) {
-                          return amount(y);
-                        },
-                      },
-                    },
-                });
+
+                var data= {
+                  datasets: [{
+                    label: 'Sales',
+                    data: gdata
+                  }]
+                };
+
+                var options= {
+                  legend: {
+                    display: false,
+                  },
+                  scales: {
+                    xAxes: [{
+                      type: 'time',
+                      time: {
+                        unit: 'day'
+                      }
+                    }],
+                    yAxes: [{
+                      ticks: {
+                        callback: function(value, index, values) {
+                          return amount(value);
+                        }
+                      }
+                    }]
+                  },
+                  tooltips: {
+                    callbacks: {
+                      label: function (tooltipItem, data) {
+                        return amount(tooltipItem.yLabel);
+                      }
+                    }
+                  }
+                };
+
+                var chart= new Chart($('.graph', table)[0],
+                                     {
+                                       type: 'line',
+                                       data: data,
+                                       options: options
+                                     });
+
                 table.udraggable({ handle: '.panel-heading' });
               }
             });

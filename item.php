@@ -325,26 +325,47 @@ $r= $db->query($q);
 
 $data= "[";
 while ($row= $r->fetch_assoc()) {
-  $data.= "[ new Date('{$row['x']}'), {$row['y']} ],";
+  $data.= "{ x: '{$row['x']}', y: {$row['y']} },";
 }
 $data.= "]";
 ?>
 <div class="container">
-  <div id="sales-chart" style="width: 100%; height: 300px"></div>
+  <div class="chart-container" style="width: 100%; height: 300px">
+   <canvas id="sales-chart"></canvas>
+  </div>
 </div>
 <script>
-var graph= new Dygraph(
-  document.querySelector('#sales-chart'),
-  <?=$data?>,
-  {
-    labels: [ "Date", "Qty" ],
-    avoidMinZero: true,
-    includeZero: true,
-    drawPoints: true,
-    pointSize: 5.0,
-    strokeWidth: 0.0,
-});
+$(function() {
 
+var data= {
+  datasets: [{
+    label: 'Sales',
+    data: <?=$data?>
+  }]
+};
+
+var options= {
+  legend: {
+    display: false,
+  },
+  scales: {
+    xAxes: [{
+      type: 'time',
+      time: {
+        unit: 'day',
+        stepSize: 90
+      }
+    }]
+  }
+};
+
+var salesChart= new Chart(document.getElementById('sales-chart'), {
+                               type: 'bar',
+                               data: data,
+                               options: options
+                         });
+
+});
 </script>
 <?
 

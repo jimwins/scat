@@ -36,8 +36,8 @@ Scat includes the jQuery udraggable plugin:
 Scat includes Keypress:
   http://dmauro.github.io/Keypress/
 
-Scat includes dygraphs for charting:
-  http://dygraphs.com/
+Scat includes Chart.js for charting:
+  http://chartjs.com/
 
 Scat includes FPDF for PDF generation:
   http://www.fpdf.org/

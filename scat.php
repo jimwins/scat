@@ -52,7 +52,6 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/bootstrap-datepicker.js"></script>
  <script src="lib/knockout/knockout-3.4.1.js"></script>
  <script src="lib/knockout/knockout.mapping-2.4.1.js"></script>
- <script src="extern/dygraphs-1.1.1/dygraph-combined-dev.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>
  <script src="js/jquery.html5uploader.js"></script>
  <script src="js/jquery.jeditable.js"></script>
@@ -60,6 +59,7 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/jquery.event.ue.js"></script>
  <script src="js/jquery.udraggable.js"></script>
  <script src="components/moment/min/moment.min.js"></script>
+ <script src="extern/chartjs-2.7.0/Chart.min.js"></script>
 <?if (!$allnew) {?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
@@ -86,6 +86,8 @@ $(document).ready(function() {
   // dynamically set active navbar link based on script
   var page= '<?=basename($_SERVER['SCRIPT_NAME'])?>';
   $("#navbar a[href='./" + page + "']").parent().addClass('active');
+  // Default Chart text color
+  Chart.defaults.global.defaultFontColor= '#000';
 }); 
  </script>
 <?}?>
