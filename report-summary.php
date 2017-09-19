@@ -105,6 +105,56 @@ $(function() {
   </div>
 </div>
 
+<?
+$q= "SELECT COUNT(*) total,
+            SUM(IF(DATE(filled) != DATE(person.created), 1, 0)) returned,
+            SUM(IF(DATE(filled) = DATE(person.created), 1, 0)) new
+       FROM txn LEFT JOIN person ON (txn.person = person.id)
+      WHERE DATE(filled) = '$date'";
+$people= $db->get_one_assoc($q);
+?>
+
+<div class="row text-center">
+  <div class="col-sm-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Transactions
+        </h3>
+      </div>
+      <div class="panel-body">
+        <span style="font-size: larger"><?=$people['total']?></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          New Signups
+        </h3>
+      </div>
+      <div class="panel-body">
+        <span style="font-size: larger"><?=$people['new']?></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Returning Customers
+        </h3>
+      </div>
+      <div class="panel-body">
+        <span style="font-size: larger"><?=$people['returned']?></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row text-center">
   <div class="col-sm-12">
     <div class="panel panel-default">
