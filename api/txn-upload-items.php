@@ -73,7 +73,7 @@ if (preg_match('/^linenum,qty/', $line)) {
         msrp, net, box_no, ext)
        SET barcode = REPLACE(@upc, 'UPC->', ''),
            sku = item_no,
-           ordered = @shipped, shipped = @shipped";
+           ordered = @shipped, shipped = 0";
   $db->query($q)
     or die_query($db, $q);
 
@@ -136,23 +136,6 @@ if (preg_match('/^linenum,qty/', $line)) {
   $db->query("DELETE FROM vendor_order WHERE status = 'asmt' OR status = 'as'");
 
   echo "Deleted ", $db->affected_rows, " assortments from file.<br>";
-} elseif (preg_match('/^sls_sku/', $line)) {
-  // SLS
-  $q= "LOAD DATA LOCAL INFILE '$fn'
-       INTO TABLE vendor_order
-       FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
-       LINES TERMINATED BY '\n'
-       IGNORE 1 LINES
-       (item_no, @cust_sku, description, @vendor_name,
-        msrp, net, @reg_discount, @promo_price, @promo_discount,
-        barcode, @upc2, @upc2_qty, @upc3, @upc3_qty, @min_ord_qty,
-        @level1, @level2, @level3, @level4, @level5, @ltl_only, @add_date,
-        @qty)
-       SET ordered = @qty, shipped = @qty";
-  $db->query($q)
-    or die_query($db, $q);
-
-  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
 } elseif (preg_match('/^,Name,MSRP/', $line)) {
   // CSV
   $q= "LOAD DATA LOCAL INFILE '$fn'
