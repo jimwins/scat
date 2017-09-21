@@ -330,7 +330,7 @@ while ($row= $r->fetch_assoc()) {
 $data.= "]";
 ?>
 <div class="container">
-  <div class="chart-container" style="width: 100%; height: 300px">
+  <div class="chart-container" style="position: relative">
    <canvas id="sales-chart"></canvas>
   </div>
 </div>
