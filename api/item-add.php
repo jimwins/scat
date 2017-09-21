@@ -22,7 +22,7 @@ $brand= $db->get_one("SELECT id FROM brand WHERE name = 'New Item'");
 $q= "INSERT INTO item
         SET code = '$code', name = '$name', retail_price = '$msrp',
             brand = $brand,
-            taxfree = 0, minimum_quantity = 1, active = 1";
+            taxfree = 0, minimum_quantity = 0, active = 1";
 
 $r= $db->query($q)
   or die_query($db, $q);
