@@ -30,6 +30,7 @@ function person_find($db, $q, $options= null) {
               email, email_ok,
               phone, loyalty_number, sms_ok,
               tax_id, payment_account_id,
+              vendor_rebate,
               birthday, notes,
               active, deleted,
               suppress_loyalty,

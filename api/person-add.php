@@ -8,7 +8,7 @@ if (empty($name) && empty($company) && empty($phone))
   die_jsonp("You need to supply at least a name, company, or phone number.");
 
 $list= array();
-foreach(array('name', 'company', 'address',
+foreach(array('name', 'company', 'address', 'vendor_rebate',
               'email', 'phone', 'tax_id') as $field) {
   $list[]= "$field = '" . $db->escape($_REQUEST[$field]) . "', ";
 }

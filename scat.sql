@@ -178,6 +178,7 @@ CREATE TABLE `person` (
   `notes` mediumtext,
   `tax_id` varchar(255) DEFAULT NULL,
   `payment_account_id` varchar(50) DEFAULT NULL,
+  `vendor_rebate` decimal(9,2) NOT NULL DEFAULT '0.00',
   `active` tinyint(1) NOT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -456,4 +457,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-07-12 18:42:07
+-- Dump completed on 2017-09-20 21:09:06

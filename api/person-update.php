@@ -15,7 +15,7 @@ if (isset($_REQUEST['phone'])) {
 
 // TODO: reset sms_ok and email_ok when email or phone changed
 
-foreach (array('name', 'role', 'company', 'email', 'notes',
+foreach (array('name', 'role', 'company', 'email', 'notes', 'vendor_rebate',
                'phone', 'loyalty_number', 'tax_id', 'address') as $key) {
   if (isset($_REQUEST[$key])) {
     $value= trim($_REQUEST[$key]);

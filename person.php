@@ -166,6 +166,17 @@ if (!$person) {
     </div>
   </div>
 
+  <div class="form-group" data-bind="visible: person.role() == 'vendor'">
+    <label for="vendor_rebate" class="col-sm-2 control-label">
+      Vendor Rebate %
+    </label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="vendor_rebate"
+             placeholder="Vendor Rebate %"
+             data-bind="value: person.vendor_rebate">
+    </div>
+  </div>
+
   <div class="form-group" data-bind="visible: changed">
     <div class="col-sm-offset-2 col-sm-8">
       <button type="submit" class="btn btn-primary"
