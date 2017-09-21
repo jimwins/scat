@@ -3,7 +3,7 @@
 define('PERSON_FIND_EMPTY', 1);
 
 function person_find($db, $q, $options= null) {
-  $criteria= array("active AND NOT deleted");
+  $criteria= array("person.active AND NOT person.deleted");
 
   $terms= preg_split('/\s+/', trim($q));
   foreach ($terms as $term) {

@@ -124,7 +124,7 @@ if (!$begin) {
 }
 # XXX allow option to include inactive and/or deleted
 if (!$_REQUEST['all'])
-  $criteria[]= "(active AND NOT deleted)";
+  $criteria[]= "(item.active AND NOT item.deleted)";
 
 $q= "SELECT
             item.id AS meta,
@@ -146,7 +146,7 @@ $q= "SELECT
               WHERE type = 'customer'
                 AND item = item.id AND filled > NOW() - INTERVAL 3 MONTH)
             AS Last3Months\$right,
-            active Active\$bool
+            item.active Active\$bool
        FROM item
   LEFT JOIN brand ON (item.brand = brand.id)
   LEFT JOIN barcode ON (item.id = barcode.item)

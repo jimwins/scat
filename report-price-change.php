@@ -71,7 +71,7 @@ $q= "SELECT
        LEFT JOIN brand ON item.brand = brand.id
        LEFT JOIN barcode ON (item.id = barcode.item)
       WHERE ABS(vendor_item.retail_price - item.retail_price) > 0.01
-        AND active AND NOT deleted
+        AND item.active AND NOT item.deleted
         AND ($sql_criteria)
       GROUP BY 1
       ORDER BY 2";

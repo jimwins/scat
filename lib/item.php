@@ -53,7 +53,7 @@ function item_terms_to_sql($db, $q, $options) {
   }
 
   if (!($options & FIND_ALL))
-    $sql_criteria= "($sql_criteria) AND (active AND NOT deleted)";
+    $sql_criteria= "($sql_criteria) AND (item.active AND NOT item.deleted)";
 
   return array($sql_criteria, $begin);
 }
@@ -97,7 +97,7 @@ function item_find($db, $q, $options) {
               GROUP_CONCAT(CONCAT(barcode.code, '!', barcode.quantity)
                            SEPARATOR ',') barcodes,
               $extra
-              active
+              item.active
          FROM item
     LEFT JOIN brand ON (item.brand = brand.id)
     LEFT JOIN barcode ON (item.id = barcode.item)

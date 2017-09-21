@@ -9,7 +9,7 @@ $q= "SELECT id, name,
               ORDER BY id DESC
               LIMIT 1) AS punched
        FROM person
-      WHERE active AND role = 'employee'
+      WHERE person.active AND role = 'employee'
       ORDER BY name";
 
 $r= $db->query($q);
