@@ -367,9 +367,11 @@ var salesChart= new Chart(document.getElementById('sales-chart'), {
 
 });
 </script>
+<button type="button" class="btn btn-default" data-bind="click: mergeItem">
+  Merge
+</button>
 <?
 
-echo '<button type="button" class="btn btn-default" data-bind="click: mergeItem">Merge</button>';
 
 foot();
 ?>
