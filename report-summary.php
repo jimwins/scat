@@ -181,6 +181,7 @@ function get_sales_data($db, $format, $begin, $end= null) {
   }
 
   $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
+              COUNT(*) AS txns,
               SUM(taxed + untaxed) AS total,
               SUM(IF(tax_rate, 0, taxed + untaxed)) AS resale,
               SUM(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)) AS tax,
@@ -220,23 +221,25 @@ function get_sales_data($db, $format, $begin, $end= null) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-  $data= array();
+  $sales= $txns= array();
   while (($row= $r->fetch_assoc())) {
-    $data[]= array('x' => $row['span'],
+    $sales[]= array('x' => $row['span'],
                    'y' => (float)$row['total']);
+    $txns[]= array('x' => $row['span'],
+                   'y' => (int)$row['txns']);
   }
 
-  return $data;
+  return json_encode(array('datasets' => array(
+    array('label' => 'Sales', 'yAxisID' => 'sales', 'data' => $sales),
+    array('type' => 'line', 'fill' => false,
+          'label' => 'Transactions', 'yAxisID' => 'txns',
+          'data' => $txns),
+  )));
 }
 ?>
 <script>
 $(function() {
-var data= {
-  datasets: [{
-    label: 'Sales',
-    data: <?=json_encode(get_sales_data($db, '%Y-%m-%d %H:00', $date))?>
-  }]
-};
+var data= <?=get_sales_data($db, '%Y-%m-%d %H:00', $date)?>;
 
 var options= {
   legend: {
@@ -255,18 +258,26 @@ var options= {
       }
     }],
     yAxes: [{
+      id: 'sales',
+      position: 'left',
       ticks: {
         callback: function(value, index, values) {
           return amount(value);
         }
       }
+    },
+    {
+      id: 'txns',
+      position: 'right',
     }]
   },
   tooltips: {
     intersect: false,
     callbacks: {
       label: function (tooltipItem, data) {
-        return amount(tooltipItem.yLabel);
+        return (tooltipItem.datasetIndex ?
+                tooltipItem.yLabel :
+                amount(tooltipItem.yLabel));
       }
     }
   }
@@ -298,16 +309,11 @@ var hourlySalesChart= new Chart(document.getElementById('hourly-sales-chart'), {
 <script>
 $(function() {
 
-var data= {
-  datasets: [{
-    label: 'Sales',
 <?
 $before= new Datetime($date);
 $before->sub(new DateInterval('P8D'));
 ?>
-    data: <?=json_encode(get_sales_data($db, '%Y-%m-%d', $before->format('Y-m-d'), $date))?>
-  }]
-};
+var data= <?=get_sales_data($db, '%Y-%m-%d', $before->format('Y-m-d'), $date)?>;
 
 var options= {
   legend: {
@@ -324,18 +330,26 @@ var options= {
       }
     }],
     yAxes: [{
+      id: 'sales',
+      position: 'left',
       ticks: {
         callback: function(value, index, values) {
           return amount(value);
         }
       }
+    },
+    {
+      id: 'txns',
+      position: 'right',
     }]
   },
   tooltips: {
     intersect: false,
     callbacks: {
       label: function (tooltipItem, data) {
-        return amount(tooltipItem.yLabel);
+        return (tooltipItem.datasetIndex ?
+                tooltipItem.yLabel :
+                amount(tooltipItem.yLabel));
       }
     }
   }
