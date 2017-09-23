@@ -119,7 +119,12 @@ if (!$person) {
     </div>
   </div>
   <div class="form-group">
-    <label for="email" class="col-sm-2 control-label">Email</label>
+    <label for="email" class="col-sm-2 control-label">
+      <a data-bind="click: sendMessage">
+        <i class="fa fa-envelope-o"></i>
+      </a>
+      Email
+    </label>
     <div class="col-sm-6">
       <input type="text" class="form-control" id="email" placeholder="Email"
              data-bind="value: person.email">
@@ -295,6 +300,36 @@ viewModel.mergePerson= function (place) {
           loadPerson(data.person);
         });
   }
+}
+
+viewModel.sendMessage= function (place) {
+  Scat.dialog('message').done(function (html) {
+    var panel= $(html);
+
+    var message= { person: viewModel.person.id(),
+                   from: '', subject: '', message: '' };
+    message.error= '';
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    messageModel= ko.mapping.fromJS(message);
+
+    messageModel.sendMessage= function(place, ev) {
+      var message= ko.mapping.toJS(messageModel);
+      delete message.error;
+
+      Scat.api('person-email', message)
+          .done(function (data) {
+            $(place).closest('.modal').modal('hide');
+            displayError({ title: "Success!", error: "Email sent." });
+          });
+    }
+
+    ko.applyBindings(messageModel, panel[0]);
+    panel.appendTo($('body')).modal();
+  });
 }
 
 ko.applyBindings(viewModel);
