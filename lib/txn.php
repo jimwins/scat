@@ -296,6 +296,9 @@ class Transaction {
     if ($name == 'payments') {
       return $this->data['payments'];
     }
+    if ($name == 'notes') {
+      return $this->data['notes'];
+    }
     return $this->data['txn'][$name];
   }
 
