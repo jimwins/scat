@@ -20,6 +20,7 @@ if (!$txn->person_details['email'])
 
 $data= array(
   'sale' => array(
+    'type' => $txn->type,
     'number' => $txn->formatted_number,
     'created' => $txn->created,
     'filled' => $txn->filled,
@@ -34,6 +35,7 @@ $data= array(
   ),
   'items' => array(),
   'payments' => array(),
+  'notes' => array(),
 );
 
 foreach ($txn->items as $item) {
@@ -60,6 +62,15 @@ foreach ($txn->payments as $payment) {
   );
 }
 
+foreach ($txn->notes as $note) {
+  if ($note['public']) {
+    $data['notes'][]= array(
+      'entered' => $note['entered'],
+      'content' => $note['content'],
+    );
+  }
+}
+
 $promise= $sparky->transmissions->post([
   'content' => [
     'template_id' => 'scat-invoice',
@@ -70,6 +81,11 @@ $promise= $sparky->transmissions->post([
       'address' => [
         'name' => $data['sale']['name'],
         'email' => $data['sale']['email'],
+      ],
+      // BCC ourselves
+      'address' => [
+        'header_to' => $data['sale']['email'],
+        'email' => OUTGOING_EMAIL_ADDRESS,
       ],
     ],
   ],
