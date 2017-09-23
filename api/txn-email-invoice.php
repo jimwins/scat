@@ -82,6 +82,8 @@ $promise= $sparky->transmissions->post([
         'name' => $data['sale']['name'],
         'email' => $data['sale']['email'],
       ],
+    ],
+    [
       // BCC ourselves
       'address' => [
         'header_to' => $data['sale']['email'],

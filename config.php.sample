@@ -15,3 +15,6 @@ define('DEFAULT_TAX_RATE', 9.00);
 
 /* Printed on till receipts */
 define('BANK_DEPOSIT_INFO', 'My Bank<br>CHECKING<br>#1234567890<br>Scat LLC');
+
+/* Bcc: on all outgoing emails */
+define('OUTGOING_EMAIL_ADDRESS', 'scat@example.com');
