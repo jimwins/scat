@@ -24,8 +24,11 @@ $sparky= new \SparkPost\SparkPost($httpClient,
 
 $data= [
   'subject' => $_REQUEST['subject'],
-  'message' => $_REQUEST['message'],
   'from' => $_REQUEST['from'],
+  'message' => $_REQUEST['message'],
+  'dynamic_html' => [
+    'message' => nl2br($_REQUEST['message']),
+  ]
 ];
 
 $promise= $sparky->transmissions->post([
