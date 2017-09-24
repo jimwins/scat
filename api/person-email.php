@@ -36,14 +36,14 @@ $promise= $sparky->transmissions->post([
   'recipients' => [
     [
       'address' => [
-        'name' => $data['sale']['name'],
-        'email' => $data['sale']['email'],
+        'name' => $person['name'],
+        'email' => $person['email'],
       ],
     ],
     [
       // BCC ourselves
       'address' => [
-        'header_to' => $data['sale']['email'],
+        'header_to' => $person['email'],
         'email' => OUTGOING_EMAIL_ADDRESS,
       ],
     ],
