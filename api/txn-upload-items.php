@@ -73,7 +73,7 @@ if (preg_match('/^linenum,qty/', $line)) {
         msrp, net, box_no, ext)
        SET barcode = REPLACE(@upc, 'UPC->', ''),
            sku = item_no,
-           ordered = @shipped, shipped = 0";
+           ordered = @shipped, backordered = @shipped, shipped = 0";
   $db->query($q)
     or die_query($db, $q);
 
