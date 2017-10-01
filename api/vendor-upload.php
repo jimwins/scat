@@ -159,7 +159,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     abc_flag CHAR(3),
     category VARCHAR(64))";
 
-  $sep= preg_match("/,/", $line) ? "," : "\t";
+  $sep= preg_match("/\t/", $line) ? "\t" : ",";
 
   $db->query($q)
     or die_query($db, $q);
