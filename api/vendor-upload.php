@@ -274,7 +274,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
            net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
            promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', ''),
-           barcode = REPLACE(@barcode, '-', '')";
+           barcode = REPLACE(REPLACE(@barcode, '-', ''), ' ', '')";
 
   $r= $db->query($q)
     or die_query($db, $q);
