@@ -14,8 +14,16 @@ head("Items @ Scat", true);
 
 // XXX can't add items on phone for now
 ?>
-<div class="hidden-xs" style="float: right">
- <button id="add-item" class="btn btn-default">Add New Item</button>
+<div class="hidden-xs btn-group" style="float: right">
+  <button id="add-item" class="btn btn-default">Add New Item</button>
+  <button type="button" class="btn btn-default dropdown-toggle"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="#" id="add-bulk-items">Bulk Add</a></li>
+  </ul>
 </div>
 <?include 'item-searchform.php';?>
 <div id="add-item-form" class="modal fade">
@@ -86,6 +94,60 @@ $('#add-item-form form').on('submit', function(ev) {
               }
               window.location.href= 'item.php?id=' + data.item.id;
             });
+});
+$('#add-bulk-items').on('click', function(ev) {
+  Scat.dialog('item-bulk-add').done(function (html) {
+    var panel= $(html);
+
+    var vendorItem= { vendor: 0, code: '' };
+    vendorItem.vendors= [];
+    vendorItem.error= '';
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    $.getJSON('api/person-list.php?callback=?',
+              { role: 'vendor' })
+      .done(function (data) {
+        ko.mapping.fromJS({ vendors: data }, vendorItemModel);
+        vendorItemModel.vendor.valueHasMutated();
+      })
+      .fail(function (jqxhr, textStatus, error) {
+        var data= $.parseJSON(jqxhr.responseText);
+        vendor_item.error(textStatus + ', ' + error + ': ' + data.text)
+      });
+
+
+    vendorItemModel= ko.mapping.fromJS(vendorItem);
+
+    vendorItemModel.addItems= function(place, ev) {
+      var vendorItem= ko.mapping.toJS(vendorItemModel);
+      delete vendorItem.vendors;
+      delete vendorItem.error;
+
+      Scat.api('item-add-bulk', vendorItem)
+          .done(function (data) {
+            $(place).closest('.modal').modal('hide');
+            alert("Added " + data.items + " items.");
+          });
+    }
+
+    vendorItemModel.selectedVendor= ko.computed({
+      read: function () {
+        return this.vendor();
+      },
+      write: function (value) {
+        if (typeof value != 'undefined' && value != '') {
+          this.vendor(value);
+        }
+      },
+      owner: vendorItemModel
+    }).extend({ notify: 'always' });
+
+    ko.applyBindings(vendorItemModel, panel[0]);
+    panel.appendTo($('body')).modal();
+  });
 });
 </script>
 <br>
