@@ -60,10 +60,8 @@ if (count($items) == 1) {
   $r= $db->query($q);
   if (!$r) die_query($db, $q);
 
-  $mul= ($txn['type'] == 'customer') ? -1 : 1;
-
   /* if found via barcode, we may have better quantity */
-  $quantity= 1;
+  $quantity= ($txn['type'] == 'customer') ? -1 : 1;
   if ($items[0]['barcode'][$search])
     $quantity*= $items[0]['barcode'][$search];
 
@@ -73,7 +71,7 @@ if (count($items) == 1) {
 
     $items[0]['quantity']= ($row['ordered'] + $quantity);
 
-    $q= "UPDATE txn_line SET ordered = $mul * {$items[0]['quantity']}
+    $q= "UPDATE txn_line SET ordered = {$items[0]['quantity']}
           WHERE id = {$items[0]['line_id']}";
     $r= $db->query($q);
     if (!$r) die_query($db, $q);
