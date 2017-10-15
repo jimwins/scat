@@ -62,16 +62,16 @@ if (count($items) == 1) {
 
   $mul= ($txn['type'] == 'customer') ? -1 : 1;
 
+  /* if found via barcode, we may have better quantity */
+  $quantity= 1;
+  if ($items[0]['barcode'][$search])
+    $quantity*= $items[0]['barcode'][$search];
+
   if (!$unique && $r->num_rows) {
     $row= $r->fetch_assoc();
     $items[0]['line_id']= $row['id'];
 
-    /* if found via barcode, we may have better quantity */
-    $quantity= 1;
-    if ($items[0]['barcode'][$search])
-      $quantity= $items[0]['barcode'][$search];
-
-    $items[0]['quantity']= -1 * ($row['ordered'] - $quantity);
+    $items[0]['quantity']= ($row['ordered'] + $quantity);
 
     $q= "UPDATE txn_line SET ordered = $mul * {$items[0]['quantity']}
           WHERE id = {$items[0]['line_id']}";
@@ -80,11 +80,15 @@ if (count($items) == 1) {
   } else {
     $prices= ($txn['type'] == 'customer') ?
                'retail_price, discount, discount_type' :
-               "IFNULL((SELECT net_price FROM vendor_item WHERE vendor = {$txn['person']} AND item = item.id), 0.00), NULL, NULL";
+               "IFNULL((SELECT net_price
+                          FROM vendor_item
+                         WHERE vendor = {$txn['person']}
+                           AND item = item.id), 0.00), NULL, NULL";
+
     $q= "INSERT INTO txn_line (txn, item, ordered,
                                retail_price, discount, discount_type, taxfree)
-         SELECT $txn_id AS txn, {$items[0]['id']} AS item, $mul AS ordered,
-                $prices, taxfree
+         SELECT $txn_id AS txn, {$items[0]['id']} AS item,
+                $quantity AS ordered, $prices, taxfree
            FROM item WHERE id = {$items[0]['id']}";
     $r= $db->query($q);
     if (!$r) die_query($db, $q);
