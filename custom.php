@@ -232,7 +232,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-5">
               <p class="form-control-static"
-                 data-bind="text: amount(Math.max(80, area())/144 * 13.95)"></p>
+                 data-bind="text: amount(Math.max(200, area())/144 * 13.95)"></p>
             </div>
           </div>
           <div class="form-group">
@@ -241,7 +241,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-5">
               <p class="form-control-static"
-                 data-bind="text: amount(Math.max(80, area())/144 * 19.95)"></p>
+                 data-bind="text: amount(Math.max(144, area())/144 * 19.95)"></p>
             </div>
           </div>
           <div class="form-group">
