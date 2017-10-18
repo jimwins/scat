@@ -101,7 +101,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   //
   $q= "CREATE TEMPORARY TABLE macitem (
     item_no VARCHAR(32),
-    sku VARCHAR(10),
+    sku VARCHAR(32),
     name VARCHAR(255),
     retail_price DECIMAL(9,2),
     net_price DECIMAL(9,2),
@@ -119,6 +119,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
             INTO TABLE macitem
           FIELDS TERMINATED BY '\t'
           OPTIONALLY ENCLOSED BY '\"'
+          LINES TERMINTED BY '\r\n'
           IGNORE 1 LINES
           (@manufacturer, @brand, @subbrand, item_no,
            name, @new, @uom,
