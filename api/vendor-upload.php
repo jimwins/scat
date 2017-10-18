@@ -119,7 +119,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
             INTO TABLE macitem
           FIELDS TERMINATED BY '\t'
           OPTIONALLY ENCLOSED BY '\"'
-          LINES TERMINTED BY '\r\n'
+          LINES TERMINATED BY '\r\n'
           IGNORE 1 LINES
           (@manufacturer, @brand, @subbrand, item_no,
            name, @new, @uom,
