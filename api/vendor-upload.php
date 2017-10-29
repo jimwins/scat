@@ -90,12 +90,6 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-  // toss bad barcodes
-  $q= "UPDATE macitem SET barcode = NULL WHERE LENGTH(barcode) < 3";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-
 } elseif (preg_match('/Alvin SRP/', $line)) {
   // Alvin Account Pricing Report
   //
@@ -138,13 +132,6 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-  // toss bad barcodes
-  $q= "UPDATE macitem SET barcode = NULL WHERE LENGTH(barcode) < 3";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-
-
 } elseif (preg_match('/C2F Pricer/', $line)) {
   // C2F Pricer
   //
@@ -183,13 +170,6 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-  // toss bad barcodes
-  $q= "UPDATE macitem SET barcode = NULL WHERE LENGTH(barcode) < 3";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-
-
 } elseif (preg_match('/Golden Ratio/', $line)) {
   // Masterpiece
   //
@@ -226,12 +206,6 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
             net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
             promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', ''),
             name = IF(@size, CONCAT(@size, ' ', @description), @description)";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-
-  // toss bad barcodes
-  $q= "UPDATE macitem SET barcode = NULL WHERE LENGTH(barcode) < 3";
 
   $r= $db->query($q)
     or die_query($db, $q);
@@ -280,6 +254,11 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 }
+
+// toss bad barcodes
+$q= "UPDATE macitem SET barcode = NULL WHERE LENGTH(barcode) < 3";
+$r= $db->query($q)
+  or die_query($db, $q);
 
 $q= "DELETE FROM vendor_item WHERE vendor = $vendor_id";
 
