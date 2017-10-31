@@ -43,6 +43,13 @@ $q= "UPDATE vendor_item
 $db->query($q)
   or die_query($db, $q);
 
+$q= "UPDATE vendor_item, barcode
+        SET vendor_item.item = $item_id
+      WHERE vendor_item.barcode = barcode.code
+        AND barcode.item = $item_id";
+$db->query($q)
+  or die_query($db, $q);
+
 $item= item_load($db, $item_id);
 
 echo jsonp(array('item' => $item));
