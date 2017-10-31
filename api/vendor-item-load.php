@@ -17,7 +17,7 @@ if (!$id)
 $q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
             code, vendor_sku, vendor_item.name,
             retail_price, net_price, promo_price,
-            special_order,
+            special_order, barcode,
             purchase_quantity
        FROM vendor_item
        JOIN person ON vendor_item.vendor = person.id
