@@ -956,7 +956,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             = <span data-bind="text: person.points_available() + person.points_pending()"></span>
           </span>
           <span data-bind="if: person.id() && !person.suppress_loyalty() &&
-                           txn.due() > 0 && txn.subtotal()">
+                           txn.due() > 0 && txn.subtotal() && !txn.no_rewards()">
             <span data-bind="if: loyaltyPointsUsed()">
               - <i class="fa fa-star"></i>
               <span data-bind="text: loyaltyPointsUsed()"></span>
@@ -1133,6 +1133,7 @@ var model= {
     number: 0,
     formatted_number: 0,
     special_order: 0,
+    no_rewards: 0,
     type: '',
   },
   items: [],

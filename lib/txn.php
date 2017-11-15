@@ -18,6 +18,7 @@ function txn_load_full($db, $id) {
 function txn_load($db, $id) {
   $q= "SELECT id, type,
               number, created, filled, paid, returned_from, special_order,
+              no_rewards,
               IF(type = 'vendor' && YEAR(created) > 2013,
                  CONCAT(SUBSTRING(YEAR(created), 3, 2), number),
                  CONCAT(DATE_FORMAT(created, '%Y-'), number))
@@ -35,7 +36,7 @@ function txn_load($db, $id) {
         FROM (SELECT
               txn.id, txn.type, txn.number,
               txn.created, txn.filled, txn.paid,
-              txn.returned_from, txn.special_order,
+              txn.returned_from, txn.special_order, txn.no_rewards,
               txn.person,
               CONCAT(IFNULL(person.name, ''),
                      IF(person.name != '' AND person.company != '', ' / ', ''),
@@ -430,7 +431,6 @@ class Transaction {
       return;
 
     // Use rewards
-
     $q= "INSERT INTO loyalty (txn_id, person_id, processed, note, points)
          SELECT {$this->id} txn_id,
                 {$this->person} person_id,
@@ -444,6 +444,10 @@ class Transaction {
     // XXX throw an exception on failure
     $r= $this->db->query($q)
         or die_query($this->db, $q);
+
+    // No rewards for this txn?
+    if ($this->no_rewards)
+      return;
 
     // Award new points
     $points= (int)$this->subtotal;

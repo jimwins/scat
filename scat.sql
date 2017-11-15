@@ -283,6 +283,7 @@ CREATE TABLE `txn` (
   `tax_rate` decimal(9,3) NOT NULL,
   `returned_from` int(10) unsigned DEFAULT NULL,
   `special_order` tinyint(4) NOT NULL DEFAULT '0',
+  `no_rewards` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `type` (`type`,`number`),
   KEY `created` (`created`),
@@ -457,4 +458,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-09-20 21:09:06
+-- Dump completed on 2017-11-14 17:29:19
