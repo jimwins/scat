@@ -72,6 +72,7 @@ function txn_load($db, $id) {
   $txn['total']= (float)$txn['total'];
   $txn['total_paid']= (float)$txn['total_paid'];
   $txn['special_order']= (int)$txn['special_order'];
+  $txn['no_rewards']= (int)$txn['no_rewards'];
 
   return $txn;
 }
