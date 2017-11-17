@@ -118,6 +118,23 @@ if (preg_match('/^linenum,qty/', $line)) {
 
   echo "Loaded ", $db->affected_rows, " rows from file.<br>";
 
+} elseif (preg_match('/^sls_sku	cust_sku/', $line)) {
+  // SLS assortment
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+       INTO TABLE vendor_order
+       FIELDS TERMINATED BY '\t'
+       LINES TERMINATED BY '\n'
+       IGNORE 1 LINES
+       (item_no, @cust_sku, description, @vendor_name, msrp,
+        net, @reg_discount, @promo_price, @promo_discount,
+        @barcode, @upc2, @upc2_qty, @upc3, @upc3_qty, @min_ord_qty,
+        @level1, @level2, @level3, @level4, @leve5, @ltl_only, @add_date,
+        @asst_qty)
+       SET ordered = @asst_qty, shipped = @asst_qty";
+  $db->query($q)
+    or die_query($db, $q);
+
+  echo "Loaded ", $db->affected_rows, " rows from SLS assortment.<br>";
 } elseif (preg_match('/^C2F Product #/', $line)) {
   // C2F
   $q= "LOAD DATA LOCAL INFILE '$fn'
