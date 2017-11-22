@@ -63,11 +63,12 @@ $db->query($q)
   or die_query($db, $q);
 
 // SLS order?
-if (preg_match('/^linenum,qty/', $line)) {
+if (preg_match('/^linenum[,\t]qty/', $line)) {
   // linenum,qty_shipped,sls_sku,cust_item_numb,description,upc,msrp,net_cost,pkg_id,extended_cost
+  $sep= preg_match("/,/", $line) ? "," : "\t";
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
-       FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
+       FIELDS TERMINATED BY '$sep' OPTIONALLY ENCLOSED BY '\"'
        IGNORE 1 LINES
        (line, @shipped, item_no, cust_item, description, @upc,
         msrp, net, box_no, ext)
