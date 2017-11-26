@@ -128,7 +128,7 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
        IGNORE 1 LINES
        (item_no, @cust_sku, description, @vendor_name, msrp,
         net, @reg_discount, @promo_price, @promo_discount,
-        @barcode, @upc2, @upc2_qty, @upc3, @upc3_qty, @min_ord_qty,
+        barcode, @upc2, @upc2_qty, @upc3, @upc3_qty, @min_ord_qty,
         @level1, @level2, @level3, @level4, @leve5, @ltl_only, @add_date,
         @asst_qty)
        SET ordered = @asst_qty, shipped = @asst_qty";
