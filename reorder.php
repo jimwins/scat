@@ -40,7 +40,7 @@ if ($vendor > 0) {
 
 $code= $_REQUEST['code'];
 if ($code) {
-  $extra= "AND code LIKE '" . $db->escape($code) . "%'";
+  $extra.= " AND code LIKE '" . $db->escape($code) . "%'";
 }
 ?>
 <style>
