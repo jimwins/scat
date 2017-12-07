@@ -20,7 +20,7 @@ ob_start();
 if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $q= "CREATE TEMPORARY TABLE macitem (
     item_no VARCHAR(32),
-    sku VARCHAR(10),
+    sku VARCHAR(255),
     name VARCHAR(255),
     retail_price DECIMAL(9,2),
     net_price DECIMAL(9,2),
@@ -59,7 +59,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   //
   $q= "CREATE TEMPORARY TABLE macitem (
     item_no VARCHAR(32),
-    sku VARCHAR(10),
+    sku VARCHAR(255),
     name VARCHAR(255),
     retail_price DECIMAL(9,2),
     net_price DECIMAL(9,2),
@@ -175,7 +175,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   //
   $q= "CREATE TEMPORARY TABLE macitem (
     item_no VARCHAR(32),
-    sku VARCHAR(10),
+    sku VARCHAR(255),
     name VARCHAR(255),
     retail_price DECIMAL(9,2),
     net_price DECIMAL(9,2),
@@ -220,7 +220,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   // Generic
   $q= "CREATE TEMPORARY TABLE macitem (
     item_no VARCHAR(32),
-    sku VARCHAR(10),
+    sku VARCHAR(255),
     name VARCHAR(255),
     retail_price DECIMAL(9,2),
     net_price DECIMAL(9,2),
