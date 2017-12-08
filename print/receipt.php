@@ -208,7 +208,14 @@ foreach ($payments as $payment) {
 <?}?>
   Invoice <?=ashtml($txn['formatted_number'])?>
   <br>
+<?if ($txn['paid']) {?>
+  Created: 
+<?}?>
   <?=date('F j, Y g:i A', strtotime($txn['created']))?>
+<?if ($txn['paid']) {?>
+  <br>
+  Paid: <?=date('F j, Y g:i A', strtotime($txn['paid']))?>
+<?}?>
   <br><br>
 <span style="font-family: Aatrix3of9Reg; font-size: 2em">*@INV-<?=ashtml($txn['id'])?>*</span>
 </div>
