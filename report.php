@@ -107,47 +107,50 @@ $("#report-params").on('submit', function(ev) {
                 table.appendTo($("body"));
                 table.show();
 
-                var data= {
-                  datasets: [{
-                    label: 'Sales',
-                    data: gdata
-                  }]
-                };
+                // Only show chart when we have multiple data points
+                if (gdata.length > 1) {
+                  var data= {
+                    datasets: [{
+                      label: 'Sales',
+                      data: gdata
+                    }]
+                  };
 
-                var options= {
-                  legend: {
-                    display: false,
-                  },
-                  scales: {
-                    xAxes: [{
-                      type: 'time',
-                      time: {
-                        unit: 'day'
-                      }
-                    }],
-                    yAxes: [{
-                      ticks: {
-                        callback: function(value, index, values) {
-                          return amount(value);
+                  var options= {
+                    legend: {
+                      display: false,
+                    },
+                    scales: {
+                      xAxes: [{
+                        type: 'time',
+                        time: {
+                          unit: 'day'
+                        }
+                      }],
+                      yAxes: [{
+                        ticks: {
+                          callback: function(value, index, values) {
+                            return amount(value);
+                          }
+                        }
+                      }]
+                    },
+                    tooltips: {
+                      callbacks: {
+                        label: function (tooltipItem, data) {
+                          return amount(tooltipItem.yLabel);
                         }
                       }
-                    }]
-                  },
-                  tooltips: {
-                    callbacks: {
-                      label: function (tooltipItem, data) {
-                        return amount(tooltipItem.yLabel);
-                      }
                     }
-                  }
-                };
+                  };
 
-                var chart= new Chart($('.graph', table)[0],
-                                     {
-                                       type: 'line',
-                                       data: data,
-                                       options: options
-                                     });
+                  var chart= new Chart($('.graph', table)[0],
+                                       {
+                                         type: 'line',
+                                         data: data,
+                                         options: options
+                                       });
+                }
 
                 table.udraggable({ handle: '.panel-heading' });
               }
