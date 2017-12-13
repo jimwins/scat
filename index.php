@@ -1104,6 +1104,10 @@ $('#tax_rate .val').editable(function(value, settings) {
         <span data-bind="text: $data.code"></span>
       </td>
       <td class="editable">
+        <!-- ko if: $data.code() == 'ZZ-GIFTCARD' && $parent.txn.paid() -->
+          <a data-bind="if: !$data.data.card, click: $parent.createGiftCard"><i class="fa fa-barcode"></i></a>
+          <a data-bind="if: $data.data.card, click: $parent.printGiftCard"><i class="fa fa-print"></i></a>
+        <!-- /ko -->
         <span class="name" data-bind="text: $data.name"></span>
         <div class="discount" data-bind="text: $data.discount"></div>
       </td>
@@ -1435,6 +1439,38 @@ viewModel.showPoints= function(data, event) {
 
     panel.appendTo($('body')).modal();
   });
+}
+
+viewModel.createGiftCard= function(item) {
+  $.getJSON("<?=GIFT_BACKEND?>/create.php?callback=?",
+            { balance: item.msrp() },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+              } else {
+                // save to txn
+                Txn.callAndLoad('txn-update-item',
+                                { force: 1, txn: Txn.id(),
+                                  id: item.line_id(),
+                                  data: { card: data.card } });
+              }
+            });
+}
+
+viewModel.printGiftCard= function(item) {
+  $.getJSON("<?=GIFT_BACKEND?>/check-balance.php?callback=?",
+            { card: item.data.card() },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+              } else {
+                var lpr= $('<iframe id="giftcard" src="print/gift-card.php?card=' + data.card + '&amp;balance=' + data.balance + '&amp;issued=' + data.latest + '"></iframe>').hide();
+                lpr.on("load", function() {
+                  this.contentWindow.print();
+                });
+                $('body').append(lpr);
+              }
+            });
 }
 
 ko.applyBindings(viewModel);
