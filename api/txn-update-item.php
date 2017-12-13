@@ -8,7 +8,7 @@ $id= (int)$_REQUEST['id'];
 if (!$txn_id || !$id) die_jsonp('No transaction or item specified');
 
 $txn= txn_load($db, $txn_id);
-if ($txn['paid'] && $txn['filled']) {
+if ($txn['paid'] && $txn['filled'] && !(int)$_REQUEST['force']) {
   die_jsonp("This order is already closed!");
 }
 
