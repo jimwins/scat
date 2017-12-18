@@ -793,29 +793,25 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
   if (card == '...') {
     card= "11111111111"; // Test card.
   }
-  $.getJSON("<?=GIFT_BACKEND?>/check-balance.php?callback=?",
-            { card: card },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                var due= Txn.due();
-                $('#pay-gift-balance').text("Balance: $" +
-                                            data.balance +
-                                            ", Last used " +
-                                            data.latest + '.');
-                var def= due;
-                if (parseFloat(data.balance) < due) {
-                  def= data.balance;
-                }
-                if (data.balance - due <= 10.00) {
-                  def= data.balance;
-                }
-                $("#pay-gift-complete .amount").val(def);
-                $.smodal.close();
-                $("#pay-gift-complete").data(data);
-                $.smodal($("#pay-gift-complete"), { overlayClose: false, persist: true });
+  Scat.api('giftcard-check-balance', { card: card })
+      .done(function (data) {
+              var due= Txn.due();
+              $('#pay-gift-balance').text("Balance: $" +
+                                          data.balance +
+                                          ", Last used " +
+                                          data.latest + '.');
+              var def= due;
+              if (parseFloat(data.balance) < due) {
+                def= data.balance;
               }
+              if (data.balance - due <= 10.00) {
+                def= data.balance;
+              }
+              $("#pay-gift-complete .amount").val(def);
+              $.smodal.close();
+              $("#pay-gift-complete").data(data);
+              $.smodal($("#pay-gift-complete"), { overlayClose: false,
+                                                  persist: true });
             });
 });
 $("#pay-gift").on("click", "button[name='old']", function (ev) {
@@ -831,17 +827,12 @@ $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
   var amount= $("#pay-gift-complete .amount").val();
   var card= $("#pay-gift-complete").data('card');
   if (card) {
-    $.getJSON("<?=GIFT_BACKEND?>/add-txn.php?callback=?",
-              { card: card, amount: -amount },
-              function (data) {
-                if (data.error) {
-                  displayError(data);
-                } else {
-                  var balance= $("#pay-gift-complete").data('balance');
-                  Txn.addPayment(txn, { method: "gift", amount: amount,
-                                        card: card,
-                                        change: (balance - amount <= 10.00) });
-                }
+    Scat.api('giftcard-add-txn', { card: card, amount: -amount })
+        .done(function (data) {
+                var balance= $("#pay-gift-complete").data('balance');
+                Txn.addPayment(txn, { method: "gift", amount: amount,
+                                      card: card,
+                                      change: (balance - amount <= 10.00) });
               });
   } else {
     Txn.addPayment(txn, { method: "gift", amount: amount, change: true });
@@ -1442,34 +1433,24 @@ viewModel.showPoints= function(data, event) {
 }
 
 viewModel.createGiftCard= function(item) {
-  $.getJSON("<?=GIFT_BACKEND?>/create.php?callback=?",
-            { balance: item.msrp() },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                // save to txn
-                Txn.callAndLoad('txn-update-item',
-                                { force: 1, txn: Txn.id(),
-                                  id: item.line_id(),
-                                  data: { card: data.card } });
-              }
+  Scat.api('giftcard-create', { balance: item.msrp() })
+      .done(function (data) {
+              // save to txn
+              Txn.callAndLoad('txn-update-item',
+                              { force: 1, txn: Txn.id(),
+                                id: item.line_id(),
+                                data: { card: data.card } });
             });
 }
 
 viewModel.printGiftCard= function(item) {
-  $.getJSON("<?=GIFT_BACKEND?>/check-balance.php?callback=?",
-            { card: item.data.card() },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                var lpr= $('<iframe id="giftcard" src="print/gift-card.php?card=' + data.card + '&amp;balance=' + data.balance + '&amp;issued=' + data.latest + '"></iframe>').hide();
-                lpr.on("load", function() {
-                  this.contentWindow.print();
-                });
-                $('body').append(lpr);
-              }
+  Scat.api('giftcard-check-balance', { card: item.data.card() })
+      .done(function (data) {
+              var lpr= $('<iframe id="giftcard" src="print/gift-card.php?card=' + data.card + '&amp;balance=' + data.balance + '&amp;issued=' + data.latest + '"></iframe>').hide();
+              lpr.on("load", function() {
+                this.contentWindow.print();
+              });
+              $('body').append(lpr);
             });
 }
 

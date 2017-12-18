@@ -27,14 +27,11 @@ head('Gift Cards', true);
 <script>
 $('#check').on('click', function() {
   var card= $('#card').val();
-  $.getJSON("<?=GIFT_BACKEND?>/check-balance.php?callback=?",
-            { card: card },
-            function (data) {
+  Scat.api('giftcard-check-balance', { card: card })
+      .done(function (data) {
               $('#result').text('');
-              if (data.error) {
-                $('#result').append(data.error);
-              } else if (data.balance > 0) {
-                $('#result').append('This card has a balance of $' + data.balance + ' and was last used or credited on ' + data.latest + '.');
+              if (data.balance != 0) {
+                $('#result').append('This card has a balance of ' + Scat.amount(data.balance) + ' and was last used or credited on ' + data.latest + '.');
               } else {
                 $('#result').append('This card is active, but has no balance.');
               }
@@ -43,62 +40,42 @@ $('#check').on('click', function() {
 });
 $('#create').on('click', function() {
   var amount= $('#amount').val();
-  $.getJSON("<?=GIFT_BACKEND?>/create.php?callback=?",
-            { balance: amount },
-            function (data) {
+  Scat.api('giftcard-create', { balance: amount })
+      .done(function (data) {
               $('#result').text('');
-              if (data.error) {
-                $('#result').append(data.error);
-              } else {
-                $('#result').append(data.success);
-                $('#amount').val(data.balance);
-                $('#card').val(data.card);
-              }
+              $('#result').append(data.success);
+              $('#amount').val(data.balance);
+              $('#card').val(data.card);
             });
   return false;
 });
 $('#add').on('click', function() {
   var card= $('#card').val();
   var amount= $('#amount').val();
-  $.getJSON("<?=GIFT_BACKEND?>/add-txn.php?callback=?",
-            { card: card, amount: amount },
-            function (data) {
+  Scat.api('giftcard-add-txn', { card: card, amount: amount })
+      .done(function (data) {
               $('#result').text('');
-              if (data.error) {
-                $('#result').append(data.error);
-              } else {
-                $('#result').append(data.success);
-              }
+              $('#result').append(data.success);
             });
   return false;
 });
 $('#spend').on('click', function() {
   var card= $('#card').val();
   var amount= $('#amount').val();
-  $.getJSON("<?=GIFT_BACKEND?>/add-txn.php?callback=?",
-            { card: card, amount: -amount },
-            function (data) {
+  Scat.api('giftcard-add-txn', { card: card, amount: -amount })
+      .done(function (data) {
               $('#result').text('');
-              if (data.error) {
-                $('#result').append(data.error);
-              } else {
-                $('#result').append(data.success);
-              }
+              $('#result').append(data.success);
             });
   return false;
 });
 $('#print').on('click', function() {
   var card= $('#card').val();
-  $.getJSON("<?=GIFT_BACKEND?>/check-balance.php?callback=?",
-            { card: card },
-            function (data) {
+  Scat.api('giftcard-check-balance', { card: card })
+      .done(function (data) {
               $('#result').text('');
-              if (data.error) {
-                $('#result').append(data.error);
-              } else {
-                printGiftCard(data.card, data.balance, data.latest);
-                $('#result').append('Card printed showing $' + data.balance + ' balance.');
-              }
+              printGiftCard(data.card, data.balance, data.latest);
+              $('#result').append('Card printed showing $' + data.balance + ' balance.');
             });
   return false;
 });
