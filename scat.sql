@@ -67,6 +67,38 @@ CREATE TABLE `cc_trace` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `giftcard`
+--
+
+DROP TABLE IF EXISTS `giftcard`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `giftcard` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pin` varchar(4) NOT NULL,
+  `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `expires` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `giftcard_txn`
+--
+
+DROP TABLE IF EXISTS `giftcard_txn`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `giftcard_txn` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `card_id` int(10) unsigned DEFAULT NULL,
+  `entered` datetime NOT NULL,
+  `amount` decimal(9,2) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `item`
 --
 
@@ -458,4 +490,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-11-14 17:29:19
+-- Dump completed on 2017-12-18 12:22:52
