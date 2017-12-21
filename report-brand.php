@@ -135,7 +135,7 @@ $r= $db->query($q) or die($db->error);
 $cat= "";
 $parent= 0;
 ?>
-<table class="table table-striped">
+<table class="table table-striped sortable">
  <thead>
   <tr>
    <th>Category</th>
