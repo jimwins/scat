@@ -44,7 +44,7 @@ $('#check').on('click', function() {
       .done(function (data) {
               $('#result').text('');
               if (data.balance != 0) {
-                $('#result').append('This card has a balance of ' + Scat.amount(data.balance) + ' and was last used or credited on ' + data.latest + '.');
+                $('#result').append('This card has a balance of ' + Scat.amount(data.balance) + (data.expires ? ' expires on ' + data.expires : '') + ' and was last used or credited on ' + data.latest + '.');
               } else {
                 $('#result').append('This card is active, but has no balance.');
               }
