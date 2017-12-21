@@ -10,6 +10,12 @@ head('Gift Cards', true);
            placeholder="Scan or enter card">
   </div>
   <div class="form-group">
+    <label for="expires">Expires</label>
+    <div class="input-daterange" id="datepicker">
+      <input type="text" class="form-control" id="expires" value="<?=ashtml($expires)?>" />
+    </div>
+  </div>
+  <div class="form-group">
     <label for="amount">Amount</label>
     <input type="text" class="form-control" id="amount"
            placeholder="$0.00">
@@ -25,6 +31,13 @@ head('Gift Cards', true);
 </div>
 
 <script>
+$(function() {
+  $('#datepicker').datepicker({
+      format: "yyyy-mm-dd",
+      todayHighlight: true
+  });
+});
+
 $('#check').on('click', function() {
   var card= $('#card').val();
   Scat.api('giftcard-check-balance', { card: card })
@@ -40,7 +53,8 @@ $('#check').on('click', function() {
 });
 $('#create').on('click', function() {
   var amount= $('#amount').val();
-  Scat.api('giftcard-create', { balance: amount })
+  var expires= $('#expires').val();
+  Scat.api('giftcard-create', { balance: amount, expires: expires })
       .done(function (data) {
               $('#result').text('');
               $('#result').append(data.success);
