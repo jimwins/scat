@@ -91,7 +91,7 @@ DROP TABLE IF EXISTS `giftcard_txn`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `giftcard_txn` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `card_id` int(10) unsigned DEFAULT NULL,
+  `card_id` int(10) unsigned NOT NULL,
   `entered` datetime NOT NULL,
   `amount` decimal(9,2) DEFAULT NULL,
   PRIMARY KEY (`id`)
