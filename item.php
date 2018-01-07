@@ -53,6 +53,17 @@ include 'item-searchform.php';
     </div>
   </div>
   <div class="form-group">
+    <label for="code" class="col-sm-2 control-label">
+      <a class="text-left fa" id="reviewed"
+         data-bind="css: { 'fa-check-square-o' : item.reviewed(), 'fa-square-o' : !item.reviewed() }"></a>
+      Short Name
+    </label>
+    <div class="col-sm-8">
+      <p class="form-control-static" id="short_name"
+         data-bind="jeditable: item.short_name, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+    </div>
+  </div>
+  <div class="form-group">
     <label for="brand" class="col-sm-2 control-label">Brand</label>
     <div class="col-sm-8">
       <p class="form-control-static" id="brand_id"
@@ -171,6 +182,20 @@ $('#active').on('click', function(ev) {
 
   $.getJSON("api/item-update.php?callback=?",
             { item: item.id(), active: item.active() ? 0 : 1 },
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+              loadItem(data.item);
+            });
+});
+$('#reviewed').on('click', function(ev) {
+  ev.preventDefault();
+  var item= itemModel.item;
+
+  $.getJSON("api/item-update.php?callback=?",
+            { item: item.id(), reviewed: item.reviewed() ? 0 : 1 },
             function (data) {
               if (data.error) {
                 displayError(data);

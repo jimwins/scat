@@ -78,6 +78,7 @@ function item_find($db, $q, $options) {
 
   $q= "SELECT
               item.id, item.product_id, item.code, item.name,
+              item.short_name, item.variation,
               brand.id brand_id, brand.name brand,
               retail_price retail_price,
               sale_price(retail_price, item.discount_type, item.discount)
@@ -99,9 +100,10 @@ function item_find($db, $q, $options) {
               minimum_quantity, purchase_quantity,
               GROUP_CONCAT(CONCAT(barcode.code, '!', barcode.quantity)
                            SEPARATOR ',') barcodes,
+              length, width, height, color,
               item.tic,
               $extra
-              item.active
+              item.active, item.reviewed
          FROM item
     LEFT JOIN brand ON (item.brand = brand.id)
     LEFT JOIN barcode ON (item.id = barcode.item)
@@ -115,6 +117,7 @@ function item_find($db, $q, $options) {
   $items= array();
   while ($item= $r->fetch_assoc()) {
     $item['active']= (int)$item['active'];
+    $item['reviewed']= (int)$item['reviewed'];
     $item['stock']= (int)$item['stock'];
     $item['minimum_quantity']= (int)$item['minimum_quantity'];
     $item['purchase_quantity']= (int)$item['purchase_quantity'];

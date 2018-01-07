@@ -21,14 +21,27 @@ if (isset($_REQUEST['code'])) {
     or die_query($db, $q);
 }
 
-if (isset($_REQUEST['name'])) {
-  $name= $db->real_escape_string($_REQUEST['name']);
-  $q= "UPDATE item
-          SET name = '$name'
-        WHERE id = $item_id";
+/* Plain string values */
+foreach(array('name', 'short_name', 'variation', 'tic') as $key) {
+  if (isset($_REQUEST[$key])) {
+    $value= $db->real_escape_string($_REQUEST[$key]);
+    // $key is one of our hardcoded values
+    $q= "UPDATE item SET $key = '$value' WHERE id = $item_id";
+    $r= $db->query($q)
+      or die_query($db, $q);
+  }
+}
 
-  $r= $db->query($q)
-    or die_query($db, $q);
+/* Plain integer values */
+foreach(array('active', 'reviewed',
+              'purchase_quantity', 'minimum_quantity') as $key) {
+  if (isset($_REQUEST[$key])) {
+    $value= (int)$_REQUEST[$key];
+    // $key is one of our hardcoded values
+    $q= "UPDATE item SET $key = $value WHERE id = $item_id";
+    $r= $db->query($q)
+      or die_query($db, $q);
+  }
 }
 
 // Workaround for jEditable sorting: id may be prefixed with _
@@ -77,37 +90,6 @@ if (isset($_REQUEST['discount'])) {
           SET 
               discount_type = $discount_type,
               discount = $discount 
-        WHERE id = $item_id";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-}
-
-if (isset($_REQUEST['minimum_quantity'])) {
-  $minimum_quantity= (int)$_REQUEST['minimum_quantity'];
-
-  $q= "UPDATE item
-          SET minimum_quantity= $minimum_quantity
-        WHERE id = $item_id";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-}
-
-if (isset($_REQUEST['purchase_quantity'])) {
-  $purchase_quantity= (int)$_REQUEST['purchase_quantity'];
-  $q= "UPDATE item
-          SET purchase_quantity = $purchase_quantity
-        WHERE id = $item_id";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-}
-
-if (isset($_REQUEST['active'])) {
-  $active= (int)$_REQUEST['active'];
-  $q= "UPDATE item
-          SET active = $active
         WHERE id = $item_id";
 
   $r= $db->query($q)
@@ -171,16 +153,6 @@ if (isset($_REQUEST['stock'])) {
     $r= $db->query($q)
       or die_query($db, $q);
   }
-}
-
-if (isset($_REQUEST['tic'])) {
-  $tic= $db->real_escape_string($_REQUEST['tic']);
-  $q= "UPDATE item
-          SET tic = '$tic'
-        WHERE id = $item_id";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
 }
 
 $item= item_load($db, $item_id);
