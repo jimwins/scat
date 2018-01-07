@@ -227,6 +227,14 @@ if (!$db->real_connect(DB_SERVER,DB_USER,DB_PASSWORD,DB_SCHEMA))
   die('connect failed: ' . mysqli_connect_error());
 $db->set_charset('utf8');
 
+/* Configuration for Paris */
+ORM::configure('mysql:host=' . DB_SERVER . ';dbname=' . DB_SCHEMA . ';charset=utf8');
+ORM::configure('username', DB_USER);
+ORM::configure('password', DB_PASSWORD);
+ORM::configure('logging', true);
+ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
+Model::$short_table_names= true;
+
 function dump_table($r, $calc = false) {
   $c= $meta= $line= 0;
   if (!$r) {

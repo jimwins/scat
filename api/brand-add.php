@@ -1,6 +1,6 @@
 <?
 include '../scat.php';
-include '../lib/item.php';
+include '../lib/catalog.php';
 
 $name= $_REQUEST['name'];
 $slug= $_REQUEST['slug'];
@@ -10,15 +10,13 @@ if (!$name)
 if (!$slug)
   die_jsonp('Must specify a slug.');
 
-$name= $db->escape($name);
-$slug= $db->escape($slug);
+try {
+  $brand= Model::factory('Brand')->create();
+  $brand->name= $name;
+  $brand->slug= $slug;
+  $brand->save();
+} catch (\PDOException $e) {
+  die_jsonp($e->getMessage());
+}
 
-$q= "INSERT INTO brand
-        SET name = '$name', slug = '$slug'";
-
-$r= $db->query($q)
-  or die_query($db, $q);
-
-$brand_id= $db->insert_id;
-
-echo jsonp(array('brand' => $brand_id));
+echo jsonp(array('brand' => $brand->id));

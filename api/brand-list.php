@@ -1,23 +1,26 @@
 <?php
 require '../scat.php';
+require '../lib/catalog.php';
 
 $verbose= (int)$_REQUEST['verbose'];
 
-$q= "SELECT id, name FROM brand WHERE name != '' ORDER BY name";
-$r= $db->query($q)
-  or die_query($db, $q);
+$brands= Model::factory('Brand')
+           ->where_not_equal('name', '')
+           ->order_by_asc('name')
+           ->find_array();
 
-$brands= array();
-while ($row= $r->fetch_row()) {
-  if ($verbose) {
-    $brands[]= array('id' => $row[0], 'name' => $row[1]);
-  } else {
+$data= array();
+
+if ($verbose) {
+  $data= $brands;
+} else {
+  foreach ($brands as $row) {
     // Workaround for jEditable sorting: prefix id with _
-    $brands['_'.$row[0]]= $row[1];
+    $data['_'.$row['id']]= $row['name'];
   }
 }
 
 if ($_REQUEST['id'])
-  $brands['selected']= $_REQUEST['id'];
+  $data['selected']= $_REQUEST['id'];
 
-echo jsonp($brands);
+echo jsonp($data);
