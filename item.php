@@ -107,6 +107,16 @@ include 'item-searchform.php';
   </div>
 
   <div class="form-group">
+    <label for="tic" class="col-sm-2 control-label">
+      <abbr title="Taxability Information Code">TIC</abbr>
+    </label>
+    <div class="col-sm-8">
+      <p class="form-control-static" id="tic"
+         data-bind="jeditable: item.tic, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+    </div>
+  </div>
+
+  <div class="form-group">
     <label for="barcodes" class="col-sm-2 control-label">Barcodes</label>
     <div class="col-sm-8">
       <table id="barcodes" class="table table-condensed">

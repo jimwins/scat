@@ -90,13 +90,13 @@ $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 /* Current */
 $q= "CREATE TEMPORARY TABLE current
        (item INT UNSIGNED PRIMARY KEY,
-        product INT UNSIGNED NOT NULL,
+        product_id INT UNSIGNED NOT NULL,
         department INT UNSIGNED NOT NULL,
         units INT NOT NULL,
         amount DECIMAL(9,2) NOT NULL,
         KEY (department))
      SELECT
-            item, 0 product, 0 department,
+            item, 0 product_id, 0 department,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
@@ -112,7 +112,7 @@ $q= "CREATE TEMPORARY TABLE current
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 $q= "UPDATE current
-        SET product = IFNULL((SELECT o.product 
+        SET product_id = IFNULL((SELECT o.product 
                                 FROM ordure.item o
                                 JOIN item USING (code)
                                WHERE item.id = current.item), 0)";
@@ -122,20 +122,20 @@ $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 $q= "UPDATE current
         SET department = IFNULL((SELECT o.department
                                    FROM ordure.product o
-                                  WHERE o.id = current.product), 0)";
+                                  WHERE o.id = current.product_id), 0)";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 /* Previous */
 $q= "CREATE TEMPORARY TABLE previous
        (item INT UNSIGNED PRIMARY KEY,
-        product INT UNSIGNED NOT NULL,
+        product_id INT UNSIGNED NOT NULL,
         department INT UNSIGNED NOT NULL,
         units INT NOT NULL,
         amount DECIMAL(9,2) NOT NULL,
         KEY (department))
      SELECT
-            item, 0 product, 0 department,
+            item, 0 product_id, 0 department,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
@@ -152,7 +152,7 @@ $q= "CREATE TEMPORARY TABLE previous
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 $q= "UPDATE previous
-        SET product = IFNULL((SELECT o.product 
+        SET product_id = IFNULL((SELECT o.product 
                                 FROM ordure.item o
                                 JOIN item USING (code)
                                WHERE item.id = previous.item), 0)";
@@ -162,7 +162,7 @@ $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 $q= "UPDATE previous
         SET department = IFNULL((SELECT o.department
                                    FROM ordure.product o
-                                  WHERE o.id = previous.product), 0)";
+                                  WHERE o.id = previous.product_id), 0)";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 

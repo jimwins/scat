@@ -107,7 +107,7 @@ DROP TABLE IF EXISTS `item`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `item` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `product` int(10) unsigned NOT NULL DEFAULT '0',
+  `product_id` int(10) unsigned NOT NULL DEFAULT '0',
   `code` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `short_name` varchar(255) DEFAULT NULL,
@@ -118,11 +118,12 @@ CREATE TABLE `item` (
   `taxfree` tinyint(4) NOT NULL DEFAULT '0',
   `minimum_quantity` int(10) unsigned NOT NULL DEFAULT '1',
   `purchase_quantity` int(10) unsigned NOT NULL DEFAULT '1',
+  `tic` char(5) NOT NULL DEFAULT '00000',
   `active` tinyint(1) NOT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`),
-  KEY `product` (`product`)
+  KEY `product` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -490,4 +491,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-12-18 12:22:52
+-- Dump completed on 2018-01-06 17:39:24

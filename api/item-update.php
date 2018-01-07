@@ -173,6 +173,15 @@ if (isset($_REQUEST['stock'])) {
   }
 }
 
+if (isset($_REQUEST['tic'])) {
+  $tic= $db->real_escape_string($_REQUEST['tic']);
+  $q= "UPDATE item
+          SET tic = '$tic'
+        WHERE id = $item_id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+}
 
 $item= item_load($db, $item_id);
 

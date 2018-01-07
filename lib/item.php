@@ -74,7 +74,7 @@ function item_find($db, $q, $options) {
   }
 
   $q= "SELECT
-              item.id, item.code, item.name,
+              item.id, item.product_id, item.code, item.name,
               brand.id brand_id, brand.name brand,
               retail_price retail_price,
               sale_price(retail_price, item.discount_type, item.discount)
@@ -96,6 +96,7 @@ function item_find($db, $q, $options) {
               minimum_quantity, purchase_quantity,
               GROUP_CONCAT(CONCAT(barcode.code, '!', barcode.quantity)
                            SEPARATOR ',') barcodes,
+              item.tic,
               $extra
               item.active
          FROM item
