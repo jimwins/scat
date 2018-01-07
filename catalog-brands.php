@@ -1,5 +1,6 @@
 <?
 require 'scat.php';
+require 'lib/catalog.php';
 
 head("Brands @ Scat", true);
 
@@ -16,9 +17,13 @@ $r= $db->query($q) or die_query($db, $q);
 echo '<div style="column-count: 3" class="list-group">';
 echo '<button type="button" id="add-brand" class="list-group-item">Add New Brand</button>';
 while (($row= $r->fetch_assoc())) {
-  echo '<a class="list-group-item" style="break-inside: avoid-column" href="items.php?search=brand:', ashtml($row['slug']), '">',
-       '<span class="badge">', $row['items'], '</span>',
-       ashtml($row['name']), '</a>';
+  echo '<div class="list-group-item" style="break-inside: avoid-column">',
+       '<a onclick="editBrand(', $row['id'], ')">',
+       '<i class="fa fa-edit"></i></a> ',
+       ashtml($row['name']),
+       '<a class="badge" href="items.php?search=brand:', ashtml($row['slug']), '">',
+       $row['items'], '</a>',
+       "</div>\n";
 }
 echo '</div>';
 ?>
@@ -26,6 +31,12 @@ echo '</div>';
 $(function() {
 
 $('#add-brand').on('click', function() {
+  editBrand(0);
+});
+
+});
+
+function editBrand(id) {
   Scat.dialog('brand').done(function (html) {
     var panel= $(html);
 
@@ -37,6 +48,13 @@ $('#add-brand').on('click', function() {
     });
 
     brandModel= ko.mapping.fromJS(brand);
+
+    if (id) {
+      Scat.api('brand-load', { id: id })
+          .done(function (data) {
+            ko.mapping.fromJS(data, brandModel);
+          });
+    }
 
     brandModel.saveBrand= function(place, ev) {
       var brand= ko.mapping.toJS(brandModel);
@@ -53,11 +71,9 @@ $('#add-brand').on('click', function() {
     ko.applyBindings(brandModel, panel[0]);
     panel.appendTo($('body')).modal();
   });
-});
+}
 
-});
 </script>
 <?
-
 foot();
 ?>
