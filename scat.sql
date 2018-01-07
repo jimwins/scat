@@ -148,7 +148,8 @@ CREATE TABLE `item` (
   `reviewed` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`),
-  KEY `product` (`product_id`)
+  KEY `product` (`product_id`),
+  KEY `brand` (`brand`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -268,6 +269,7 @@ CREATE TABLE `product` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `department` (`department_id`,`brand_id`,`slug`),
   KEY `name` (`name`),
+  KEY `brand_id` (`brand_id`),
   FULLTEXT KEY `full` (`name`,`description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -515,4 +517,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-07  9:46:53
+-- Dump completed on 2018-01-07 13:07:34
