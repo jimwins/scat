@@ -34,6 +34,9 @@ function item_terms_to_sql($db, $q, $options) {
     } elseif (preg_match('/^stocked:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.minimum_quantity)"
                         : "(NOT item.minimum_quantity)";
+    } elseif (preg_match('/^reviewed:(.+)/i', $term, $dbt)) {
+      $andor[]= $dbt[1] ? "(item.reviewed)"
+                        : "(NOT item.reviewed)";
     } else {
       if ($options & FIND_LIMITED) {
         $andor[]= "(item.name LIKE '%$term%'
