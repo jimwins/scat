@@ -67,6 +67,24 @@ CREATE TABLE `cc_trace` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `department`
+--
+
+DROP TABLE IF EXISTS `department`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `department` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL,
+  `slug` varchar(80) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `parent` (`parent_id`,`slug`),
+  KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `giftcard`
 --
 
@@ -237,19 +255,18 @@ DROP TABLE IF EXISTS `product`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `product` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `department` int(10) unsigned DEFAULT NULL,
-  `brand` int(10) unsigned NOT NULL,
+  `department_id` int(10) unsigned DEFAULT NULL,
+  `brand_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `description` text,
   `slug` varchar(255) NOT NULL,
   `image` varchar(255) NOT NULL DEFAULT '',
-  `from_item_no` varchar(255) DEFAULT NULL,
+  `variation_style` enum('tabs','flat') DEFAULT 'flat',
   `added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `inactive` tinyint(4) NOT NULL DEFAULT '1',
+  `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `department` (`department`,`brand`,`slug`),
-  KEY `from_item_no` (`from_item_no`),
+  UNIQUE KEY `department` (`department_id`,`brand_id`,`slug`),
   KEY `name` (`name`),
   FULLTEXT KEY `full` (`name`,`description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -498,4 +515,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-06 21:15:26
+-- Dump completed on 2018-01-07  9:46:53
