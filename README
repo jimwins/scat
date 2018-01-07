@@ -51,4 +51,7 @@ Scat includes the Knockout JavaScript MVVM library:
 Scat uses PHPExcel for reading and writing Excel spreadsheets:
   https://github.com/PHPOffice/PHPExcel
 
+Scat uses the Idiorm & Paris minimalist database toolkit:
+  http://j4mie.github.io/idiormandparis/
+
 See the LICENSE file for licensing information.

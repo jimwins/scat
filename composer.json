@@ -16,6 +16,7 @@
         "giggsey/libphonenumber-for-php": "^8.1",
         "guzzlehttp/guzzle": "^6.2",
         "php-http/guzzle6-adapter": "^1.1",
-        "sparkpost/sparkpost": "^2.0"
+        "sparkpost/sparkpost": "^2.0",
+        "j4mie/paris": "^1.5"
     }
 }
