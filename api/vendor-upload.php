@@ -170,6 +170,42 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
+} elseif (preg_match('/C2F Inc. Pricer/', $line)) {
+  // C2F Pricer (another version)
+  //
+  $q= "CREATE TEMPORARY TABLE macitem (
+    item_no VARCHAR(255),
+    sku VARCHAR(255),
+    name VARCHAR(255),
+    retail_price DECIMAL(9,2),
+    net_price DECIMAL(9,2),
+    promo_price DECIMAL(9,2),
+    barcode VARCHAR(32),
+    purchase_quantity INT,
+    abc_flag CHAR(3),
+    category VARCHAR(64))";
+
+  $sep= preg_match("/\t/", $line) ? "\t" : ",";
+
+  $db->query($q)
+    or die_query($db, $q);
+
+#Prod	Unit	Descrip	Mult	Status	UPC/EAN	Retail	Disc	Net	CatDescription	Effectdt	NewRetail	Disc	NewNet		
+
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+            INTO TABLE macitem
+          FIELDS TERMINATED BY '$sep'
+          OPTIONALLY ENCLOSED BY '\"'
+          IGNORE 3 LINES
+          (item_no, @uom, name,
+           purchase_quantity, @status, barcode,
+           retail_price, @disc, net_price,
+           @cat_description, @effectdt, @newretail, @disc, @newnet)
+        SET sku = item_no";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
 } elseif (preg_match('/Golden Ratio/', $line)) {
   // Masterpiece
   //
