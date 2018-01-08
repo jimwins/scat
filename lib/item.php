@@ -37,6 +37,15 @@ function item_terms_to_sql($db, $q, $options) {
     } elseif (preg_match('/^reviewed:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.reviewed)"
                         : "(NOT item.reviewed)";
+    } elseif (preg_match('/^vendor:(.+)/i', $term, $dbt)) {
+      $vendor= (int)$dbt[1];
+      $andor[]= $vendor ? "EXISTS (SELECT id
+                                     FROM vendor_item
+                                    WHERE item = item.id
+                                      AND vendor = $vendor)"
+                        : "NOT EXISTS (SELECT id
+                                         FROM vendor_item
+                                        WHERE item = item.id)";
     } else {
       if ($options & FIND_LIMITED) {
         $andor[]= "(item.name LIKE '%$term%'
