@@ -35,7 +35,8 @@ if (isset($_REQUEST['price'])) {
   } elseif (preg_match('/^(cost)$/', $price)) {
     $discount = "(SELECT MIN(net_price)
                     FROM vendor_item
-                   WHERE vendor_item.item = item.id)";
+                   WHERE vendor_item.item = item.id
+                     AND vendor_item.active)";
     $discount_type = "'fixed'";
     $price= 'item.retail_price';
     $discount_manual= 1;

@@ -186,7 +186,8 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
               msrp = vendor_item.retail_price,
               net = vendor_item.net_price
         WHERE vendor_order.item_no = vendor_item.code
-          AND vendor = $txn[person]";
+          AND vendor = $txn[person]
+          AND vendor_item.active";
   $db->query($q)
     or die_query($db, $q);
 
@@ -243,7 +244,8 @@ $q= "UPDATE vendor_order, vendor_item
         SET vendor_order.item = vendor_item.item
       WHERE vendor_order.sku != '' AND vendor_order.sku IS NOT NULL
         AND vendor_order.sku = vendor_item.vendor_sku
-        AND vendor = $txn[person]";
+        AND vendor = $txn[person]
+        AND vendor_item.active";
 $db->query($q)
   or die_query($db, $q);
 
@@ -253,7 +255,8 @@ $q= "UPDATE vendor_order, vendor_item
       WHERE (NOT vendor_order.item OR vendor_order.item IS NULL)
         AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
         AND vendor_order.item_no = vendor_item.code
-        AND vendor = $txn[person]";
+        AND vendor = $txn[person]
+        AND vendor_item.active";
 $db->query($q)
   or die_query($db, $q);
 
@@ -344,7 +347,8 @@ echo "Loaded ", $db->affected_rows, " new barcodes from order.<br>";
 $q= "UPDATE vendor_item, vendor_order
         SET vendor_item.item = vendor_order.item
       WHERE NOT vendor_item.item
-        AND vendor_item.code = vendor_order.item_no";
+        AND vendor_item.code = vendor_order.item_no
+        AND vendor_item.active";
 $db->query($q)
   or die_query($db, $q);
 echo "Linked ", $db->affected_rows, " items to vendor items.<br>";

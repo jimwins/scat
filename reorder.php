@@ -10,32 +10,36 @@ $all= (int)$_REQUEST['all'];
 
 $vendor= (int)$_REQUEST['vendor'];
 if ($vendor > 0) {
-  $code_field= "(SELECT code FROM vendor_item WHERE vendor = $vendor AND item = item.id LIMIT 1)";
+  $code_field= "(SELECT code FROM vendor_item WHERE vendor = $vendor AND item = item.id AND vendor_item.active LIMIT 1)";
   $extra= "AND EXISTS (SELECT id
                          FROM vendor_item
                         WHERE vendor = $vendor
-                          AND item = item.id)";
+                          AND item = item.id
+                          AND vendor_item.active)";
   $extra_field= "(SELECT MIN(IF(promo_price, promo_price, net_price)
                              * ((100 - vendor_rebate) / 100))
                     FROM vendor_item
                     JOIN person ON vendor_item.vendor = person.id
                   WHERE item = item.id
                     AND NOT special_order
-                    AND vendor = $vendor) -
+                    AND vendor = $vendor
+                    AND vendor_item.active) -
                  (SELECT MIN(IF(promo_price, promo_price, net_price)
                              * ((100 - vendor_rebate) / 100))
                     FROM vendor_item
                     JOIN person ON vendor_item.vendor = person.id
                    WHERE item = item.id
                      AND NOT special_order
-                     AND vendor != $vendor)
+                     AND vendor != $vendor
+                     AND vendor_item.active)
                  Cheapest\$trool, ";
   $extra_field_name= "Cheapest\$trool,";
 } else if ($vendor < 0) {
   // No vendor
   $extra= "AND NOT EXISTS (SELECT id
                              FROM vendor_item
-                            WHERE item = item.id)";
+                            WHERE item = item.id
+                              AND vendor_item.active)";
 }
 
 $code= $_REQUEST['code'];

@@ -11,7 +11,7 @@ if (!$vendor_item_id)
 $db->start_transaction();
 
 foreach(array('item', 'vendor', 'code', 'vendor_sku', 'name',
-              'retail_price', 'net_price', 'promo_price',
+              'retail_price', 'net_price', 'promo_price', 'promo_quantity',
               'barcode', 'purchase_quantity', 'special_order') as $key) {
   if (isset($_REQUEST[$key])) {
     $value= trim($_REQUEST[$key]);

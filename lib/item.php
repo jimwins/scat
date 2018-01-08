@@ -42,10 +42,12 @@ function item_terms_to_sql($db, $q, $options) {
       $andor[]= $vendor ? "EXISTS (SELECT id
                                      FROM vendor_item
                                     WHERE item = item.id
-                                      AND vendor = $vendor)"
+                                      AND vendor = $vendor
+                                      AND vendor_item.active)"
                         : "NOT EXISTS (SELECT id
                                          FROM vendor_item
-                                        WHERE item = item.id)";
+                                        WHERE item = item.id
+                                          AND vendor_item.active)";
     } else {
       if ($options & FIND_LIMITED) {
         $andor[]= "(item.name LIKE '%$term%'

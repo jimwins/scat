@@ -250,7 +250,7 @@ $q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
             purchase_quantity
        FROM vendor_item
        JOIN person ON vendor_item.vendor = person.id
-      WHERE item = $id";
+      WHERE item = $id AND vendor_item.active";
 
 $r= $db->query($q)
   or die_query($db, $q);

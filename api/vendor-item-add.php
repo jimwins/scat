@@ -13,7 +13,7 @@ if (empty($_REQUEST['code'])) {
 
 $list= array();
 foreach(array('item', 'vendor', 'code', 'vendor_sku', 'name',
-              'retail_price', 'net_price', 'promo_price',
+              'retail_price', 'net_price', 'promo_price', 'promo_quantity',
               'barcode', 'purchase_quantity', 'special_order') as $field) {
   $value= trim($_REQUEST[$field]);
   /* Turn empty strings into NULL, escape others and wrap in quotes */
@@ -29,7 +29,7 @@ $r= $db->query($q)
 
 $q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
             code, vendor_sku, vendor_item.name,
-            retail_price, net_price, promo_price,
+            retail_price, net_price, promo_price, promo_quantity,
             special_order,
             purchase_quantity
        FROM vendor_item

@@ -82,6 +82,7 @@ if (count($items) == 1) {
                           FROM vendor_item
                          WHERE vendor = {$txn['person']}
                            AND item = item.id
+                           AND vendor_item.active
                          ORDER BY 1
                          LIMIT 1), 0.00), NULL, NULL";
 

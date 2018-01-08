@@ -18,6 +18,7 @@ foreach ($_REQUEST['items'] as $item) {
               (SELECT net_price
                  FROM vendor_item
                 WHERE item = $item[0] AND vendor = {$txn['person']}
+                  AND vendor_item.active
                 ORDER BY id DESC LIMIT 1), taxfree
          FROM item WHERE id = $item[0]";
   $r= $db->query($q);
