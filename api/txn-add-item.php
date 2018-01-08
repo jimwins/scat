@@ -78,7 +78,8 @@ if (count($items) == 1) {
   } else {
     $prices= ($txn['type'] == 'customer') ?
                'retail_price, discount, discount_type' :
-               "IFNULL((SELECT IF(promo_price, promo_price, net_price)
+               "IFNULL((SELECT IF(promo_price AND promo_price < net_price,
+                                  promo_price, net_price)
                           FROM vendor_item
                          WHERE vendor = {$txn['person']}
                            AND item = item.id
