@@ -21,16 +21,16 @@ $action= 'replace';
 
 /* Load uploaded file into a temporary table */
 
-# On DEBUG server, we leave behind the upload table for debugging
+# On DEBUG server, we leave behind the vendor_upload table for debugging
 $temporary= "TEMPORARY";
 if ($DEBUG) {
-  $q= "DROP TABLE IF EXISTS upload";
+  $q= "DROP TABLE IF EXISTS vendor_upload";
   $db->query($q)
     or die_query($db, $q);
   $temporary= "";
 }
 
-$q= "CREATE $temporary TABLE upload LIKE vendor_item";
+$q= "CREATE $temporary TABLE vendor_upload LIKE vendor_item";
 $db->query($q)
   or die_query($db, $q);
 
@@ -39,7 +39,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $base= basename($_FILES['src']['name'], '.zip');
 
   $q= "LOAD DATA LOCAL INFILE 'zip://$fn#$base.txt'
-            INTO TABLE upload
+            INTO TABLE vendor_upload
           CHARACTER SET 'latin1'
           FIELDS TERMINATED BY '\t'
           IGNORE 1 LINES
@@ -60,7 +60,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   // SLS
 #sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date
   $q= "LOAD DATA LOCAL INFILE '$fn'
-            INTO TABLE upload
+            INTO TABLE vendor_upload
           FIELDS TERMINATED BY '$m[1]'
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 1 LINES
@@ -81,7 +81,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   // Alvin Account Pricing Report
 #Manufacturer	BrandName	SubBrand	AlvinItem#	Description	New	UoM	Alvin SRP	RegularMultiplier	RegularNet	CurrentMultiplier	CurrentNetPrice	CurrentPriceSource	SaleStarted	SaleExpiration	Buying Quantity (BQ)	DropShip	UPC or EAN	Weight	Length	Width	Height	Ship Truck	CountryofOrigin	HarmonizedCode	DropShipDiscount	CatalogPage	VendorItemNumber
   $q= "LOAD DATA LOCAL INFILE '$fn'
-            INTO TABLE upload
+            INTO TABLE vendor_upload
           FIELDS TERMINATED BY '\t'
           OPTIONALLY ENCLOSED BY '\"'
           LINES TERMINATED BY '\r\n'
@@ -110,7 +110,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 
 #Cat Desc,Prefix,Prod,Descrip,Unitstock,Mult,Status,Nonstockty,UPC,EAN,Effectdt,NewRetail,EffPrice1,EffQtyPrice,Retail,DealerNet,Qtybrk,QtyPrice,CaseQty,CasePrice 
   $q= "LOAD DATA LOCAL INFILE '$fn'
-            INTO TABLE upload
+            INTO TABLE vendor_upload
           FIELDS TERMINATED BY '$sep'
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 3 LINES
@@ -134,7 +134,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 #Prod	Unit	Descrip	Mult	Status	UPC/EAN	Retail	Disc	Net	CatDescription	Effectdt	NewRetail	Disc	NewNet		
 
   $q= "LOAD DATA LOCAL INFILE '$fn'
-            INTO TABLE upload
+            INTO TABLE vendor_upload
           FIELDS TERMINATED BY '$sep'
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 3 LINES
@@ -153,7 +153,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 
 #Category	Page #	Brand	Item#	Description	SU	Sell Mult	Retail	Discount	Dealer Net	Min	New	Dropship		
   $q= "LOAD DATA LOCAL INFILE '$fn'
-            INTO TABLE upload
+            INTO TABLE vendor_upload
           FIELDS TERMINATED BY '$sep'
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 1 LINES
@@ -174,7 +174,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 
 #,SN,PK Sort,SKU Sort,,SKU,Golden Ratio,Size,Item Description,,,,,,,,,2016 Retail,Under $500 Net Order,Net $500 Order,Units Per Pkg,Pkgs Per Box,Weight,UPC,Freight Status,DIM. Weight,Est. Freight EACH,Est. Freight CASE
   $q= "LOAD DATA LOCAL INFILE '$fn'
-            INTO TABLE upload
+            INTO TABLE vendor_upload
           FIELDS TERMINATED BY ','
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 1 LINES
@@ -196,7 +196,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
     or die_query($db, $q);
 
   // toss junk from header lines
-  $q= "DELETE FROM upload WHERE purchase_quantity = 0";
+  $q= "DELETE FROM vendor_upload WHERE purchase_quantity = 0";
 
   $r= $db->query($q)
     or die_query($db, $q);
@@ -210,7 +210,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   }
 
   $q= "LOAD DATA LOCAL INFILE '$fn'
-            INTO TABLE macitem
+            INTO TABLE vendor_upload
           $format
           IGNORE 1 LINES
           (code, vendor_sku, name, @retail_price, @net_price, @promo_price,
@@ -228,7 +228,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 /* END Vendors */
 
 /* Just toss bad barcodes to avoid grief */
-$q= "UPDATE upload SET barcode = NULL WHERE LENGTH(barcode) < 3";
+$q= "UPDATE vendor_upload SET barcode = NULL WHERE LENGTH(barcode) < 3";
 $db->query($q)
   or die_query($db, $q);
 
@@ -256,7 +256,7 @@ $q= "INSERT INTO vendor_item
             REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS barcode,
             purchase_quantity,
             special_order
-       FROM upload
+       FROM vendor_upload
      ON DUPLICATE KEY UPDATE
        code = VALUES(code),
        name = VALUES(name),

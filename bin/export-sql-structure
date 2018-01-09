@@ -1,7 +1,7 @@
 #!/bin/sh
 mysqldump --routines --no-data \
-          --ignore-table=scat.upload \
           --ignore-table=scat.vendor_order \
+          --ignore-table=scat.vendor_upload \
           scat | \
   sed -e 's/ AUTO_INCREMENT=[0-9]*//' \
   > scat.sql
