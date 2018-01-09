@@ -411,10 +411,10 @@ CREATE TABLE `vendor_item` (
   `retail_price` decimal(9,2) NOT NULL,
   `net_price` decimal(9,2) NOT NULL,
   `promo_price` decimal(9,2) DEFAULT NULL,
-  `promo_quantity` int(11) NOT NULL,
+  `promo_quantity` int(11) DEFAULT NULL,
   `barcode` varchar(20) DEFAULT NULL,
   `purchase_quantity` int(11) NOT NULL,
-  `special_order` tinyint(1) DEFAULT NULL,
+  `special_order` tinyint(1) DEFAULT '0',
   `added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `active` tinyint(1) NOT NULL DEFAULT '1',
@@ -520,4 +520,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-08 15:28:28
+-- Dump completed on 2018-01-08 16:40:25
