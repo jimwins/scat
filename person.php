@@ -207,6 +207,12 @@ if (!$person) {
     Reorder
   </button>
   <button class="btn btn-default"
+          data-loading-text="Processing..."
+          data-bind="click: checkPriceChanges,
+                     visible: person.role() == 'vendor'">
+    Price Changes
+  </button>
+  <button class="btn btn-default"
           id="upload-items"
           data-loading-text="Processing..."
           data-bind="click: uploadItems, visible: person.role() == 'vendor'">
@@ -375,6 +381,11 @@ function createPurchaseOrder(place, ev) {
 function reorder(place, ev) {
   $(ev.target).button('loading');
   window.location= 'reorder.php?vendor=' + place.person.id();
+}
+
+function checkPriceChanges(place, ev) {
+  $(ev.target).button('loading');
+  window.location= 'report-price-change.php?vendor=' + place.person.id();
 }
 
 function uploadItems(place, ev) {
