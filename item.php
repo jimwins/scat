@@ -272,6 +272,9 @@ $vendor_items= item_load_vendor_items($db, $id);
         <button class="btn btn-primary" data-bind="click: editVendorItem">
           Add Vendor Item
         </button>
+        <button class="btn btn-primary" data-bind="click: findVendorItem">
+          Find Vendor Items
+        </button>
       </td>
     </tr>
   </tfoot>
@@ -527,6 +530,13 @@ itemModel.editVendorItem= function(item) {
     ko.applyBindings(vendorItemModel, panel[0]);
     panel.appendTo($('body')).modal();
   });
+}
+
+itemModel.findVendorItem= function() {
+  Scat.api('item-find-vendor-items', { id: this.item.id() })
+      .done(function (data) {
+        ko.mapping.fromJS(data, itemModel);
+      });
 }
 
 ko.applyBindings(itemModel);
