@@ -154,3 +154,24 @@ function item_load($db, $id) {
   $items= item_find($db, "item:$id", FIND_ALL);
   return $items[0];
 }
+
+function item_load_vendor_items($db, $id) {
+  $q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
+              code, vendor_sku, vendor_item.name,
+              retail_price, net_price, promo_price,
+              special_order,
+              purchase_quantity
+         FROM vendor_item
+         JOIN person ON vendor_item.vendor = person.id
+        WHERE item = $id AND vendor_item.active";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  $vendor_items= array();
+  while ($row= $r->fetch_assoc()) {
+    $vendor_items[]= $row;
+  }
+
+  return $vendor_items;
+}
