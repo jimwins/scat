@@ -129,7 +129,7 @@ CREATE TABLE `item` (
   `code` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `short_name` varchar(255) DEFAULT NULL,
-  `variation` varchar(255) NOT NULL,
+  `variation` varchar(255) NOT NULL DEFAULT '',
   `brand` int(10) unsigned DEFAULT NULL,
   `retail_price` decimal(9,2) NOT NULL DEFAULT '0.00',
   `discount_type` enum('percentage','relative','fixed') DEFAULT NULL,
@@ -522,4 +522,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-08 16:40:25
+-- Dump completed on 2018-01-11 14:30:21
