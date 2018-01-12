@@ -463,6 +463,9 @@
                     if (settings.height != 'none') {
                       input.height(settings.height);
                     }
+                    if (settings.textType) {
+                      input.attr('type', settings.textType);
+                    }
                     /* https://bugzilla.mozilla.org/show_bug.cgi?id=236791 */
                     //input[0].setAttribute('autocomplete','off');
                     input.attr('autocomplete','off');
