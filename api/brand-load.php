@@ -11,7 +11,7 @@ if (!$id) {
 $brand= Model::factory('Brand')->find_one($id);
 
 if (!$brand)
-  die(json_encode(array('error' => 'No such brand!')));
+  die_jsonp(array('error' => 'No such brand!'));
 
 echo jsonp($brand->as_array());
 
