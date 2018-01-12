@@ -390,9 +390,10 @@ function jsonp($data) {
   }
   header('Content-type: application/json; charset=utf-8');
   if ($_GET['callback']) {
-    return sprintf('%s(%s);', $_GET['callback'], json_encode($data));
+    return sprintf('%s(%s);', $_GET['callback'],
+                   json_encode($data, JSON_PRETTY_PRINT));
   }
-  return json_encode($data);
+  return json_encode($data, JSON_PRETTY_PRINT);
 }
 
 function die_jsonp($data) {
@@ -404,9 +405,10 @@ function die_jsonp($data) {
   }
   header('Content-type: application/javascript; charset=utf-8');
   if ($_GET['callback']) {
-    die(sprintf('%s(%s);', $_GET['callback'], json_encode($data)));
+    die(sprintf('%s(%s);', $_GET['callback'],
+                json_encode($data, JSON_PRETTY_PRINT)));
   }
-  die(json_encode($data));
+  die(json_encode($data, JSON_PRETTY_PRINT|JSON_NUMERIC_CHECK));
 }
 
 function die_query($db, $query) {
