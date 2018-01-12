@@ -22,7 +22,7 @@ if (isset($_REQUEST['code'])) {
 }
 
 /* Plain string values */
-foreach(array('name', 'short_name', 'variation', 'tic') as $key) {
+foreach(array('name', 'short_name', 'variation', 'tic', 'color') as $key) {
   if (isset($_REQUEST[$key])) {
     $value= $db->real_escape_string($_REQUEST[$key]);
     // $key is one of our hardcoded values
@@ -39,6 +39,19 @@ foreach(array('active', 'reviewed',
     $value= (int)$_REQUEST[$key];
     // $key is one of our hardcoded values
     $q= "UPDATE item SET $key = $value WHERE id = $item_id";
+    $r= $db->query($q)
+      or die_query($db, $q);
+  }
+}
+
+/* Decimal values */
+foreach(array('length', 'width', 'height', 'weight') as $key) {
+  if (isset($_REQUEST[$key])) {
+    $value= $db->real_escape_string($_REQUEST[$key]);
+    // $key is one of our hardcoded values
+    $q= "UPDATE item
+            SET $key = CAST('$value' AS DECIMAL(9,3))
+          WHERE id = $item_id";
     $r= $db->query($q)
       or die_query($db, $q);
   }
