@@ -211,6 +211,11 @@ include 'item-searchform.php';
         <div class="form-group">
           <label for="color" class="col-sm-4 control-label">
             Color
+            <span
+                 data-bind="if: item.color() != '',
+                            style: { background: '#' + item.color() }">
+              &nbsp; &nbsp; &nbsp;
+            </span>
           </label>
           <div class="col-sm-8">
             <p class="form-control-static" id="color"
