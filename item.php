@@ -28,109 +28,207 @@ head("Item: " . $item['name']. " @ Scat", true);
 include 'item-searchform.php';
 ?>
 <form class="form-horizontal" role="form">
-  <div class="form-group">
-    <label for="code" class="col-sm-2 control-label">
-      <a class="text-left fa" id="active"
-         data-bind="css: { 'fa-check-square-o' : item.active(), 'fa-square-o' : !item.active() }"></a>
-      Code
-    </label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="code"
-         data-bind="jeditable: item.code, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="name" class="col-sm-2 control-label">
-      <a data-bind="attr: { href: 'http://rawm.us/' + item.code() }"
-         target="_blank">
-        <i class="fa fa-external-link"></i>
-      </a>
-      Name
-    </label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="name"
-         data-bind="jeditable: item.name, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="code" class="col-sm-2 control-label">
-      <a class="text-left fa" id="reviewed"
-         data-bind="css: { 'fa-check-square-o' : item.reviewed(), 'fa-square-o' : !item.reviewed() }"></a>
-      Short Name
-    </label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="short_name"
-         data-bind="jeditable: item.short_name, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="brand" class="col-sm-2 control-label">Brand</label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="brand_id"
-         data-bind="jeditable: item.brand, jeditableOptions: { type: 'select', submit: 'OK', loadurl: 'api/brand-list.php', onupdate: saveItemProperty, onblur: 'cancel', cssclass: 'form-inline' }"></p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="retail_price" class="col-sm-2 control-label">List</label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="retail_price"
-         data-bind="jeditable: item.retail_price, jeditableOptions: { ondisplay: amount, data: item.retail_price(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="sale_price" class="col-sm-2 control-label">Sale</label>
-    <div class="col-sm-8">
-      <p class="form-control-static"
-         data-bind="text: amount(item.sale_price())"></p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="discount" class="col-sm-2 control-label">Discount</label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="discount"
-         data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : item.discount() ? amount(item.discount()) : '...' } , data : item.discount(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="stock" class="col-sm-2 control-label">Stock</label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="stock"
-         data-bind="jeditable: item.stock, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="minimum_quantity" class="col-sm-2 control-label">
-      Minimum Quantity
-    </label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="minimum_quantity"
-         data-bind="jeditable: item.minimum_quantity, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="purchase_quantity" class="col-sm-2 control-label">
-      Purchase Quantity
-    </label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="purchase_quantity"
-         data-bind="jeditable: item.purchase_quantity, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
-    </div>
-  </div>
+  <div class="row">
 
-  <div class="form-group">
-    <label for="tic" class="col-sm-2 control-label">
-      <abbr title="Taxability Information Code">TIC</abbr>
-    </label>
-    <div class="col-sm-8">
-      <p class="form-control-static" id="tic"
-         data-bind="jeditable: item.tic, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
-    </div>
-  </div>
+    <!-- Basics -->
+    <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="pull-right">
+          <button id="active" type="button" class="btn btn-default btn-xs">
+            <i class="fa"
+               data-bind="css: { 'fa-check-square-o' : item.active(),
+                                'fa-square-o' : !item.active() }"></i>
+            Active
+          </button>
+          <button id="reviewed" type="button" class="btn btn-default btn-xs">
+            <i class="fa"
+               data-bind="css: { 'fa-check-square-o' : item.reviewed(),
+                                'fa-square-o' : !item.reviewed() }"></i>
+            Reviewed
+          </button>
+        </div>
+        <h3 class="panel-title">Basics</h3>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel-body">
 
-  <div class="form-group">
-    <label for="barcodes" class="col-sm-2 control-label">Barcodes</label>
-    <div class="col-sm-8">
-      <table id="barcodes" class="table table-condensed">
+        <div class="form-group">
+          <label for="code" class="col-sm-2 control-label">
+            Code
+          </label>
+          <div class="col-sm-10">
+            <p class="form-control-static" id="code"
+               data-bind="jeditable: item.code, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="name" class="col-sm-2 control-label">
+            Name
+          </label>
+          <div class="col-sm-10">
+            <p class="form-control-static" id="name"
+               data-bind="jeditable: item.name, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="brand" class="col-sm-2 control-label">Brand</label>
+          <div class="col-sm-10">
+            <p class="form-control-static" id="brand_id"
+               data-bind="jeditable: item.brand, jeditableOptions: { type: 'select', submit: 'OK', loadurl: 'api/brand-list.php', onupdate: saveItemProperty, onblur: 'cancel', cssclass: 'form-inline' }"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    </div>
+
+    <!-- Pricing -->
+    <div class="col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Pricing</h3>
+      </div>
+      <div class="panel-body">
+        
+        <div class="well">
+          <h3 class="text-center" style="margin: 0px; padding: 0px"
+              data-bind="text: amount(item.sale_price())">$0.00</h3>
+        </div>
+
+        <div class="form-group">
+          <label for="retail_price" class="col-sm-4 control-label">List</label>
+          <div class="col-sm-8">
+            <p class="form-control-static" id="retail_price"
+               data-bind="jeditable: item.retail_price, jeditableOptions: { ondisplay: amount, data: item.retail_price(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="discount" class="col-sm-4 control-label">Discount</label>
+          <div class="col-sm-8">
+            <p class="form-control-static" id="discount"
+               data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : item.discount() ? amount(item.discount()) : '...' } , data : item.discount(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    </div>
+
+    <!-- Inventory -->
+    <div class="col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Inventory</h3>
+      </div>
+      <div class="panel-body">
+
+        <div class="form-group">
+          <label for="stock" class="col-sm-8 control-label">Currently in Stock</label>
+          <div class="col-sm-4">
+            <p class="form-control-static" id="stock"
+               data-bind="jeditable: item.stock, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="minimum_quantity" class="col-sm-8 control-label">
+            Minimum Quantity
+          </label>
+          <div class="col-sm-4">
+            <p class="form-control-static" id="minimum_quantity"
+               data-bind="jeditable: item.minimum_quantity, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="purchase_quantity" class="col-sm-8 control-label">
+            Purchase Quantity
+          </label>
+          <div class="col-sm-4">
+            <p class="form-control-static" id="purchase_quantity"
+               data-bind="jeditable: item.purchase_quantity, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    </div>
+  </div><!-- /.row -->
+
+  <div class="row">
+
+    <!-- Catalog -->
+    <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="pull-right">
+          <!-- XXX base url should be config value -->
+          <a class="btn btn-default btn-xs"
+             data-bind="attr: { href: 'http://rawm.us/' + item.code() }"
+             target="_blank">
+            <i class="fa fa-external-link"></i>
+            Website
+          </a>
+        </div>
+        <h3 class="panel-title">Catalog</h3>
+        <div class="clearfix"></div>
+      </div>
+      <div class="panel-body">
+
+        <div class="form-group">
+          <label for="short_name" class="col-sm-4 control-label">
+            Short Name
+          </label>
+          <div class="col-sm-8">
+            <p class="form-control-static" id="short_name"
+               data-bind="jeditable: item.short_name, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="variation" class="col-sm-4 control-label">
+            Variation
+          </label>
+          <div class="col-sm-8">
+            <p class="form-control-static" id="variation"
+               data-bind="jeditable: item.variation, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="tic" class="col-sm-4 control-label">
+            <abbr class="initialism"
+                  title="Taxability Information Code">TIC</abbr>
+          </label>
+          <div class="col-sm-8">
+            <p class="form-control-static" id="tic"
+               data-bind="jeditable: item.tic, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="color" class="col-sm-4 control-label">
+            Color
+          </label>
+          <div class="col-sm-8">
+            <p class="form-control-static" id="color"
+               data-bind="jeditable: item.color, jeditableOptions: { textType: 'color', onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    </div>
+
+    <!-- Barcodes -->
+    <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Barcodes</h3>
+      </div>
+      <table id="barcodes" class="table table-striped">
         <tbody data-bind="foreach: item.barcode_list">
           <tr>
             <td><span data-bind="text: $data.code"></span></td>
@@ -138,42 +236,42 @@ include 'item-searchform.php';
             <td><button type="button" class="btn btn-default btn-xs" data-bind="click: $parent.removeBarcode"><i class="fa fa-trash-o"></i></button></td>
           </tr>
         </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="3">
-              <button id="new-barcode" class="btn btn-default">
-                <i class="fa fa-barcode"></i> New
-              </button>
-              <div class="btn-group">
-                <button type="button" class="btn btn-default"
-                        data-bind="click: printBarcode">
-                  <i class="fa fa-print"></i> Print
-                </button>
-                <button type="button" class="btn btn-default dropdown-toggle"
-                        data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false">
-                  <span class="caret"></span>
-                  <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li>
-                    <a data-bind="click: printBarcode" data-multiple="1">
-                      Multiple
-                    </a>
-                  </li>
-                  <li>
-                    <a data-bind="click: printBarcode" data-noprice="1">
-                      No price
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>
-        </tfoot>
       </table>
+
+      <div class="panel-footer">
+        <button id="new-barcode" class="btn btn-default">
+          <i class="fa fa-barcode"></i> New
+        </button>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default"
+                  data-bind="click: printBarcode">
+            <i class="fa fa-print"></i> Print
+          </button>
+          <button type="button" class="btn btn-default dropdown-toggle"
+                  data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a data-bind="click: printBarcode" data-multiple="1">
+                Multiple
+              </a>
+            </li>
+            <li>
+              <a data-bind="click: printBarcode" data-noprice="1">
+                No price
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
-  </div>
+    </div>
+
+  </div><!-- /.row -->
+
 </form>
 <script>
 $('#active').on('click', function(ev) {
