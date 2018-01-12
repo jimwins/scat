@@ -111,7 +111,7 @@ function item_find($db, $q, $options) {
               minimum_quantity, purchase_quantity,
               GROUP_CONCAT(CONCAT(barcode.code, '!', barcode.quantity)
                            SEPARATOR ',') barcodes,
-              length, width, height, color,
+              length, width, height, weight, color,
               item.tic,
               $extra
               item.active, item.reviewed
