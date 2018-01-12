@@ -133,6 +133,8 @@ function item_find($db, $q, $options) {
   while ($item= $r->fetch_assoc()) {
     $item['active']= (int)$item['active'];
     $item['reviewed']= (int)$item['reviewed'];
+    $item['brand_id']= (int)$item['brand_id'];
+    $item['product_id']= (int)$item['product_id'];
     $item['stock']= (int)$item['stock'];
     $item['minimum_quantity']= (int)$item['minimum_quantity'];
     $item['purchase_quantity']= (int)$item['purchase_quantity'];
