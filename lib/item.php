@@ -37,6 +37,10 @@ function item_terms_to_sql($db, $q, $options) {
     } elseif (preg_match('/^reviewed:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.reviewed)"
                         : "(NOT item.reviewed)";
+    } elseif (preg_match('/^active:(.+)/i', $term, $dbt)) {
+      $andor[]= $dbt[1] ? "(item.active)"
+                        : "(NOT item.active)";
+      $options|= FIND_ALL; /* Force FIND_ALL on or this won't work */
     } elseif (preg_match('/^vendor:(.+)/i', $term, $dbt)) {
       $vendor= (int)$dbt[1];
       $andor[]= $vendor ? "EXISTS (SELECT id

@@ -184,7 +184,6 @@ $extra= "";
 if (!$begin) {
   $begin= date("Y-m-d", time() - 90*24*3600);
 }
-# XXX allow option to include inactive and/or deleted
 if (!$_REQUEST['all'])
   $criteria[]= "(item.active AND NOT item.deleted)";
 
