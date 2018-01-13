@@ -21,7 +21,6 @@ require dirname(__FILE__).'/lib/db.php';
 
 define('APP_NAME', 'ScatPOS');
 define('VERSION', '0.6.0');
-define('EPS_ApplicationID', '984');
 
 /** Basic functions */
 
