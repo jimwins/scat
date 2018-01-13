@@ -173,3 +173,6 @@ function available_loyalty_items($db, $points) {
 
   return $rewards;
 }
+
+class Person extends Model {
+}

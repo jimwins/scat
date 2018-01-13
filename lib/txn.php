@@ -475,3 +475,7 @@ class Transaction {
         or die_query($this->db, $q);
   }
 }
+
+class Txn extends Model {
+  /* XXX handle contents */
+}
