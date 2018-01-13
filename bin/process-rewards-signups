@@ -1,0 +1,87 @@
+#!/usr/bin/env php
+<?php
+require __DIR__.'/../scat.php';
+require __DIR__.'/../lib/txn.php';
+
+$exit= 0;
+
+$client= new \GuzzleHttp\Client();
+
+$url= ORDURE . '/get-pending-rewards';
+$res= $client->request('GET', $url,
+                       [
+                         'debug' => $DEBUG,
+                         'query' => [ 'key' => ORDURE_KEY ]
+                       ]);
+
+$updates= json_decode($res->getBody());
+
+foreach ($updates as $update) {
+  $person= Model::factory('Person')->where('loyalty_number',
+                                           $update->loyalty_number)
+                                   ->find_one();
+
+  /* Didn't find them? Create them. */
+  if (!$person) {
+    $person= Model::factory('Person')->create();
+    $person->name= $update->name;
+    $person->email= $update->email;
+    $person->phone= $update->phone;
+    $person->loyalty_number= $update->loyalty_number;
+    $person->save();
+
+    echo "Created new person '{$person->name}'.\n";
+  }
+  /* Otherwise update name, email */
+  else {
+    if ($update->name) $person->name= $update->name;
+    if ($update->email) $person->email= $update->email;
+    $person->save();
+
+    echo "Updated details for person '{$person->name}'.\n";
+  }
+
+  /* Handle code */
+  if ($update->code) {
+    list($created, $id)= preg_split('/\s+/', $update->code);
+    $created=  date("Y-m-d H:i:s", hexdec($created));
+    $id= hexdec($id);
+
+    $txn= Model::factory('Txn')->find_one($id);
+    if (!$txn) {
+      echo "No such transaction found for '{$update->code}'\n";
+      $exit= 1;
+      continue;
+    }
+
+    if ($txn->person && $txn->person != $person->id) {
+      echo "Transaction already assigned to someone else.\n";
+      $exit= 1;
+      continue;
+    }
+
+    if ($txn->created != $created) {
+      echo "Timestamps for transactions don't match. '{$created}' != '{$txn->created}'\n";
+      $exit= 1;
+      continue;
+    }
+
+    $txn->person= $person->id;
+    $txn->save();
+
+    echo "Attached transaction {$id} to person.\n";
+  }
+
+
+  $url= ORDURE . '/mark-rewards-processed';
+  $res= $client->request('GET', $url,
+                         [
+                           'debug' => $DEBUG,
+                           'query' => [ 'key' => ORDURE_KEY,
+                                        'id' => $update->id ]
+                         ]);
+
+  echo "Completed update for {$update->name}.\n";
+}
+
+exit($exit);
