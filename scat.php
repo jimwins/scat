@@ -234,6 +234,12 @@ ORM::configure('logging', true);
 ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
 Model::$short_table_names= true;
 
+if ($DEBUG) {
+  ORM::configure('logger', function ($log_string, $query_time) {
+    error_log('ORM: "' . $log_string . '" in ' . $query_time);
+  });
+}
+
 function dump_table($r, $calc = false) {
   $c= $meta= $line= 0;
   if (!$r) {
