@@ -6,6 +6,7 @@ $parent= (int)$_REQUEST['parent'];
 
 $departments= Model::factory('Department')
                 ->where('parent_id', $parent)
+                ->order_by_asc('name')
                 ->find_many();
 
 if (!$departments)
