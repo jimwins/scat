@@ -59,50 +59,25 @@ head("Category Sales @ Scat", true);
 </form>
 <div id="results">
 <?
-$q= "CREATE TEMPORARY TABLE department
-       (id INT UNSIGNED PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        sort_name VARCHAR(255) NOT NULL,
-        slug VARCHAR(255) NOT NULL,
-        parent INT UNSIGNED NOT NULL)
-     SELECT id, name,
-            IF(parent,
-               (SELECT name FROM ordure.department d
-                 WHERE d.id = department.parent),
-               name) sort_name,
-            IF(parent,
-               CONCAT((SELECT slug FROM ordure.department d
-                        WHERE d.id = department.parent), '/', slug),
-               slug)
-              AS slug,
-            parent
-       FROM ordure.department";
-$db->query($q) or die('Line : ' . __LINE__ . $db->error);
-
-$q= "INSERT INTO department
-        SET id = 0,
-            name = 'Unknown',
-            sort_name = 'ZZZ',
-            slug = '',
-            parent = 0";
-$db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 /* Current */
-$q= "CREATE TEMPORARY TABLE current
+$q= "CREATE TABLE report_current
        (item INT UNSIGNED PRIMARY KEY,
-        product_id INT UNSIGNED NOT NULL,
-        department INT UNSIGNED NOT NULL,
+        product_id INT UNSIGNED,
+        department_id INT UNSIGNED,
         units INT NOT NULL,
         amount DECIMAL(9,2) NOT NULL,
-        KEY (department))
+        KEY (department_id))
      SELECT
-            item, 0 product_id, 0 department,
+            item, product_id, department_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
                                             txn_line.discount)) amount
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
+       JOIN item ON txn_line.item = item.id
+       LEFT JOIN product ON product_id = product.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
@@ -111,37 +86,24 @@ $q= "CREATE TEMPORARY TABLE current
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
-$q= "UPDATE current
-        SET product_id = IFNULL((SELECT o.product 
-                                FROM ordure.item o
-                                JOIN item USING (code)
-                               WHERE item.id = current.item), 0)";
-
-$db->query($q) or die('Line : ' . __LINE__ . $db->error);
-
-$q= "UPDATE current
-        SET department = IFNULL((SELECT o.department
-                                   FROM ordure.product o
-                                  WHERE o.id = current.product_id), 0)";
-
-$db->query($q) or die('Line : ' . __LINE__ . $db->error);
-
 /* Previous */
-$q= "CREATE TEMPORARY TABLE previous
+$q= "CREATE TABLE report_previous
        (item INT UNSIGNED PRIMARY KEY,
-        product_id INT UNSIGNED NOT NULL,
-        department INT UNSIGNED NOT NULL,
+        product_id INT UNSIGNED,
+        department_id INT UNSIGNED,
         units INT NOT NULL,
         amount DECIMAL(9,2) NOT NULL,
-        KEY (department))
+        KEY (department_id))
      SELECT
-            item, 0 product_id, 0 department,
+            item, product_id, department_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
                                             txn_line.discount)) amount
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
+       JOIN item ON txn_line.item = item.id
+       LEFT JOIN product ON product_id = product.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' - INTERVAL 1 YEAR
@@ -151,30 +113,31 @@ $q= "CREATE TEMPORARY TABLE previous
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
-$q= "UPDATE previous
-        SET product_id = IFNULL((SELECT o.product 
-                                FROM ordure.item o
-                                JOIN item USING (code)
-                               WHERE item.id = previous.item), 0)";
-
-$db->query($q) or die('Line : ' . __LINE__ . $db->error);
-
-$q= "UPDATE previous
-        SET department = IFNULL((SELECT o.department
-                                   FROM ordure.product o
-                                  WHERE o.id = previous.product_id), 0)";
-
-$db->query($q) or die('Line : ' . __LINE__ . $db->error);
-
 /* Report */
 $q= "SELECT
-            name, slug, parent,
-            (SELECT SUM(amount) FROM current WHERE department = id)
+            name, parent_id,
+            IF(parent_id,
+               CONCAT((SELECT slug FROM department d
+                        WHERE d.id = department.parent_id), '/', slug),
+               slug)
+              AS slug,
+            (SELECT SUM(amount) FROM report_current WHERE department_id = id)
               AS current_amount,
-            (SELECT SUM(amount) FROM previous WHERE department = id)
+            (SELECT SUM(amount) FROM report_previous WHERE department_id = id)
               AS previous_amount
        FROM department
-      ORDER BY slug";
+      UNION
+      SELECT
+            'Unknown' AS name, 0 AS parent_id,
+            ''  AS slug,
+            (SELECT SUM(amount) FROM report_current
+                               WHERE department_id IS NULL)
+              AS current_amount,
+            (SELECT SUM(amount) FROM report_previous
+                               WHERE department_id IS NULL)
+              AS previous_amount
+      ORDER BY slug
+      ";
 
 $r= $db->query($q) or die($db->error);
 
@@ -192,7 +155,7 @@ $parent= 0;
  <tbody>
 <?
 while ($row= $r->fetch_assoc()) {
-  if ($row['parent'] && !$row['previous_amount'] && !$row['current_amount']) {
+  if ($row['parent_id'] && !$row['previous_amount'] && !$row['current_amount']) {
     continue;
   }
 
@@ -203,7 +166,7 @@ while ($row= $r->fetch_assoc()) {
   }
 ?>
   <tr class="XXX<?=($change < 0) ? 'danger' : ($change > 100) ? 'success' : ''?>">
-   <td><?=$row['parent'] ? ' &nbsp; ' . ashtml($row['name']) : '<b> ' . ashtml($row['name']) . '</b>' ?></td>
+   <td><?=$row['parent_id'] ? ' &nbsp; ' . ashtml($row['name']) : '<b> ' . ashtml($row['name']) . '</b>' ?></td>
    <td align="right"><?=amount($row['current_amount'])?></td>
    <td align="right"><?=amount($row['previous_amount'])?></td>
    <td align="right"><?=sprintf("%.1f%%", $change)?></td>
@@ -213,6 +176,7 @@ while ($row= $r->fetch_assoc()) {
 </table>
 
 <?
+$db->query("DROP TABLE report_current, report_previous");
 foot();
 ?>
 <script>
