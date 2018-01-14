@@ -1,6 +1,7 @@
 <?
 require 'scat.php';
 require 'lib/item.php';
+require 'lib/catalog.php';
 
 $code= $_GET['code'];
 $id= (int)$_GET['id'];
@@ -19,7 +20,13 @@ if (!$id && $code) {
   $id= $id[0];
 }
 
+$product= array();
+
 $item= item_load($db, $id);
+
+if ($item['product_id']) {
+  $product= Model::factory('Product')->find_one($item['product_id'])->as_array();
+}
 
 $search= "";
 
@@ -176,6 +183,26 @@ include 'item-searchform.php';
         <div class="clearfix"></div>
       </div>
       <div class="panel-body">
+
+        <div class="form-group">
+          <label for="product" class="col-sm-4 control-label">
+            Product
+          </label>
+         
+          <div class="col-sm-8">
+            <p class="form-control-static">
+              <a data-bind="visible: item.product_id(),
+                            text: product.name,
+                            attr: { href: 'catalog-product.php?id=' +
+                                          item.product_id() }">
+                Product Name
+              </a>
+              <a data-bind="visible: !item.product_id(), click: linkToProduct">
+                Link to Product
+              </a>
+            </p>
+          </div>
+        </div>
 
         <div class="form-group">
           <label for="short_name" class="col-sm-4 control-label">
@@ -505,6 +532,7 @@ var model= {
   search: '<?=ashtml($search);?>',
   all: <?=(int)$all?>,
   item: <?=json_encode($item);?>,
+  product: <?=json_encode($product);?>,
   vendor_items: <?=json_encode($vendor_items);?>,
   brands: [],
 
@@ -640,6 +668,11 @@ itemModel.findVendorItem= function() {
       .done(function (data) {
         ko.mapping.fromJS(data, itemModel);
       });
+}
+
+itemModel.linkToProduct= function() {
+  // XXX implement
+  alert("I don't know how yet.");
 }
 
 ko.applyBindings(itemModel);
