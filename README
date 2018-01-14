@@ -33,6 +33,9 @@ Scat includes the jquery.event.ue unified event plugin:
 Scat includes the jQuery udraggable plugin:
   https://github.com/grantm/jquery-udraggable
 
+Scat includes the jQuery.scrollTo plugin:
+  https://github.com/flesler/jquery.scrollTo
+
 Scat includes Keypress:
   http://dmauro.github.io/Keypress/
 

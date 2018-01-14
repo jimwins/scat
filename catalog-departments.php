@@ -2,6 +2,8 @@
 require 'scat.php';
 require 'lib/catalog.php';
 
+$id= (int)$_REQUEST['id'];
+
 head("Departments @ Scat", true);
 
 $departments= Model::factory('Department')
@@ -41,6 +43,12 @@ viewModel.showDepartment= function (department) {
 
 ko.applyBindings(viewModel);
 
+var active= <?=$id?>;
+if (active) {
+  $('#heading' + active + ' a').click();
+  $('body').scrollTo('#heading' + active);
+}
+
 });
 </script>
 <div class="panel-group" id="accordion" role="tablist"
@@ -48,19 +56,19 @@ ko.applyBindings(viewModel);
      data-bind="foreach: departments">
   <div class="panel panel-default">
     <div class="panel-heading" role="tab"
-         data-bind="attr: { id: 'heading' + $index() }">
+         data-bind="attr: { id: 'heading' + $data.id() }">
       <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse"
            data-parent="#accordion"
-           data-bind="attr: { href: '#collapse' + $index(),
-                              'aria-controls': 'collapse' + $index() },
+           data-bind="attr: { href: '#collapse' + $data.id(),
+                              'aria-controls': 'collapse' + $data.id() },
                       text: $data.name"
            aria-expanded="true"></a>
       </h4>
     </div>
     <div class="panel-collapse collapse" role="tabpanel"
-         data-bind="attr: { id: 'collapse' + $index(),
-                            'aria-labelledby': 'heading' + $index() },
+         data-bind="attr: { id: 'collapse' + $data.id(),
+                            'aria-labelledby': 'heading' + $data.id() },
                     event: { 'show.bs.collapse': $parent.showDepartment }">
       <ul class="list-group"
           data-bind="foreach: $data.departments">

@@ -57,6 +57,7 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="js/jquery.dragbetter.js"></script>
  <script src="js/jquery.event.ue.js"></script>
  <script src="js/jquery.udraggable.js"></script>
+ <script src="vendor/flesler/jquery.scrollto/jquery.scrollTo.min.js"></script>
  <script src="components/moment/min/moment.min.js"></script>
  <script src="extern/chartjs-2.7.0/Chart.min.js"></script>
 <?if (!$allnew) {?>
