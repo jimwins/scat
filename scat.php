@@ -115,6 +115,13 @@ $(document).ready(function() {
         <li><a href="./txns.php">Transactions</a></li>
         <li><a href="./clock.php">Clock</a></li>
         <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalog <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="catalog-brands.php">Brands</a></li>
+            <li><a href="catalog-departments.php">Departments</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a id="reports" href="#">Quick</a></li>
