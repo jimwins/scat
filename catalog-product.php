@@ -21,6 +21,12 @@ if (!$product) {
   die("No such product.");
 }
 
+$items= $product->items()
+          ->order_by_asc('variation')
+          ->order_by_desc('active')
+          ->order_by_expr('IF(minimum_quantity OR stock, 0, 1)')
+          ->order_by_asc('code')
+          ->find_many();
 ?>
 <script>
 $(function() { 
@@ -32,18 +38,14 @@ var model= {
   /* Convert each row to an object */
   echo join(", \n",
             array_map(function ($items) {
-                      return json_encode($items->as_array(),
-                                         JSON_PRETTY_PRINT|JSON_NUMERIC_CHECK);
+                        return json_encode($items->as_array(),
+                                           JSON_PRETTY_PRINT|
+                                           JSON_NUMERIC_CHECK);
                       },
-                      $product->items()
-                              ->order_by_asc('variation')
-                              ->order_by_desc('active')
-                              ->order_by_expr('IF(minimum_quantity OR stock,
-                                                  0, 1)')
-                              ->order_by_asc('code')
-                              ->find_many()));
+                      $items));
 ?>
-  ]
+  ],
+  showInactive: <?=array_reduce($items, function ($c, $i) { return $c + $i->active; }) ? 0 : 1?>
 };
 
 var viewModel= ko.mapping.fromJS(model);
@@ -61,6 +63,12 @@ viewModel.toggleActive= function (item) {
 ko.applyBindings(viewModel);
 });
 </script>
+<div class="pull-right">
+  <label>
+    <input type="checkbox" data-bind="checked: showInactive">
+    Show inactive
+  </label>
+</div>
 <div class="page_header">
   <h1>
     <span data-bind="text: product.name"></span>
@@ -101,7 +109,7 @@ ko.applyBindings(viewModel);
     </tr>
   </thead>
   <tbody data-bind="foreach: items">
-    <tr>
+    <tr data-bind="visible: $data.active() || $parent.showInactive()">
       <td>
         <a data-bind="text: $data.code,
                       attr: { href: 'item.php?id=' + $data.id() }"></a>
