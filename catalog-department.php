@@ -75,6 +75,9 @@ ko.applyBindings(viewModel);
     </small>
   </h1>
 </div>
+
+<?require 'ui/catalog-search.html'?>
+
 <table class="table table-striped table-hover">
   <thead>
     <tr>

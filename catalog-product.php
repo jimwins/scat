@@ -157,6 +157,8 @@ ko.applyBindings(viewModel);
   </div>
 </div>
 
+<?require 'ui/catalog-search.html'?>
+
 <div class="page_header">
   <h1>
     <span data-bind="text: product.name"></span>

@@ -51,6 +51,9 @@ if (active) {
 
 });
 </script>
+
+<?require 'ui/catalog-search.html'?>
+
 <div class="panel-group" id="accordion" role="tablist"
      aria-multiselectable="true"
      data-bind="foreach: departments">
