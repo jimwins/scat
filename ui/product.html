@@ -1,0 +1,78 @@
+<div class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <form class="modal-content" data-bind="submit: saveProduct" role="form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+          Product:
+          <span data-bind="text: name"></span>
+        </h4>
+      </div>
+      <div id="accordion" class="modal-body">
+        <div id="content" class="collapse in">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name"
+                      data-bind="value: name">
+          </div>
+          <div class="form-group">
+            <label for="brand">Brand</label>
+            <select class="form-control" id="brand"
+                    data-bind="value: selectedBrand, foreach: brands">
+              <option data-bind="text: name, value: id"></option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="slug">Slug</label>
+            <div class="input-group">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button"
+                        data-bind="click: generateSlug">
+                  <i class="fa fa-cog"></i>
+                </button>
+              </span>
+              <input type="text" class="form-control" id="slug"
+                     data-bind="value: slug">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" rows="10" id="description"
+                      data-bind="value: description"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="image">Image</label>
+            <input type="text" class="form-control" id="image"
+                   data-bind="value: image">
+          </div>
+          <div class="form-group">
+            <label for="image">Variation Style</label>
+            <select class="form-control" id="department"
+                    data-bind="value: variation_style">
+              <option value="tabs">Tabs</option>
+              <option value="flat">Flat</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="parent">Department</label>
+            <select class="form-control" id="department"
+                    data-bind="value: selectedDepartment, foreach: departments">
+              <optgroup data-bind="attr: { label: name }, foreach: sub">
+                <option data-bind="text: name, value: id"></option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <input type="hidden" name="parent" data-bind="value: parent">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" class="btn btn-primary">
+          Save changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

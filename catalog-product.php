@@ -60,19 +60,108 @@ viewModel.toggleActive= function (item) {
       });
 }
 
+viewModel.editProduct= function (self) {
+  Scat.dialog('product').done(function (html) {
+    var panel= $(html);
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    var product= ko.mapping.toJS(self.product);
+
+    product.departments= [];
+    product.brands= [];
+
+    var panelModel= ko.mapping.fromJS(product);
+
+    /* Load departments */
+    Scat.api('department-find', { levels: 2 })
+        .done(function (data) {
+          ko.mapping.fromJS(data, {}, panelModel.departments);
+          // make sure correct selection is made
+          panelModel.department_id.valueHasMutated();
+        });
+
+    /* Load brands */
+    Scat.api('brand-list', { verbose: 1 })
+        .done(function (data) {
+          ko.mapping.fromJS(data, {}, panelModel.brands);
+          // make sure correct selection is made
+          panelModel.brand_id.valueHasMutated();
+        });
+
+    panelModel.saveProduct= function(place, ev) {
+      var product= ko.mapping.toJS(panelModel); /* XXX */
+      delete product.departments;
+      delete product.brands;
+
+      Scat.api('product-update', product)
+          .done(function (data) {
+            $(place).closest('.modal').modal('hide');
+            ko.mapping.fromJS(data, {}, viewModel.product);
+          });
+    }
+
+    panelModel.generateSlug= function(place, ev) {
+      $.ajax(BASE + 'api/generateSlug',
+             { type: 'POST', data: {
+               brand: pageModel.brand(), name: pageModel.name() }})
+        .done(function (data) {
+          pageModel.slug(data.slug);
+        })
+    }
+
+
+    panelModel.selectedDepartment= ko.computed({
+      read: function () {
+        return this.department_id();
+      },
+      write: function (value) {
+        if (typeof value != 'undefined' && value != '') {
+          this.department_id(value);
+        }
+      },
+      owner: panelModel
+    }).extend({ notify: 'always' });
+
+    panelModel.selectedBrand= ko.computed({
+      read: function () {
+        return this.brand_id();
+      },
+      write: function (value) {
+        if (typeof value != 'undefined' && value != '') {
+          this.brand_id(value);
+        }
+      },
+      owner: panelModel
+    }).extend({ notify: 'always' });
+
+    ko.applyBindings(panelModel, panel[0]);
+    panel.appendTo($('body')).modal();
+  });
+}
+
 ko.applyBindings(viewModel);
 });
 </script>
-<div class="pull-right">
+
+<div class="pull-right well text-center">
   <label>
     <input type="checkbox" data-bind="checked: showInactive">
     Show inactive
   </label>
+  <div>
+    <button class="btn btn-primary"
+            data-bind="click: editProduct">Edit</button>
+  </div>
 </div>
+
 <div class="page_header">
   <h1>
     <span data-bind="text: product.name"></span>
     <small>
+      <span data-bind="text: product.brand_name"></span>
       <a data-bind="attr: { href: 'catalog-department.php?id=' +
                                   product.department_id() }">
         <i class="fa fa-reply"></i>
