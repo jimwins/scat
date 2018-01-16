@@ -264,7 +264,7 @@ CREATE TABLE `person` (
   `tax_id` varchar(255) DEFAULT NULL,
   `payment_account_id` varchar(50) DEFAULT NULL,
   `vendor_rebate` decimal(9,2) NOT NULL DEFAULT '0.00',
-  `active` tinyint(1) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
