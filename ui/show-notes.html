@@ -16,7 +16,7 @@
           <dt data-bind="text: $data.added"></dt>
           <dd>
             <span data-bind="visible: $data.public()"><i class="fa fa-comment" aria-hidden="true"></i></span>
-            <span data-bind="text: $data.content"></span>
+            <span data-bind="html: marked($data.content())"></span>
           </dd>
           <!-- /ko -->
         </dl>
