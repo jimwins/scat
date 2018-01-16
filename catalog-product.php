@@ -174,8 +174,7 @@ ko.applyBindings(viewModel);
 
 <!-- Product description -->
 <div class="row">
-  <!-- XXX markdown -->
-  <div class="col-sm-9" data-bind="text: product.description"></div>
+  <div class="col-sm-9" data-bind="html: marked(product.description())"></div>
 
   <div class="col-sm-3">
     <div class="thumbnail pull-right">
