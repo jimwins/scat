@@ -15,9 +15,9 @@ if (!$note)
 
 $note= $db->escape($note);
 
-$q= "INSERT INTO txn_note
-             SET entered = NOW(),
-                 txn = $id,
+$q= "INSERT INTO note
+             SET kind = 'txn',
+                 attach_id = $id,
                  content = '$note',
                  public = $public";
 $db->query($q)

@@ -60,8 +60,8 @@ if ($discount) {
     or die_query($db, $q);
 
   if ($db->affected_rows) {
-    $q= "INSERT INTO txn_note
-            SET txn = $new_txn_id, entered = NOW(),
+    $q= "INSERT INTO note
+            SET kind = 'txn', attach_id = $new_txn_id,
                 content = 'Applied extra $discount% discount to items from original purchase.'";
 
     $r= $db->query($q)

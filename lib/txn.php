@@ -153,10 +153,10 @@ function txn_load_payments($db, $id) {
 }
 
 function txn_load_notes($db, $id) {
-  $q= "SELECT id, entered, content, public
-         FROM txn_note
-        WHERE txn = $id
-        ORDER BY entered ASC";
+  $q= "SELECT id, added, content, public
+         FROM note
+        WHERE kind = 'txn' AND attach_id = $id
+        ORDER BY added ASC";
 
   $r= $db->query($q)
     or die_query($db, $q);

@@ -190,6 +190,30 @@ CREATE TABLE `loyalty_reward` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `note`
+--
+
+DROP TABLE IF EXISTS `note`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `note` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `kind` enum('general','txn','person','item') NOT NULL DEFAULT 'general',
+  `attach_id` int(10) unsigned DEFAULT NULL,
+  `content` mediumtext,
+  `added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `person_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `public` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `person_id` (`person_id`),
+  KEY `parent_id` (`parent_id`,`id`),
+  KEY `kind` (`kind`,`attach_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `payment`
 --
 
@@ -522,4 +546,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-11 14:30:21
+-- Dump completed on 2018-01-16  9:45:37

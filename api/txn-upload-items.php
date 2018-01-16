@@ -78,7 +78,7 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
 // C2F order (CSV)
 } elseif (preg_match('/^LineNumber/', $line)) {
@@ -95,11 +95,11 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
   $db->query("DELETE FROM vendor_order WHERE cust_item IN ('AS','ASMT')");
 
-  echo "Removed ", $db->affected_rows, " assortments from file.<br>";
+  echo "- Removed ", $db->affected_rows, " assortments from file.\n";
 
 } elseif (preg_match('/^Vendor Name	Assortment Item Number/', $line)) {
   // MacPherson assortment
@@ -117,7 +117,7 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
 } elseif (preg_match('/^sls_sku	cust_sku/', $line)) {
   // SLS assortment
@@ -135,7 +135,7 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  echo "Loaded ", $db->affected_rows, " rows from SLS assortment.<br>";
+  echo "- Loaded ", $db->affected_rows, " rows from SLS assortment.\n";
 } elseif (preg_match('/^C2F Product #/', $line)) {
   // C2F
   $q= "LOAD DATA LOCAL INFILE '$fn'
@@ -148,12 +148,12 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
   // Don't import assortments (have to do that manually)
   $db->query("DELETE FROM vendor_order WHERE status = 'asmt' OR status = 'as'");
 
-  echo "Deleted ", $db->affected_rows, " assortments from file.<br>";
+  echo "- Deleted ", $db->affected_rows, " assortments from file.\n";
 } elseif (preg_match('/^,Name,MSRP/', $line)) {
   // CSV
   $q= "LOAD DATA LOCAL INFILE '$fn'
@@ -166,7 +166,7 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 } elseif (preg_match('/^code\tqty/', $line)) {
   // Order file
   $q= "LOAD DATA LOCAL INFILE '$fn'
@@ -178,7 +178,7 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
   // Need to get price, item info from vendor info
   $q= "UPDATE vendor_order, vendor_item
@@ -191,7 +191,7 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  echo "Updated ", $db->affected_rows, " rows from vendor info.<br>";
+  echo "- Updated ", $db->affected_rows, " rows from vendor info.\n";
 
 } elseif (($json= json_decode(file_get_contents($fn)))) {
   // JSON
@@ -221,7 +221,7 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query($q)
     or die_query($db, $q);
 
-  echo "Loaded ", $db->affected_rows, " rows from file.<br>";
+  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
   /* Fix quantities on backorders */
   $q= "SELECT SUM(shipped + backordered)
@@ -311,7 +311,7 @@ $q= "INSERT IGNORE INTO item (code, brand, name, retail_price, active)
       WHERE (NOT item OR item IS NULL) AND msrp > 0 AND IFNULL(unit,'') != 'AS'";
 $db->query($q)
   or die_query($db, $q);
-echo "Loaded ", $db->affected_rows, " items from order.<br>";
+echo "- Loaded ", $db->affected_rows, " items from order.\n";
 
 if ($db->affected_rows) {
   # Attach order lines to new items
@@ -330,7 +330,7 @@ $q= "UPDATE item, vendor_order
       WHERE vendor_order.item = item.id";
 $db->query($q)
   or die_query($db, $q);
-echo "Activated ", $db->affected_rows, " items from order.<br>";
+echo "- Activated ", $db->affected_rows, " items from order.\n";
 
 # Make sure we know all the barcodes
 $q= "INSERT IGNORE INTO barcode (item, code, quantity)
@@ -341,7 +341,7 @@ $q= "INSERT IGNORE INTO barcode (item, code, quantity)
      WHERE item AND barcode != ''";
 $db->query($q)
   or die_query($db, $q);
-echo "Loaded ", $db->affected_rows, " new barcodes from order.<br>";
+echo "- Loaded ", $db->affected_rows, " new barcodes from order.\n";
 
 # Link items to vendor items if they aren't already
 $q= "UPDATE vendor_item, vendor_order
@@ -351,7 +351,7 @@ $q= "UPDATE vendor_item, vendor_order
         AND vendor_item.active";
 $db->query($q)
   or die_query($db, $q);
-echo "Linked ", $db->affected_rows, " items to vendor items.<br>";
+echo "- Linked ", $db->affected_rows, " items to vendor items.\n";
 
 # Add items to order
 $q= "INSERT INTO txn_line (txn, item, ordered, allocated, retail_price)
@@ -362,7 +362,7 @@ $q= "INSERT INTO txn_line (txn, item, ordered, allocated, retail_price)
 $db->query($q)
   or die_query($db, $q);
 
-echo "Loaded ", $db->affected_rows, " rows into purchase order.<br>";
+echo "- Loaded ", $db->affected_rows, " rows into purchase order.\n";
 
 $db->commit()
   or die_jsonp($db->error);
@@ -373,14 +373,13 @@ $item_rate= $db->get_one($q);
 $q= "SELECT CAST((SUM(shipped > 0) / SUM(ordered > 0)) * 100 AS DECIMAL(9,1))
        FROM vendor_order";
 $sku_rate= $db->get_one($q);
-echo "Fill rate by item: $item_rate%, by SKU: $sku_rate%.";
+echo "- Fill rate by item: $item_rate%, by SKU: $sku_rate%.\n";
 
 $out= ob_get_contents();
 ob_end_clean();
 
-$db->query("INSERT INTO txn_note
-               SET txn = $txn_id,
-                   entered = NOW(),
+$db->query("INSERT INTO note
+               SET kind = 'txn', attach_id = $txn_id,
                    content = '" . $db->escape($out) . "'")
   or die_jsonp($db->error);
 

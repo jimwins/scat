@@ -322,8 +322,8 @@ echo '<h2>Notes</h2>';
 $q= "SELECT id AS meta,
             entered AS Date,
             content AS Note
-       FROM txn_note
-      WHERE txn = $id
+       FROM note
+      WHERE kind = 'txn' AND attach_id = $id
       ORDER BY entered ASC";
 dump_table($db->query($q));
 dump_query($q);
