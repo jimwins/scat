@@ -12,7 +12,7 @@ if ($txn_id) {
   }
 }
 
-foreach ($_REQUEST['items'] as $item) {
+foreach ((array)$_REQUEST['items'] as $item) {
   $q= "INSERT INTO txn_line (txn, item, ordered, retail_price, taxfree)
        SELECT $txn_id AS txn, $item[0] AS item, $item[1] AS ordered,
               (SELECT IF(promo_price AND promo_price < net_price,
