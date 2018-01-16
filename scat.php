@@ -60,6 +60,7 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="vendor/flesler/jquery.scrollto/jquery.scrollTo.min.js"></script>
  <script src="components/moment/min/moment.min.js"></script>
  <script src="extern/chartjs-2.7.0/Chart.min.js"></script>
+ <script src="extern/marked-0.3.12/marked.min.js"></script>
 <?if (!$allnew) {?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>

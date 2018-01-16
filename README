@@ -57,4 +57,7 @@ Scat uses PHPExcel for reading and writing Excel spreadsheets:
 Scat uses the Idiorm & Paris minimalist database toolkit:
   http://j4mie.github.io/idiormandparis/
 
+Scat includes the Marked markdown parser and compiler for Javascript:
+  https://github.com/chjj/marked
+
 See the LICENSE file for licensing information.
