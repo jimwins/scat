@@ -150,7 +150,7 @@ head("Custom @ Scat", true);
           </div>
           <div class="form-group">
             <label for="thick" class="col-sm-6 control-label">
-              Thick (1&frac12;")
+              Thick (1&frac34;")
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
@@ -161,7 +161,7 @@ head("Custom @ Scat", true);
           </div>
           <div class="form-group">
             <label for="epic" class="col-sm-6 control-label">
-              Epic (2&frac12;")
+              Epic (2&frac34;")
             </label>
             <div class="col-sm-6">
               <p class="form-control-static"
