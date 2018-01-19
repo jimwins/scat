@@ -22,3 +22,7 @@
 
   background: #b00;
 }
+
+@media print {
+  #corner-banner { display: none }
+}
