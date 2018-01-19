@@ -206,6 +206,7 @@ CREATE TABLE `note` (
   `person_id` int(10) unsigned NOT NULL DEFAULT '0',
   `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
   `public` tinyint(4) NOT NULL DEFAULT '0',
+  `todo` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `person_id` (`person_id`),
   KEY `parent_id` (`parent_id`,`id`),
@@ -546,4 +547,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-16  9:45:37
+-- Dump completed on 2018-01-18 19:55:18
