@@ -233,11 +233,19 @@ if (!$person) {
     </li>
 
     <span>
-      Page <!--ko text: activity_page() + 1 --><!--/ko--> of ?
+      Page
+        <!--ko text: activity_page() + 1 --><!--/ko-->
+        of
+        <!--ko text: Math.ceil(total() / 50)--><!--/ko-->
     </span>
 
-    <li class="next" data-bind="css: { enabled: !loading() }">
-      <a href="#" data-bind="click: function(data, event) { loadActivity(person.id(), activity_page() + 1) }">Older <span aria-hidden="true">&rarr;</span></a>
+    <li class="next" data-bind="css: { disabled: activity_page() + 1 >=
+                                                 Math.ceil(total() / 50) }">
+      <a href="#"
+         data-bind="click: function() { loadActivity(person.id(),
+                                                     activity_page() + 1) }">
+        Older <span aria-hidden="true">&rarr;</span>
+      </a>
     </li>
   </ul>
 </li>
@@ -285,6 +293,7 @@ var model= {
   person: <?=json_encode($person);?>,
   activity: [],
   activity_page: 0,
+  total: 0,
   loading: 1,
   people: <?=json_encode($people);?>,
 };
