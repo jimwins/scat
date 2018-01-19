@@ -280,6 +280,17 @@ if (!$person) {
   Merge
 </button>
 
+<button type="button" class="btn btn-default"
+        data-bind="click: downloadActivity">
+  Download
+</button>
+
+<form id="post-csv" style="display: none"
+      method="post" action="api/encode-tsv.php">
+  <input type="hidden" name="fn" value="activity.txt">
+  <textarea id="file" name="file"></textarea>
+</form>
+
 <?
 
 end:
@@ -315,6 +326,21 @@ viewModel.mergePerson= function (place) {
           loadPerson(data.person);
         });
   }
+}
+
+viewModel.downloadActivity= function (place) {
+  Scat.api('person-load-activity', { person: viewModel.person.id(), limit: 0 })
+      .done(function (data) {
+        var tsv= "Invoice #\tCreated\tItems\tTotal\r\n";
+        $.each(data.activity, function (i, row) {
+            tsv += row[1] + "\t" +
+                   row[2] + "\t" +
+                   row[4] + "\t" +
+                   row[5] + "\r\n";
+        });
+        $("#file").val(tsv);
+        $("#post-csv").submit();
+      });
 }
 
 viewModel.sendMessage= function (place) {
