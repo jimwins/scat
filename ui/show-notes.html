@@ -40,7 +40,10 @@
               <div style="padding-left: 1em"
                    data-bind="foreach: $data.kids">
                 <small style="margin-left: -0.5em"
-                       data-bind="text: moment($data.added).calendar()">
+                       data-bind="text: moment($data.added).calendar() +
+                                        ' ' +
+                                        ($data.person_id != '0' ?
+                                         '(' + $data.person_name + ')' : '')">
                 </small>
                 <div data-bind="html: marked($data.content)"></div>
               </div>
@@ -78,6 +81,16 @@
         </div>
         <div class="checkbox">
           <span data-bind="text: parent_id() != '0' ? 'Replying...' : ''"></span>
+          <div class="form-group">
+            <select class="form-control input-sm"
+                    data-bind="options: people,
+                               optionsText: 'name',
+                               optionsValue: 'id',
+                               value: selectedPerson,
+                               optionsCaption: 'Select...'">
+            </select>
+          </div>
+
           <label>
             <input type="checkbox" data-bind="checked: todo">
             Todo?

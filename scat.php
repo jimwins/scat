@@ -179,8 +179,9 @@ Scat.showNotes= function (options) {
   Scat.dialog('show-notes').done(function (html) {
     var panel= $(html);
 
-    var data= { notes: [], content: '', todo: 0, public: 0, parent_id: 0,
-                kind: 'general', attach_id: 0 }
+    var data= { notes: [], people: [],
+                content: '', todo: 0, public: 0, parent_id: 0,
+                kind: 'general', attach_id: 0, person_id: 0 }
     $.extend(data, options);
     var dataModel= ko.mapping.fromJS(data);
 
@@ -189,6 +190,17 @@ Scat.showNotes= function (options) {
         .done(function (data) {
           dataModel.notes(data);
         });
+
+    /* Load employees */
+    Scat.api('person-list', { role: 'employee' })
+        .done(function (data) {
+          ko.mapping.fromJS({ people: data }, dataModel);
+          dataModel.person_id.valueHasMutated();
+        })
+      .fail(function (jqxhr, textStatus, error) {
+        var data= $.parseJSON(jqxhr.responseText);
+        vendor_item.error(textStatus + ', ' + error + ': ' + data.text)
+      });
 
     dataModel.toggleTodo= function(place, ev) {
       Scat.api('note-update', { id: place.id,
@@ -230,7 +242,7 @@ Scat.showNotes= function (options) {
       var data= ko.mapping.toJS(dataModel); 
       data.todo= data.todo ? 1 : 0; // knockout 'checked' is annoying
       data.public= data.public ? 1 : 0;
-      delete data.notes;
+      delete data.notes; delete data.people;
 
       Scat.api('note-add', data)
           .done(function (data) {
@@ -254,6 +266,18 @@ Scat.showNotes= function (options) {
 
       // $(place).closest('.modal').modal('hide');
     }
+
+    dataModel.selectedPerson= ko.computed({
+      read: function () {
+        return this.person_id();
+      },
+      write: function (value) {
+        if (typeof value != 'undefined' && value != '') {
+          this.person_id(value);
+        }
+      },
+      owner: dataModel
+    }).extend({ notify: 'always' });
 
     ko.applyBindings(dataModel, panel[0]);
 

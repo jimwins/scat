@@ -25,4 +25,7 @@ echo jsonp(Model::factory('Note')
              ->select_expr('(SELECT COUNT(*) FROM note children
                               WHERE children.parent_id = note.id)',
                            'children')
+             ->select_expr('(SELECT name FROM person
+                              WHERE person_id = person.id)',
+                           'person_name')
              ->find_one($note->id)->as_array());
