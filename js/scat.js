@@ -39,14 +39,6 @@ Scat.api= function (func, args, opts) {
 Scat.dialog= function (name) {
   var url= 'ui/' + name + '.html';
 
-  $.ajax({ url: url, cache: false }).done(function (html) {
-    var panel= $(html);
-
-    panel.on('hidden.bs.modal', function() {
-      $(this).remove();
-    });
-
-  });
   // XXX handle error
   return $.ajax({ url: url, cache: false });
   /*
