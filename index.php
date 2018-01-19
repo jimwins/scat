@@ -91,10 +91,6 @@ Txn.loadNumber= function(num) {
   Txn.callAndLoad('txn-load', { type: 'customer', number: num });
 }
 
-Txn.addNote= function(id, note, pub) {
-  Txn.callAndLoad('txn-add-note', { id: id, note: note, public: pub });
-}
-
 Txn.addPayment= function (id, options) {
   options.id= id;
   Txn.callAndLoad('txn-add-payment', options,
@@ -1224,35 +1220,7 @@ viewModel.reopenAllocated= function() {
 }
 
 viewModel.showNotes= function() {
-  Scat.dialog('show-notes').done(function (html) {
-    var panel= $(html);
-
-    var data= { notes: viewModel.notes() }
-    var dataModel= ko.mapping.fromJS(data);
-
-    dataModel.addNote= function(place, ev) {
-      var txn= Txn.id();
-      var note= $('input[name="note"]', place).val();
-      var pub= $('input[name="public"]', place).is(':checked') ? 1 : 0;
-
-      Txn.addNote(txn, note, pub);
-
-      $(place).closest('.modal').modal('hide');
-    }
-
-    ko.applyBindings(dataModel, panel[0]);
-
-    panel.on('hidden.bs.modal', function() {
-      $(this).remove();
-    });
-    panel.on('shown.bs.modal', function() {
-      $('input[name="note"]', this).focus();
-    });
-
-
-    panel.appendTo($('body')).modal();
-    $('input[name="note"]', panel).focus();
-  });
+  Scat.showNotes({ kind: 'txn', attach_id: Txn.id() });
 }
 
 viewModel.removeItem= function(item) {

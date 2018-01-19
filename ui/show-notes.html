@@ -9,26 +9,67 @@
         </h4>
       </div>
 
-      <div class="modal-body">
+      <table class="modal-body table table-striped">
+        <tbody style="display: block; max-height: 500px; overflow: auto"
+               data-bind="foreach: notes">
+          <tr data-bind="css: { active: $parent.parent_id() == $data.id },
+                         click: $parent.showChildren">
+            <td class="text-right" width="30%">
+              <div data-bind="text: moment($data.added).calendar()"></div>
+              <div data-bind="text: $data.person_name"></div>
+              <div data-bind="visible: $data.kind == 'txn' &&
+                                       $data.attach_id != $parent.attach_id()">
+                <a data-bind="attr: { href: './?id=' + $data.attach_id },
+                              text: ($data.txn_type == 'vendor' ? 'PO  '
+                                                                : 'Invoice ') +
+                                    $data.txn_name"></a>
+              </div>
+              <div data-bind="visible: $data.kind == 'person'">
+                <a data-bind="attr: { href: './person.php?id=' +
+                                            $data.attach_id },
+                              text: $data.about_name"></a>
+              </div>
+              <div data-bind="visible: $data.kind == 'item'">
+                <a data-bind="attr: { href: './item.php?id=' +
+                                            $data.attach_id },
+                              text: $data.item_name"></a>
+              </div>
+            </td>
+            <td width="65%">
+              <div data-bind="html: marked($data.content)"></div>
+              <div style="padding-left: 1em"
+                   data-bind="foreach: $data.kids">
+                <small style="margin-left: -0.5em"
+                       data-bind="text: moment($data.added).calendar()">
+                </small>
+                <div data-bind="html: marked($data.content)"></div>
+              </div>
+            </td>
+            <td width="5%" align="center">
+              <div data-bind="visible: $data.public == '1'">
+                <i class="fa fa-comment text-primary"></i>
+              </div>
+              <div>
+                <a href="#" data-bind="click: $parent.toggleTodo">
+                  <i class="fa fa-check-circle text-primary"
+                     data-bind="css: { 'fa-check-circle': $data.todo == '0',
+                                       'fa-circle text-danger': $data.todo == '1' }"></i>
+                </a>
+              </div>
+              <div class="badge" data-bind="text: $data.children"></div>
+            </td>
 
-        <dl class="dl-horizontal">
-          <!-- ko foreach: notes -->
-          <dt data-bind="text: $data.added"></dt>
-          <dd>
-            <span data-bind="visible: $data.public()"><i class="fa fa-comment" aria-hidden="true"></i></span>
-            <span data-bind="html: marked($data.content())"></span>
-          </dd>
-          <!-- /ko -->
-        </dl>
+          </tr>
+        </tbody>
 
-      </div>
+      </table>
 
       <form class="modal-footer form-inline"
             data-bind="submit: addNote" role="form">
         <div class="form-group">
           <div class="input-group">
             <input type="text" class="form-control"
-                   name="note"
+                   data-bind="value: content"
                    placeholder="Enter your comment..." size="500">
             <div class="input-group-btn">
               <button type="submit" class="btn btn-primary">Add</button>
@@ -36,8 +77,14 @@
           </div>
         </div>
         <div class="checkbox">
+          <span data-bind="text: parent_id() != '0' ? 'Replying...' : ''"></span>
           <label>
-            <input type="checkbox" name="public" value="1"> Public?
+            <input type="checkbox" data-bind="checked: todo">
+            Todo?
+          </label>
+          <label>
+            <input type="checkbox" data-bind="checked: public">
+            Public?
           </label>
         </div>
       </form>

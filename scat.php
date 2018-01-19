@@ -104,7 +104,11 @@ $(document).ready(function() {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <span class="navbar-brand"><i class="fa fa-barcode"></i> Scat</span>
+      <span id="show-notes" class="navbar-brand">
+        <i class="fa fa-barcode"></i>
+        Scat
+        <span class="badge"></span>
+      </span>
     </div>
     <div class="collapse navbar-collapse">
       <ul id="navbar" class="nav navbar-nav">
@@ -166,6 +170,103 @@ $("header #reports").on('click', function(ev) {
               }
             });
 });
+
+$("#show-notes").on('click', function(ev) {
+  Scat.showNotes({ todo: 1});
+});
+
+Scat.showNotes= function (options) {
+  Scat.dialog('show-notes').done(function (html) {
+    var panel= $(html);
+
+    var data= { notes: [], content: '', todo: 0, public: 0, parent_id: 0,
+                kind: 'general', attach_id: 0 }
+    $.extend(data, options);
+    var dataModel= ko.mapping.fromJS(data);
+
+    /* Load notes */
+    Scat.api('note-find', options)
+        .done(function (data) {
+          dataModel.notes(data);
+        });
+
+    dataModel.toggleTodo= function(place, ev) {
+      Scat.api('note-update', { id: place.id,
+                                todo: place.todo == '0' ? 1 : 0 })
+          .done(function (data) {
+            for (var i= 0; i < dataModel.notes().length; i++) {
+              if (place.id === dataModel.notes()[i].id) {
+                var note= dataModel.notes.splice(i, 1); // remove it
+                $.extend(note[0], data);
+                dataModel.notes.splice(i, 0, note[0]); // add the new one
+                return;
+              }
+            }
+          });
+    }
+
+    dataModel.showChildren= function(place, ev) {
+      if (dataModel.parent_id() == place.id) {
+        dataModel.parent_id(0);
+      } else {
+        dataModel.parent_id(place.id);
+      }
+
+      Scat.api('note-find', { parent_id: place.id, limit: place.children })
+          .done(function (data) {
+            for (var i= 0; i < dataModel.notes().length; i++) {
+              if (place.id === dataModel.notes()[i].id) {
+                var note= dataModel.notes.splice(i, 1); // remove it
+                note[0].kids= data;
+                note[0].children= note[0].kids.length;
+                dataModel.notes.splice(i, 0, note[0]); // add it back
+                return;
+              }
+            }
+          });
+    }
+
+    dataModel.addNote= function(place, ev) {
+      var data= ko.mapping.toJS(dataModel); 
+      data.todo= data.todo ? 1 : 0; // knockout 'checked' is annoying
+      data.public= data.public ? 1 : 0;
+      delete data.notes;
+
+      Scat.api('note-add', data)
+          .done(function (data) {
+            if (data.parent_id != '0') {
+              for (var i= 0; i < dataModel.notes().length; i++) {
+                if (data.parent_id == dataModel.notes()[i].id) {
+                  var note= dataModel.notes.splice(i, 1); // remove it
+                  note[0].kids.push(data);
+                  note[0].children= note[0].kids.length;
+                  dataModel.notes.splice(i, 0, note[0]); // add it back
+                  break;
+                }
+              }
+            } else {
+              dataModel.notes.unshift(data);
+              // TODO scroll new note into view?
+            }
+            // flush the input
+            dataModel.content(''); dataModel.public(0);
+          });
+
+      // $(place).closest('.modal').modal('hide');
+    }
+
+    ko.applyBindings(dataModel, panel[0]);
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+    panel.on('shown.bs.modal', function() {
+      $('input[type="text"]', this).focus();
+    });
+
+    panel.appendTo($('body')).modal();
+  });
+}
 </script>
 <div id="quick-report" class="modal fade">
   <div class="modal-dialog">
@@ -204,6 +305,14 @@ function foot() {
  <div id="time">Page generated in $time seconds.</div>
  <div id="status">&nbsp;</div>
 </footer>
+<script>
+$(function() {
+  Scat.api('note-count', { todo: 1})
+      .done(function(data) {
+        $('#show-notes .badge').text(data.notes);
+      });
+});
+</script>
 FOOTER;
 }
 
