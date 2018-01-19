@@ -129,6 +129,16 @@ include 'item-searchform.php';
     <div class="col-md-3">
     <div class="panel panel-default">
       <div class="panel-heading">
+        <div class="pull-right">
+          <button class="btn btn-default btn-xs"
+                  data-bind="click: function() {
+                                      Scat.showNotes({ kind: 'item',
+                                                       attach_id: item.id() })
+                                    }">
+            Notes
+            <span id="item-notes" class="badge"></span>
+          </button>
+        </div>
         <h3 class="panel-title">Inventory</h3>
       </div>
       <div class="panel-body">
@@ -700,4 +710,10 @@ function saveItemProperty(value, settings) {
             });
   return '<span><i class="fa fa-spinner fa-spin"></i></span>';
 }
+
+Scat.api('note-count', { kind: 'item', attach_id: model.item.id })
+    .done(function(data) {
+      $('#item-notes').text(data.notes);
+    });
+
 </script>

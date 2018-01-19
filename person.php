@@ -195,6 +195,14 @@ if (!$person) {
 <h2>
   Activity
   <button class="btn btn-default"
+          data-bind="click: function() {
+                              Scat.showNotes({ kind: 'person',
+                                               attach_id: person.id() })
+                            }">
+    Notes
+    <span id="person-notes" class="badge"></span>
+  </button>
+  <button class="btn btn-default"
           data-loading-text="Processing..."
           data-bind="click: createPurchaseOrder,
                      visible: person.role() == 'vendor'">
@@ -374,6 +382,11 @@ viewModel.sendMessage= function (place) {
 }
 
 ko.applyBindings(viewModel);
+
+Scat.api('note-count', { kind: 'person', attach_id: <?=(int)$person['id']?> })
+    .done(function(data) {
+      $('#person-notes').text(data.notes);
+    });
 
 function loadActivity(person, page) {
   viewModel.loading(1);
