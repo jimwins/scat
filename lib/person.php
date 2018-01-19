@@ -82,13 +82,18 @@ function person_load($db, $id, $options= null) {
   return $people[0];
 }
 
-function person_load_activity($db, $id, $page= 0) {
+function person_load_activity($db, $id, $page= 0, $page_size= 50) {
   $id= (int)$id;
 
-  $page_size= 50;
   $offset= $page * $page_size;
 
-  $q= "SELECT txn.type,
+  $limit= "";
+  if ($page_size) {
+    $limit= "LIMIT $offset, $page_size";
+  }
+
+  $q= "SELECT SQL_CALC_FOUND_ROWS
+              txn.type,
               CONCAT(txn.id, '|', type, '|', txn.number) AS number,
               txn.created,
               (SELECT SUM(ordered) * IF(txn.type = 'customer', -1, 1)
@@ -117,7 +122,7 @@ function person_load_activity($db, $id, $page= 0) {
         WHERE person = $id
         GROUP BY txn.id
         ORDER BY created DESC
-        LIMIT $offset, 50";
+        $limit";
 
   $r= $db->query($q);
 
