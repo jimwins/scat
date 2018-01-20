@@ -324,7 +324,7 @@ $q= "SELECT id AS meta,
             content AS Note
        FROM note
       WHERE kind = 'txn' AND attach_id = $id
-      ORDER BY entered ASC";
+      ORDER BY added ASC";
 dump_table($db->query($q));
 dump_query($q);
 ?>
