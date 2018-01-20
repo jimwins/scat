@@ -320,7 +320,7 @@ if (preg_match('/customer/', $txn['Number$txn'])) {
 
 echo '<h2>Notes</h2>';
 $q= "SELECT id AS meta,
-            entered AS Date,
+            added AS Date,
             content AS Note
        FROM note
       WHERE kind = 'txn' AND attach_id = $id
