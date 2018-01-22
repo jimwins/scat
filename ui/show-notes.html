@@ -12,8 +12,7 @@
       <table class="modal-body table table-striped">
         <tbody style="display: block; max-height: 500px; overflow: auto"
                data-bind="foreach: notes">
-          <tr data-bind="css: { active: $parent.parent_id() == $data.id },
-                         click: $parent.showChildren">
+          <tr data-bind="css: { active: $parent.parent_id() == $data.id }">
             <td class="text-right" width="30%">
               <div data-bind="text: moment($data.added).calendar()"></div>
               <div data-bind="text: $data.person_name"></div>
@@ -35,7 +34,7 @@
                               text: $data.item_name"></a>
               </div>
             </td>
-            <td width="65%">
+            <td width="65%" data-bind="click: $parent.showChildren">
               <div data-bind="html: marked($data.content)"></div>
               <div style="padding-left: 1em"
                    data-bind="foreach: $data.kids">
