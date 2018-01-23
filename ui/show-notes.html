@@ -34,10 +34,24 @@
                               text: $data.item_name"></a>
               </div>
             </td>
-            <td width="65%" data-bind="click: $parent.showChildren">
+            <td width="65%">
               <div data-bind="html: marked($data.content)"></div>
+              <div class="small"
+                   data-bind="visible: !$data.showingKids &&
+                                       $data.children != '0'">
+                <a href="#"
+                   data-bind="click: $parent.showChildren,
+                              text: 'View ' + $data.children +
+                                    ' repl' + ($data.children != '1' ?
+                                               'ies' : 'y')"></a>
+              </div>
+              <div class="small"
+                   data-bind="visible: $data.showingKids">
+                <a href="#"
+                  data-bind="click: $parent.hideChildren">Hide replies</a>
+              </div>
               <div style="padding-left: 1em"
-                   data-bind="foreach: $data.kids">
+                   data-bind="visible: $data.showingKids, foreach: $data.kids">
                 <small style="margin-left: -0.5em"
                        data-bind="text: moment($data.added).calendar() +
                                         ' ' +
@@ -45,6 +59,7 @@
                                          '(' + $data.person_name + ')' : '')">
                 </small>
                 <div data-bind="html: marked($data.content)"></div>
+                </div>
               </div>
             </td>
             <td width="5%" align="center">
@@ -58,7 +73,6 @@
                                        'fa-circle text-danger': $data.todo == '1' }"></i>
                 </a>
               </div>
-              <div class="badge" data-bind="text: $data.children"></div>
             </td>
 
           </tr>

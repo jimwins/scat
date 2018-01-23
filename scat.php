@@ -231,11 +231,25 @@ Scat.showNotes= function (options) {
                 var note= dataModel.notes.splice(i, 1); // remove it
                 note[0].kids= data;
                 note[0].children= note[0].kids.length;
+                note[0].showingKids= true;
                 dataModel.notes.splice(i, 0, note[0]); // add it back
                 return;
               }
             }
           });
+    }
+
+    dataModel.hideChildren= function(place, ev) {
+      dataModel.parent_id(0);
+
+      for (var i= 0; i < dataModel.notes().length; i++) {
+        if (place.id === dataModel.notes()[i].id) {
+          var note= dataModel.notes.splice(i, 1); // remove it
+          note[0].showingKids= false;
+          dataModel.notes.splice(i, 0, note[0]); // add it back
+          return;
+        }
+      }
     }
 
     dataModel.addNote= function(place, ev) {
