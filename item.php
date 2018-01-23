@@ -183,7 +183,7 @@ include 'item-searchform.php';
         <div class="pull-right">
           <!-- XXX base url should be config value -->
           <a class="btn btn-default btn-xs"
-             data-bind="attr: { href: 'http://rawm.us/' + item.code() }"
+             data-bind="attr: { href: '<?=ORDURE?>' + item.code() }"
              target="_blank">
             <i class="fa fa-external-link"></i>
             Website
