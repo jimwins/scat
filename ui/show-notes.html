@@ -67,11 +67,12 @@
                 <i class="fa fa-comment text-primary"></i>
               </div>
               <div>
-                <a href="#" data-bind="click: $parent.toggleTodo">
-                  <i class="fa fa-check-circle text-primary"
-                     data-bind="css: { 'fa-check-circle': $data.todo == '0',
-                                       'fa-circle text-danger': $data.todo == '1' }"></i>
-                </a>
+                <a href="#"
+                   class="label"
+                   data-bind="click: $parent.toggleTodo,
+                              text: $data.todo == '1' ?  'TODO' : 'DONE',
+                              css: { 'label-primary': $data.todo == '1',
+                                     'label-success': $data.todo == '0' }"></a>
               </div>
             </td>
 
