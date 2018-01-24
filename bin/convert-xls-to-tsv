@@ -15,7 +15,7 @@ foreach ($sheet->getRowIterator() as $row) {
   $cells= $row->getCellIterator();
   $cells->setIterateOnlyExistingCells(FALSE);
   foreach ($cells as $cell) {
-    echo $cell->getValue(), "\t";
+    echo $cell->getCalculatedValue(), "\t";
   }
   echo "\n";
 }
