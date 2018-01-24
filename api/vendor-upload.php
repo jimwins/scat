@@ -171,11 +171,12 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 
 } elseif (preg_match('/Golden Ratio/', $line)) {
   // Masterpiece
+  $sep= preg_match("/\t/", $line) ? "\t" : ",";
 
 #,SN,PK Sort,SKU Sort,,SKU,Golden Ratio,Size,Item Description,,,,,,,,,2016 Retail,Under $500 Net Order,Net $500 Order,Units Per Pkg,Pkgs Per Box,Weight,UPC,Freight Status,DIM. Weight,Est. Freight EACH,Est. Freight CASE
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE vendor_upload
-          FIELDS TERMINATED BY ','
+          FIELDS TERMINATED BY '$sep'
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 1 LINES
           (@x, @sn, @pk_sort, @sku_sort, @y,
@@ -189,7 +190,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
             retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
             net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
             promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', ''),
-            promo_quantty = purchase_quantity,
+            promo_quantity = purchase_quantity,
             name = IF(@size, CONCAT(@size, ' ', @description), @description)";
 
   $r= $db->query($q)
