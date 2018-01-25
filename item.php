@@ -181,7 +181,6 @@ include 'item-searchform.php';
     <div class="panel panel-default">
       <div class="panel-heading">
         <div class="pull-right">
-          <!-- XXX base url should be config value -->
           <a class="btn btn-default btn-xs"
              data-bind="attr: { href: '<?=ORDURE?>/' + item.code() }"
              target="_blank">
