@@ -88,9 +88,10 @@ if (count($items) == 1) {
                          LIMIT 1), 0.00), NULL, NULL";
 
     $q= "INSERT INTO txn_line (txn, item, ordered,
-                               retail_price, discount, discount_type, taxfree)
+                               retail_price, discount, discount_type,
+                               taxfree, tic)
          SELECT $txn_id AS txn, {$items[0]['id']} AS item,
-                $quantity AS ordered, $prices, taxfree
+                $quantity AS ordered, $prices, taxfree, tic
            FROM item WHERE id = {$items[0]['id']}";
     $r= $db->query($q);
     if (!$r) die_query($db, $q);

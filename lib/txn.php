@@ -16,7 +16,7 @@ function txn_load_full($db, $id) {
 }
 
 function txn_load($db, $id) {
-  $q= "SELECT id, type,
+  $q= "SELECT id, uuid, type,
               number, created, filled, paid, returned_from, special_order,
               no_rewards,
               IF(type = 'vendor' && YEAR(created) > 2013,
@@ -476,6 +476,13 @@ class Transaction {
   }
 }
 
+/* XXX add relationships, but just using these raw for now */
+
 class Txn extends Model {
-  /* XXX handle contents */
+}
+
+class TxnLine extends Model {
+}
+
+class Payment extends Model {
 }

@@ -360,6 +360,7 @@ DROP TABLE IF EXISTS `txn`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `txn` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(50) DEFAULT NULL,
   `number` int(10) unsigned NOT NULL,
   `created` datetime NOT NULL,
   `filled` datetime DEFAULT NULL,
@@ -372,6 +373,7 @@ CREATE TABLE `txn` (
   `no_rewards` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `type` (`type`,`number`),
+  UNIQUE KEY `uuid` (`uuid`),
   KEY `created` (`created`),
   KEY `person` (`person`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -398,6 +400,8 @@ CREATE TABLE `txn_line` (
   `discount` decimal(9,2) DEFAULT NULL,
   `discount_manual` tinyint(4) NOT NULL DEFAULT '0',
   `taxfree` tinyint(4) NOT NULL DEFAULT '0',
+  `tic` char(5) NOT NULL DEFAULT '00000',
+  `tax` decimal(9,3) NOT NULL DEFAULT '0.000',
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`,`line`),
   KEY `item` (`item`)
@@ -547,4 +551,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-18 19:55:18
+-- Dump completed on 2018-01-27 17:08:07

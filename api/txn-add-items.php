@@ -13,14 +13,14 @@ if ($txn_id) {
 }
 
 foreach ((array)$_REQUEST['items'] as $item) {
-  $q= "INSERT INTO txn_line (txn, item, ordered, retail_price, taxfree)
+  $q= "INSERT INTO txn_line (txn, item, ordered, retail_price, taxfree, tic)
        SELECT $txn_id AS txn, $item[0] AS item, $item[1] AS ordered,
               (SELECT IF(promo_price AND promo_price < net_price,
                          promo_price, net_price)
                  FROM vendor_item
                 WHERE item = $item[0] AND vendor = {$txn['person']}
                   AND vendor_item.active
-                ORDER BY id DESC LIMIT 1), taxfree
+                ORDER BY id DESC LIMIT 1), taxfree, tic
          FROM item WHERE id = $item[0]";
   $r= $db->query($q);
   if (!$r) die_query($db, $q);
