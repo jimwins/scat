@@ -34,7 +34,7 @@ function txn_load($db, $id) {
                    AS DECIMAL(9,2)) total,
               IFNULL(total_paid, 0.00) total_paid
         FROM (SELECT
-              txn.id, txn.type, txn.number,
+              txn.id, txn.uuid, txn.type, txn.number,
               txn.created, txn.filled, txn.paid,
               txn.returned_from, txn.special_order, txn.no_rewards,
               txn.person,
