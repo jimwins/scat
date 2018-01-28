@@ -47,6 +47,14 @@
                                                'ies' : 'y')"></a>
               </div>
               <div class="small"
+                   data-bind="visible: !$data.showingKids &&
+                                       $data.children == '0'">
+                <a href="#"
+                   data-bind="click: $parent.showChildren">
+                  Reply
+                </a>
+              </div>
+              <div class="small"
                    data-bind="visible: $data.showingKids">
                 <a href="#"
                   data-bind="click: $parent.hideChildren">Hide replies</a>
