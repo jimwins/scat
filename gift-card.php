@@ -48,12 +48,13 @@ head('Gift Cards', true);
     <thead>
       <tr>
         <th>Date</th>
+        <th>Transaction</th>
         <th>Amount</th>
       </tr>
     </thead>
     <tfoot>
       <tr>
-        <td align="right">
+        <td colspan="2" align="right">
           <strong>Balance:</strong>
         </td>
         <td data-bind="text: amount(balance)">
@@ -63,6 +64,10 @@ head('Gift Cards', true);
     <tbody data-bind="foreach: history">
       <tr>
         <td data-bind="text: $data.entered"></td>
+        <td>
+          <a data-bind="text: $data.txn_name,
+                        attr: { href: 'txn.php?id=' + $data.txn_id() }"></a>
+        </td>
         <td data-bind="text: Scat.amount($data.amount)"></td>
       </tr>
     </tbody>
