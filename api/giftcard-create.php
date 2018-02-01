@@ -1,42 +1,34 @@
 <?php
-
 include '../scat.php';
+include '../lib/giftcard.php';
 
 $balance= (float)$_REQUEST['balance'];
+$txn_id= (int)$_REQUEST['txn'];
 $expires= $_REQUEST['expires'];
+
+ORM::get_db()->beginTransaction();
+
+$card= Model::factory('Giftcard')->create();
+
+$card->set_expr('pin', 'SUBSTR(RAND(), 5, 4)');
 if ($expires) {
-  $expires= '"' . $db->escape($expires) . ' 23:59:59"';
-} else {
-  $expires= "NULL";
+  $card->expires= $expires . ' 23:59:59';
 }
+$card->active= 1;
 
-$q= "INSERT INTO giftcard 
-        SET pin = SUBSTR(RAND(), 5, 4),
-            expires = $expires,
-            active = 1";
-$r= $db->query($q);
-if (!$r) die(jsonp(array("error" => "Unable to create card.",
-                         "detail" => $db->error)));
+$card->save();
 
-$q= "SELECT CONCAT(id, pin) card, id, pin FROM giftcard
-      WHERE id = LAST_INSERT_ID()";
-$r= $db->query($q);
-if (!$r) die(jsonp(array("error" => "Unable to create card.",
-                         "detail" => $db->error)));
-$card= $r->fetch_assoc();
+/* Have to reload the card to make sure we have calculated values */
+$card= Model::factory('Giftcard')->find_one($card->id);
 
 if ($balance) {
-  $q= "INSERT INTO giftcard_txn
-          SET card_id = $card[id],
-              amount = $balance,
-              entered = NOW()";
-
-  $r= $db->query($q);
-  if (!$r) die(jsonp(array("error" => "Unable to add balance to card.",
-                                    "detail" => $db->error)));
+  $txn= $card->txns()->create();
+  $txn->amount= $balance;
+  $txn->card_id= $card->id;
+  if ($txn_id) $txn->txn_id= $txn_id;
+  $txn->save();
 }
 
-echo jsonp(array("card" => $card['card'],
-                 "balance" => sprintf("%.2f", $balance),
-                 "success" =>sprintf("Card activated with \$%.2f balance.",
-                                     $balance)));
+ORM::get_db()->commit();
+
+echo jsonp($card);

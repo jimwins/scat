@@ -110,9 +110,11 @@ DROP TABLE IF EXISTS `giftcard_txn`;
 CREATE TABLE `giftcard_txn` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `card_id` int(10) unsigned NOT NULL,
-  `entered` datetime NOT NULL,
+  `entered` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `amount` decimal(9,2) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `txn_id` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `txn_id` (`txn_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -551,4 +553,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-27 17:08:07
+-- Dump completed on 2018-01-31 18:21:17

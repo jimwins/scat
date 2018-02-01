@@ -1,45 +1,33 @@
 <?php
-
 include '../scat.php';
-
-$card= $db->real_escape_string($_REQUEST['card']);
-$card= preg_replace('/^RAW-/', '', $card);
+include '../lib/giftcard.php';
 
 $amount= (float)$_REQUEST['amount'];
 
 if (!$amount)
-  die(jsonp(array("error" => "No amount specified.")));
+  die_jsonp(array("error" => "No amount specified."));
 
-$q= "SELECT id, active
-       FROM giftcard
-      WHERE id = SUBSTRING('$card', 1, 7)
-        AND pin = SUBSTRING('$card',-4)";
-$r= $db->query($q);
-if (!$r) die(jsonp(array("error" => "Unable to check card info.",
-                         "detail" => $db->error)));
-$row= $r->fetch_row();
-if (!$r->num_rows || !$row[1]) {
-  die(jsonp(array("error" => "No such gift card is active.")));
+$txn_id= (int)$_REQUEST['txn'];
+
+$card= $_REQUEST['card'];
+$card= preg_replace('/^RAW-/', '', $card);
+
+$id= substr($card, 0, 7);
+$pin= substr($card, -4);
+
+$card= Model::factory('Giftcard')
+         ->where('id', $id)
+         ->where('pin', $pin)
+         ->find_one();
+
+if (!$card) {
+  die_jsonp(array("error" => "Unable to find that card."));
 }
-$card= $row[0];
 
-$q= "INSERT INTO giftcard_txn
-        SET card_id = $card, amount = $amount, entered = NOW()";
-$r= $db->query($q);
-if (!$r)
-  die(jsonp(array("error" => "Unable to add transaction to card.",
-                  "detail" => $db->error)));
+$txn= $card->txns()->create();
+$txn->amount= $amount;
+$txn->card_id= $card->id;
+if ($txn_id) $txn->txn_id= $txn_id;
+$txn->save();
 
-$q= "SELECT SUM(amount) FROM giftcard_txn WHERE card_id = $card";
-$r= $db->query($q);
-if (!$r)
-  die(jsonp(array("error" => "Unable to get card balance.",
-                  "detail" => $db->error)));
-$row= $r->fetch_row();
-$balance= $row[0];
-
-echo jsonp(array("success" =>
-                   sprintf("Transaction added, balance is now \$%.2f.",
-                           $balance),
-                   "balance" => $balance,
-                   "amount" => $amount));
+echo jsonp($card);
