@@ -823,7 +823,7 @@ $("#pay-gift-complete").on("click", "button[name='pay']", function (ev) {
   var amount= $("#pay-gift-complete .amount").val();
   var card= $("#pay-gift-complete").data('card');
   if (card) {
-    Scat.api('giftcard-add-txn', { card: card, amount: -amount })
+    Scat.api('giftcard-add-txn', { card: card, amount: -amount, txn: txn })
         .done(function (data) {
                 var balance= $("#pay-gift-complete").data('balance');
                 Txn.addPayment(txn, { method: "gift", amount: amount,
@@ -1401,7 +1401,7 @@ viewModel.showPoints= function(data, event) {
 }
 
 viewModel.createGiftCard= function(item) {
-  Scat.api('giftcard-create', { balance: item.msrp() })
+  Scat.api('giftcard-create', { balance: item.msrp(), txn: Txn.id() })
       .done(function (data) {
               // save to txn
               Txn.callAndLoad('txn-update-item',
