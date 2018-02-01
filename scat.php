@@ -321,7 +321,7 @@ Scat.showNotes= function (options) {
 <?if ($GLOBALS['DEBUG']) {?>
   <div id="corner-banner">DEBUG</div>
 <?}?>
-<div class="container">
+<div id="scat-page" class="container">
 <?
 }
 
