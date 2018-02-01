@@ -10,6 +10,8 @@ $card= $_REQUEST['card'];
 $balance= $_REQUEST['balance'];
 $issued= $_REQUEST['issued'];
 
+$issued= (new \Datetime($issued))->format('l, F j, Y');
+
 // initiate FPDI
 $pdf = new FPDI('P', 'in', array(8.5, 11));
 // add a page
