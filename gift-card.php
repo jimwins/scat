@@ -3,105 +3,151 @@ require 'scat.php';
 
 head('Gift Cards', true);
 ?>
-<form role="form">
-  <div class="form-group">
-    <label for="card">Card</label>
-    <input type="text" class="autofocus form-control" id="card"
-           placeholder="Scan or enter card">
+<div class="row">
+  <div class="col-sm-6">
+    <form data-bind="submit: checkGiftCard">
+      <div class="input-group">
+        <input type="text" class="autofocus form-control"
+               data-bind="value: card"
+               placeholder="Scan or enter card">
+        </input>
+        <span class="input-group-btn">
+          <button type="submit" class="btn btn-primary">
+            Check Card
+          </button>
+        </span>
+      </div>
+    </form>
   </div>
-  <div class="form-group">
-    <label for="expires">Expires</label>
-    <div class="input-daterange" id="datepicker">
-      <input type="text" class="form-control" id="expires" value="<?=ashtml($expires)?>" />
+
+  <div class="col-sm-6">
+    <div class="input-group input-daterange" id="datepicker">
+      <input type="text" class="form-control"
+             data-bind="value: expires"
+             placeholder="Expiration date (optional)">
+      <span class="input-group-btn">
+        <button type="button" class="btn btn-success"
+                data-bind="click: createGiftCard">
+          Create Card
+        </button>
+      </span>
     </div>
   </div>
-  <div class="form-group">
-    <label for="amount">Amount</label>
-    <input type="text" class="form-control" id="amount"
-           placeholder="$0.00">
-  </div>
-  <button id="check" type="submit" class="btn btn-primary">Check</button>
-  <button id="create" class="btn btn-default">Create</button>
-  <button id="add" class="btn btn-default">Add</button>
-  <button id="spend" class="btn btn-default">Spend</button>
-  <button id="print" class="btn btn-default">Print</button>
-</form>
+
+</div>
+
 <br>
-<div id="result" class="alert alert-success">
+
+<div class="panel panel-default" data-bind="visible: id() != ''">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      Gift Card
+    </h3>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tfoot>
+      <tr>
+        <td align="right">
+          <strong>Balance:</strong>
+        </td>
+        <td data-bind="text: amount(balance)">
+        </td>
+      </tr>
+    </tfoot>
+    <tbody data-bind="foreach: history">
+      <tr>
+        <td data-bind="text: $data.entered"></td>
+        <td data-bind="text: Scat.amount($data.amount)"></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="panel-footer">
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-primary"
+              data-bind="click: printGiftCard, disable: balance() <= 0">
+        Print
+      </button>
+    </div>
+    <div class="input-group col-sm-4">
+      <input type="text" class="form-control"
+             data-bind="value: updateAmount"
+             placeholder="$0.00">
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default"
+                data-action="add" data-bind="click: updateGiftCard">
+          Add
+        </button>
+        <button type="button" class="btn btn-default"
+                data-action="spend" data-bind="click: updateGiftCard">
+          Spend
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 $(function() {
+
+  var model= {
+    card: '', id: '',
+    expires: '', active: 0,
+    balance: 0, latest: '', history: [],
+    updateAmount: '',
+  };
+
+  var viewModel= ko.mapping.fromJS(model);
+
+  viewModel.checkGiftCard= function() {
+    Scat.api('giftcard-check-balance', { card: this.card() })
+        .done(function (data) {
+                ko.mapping.fromJS(data, viewModel);
+              });
+  }
+
+  viewModel.createGiftCard= function() {
+    Scat.api('giftcard-create', { expires: this.expires() })
+        .done(function (data) {
+                ko.mapping.fromJS(data, viewModel);
+              });
+  }
+
+  viewModel.printGiftCard= function() {
+    var lpr= $('<iframe id="giftcard-print" src="print/gift-card.php?card=' +
+               this.card() + '&amp;balance=' + this.balance() +
+               '&amp;issued=' + this.latest() + '"></iframe>').hide();
+    $("#giftcard-print").remove();
+    lpr.on("load", function() {
+      this.contentWindow.print();
+    });
+    $('body').append(lpr);
+  }
+
+  viewModel.updateGiftCard= function(place, ev) {
+    var action= $(ev.target).data('action');
+    Scat.api('giftcard-add-txn', { card: this.card(),
+                                   amount: (action == 'add' ? 1 : -1) *
+                                           this.updateAmount() })
+        .done(function (data) {
+                ko.mapping.fromJS(data, viewModel);
+                viewModel.updateAmount('');
+              });
+  }
+
+  ko.applyBindings(viewModel, document.getElementById('scat-page'));
+
   $('#datepicker').datepicker({
       format: "yyyy-mm-dd",
       todayHighlight: true
   });
-});
 
-$('#check').on('click', function() {
-  var card= $('#card').val();
-  Scat.api('giftcard-check-balance', { card: card })
-      .done(function (data) {
-              $('#result').text('');
-              if (data.balance != 0) {
-                $('#result').append('This card has a balance of ' + Scat.amount(data.balance) + (data.expires ? ' expires on ' + data.expires : '') + ' and was last used or credited on ' + data.latest + '.');
-              } else {
-                $('#result').append('This card is active, but has no balance.');
-              }
-            });
-  return false;
 });
-$('#create').on('click', function() {
-  var amount= $('#amount').val();
-  var expires= $('#expires').val();
-  Scat.api('giftcard-create', { balance: amount, expires: expires })
-      .done(function (data) {
-              $('#result').text('');
-              $('#result').append(data.success);
-              $('#amount').val(data.balance);
-              $('#card').val(data.card);
-            });
-  return false;
-});
-$('#add').on('click', function() {
-  var card= $('#card').val();
-  var amount= $('#amount').val();
-  Scat.api('giftcard-add-txn', { card: card, amount: amount })
-      .done(function (data) {
-              $('#result').text('');
-              $('#result').append(data.success);
-            });
-  return false;
-});
-$('#spend').on('click', function() {
-  var card= $('#card').val();
-  var amount= $('#amount').val();
-  Scat.api('giftcard-add-txn', { card: card, amount: -amount })
-      .done(function (data) {
-              $('#result').text('');
-              $('#result').append(data.success);
-            });
-  return false;
-});
-$('#print').on('click', function() {
-  var card= $('#card').val();
-  Scat.api('giftcard-check-balance', { card: card })
-      .done(function (data) {
-              $('#result').text('');
-              printGiftCard(data.card, data.balance, data.latest);
-              $('#result').append('Card printed showing $' + data.balance + ' balance.');
-            });
-  return false;
-});
-function printGiftCard(card, balance, issued) {
-  var lpr= $('<iframe id="giftcard" src="print/gift-card.php?card=' + card + '&amp;balance=' + balance + '&amp;issued=' + issued + '"></iframe>').hide();
-  $("#giftcard").remove();
-  lpr.on("load", function() {
-    this.contentWindow.print();
-  });
-  $('body').append(lpr);
-  return false;
-}
 </script>
 <?
 foot();
