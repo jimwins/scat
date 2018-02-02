@@ -79,6 +79,7 @@ foreach ($sales as $summary) {
       $txn_line->txn= $txn->id;
       $txn_line->item= $item->item_id;
       $txn_line->ordered= $txn_line->allocated= -1 * ($item->quantity);
+      $txn_line->override_name= $item->override_name;
       $txn_line->retail_price= $item->retail_price;
       $txn_line->discount_type= $item->discount_type;
       $txn_line->discount= $item->discount;
