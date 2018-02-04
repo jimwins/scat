@@ -2,151 +2,241 @@
 include 'scat.php';
 
 head("Till @ Scat", true);
-
-$q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) FROM payment
-      WHERE method IN ('cash','change','withdrawal')";
-$current= $db->get_one($q)
-  or die($db->error);
-
-$q= "SELECT created FROM txn
-      WHERE type = 'drawer'
-      ORDER BY id DESC
-      LIMIT 1";
-$last_txn= $db->get_one($q)
-  or die($db->error);
-
-$q= "SELECT COUNT(*)
-       FROM payment
-      WHERE method = 'check' AND processed > '$last_txn'";
-$checks= $db->get_one($q);
-
-$count= $_REQUEST['count'];
-$withdrawal= $_REQUEST['withdrawal'];
-
-if (!empty($count) && !empty($withdrawal)) {
-  $q= "START TRANSACTION";
-  $r= $db->query($q)
-    or die($db->error);
-
-  $q= "SELECT MAX(number) + 1 FROM txn WHERE type = 'drawer'";
-  $r= $db->query($q)
-    or die($db->error);
-  $row= $r->fetch_row();
-  $number= $row[0];
-
-  $q= "INSERT INTO txn
-          SET number= $number,
-              created = NOW(), filled = NOW(), paid = NOW(),
-              type= 'drawer', tax_rate= 0.0";
-  $r= $db->query($q)
-    or die($db->error);
-  $txn= $db->insert_id;
-
-  if ($count != $current) {
-    $amount= $count - $current;
-    $q= "INSERT INTO payment
-            SET txn = $txn,
-                processed = NOW(),
-                method = 'cash',
-                amount = $amount";
-    $r= $db->query($q)
-      or die($db->error);
-  }
-
-  if ($withdrawal) {
-    $q= "INSERT INTO payment
-            SET txn = $txn,
-                processed = NOW(),
-                method = 'withdrawal',
-                amount = -$withdrawal";
-    $r= $db->query($q)
-      or die($db->error);
-  }
-
-  $db->commit()
-    or die($db->error);
-
-  $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) FROM payment
-        WHERE method IN ('cash','change','withdrawal')";
-  $current= $db->get_one($q)
-    or die($db->error);
-
-  ?>
-<div class="error">Till update successful!</div>
-<script>
-  var lpr= $('<iframe id="receipt" src="print/deposit-slip.php?print=1&amp;id=<?=$txn?>"></iframe>').hide();
-  $("#receipt").remove();
-  $('body').append(lpr);
-</script>
-  <?
-}
 ?>
-<form class="form-horizontal" method="post" action="./till.php">
-  <div class="form-group">
-    <label for="expected" class="col-sm-2 control-label">Expected</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" disabled
-             id="expected" data-bind="value: amount(expected())">
+<div class="col-sm-6">
+  <form class="form-horizontal" data-bind="submit: saveCount">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Till Count</h3>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="expected" class="col-sm-2 control-label">Expected</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" disabled
+                   id="expected" data-bind="value: amount(expected())">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="counted" class="col-sm-2 control-label">Counted</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control"
+                   id="counted" name="count" data-bind="value: current">
+          </div>
+        </div>
+        <div class="form-group"
+             data-bind="css: { 'has-error' : overshort() < 0 }">
+          <label for="overshort" class="col-sm-2 control-label">
+            Over/(Short)
+          </label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" disabled
+                   id="overshort" data-bind="value: amount(overshort())">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="withdraw" class="col-sm-2 control-label">
+            Withdrawal
+          </label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control"
+                   id="withdraw" name="withdrawal" data-bind="value: withdraw"
+                   placeholder="$0.00">
+          </div>
+        </div>
+        <div class="form-group"
+             data-bind="css: { 'has-error' : remaining() < 0 }">
+          <label for="remaining" class="col-sm-2 control-label">
+            Remaining
+          </label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" disabled
+                   id="remaining" data-bind="value: amount(remaining())">
+          </div>
+        </div>
+        <div data-bind="visible: checks, text: checks_pending"></div>
+      </div>
+      <div class="panel-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
     </div>
-  </div>
-  <div class="form-group">
-    <label for="counted" class="col-sm-2 control-label">Counted</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control"
-             id="counted" name="count" data-bind="value: current">
-    </div>
-  </div>
-  <div class="form-group" data-bind="css: { 'has-error' : overshort() < 0 }">
-    <label for="overshort" class="col-sm-2 control-label">Over/Short</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" disabled
-             id="overshort" data-bind="value: amount(overshort())">
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="withdraw" class="col-sm-2 control-label">Withdrawal</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control"
-             id="withdraw" name="withdrawal" data-bind="value: withdraw">
-    </div>
-  </div>
-  <div class="form-group" data-bind="css: { 'has-error' : remaining() < 0 }">
-    <label for="remaining" class="col-sm-2 control-label">Remaining</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" disabled
-             id="remaining" data-bind="value: amount(remaining())">
-    </div>
-  </div>
-  <div data-bind="visible: checks, text: checks_pending"></div>
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-      <button type="submit" class="btn btn-primary">Kaching</button>
-    </div>
-  </div>
-</form>
+  </form>
 
+  <form class="form-horizontal" data-bind="submit: withdrawPettyCash">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Petty Cash</h3>
+      </div>
+      <div class="panel-body form-horizontal">
+        <div class="form-group">
+          <label for="withdraw" class="col-sm-2 control-label">
+            Withdrawal
+          </label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control"
+                   id="withdraw" name="withdrawal" data-bind="value: withdraw"
+                   placeholder="$0.00">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reason" class="col-sm-2 control-label">
+            Reason
+          </label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control"
+                   id="withdraw" name="withdrawal" data-bind="value: reason"
+                   placeholder="Reason for withdrawing petty cash.">
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <button type="submit" class="btn btn-primary">
+          Process
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="col-sm-5">
+  <form class="form" data-bind="submit: printChange">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Change Order</h3>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="col-sm-3">Quantity</th>
+            <th class="col-sm-6">Type</th>
+            <th class="col-sm-3">Total</th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: changeTypes">
+          <tr>
+            <td>
+              <input type="number" size="4" class="form-control"
+                     data-bind="attr: { step: $data.step },
+                                value: $data.quantity">
+            </td>
+            <td data-bind="text: $data.label">$5 bills</td>
+            <td data-bind="text: amount($data.quantity() * $data.value)">
+              $0.00
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2" align="right">Total:</td>
+            <td data-bind="text: amount(totalChange)"></td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="panel-footer">
+        <button type="submit" class="btn btn-primary">
+          Print
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
 <script>
-var tillModel= function(expected, checks) {
-  this.expected= ko.observable(expected);
-  this.current= ko.observable(expected);
-  this.withdraw= ko.observable(0.00);
-  this.checks= ko.observable(checks);
+var tillModel= function() {
+  var self= this;
 
-  this.overshort= ko.computed(function() {
-    return (this.current() - this.expected()).toFixed(2);
-  }, this);
+  self.expected= ko.observable(0);
+  self.current= ko.observable(0);
+  self.withdraw= ko.observable(null);
+  self.checks= ko.observable(0);
+  self.reason= ko.observable('');
 
-  this.remaining= ko.computed(function() {
-    return (this.current() - this.withdraw()).toFixed(2);
-  }, this);
+  self.overshort= ko.computed(function() {
+    return (self.current() - self.expected()).toFixed(2);
+  });
 
-  this.checks_pending= ko.computed(function() {
-    return "(" + this.checks() + " check" + ((this.checks() > 1) ? 's' : '')
+  self.remaining= ko.computed(function() {
+    return (self.current() - self.withdraw()).toFixed(2);
+  });
+
+  self.checks_pending= ko.computed(function() {
+    return "(" + self.checks() + " check" + ((self.checks() > 1) ? 's' : '')
            + " pending)";
-  }, this);
+  });
+
+  self.saveCount= function (place, ev) {
+    Scat.api('till-count', { count: self.current(),
+                             withdrawal: self.withdraw() })
+        .done(function (data) {
+          self.reset();
+          self.printDepositSlip(data.txn_id);
+        });
+  }
+
+  self.printDepositSlip= function(txn_id) {
+    var lpr= $('<iframe id="receipt" src="print/deposit-slip.php?print=1&amp;'+
+               'id=' + txn_id + '"></iframe>').hide();
+    $("#receipt").remove();
+    $('body').append(lpr);
+  }
+
+  self.changeTypes= ko.observableArray([
+   { name: 'fives', label: '$5 bills', value: 5.00, step: 20, quantity: ko.observable(0) },
+   { name: 'ones', label: '$1 bills', value: 1.00, step: 25, quantity: ko.observable(0) },
+   { name: 'quarters', label: 'Rolls of Quarters', value: 10.00, step: 1, quantity: ko.observable(0) },
+   { name: 'dimes', label: 'Rolls of Dimes', value: 5.00, step: 1, quantity: ko.observable(0) },
+   { name: 'nickels', label: 'Rolls of Nickels', value: 2.00, step: 1, quantity: ko.observable(0) },
+   { name: 'pennies', label: 'Rolls of Pennies', value: 0.50, step: 1, quantity: ko.observable(0) },
+  ]);
+
+  self.totalChange= ko.computed(function() {
+    return self.changeTypes().reduce(function (sum, cur) {
+                                     return sum + (cur.quantity() * cur.value)
+                                   }, 0);
+  });
+
+  self.printChange= function (place, ev) {
+    var types= self.changeTypes().filter(function (el) {
+                                    return el.quantity() > 0
+                                 })
+                                 .map(function (el) {
+                                   return {
+                                     quantity: el.quantity(),
+                                     label: el.label,
+                                     total: (el.quantity() * el.value)
+                                   };
+                                 });
+
+    var lpr= $('<iframe id="receipt" src="print/change-order.php?print=1&amp;'+
+               $.param({ types: types }) + '"></iframe>').hide();
+    $("#receipt").remove();
+    $('body').append(lpr);
+  };
+
+  self.withdrawPettyCash= function (place, ev) {
+    Scat.api('till-withdraw', { reason: self.reason(),
+                                amount: self.withdraw() })
+        .done(function (data) {
+          displayError(data.message);
+          self.reset();
+        });
+  }
+
+  self.reset= function () {
+    Scat.api('till-load')
+        .done(function (data) {
+          self.expected(data.current);
+          self.checks(data.checks);
+          /* Reset inputs */
+          self.current(self.expected());
+          self.withdraw(null);
+          self.reason(null);
+        });
+  }
 };
 
-ko.applyBindings(new tillModel(<?=$current.','.(int)$checks?>));
+var till= new tillModel();
+ko.applyBindings(till);
+till.reset();
 </script>
 <?
 foot();
