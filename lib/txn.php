@@ -17,7 +17,7 @@ function txn_load_full($db, $id) {
 
 function txn_load($db, $id) {
   $q= "SELECT id, uuid, type,
-              number, created, filled, paid, returned_from, special_order,
+              number, created, filled, paid, returned_from,
               no_rewards,
               IF(type = 'vendor' && YEAR(created) > 2013,
                  CONCAT(SUBSTRING(YEAR(created), 3, 2), number),
@@ -36,7 +36,7 @@ function txn_load($db, $id) {
         FROM (SELECT
               txn.id, txn.uuid, txn.type, txn.number,
               txn.created, txn.filled, txn.paid,
-              txn.returned_from, txn.special_order, txn.no_rewards,
+              txn.returned_from, txn.no_rewards,
               txn.person,
               CONCAT(IFNULL(person.name, ''),
                      IF(person.name != '' AND person.company != '', ' / ', ''),
@@ -71,7 +71,6 @@ function txn_load($db, $id) {
   $txn['subtotal']= (float)$txn['subtotal'];
   $txn['total']= (float)$txn['total'];
   $txn['total_paid']= (float)$txn['total_paid'];
-  $txn['special_order']= (int)$txn['special_order'];
   $txn['no_rewards']= (int)$txn['no_rewards'];
 
   return $txn;
@@ -211,7 +210,7 @@ function txn_apply_discounts($db, $id) {
       list($discount, $flags)= explode(',', $discount);
       if ($qty != 'type' &&
           $count >= $qty &&
-          ($flags != 'SO' || $txn['special_order']) &&
+          ($flags != 'SO') && // XXX apply special order discounts to quotes?
           (!$new_discount || $discount < $new_discount)) {
         $new_discount= $discount;
       }

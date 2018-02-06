@@ -21,7 +21,7 @@ if ($_REQUEST['unpaid']) {
   $criteria[]= "txn.paid IS NULL";
 }
 if ($_REQUEST['active']) {
-  $criteria[]= "txn.paid IS NULL OR txn.special_order";
+  $criteria[]= "txn.paid IS NULL";
 }
 
 if (empty($criteria)) {

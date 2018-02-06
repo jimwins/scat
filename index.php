@@ -198,15 +198,6 @@ Txn.askAboutTaxExemption= function(person) {
   }
 }
 
-Txn.isSpecialOrder = function() {
-  return viewModel.txn.special_order ?
-           viewModel.txn.special_order() : undefined;
-}
-
-Txn.setSpecialOrder= function(txn, special) {
-  Txn.callAndLoad('txn-update', { txn: txn, special_order: special ? 1 : 0 });
-}
-
 Txn.choosePayMethod= function() {
   Scat.dialog('pay-choose-method').done(function (html) {
     var panel= $(html);
@@ -622,14 +613,10 @@ $("#txn-load").submit(function(ev) {
 <script>
 $(".pay-button").on("click", function() {
   var txn= Txn.id();
-  if (!Txn.isSpecialOrder()) {
-    Txn.callAndLoad('txn-allocate', { txn: txn })
-        .done(function (data) {
-          Txn.choosePayMethod();
-        });
-    } else {
-      Txn.choosePayMethod();
-    }
+  Txn.callAndLoad('txn-allocate', { txn: txn })
+      .done(function (data) {
+        Txn.choosePayMethod();
+      });
 });
 
 $(".return-button").on("click", function() {
@@ -905,7 +892,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
 </script>
       <div id="details" class="col-md-6 col-md-pull-6">
         <div style="font-size: larger; font-weight: bold">
-          <span data-bind="text: description, click: toggleSpecialOrder">
+          <span data-bind="text: description">
             New Sale
           </span>
           <button class="btn btn-xs btn-link"
@@ -1125,7 +1112,6 @@ var model= {
     paid: null,
     number: 0,
     formatted_number: 0,
-    special_order: 0,
     no_rewards: 0,
     type: '',
   },
@@ -1157,9 +1143,8 @@ var viewModel= ko.mapping.fromJS(model);
 viewModel.description= ko.computed(function() {
   if (!viewModel.txn.created()) { return "New Sale"; }
   var type= (viewModel.txn.type() == 'vendor' ? 'PO' :
-             (viewModel.txn.special_order() ? 'Special Order' :
               (viewModel.txn.total_paid() ? 'Invoice' :
-               (viewModel.txn.returned_from() ? 'Return' : 'Sale'))));
+               (viewModel.txn.returned_from() ? 'Return' : 'Sale')));
   return type + ' ' + viewModel.txn.formatted_number();
 }, viewModel);
 
@@ -1229,18 +1214,12 @@ viewModel.removeItem= function(item) {
   Txn.removeItem(txn, item.line_id());
 }
 
-viewModel.toggleSpecialOrder= function(item) {
-  var txn= Txn.id();
-  if (!txn) return;
-  Txn.setSpecialOrder(txn, !Txn.isSpecialOrder());
-}
-
 viewModel.loadOrder= function(order) {
   Txn.loadId(order.id());
 }
 
 viewModel.showAllocated= function() {
-  return (viewModel.txn.special_order() || viewModel.txn.type() == 'vendor');
+  return (viewModel.txn.type() == 'vendor');
 }
 
 viewModel.changePerson= function(data, event) {
