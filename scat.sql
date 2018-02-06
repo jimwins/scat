@@ -239,7 +239,8 @@ CREATE TABLE `payment` (
   `discount` decimal(9,2) DEFAULT NULL,
   `processed` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `txn` (`txn`)
+  KEY `txn` (`txn`),
+  KEY `processed` (`processed`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
