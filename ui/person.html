@@ -62,6 +62,14 @@
       </div>
 
       <div class="modal-footer">
+        <div class="pull-left" data-bind="if: id">
+          <button type="button" class="btn btn-default"
+             data-bind="click: function () {
+               window.location.href= 'person.php?id=' + id()
+             }">
+            View
+          </button>
+        </div>
         <button type="button" class="btn btn-default" data-dismiss="modal">
           Close
         </button>
