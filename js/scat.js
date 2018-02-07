@@ -72,6 +72,21 @@ Scat.dialog= function (name) {
   */
 }
 
+Scat.print= function(name, options) {
+  $('#scat-print').remove();
+
+  var url= 'print/' + name + '.php?' + $.param(options);
+  var lpr= $('<iframe id="scat-print" src="' + url + '"></iframe>').hide();
+
+  lpr.on("load", function() {
+    this.contentWindow.print();
+  });
+
+  $('body').append(lpr);
+
+  return false;
+}
+
 function play(type) {
   var sounds = {
     'yes' : 'Pop',

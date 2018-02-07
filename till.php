@@ -173,10 +173,7 @@ var tillModel= function() {
   }
 
   self.printDepositSlip= function(txn_id) {
-    var lpr= $('<iframe id="receipt" src="print/deposit-slip.php?print=1&amp;'+
-               'id=' + txn_id + '"></iframe>').hide();
-    $("#receipt").remove();
-    $('body').append(lpr);
+    Scat.print('deposit-slip', { id: txn_id });
   }
 
   self.changeTypes= ko.observableArray([
@@ -206,10 +203,7 @@ var tillModel= function() {
                                    };
                                  });
 
-    var lpr= $('<iframe id="receipt" src="print/change-order.php?print=1&amp;'+
-               $.param({ types: types }) + '"></iframe>').hide();
-    $("#receipt").remove();
-    $('body').append(lpr);
+    Scat.print('change-order', { types: types });
   };
 
   self.withdrawPettyCash= function (place, ev) {

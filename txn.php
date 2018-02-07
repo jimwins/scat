@@ -267,9 +267,7 @@ if ($txn['meta'] == 'customer') {
 <button id="receipt" class="btn btn-default">Print Receipt</button>
 <script>
 $("#receipt").on('click', function() {
-  var lpr= $('<iframe id="receipt" src="print/receipt.php?print=1&amp;id=<?=$id?>"></iframe>').hide();
-  $(this).children("#receipt").remove();
-  $(this).append(lpr);
+  Scat.print('receipt', { id: <?=$id?> });
 });
 </script>
 <?
@@ -282,12 +280,7 @@ if ($txn['txn']['type'] == 'vendor') {
 </button>
 <script>
 $("#print-product-labels").on('click', function() {
-  var lpr= $('<iframe id="receipt" src="print/labels-product.php?print=1&amp;id=<?=$id?>"></iframe>').hide();
-  $(this).children("#receipt").remove();
-  $(this).append(lpr);
-  lpr.on('load', function (ev) {
-    window.frames['receipt'].print()
-  });
+  Scat.print('labels-product', { id: <?=$id?> });
 });
 </script>
 <button id="export-order" class="btn btn-default">

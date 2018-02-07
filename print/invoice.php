@@ -18,9 +18,6 @@ $fn= (($details['type'] == 'vendor') ? 'PO' : 'I') .
  <title><?=ashtml($fn)?></title>
  <link href="style.css" rel="stylesheet" type="text/css">
 </head>
-<?if ($_GET['print']) {?>
-<body onload="window.print()">
-<?}?>
 <div id="store_name">Raw Materials Art Supplies</div>
 <div id="doc_header">
  <div id="doc_info">

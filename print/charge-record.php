@@ -1,9 +1,6 @@
 <?
 require '../scat.php';
 ?>
-<?if ($_GET['print']) {?>
-<body onload="window.print()">
-<?}?>
 <style type="text/css">
 body {
   font:28px Monaco, monospace;

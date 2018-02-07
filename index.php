@@ -331,10 +331,7 @@ function printReceipt() {
     displayError("No sale to print.");
     return false;
   }
-  var lpr= $('<iframe id="receipt" src="print/receipt.php?print=1&amp;id=' + txn + '"></iframe>').hide();
-  $("#receipt").remove();
-  $('body').append(lpr);
-  return false;
+  return Scat.print('receipt', { id: txn });
 }
 
 function printInvoice() {
@@ -343,10 +340,7 @@ function printInvoice() {
     displayError("No sale to print.");
     return false;
   }
-  var lpr= $('<iframe id="receipt" src="print/invoice.php?print=1&amp;id=' + txn + '"></iframe>').hide();
-  $("#receipt").remove();
-  $('body').append(lpr);
-  return false;
+  return Scat.print('invoice', { id: txn });
 }
 
 function emailInvoice() {
@@ -363,10 +357,7 @@ function emailInvoice() {
 }
 
 function printChargeRecord(id) {
-  var lpr= $('<iframe id="receipt" src="print/charge-record.php?print=1&amp;id=' + id + '"></iframe>').hide();
-  $("#receipt").remove();
-  $('body').append(lpr);
-  return false;
+  return Scat.print('charge-record', { id: id });
 }
 
 $(function() {
@@ -1393,11 +1384,9 @@ viewModel.createGiftCard= function(item) {
 viewModel.printGiftCard= function(item) {
   Scat.api('giftcard-check-balance', { card: item.data.card() })
       .done(function (data) {
-              var lpr= $('<iframe id="giftcard" src="print/gift-card.php?card=' + data.card + '&amp;balance=' + data.balance + '&amp;issued=' + data.latest + '"></iframe>').hide();
-              lpr.on("load", function() {
-                this.contentWindow.print();
-              });
-              $('body').append(lpr);
+              Scat.print('gift-card', { card: data.card,
+                                        balance: data.balance,
+                                        issued: data.latest });
             });
 }
 

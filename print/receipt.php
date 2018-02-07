@@ -2,9 +2,6 @@
 require '../scat.php';
 require '../lib/txn.php';
 ?>
-<?if ($_GET['print']) {?>
-<body onload="window.print()">
-<?}?>
 <style type="text/css">
 body {
   font:28px Monaco, monospace;

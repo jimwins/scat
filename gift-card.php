@@ -124,14 +124,9 @@ $(function() {
   }
 
   viewModel.printGiftCard= function() {
-    var lpr= $('<iframe id="giftcard-print" src="print/gift-card.php?card=' +
-               this.card() + '&amp;balance=' + this.balance() +
-               '&amp;issued=' + this.latest() + '"></iframe>').hide();
-    $("#giftcard-print").remove();
-    lpr.on("load", function() {
-      this.contentWindow.print();
-    });
-    $('body').append(lpr);
+    Scat.print('gift-card', { card: this.card(),
+                              balance: this.balance(),
+                              issued: this.latest() });
   }
 
   viewModel.updateGiftCard= function(place, ev) {
