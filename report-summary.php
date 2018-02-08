@@ -9,11 +9,16 @@ if (!$date) {
 }
 
 $q= "SELECT SUM(taxed + untaxed) AS sales,
-            SUM(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)) AS tax,
-            SUM(ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed)
+            SUM(IF(uuid,
+                   tax,
+                   ROUND_TO_EVEN(taxed * (tax_rate / 100), 2))) AS tax,
+            SUM(IF(uuid,
+                   untaxed + taxed + tax,
+                   ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed))
               AS total
        FROM (SELECT 
                     filled,
+                    txn.uuid,
                     CAST(ROUND_TO_EVEN(
                       SUM(IF(txn_line.taxfree, 1, 0) *
                         IF(type = 'customer', -1, 1) * ordered *
@@ -30,6 +35,7 @@ $q= "SELECT SUM(taxed + untaxed) AS sales,
                                    txn_line.discount)),
                       2) AS DECIMAL(9,2))
                     AS taxed,
+                    SUM(tax) AS tax,
                     tax_rate
                FROM txn
                LEFT JOIN txn_line ON (txn.id = txn_line.txn)

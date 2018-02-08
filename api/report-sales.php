@@ -50,12 +50,16 @@ default:
 
 $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
             SUM(taxed + untaxed) AS total,
-            SUM(IF(tax_rate, 0, taxed + untaxed)) AS resale,
-            SUM(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)) AS tax,
-            SUM(ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed)
+            SUM(IF(tax_rate OR uuid, 0, taxed + untaxed)) AS resale,
+            SUM(IF(uuid, tax,
+                   ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)))
+              AS tax,
+            SUM(IF(uuid, untaxed + taxed + tax,
+                   ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed))
               AS total_taxed,
             MIN(DATE(filled)) AS raw_date
        FROM (SELECT 
+                    txn.uuid,
                     filled,
                     CAST(ROUND_TO_EVEN(
                       SUM(IF(txn_line.taxfree, 1, 0) *
@@ -73,7 +77,8 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
                                    txn_line.discount)),
                       2) AS DECIMAL(9,2))
                     AS taxed,
-                    tax_rate
+                    tax_rate,
+                    SUM(tax) AS tax
                FROM txn
                LEFT JOIN txn_line ON (txn.id = txn_line.txn)
                     JOIN item ON (txn_line.item = item.id)

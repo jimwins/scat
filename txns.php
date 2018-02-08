@@ -22,7 +22,7 @@ if ($_REQUEST['unpaid']) {
   $criteria[]= "txn.paid IS NULL";
 }
 if ($_REQUEST['untaxed']) {
-  $criteria[]= "txn.tax_rate = 0";
+  $criteria[]= "txn.tax_rate = 0 AND txn.uuid IS NULL";
 }
 
 if ($_REQUEST['total']) {
@@ -76,13 +76,15 @@ $q= "SELECT meta, Number\$txn,
             Created\$date, Filled\$date,
             Person\$person,
             Ordered, Allocated,
-            CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
-                 AS DECIMAL(9,2))
+            IF(uuid, untaxed + taxed + tax,
+               CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
+                    AS DECIMAL(9,2)))
             Total\$dollar,
             Paid\$dollar, Paid\$date
       FROM (SELECT
             txn.type AS meta,
             CONCAT(txn.id, '|', type, '|', txn.number) AS Number\$txn,
+            txn.uuid,
             txn.created AS Created\$date,
             txn.filled AS Filled\$date,
             CONCAT(txn.person, '|', IFNULL(person.company,''),
@@ -104,6 +106,7 @@ $q= "SELECT meta, Number\$txn,
               2) AS DECIMAL(9,2))
             taxed,
             tax_rate,
+            SUM(tax) AS tax,
             CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
                  AS DECIMAL(9,2)) AS Paid\$dollar,
             txn.paid AS Paid\$date

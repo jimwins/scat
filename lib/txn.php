@@ -28,10 +28,14 @@ function txn_load($db, $id) {
               taxed, untaxed,
               CAST(tax_rate AS DECIMAL(9,2)) tax_rate, 
               taxed + untaxed subtotal,
-              CAST(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)
-                   AS DECIMAL(9,2)) tax,
-              CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
-                   AS DECIMAL(9,2)) total,
+              IF(uuid, /* Tax calculated per-line */
+                 tax,
+                 CAST(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)
+                      AS DECIMAL(9,2))) AS tax,
+              IF(uuid, 
+                 taxed + untaxed + tax,
+                 CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
+                      AS DECIMAL(9,2))) total,
               IFNULL(total_paid, 0.00) total_paid
         FROM (SELECT
               txn.id, txn.uuid, txn.type, txn.number,
@@ -57,6 +61,7 @@ function txn_load($db, $id) {
                 2) AS DECIMAL(9,2))
               taxed,
               tax_rate,
+              SUM(tax) AS tax,
               CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
                    AS DECIMAL(9,2)) AS total_paid
          FROM txn

@@ -14,12 +14,14 @@ $q= "SELECT id, type, created,
             taxed, untaxed,
             CAST(tax_rate AS DECIMAL(9,2)) tax_rate, 
             taxed + untaxed subtotal,
-            CAST(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)
-                 AS DECIMAL(9,2)) tax,
-            CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
-                 AS DECIMAL(9,2)) total
+            IF(uuid, tax,
+               CAST(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)
+                    AS DECIMAL(9,2))) tax,
+            IF(uuid, untaxed + taxed + tax,
+               CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
+                    AS DECIMAL(9,2))) total
       FROM (SELECT
-            txn.id, txn.type, txn.number,
+            txn.id, txn.uuid, txn.type, txn.number,
             txn.created, txn.filled, txn.paid,
             SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS ordered,
             SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS allocated,
@@ -35,7 +37,8 @@ $q= "SELECT id, type, created,
                 sale_price(retail_price, discount_type, discount)),
               2) AS DECIMAL(9,2))
             taxed,
-            tax_rate
+            tax_rate,
+            SUM(tax) AS tax
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)
       WHERE (type = 'correction' AND created BETWEEN $range)

@@ -984,7 +984,9 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
     </tr>
     <tr id="tax-row">
       <th data-bind="attr: { colspan: showAllocated() ? 5 : 4 }"></th>
-      <th align="right" id="tax_rate">Tax (<span class="val" data-bind="text: txn.tax_rate">0.00</span>%):</th>
+      <th align="right" id="tax_rate">
+        Tax<span data-bind="visible: !txn.uuid()"> (<span class="val" data-bind="text: txn.tax_rate">0.00</span>%)</span>:
+      </th>
       <td data-bind="text: amount(txn.total() - txn.subtotal())" class="right">$0.00</td>
     </tr>
     <tr id="total-row">
@@ -1092,6 +1094,7 @@ $('#tax_rate .val').editable(function(value, settings) {
 var model= {
   txn: {
     id: 0,
+    uuid: null,
     subtotal: 0.00,
     tax_rate: 0.00,
     tax: 0.00,
