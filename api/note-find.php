@@ -3,7 +3,7 @@ require '../scat.php';
 require '../lib/catalog.php';
 
 $limit= (int)$_REQUEST['limit'];
-if (!$limit) $limit= 10;
+if (!$limit) $limit= 100;
 $offset= (int)$_REQUEST['offset'];
 
 $attach_id= (int)$_REQUEST['attach_id'];
