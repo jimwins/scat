@@ -267,7 +267,7 @@ $q= "INSERT INTO vendor_item
                       VALUES(net_price), vendor_item.net_price),
        promo_price = VALUES(promo_price),
        promo_quantity = VALUES(promo_quantity),
-       barcode = IF(VALUES(barcode),
+       barcode = IF(VALUES(barcode) != '',
                     VALUES(barcode), vendor_item.barcode),
        purchase_quantity = VALUES(purchase_quantity),
        special_order = IFNULL(VALUES(special_order),
