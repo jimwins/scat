@@ -2,8 +2,6 @@
 include '../scat.php';
 include '../lib/person.php';
 
-if (!defined('LOYALTY')) exit;
-
 $person_id= (int)$_REQUEST['person'];
 
 $person= person_load($db, $person_id);
