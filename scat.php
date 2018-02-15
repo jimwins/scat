@@ -140,6 +140,7 @@ $(document).ready(function() {
             <li><a href="reorder.php">Reorder</a></li>
             <li><a href="report-backorders.php">Backorders</a></li>
             <li><a href="report-price-change.php">Price Changes</a></li>
+            <li><a href="price-overrides.php">Price Overrides</a></li>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header">Money</li>
             <li><a href="./till.php">Till</a></li>

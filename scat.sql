@@ -278,6 +278,28 @@ CREATE TABLE `person` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `price_override`
+--
+
+DROP TABLE IF EXISTS `price_override`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `price_override` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pattern` varchar(255) NOT NULL,
+  `pattern_type` enum('like','rlike') NOT NULL DEFAULT 'like',
+  `minimum_quantity` int(10) unsigned NOT NULL DEFAULT '1',
+  `discount_type` enum('percentage','additional_percentage','relative','fixed') DEFAULT NULL,
+  `discount` decimal(9,2) DEFAULT NULL,
+  `expires` datetime DEFAULT NULL,
+  `added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `pattern` (`pattern`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `product`
 --
 
@@ -553,4 +575,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-06 12:06:27
+-- Dump completed on 2018-02-14 19:19:12

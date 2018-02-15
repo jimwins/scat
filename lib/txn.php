@@ -187,53 +187,60 @@ function txn_apply_discounts($db, $id) {
     return true;
   }
 
-  // XXX store this somewhere else, obviously
-  $discounts= array(
-    '^AAM-[^S].*' => array('type' => 'RLIKE', 6 => '2.59', 12 => '2.39'),
-    'MXG-%'  => array(12 => '6.79', 36 => '6.49', 72 => '5.99,SO'),
-    'MXB-%'  => array(12 => '5.99', 36 => '5.49', 72 => '4.99,SO'),
-    'MTEX014%' => array(12 => '6.49', 36 => '5.99', 72 => '4.99,SO'),
-    'MTEX019%' => array(12 => '8.25', 36 => '7.49', 72 => '6.99,SO'),
-    'SKXSDK%'=> array(12 => '2.49'),
-    '^TB56[56].*'=> array('type' => 'RLIKE', 12 => '2.69'),
-    'DA40286%'=>array(10 => '0.79', 100 => '0.69'),
-    '^DA(1600|6032).*'=> array('type' => 'RLIKE', 12 => 5.99),
-  );
+  $q= "SELECT pattern, ANY_VALUE(pattern_type) pattern_type,
+              GROUP_CONCAT(minimum_quantity ORDER BY minimum_quantity
+                           SEPARATOR ',') breaks,
+              GROUP_CONCAT(discount_type ORDER BY minimum_quantity
+                           SEPARATOR ',') discount_types,
+              GROUP_CONCAT(discount ORDER BY minimum_quantity
+                           SEPARATOR ',') discounts
+         FROM price_override
+        GROUP BY pattern";
 
-  foreach ($discounts as $code => $breaks) {
-    $like= isset($breaks['type']) ? $breaks['type'] : 'LIKE';
+  $discounts= $db->query($q)
+    or die_query($db, $q);
+
+  foreach ($discounts as $d) {
     $count= $db->get_one("SELECT ABS(SUM(ordered))
                             FROM txn_line
                             JOIN item ON txn_line.item = item.id
                            WHERE txn = $id
-                             AND code $like '$code'
+                             AND code {$d['pattern_type']} '{$d['pattern']}'
                              AND NOT discount_manual");
 
-    $new_discount= 0;
+    if (!$count) {
+      continue;
+    }
 
-    foreach ($breaks as $qty => $discount) {
-      list($discount, $flags)= explode(',', $discount);
-      if ($qty != 'type' &&
-          $count >= $qty &&
-          ($flags != 'SO') && // XXX apply special order discounts to quotes?
-          (!$new_discount || $discount < $new_discount)) {
-        $new_discount= $discount;
+    $new_discount= 0;
+    $new_discount_type= '';
+
+    $breaks= explode(',', $d['breaks']);
+    $discount_types= explode(',', $d['discount_types']);
+    $discounts= explode(',', $d['discounts']);
+
+    foreach ($breaks as $i => $qty) {
+      if ($count >= $qty) {
+        $new_discount_type= $discount_types[$i];
+        $new_discount= $discounts[$i];
       }
     }
+
+    // XXX handle additional_percentage discount type
 
     if ($new_discount) {
       $q= "UPDATE txn_line, item
               SET txn_line.discount = $new_discount,
-                  txn_line.discount_type = 'fixed'
+                  txn_line.discount_type = '$new_discount_type'
             WHERE txn = $id AND txn_line.item = item.id
-              AND code $like '$code'
+              AND code {$d['pattern_type']} '{$d['pattern']}'
               AND NOT discount_manual";
     } else {
       $q= "UPDATE txn_line, item
               SET txn_line.discount = item.discount,
-                  txn_line.discount_type = item.discount_type
+                  txn_line.discount_type = NULL
             WHERE txn = $id AND txn_line.item = item.id
-              AND code $like '$code'
+              AND code {$d['pattern_type']} '{$d['pattern']}'
               AND NOT discount_manual";
     }
 
@@ -489,4 +496,7 @@ class TxnLine extends Model {
 }
 
 class Payment extends Model {
+}
+
+class PriceOverride extends Model {
 }
