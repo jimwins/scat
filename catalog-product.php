@@ -60,6 +60,15 @@ viewModel.toggleActive= function (item) {
       });
 }
 
+viewModel.toggleProductActive= function () {
+  Scat.api('product-update',
+           { id: viewModel.product.id(),
+             active: viewModel.product.active() == '1' ? 0 : 1 })
+      .done(function (data) {
+        ko.mapping.fromJS(data, {}, viewModel.product);
+      });
+}
+
 viewModel.editProduct= function (self) {
   Scat.dialog('product').done(function (html) {
     var panel= $(html);
@@ -154,6 +163,13 @@ ko.applyBindings(viewModel);
   <div>
     <button class="btn btn-primary"
             data-bind="click: editProduct">Edit</button>
+  </div>
+  <div>
+    <button class="btn btn-xs btn-default"
+            data-bind="click: toggleProductActive,
+                       text: product.active() == '1' ? 'Active' : 'Inactive',
+                       css: { 'btn-danger' : product.active() != '1' }">
+    </button>
   </div>
 </div>
 
