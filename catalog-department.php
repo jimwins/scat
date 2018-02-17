@@ -53,7 +53,7 @@ var viewModel= ko.mapping.fromJS(model);
 viewModel.toggleActive= function (product) {
   Scat.api('product-update',
            { id: product.id(),
-             active: product.active() ? 0 : 1 })
+             active: product.active() == '1' ? 0 : 1 })
       .done(function (data) {
         // XXX Doesn't re-sort the products
         ko.mapping.fromJS(data, {}, product);
@@ -102,8 +102,8 @@ ko.applyBindings(viewModel);
       <td class="text-center">
         <a data-bind="click: $parent.toggleActive">
           <i class="fa fa-lg"
-             data-bind="css: { 'fa-eye': $data.active(),
-                               'fa-eye-slash': !$data.active() }"></i>
+             data-bind="css: { 'fa-eye': $data.active() == '1',
+                               'fa-eye-slash': $data.active() == '0' }"></i>
         </a>
       </td>
     </tr>
