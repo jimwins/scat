@@ -20,7 +20,7 @@ class Department extends Model {
   }
 }
 
-class Product extends Model {
+class Product extends Model implements JsonSerializable {
   public function brand() {
     return $this->belongs_to('Brand');
   }
