@@ -108,14 +108,12 @@ viewModel.addProduct= function (self) {
     }
 
     panelModel.generateSlug= function(place, ev) {
-      $.ajax(BASE + 'api/generateSlug',
-             { type: 'POST', data: {
-               brand: pageModel.brand(), name: pageModel.name() }})
-        .done(function (data) {
-          pageModel.slug(data.slug);
-        })
+      Scat.api('generate-slug',
+               { brand: panelModel.brand_id(), name: panelModel.name() })
+          .done(function (data) {
+            panelModel.slug(data.slug);
+          })
     }
-
 
     panelModel.selectedDepartment= ko.computed({
       read: function () {
