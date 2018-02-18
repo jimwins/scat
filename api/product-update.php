@@ -36,4 +36,4 @@ try {
   die_jsonp($e->getMessage());
 }
 
-echo jsonp($product->as_array());
+echo jsonp($product);
