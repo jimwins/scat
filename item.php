@@ -20,7 +20,7 @@ if (!$id && $code) {
   $id= $id[0];
 }
 
-$product= array();
+$product= array('id' => 0, 'name' => ''); /* Bare necessities for KO */
 
 $item= item_load($db, $id);
 
