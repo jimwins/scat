@@ -60,6 +60,92 @@ viewModel.toggleActive= function (product) {
       });
 }
 
+viewModel.addProduct= function (self) {
+  Scat.dialog('product').done(function (html) {
+    var panel= $(html);
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    var product= {
+      id: 0, department_id: self.department.id(), brand_id: 0,
+      name: '', description: '', slug: '',
+      image: '', variation_style: 'flat', active: 1
+    };
+
+    product.departments= [];
+    product.brands= [];
+
+    var panelModel= ko.mapping.fromJS(product);
+
+    /* Load departments */
+    Scat.api('department-find', { levels: 2 })
+        .done(function (data) {
+          ko.mapping.fromJS(data, {}, panelModel.departments);
+          // make sure correct selection is made
+          panelModel.department_id.valueHasMutated();
+        });
+
+    /* Load brands */
+    Scat.api('brand-list', { verbose: 1 })
+        .done(function (data) {
+          ko.mapping.fromJS(data, {}, panelModel.brands);
+          // make sure correct selection is made
+          panelModel.brand_id.valueHasMutated();
+        });
+
+    panelModel.saveProduct= function(place, ev) {
+      var product= ko.mapping.toJS(panelModel); /* XXX */
+      delete product.departments;
+      delete product.brands;
+
+      Scat.api('product-add', product)
+          .done(function (data) {
+            $(place).closest('.modal').modal('hide');
+            ko.mapping.fromJS(data, {}, viewModel.product);
+          });
+    }
+
+    panelModel.generateSlug= function(place, ev) {
+      $.ajax(BASE + 'api/generateSlug',
+             { type: 'POST', data: {
+               brand: pageModel.brand(), name: pageModel.name() }})
+        .done(function (data) {
+          pageModel.slug(data.slug);
+        })
+    }
+
+
+    panelModel.selectedDepartment= ko.computed({
+      read: function () {
+        return this.department_id();
+      },
+      write: function (value) {
+        if (typeof value != 'undefined' && value != '') {
+          this.department_id(value);
+        }
+      },
+      owner: panelModel
+    }).extend({ notify: 'always' });
+
+    panelModel.selectedBrand= ko.computed({
+      read: function () {
+        return this.brand_id();
+      },
+      write: function (value) {
+        if (typeof value != 'undefined' && value != '') {
+          this.brand_id(value);
+        }
+      },
+      owner: panelModel
+    }).extend({ notify: 'always' });
+
+    ko.applyBindings(panelModel, panel[0]);
+    panel.appendTo($('body')).modal();
+  });
+}
+
 ko.applyBindings(viewModel);
 
 });
@@ -74,6 +160,12 @@ ko.applyBindings(viewModel);
       </a>
     </small>
   </h1>
+</div>
+
+<div class="pull-right well well-sm">
+  <button class="btn btn-primary" data-bind="click: addProduct">
+    Add Product
+  </button>
 </div>
 
 <?require 'ui/catalog-search.html'?>
