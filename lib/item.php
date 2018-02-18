@@ -21,6 +21,8 @@ function item_terms_to_sql($db, $q, $options) {
       $andor[]= "(item.id = '{$dbt[1]}')";
     } elseif (preg_match('/^brand:(.+)/i', $term, $dbt)) {
       $andor[]= "(brand.slug = '{$dbt[1]}')";
+    } elseif (preg_match('/^product:(.+)/i', $term, $dbt)) {
+      $andor[]= "(item.product_id = '{$dbt[1]}')";
     } elseif (preg_match('/^begin:([-0-9]+)/i', $term, $dbt)) {
       $begin= $dbt[1];
     } elseif (preg_match('/^-(.+)/i', $term, $dbt)) {
