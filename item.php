@@ -25,7 +25,9 @@ $product= array();
 $item= item_load($db, $id);
 
 if ($item['product_id']) {
-  $product= Model::factory('Product')->find_one($item['product_id'])->as_array();
+  $product= Model::factory('Product')
+              ->find_one($item['product_id'])
+              ->as_array();
 }
 
 $search= "";
