@@ -202,14 +202,15 @@ include 'item-searchform.php';
          
           <div class="col-sm-8">
             <p class="form-control-static">
+              <a class="btn btn-default btn-xs"
+                 data-bind="click: linkToProduct">
+                <i class="fa fa-link"></i>
+              </a>
               <a data-bind="visible: item.product_id(),
                             text: product.name,
                             attr: { href: 'catalog-product.php?id=' +
                                           item.product_id() }">
                 Product Name
-              </a>
-              <a data-bind="visible: !item.product_id(), click: linkToProduct">
-                Link to Product
               </a>
             </p>
           </div>
@@ -682,8 +683,49 @@ itemModel.findVendorItem= function() {
 }
 
 itemModel.linkToProduct= function() {
-  // XXX implement
-  alert("I don't know how yet.");
+  Scat.dialog('product-find').done(function (html) {
+    var panel= $(html);
+
+    panel.on('shown.bs.modal', function() {
+      $('#search',this).focus();
+    });
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    var model= { error: '', search: '', product: 0 };
+
+    var productModel= ko.mapping.fromJS(model);
+    productModel.products= ko.observableArray();
+
+    ko.computed(function() {
+      var search= this.search();
+
+      if (search.length < 3) {
+        return;
+      }
+
+      Scat.api('product-find', { term: search })
+          .done(function (data) {
+            productModel.products(data);
+          });
+    }, productModel);
+
+    productModel.selectProduct= function(place, ev) {
+      Scat.api('item-update', { id: itemModel.item.id(),
+                                product_id: place.id })
+          .done(function (data) {
+            loadItem(data.item);
+            ko.mapping.fromJS(place, {}, itemModel.product);
+          });
+      panel.modal('hide');
+    }
+
+    ko.applyBindings(productModel, panel[0]);
+
+    panel.appendTo($('body')).modal();
+  });
 }
 
 ko.applyBindings(itemModel);
