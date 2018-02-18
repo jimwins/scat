@@ -33,7 +33,7 @@ foreach(array('name', 'short_name', 'variation', 'tic', 'color') as $key) {
 }
 
 /* Plain integer values */
-foreach(array('active', 'reviewed',
+foreach(array('active', 'reviewed', 'product_id',
               'purchase_quantity', 'minimum_quantity') as $key) {
   if (isset($_REQUEST[$key])) {
     $value= (int)$_REQUEST[$key];
