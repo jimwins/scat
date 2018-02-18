@@ -103,7 +103,7 @@ viewModel.addProduct= function (self) {
       Scat.api('product-add', product)
           .done(function (data) {
             $(place).closest('.modal').modal('hide');
-            ko.mapping.fromJS(data, {}, viewModel.product);
+            window.location.href= 'catalog-product.php?id=' + data.id;
           });
     }
 
