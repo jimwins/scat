@@ -37,6 +37,10 @@ class Product extends Model {
                                  WHERE txn_line.item = item.id)',
                               'stock');
   }
+
+  public function jsonSerialize() {
+    return $this->asArray();
+  }
 }
 
 class Item extends Model {
