@@ -190,7 +190,7 @@ ko.applyBindings(viewModel);
 <div class="row">
   <div class="col-sm-9" data-bind="html: marked(product.description().replace(/{{\s*@STATIC\s*}}/, '<?=ORDURE_STATIC?>'))"></div>
 
-  <div class="col-sm-3">
+  <div class="col-sm-3" data-bind="if: product.image">
     <div class="thumbnail pull-right">
       <img width="240"
            data-bind="attr: { src: '<?=ORDURE_STATIC?>' + product.image() }">
