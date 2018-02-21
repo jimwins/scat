@@ -238,7 +238,7 @@ function txn_apply_discounts($db, $id) {
     } else {
       $q= "UPDATE txn_line, item
               SET txn_line.discount = item.discount,
-                  txn_line.discount_type = NULL
+                  txn_line.discount_type = item.discount_type 
             WHERE txn = $id AND txn_line.item = item.id
               AND code {$d['pattern_type']} '{$d['pattern']}'
               AND NOT discount_manual";
