@@ -1,5 +1,6 @@
 <?
 require 'scat.php';
+require 'lib/txn.php';
 
 head("Daily Flow @ Scat", true);
 
@@ -13,49 +14,54 @@ $q= "SELECT DATE_FORMAT(processed, '%Y-%m-%d %a') AS date,
 $r= $db->query($q)
   or die($db->error);
 
+$data= $seen= array();
+
+while ($row= $r->fetch_assoc()) {
+  $method= $row['method'];
+  if ($method == 'change') $method= 'cash';
+  $data[$row['date']][$method]=
+    bcadd($data[$row['date']][$method], $row['amount']);
+  $seen[$method]++;
+  /* Don't add withdrawals to total */
+  if ($method != 'withdrawal')
+    $data[$row['date']]['total']=
+      bcadd($data[$row['date']]['total'], $row['amount']);
+}
+
+$total= 0;
 ?>
 <table class="table table-striped sortable" style="width: auto">
 <thead>
- <tr><th>Date</th><th>Cash</th><th>Credit</th><th>Check</th><th>Other</th><th>Total</th></tr>
+ <tr>
+   <th>Date</th>
+<?
+foreach (\Payment::$methods as $method => $name) {
+  if ($seen[$method])
+    echo '<th>', $name, '</th>';
+}
+?>
+   <th>Total</th>
+ </tr>
 </thead>
 <tbody>
 <?
-$day= null;
-$total= $cash= $credit= $amex= $check= $other= 0.00;
-while ($row= $r->fetch_assoc()) {
-  if ($row['date'] != $day && $day) {
-    echo '<tr><td>',
-         ashtml($day), '</td><td align="right">',
-         amount($cash), '</td><td align="right">',
-         amount($credit), '</td><td align="right">',
-         amount($check), '</td><td align="right">',
-         amount($other), '</td><td align="right">',
-         amount($total), "</td></tr>\n";
-    $total= $cash= $credit= $check= $other= 0.00;
+foreach ($data as $date => $data) {
+  echo '<tr><td>', $date, '</td>';
+  foreach (\Payment::$methods as $method => $name) {
+    if ($seen[$method])
+      echo '<td>', $data[$method] ? amount($data[$method]) : '', '</td>';
   }
-
-  switch ($row['method']) {
-  case 'cash':
-  case 'change':
-    $cash= bcadd($cash, $row['amount']);
-    break;
-  case 'credit':
-    $credit= bcadd($credit, $row['amount']);
-    break;
-  case 'check':
-    $check= bcadd($check, $row['amount']);
-    break;
-  case 'withdrawal':
-    break;
-  default:
-    $other= bcadd($other, $row['amount']);
-  }
-  $total= bcadd($total, $row['amount']);
-
-  $day= $row['date'];
+  echo '<td>', amount($data['total']), '</td></tr>';
+  $total= bcadd($total, $data['total']);
 }
 ?>
  </tbody>
+ <tfoot>
+   <tr>
+     <th colspan="<?=1 + count($seen)?>" class="text-right">Total:</th>
+     <th><?=amount($total)?></th>
+   <tr>
+ </tfoot>
 </table>
 <?
 
