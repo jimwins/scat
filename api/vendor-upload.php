@@ -80,9 +80,10 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 } elseif (preg_match('/Alvin SRP/', $line)) {
   // Alvin Account Pricing Report
 #Manufacturer	BrandName	SubBrand	AlvinItem#	Description	New	UoM	Alvin SRP	RegularMultiplier	RegularNet	CurrentMultiplier	CurrentNetPrice	CurrentPriceSource	SaleStarted	SaleExpiration	Buying Quantity (BQ)	DropShip	UPC or EAN	Weight	Length	Width	Height	Ship Truck	CountryofOrigin	HarmonizedCode	DropShipDiscount	CatalogPage	VendorItemNumber
+  $sep= preg_match("/\t/", $line) ? "\t" : ",";
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE vendor_upload
-          FIELDS TERMINATED BY '\t'
+          FIELDS TERMINATED BY '$sep'
           OPTIONALLY ENCLOSED BY '\"'
           LINES TERMINATED BY '\r\n'
           IGNORE 1 LINES
