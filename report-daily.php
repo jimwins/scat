@@ -4,10 +4,49 @@ require 'lib/txn.php';
 
 head("Daily Flow @ Scat", true);
 
+$begin= $_REQUEST['begin'];
+$end= $_REQUEST['end'];
+
+if (!$begin) {
+  $begin= (new \Datetime('8 days ago'))->format('Y-m-d');
+} else {
+  $begin= $db->escape($begin);
+}
+
+if (!$end) {
+  $end= (new \Datetime())->format('Y-m-d');
+} else {
+  $end= $db->escape($end);
+}
+
+?>
+<form id="report-params" class="form-horizontal" role="form"
+      action="<?=$_SERVER['PHP_SELF']?>">
+  <div class="form-group">
+    <label for="datepicker" class="col-sm-1 control-label">
+      Dates
+    </label>
+    <div class="col-sm-11">
+      <div class="input-daterange input-group" id="datepicker">
+        <input type="text" class="form-control" name="begin"
+               value="<?=ashtml($begin)?>" />
+        <span class="input-group-addon">to</span>
+        <input type="text" class="form-control" name="end"
+               value="<?=ashtml($end)?>" />
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-1 col-sm-11">
+      <input type="submit" class="btn btn-primary" value="Show">
+    </div>
+  </div>
+</form>
+<?
 $q= "SELECT DATE_FORMAT(processed, '%Y-%m-%d %a') AS date,
             method, cc_type, SUM(amount) amount
        FROM payment
-      WHERE processed > DATE(NOW() - INTERVAL 8 DAY)
+      WHERE processed BETWEEN '$begin' AND '$end'
       GROUP BY date, method, cc_type
       ORDER BY date DESC";
 
@@ -18,10 +57,11 @@ $data= $seen= array();
 
 while ($row= $r->fetch_assoc()) {
   $method= $row['method'];
+  /* Treat change as cash */
   if ($method == 'change') $method= 'cash';
   $data[$row['date']][$method]=
     bcadd($data[$row['date']][$method], $row['amount']);
-  $seen[$method]++;
+  $seen[$method]++; /* Track methods we've seen */
   /* Don't add withdrawals to total */
   if ($method != 'withdrawal')
     $data[$row['date']]['total']=
@@ -63,6 +103,13 @@ foreach ($data as $date => $data) {
    <tr>
  </tfoot>
 </table>
+<script>
+$(function() {
+  $('#report-params .input-daterange').datepicker({
+      format: "yyyy-mm-dd",
+      todayHighlight: true
+  });
+});
+</script>
 <?
-
 foot();
