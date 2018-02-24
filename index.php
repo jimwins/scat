@@ -301,21 +301,7 @@ $(document).on('dblclick', '.editable', function() {
   fld.focus().select();
 });
 
-var paymentMethods= {
-  cash: "Cash",
-  change: "Change",
-  credit: "Credit Card",
-  square: "Square",
-  stripe: "Stripe",
-  dwolla: "Dwolla",
-  paypal: "PayPal",
-  gift: "Gift Card",
-  check: "Check",
-  discount: "Discount",
-  bad: "Bad Debt",
-  donation: "Donation",
-  withdrawal: "Withdrawal",
-};
+var paymentMethods= <?=json_encode(\Payment::$methods)?>;
 
 function formatMethod(payment) {
   if (payment.method() == 'discount' && payment.discount()) {

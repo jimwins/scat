@@ -490,20 +490,7 @@ function expand_field($data, $class, $meta = null) {
       return $data;
     return amount($data);
   case '$payment':
-    $desc= array('cash' => 'Cash',
-                 'change' => 'Change',
-                 'credit' => 'Credit Card',
-                 'square' => 'Square',
-                 'stripe' => 'Stripe',
-                 'gift' => 'Gift Card',
-                 'check' => 'Check',
-                 'dwolla' => 'Dwolla',
-                 'paypal' => 'PayPal',
-                 'discount' => 'Discount',
-                 'withdrawal' => 'Withdrawal',
-                 'bad' => 'Bad Debt',
-                 );
-    return $desc[$data];
+    return \Payment::$methods[$data];
   case '$bool':
     if ($data) {
       return '<i data-truth="1" class="fa fa-check-square-o"></i>';
