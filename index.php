@@ -119,7 +119,6 @@ Txn.addItem= function (txn, item) {
       .done(function (data) {
         if (data.matches) {
           // this shouldn't happen!
-          play("no");
         } else {
           Txn.loadData(data);
         }
@@ -137,14 +136,12 @@ Txn.findAndAddItem= function(q) {
       .done(function (data) {
         if (data.matches) {
           if (data.matches.length == 0) {
-            play("no");
             $("#lookup").addClass("error");
             var errors= $('<div class="alert alert-danger"/>');
             errors.text(" Didn't find anything for '" + q + "'.");
             errors.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
             $("#items").before(errors);
           } else {
-            play("maybe");
             var choices= $('<div class="choices alert alert-warning"/>');
             choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
             var list= $('<table class="table table-condensed" style="width: 95%;">');
@@ -165,7 +162,6 @@ Txn.findAndAddItem= function(q) {
             $("#items").before(choices);
           }
         } else {
-          play("yes");
           Txn.loadData(data);
         }
       });

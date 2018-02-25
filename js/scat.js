@@ -98,17 +98,6 @@ Scat.printDirect= function(name, options) {
             });
 }
 
-function play(type) {
-  var sounds = {
-    'yes' : 'Pop',
-    'no' : 'Basso',
-    'maybe' : 'Bottle',
-  };
-  if (window.fluid) {
-    window.fluid.playSound(sounds[type]);
-  }
-}
-
 $.getFocusedElement = function() {
   var elem = document.activeElement;
   return $( elem && ( elem.type || elem.href ) ? elem : [] );
@@ -171,8 +160,6 @@ function displayError(data) {
 
     return;
   }
-
-  // play("no");
 
   alert(data.error);
 }
