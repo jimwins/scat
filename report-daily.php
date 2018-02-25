@@ -46,7 +46,7 @@ if (!$end) {
 $q= "SELECT DATE_FORMAT(processed, '%Y-%m-%d %a') AS date,
             method, cc_type, SUM(amount) amount
        FROM payment
-      WHERE processed BETWEEN '$begin' AND '$end'
+      WHERE processed BETWEEN '$begin 00:00:00' AND '$end 23:59:59'
       GROUP BY date, method, cc_type
       ORDER BY date DESC";
 
