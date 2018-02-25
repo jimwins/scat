@@ -141,7 +141,7 @@ viewModel.allocateAll= function() {
             { txn: viewModel.txn.id() },
             function (data) {
               if (data.error) {
-                displayError(data);
+                Scat.alert(data);
                 return;
               }
               ko.mapping.fromJS({ txn: data.txn, items: data.items },
@@ -154,7 +154,7 @@ viewModel.allocateLine= function(line) {
             { txn: viewModel.txn.id(), line: line.line_id() },
             function (data) {
               if (data.error) {
-                displayError(data);
+                Scat.alert(data);
                 return;
               }
               var top= document.documentElement.scrollTop || document.body.scrollTop;
@@ -169,7 +169,7 @@ viewModel.closeAll= function() {
             { txn: viewModel.txn.id() },
             function (data) {
               if (data.error) {
-                displayError(data);
+                Scat.alert(data);
                 return;
               }
               ko.mapping.fromJS({ txn: data.txn, items: data.items },
@@ -182,7 +182,7 @@ viewModel.closeLine= function(line) {
             { txn: viewModel.txn.id(), line: line.line_id() },
             function (data) {
               if (data.error) {
-                displayError(data);
+                Scat.alert(data);
                 return;
               }
               var top= document.documentElement.scrollTop || document.body.scrollTop;
@@ -197,7 +197,7 @@ viewModel.openAll= function() {
             { txn: viewModel.txn.id() },
             function (data) {
               if (data.error) {
-                displayError(data);
+                Scat.alert(data);
                 return;
               }
               ko.mapping.fromJS({ txn: data.txn, items: data.items },
@@ -213,7 +213,7 @@ viewModel.updateLine= function (value, settings) {
             data,
             function (data) {
               if (data.error) {
-                displayError(data);
+                Scat.alert(data);
                 return;
               }
               ko.mapping.fromJS({ txn: data.txn, items: data.items },
@@ -246,7 +246,7 @@ $("body").html5Uploader({
   onSuccess: function(e, file, response) {
     data= $.parseJSON(response);
     if (data.error) {
-      displayError(data);
+      Scat.alert(data);
       return;
     }
     ko.mapping.fromJS({ txn: data.txn, items: data.items },
@@ -255,7 +255,7 @@ $("body").html5Uploader({
     $('#upload-status').modal('show');
   },
   onServerError: function(e, file) {
-    alert("File upload failed.");
+    Scat.alert("File upload failed.");
   },
 });
 </script>

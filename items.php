@@ -118,7 +118,7 @@ $('#add-bulk-items').on('click', function(ev) {
       Scat.api('item-add-bulk', vendorItem)
           .done(function (data) {
             $(place).closest('.modal').modal('hide');
-            alert("Added " + data.items + " items.");
+            Scat.alert("Added " + data.items + " items.");
           });
     }
 

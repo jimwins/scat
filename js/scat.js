@@ -29,7 +29,7 @@ Scat.api= function (func, args, opts) {
 
   return validated(jqXHR, function(data) {
     if (data.error) {
-      displayError(data);
+      Scat.alert(data);
       return false;
     }
     return true;
@@ -92,7 +92,7 @@ Scat.printDirect= function(name, options) {
             options,
             function (data) {
               if (data.error) {
-                displayError(data);
+                Scat.alert(data);
                 return;
               }
             });
@@ -133,7 +133,7 @@ function amount(amount) {
 Scat.amount= amount;
 
 // display an error message
-function displayError(data) {
+Scat.alert= function (data) {
   if (typeof data != "object") {
     data= { error: data };
   }

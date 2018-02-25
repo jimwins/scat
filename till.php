@@ -210,7 +210,7 @@ var tillModel= function() {
     Scat.api('till-withdraw', { reason: self.reason(),
                                 amount: self.withdraw() })
         .done(function (data) {
-          displayError(data.message);
+          Scat.alert(data.message);
           self.reset();
         });
   }

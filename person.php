@@ -372,7 +372,7 @@ viewModel.sendMessage= function (place) {
       Scat.api('person-email', message)
           .done(function (data) {
             $(place).closest('.modal').modal('hide');
-            displayError({ title: "Success!", error: "Email sent." });
+            Scat.alert({ title: "Success!", error: "Email sent." });
           });
     }
 
@@ -398,7 +398,7 @@ function loadActivity(person, page) {
       .fail(function (jqxhr, textStatus, error) {
         viewModel.loading(0);
         var data= $.parseJSON(jqxhr.responseText);
-        alert(textStatus + ', ' + error + ': ' + data.text);
+        Scat.alert(textStatus + ', ' + error + ': ' + data.text);
       });
 }
 
@@ -437,7 +437,7 @@ function checkPriceChanges(place, ev) {
 }
 
 function uploadItems(place, ev) {
-  displayError("Just drag & drop a file on this window.<br><br>File format: item_no, sku, name, retail_price, net_price, promo_price, barcode, purchase_quantity");
+  Scat.alert("Just drag & drop a file on this window.<br><br>File format: item_no, sku, name, retail_price, net_price, promo_price, barcode, purchase_quantity");
 }
 
 $("body").html5Uploader({
@@ -458,15 +458,15 @@ $("body").html5Uploader({
   onSuccess: function(e, file, response) {
     data= $.parseJSON(response);
     if (data.error) {
-      displayError(data);
+      Scat.alert(data);
       return;
     }
-    displayError({ title: "Upload Successful", error: data.result });
+    Scat.alert({ title: "Upload Successful", error: data.result });
     $('#upload-items')
       .html('Upload Items');
   },
   onServerError: function(e, file) {
-    displayError("File upload failed.");
+    Scat.alert("File upload failed.");
     $('#upload-items')
       .html($('Upload Items'));
   },

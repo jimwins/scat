@@ -310,7 +310,7 @@ function formatMethod(payment) {
 function printReceipt() {
   var txn= Txn.id();
   if (!txn) {
-    displayError("No sale to print.");
+    Scat.alert("No sale to print.");
     return false;
   }
   return Scat.print('receipt', { id: txn });
@@ -319,7 +319,7 @@ function printReceipt() {
 function printInvoice() {
   var txn= Txn.id();
   if (!txn) {
-    displayError("No sale to print.");
+    Scat.alert("No sale to print.");
     return false;
   }
   return Scat.print('invoice', { id: txn });
@@ -328,12 +328,12 @@ function printInvoice() {
 function emailInvoice() {
   var txn= Txn.id();
   if (!txn) {
-    displayError("No sale to email.");
+    Scat.alert("No sale to email.");
     return false;
   }
   Scat.api("txn-email-invoice", { txn: txn })
       .done(function (data) {
-        displayError({ title: "Success!", error: "Invoice emailed." });
+        Scat.alert({ title: "Success!", error: "Invoice emailed." });
       });
   return false;
 }
@@ -1396,13 +1396,13 @@ $("body").html5Uploader({
   onSuccess: function(e, file, response) {
     data= $.parseJSON(response);
     if (data.error) {
-      displayError(data);
+      Scat.alert(data);
       return;
     }
     Txn.loadData(data);
   },
   onServerError: function(e, file) {
-    alert("File upload failed.");
+    Scat.alert("File upload failed.");
   },
 });
 </script>
