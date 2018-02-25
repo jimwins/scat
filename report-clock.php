@@ -106,13 +106,8 @@ $(function() {
   $('.time').editable(function (val, settings) {
     var type= $(this).data('type');
     var id= $(this).parent().data('id');
-    $.getJSON("api/clock-edit.php?callback=?",
-              { id: id, type: type, time: val },
-              function (data) {
-                if (data.error) {
-                  displayError(data);
-                }
-              });
+    Scat.api('clock-edit', { id: id, type: type, time: val });
+    // XXX update what we're showing
     return '...';
   }, { select: true });
 

@@ -70,30 +70,21 @@ $('#add-item').on('click', function(ev) {
   $('#add-item-form').modal('show');
 });
 $('#add-item-form #load').on('click', function(ev) {
-  $.getJSON("api/vendor-item-load.php?callback=?",
-            { code: $('#add-item-form [name="code"]').val() },
-            function (data) {
-              if (data.error) {
-                displayError(data.error);
-                return;
-              }
-              $('#add-item-form [name="name"]').val(data.item.name);
-              $('#add-item-form [name="retail_price"]').val(data.item.retail_price);
-              $('#add-item-form [name="barcode"]').val(data.item.barcode);
-            });
+  Scat.api('vendor-item-load',
+           { code: $('#add-item-form [name="code"]').val() })
+      .done(function (data) {
+        $('#add-item-form [name="name"]').val(data.item.name);
+        $('#add-item-form [name="retail_price"]').val(data.item.retail_price);
+        $('#add-item-form [name="barcode"]').val(data.item.barcode);
+      });
 });
 $('#add-item-form form').on('submit', function(ev) {
   ev.preventDefault();
   var data= $("#add-item-form :input").serializeArray();
-  $.getJSON("api/item-add.php?callback=?",
-            data,
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              window.location.href= 'item.php?id=' + data.item.id;
-            });
+  Scat.api('item-add', data)
+      .done(function (data) {
+        window.location.href= 'item.php?id=' + data.item.id;
+      });
 });
 $('#add-bulk-items').on('click', function(ev) {
   Scat.dialog('item-bulk-add').done(function (html) {
@@ -107,17 +98,15 @@ $('#add-bulk-items').on('click', function(ev) {
       $(this).remove();
     });
 
-    $.getJSON('api/person-list.php?callback=?',
-              { role: 'vendor' })
-      .done(function (data) {
-        ko.mapping.fromJS({ vendors: data }, vendorItemModel);
-        vendorItemModel.vendor.valueHasMutated();
-      })
-      .fail(function (jqxhr, textStatus, error) {
-        var data= $.parseJSON(jqxhr.responseText);
-        vendor_item.error(textStatus + ', ' + error + ': ' + data.text)
-      });
-
+    Scat.api('person-list', { role: 'vendor' })
+        .done(function (data) {
+          ko.mapping.fromJS({ vendors: data }, vendorItemModel);
+          vendorItemModel.vendor.valueHasMutated();
+        })
+        .fail(function (jqxhr, textStatus, error) {
+          var data= $.parseJSON(jqxhr.responseText);
+          vendor_item.error(textStatus + ', ' + error + ': ' + data.text)
+        });
 
     vendorItemModel= ko.mapping.fromJS(vendorItem);
 
@@ -334,86 +323,56 @@ function updateItem(item) {
 $('tbody tr .name').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item, name: value },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              updateItem(data.item);
-            });
+  Scat.api('item-update', { item: item, name: value })
+      .done(function (data) {
+        updateItem(data.item);
+      });
   return "...";
 }, { event: 'click', style: 'display: inline' });
 $('tbody tr .brand').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item, brand_id: value },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              updateItem(data.item);
-            });
+  Scat.api('item-update', { item: item, brand_id: value })
+      .done(function (data) {
+        updateItem(data.item);
+      });
   return "...";
 }, { event: 'click', style: 'display: inline', type: 'select', submit: 'OK',
 loadurl: 'api/brand-list.php', placeholder: '' });
 $('tbody tr td#msrp').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item, retail_price: value },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              updateItem(data.item);
-            });
+  Scat.api('item-update', { item: item, retail_price: value })
+      .done(function (data) {
+        updateItem(data.item);
+      });
   return "...";
 }, { event: 'click', style: 'display: inline', placeholder: '', width: '5em', select: true, });
 $('tbody tr .discount').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item, discount: value },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              updateItem(data.item);
-            });
+  Scat.api('item-update', { item: item, discount: value })
+      .done(function (data) {
+        updateItem(data.item);
+      });
   return "...";
 }, { event: 'click', style: 'display: inline', placeholder: '', width: '6em', select: true, });
 $('tbody tr td#stock').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item, stock: value },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              updateItem(data.item);
-            });
+  Scat.api('item-update', { item: item, stock: value })
+      .done(function (data) {
+        updateItem(data.item);
+      });
   return "...";
 }, { event: 'click', style: 'display: inline', width: '3em', select: true });
 $('tbody tr td#minimum').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item, minimum_quantity: value },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              updateItem(data.item);
-            });
+  Scat.api('item-update', { item: item, minimum_quantity: value })
+      .done(function (data) {
+        updateItem(data.item);
+      });
   return "...";
 }, { event: 'click', style: 'display: inline', width: '3em', select: true });
 $('tbody').on('click', 'tr td#active', function(ev) {
@@ -421,15 +380,10 @@ $('tbody').on('click', 'tr td#active', function(ev) {
   var item= $(this).closest('tr').attr('class');
   var val= $("i", this).data('truth');
 
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item, active: parseInt(val) ? 0 : 1 },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              updateItem(data.item);
-            });
+  Scat.api('item-update', { item: item, active: parseInt(val) ? 0 : 1 })
+      .done(function (data) {
+        updateItem(data.item);
+      });
 });
 $('#print-price-labels').on('click', function(ev) {
   ev.preventDefault();
@@ -491,18 +445,13 @@ $('#bulk-edit-form').on('show.bs.collapse', function () {
 
   if ($('#bulk-edit-form select#brand_id option').length > 2) return;
 
-  $.getJSON("api/brand-list?callback=?",
-            { verbose: 1 },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              var brand_list= $('#bulk-edit-form select#brand_id');
-              $.each(data, function (i, row) {
-                brand_list.append($('<option>').val(row.id).text(row.name));
-              });
-            });
+  Scat.api('brand-list', { verbose: 1})
+      .done(function (data) {
+        var brand_list= $('#bulk-edit-form select#brand_id');
+        $.each(data, function (i, row) {
+          brand_list.append($('<option>').val(row.id).text(row.name));
+        });
+      });
 });
 $('#bulk-edit-form').on('hide.bs.collapse', function () {
   $.each($("tbody tr"), function (i, row) {

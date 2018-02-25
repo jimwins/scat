@@ -31,39 +31,29 @@ var model= {
 var viewModel= ko.mapping.fromJS(model);
 
 function punch(place, ev) {
-  $.getJSON("api/clock-punch.php?callback=?",
-            { id: place.id(), punched: place.punched() },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              $.each(viewModel.people(), function (i, person) {
-                if (person.id() == data.person.id) {
-                  person.punched(data.person.punched);
-                }
-              });
+  Scat.api('clock-punch', { id: place.id(), punched: place.punched() })
+      .done(function (data) {
+        $.each(viewModel.people(), function (i, person) {
+          if (person.id() == data.person.id) {
+            person.punched(data.person.punched);
+          }
+        });
 
-              $('#clock-alert').hide().clearQueue();
-              $('#clock-alert')
-                .text("Clocked " + data.person.name + " " + data.action);
-              $('#clock-alert')
-                .fadeToggle()
-                .delay(3000)
-                .fadeToggle();
-            });
+        $('#clock-alert').hide().clearQueue();
+        $('#clock-alert')
+          .text("Clocked " + data.person.name + " " + data.action);
+        $('#clock-alert')
+          .fadeToggle()
+          .delay(3000)
+          .fadeToggle();
+      });
 }
 
 function reload() {
-  $.getJSON("api/clock-load.php?callback=?",
-            { },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              ko.mapping.fromJS(data, viewModel);
-            });
+  Scat.api('clock-load', { })
+      .done(function (data) {
+        ko.mapping.fromJS(data, viewModel);
+      });
 }
 
 $(window).on('focus load', function (ev, target) { reload() });

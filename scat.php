@@ -154,22 +154,17 @@ $(document).ready(function() {
 <script>
 $("header #reports").on('click', function(ev) {
   ev.preventDefault();
-  $.getJSON("./api/report-sales.php?callback=?",
-            { days: 7 },
-            function(data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                var t= $("<table class='table table-condensed table-striped' style='width: auto'><tr><th>Day<th>Sales</tr>");
-                $.each(data.sales, function(i, sales) {
-                  t.append($('<tr><td>' + sales.span +
-                             '<td align="right">' + amount(sales.total.toFixed(2)) +
-                             '</tr>'));
-                });
-                $('#quick-report .modal-body').empty().append(t);
-                $('#quick-report').modal('show');
-              }
-            });
+  Scat.api('report-sales', { days: 7 })
+      .done(function(data) {
+        var t= $("<table class='table table-condensed table-striped' style='width: auto'><tr><th>Day<th>Sales</tr>");
+        $.each(data.sales, function(i, sales) {
+          t.append($('<tr><td>' + sales.span +
+                     '<td align="right">' + amount(sales.total.toFixed(2)) +
+                     '</tr>'));
+        });
+        $('#quick-report .modal-body').empty().append(t);
+        $('#quick-report').modal('show');
+      });
 });
 
 $("#show-notes").on('click', function(ev) {

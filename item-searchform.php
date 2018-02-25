@@ -44,15 +44,10 @@ $('#save').on('click', function(ev) {
     data.id= saved;
   }
 
-  $.getJSON("api/search-save.php?callback=?",
-            data,
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              $('#save').data('saved', data.id);
-            });
+  Scat.api('save-search', data)
+      .done(function (data) {
+        $('#save').data('saved', data.id);
+      });
 });
 </script>
 <?} else {?>

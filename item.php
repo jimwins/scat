@@ -322,56 +322,39 @@ $('#active').on('click', function(ev) {
   ev.preventDefault();
   var item= itemModel.item;
 
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item.id(), active: item.active() ? 0 : 1 },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              loadItem(data.item);
-            });
+  Scat.api('item-update', { item: item.id(), active: item.active() ? 0 : 1 })
+      .done(function (data) {
+        loadItem(data.item);
+      });
 });
 $('#reviewed').on('click', function(ev) {
   ev.preventDefault();
   var item= itemModel.item;
 
-  $.getJSON("api/item-update.php?callback=?",
-            { item: item.id(), reviewed: item.reviewed() ? 0 : 1 },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              loadItem(data.item);
-            });
+  Scat.api('item-update',
+           { item: item.id(), reviewed: item.reviewed() ? 0 : 1 })
+      .done(function (data) {
+        loadItem(data.item);
+      });
 });
 function editBarcodeQuantity(value, settings) {
   var item= itemModel.item;
   var row= $(this).closest('tr');
   var code= $('td:nth(0)', row).text();
 
-  $.getJSON("api/item-barcode-update.php?callback=?",
-            { item: item.id, code: code, quantity: value},
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              loadItem(data.item);
-            });
+  Scat.api('item-barcode-update',
+           { item: item.id, code: code, quantity: value})
+      .done(function (data) {
+        loadItem(data.item);
+      });
 }
 $('#new-barcode').editable(function(value, settings) {
   var item= itemModel.item;
-  $.getJSON("api/item-barcode-update.php?callback=?",
-            { item: item.id, code: value },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              loadItem(data.item);
-            });
+  Scat.api('item-barcode-update',
+            { item: item.id, code: value })
+      .done(function (data) {
+        loadItem(data.item);
+      });
   return  $(this).data('original');
 }, {
   event: 'click',
@@ -576,30 +559,20 @@ itemModel.printBarcode= function(place, ev) {
 }
 
 itemModel.removeBarcode= function(place) {
-  $.getJSON("api/item-barcode-delete.php?callback=?",
-            { item: itemModel.item.id, code: place.code },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              loadItem(data.item);
-            });
+  Scat.api('item-barcode-delete', { item: itemModel.item.id, code: place.code })
+      .done(function (data) {
+        loadItem(data.item);
+      });
 }
 
 itemModel.mergeItem= function(place) {
   var code= window.prompt("Please enter the item to merge this one into.", "");
 
   if (code) {
-    $.getJSON("api/item-merge.php?callback=?",
-              { from: itemModel.item.id, to: code },
-              function (data) {
-                if (data.error) {
-                  displayError(data);
-                  return;
-                }
-                loadItem(data.item);
-              });
+    Scat.api('item-merge', { from: itemModel.item.id, to: code })
+        .done(function (data) {
+          loadItem(data.item);
+        });
   }
 }
 
@@ -621,16 +594,15 @@ itemModel.editVendorItem= function(item) {
       $(this).remove();
     });
 
-    $.getJSON('api/person-list.php?callback=?',
-              { role: 'vendor' })
-      .done(function (data) {
-        ko.mapping.fromJS({ vendors: data }, vendorItemModel);
-        vendorItemModel.vendor.valueHasMutated();
-      })
-      .fail(function (jqxhr, textStatus, error) {
-        var data= $.parseJSON(jqxhr.responseText);
-        vendor_item.error(textStatus + ', ' + error + ': ' + data.text)
-      });
+    Scat.api('person-list', { role: 'vendor' })
+        .done(function (data) {
+          ko.mapping.fromJS({ vendors: data }, vendorItemModel);
+          vendorItemModel.vendor.valueHasMutated();
+        })
+        .fail(function (jqxhr, textStatus, error) {
+          var data= $.parseJSON(jqxhr.responseText);
+          vendor_item.error(textStatus + ', ' + error + ': ' + data.text)
+        });
 
 
     vendorItemModel= ko.mapping.fromJS(vendorItem);
@@ -742,15 +714,11 @@ function saveItemProperty(value, settings) {
 
   item[key]("\0"); // force knockout to update this observable when item updated
 
-  $.getJSON("api/item-update.php?callback=?",
-            data,
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              loadItem(data.item);
-            });
+  Scat.api('item-update', data)
+      .done(function (data) {
+        loadItem(data.item);
+      });
+
   return '<span><i class="fa fa-spinner fa-spin"></i></span>';
 }
 

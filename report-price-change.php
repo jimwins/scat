@@ -139,27 +139,22 @@ $('.price-change').popover({
 $('body').on('submit', '.price-change-form', function(ev) {
   ev.preventDefault();
   var form= $(this);
-  $.getJSON("api/item-update.php?callback=?",
-            form.serializeArray(),
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-              if ($('input[name="print"]:checked', form).length) {
-                $.getJSON("print/labels-price.php?callback=?",
-                          { id: $('input[name="id"]', form).val() },
-                          function (data) {
-                            if (data.error) {
-                              displayError(data);
-                              return;
-                            }
-                          });
-              }
-              $(form).parent().parent()
-                     .siblings('.price-change')
-                     .popover('hide');
-            });
+  Scat.api('item-update', form.serializeArray())
+      .done(function (data) {
+        if ($('input[name="print"]:checked', form).length) {
+          $.getJSON("print/labels-price.php?callback=?",
+                    { id: $('input[name="id"]', form).val() },
+                    function (data) {
+                      if (data.error) {
+                        displayError(data);
+                        return;
+                      }
+                    });
+        }
+        $(form).parent().parent()
+               .siblings('.price-change')
+               .popover('hide');
+      });
 });
 
 $('#download').on('click', function(ev) {

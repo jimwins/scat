@@ -81,79 +81,76 @@ $(function() {
 $("#report-params").on('submit', function(ev) {
   ev.preventDefault();
   var params= $(this).serializeArray();
-  $.getJSON("./api/report-sales.php?callback=?",
-            params,
-            function(data) {
-              if (data.error) {
-                displayError(data);
-              } else {
-                var table= $("#results-template").clone();
-                table.removeAttr('id');
-                var t= $("tbody", table);
-                var gdata= [];
-                $.each(data.sales, function(i, sales) {
-                  t.append($('<tr><td>' + sales.span +
-                             '<td align="right">' + amount(sales.total) +
-                             '<td align="right">' + amount(sales.resale) +
-                             '<td align="right">' + amount(sales.tax) +
-                             '<td align="right">' + amount(sales.total_taxed) +
-                             '</tr>'));
-                  gdata.unshift({ x: sales.raw_date, y: sales.total });
-                });
-                var cap= $('#items').val();
-                if (cap) {
-                  $(".panel-title", table).text(cap);
+  Scat.api('report-sales', params)
+      .done(function(data) {
+        var table= $("#results-template").clone();
+        table.removeAttr('id');
+        var t= $("tbody", table);
+        var gdata= [];
+        $.each(data.sales, function(i, sales) {
+          t.append($('<tr><td>' + sales.span +
+                     '<td align="right">' + amount(sales.total) +
+                     '<td align="right">' + amount(sales.resale) +
+                     '<td align="right">' + amount(sales.tax) +
+                     '<td align="right">' + amount(sales.total_taxed) +
+                     '</tr>'));
+          gdata.unshift({ x: sales.raw_date, y: sales.total });
+        });
+        var cap= $('#items').val();
+        if (cap) {
+          $(".panel-title", table).text(cap);
+        }
+        table.appendTo($("body"));
+        table.show();
+
+        // Only show chart when we have multiple data points
+        if (gdata.length > 1) {
+          var data= {
+            datasets: [{
+              label: 'Sales',
+              data: gdata
+            }]
+          };
+
+          var options= {
+            legend: {
+              display: false,
+            },
+            scales: {
+              xAxes: [{
+                type: 'time',
+                time: {
+                  unit: 'day'
                 }
-                table.appendTo($("body"));
-                table.show();
-
-                // Only show chart when we have multiple data points
-                if (gdata.length > 1) {
-                  var data= {
-                    datasets: [{
-                      label: 'Sales',
-                      data: gdata
-                    }]
-                  };
-
-                  var options= {
-                    legend: {
-                      display: false,
-                    },
-                    scales: {
-                      xAxes: [{
-                        type: 'time',
-                        time: {
-                          unit: 'day'
-                        }
-                      }],
-                      yAxes: [{
-                        ticks: {
-                          callback: function(value, index, values) {
-                            return amount(value);
-                          }
-                        }
-                      }]
-                    },
-                    tooltips: {
-                      callbacks: {
-                        label: function (tooltipItem, data) {
-                          return amount(tooltipItem.yLabel);
-                        }
-                      }
-                    }
-                  };
-
-                  var chart= new Chart($('.graph', table)[0],
-                                       {
-                                         type: 'line',
-                                         data: data,
-                                         options: options
-                                       });
+              }],
+              yAxes: [{
+                ticks: {
+                  callback: function(value, index, values) {
+                    return amount(value);
+                  }
                 }
-
-                table.udraggable({ handle: '.panel-heading' });
+              }]
+            },
+            tooltips: {
+              callbacks: {
+                label: function (tooltipItem, data) {
+                  return amount(tooltipItem.yLabel);
+                }
               }
-            });
+            }
+          };
+
+          var chart= new Chart($('.graph', table)[0],
+                               {
+                                 type: 'line',
+                                 data: data,
+                                 options: options
+                               });
+        } else {
+          $('.graph', table).hide();
+        }
+
+        table.udraggable({ handle: '.panel-heading' });
+      });
 });
 </script>
