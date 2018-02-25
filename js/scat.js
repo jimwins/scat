@@ -98,21 +98,6 @@ Scat.printDirect= function(name, options) {
             });
 }
 
-$.getFocusedElement = function() {
-  var elem = document.activeElement;
-  return $( elem && ( elem.type || elem.href ) ? elem : [] );
-};
-
-// http://stackoverflow.com/a/3109234
-function round_to_even(num, decimalPlaces) {
-  var d = decimalPlaces || 0;
-  var m = Math.pow(10, d);
-  var n = d ? num * m : num;
-  var i = Math.floor(n), f = n - i;
-  var r = (f == 0.5) ? ((i % 2 == 0) ? i : i + 1) : Math.round(n);
-  return d ? r / m : r;
-}
-
 // format number as $3.00 or ($3.00)
 function amount(amount) {
   if (typeof(amount) == 'function') {
@@ -164,6 +149,11 @@ Scat.alert= function (data) {
   alert(data.error);
 }
 
+Scat.getFocusedElement= function() {
+  var elem = document.activeElement;
+  return $( elem && ( elem.type || elem.href ) ? elem : [] );
+};
+
 $(function() {
   $(document).keydown(function(ev) {
     if (ev.keyCode == 16 || ev.keyCode == 17
@@ -171,7 +161,7 @@ $(function() {
         || ev.metaKey || ev.altKey || ev.ctrlKey) {
       return true;
     }
-    var el = $.getFocusedElement();
+    var el= Scat.getFocusedElement();
     if (!el.length &&
         !$('#simplemodal-overlay').length && !$('.modal-backdrop').length) {
       var inp= $('.autofocus', this);
@@ -184,14 +174,14 @@ $(function() {
 });
 
 // http://blog.fawnanddoug.com/2012/05/inline-editor-custom-binding-for.html
-ko.bindingHandlers.jeditable = {
+ko.bindingHandlers.jeditable= {
   init: function(element, valueAccessor, allBindingsAccessor) {
     // get the options that were passed in
-    var options = allBindingsAccessor().jeditableOptions || {};
+    var options= allBindingsAccessor().jeditableOptions || {};
           
     // "submit" should be the default onblur action like regular ko controls
     if (!options.onblur) {
-      options.onblur = 'submit';
+      options.onblur= 'submit';
     }
 
     // allow the editable function to be set as an option
@@ -215,9 +205,9 @@ ko.bindingHandlers.jeditable = {
   //update the control when the view model changes
   update: function(element, valueAccessor, allBindingsAccessor) {
     // get the options that were passed in
-    var options = allBindingsAccessor().jeditableOptions || {};
+    var options= allBindingsAccessor().jeditableOptions || {};
 
-    var value = ko.utils.unwrapObservable(valueAccessor());
+    var value= ko.utils.unwrapObservable(valueAccessor());
     if (options.ondisplay) {
       value= options.ondisplay(value);
     }
@@ -235,5 +225,5 @@ $.editable.types['textarea'].plugin= function(settings, original) {
   $('textarea', this).addClass('form-control');
 }
 
-$.fn.editable.defaults.width  = 'none';
-$.fn.editable.defaults.height = 'none';
+$.fn.editable.defaults.width=  'none';
+$.fn.editable.defaults.height= 'none';
