@@ -20,10 +20,6 @@ $file= fopen($fn, 'r');
 $line= fgets($file);
 fclose($file);
 
-$q= "SELECT id FROM brand WHERE name = 'New Item'";
-$new_item= $db->get_one($q)
-  or die_query($db, $q);
-
 $temporary= "TEMPORARY";
 
 # On DEBUG server, we leave behind the vendor_order table
@@ -303,7 +299,7 @@ if ($txn['type'] != 'vendor') {
 # Make sure we have all the items
 $q= "INSERT IGNORE INTO item (code, brand, name, retail_price, active)
      SELECT item_no AS code,
-            $new_item AS brand,
+            0 AS brand,
             description AS name,
             msrp AS retail_price,
             1 AS active

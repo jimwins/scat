@@ -17,11 +17,9 @@ $code= $db->escape($code);
 $name= $db->escape($name);
 $msrp= $db->escape($msrp);
 
-$brand= $db->get_one("SELECT id FROM brand WHERE name = 'New Item'");
-
 $q= "INSERT INTO item
         SET code = '$code', name = '$name', retail_price = '$msrp',
-            brand = $brand,
+            brand = 0,
             taxfree = 0, minimum_quantity = 0, active = 1";
 
 $r= $db->query($q)

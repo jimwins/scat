@@ -20,7 +20,11 @@ function item_terms_to_sql($db, $q, $options) {
     } elseif (preg_match('/^item:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.id = '{$dbt[1]}')";
     } elseif (preg_match('/^brand:(.+)/i', $term, $dbt)) {
-      $andor[]= "(brand.slug = '{$dbt[1]}')";
+      if ($dbt[1] === "0") {
+        $andor[]= "(item.brand = 0)";
+      } else {
+        $andor[]= "(brand.slug = '{$dbt[1]}')";
+      }
     } elseif (preg_match('/^product:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.product_id = '{$dbt[1]}')";
     } elseif (preg_match('/^begin:([-0-9]+)/i', $term, $dbt)) {

@@ -12,13 +12,11 @@ if (!$code)
 
 $code= $db->escape($code);
 
-$brand= $db->get_one("SELECT id FROM brand WHERE name = 'New Item'");
-
 /* Add the items */
 $q= "INSERT INTO item (code, name, brand, retail_price,
                        discount_type, discount,
                        active, minimum_quantity, purchase_quantity)
-     SELECT vi.code, vi.name, $brand, vi.retail_price,
+     SELECT vi.code, vi.name, 0, vi.retail_price,
             NULL, NULL, 1, 0, vi.purchase_quantity
        FROM vendor_item vi
        LEFT JOIN item ON item = item.id
