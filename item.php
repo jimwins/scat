@@ -548,14 +548,8 @@ itemModel.printBarcode= function(place, ev) {
   if (!qty)
     return;
 
-  $.getJSON("print/labels-price.php?callback=?",
-            { id: item, noprice: noprice, quantity: qty },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-            });
+  Scat.printDirect('labels-price',
+                   { id: item, noprice: noprice, quantity: qty });
 }
 
 itemModel.removeBarcode= function(place) {

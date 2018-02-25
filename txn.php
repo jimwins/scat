@@ -294,10 +294,6 @@ $("#export-order").on('click', function() {
 <?
 }
 
-function charge_record($row) {
-  return '<a href="print/charge-record.php?id=' . $row[0] . '">Charge Record</a>';
-}
-
 if (preg_match('/customer/', $txn['Number$txn'])) {
   echo '<h2>Payments</h2>';
   $q= "SELECT id AS meta,
@@ -307,7 +303,7 @@ if (preg_match('/customer/', $txn['Number$txn'])) {
          FROM payment
         WHERE txn = $id
         ORDER BY processed ASC";
-  dump_table($db->query($q), 'charge_record$html');
+  dump_table($db->query($q));
   dump_query($q);
 }
 

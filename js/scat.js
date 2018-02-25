@@ -87,6 +87,17 @@ Scat.print= function(name, options) {
   return false;
 }
 
+Scat.printDirect= function(name, options) {
+  $.getJSON("print/" + name + ".php?callback=?",
+            options,
+            function (data) {
+              if (data.error) {
+                displayError(data);
+                return;
+              }
+            });
+}
+
 function play(type) {
   var sounds = {
     'yes' : 'Pop',

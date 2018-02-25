@@ -389,27 +389,13 @@ $('#print-price-labels').on('click', function(ev) {
   ev.preventDefault();
   var q= $('#search').val();
 
-  $.getJSON("print/labels-price.php?callback=?",
-            { q: q },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-            });
+  Scat.printDirect('labels-price', { q: q });
 });
 $('#print-price-labels-noprice').on('click', function(ev) {
   ev.preventDefault();
   var q= $('#search').val();
 
-  $.getJSON("print/labels-price.php?callback=?",
-            { q: q, noprice: 1 },
-            function (data) {
-              if (data.error) {
-                displayError(data);
-                return;
-              }
-            });
+  Scat.printDirect('labels-price', { q: q, noprice: 1 });
 });
 $('#print-price-labels-brush').on('click', function(ev) {
   ev.preventDefault();
@@ -418,14 +404,7 @@ $('#print-price-labels-brush').on('click', function(ev) {
   var trim= window.prompt("Please enter the part of the name to trim from the labels", "");
 
   if (trim) {
-    $.getJSON("print/labels-price-brush.php?callback=?",
-              { q: q, trim: trim },
-              function (data) {
-                if (data.error) {
-                  displayError(data);
-                  return;
-                }
-              });
+    Scat.printDirect('labels-price-brush', { q: q, trim: trim });
   }
 });
 

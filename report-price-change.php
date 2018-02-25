@@ -142,14 +142,8 @@ $('body').on('submit', '.price-change-form', function(ev) {
   Scat.api('item-update', form.serializeArray())
       .done(function (data) {
         if ($('input[name="print"]:checked', form).length) {
-          $.getJSON("print/labels-price.php?callback=?",
-                    { id: $('input[name="id"]', form).val() },
-                    function (data) {
-                      if (data.error) {
-                        displayError(data);
-                        return;
-                      }
-                    });
+          Scat.printDirect('labels-price',
+                           { id: $('input[name="id"]', form).val() });
         }
         $(form).parent().parent()
                .siblings('.price-change')
