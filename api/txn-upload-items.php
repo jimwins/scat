@@ -85,9 +85,10 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
        FIELDS TERMINATED BY '$sep' OPTIONALLY ENCLOSED BY '\"'
        IGNORE 1 LINES
        (line, item_no, description, status, @upc,
-        ordered, shipped, @backordered, msrp, net)
+        @ordered, @shipped, @backordered, msrp, net)
        SET barcode = REPLACE(@upc, 'UPC->', ''),
-           sku = item_no, cust_item = @uom";
+           sku = item_no, cust_item = @uom,
+           ordered = @shipped, backordered = @shipped, shipped = 0";
   $db->query($q)
     or die_query($db, $q);
 
