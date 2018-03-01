@@ -28,7 +28,8 @@ $q= "SELECT note.id, note.kind, note.attach_id,
                CONCAT(SUBSTRING(YEAR(txn.created), 3, 2), txn.number),
                CONCAT(DATE_FORMAT(txn.created, '%Y-'), txn.number))
               AS txn_name,
-            IF(about.name != '', about.name, about.company) AS about_name,
+            about.id AS about_id,
+            about.name AS about_name, about.company AS about_company,
             item.name AS item_name
        FROM note
        LEFT JOIN person ON note.person_id = person.id
