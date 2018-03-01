@@ -33,8 +33,10 @@ $q= "SELECT note.id, note.kind, note.attach_id,
        FROM note
        LEFT JOIN person ON note.person_id = person.id
        LEFT JOIN txn ON note.kind = 'txn' AND note.attach_id = txn.id
-       LEFT JOIN person about ON note.kind = 'person'
-                             AND note.attach_id = about.id
+       LEFT JOIN person about ON (note.kind = 'person'
+                                  AND note.attach_id = about.id)
+                              OR (note.kind = 'txn'
+                                  AND txn.person = about.id)
        LEFT JOIN item ON note.kind = 'item' AND note.attach_id = item.id
       WHERE parent_id = $parent_id
         AND IF($todo, todo, 1)

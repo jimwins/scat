@@ -14,9 +14,6 @@
                data-bind="foreach: notes">
           <tr data-bind="css: { active: $parent.parent_id() == $data.id }">
             <td class="text-right" style="white-space: nowrap" width="30%">
-              <div data-bind="text: moment($data.added).calendar(),
-                              attr: { title: moment($data.added).format('dddd, MMMM Do YYYY, h:mm:ss a') }"></div>
-              <div data-bind="text: $data.person_name"></div>
               <div data-bind="visible: $data.kind == 'txn' &&
                                        $data.attach_id != $parent.attach_id()">
                 <a data-bind="attr: { href: './?id=' + $data.attach_id },
@@ -24,7 +21,7 @@
                                                                 : 'Invoice ') +
                                     $data.txn_name"></a>
               </div>
-              <div data-bind="visible: $data.kind == 'person'">
+              <div data-bind="visible: $data.kind == 'person' || $data.kind == 'txn'">
                 <a data-bind="attr: { href: './person.php?id=' +
                                             $data.attach_id },
                               text: $data.about_name"></a>
@@ -36,7 +33,15 @@
               </div>
             </td>
             <td width="65%">
-              <div data-bind="html: marked($data.content)"></div>
+              <div style="padding-left: 0.5em">
+                <small style="margin-left: -0.5em"
+                       data-bind="text: moment($data.added).calendar() +
+                                        ' ' +
+                                        ($data.person_id != '0' ?
+                                         '(' + $data.person_name + ')' : '')">
+                </small>
+                <div data-bind="html: marked($data.content)"></div>
+              </div>
               <div class="small"
                    data-bind="visible: !$data.showingKids &&
                                        $data.children != '0'">
