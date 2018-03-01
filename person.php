@@ -480,7 +480,7 @@ $('body').on('dragbetterleave', function () {
 
 function linkTransaction(components) {
   var m= components.split(/\|/);
-  var base= { correction: 'txn.php',
+  var base= { correction: './',
               drawer: 'txn.php',
               customer: './',
               vendor: './' };
