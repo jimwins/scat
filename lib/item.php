@@ -35,6 +35,8 @@ function item_terms_to_sql($db, $q, $options) {
       $andor[]= "(item.name LIKE '%{$dbt[1]}%')";
     } elseif (preg_match('/^msrp:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.retail_price = '{$dbt[1]}')";
+    } elseif (preg_match('/^discount:(.+)/i', $term, $dbt)) {
+      $andor[]= "(item.discount = '{$dbt[1]}')";
     } elseif (preg_match('/^min:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.minimum_quantity = '{$dbt[1]}')";
     } elseif (preg_match('/^stocked:(.+)/i', $term, $dbt)) {
