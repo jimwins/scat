@@ -17,9 +17,21 @@ $res= $client->request('GET', $url,
 $updates= json_decode($res->getBody());
 
 foreach ($updates as $update) {
-  $person= Model::factory('Person')->where('loyalty_number',
-                                           $update->loyalty_number)
-                                   ->find_one();
+  $person= null;
+
+  /* First we look by number, and then by email. */
+
+  if (!empty($update->loyalty_number)) {
+    $person= Model::factory('Person')->where('loyalty_number',
+                                             $update->loyalty_number)
+                                     ->find_one();
+  }
+
+  if (!$person && !empty($update->email)) {
+    $person= Model::factory('Person')->where('email',
+                                             $update->email)
+                                     ->find_one();
+  }
 
   /* Didn't find them? Create them. */
   if (!$person) {
