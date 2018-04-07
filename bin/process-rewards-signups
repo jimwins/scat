@@ -39,7 +39,8 @@ foreach ($updates as $update) {
     $person->name= $update->name;
     $person->email= $update->email;
     $person->phone= $update->phone;
-    $person->loyalty_number= $update->loyalty_number;
+    if (!empty($update->loyalty_number))
+      $person->loyalty_number= $update->loyalty_number;
     $person->save();
 
     echo "Created new person '{$person->name}'.\n";
