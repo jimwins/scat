@@ -589,6 +589,10 @@ itemModel.editVendorItem= function(item) {
     vendorItem.vendors= [];
     vendorItem.error= '';
 
+    panel.on('shown.bs.modal', function() {
+      $(".initial-focus", this).focus();
+    });
+
     panel.on('hidden.bs.modal', function() {
       $(this).remove();
     });
