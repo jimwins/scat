@@ -572,6 +572,12 @@ $("#txn-load").submit(function(ev) {
                              click: deleteTransaction">
             Delete
           </button>
+          <button class="btn btn-default"
+                  data-bind="enable: txn.id() && items().length != 0 &&
+                                     txn.type() == 'vendor',
+                             click: exportTransaction">
+            Export
+          </button>
           <button id="pay" class="pay-button btn btn-default"
                   data-bind="enable: txn.id() && !txn.paid(),
                              visible: !txn.paid() && txn.type() != 'vendor'">
@@ -760,6 +766,7 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
               if (parseFloat(data.balance) < due) {
                 def= data.balance;
               }
+              // XXX can't get change from gift cert that expires
               if (data.balance - due <= 10.00) {
                 def= data.balance;
               }
@@ -1168,6 +1175,11 @@ viewModel.loadReturnedFrom= function() {
 viewModel.deleteTransaction= function() {
   var txn= Txn.id();
   Txn.delete(txn);
+}
+
+viewModel.exportTransaction= function() {
+  var txn= Txn.id();
+  window.location.href= 'export/txn.php?dl=1&id=' + txn;
 }
 
 viewModel.allocateTransaction= function() {
