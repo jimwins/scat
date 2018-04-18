@@ -380,7 +380,7 @@ $vendor_items= item_load_vendor_items($db, $id);
 <table id="vendors" class="table table-striped table-hover">
   <thead>
     <tr>
-      <th class="num">#</th>
+      <th></th>
       <th>Company</th>
       <th>Code</th>
       <th>List</th>
@@ -404,8 +404,13 @@ $vendor_items= item_load_vendor_items($db, $id);
     </tr>
   </tfoot>
   <tbody data-bind="foreach: vendor_items">
-    <tr data-bind="click: $parent.editVendorItem">
-      <td class="num" data-bind="text: $index() + 1"></td>
+    <tr>
+      <td>
+        <button type="button" class="btn btn-default btn-xs"
+                data-bind="click: $parent.editVendorItem">
+          <i class="fa fa-edit"></i>
+        </button>
+      </td>
       <td data-bind="text: $data.vendor_name"></td>
       <td data-bind="text: $data.code"></td>
       <td data-bind="text: amount($data.retail_price())"></td>
