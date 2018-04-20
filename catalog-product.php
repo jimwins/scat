@@ -198,7 +198,7 @@ ko.applyBindings(viewModel);
   </div>
 <div>
 
-<table class="table table-striped table-hover">
+<table class="table table-striped table-hover sortable">
   <thead>
     <tr>
       <th class="col-xs-2">Item No.</th>
