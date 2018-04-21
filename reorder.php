@@ -16,7 +16,13 @@ if ($vendor > 0) {
                         WHERE vendor = $vendor
                           AND item = item.id
                           AND vendor_item.active)";
-  $extra_field= "(SELECT MIN(IF(promo_price, promo_price, net_price)
+  $extra_field= "(SELECT MIN(purchase_quantity)
+                    FROM vendor_item
+                   WHERE item = item.id
+                     AND vendor = $vendor
+                     AND vendor_item.active)
+                  AS MOQ,
+                 (SELECT MIN(IF(promo_price, promo_price, net_price)
                              * ((100 - vendor_rebate) / 100))
                     FROM vendor_item
                     JOIN person ON vendor_item.vendor = person.id
@@ -33,7 +39,7 @@ if ($vendor > 0) {
                      AND vendor != $vendor
                      AND vendor_item.active)
                  Cheapest\$trool, ";
-  $extra_field_name= "Cheapest\$trool,";
+  $extra_field_name= "MOQ, Cheapest\$trool,";
 } else if ($vendor < 0) {
   // No vendor
   $extra= "AND NOT EXISTS (SELECT id
