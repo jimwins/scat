@@ -119,7 +119,7 @@ include 'item-searchform.php';
           <label for="discount" class="col-sm-4 control-label">Discount</label>
           <div class="col-sm-8">
             <p class="form-control-static" id="discount"
-               data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : item.discount() ? amount(item.discount()) : '...' } , data : item.discount(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+               data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : item.discount() ? amount(item.discount()) : '' } , data : item.discount(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
           </div>
         </div>
 
