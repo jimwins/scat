@@ -1,0 +1,20 @@
+<div class="well">
+  <form role="form" method="get" action="people.php">
+    <div class="input-group">
+      <span class="input-group-btn">
+        <input type="submit" class="btn btn-primary" value="Search">
+      </span>
+      <input name="search"
+             type="text" class="autofocus form-control" size="60"
+             autocomplete="off" autocorrect="off" autocapitalize="off"
+             data-bind="value: search"
+             placeholder="Name">
+      <span class="input-group-addon">
+        <label><input type="checkbox" value="1" name="all" data-bind="checked: all"> Include inactive?</label>
+      </span>
+      <span class="input-group-btn">
+        <a class="btn btn-default" href="person.php">Create New Person</a>
+      </span>
+    </div>
+  </form>
+</div>

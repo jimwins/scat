@@ -2,73 +2,19 @@
 require 'scat.php';
 require 'lib/person.php';
 
+$id= (int)$_REQUEST['id'];
+
 head("Person @ Scat", true);
 
-$id= (int)$_REQUEST['id'];
-$search= $_REQUEST['search'];
-
-?>
-<form class="col-sm-10" role="form" method="get" action="person.php">
-  <div class="input-group">
-    <span class="input-group-btn">
-      <input type="submit" class="btn btn-primary" value="Search">
-    </span>
-    <input name="search"
-           type="text" class="autofocus form-control" size="60"
-           autocomplete="off" autocorrect="off" autocapitalize="off"
-           data-bind="value: search"
-           placeholder="Name">
-    <span class="input-group-addon">
-      <label><input type="checkbox" value="1" name="all" data-bind="checked: all"> Include inactive?</label>
-    </span>
-  </div>
-</form>
-<br>
-<br>
-<?
+require 'ui/person-search.html';
 
 $person= array();
 $activity= array();
-$people= array();
 
-if (!empty($search)) {
-  $people= person_find($db, $search);
+$person= person_load($db, $id, PERSON_FIND_EMPTY);
 
-  if (count($people) == 1) {
-    $person= $people[0];
-    $id= (int)$person['id'];
-  }
-}
-?>
-<table class="table table-condensed table-striped table-hover"
-       data-bind="if: people().length && !person.id">
- <thead>
-  <tr>
-    <th>#</th>
-    <th>Name</th>
-    <th>Company</th>
-    <th>Phone</th>
-  </tr>
- </thead>
- <tbody data-bind="foreach: people">
-  <tr data-bind="click: function(d, e) { window.location.href= 'person.php?id=' + $data.id() }">
-   <td data-bind="text: $index() + 1"></td>
-   <td data-bind="text: $data.name"></td>
-   <td data-bind="text: $data.company"></td>
-   <td data-bind="text: $data.pretty_phone"></td>
-  </tr>
- </tbody>
-</table>
-<?
-
-if (!$id)
-  goto end;
-
-$person= person_load($db, $id);
-
-if (!$person) {
+if ($id && !$person) {
   echo '<div class="alert alert-danger">No such person.</div>';
-  goto end;
 }
 
 ?>
@@ -234,7 +180,7 @@ if (!$person) {
   </div>
 </div>
 
-<nav data-bind="if: !loading()">
+<nav data-bind="if: !loading() && activity().length">
   <ul class="pager">
     <li class="previous" data-bind="css: { disabled: activity_page() == 0 }">
       <a href="#" data-bind="click: function(data, event) { loadActivity(person.id(), activity_page() - 1) }"><span aria-hidden="true">&larr;</span> Newer</a>
@@ -301,20 +247,17 @@ if (!$person) {
 
 <?
 
-end:
-
 foot();
 ?>
 <script>
 var model= {
-  search: '<?=ashtml($search);?>',
+  search: '<?=ashtml($_REQUEST['search']);?>',
   all: <?=(int)$all?>,
   person: <?=json_encode($person);?>,
   activity: [],
   activity_page: 0,
   total: 0,
-  loading: 1,
-  people: <?=json_encode($people);?>,
+  loading: 0,
 };
 
 var viewModel= ko.mapping.fromJS(model);
@@ -383,10 +326,12 @@ viewModel.sendMessage= function (place) {
 
 ko.applyBindings(viewModel);
 
-Scat.api('note-count', { kind: 'person', attach_id: <?=(int)$person['id']?> })
-    .done(function(data) {
-      $('#person-notes').text(data.notes);
-    });
+if (<?=(int)$person['id']?>) {
+  Scat.api('note-count', { kind: 'person', attach_id: <?=(int)$person['id']?> })
+      .done(function(data) {
+        $('#person-notes').text(data.notes);
+      });
+}
 
 function loadActivity(person, page) {
   viewModel.loading(1);
@@ -412,7 +357,8 @@ function loadPerson(person) {
 }
 
 function savePerson(place) {
-  Scat.api('person-update', ko.mapping.toJS(viewModel.person))
+  Scat.api(viewModel.person.id() ? 'person-update' : 'person-add',
+           ko.mapping.toJS(viewModel.person))
       .done(function (data) {
               loadPerson(data.person);
             });
