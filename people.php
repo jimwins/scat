@@ -31,7 +31,7 @@ include 'ui/person-search.html';
   </tr>
  </thead>
  <tbody data-bind="foreach: people">
-  <tr data-bind="click: function(d, e) { window.location.href= 'person.php?id=' + $data.id() }">
+  <tr data-bind="click: function(d, e) { window.location.href= 'person.php?id=' + $data.id() }" style="cursor: pointer">
    <td data-bind="text: $index() + 1"></td>
    <td data-bind="text: $data.name"></td>
    <td data-bind="text: $data.company"></td>
@@ -39,6 +39,9 @@ include 'ui/person-search.html';
   </tr>
  </tbody>
 </table>
+<style>
+tbody tr:hover { color: #02314d; text-decoration: underline; }
+</style>
 <?
 foot();
 ?>
