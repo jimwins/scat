@@ -261,6 +261,7 @@ $q= "INSERT INTO vendor_item
        FROM vendor_upload
      ON DUPLICATE KEY UPDATE
        code = VALUES(code),
+       vendor_sku = VALUES(vendor_sku),
        name = VALUES(name),
        retail_price = IF(VALUES(retail_price),
                          VALUES(retail_price), vendor_item.retail_price),
