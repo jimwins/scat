@@ -150,10 +150,12 @@ CREATE TABLE `item` (
   `reviewed` tinyint(4) NOT NULL DEFAULT '0',
   `added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `inventoried` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`),
   KEY `product` (`product_id`),
-  KEY `brand` (`brand`)
+  KEY `brand` (`brand`),
+  KEY `inventoried` (`inventoried`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -575,4 +577,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-14 19:19:12
+-- Dump completed on 2018-04-29 21:33:43

@@ -171,6 +171,15 @@ include 'item-searchform.php';
           </div>
         </div>
 
+        <div class="form-group">
+          <label for="inventoried" class="col-sm-8 control-label">
+            Inventoried
+          </label>
+          <div class="col-sm-4">
+            <p class="form-control-static" id="inventoried"
+               data-bind="text: moment(item.inventoried()).calendar()"></p>
+          </div>
+        </div>
       </div>
     </div>
     </div>

@@ -126,6 +126,7 @@ function item_find($db, $q, $options) {
               length, width, height, weight, color,
               item.tic,
               $extra
+              item.added, item.modified, item.inventoried,
               item.active, item.reviewed
          FROM item
     LEFT JOIN brand ON (item.brand = brand.id)
