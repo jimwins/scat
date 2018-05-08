@@ -31,7 +31,7 @@ if ($_REQUEST['total']) {
 }
 
 if ($_REQUEST['date']) {
-  $criteria[]= "DATE(created) = DATE('" . $db->escape($_REQUEST['date']) . "')";
+  $criteria[]= "DATE(txn.created) = DATE('" . $db->escape($_REQUEST['date']) . "')";
 }
 
 if (empty($criteria)) {
@@ -52,19 +52,25 @@ $page= (int)$_REQUEST['page'];
    <option value="correction" <?=($type=="correction")?' selected': ''?>>Correction
    <option value="drawer" <?=($type=="drawer")?' selected': ''?>>Till Count
   </select>
-  that includes
-  <input type="text" name="q" value="<?=ashtml($q)?>">
-  <div class="checkbox">
-    <label>
-      <input type="checkbox" name="unfilled" value="1" <?=($_REQUEST['unfilled'])?' checked':''?>>
-      Unfilled
-    </label>
-  </div>
-  <div class="checkbox">
-    <label>
-      <input type="checkbox" name="unpaid" value="1" <?=($_REQUEST['unpaid'])?' checked':''?>>
-      Unpaid
-    </label>
+  <input type="text" class="form-control" name="q"
+         placeholder="Name or company"
+         value="<?=ashtml($q)?>">
+  <label class="checkbox-inline">
+    <input type="checkbox" name="unfilled" value="1"
+           <?=($_REQUEST['unfilled'])?' checked':''?>>
+    Unfilled
+  </label>
+  <label class="checkbox-inline">
+    <input type="checkbox" name="unpaid" value="1"
+           <?=($_REQUEST['unpaid'])?' checked':''?>>
+    Unpaid
+  </label>
+  <div class="form-group">
+    <div class="input-daterange" id="datepicker">
+      <input type="text" class="form-control" name="date"
+             placeholder="Date to search"
+             value="<?=ashtml($_REQUEST['date'])?>" />
+    </div>
   </div>
 </form>
 <br>
@@ -145,5 +151,14 @@ dump_table($db->query($q));
 echo $nav;
 
 dump_query($q);
-
+?>
+<script>
+$(function() {
+  $('.input-daterange').datepicker({
+      format: "yyyy-mm-dd",
+      todayHighlight: true
+  });
+});
+</script>
+<?
 foot();
