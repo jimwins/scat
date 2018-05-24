@@ -27,6 +27,23 @@ if ($term) {
                ->where('active', 1)
                ->find_many();
 }
+if ($_REQUEST['empty']) {
+  $products= Model::factory('Product')
+               ->select("product.*")
+               ->select("department.name", "department_name")
+               ->select("department.slug", "department_slug")
+               ->select("brand.name", "brand_name")
+               ->select_expr('(SELECT slug
+                                 FROM department AS parent
+                                WHERE department.parent_id = parent.id)',
+                             'parent_slug')
+               ->join('brand', array('product.brand_id', '=', 'brand.id'))
+               ->join('department', array('product.department_id', '=',
+                                          'department.id'))
+               ->where_raw('(SELECT COUNT(*) FROM item WHERE item.product_id = product.id AND item.active AND NOT item.deleted) = 0')
+               ->where('active', 1)
+               ->find_many();
+}
 
 ?>
 <script>
