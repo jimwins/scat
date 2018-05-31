@@ -210,19 +210,23 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   } else {
     $format= "FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'";
   }
+  if (preg_match('/promo/i', $line)) {
+    $action= 'promo';
+  }
 
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE vendor_upload
           $format
           IGNORE 1 LINES
           (code, vendor_sku, name, @retail_price, @net_price, @promo_price,
-           @barcode, purchase_quantity)
+           @barcode, purchase_quantity, @promo_quantity)
        SET
            retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
            net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
            promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', ''),
            barcode = REPLACE(REPLACE(@barcode, '-', ''), ' ', ''),
-           promo_quantity = IF(@promo_price, purchase_quantity, NULL)";
+           promo_quantity = IF(@promo_quantity, @promo_quantity,
+                               IF(@promo_price, purchase_quantity, NULL))";
 
   $r= $db->query($q)
     or die_query($db, $q);
@@ -240,6 +244,13 @@ if ($action == 'replace') {
   $db->query($q)
     or die_query($db, $q);
 } 
+/* If this is a promo, unset existing promos for this vendor */
+if ($action == 'promo') {
+  $q= "UPDATE vendor_item SET promo_price = NULL, promo_quantity = NULL
+        WHERE vendor = $vendor_id";
+  $db->query($q)
+    or die_query($db, $q);
+}
 
 $q= "INSERT INTO vendor_item
             (vendor, item, code, vendor_sku, name,
@@ -271,7 +282,9 @@ $q= "INSERT INTO vendor_item
        promo_quantity = VALUES(promo_quantity),
        barcode = IF(VALUES(barcode) != '',
                     VALUES(barcode), vendor_item.barcode),
-       purchase_quantity = VALUES(purchase_quantity),
+       purchase_quantity = IF(VALUES(purchase_quantity),
+                              VALUES(purchase_quantity),
+                              vendor_item.purchase_quantity),
        special_order = IFNULL(VALUES(special_order),
                               vendor_item.special_order),
        active = 1
