@@ -289,7 +289,7 @@ DROP TABLE IF EXISTS `price_override`;
 CREATE TABLE `price_override` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `pattern` varchar(255) NOT NULL,
-  `pattern_type` enum('like','rlike') NOT NULL DEFAULT 'like',
+  `pattern_type` enum('like','rlike','product') NOT NULL DEFAULT 'like',
   `minimum_quantity` int(10) unsigned NOT NULL DEFAULT '1',
   `discount_type` enum('percentage','additional_percentage','relative','fixed') DEFAULT NULL,
   `discount` decimal(9,2) DEFAULT NULL,
