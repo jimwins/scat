@@ -16,7 +16,8 @@ if ($vendor > 0) {
                         WHERE vendor = $vendor
                           AND item = item.id
                           AND vendor_item.active)";
-  $extra_field= "(SELECT MIN(purchase_quantity)
+  $extra_field= "(SELECT MIN(IF(promo_quantity, promo_quantity,
+                                purchase_quantity))
                     FROM vendor_item
                    WHERE item = item.id
                      AND vendor = $vendor
