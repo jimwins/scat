@@ -61,6 +61,17 @@ $q= "SELECT
             MAX(vendor_item.retail_price) AS NewList\$dollar,
             sale_price(item.retail_price, item.discount_type, item.discount)
               AS OldSale\$dollar,
+            CASE
+            WHEN (item.discount_type = 'percentage')
+              THEN CONCAT(item.discount, '%')
+            WHEN (item.discount_type = 'relative')
+              THEN CONCAT('-$', item.discount)
+            WHEN (item.discount_type = 'fixed')
+              THEN CONCAT('$', item.discount)
+            ELSE 
+              ''
+            END
+              AS Discount,
             CONCAT('$', CAST(MAX(vendor_item.net_price) / 0.6 AS DECIMAL(9,2)),
                    ' - ',
                    '$', CAST(MAX(vendor_item.net_price) / 0.5 AS DECIMAL(9,2)))
