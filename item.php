@@ -111,7 +111,7 @@ include 'item-searchform.php';
           <label for="retail_price" class="col-sm-4 control-label">List</label>
           <div class="col-sm-8">
             <p class="form-control-static" id="retail_price"
-               data-bind="jeditable: item.retail_price, jeditableOptions: { ondisplay: amount, data: item.retail_price(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+               data-bind="jeditable: item.retail_price, jeditableOptions: { ondisplay: amount, data: item.retail_price(), onupdate: saveItemProperty, onblur: 'cancel' }, css: { 'text-danger': differentVendorPrice() }"></p>
           </div>
         </div>
 
@@ -548,6 +548,16 @@ var model= {
 };
 
 var itemModel= ko.mapping.fromJS(model);
+
+itemModel.differentVendorPrice= function() {
+  var ret= false;
+  $.each(itemModel.vendor_items(), function (i, vi) {
+    if (vi.retail_price() != itemModel.item.retail_price()) {
+      ret= true;
+    }
+  });
+  return ret;
+}
 
 itemModel.printBarcode= function(place, ev) {
   var item= itemModel.item.id();
