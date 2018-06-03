@@ -50,6 +50,7 @@ while ($row= $r->fetch_assoc()) {
     </div>
   </div>
 </form>
+<?if (!isset($_REQUEST['vendor'])) { foot(); exit; }?>
 <div id="results">
 <?
 $q= "SELECT
