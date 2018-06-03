@@ -135,6 +135,7 @@ $(document).ready(function() {
             <li><a href="report.php">Sales by Date</a></li>
             <li><a href="report-items.php">Sales by Item</a></li>
             <li><a href="report-dogs.php">Dogs</a></li>
+            <li><a href="report-underpriced.php">Underpriced</a></li>
             <li><a href="report-clock.php">Clock</a></li>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header">Inventory</li>
