@@ -80,7 +80,7 @@ if (isset($_REQUEST['retail_price'])) {
     or die_query($db, $q);
 }
 
-if (isset($_REQUEST['discount'])) {
+if (isset($_REQUEST['discount']) && $_REQUEST['discount'] !== '') {
   $discount= preg_replace('/^\\$/', '', $_REQUEST['discount']);
   $discount= $db->real_escape_string($discount);
   if (preg_match('/^(\d*)(\/|%)( off)?$/', $discount, $m)) {
