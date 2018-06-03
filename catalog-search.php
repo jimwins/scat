@@ -57,8 +57,7 @@ var model= {
   echo join(", \n",
             array_map(function ($p) {
                         return json_encode($p->as_array(),
-                                           JSON_PRETTY_PRINT|
-                                           JSON_CHECK_NUMERIC);
+                                           JSON_PRETTY_PRINT);
                       },
                       $products));
 ?>
