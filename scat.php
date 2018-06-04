@@ -492,17 +492,17 @@ function expand_field($data, $class, $meta = null) {
     return \Payment::$methods[$data];
   case '$bool':
     if ($data) {
-      return '<i data-truth="1" class="fa fa-check-square-o"></i>';
+      return '<i data-truth="1" class="far fa-check-square"></i>';
     } else {
-      return '<i data-truth="0" class="fa fa-square-o"></i>';
+      return '<i data-truth="0" class="far fa-square"></i>';
     }
   case '$trool':
     if ($data < 0 || $data === null) {
-      return '<i data-truth="1" class="fa fa-check-square-o"></i>';
+      return '<i data-truth="1" class="far fa-check-square"></i>';
     } elseif ($data == 0) {
-      return '<i data-truth="1" class="fa fa-minus-square-o"></i>';
+      return '<i data-truth="1" class="far fa-minus-square"></i>';
     } else {
-      return '<i data-truth="0" class="fa fa-square-o"></i>';
+      return '<i data-truth="0" class="far fa-square"></i>';
     }
   case '$html':
     return $data;
