@@ -153,7 +153,7 @@ if (!$search) {
             'title="', ashtml($row['search']), '">',
          ashtml($row['name']), '</a>',
          '<a class="pull-right" href="report-performance.php?saved=', $row['id'], '">',
-         '<i class="fa fa-bar-chart"></i></a>',
+         '<i class="far fa-chart-bar"></i></a>',
          '</li>';
   }
   echo '</ul>';
@@ -315,9 +315,9 @@ function updateItem(item) {
   var active= parseInt(item.active);
   $('.' + item.id + ' td:nth(10) i').data('truth', active);
   if (active) {
-    $('.' + item.id + ' td:nth(10) i').removeClass('fa-square-o').addClass('fa-check-square-o');
+    $('.' + item.id + ' td:nth(10) i').removeClass('fa-square').addClass('fa-check-square');
   } else {
-    $('.' + item.id + ' td:nth(10) i').removeClass('fa-check-square-o').addClass('fa-square-o');
+    $('.' + item.id + ' td:nth(10) i').removeClass('fa-check-square').addClass('fa-square');
   }
 }
 $('tbody tr .name').editable(function(value, settings) {

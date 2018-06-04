@@ -45,15 +45,15 @@ include 'item-searchform.php';
       <div class="panel-heading">
         <div class="pull-right">
           <button id="active" type="button" class="btn btn-default btn-xs">
-            <i class="fa"
-               data-bind="css: { 'fa-check-square-o' : item.active(),
-                                'fa-square-o' : !item.active() }"></i>
+            <i class="far"
+               data-bind="css: { 'fa-check-square' : item.active(),
+                                'fa-square' : !item.active() }"></i>
             Active
           </button>
           <button id="reviewed" type="button" class="btn btn-default btn-xs">
-            <i class="fa"
-               data-bind="css: { 'fa-check-square-o' : item.reviewed(),
-                                'fa-square-o' : !item.reviewed() }"></i>
+            <i class="far"
+               data-bind="css: { 'fa-check-square' : item.reviewed(),
+                                'fa-square' : !item.reviewed() }"></i>
             Reviewed
           </button>
         </div>
@@ -195,7 +195,7 @@ include 'item-searchform.php';
           <a class="btn btn-default btn-xs"
              data-bind="attr: { href: '<?=ORDURE?>/' + item.code() }"
              target="_blank">
-            <i class="fa fa-external-link"></i>
+            <i class="fas fa-external-link-alt"></i>
             Website
           </a>
         </div>
@@ -220,12 +220,6 @@ include 'item-searchform.php';
                             attr: { href: 'catalog-product.php?id=' +
                                           item.product_id() }">
                 Product Name
-              </a>
-              <a class="btn btn-default btn-xs"
-                 data-bind="visible: item.product_id(),
-                            attr: { href: 'items.php?search=product:' +
-                                           item.product_id() }">
-                <i class="fa fa-list"></i> Items
               </a>
             </p>
           </div>
@@ -277,6 +271,24 @@ include 'item-searchform.php';
           </div>
         </div>
 
+        <div class="form-group">
+          <div class="col-sm-push-4 col-sm-8">
+            <a class="btn btn-default btn-sm"
+               data-bind="visible: item.product_id(),
+                          attr: { href: 'catalog-product.php?id=' +
+                                         item.product_id() }">
+              <i class="fa fa-cubes"></i> Product
+            </a>
+
+            <a class="btn btn-default btn-sm"
+               data-bind="visible: item.product_id(),
+                          attr: { href: 'items.php?search=product:' +
+                                         item.product_id() }">
+              <i class="far fa-clipboard"></i> Product List
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
     </div>
@@ -292,7 +304,7 @@ include 'item-searchform.php';
           <tr>
             <td><span data-bind="text: $data.code"></span></td>
             <td><span data-bind="text: $data.quantity, jeditable: $data.quantity, jeditableOptions: { onupdate: editBarcodeQuantity, onblur: 'cancel' }"></span></td>
-            <td><button type="button" class="btn btn-default btn-xs" data-bind="click: $parent.removeBarcode"><i class="fa fa-trash-o"></i></button></td>
+            <td><button type="button" class="btn btn-default btn-xs" data-bind="click: $parent.removeBarcode"><i class="far fa-trash-alt"></i></button></td>
           </tr>
         </tbody>
       </table>
@@ -432,7 +444,7 @@ $vendor_items= item_load_vendor_items($db, $id);
       <td data-bind="text: amount($data.net_price())"></td>
       <td data-bind="text: amount($data.promo_price())"></td>
       <td data-bind="text: amount($data.net_price() / 0.6) + ' - ' + amount($data.net_price() / 0.5)"></td>
-      <td><i class="fa" data-bind="css: { 'fa-check-square-o': $data.special_order() == '1', 'fa-square-o': $data.special_order() == '0' }"></i></td>
+      <td><i class="far" data-bind="css: { 'fa-check-square': $data.special_order() == '1', 'fa-square': $data.special_order() == '0' }"></i></td>
       <td data-bind="text: $data.purchase_quantity"></td>
     </tr>
   </tbody>

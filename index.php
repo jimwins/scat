@@ -889,12 +889,12 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
           </span>
           <span data-bind="css: { 'text-muted': !txn.paid() },
                            attr: { title: txn.paid() ? moment(txn.paid()).format('MMMM D YYYY h:mm:ss a') : '' }">
-            <i class="fa fa-money"></i>
+            <i class="far fa-money-bill-alt"></i>
           </span>
         </div>
         <div>
           <a data-bind="click: changePerson">
-            <i class="fa fa-user-o"></i>
+            <i class="far fa-user"></i>
             <span class="val"
                   data-bind="text: person.display_name()"></span>
           </a>
@@ -905,7 +905,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
           </a>
           <span data-bind="if: person.id() && !person.suppress_loyalty() &&
                            person.points_pending() > 0">
-            + <i class="fa fa-star-o"></i>
+            + <i class="far fa-star"></i>
             <span data-bind="text: person.points_pending()"></span>
             = <span data-bind="text: person.points_available() + person.points_pending()"></span>
           </span>
@@ -916,13 +916,13 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
               <span data-bind="text: loyaltyPointsUsed()"></span>
             </span>
             <span data-bind="if: !txn.no_rewards()">
-              + <i class="fa fa-star-o"></i>
+              + <i class="far fa-star"></i>
               <span data-bind="text: Math.max(1, Math.floor(txn.subtotal()))"></span>
             </span>
             = <span data-bind="text: person.points_available() + person.points_pending() + (txn.no_rewards() ? 0 : Math.max(1, Math.floor(txn.subtotal()))) - loyaltyPointsUsed()"></span>
           </span>
           <a data-bind="if: person.id(), click: removePerson">
-            <i class="fa fa-trash-o"></i>
+            <i class="far fa-trash-alt"></i>
           </a>
         </div>
       </div>
@@ -988,7 +988,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
       <th data-bind="attr: { colspan: $parent.showAllocated() ? 5 : 4 }"
           class="payment-buttons">
         <a data-bind="visible: $parent.showAdmin()" name="remove">
-          <i class="fa fa-trash-o"></i>
+          <i class="far fa-trash-alt"></i>
         </a>
         <a data-bind="visible: method() == 'credit',
                       click: function (data) { printChargeRecord(data.id()) }">
@@ -1044,7 +1044,7 @@ $('#tax_rate .val').editable(function(value, settings) {
       <td>
         <a class="remove"
            data-bind="click: $parent.removeItem">
-          <i class="fa fa-trash-o" title="Remove"></i>
+          <i class="far fa-trash-alt" title="Remove"></i>
         </a>
       </td>
       <td align="center" class="editable"

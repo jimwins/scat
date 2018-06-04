@@ -90,7 +90,7 @@ $q= "SELECT
       ORDER BY 2";
 
 function Change($row) {
-  echo '<a class="price-change" data-id="' . $row[0] . '" data-msrp="' . $row[4] . '"><i class="fa fa-money"></a>';
+  echo '<a class="price-change" data-id="' . $row[0] . '" data-msrp="' . $row[4] . '"><i class="far fa-money-bill-alt"></a>';
 }
 
 dump_table($db->query($q), 'Change$right');

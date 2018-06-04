@@ -21,7 +21,7 @@
       <button id="save"
               data-saved="<?=(int)$_REQUEST['saved']?>"
               class="btn btn-default">
-        <i class="fa fa-floppy-o"></i>
+        <i class="far fa-save"></i>
       </button>
     </span>
 <script>

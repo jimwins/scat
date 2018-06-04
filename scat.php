@@ -32,8 +32,9 @@ header("content-type: text/html;charset=utf-8");?>
  <title><?=ashtml($title)?></title>
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <link rel="stylesheet" type="text/css" href="extern/bootstrap/css/bootstrap.min.css">
- <link rel="stylesheet" type="text/css" href="components/font-awesome/css/font-awesome.min.css">
+ <link rel="stylesheet" type="text/css" href="components/font-awesome/css/fontawesome-all.min.css">
  <link rel="stylesheet" type="text/css" href="extern/bootstrap-datepicker-1.7.1/css/bootstrap-datepicker3.min.css">
+ <link rel="stylesheet" type="text/css" href="vendor/select2/select2/dist/css/select2.min.css">
  <link rel="stylesheet" type="text/css" href="css/scat.css">
 <?if (!$allnew) {?>
   <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
@@ -49,6 +50,7 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="components/jquery/jquery.min.js"></script>
  <script src="extern/bootstrap/js/bootstrap.min.js"></script>
  <script src="extern/bootstrap-datepicker-1.7.1/js/bootstrap-datepicker.min.js"></script>
+ <script src="vendor/select2/select2/dist/js/select2.min.js"></script>
  <script src="extern/knockout/knockout-3.4.2.js"></script>
  <script src="extern/knockout/knockout.mapping-2.4.1.js"></script>
  <script src="js/jquery.tablesorter.min.js"></script>

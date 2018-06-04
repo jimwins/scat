@@ -67,7 +67,7 @@ if ($id && !$person) {
   <div class="form-group">
     <label for="email" class="col-sm-2 control-label">
       <a data-bind="click: sendMessage">
-        <i class="fa fa-envelope-o"></i>
+        <i class="far fa-envelope"></i>
       </a>
       Email
     </label>

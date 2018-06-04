@@ -35,11 +35,11 @@ head("Price Overrides @ Scat", true);
       <td>
         <button role="button" class="btn btn-xs btn-default"
                 data-bind="click: $parent.editOverride">
-          <i class="fa fa-pencil"></i>
+          <i class="fa fa-pencil-alt"></i>
         </button>
         <button role="button" class="btn btn-xs btn-default"
                 data-bind="click: $parent.deleteOverride">
-          <i class="fa fa-trash-o"></i>
+          <i class="far fa-trash-alt"></i>
         </button>
       </td>
     </tr>
