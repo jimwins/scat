@@ -221,6 +221,12 @@ include 'item-searchform.php';
                                           item.product_id() }">
                 Product Name
               </a>
+              <a class="btn btn-default btn-xs"
+                 data-bind="visible: item.product_id(),
+                            attr: { href: 'items.php?search=product:' +
+                                           item.product_id() }">
+                <i class="fa fa-list"></i> Items
+              </a>
             </p>
           </div>
         </div>
