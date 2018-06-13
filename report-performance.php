@@ -74,7 +74,7 @@ $q= "SELECT SUM(ordered *
        JOIN item ON (txn_line.item = item.id)
       WHERE type = 'vendor'
         AND ($sql_criteria)
-        AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY";
+        AND created BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY";
 
 $purchased= $db->get_one($q);
 
