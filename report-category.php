@@ -76,7 +76,8 @@ $q= "CREATE TABLE report_current
                                             txn_line.discount)) amount
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
-       JOIN item ON txn_line.item = item.id
+            JOIN item ON txn_line.item = item.id
+            JOIN brand ON item.brand = brand.id
        LEFT JOIN product ON product_id = product.id
       WHERE type = 'customer'
         AND ($sql_criteria)
@@ -102,7 +103,8 @@ $q= "CREATE TABLE report_previous
                                             txn_line.discount)) amount
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
-       JOIN item ON txn_line.item = item.id
+            JOIN item ON txn_line.item = item.id
+            JOIN brand ON item.brand = brand.id
        LEFT JOIN product ON product_id = product.id
       WHERE type = 'customer'
         AND ($sql_criteria)
