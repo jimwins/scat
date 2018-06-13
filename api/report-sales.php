@@ -82,6 +82,7 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
                FROM txn
                LEFT JOIN txn_line ON (txn.id = txn_line.txn)
                     JOIN item ON (txn_line.item = item.id)
+                    JOIN brand ON (item.brand = brand.id)
               WHERE filled IS NOT NULL
                 AND filled BETWEEN $begin AND $end
                 AND type = 'customer'
