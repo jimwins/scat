@@ -74,6 +74,8 @@ $q= "CREATE TEMPORARY TABLE current
                                             txn_line.discount)) amount
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
+            JOIN item ON txn_line.item = item.id
+            JOIN brand ON item.brand = brand.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
@@ -104,6 +106,8 @@ $q= "CREATE TEMPORARY TABLE previous
                                             txn_line.discount)) amount
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
+            JOIN item ON txn_line.item = item.id
+            JOIN brand ON item.brand = brand.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' - INTERVAL 1 YEAR
