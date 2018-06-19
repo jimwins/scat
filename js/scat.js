@@ -215,15 +215,9 @@ ko.bindingHandlers.jeditable= {
   }
 };
 
-$.editable.types['text'].plugin= function(settings, original) {
-  $('input', this).addClass('form-control');
-}
-$.editable.types['select'].plugin= function(settings, original) {
-  $('select', this).addClass('form-control');
-}
-$.editable.types['textarea'].plugin= function(settings, original) {
-  $('textarea', this).addClass('form-control');
-}
 
+$.fn.editable.defaults.inputcssclass= 'form-control';
+$.fn.editable.defaults.cancelcssclass= 'btn btn-default';
+$.fn.editable.defaults.submitcssclass= 'btn btn-primary';
 $.fn.editable.defaults.width=  'none';
 $.fn.editable.defaults.height= 'none';
