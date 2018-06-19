@@ -310,7 +310,10 @@ $q= "UPDATE vendor_item
                             WHERE barcode.code = barcode
                             LIMIT 1),
                           0)
-     WHERE vendor = $vendor_id AND item = 0 AND barcode IS NOT NULL";
+     WHERE vendor = $vendor_id
+       AND item = 0
+       AND barcode IS NOT NULL
+       AND barcode != ''";
 $r= $db->query($q)
   or die_query($db, $q);
 
