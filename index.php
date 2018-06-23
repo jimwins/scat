@@ -1230,6 +1230,10 @@ viewModel.changePerson= function(data, event) {
 
     var personModel= ko.mapping.fromJS(model);
     personModel.people= ko.observableArray();
+    personModel.search.extend({ rateLimit: {
+                                  timeout: 250,
+                                  method: "notifyWhenChangesStop"
+                                } });
 
     ko.computed(function() {
       var search= this.search();
