@@ -14,7 +14,7 @@ head("Items @ Scat", true);
 
 // XXX can't add items on phone for now
 ?>
-<div class="hidden-xs btn-group" style="float: right">
+<div class="hidden-xs btn-group hidden-print" style="float: right">
   <button id="add-item" class="btn btn-default">Add New Item</button>
   <button type="button" class="btn btn-default dropdown-toggle"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -218,7 +218,7 @@ ob_end_flush();
 
 dump_table($r);
 ?>
-<div class="panel-group" id="accordion">
+<div class="panel-group hidden-print" id="accordion">
   <div class="panel panel-default">
     <div class="panel-heading">
       <h4 class="panel-title">
@@ -279,7 +279,7 @@ dump_table($r);
   </div>
 </div>
 
-<div class="btn-group">
+<div class="btn-group hidden-print">
   <button type="button" class="btn btn-default"
           id="print-price-labels">
     <i class="fa fa-print"></i> Print Price Labels
