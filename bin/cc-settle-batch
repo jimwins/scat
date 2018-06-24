@@ -1,0 +1,12 @@
+#!/usr/bin/php
+<?php
+
+include basename(__FILENAME__) . '/../config.php';
+include_encrypted(basename(__FILENAME__) . '/../lib/cc-terminal.phpc');
+
+$cc= new CC_Terminal();
+
+list($amount, $details)= $cc->settleBatch();
+
+echo "Settled {$details['cc_numtrans']} transactions "
+   . "for $amount (#{$details['cc_batchnum']}).\n";
