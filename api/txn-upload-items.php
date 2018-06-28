@@ -151,6 +151,18 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   $db->query("DELETE FROM vendor_order WHERE status = 'asmt' OR status = 'as'");
 
   echo "- Deleted ", $db->affected_rows, " assortments from file.\n";
+} elseif (preg_match('/^Item #	Description	Qty	UPC/', $line)) {
+  // C2F Assortment
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+       INTO TABLE vendor_order
+       FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
+       IGNORE 1 LINES
+       (item_no, description, @qty, barcode)
+       SET ordered = @qty, shipped = @qty, msrp = 0, net = 0";
+  $db->query($q)
+    or die_query($db, $q);
+
+  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 } elseif (preg_match('/^,Name,MSRP/', $line)) {
   // CSV
   $q= "LOAD DATA LOCAL INFILE '$fn'
