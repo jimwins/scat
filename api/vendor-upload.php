@@ -219,12 +219,13 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
           $format
           IGNORE 1 LINES
           (code, vendor_sku, name, @retail_price, @net_price, @promo_price,
-           @barcode, purchase_quantity, @promo_quantity)
+           @barcode, @purchase_quantity, @promo_quantity)
        SET
            retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
            net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
            promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', ''),
            barcode = REPLACE(REPLACE(@barcode, '-', ''), ' ', ''),
+           purchase_quantity = IF(@purchase_quantity, @purchase_quantity, 1),
            promo_quantity = IF(@promo_quantity, @promo_quantity,
                                IF(@promo_price, purchase_quantity, NULL))";
 
