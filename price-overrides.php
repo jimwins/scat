@@ -26,7 +26,8 @@ head("Price Overrides @ Scat", true);
   </tfoot>
   <tbody data-bind="foreach: overrides">
     <tr>
-      <td data-bind="text: $data.pattern">MXG%</td>
+      <td><a data-bind="text: $data.pattern,
+                     attr: { href : $parent.getSearchURL($data) }">MXG%</a></td>
       <td data-bind="text: $data.minimum_quantity">12</td>
       <td data-bind="text: $parent.formatDiscount($data.discount_type,
                                                   $data.discount)">+10%</td>
@@ -70,6 +71,23 @@ $(function() {
         return Scat.amount(val);
     }
     return "???";
+  }
+
+  viewModel.getSearchURL= function(data) {
+    var search= '';
+    switch (data.pattern_type) {
+    case 'rlike':
+      search= 're:' + data.pattern;
+      break;
+    case 'like':
+      search= data.pattern;
+      break;
+    case 'product':
+      search= 'product:' + data.pattern;
+      break;
+    }
+
+    return 'items.php?search=' + search;
   }
 
   viewModel.editOverride= function(place, ev) {

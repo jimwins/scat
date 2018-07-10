@@ -60,6 +60,8 @@ function item_terms_to_sql($db, $q, $options) {
                                          FROM vendor_item
                                         WHERE item = item.id
                                           AND vendor_item.active)";
+    } elseif (preg_match('/^re:(.+)/i', $term, $dbt)) {
+      $andor[]= ("item.code RLIKE '{$dbt[1]}'");
     } else {
       if ($options & FIND_LIMITED) {
         $andor[]= "(item.name LIKE '%$term%'
