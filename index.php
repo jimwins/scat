@@ -1007,12 +1007,14 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
     <tr id="due-row" data-bind="visible: txn.total()">
       <th data-bind="attr: { colspan: showAllocated() ? 5 : 4 }"
           style="text-align: right">
+<!-- too dangerous
         <a id="lock" data-bind="visible: payments().length,
                                 click: function () { showAdmin(!showAdmin()) }">
           <i data-bind="css: { fa: true,
                                'fa-lock': !showAdmin(),
                                'fa-unlock-alt': showAdmin() }"></i>
         </a>
+-->
       </th>
       <th align="right">Due:</th>
       <td data-bind="text: amount(txn.total() - txn.total_paid())"
