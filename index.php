@@ -349,6 +349,12 @@ $(function() {
   $('input').bind('keydown', 'meta+p', function(ev) {
     return printReceipt();
   });
+  $(document).bind('keydown', 'meta+shift+z', function(ev) {
+    viewModel.showAdmin(true);
+  });
+  $('input').bind('keydown', 'meta+shift+z', function(ev) {
+    viewModel.showAdmin(true);
+  });
 
   $('#lookup').submit(function(ev) {
     ev.preventDefault();
