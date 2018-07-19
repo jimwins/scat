@@ -153,12 +153,13 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   echo "- Deleted ", $db->affected_rows, " assortments from file.\n";
 } elseif (preg_match('/^Item #	Description	Qty	UPC/', $line)) {
   // C2F Assortment
+  echo "- Loading C2F Assortment\n";
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
        FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
        IGNORE 1 LINES
        (item_no, description, @qty, barcode)
-       SET ordered = @qty, shipped = @qty, msrp = 0, net = 0";
+       SET ordered = @qty, shipped = @qty, msrp = 1, net = 1";
   $db->query($q)
     or die_query($db, $q);
 
