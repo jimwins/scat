@@ -289,7 +289,7 @@ include 'item-searchform.php';
 
             <a class="btn btn-default"
                data-bind="visible: item.product_id(),
-                          attr:{ href: 'report-performance.php?items=product:' +
+                          attr: { href: 'report-performance.php?product=' +
                                          item.product_id() }">
               <i class="far fa-chart-bar"></i> Performance
             </a>
