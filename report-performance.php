@@ -3,6 +3,9 @@ require 'scat.php';
 require 'lib/item.php';
 
 $items= $_REQUEST['items'];
+if (!$items && ($product= (int)$_REQUEST['product'])) {
+  $items= "product:$product";
+}
 
 if (($saved= (int)$_GET['saved']) && !$items) {
   $items= $db->get_one("SELECT search FROM saved_search WHERE id = $saved");
@@ -66,6 +69,11 @@ head("Performance @ Scat", true);
 </form>
 <div id="results">
 <?
+if ($product) {
+  $name= $db->get_one("SELECT name FROM product WHERE id = $product");
+  echo '<div class="page-header"><h2>', ashtml($name), '</h2></div>';
+}
+
 $q= "SELECT SUM(ordered *
                 sale_price(txn_line.retail_price, txn_line.discount_type,
                            txn_line.discount)) total
@@ -107,13 +115,124 @@ $q= "SELECT SUM(minimum_quantity *
 $ideal= $db->get_one($q);
 ?>
 </div>
-<dl>
-  <dt>Purchased:</dt> <dd><?=amount($purchased)?></dd>
-  <dt>Sold:</dt> <dd><?=amount($sold)?></dd>
-  <dt>Stock:</dt> <dd><?=amount($stock)?></dd>
-  <dt>Ideal:</dt> <dd><?=amount($ideal)?></dd>
-  <dt>Turns:</dt> <dd><?=($sold / $ideal)?></dd>
-</dl>
+<div class="row">
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h1 class="panel-title">Purchased</h1>
+      </div>
+      <div class="panel-body text-center text-center">
+        <span style="font-size: 300%">
+          <?=amount($purchased)?>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h1 class="panel-title">Sold</h1>
+      </div>
+      <div class="panel-body text-center">
+        <span style="font-size: 300%">
+          <?=amount($sold)?>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h1 class="panel-title">Stock</h1>
+      </div>
+      <div class="panel-body text-center">
+        <span style="font-size: 300%">
+          <?=amount($stock)?>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h1 class="panel-title">Ideal</h1>
+      </div>
+      <div class="panel-body text-center">
+        <span style="font-size: 300%">
+          <?=amount($ideal)?>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h1 class="panel-title">Turns</h1>
+      </div>
+      <div class="panel-body text-center">
+        <span style="font-size: 300%">
+          <?=sprintf('%.2f', $sold/$ideal)?>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+<?
+$span= $_REQUEST['span'];
+if (!$span) $span= 'month';
+switch ($span) {
+case 'all':
+  $format= 'All';
+  break;
+case 'year':
+  $format= '%Y';
+  break;
+case 'week':
+  $format= '%X-W%v';
+  break;
+case 'hour':
+  $format= '%w (%a) %H:00';
+  break;
+case 'day':
+  $format= '%Y-%m-%d %a';
+  break;
+default:
+case 'month':
+  $format= '%Y-%m';
+  break;
+}
+
+$q= "SELECT DATE_FORMAT(created, '$format') AS span,
+           SUM(ordered * -1 *
+                sale_price(txn_line.retail_price, txn_line.discount_type,
+                           txn_line.discount)) total
+       FROM txn 
+       JOIN txn_line ON (txn.id = txn_line.txn)
+       JOIN item ON (txn_line.item = item.id)
+      WHERE type = 'customer'
+        AND ($sql_criteria)
+        AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
+      GROUP BY 1 DESC";
+
+$r= $db->query($q)
+  or die_query($db, $q);
+
+$data= "[";
+while ($row= $r->fetch_assoc()) {
+  $data.= "{ x: '{$row['span']}', y: {$row['total']} },";
+}
+$data.= "]";
+?>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Sales</h1>
+  </div>
+  <div class="panel-body">
+    <div class="chart-container" style="position: relative">
+     <canvas id="sales-chart"></canvas>
+    </div>
+  </div>
+</div>
 <?
 foot();
 ?>
@@ -123,6 +242,54 @@ $(function() {
       format: "yyyy-mm-dd",
       todayHighlight: true
   });
-});
+
+  var data= {
+    datasets: [{
+      label: 'Sales',
+      data: <?=$data?>
+    }]
+  };
+
+  var options= {
+    legend: false,
+    scales: {
+      xAxes: [{
+        type: 'time',
+        time: {
+          unit: '<?=$span?>',
+          min: '<?=$begin?>',
+          max: '<?=$end?>'
+        },
+        barPercentage: 1.0,
+        categoryPercentage: 1.0,
+        barThickness: 50,
+      }],
+      yAxes: [{
+        position: 'left',
+        ticks: {
+          callback: function(value, index, values) {
+            return amount(value);
+          }
+        }
+      }],
+    },
+    tooltips: {
+      intersect: false,
+      callbacks: {
+        label: function (tooltipItem, data) {
+          return (tooltipItem.datasetIndex ?
+                  tooltipItem.yLabel :
+                  amount(tooltipItem.yLabel));
+        }
+      }
+    }
+  };
+
+  var salesChart= new Chart(document.getElementById('sales-chart'), {
+                                 type: 'bar',
+                                 data: data,
+                                 options: options
+                           });
+  });
 </script>
 
