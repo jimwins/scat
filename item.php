@@ -286,6 +286,13 @@ include 'item-searchform.php';
                                          item.product_id() }">
               <i class="far fa-clipboard"></i> Product List
             </a>
+
+            <a class="btn btn-default"
+               data-bind="visible: item.product_id(),
+                          attr:{ href: 'report-performance.php?items=product:' +
+                                         item.product_id() }">
+              <i class="far fa-chart-bar"></i> Performance
+            </a>
           </div>
         </div>
 
