@@ -272,7 +272,7 @@ include 'item-searchform.php';
         </div>
 
         <div class="form-group">
-          <div class="col-sm-push-4 col-sm-8">
+          <div class="col-sm-12">
             <a class="btn btn-default"
                data-bind="visible: item.product_id(),
                           attr: { href: 'catalog-product.php?id=' +
