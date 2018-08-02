@@ -213,6 +213,7 @@ $q= "SELECT DATE_FORMAT(created, '$format') AS span,
        FROM txn 
        JOIN txn_line ON (txn.id = txn_line.txn)
        JOIN item ON (txn_line.item = item.id)
+       LEFT JOIN brand ON item.brand = brand.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
