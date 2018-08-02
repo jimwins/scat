@@ -80,6 +80,7 @@ $q= "SELECT SUM(ordered *
        FROM txn 
        JOIN txn_line ON (txn.id = txn_line.txn)
        JOIN item ON (txn_line.item = item.id)
+       LEFT JOIN brand ON item.brand = brand.id
       WHERE type = 'vendor'
         AND ($sql_criteria)
         AND created BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY";
@@ -92,6 +93,7 @@ $q= "SELECT SUM(ordered * -1 *
        FROM txn 
        JOIN txn_line ON (txn.id = txn_line.txn)
        JOIN item ON (txn_line.item = item.id)
+       LEFT JOIN brand ON item.brand = brand.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY";
@@ -102,6 +104,7 @@ $q= "SELECT SUM((SELECT SUM(allocated) FROM txn_line WHERE item = item.id) *
                 sale_price(item.retail_price, item.discount_type,
                            item.discount))
        FROM item
+       LEFT JOIN brand ON item.brand = brand.id
       WHERE ($sql_criteria)";
 
 $stock= $db->get_one($q);
@@ -110,6 +113,7 @@ $q= "SELECT SUM(minimum_quantity *
                 sale_price(item.retail_price, item.discount_type,
                            item.discount))
        FROM item
+       LEFT JOIN brand ON item.brand = brand.id
       WHERE ($sql_criteria) AND item.active";
 
 $ideal= $db->get_one($q);
