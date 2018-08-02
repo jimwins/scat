@@ -175,7 +175,7 @@ $ideal= $db->get_one($q);
       </div>
       <div class="panel-body text-center">
         <span style="font-size: 300%">
-          <?=sprintf('%.2f', $sold/$ideal)?>
+          <?=$ideal ? sprintf('%.2f', $sold/$ideal) : '∞'?>
         </span>
       </div>
     </div>
