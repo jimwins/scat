@@ -1,6 +1,8 @@
 <?php
 
 function pole_display_price($label, $price) {
+  if (!function_exists('socket_create')) return;
+
   $sock= socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
   /* Set 1 sec timeout to avoid getting stuck, should be plenty long enough */
   socket_set_option($sock, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1,
