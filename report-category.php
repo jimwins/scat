@@ -61,7 +61,7 @@ head("Category Sales @ Scat", true);
 <?
 
 /* Current */
-$q= "CREATE TABLE report_current
+$q= "CREATE TEMPORARY TABLE report_current
        (item INT UNSIGNED PRIMARY KEY,
         product_id INT UNSIGNED,
         department_id INT UNSIGNED,
@@ -88,7 +88,7 @@ $q= "CREATE TABLE report_current
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 /* Previous */
-$q= "CREATE TABLE report_previous
+$q= "CREATE TEMPORARY TABLE report_previous
        (item INT UNSIGNED PRIMARY KEY,
         product_id INT UNSIGNED,
         department_id INT UNSIGNED,
