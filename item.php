@@ -30,6 +30,21 @@ if ($item['product_id']) {
               ->as_array();
 }
 
+$q= "SELECT pattern_type, minimum_quantity, discount_type, discount, expires
+       FROM price_override
+      WHERE (pattern_type = 'product' AND pattern = {$item['product_id']})
+         OR (pattern_type = 'like'  AND '{$item['code']}' LIKE pattern)
+         OR (pattern_type = 'rlike' AND '{$item['code']}' RLIKE pattern)
+      ORDER BY minimum_quantity";
+
+$r= $db->query($q)
+  or die_query($db, $q);
+
+$price_overrides= array();
+while (($row= $r->fetch_assoc())) {
+  $price_overrides[]= $row;
+}
+
 $search= "";
 
 head("Item: " . $item['name']. " @ Scat", true);
@@ -120,6 +135,17 @@ include 'item-searchform.php';
           <div class="col-sm-8">
             <p class="form-control-static" id="discount"
                data-bind="jeditable: item.discount, jeditableOptions: { ondisplay: function() { return item.discount_label() ? item.discount_label() : item.discount() ? amount(item.discount()) : '' } , data : item.discount(), onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+
+        <div class="form-group"
+             data-bind="visible: price_overrides().length">
+          <label class="col-sm-4 control-label">Overrides</label>
+          <div class="col-sm-8"
+               data-bind="foreach: price_overrides">
+            <p class="form-control-static">
+              <span data-bind="text: $parent.formatDiscount($data.discount_type(), $data.discount())"></span> for <span data-bind="text: $data.minimum_quantity"></span>
+            </p>
           </div>
         </div>
 
@@ -568,6 +594,7 @@ var model= {
   item: <?=json_encode($item);?>,
   product: <?=json_encode($product);?>,
   vendor_items: <?=json_encode($vendor_items);?>,
+  price_overrides: <?=json_encode($price_overrides);?>,
   brands: [],
 
 };
@@ -745,6 +772,24 @@ itemModel.linkToProduct= function() {
 
     panel.appendTo($('body')).modal();
   });
+}
+
+itemModel.formatDiscount= function(discount_type, discount) {
+  var val= parseFloat(discount).toFixed(2);
+  switch (discount_type) {
+    case 'percentage':
+      return val + '%';
+
+    case 'additional_percentage':
+      return '+' + val + '%';
+
+    case 'relative':
+      return '-' + val;
+
+    case 'fixed':
+      return Scat.amount(val);
+  }
+  return "???";
 }
 
 ko.applyBindings(itemModel);
