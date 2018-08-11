@@ -73,10 +73,14 @@ head('Gift Cards', true);
     </tbody>
   </table>
   <div class="panel-footer">
-    <div class="col-sm-1">
+    <div class="col-sm-4">
       <button type="button" class="btn btn-primary"
               data-bind="click: printGiftCard, disable: balance() <= 0">
         Print
+      </button>
+      <button type="button" class="btn btn-primary"
+              data-bind="click: emailGiftCard, disable: balance() <= 0">
+        Email
       </button>
     </div>
     <div class="input-group col-sm-4">
@@ -127,6 +131,40 @@ $(function() {
     Scat.print('gift-card', { card: this.card(),
                               balance: this.balance(),
                               issued: this.latest() });
+  }
+
+  viewModel.emailGiftCard= function() {
+    var card= this.card();
+    Scat.dialog('giftcard-message').done(function (html) {
+      var panel= $(html);
+
+      var message= { card: card,
+                     from_name: '', from_email: '',
+                     to_name: '', to_email: '',
+                     message: '' };
+      message.error= '';
+
+      panel.on('hidden.bs.modal', function() {
+        $(this).remove();
+      });
+
+      messageModel= ko.mapping.fromJS(message);
+
+      messageModel.sendMessage= function(place, ev) {
+        var message= ko.mapping.toJS(messageModel);
+        delete message.error;
+
+        Scat.api('giftcard-email', message)
+            .done(function (data) {
+              $(place).closest('.modal').modal('hide');
+              Scat.alert({ title: "Success!", error: "Email sent." });
+            });
+      }
+
+      ko.applyBindings(messageModel, panel[0]);
+      panel.appendTo($('body')).modal();
+    });
+
   }
 
   viewModel.updateGiftCard= function(place, ev) {
