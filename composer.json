@@ -19,6 +19,7 @@
         "sparkpost/sparkpost": "^2.0",
         "j4mie/paris": "^1.5",
         "flesler/jquery.scrollto": "^2.1",
-        "select2/select2": "^4.0"
+        "select2/select2": "^4.0",
+        "michelf/php-markdown": "^1.8"
     }
 }
