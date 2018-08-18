@@ -34,6 +34,7 @@ $basefontsize= 9;
 $vmargin= 0.1;
 
 $dummy = new AlphaPDF('P', 'in', array($label_width, $label_height));
+$dummy->AddPage();
 
 $pdf= new AlphaPDF('P', 'in', array($label_width, $label_height));
 

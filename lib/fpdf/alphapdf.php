@@ -1,5 +1,4 @@
 <?php
-require('fpdf.php');
 
 class AlphaPDF extends FPDF
 {

@@ -183,14 +183,23 @@ class Barcode {
 
         $fn = function($points) use ($pdf) {
             $op = 'f';
-            $h = $pdf->h;
-            $k = $pdf->k;
+            $h = $pdf->GetPageHeight();
+            /* Hack to get at protected class variable */
+            $k_closure= function() {
+              return $this->k;
+            };
+            $result= Closure::bind($k_closure, $pdf, get_class($pdf));
+            $k= $result();
             $points_string = '';
             for($i=0; $i < 8; $i+=2){
                 $points_string .= sprintf('%.2F %.2F', $points[$i]*$k, ($h-$points[$i+1])*$k);
                 $points_string .= $i ? ' l ' : ' m ';
             }
-            $pdf->_out($points_string . $op);
+            $out_closure= function($string) {
+              return $this->_out($string);
+            };
+            $func= Closure::bind($out_closure, $pdf, get_class($pdf));
+            $func($points_string . $op);
         };
         return self::digitToRenderer($fn, $xi, $yi, $angle, $mw, $mh, $digit);
     }

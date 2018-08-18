@@ -20,6 +20,8 @@
         "j4mie/paris": "^1.5",
         "flesler/jquery.scrollto": "^2.1",
         "select2/select2": "^4.0",
-        "michelf/php-markdown": "^1.8"
+        "michelf/php-markdown": "^1.8",
+        "mpdf/mpdf": "^6.1",
+        "setasign/fpdf": "^1.8"
     }
 }

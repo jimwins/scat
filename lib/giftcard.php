@@ -1,7 +1,5 @@
 <?php
 
-include '../lib/fpdf/fpdf.php';
-include '../lib/fpdi/fpdi.php';
 include '../lib/php-barcode.php';
 
 class Giftcard extends Model implements JsonSerializable {
@@ -69,6 +67,9 @@ class Giftcard extends Model implements JsonSerializable {
 
     $issued= (new \Datetime($this->issued))->format('l, F j, Y');
 
+    /* Work around deprecations in FPDF code */
+    $error_reporting= error_reporting(E_ALL ^ E_DEPRECATED);
+
     // initiate FPDI
     $pdf = new FPDI('P', 'in', array(8.5, 11));
     // add a page
@@ -112,6 +113,9 @@ class Giftcard extends Model implements JsonSerializable {
     $pdf->Output();
     $content= ob_get_contents();
     ob_end_clean();
+
+    error_reporting($error_reporting);
+
     return $content;
   }
 }
