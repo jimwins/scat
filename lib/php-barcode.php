@@ -185,21 +185,17 @@ class Barcode {
             $op = 'f';
             $h = $pdf->GetPageHeight();
             /* Hack to get at protected class variable */
-            $k_closure= function() {
-              return $this->k;
-            };
-            $result= Closure::bind($k_closure, $pdf, get_class($pdf));
-            $k= $result();
+            $rp= new ReflectionProperty(get_class($pdf), 'k');
+            $rp->setAccessible(true);
+            $k= $rp->getValue($pdf);
             $points_string = '';
             for($i=0; $i < 8; $i+=2){
                 $points_string .= sprintf('%.2F %.2F', $points[$i]*$k, ($h-$points[$i+1])*$k);
                 $points_string .= $i ? ' l ' : ' m ';
             }
-            $out_closure= function($string) {
-              return $this->_out($string);
-            };
-            $func= Closure::bind($out_closure, $pdf, get_class($pdf));
-            $func($points_string . $op);
+            $rp= new ReflectionMethod(get_class($pdf), '_out');
+            $rp->setAccessible(true);
+            $rp->invoke($pdf, $points_string . $op);
         };
         return self::digitToRenderer($fn, $xi, $yi, $angle, $mw, $mh, $digit);
     }
