@@ -3,5 +3,8 @@ mysqldump --routines --no-data \
           --ignore-table=scat.vendor_order \
           --ignore-table=scat.vendor_upload \
           scat | \
+  sed -e '1,2d' | \
+  sed -e 's/Host: .*Data/Data/' | \
+  sed -e 's/\(Dump completed \).*/\1/' | \
   sed -e 's/ AUTO_INCREMENT=[0-9]*//' \
   > scat.sql
