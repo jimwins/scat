@@ -41,7 +41,7 @@ th {padding:0.2em 0.1em; border-bottom:1px solid #000;}
 .description { font-size: 0.75em; }
 td {padding:0.2em 0.1em; vertical-align:top;}
 tr.sub td {border-top:2px solid #000; border-bottom:2px solid #000;}
-tr.total td {border-top:solid #000 6px; text-align:right; font-weight:;}
+tr.total td {border-top:6px solid #000; text-align:right; font-weight:;}
 
 .cc-info {font-size:1em; width:100%; margin:2em 0;
         border-bottom:2px solid #000; border-left:0; border-right:0;}
