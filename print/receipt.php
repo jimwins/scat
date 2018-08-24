@@ -1,18 +1,15 @@
 <?
 require '../scat.php';
 require '../lib/txn.php';
+
+ob_start();
 ?>
 <style type="text/css">
 body {
-  font:28px Monaco, monospace;
-  text-align:left;
-  color:#000;
-  margin:0;
-  padding:0;
-}
-
-header, footer {
-  display: none;
+  font-family: Monaco, monospace;
+  font-size: 28px;
+  text-align: left;
+  color: #000;
 }
 
 .right {
@@ -23,15 +20,11 @@ header, footer {
 }
 
 #doc_header {
+  padding-top: 1em;
   margin-bottom: 2em;
   padding-bottom:1em;
   border-bottom:2px solid #000;
   text-align:center;
-}
-#store_name {
-  font-size:1.5em;
-  font-weight:bold;
-  font-family: 'Directa Serif';
 }
 table#products {font-size:1em; width:100%; margin:2em 0;
         border-top:2px solid #000; border-bottom:2px solid #000; border-left:0; border-right:0;}
@@ -41,7 +34,7 @@ th {padding:0.2em 0.1em; border-bottom:1px solid #000;}
 .description { font-size: 0.75em; }
 td {padding:0.2em 0.1em; vertical-align:top;}
 tr.sub td {border-top:2px solid #000; border-bottom:2px solid #000;}
-tr.total td {border-top:6px solid #000; text-align:right; font-weight:;}
+tr.total td {border-top:6px solid #000; text-align:right; }
 
 .cc-info {font-size:1em; width:100%; margin:2em 0;
         border-bottom:2px solid #000; border-left:0; border-right:0;}
@@ -62,7 +55,9 @@ tr.total td {border-top:6px solid #000; text-align:right; font-weight:;}
 
 </style>
 <div id="doc_header">
-  <div id="store_name">Raw Materials Art Supplies</div>
+  <div id="store_name">
+  <img src="data:<?=mime_content_type('../ui/logo.png')?>;base64,<?=base64_encode(file_get_contents('../ui/logo.png'))?>" width="80%">
+  </div>
   436 South Main Street<br>
   Los Angeles, CA 90013<br>
   (800) 729-7060<br>
@@ -85,9 +80,7 @@ function pts($num) {
 }
 ?>
 <table id="products" cellspacing="0" cellpadding="0">
- <thead>
   <tr><th class="qty">QTY</th><th class="left">PRODUCT</th><th class="price">PRICE</th></tr>
- </thead>
  <tbody>
 <?
 foreach ($items as $item) {
@@ -214,7 +207,11 @@ foreach ($payments as $payment) {
   Paid: <?=date('F j, Y g:i A', strtotime($txn['paid']))?>
 <?}?>
   <br><br>
-<span style="font-family: Aatrix3of9Reg; font-size: 2em">*@INV-<?=ashtml($txn['id'])?>*</span>
+<?if (defined('PRINT_DIRECT')) {?>
+  <barcode code="@INV-<?=ashtml($txn['id'])?>" type="C39E" class="barcode" size="2" />
+<?} else {?>
+  <span style="font-family: Aatrix3of9Reg; font-size: 2em">*@INV-<?=ashtml($txn['id'])?>*</span>
+<?}?>
 </div>
 <div id="store_footer">
 Items purchased from stock may be returned in original condition and packaging
@@ -222,3 +219,30 @@ within 30 days with receipt. Assembled easels are subject to a 20% restocking fe
 <br><br>
 http://RawMaterialsLA.com/
 </div>
+<?
+$html= ob_get_clean();
+
+if (defined('PRINT_DIRECT')) {
+  define('_MPDF_TTFONTDATAPATH', '/tmp/ttfontdata');
+  @mkdir(_MPDF_TTFONTDATAPATH);
+
+  $mpdf= new \mPDF('utf8','letter',28,'',15,15,9,10,'P');
+  $mpdf->writeHTML($html);
+  $mpdf->Output();
+
+  $tmpfname= tempnam("/tmp", "rec");
+
+  if ($_REQUEST['DEBUG']) {
+    $mpdf->Output();
+    exit;
+  }
+
+  $mpdf->Output($tmpfname, \Mpdf\Output\Destination::FILE);
+
+  $printer= RECEIPT_PRINTER;
+  shell_exec("lpr -P$printer $tmpfname");
+
+  echo jsonp(array("result" => "Printed."));
+} else {
+  echo $html;
+}
