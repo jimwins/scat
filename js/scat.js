@@ -79,7 +79,10 @@ Scat.print= function(name, options) {
   var lpr= $('<iframe id="scat-print" src="' + url + '"></iframe>').hide();
 
   lpr.on("load", function() {
-    this.contentWindow.print();
+    /* If we got JSON, we printed directly */
+    if (this.contentDocument.contentType != 'application/json') {
+      this.contentWindow.print();
+    }
   });
 
   $('body').append(lpr);
