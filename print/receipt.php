@@ -228,7 +228,6 @@ if (defined('PRINT_DIRECT')) {
 
   $mpdf= new \mPDF('utf8','letter',28,'',15,15,9,10,'P');
   $mpdf->writeHTML($html);
-  $mpdf->Output();
 
   $tmpfname= tempnam("/tmp", "rec");
 
@@ -237,7 +236,7 @@ if (defined('PRINT_DIRECT')) {
     exit;
   }
 
-  $mpdf->Output($tmpfname, \Mpdf\Output\Destination::FILE);
+  $mpdf->Output($tmpfname, 'f');
 
   $printer= RECEIPT_PRINTER;
   shell_exec("lpr -P$printer $tmpfname");
