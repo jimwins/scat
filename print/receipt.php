@@ -148,8 +148,11 @@ if (count($payments)) {
  </tbody>
 </table>
 <?
-$credit= 0;
+$credit= $used_cash= 0;
 foreach ($payments as $payment) {
+  if ($payment['method'] == 'cash' || $payment['method'] == 'change') {
+    $used_cash++;
+  }
   if ($payment['method'] == 'credit') {
     $credit++;
 ?>
@@ -238,8 +241,13 @@ if (defined('PRINT_DIRECT')) {
 
   $mpdf->Output($tmpfname, 'f');
 
+  $option= "";
+  if ($used_cash) {
+    $option= "-o CashDrawerSetting=1OpenDrawer1";
+  }
+
   $printer= RECEIPT_PRINTER;
-  shell_exec("lpr -P$printer $tmpfname");
+  shell_exec("lpr -P$printer $option $tmpfname");
 
   echo jsonp(array("result" => "Printed."));
 } else {
