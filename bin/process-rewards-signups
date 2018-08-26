@@ -56,8 +56,10 @@ foreach ($updates as $update) {
 
   /* Handle code */
   if ($update->code) {
-    list($created, $id)= preg_split('/\s+/', $update->code);
-    $created=  date("Y-m-d H:i:s", hexdec($created));
+    $code= preg_replace('/[^0-9A-F]/i', '', $update->code);
+    $created= substr($code, 0, 8);
+    $id= substr($code, -8);
+    $created= date("Y-m-d H:i:s", hexdec($created));
     $id= hexdec($id);
 
     $txn= Model::factory('Txn')->find_one($id);
