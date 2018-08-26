@@ -22,7 +22,7 @@ if ($vendor > 0) {
                    WHERE item = item.id
                      AND vendor = $vendor
                      AND vendor_item.active)
-                  AS MOQ,
+                  AS minimum_order_quantity,
                  (SELECT MIN(IF(promo_price, promo_price, net_price)
                              * ((100 - vendor_rebate) / 100))
                     FROM vendor_item
@@ -39,8 +39,8 @@ if ($vendor > 0) {
                      AND NOT special_order
                      AND vendor != $vendor
                      AND vendor_item.active)
-                 Cheapest\$trool, ";
-  $extra_field_name= "MOQ, Cheapest\$trool,";
+                 cheapest, ";
+  $extra_field_name= "minimum_order_quantity, cheapest";
 } else if ($vendor < 0) {
   // No vendor
   $extra= "AND NOT EXISTS (SELECT id
@@ -54,9 +54,6 @@ if ($code) {
   $extra.= " AND code LIKE '" . $db->escape($code) . "%'";
 }
 ?>
-<style>
-.order { text-align: right; }
-</style>
 <form class="form-inline" method="get" action="<?=$_SERVER['PHP_SELF']?>">
   <div class="form-group">
     <label class="sr-only" for="vendor"></label>
@@ -94,29 +91,25 @@ while ($row= $r->fetch_assoc()) {
   <button type="submit" class="btn btn-primary">Limit</button>
 </form>
 
-<div class="pull-right">
-  <button id="zero" class="btn btn-default">Zero</button>
-</div>
 <?
 $criteria= ($all ? '1=1'
                  : '(ordered IS NULL OR NOT ordered)
-                    AND IFNULL(Stock$right, 0) < Min$right');
-$q= "SELECT meta, Code\$item, Name, Stock\$right,
-            Min\$right,
-            Last3Months\$right,
-            $extra_field_name
-            Order\$order
-       FROM (SELECT item.id meta,
-                    $code_field Code\$item,
-                    name Name,
-                    SUM(allocated) Stock\$right,
-                    minimum_quantity Min\$right,
+                    AND IFNULL(stock, 0) < minimum_quantity');
+$q= "SELECT id, code, name, stock,
+            minimum_quantity, last3months,
+            $extra_field_name,
+            order_quantity
+       FROM (SELECT item.id,
+                    $code_field code,
+                    name,
+                    SUM(allocated) stock,
+                    minimum_quantity,
                     (SELECT -1 * SUM(allocated)
                        FROM txn_line JOIN txn ON (txn = txn.id)
                       WHERE type = 'customer'
                         AND txn_line.item = item.id
                         AND filled > NOW() - INTERVAL 3 MONTH)
-                    AS Last3Months\$right,
+                    AS last3months,
                     (SELECT SUM(ordered - allocated)
                        FROM txn_line JOIN txn ON (txn = txn.id)
                       WHERE type = 'vendor'
@@ -127,7 +120,7 @@ $q= "SELECT meta, Code\$item, Name, Stock\$right,
                     IF(minimum_quantity > minimum_quantity - SUM(allocated),
                        minimum_quantity,
                        minimum_quantity - IFNULL(SUM(allocated), 0))
-                      AS Order\$order
+                      AS order_quantity
                FROM item
                LEFT JOIN txn_line ON (item = item.id)
               WHERE purchase_quantity
@@ -136,17 +129,101 @@ $q= "SELECT meta, Code\$item, Name, Stock\$right,
               GROUP BY item.id
               ORDER BY code) t
        WHERE $criteria
-       ORDER BY Code\$item
+       ORDER BY code
       ";
 
-dump_table($db->query($q));
+$r= $db->query($q)
+  or die_query($db, $q);
+
+$results= array();
+while (($row= $r->fetch_assoc())) {
+  $results[]= $row;
+}
+
 ?>
-<button id="download" class="btn btn-default">Download TSV</button>
-<button id="download-xls" class="btn btn-default">Download XLS</button>
-<?if ($vendor > 0) {?>
-  <button id="create" class="btn btn-default">Create Order</button>
-<?}?>
-<form id="post-csv" style="display: none"
+<form class="form-inline" data-bind="submit: createOrder">
+  <div class="pull-right">
+    <button class="btn btn-default"
+            data-bind="click: zero">Zero</button>
+  </div>
+  <table class="table table-condensed table-striped" id="search-results"
+         data-bind="if: results().length">
+    <thead>
+      <tr>
+        <th class="">Code</th>
+        <th class="">Name</th>
+        <th width="5%" class="text-center">Stock</th>
+        <th width="5%" class="text-center">Min</th>
+        <th width="5%" class="text-center">Last 3</th>
+        <th width="5%" class="text-center">MOQ</th>
+        <th width="5%" class="text-center">Best?</th>
+        <th class=""></th>
+      </tr>
+    </thead>
+
+    <tfoot>
+      <tr>
+        <td colspan="8">
+          <button role="button" class="btn btn-default"
+                  data-format="tsv"
+                  data-bind="click: download">
+            Download TSV
+          </button>
+          <button role="button" class="btn btn-default"
+                  data-format="xls"
+                  data-bind="click: download">
+            Download XLS
+          </button>
+          <button role="submit" class="btn btn-primary"
+                  data-bind="enable: readyToSubmit">
+            Create Order
+          </button>
+        </td>
+      </tr>
+    </tfoot>
+
+    <tbody data-bind="foreach: results">
+      <tr data-bind="css: { active: $data.id == $parent.activeRow() },
+                     click: $parent.selectRow">
+        <td>
+          <a data-bind="text: $data.code,
+                        attr: { href: 'item.php?id=' + $data.id }"></a>
+        </td>
+        <td data-bind="text: $data.name"></td>
+        <td align="center" data-bind="text: $data.stock"></td>
+        <td align="center" data-bind="text: $data.minimum_quantity"></td>
+        <td align="center" data-bind="text: $data.last3months"></td>
+        <td align="center" data-bind="text: $data.minimum_order_quantity"></td>
+        <td align="center">
+          <i class="far"
+             data-bind="css: { 'fa-check-square' : $data.cheapest < 0 || $data.cheapest == null,
+                               'fa-minus-square' : $data.cheapest == 0,
+                               'fa-square' : $data.cheapest > 0 }"></i>
+        </td>
+        <td>
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button class="btn btn-default btn-sm" type="button"
+                      data-bind="click: $parent.changeQuantity" data-value="-1">
+                <i class="fa fa-angle-left"></i>
+              </button>
+            </span>
+            <input type="text"
+                   class="form-control input-sm text-center" size="3"
+                   data-bind="textInput: $data.order_quantity">
+            <span class="input-group-btn">
+              <button class="btn btn-default btn-sm" type="button"
+                      data-bind="click: $parent.changeQuantity" data-value="1">
+                <i class="fa fa-angle-right"></i>
+              </button>
+            </span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</form>
+<form id="post-tsv" style="display: none"
       method="post" action="api/encode-tsv.php">
 <textarea id="file" name="file"></textarea>
 </form>
@@ -155,48 +232,156 @@ dump_table($db->query($q));
 <textarea id="file" name="file"></textarea>
 </form>
 <script>
-$('.order').editable(function (val, settings) { return val; },
-                     { width: '3em', select: true });
+$(function() {
+  function PageModel() {
+    var self= this;
 
-$('#download').on('click', function(ev) {
-  var tsv= "code\tqty\r\n";
-  $.each($(".sortable tr"), function (i, row) {
-    if (i > 0 && parseInt($('.order', row).text()) > 0) {
-      tsv += $('.item a', row).text() + "\t" + $('.order', row).text() + "\r\n";
-    }
-  });
-  $("#post-csv #file").val(tsv);
-  $("#post-csv").submit();
-});
-$('#download-xls').on('click', function(ev) {
-  var tsv= "code\tqty\r\n";
-  $.each($(".sortable tr"), function (i, row) {
-    if (i > 0 && parseInt($('.order', row).text()) > 0) {
-      tsv += $('.item a', row).text() + "\t" + $('.order', row).text() + "\r\n";
-    }
-  });
-  $("#post-xls #file").val(tsv);
-  $("#post-xls").submit();
-});
-$('#create').on('click', function(ev) {
-  var order= [];
-  $.each($(".sortable tr"), function (i, row) {
-    if (i > 0 && parseInt($('.order', row).text()) > 0) {
-      order.push([ $(row).attr('data-id'), $('.order', row).text() ]);
-    }
-  });
+    self.results= ko.observableArray(
+                   $.map(<?=json_encode($results)?>,
+                         function (a) {
+                           a.order_quantity= ko.observable(a.order_quantity);
+                           return a;
+                         }));
+    self.activeRow= ko.observable(0);
 
-  Scat.api("txn-create", { type: 'vendor', person: <?=$vendor?> })
-      .done(function (data) {
-        Scat.api("txn-add-items", { txn: data.txn.id, items: order },
-                 { method: 'POST' })
-            .done(function(data) {
-              window.location= './?id=' + data.txn.id;
-            });
+    self.activeRow.subscribe(function(newValue) {
+      var idx= pageModel.results().findIndex(function (a) {
+                                               return a.id == newValue;
+                                             });
+
+      if (idx < 0) {
+        console.log("Couldn't find active row!");
+        return true;
+      }
+
+      $('#search-results tbody tr:nth(' + idx + ') input').select().focus();
+    });
+
+    self.changeQuantity= function (item, event) {
+      item.order_quantity(Number(item.order_quantity()) +
+                          $(event.currentTarget).data('value'));
+    }
+    self.selectRow= function (item, event) {
+      self.activeRow(item.id);
+      return true; // allow click to continue to buttons and links
+    }
+
+    self.readyToSubmit= ko.computed(function() {
+      return true;
+    });
+
+    self.createOrder= function (form) {
+      var order= [];
+      $.each(self.results(), function (i, row) {
+        if (parseInt(row.order_quantity())) {
+          order.push([ row.id, row.order_quantity() ]);
+        }
       });
-});
-$('#zero').on('click', function(ev) {
-  $('.order').text('0');
+
+      Scat.api("txn-create", { type: 'vendor', person: <?=$vendor?> })
+          .done(function (data) {
+            Scat.api("txn-add-items", { txn: data.txn.id, items: order },
+                     { method: 'POST' })
+                .done(function(data) {
+                  window.location= './?id=' + data.txn.id;
+                });
+          });
+    }
+
+    self.download= function (view, ev) {
+      var format= $(ev.target).data('format');
+      var tsv= "code\tqty\r\n";
+      $.each(self.results(), function (i, row) {
+        if (parseInt(row.order_quantity()) > 0) {
+          tsv += row.code + "\t" + row.order_quantity() + "\r\n";
+        }
+      });
+      $("#post-" + format + " #file").val(tsv);
+      $("#post-" + format).submit();
+    }
+
+    self.zero= function (form) {
+      $.each(self.results(), function (i, item) {
+        item.order_quantity(0);
+      });
+    }
+  }
+
+  var pageModel= new PageModel();
+  ko.applyBindings(pageModel, document.getElementById('scat-page'));
+
+  // Set first row active */
+  pageModel.activeRow(pageModel.results()[0].id);
+
+  $(document).keydown(function(ev) {
+    var el= Scat.getFocusedElement();
+    if ($(el).hasClass('autofocus')) {
+      return true;
+    }
+
+    // left = 37, up = 38, right = 39, down = 40
+    if (pageModel.activeRow()) {
+      var idx= pageModel.results().findIndex(function (a) {
+                                               return a.id ==
+                                                       pageModel.activeRow();
+                                             });
+      var item= (pageModel.results())[idx];
+      if (idx < 0) {
+        console.log("Couldn't find active row!");
+        return true;
+      }
+
+      if (ev.keyCode == 37 || ev.keyCode == 72 /* H */) {
+        // subtract one
+        item.order_quantity(Number(item.order_quantity()) - 1);
+        return false;
+      }
+      if (ev.keyCode == 39 || ev.keyCode == 76 /* L */) {
+        // add one
+        item.order_quantity(Number(item.order_quantity()) + 1);
+        return false;
+      }
+      if (ev.keyCode == 38 || ev.keyCode == 75 /* K */) {
+        // previous one
+        if (idx > 0) {
+          pageModel.activeRow((pageModel.results())[idx - 1].id);
+        }
+        return false;
+      }
+      if (ev.keyCode == 40 || ev.keyCode == 74 /* J */) {
+        // next one
+        if (idx < pageModel.results().length - 1) {
+          pageModel.activeRow((pageModel.results())[idx + 1].id);
+        }
+        return false;
+      }
+      if (ev.keyCode >= 48 /* 0 */ && ev.keyCode <= 57 /* 9 */) {
+        // select and start entering
+        var el= $('#search-results tbody tr:nth(' + idx + ') input');
+        if (!el.is(':focus')) {
+          el.select().focus();
+        }
+        return true;
+      }
+      if (ev.keyCode == 88 /* X */) {
+        // zero, mark done and move on
+        item.order_quantity(0);
+        if (idx < pageModel.results().length - 1) {
+          pageModel.activeRow((pageModel.results())[idx + 1].id);
+        }
+        return false;
+      }
+      if (ev.keyCode == 13 || ev.keyCode == 32 /* space */) {
+        // mark done and move on
+        if (idx < pageModel.results().length - 1) {
+          pageModel.activeRow((pageModel.results())[idx + 1].id);
+        }
+        return false;
+      }
+
+      return true;
+    }
+  });
 });
 </script>
 <?
