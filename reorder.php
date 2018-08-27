@@ -145,6 +145,8 @@ while (($row= $r->fetch_assoc())) {
   <div class="pull-right">
     <button class="btn btn-default"
             data-bind="click: zero">Zero</button>
+    <button class="btn btn-default"
+            data-bind="click: optimize">Optimize</button>
   </div>
   <table class="table table-condensed table-striped" id="search-results"
          data-bind="if: results().length">
@@ -196,7 +198,8 @@ while (($row= $r->fetch_assoc())) {
         <td align="center" data-bind="text: $data.minimum_order_quantity"></td>
         <td align="center">
           <i class="far"
-             data-bind="css: { 'fa-check-square' : $data.cheapest < 0 || $data.cheapest == null,
+             data-bind="css: { 'fa-check-square' : $data.cheapest < 0 ||
+                                                   $data.cheapest === null,
                                'fa-minus-square' : $data.cheapest == 0,
                                'fa-square' : $data.cheapest > 0 }"></i>
         </td>
@@ -298,6 +301,21 @@ $(function() {
       });
       $("#post-" + format + " #file").val(tsv);
       $("#post-" + format).submit();
+    }
+
+    self.optimize= function (form) {
+      $.each(self.results(), function (i, item) {
+        item.order_quantity(
+          (item.cheapest < 0 || item.cheapest === null) ?
+          Math.max(
+            item.minimum_order_quantity,
+            item.minimum_quantity > item.minimum_quantity - item.stock ?
+              item.minimum_quantity :
+              item.minimum_quantity - item.stock
+          ) :
+          0
+        );
+      });
     }
 
     self.zero= function (form) {
