@@ -47,7 +47,7 @@ if ($vendor > 0) {
                      AND vendor != $vendor
                      AND vendor_item.active)
                  cheapest, ";
-  $extra_field_name= "minimum_order_quantity, cheapest, cost";
+  $extra_field_name= "minimum_order_quantity, cheapest, cost,";
 } else if ($vendor < 0) {
   // No vendor
   $extra= "AND NOT EXISTS (SELECT id
@@ -104,7 +104,7 @@ $criteria= ($all ? '1=1'
                     AND IFNULL(stock, 0) < minimum_quantity');
 $q= "SELECT id, code, name, stock,
             minimum_quantity, last3months,
-            $extra_field_name,
+            $extra_field_name
             order_quantity
        FROM (SELECT item.id,
                     $code_field code,
