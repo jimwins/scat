@@ -23,6 +23,13 @@ if ($vendor > 0) {
                      AND vendor = $vendor
                      AND vendor_item.active)
                   AS minimum_order_quantity,
+                 (SELECT MIN(IF(promo_price, promo_price, net_price))
+                    FROM vendor_item
+                    JOIN person ON vendor_item.vendor = person.id
+                  WHERE item = item.id
+                    AND vendor = $vendor
+                    AND vendor_item.active)
+                  AS cost,
                  (SELECT MIN(IF(promo_price, promo_price, net_price)
                              * ((100 - vendor_rebate) / 100))
                     FROM vendor_item
@@ -40,7 +47,7 @@ if ($vendor > 0) {
                      AND vendor != $vendor
                      AND vendor_item.active)
                  cheapest, ";
-  $extra_field_name= "minimum_order_quantity, cheapest";
+  $extra_field_name= "minimum_order_quantity, cheapest, cost";
 } else if ($vendor < 0) {
   // No vendor
   $extra= "AND NOT EXISTS (SELECT id
@@ -165,7 +172,7 @@ while (($row= $r->fetch_assoc())) {
 
     <tfoot>
       <tr>
-        <td colspan="8">
+        <td colspan="6">
           <button role="button" class="btn btn-default"
                   data-format="tsv"
                   data-bind="click: download">
@@ -180,6 +187,12 @@ while (($row= $r->fetch_assoc())) {
                   data-bind="enable: readyToSubmit">
             Create Order
           </button>
+        </td>
+        <td colspan="2" align="right">
+         <big>
+           <strong>Total: </strong> &nbsp; 
+           <span data-bind="text: Scat.amount(orderTotal())"></span>
+         </big>
         </td>
       </tr>
     </tfoot>
@@ -271,6 +284,16 @@ $(function() {
 
     self.readyToSubmit= ko.computed(function() {
       return true;
+    });
+
+    self.orderTotal= ko.computed(function() {
+      var total= 0.00;
+      $.each(self.results(), function (i, row) {
+        if (parseInt(row.order_quantity())) {
+          total= total + (parseInt(row.order_quantity()) * row.cost);
+        }
+      });
+      return total;
     });
 
     self.createOrder= function (form) {
