@@ -45,6 +45,15 @@ function item_terms_to_sql($db, $q, $options) {
     } elseif (preg_match('/^reviewed:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.reviewed)"
                         : "(NOT item.reviewed)";
+    } elseif (preg_match('/^prop65:(.+)/i', $term, $dbt)) {
+      $andor[]= $dbt[1] ? "(item.prop65)"
+                        : "(NOT item.prop65)";
+    } elseif (preg_match('/^oversized:(.+)/i', $term, $dbt)) {
+      $andor[]= $dbt[1] ? "(item.oversized)"
+                        : "(NOT item.oversized)";
+    } elseif (preg_match('/^hazmat:(.+)/i', $term, $dbt)) {
+      $andor[]= $dbt[1] ? "(item.hazmat)"
+                        : "(NOT item.hazmat)";
     } elseif (preg_match('/^active:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.active)"
                         : "(NOT item.active)";
@@ -129,6 +138,7 @@ function item_find($db, $q, $options) {
               item.tic,
               $extra
               item.added, item.modified, item.inventoried,
+              item.prop65, item.oversized, item.hazmat,
               item.active, item.reviewed
          FROM item
     LEFT JOIN brand ON (item.brand = brand.id)

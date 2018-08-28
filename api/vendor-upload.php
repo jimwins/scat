@@ -70,8 +70,11 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            barcode, @upc2, @upc2_qty, @upc3, @upc3_qty,
            purchase_quantity,
            @level1, @level2, @level3, @level4, @level5,
-           @ltl_only, @add_date)
+           @ltl_only, @add_date, @ormd, @prop65)
         SET vendor_sku = code,
+            prop65 = IF(@prop65 = 'Y', 1, NULL),
+            hazmat = IF(@ormd = 'Y', 1, NULL),
+            oversized = IF(@ltl_only = 'Y', 1, NULL),
             promo_quantity = purchase_quantity";
 
   $r= $db->query($q)
@@ -256,7 +259,9 @@ if ($action == 'promo') {
 $q= "INSERT INTO vendor_item
             (vendor, item, code, vendor_sku, name,
              retail_price, net_price, promo_price, promo_quantity,
-             barcode, purchase_quantity, special_order)
+             barcode, purchase_quantity, 
+             prop65, hazmat, oversized,
+             special_order)
      SELECT
             $vendor_id AS vendor,
             0 AS item,
@@ -269,6 +274,7 @@ $q= "INSERT INTO vendor_item
             promo_quantity,
             REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS barcode,
             purchase_quantity,
+            prop65, hazmat, oversized,
             special_order
        FROM vendor_upload
      ON DUPLICATE KEY UPDATE
@@ -286,6 +292,12 @@ $q= "INSERT INTO vendor_item
        purchase_quantity = IF(VALUES(purchase_quantity),
                               VALUES(purchase_quantity),
                               vendor_item.purchase_quantity),
+       prop65 = IFNULL(VALUES(prop65),
+                       vendor_item.prop65),
+       hazmat = IFNULL(VALUES(hazmat),
+                       vendor_item.hazmat),
+       oversized = IFNULL(VALUES(oversized),
+                          vendor_item.oversized),
        special_order = IFNULL(VALUES(special_order),
                               vendor_item.special_order),
        active = 1

@@ -1,8 +1,6 @@
--- MySQL dump 10.13  Distrib 5.7.10, for osx10.9 (x86_64)
---
--- Host: localhost    Database: scat
+-- Database: scat
 -- ------------------------------------------------------
--- Server version	5.7.10
+-- Server version	8.0.11
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -151,6 +149,9 @@ CREATE TABLE `item` (
   `added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `inventoried` datetime DEFAULT NULL,
+  `prop65` tinyint(1) DEFAULT NULL,
+  `oversized` tinyint(1) DEFAULT NULL,
+  `hazmat` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`),
   KEY `product` (`product_id`),
@@ -580,4 +581,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-04-29 21:33:43
+-- Dump completed 
