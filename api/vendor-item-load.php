@@ -21,7 +21,8 @@ $q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
             purchase_quantity
        FROM vendor_item
        JOIN person ON vendor_item.vendor = person.id
-      WHERE vendor_item.id = $id";
+       WHERE vendor_item.id = $id
+       ORDER BY vendor_item.active DESC";
 
 $vendor_item= $db->get_one_assoc($q);
 
