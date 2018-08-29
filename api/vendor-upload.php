@@ -38,7 +38,7 @@ $db->query($q)
 if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $base= basename($_FILES['src']['name'], '.zip');
 
-  $q= "LOAD DATA LOCAL INFILE 'zip://$fn#$base.txt'
+  $q= "LOAD DATA LOCAL INFILE 'zip:$fn#$base.txt'
             INTO TABLE vendor_upload
           CHARACTER SET 'latin1'
           FIELDS TERMINATED BY '\t'
@@ -49,7 +49,9 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            @purchase_unit, purchase_quantity,
            @customer_item_no, @pending_msrp, @pending_date, @pending_net,
            promo_price, @promo_name,
-           @abc_flag, @vendor, @group_code, @category)
+           @abc_flag, @vendor, @group_code, @catalog_description,
+           weight, @cm_product_line, @cm_product_line_desc,
+           @category_manager, @price_contract, @case_qty, @case_net)
         SET special_order = IF(@abc_flag = 'S', 1, 0),
             promo_quantity = purchase_quantity";
 
@@ -274,6 +276,7 @@ $q= "INSERT INTO vendor_item
             promo_quantity,
             REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS barcode,
             purchase_quantity,
+            length, width, height, weight,
             prop65, hazmat, oversized,
             special_order
        FROM vendor_upload
@@ -292,6 +295,14 @@ $q= "INSERT INTO vendor_item
        purchase_quantity = IF(VALUES(purchase_quantity),
                               VALUES(purchase_quantity),
                               vendor_item.purchase_quantity),
+       length = IFNULL(VALUES(length),
+                       vendor_item.length),
+       width = IFNULL(VALUES(width),
+                      vendor_item.width),
+       height = IFNULL(VALUES(height),
+                       vendor_item.height),
+       weight = IFNULL(VALUES(weight),
+                       vendor_item.weight),
        prop65 = IFNULL(VALUES(prop65),
                        vendor_item.prop65),
        hazmat = IFNULL(VALUES(hazmat),
