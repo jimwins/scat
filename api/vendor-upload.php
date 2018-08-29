@@ -262,6 +262,7 @@ $q= "INSERT INTO vendor_item
             (vendor, item, code, vendor_sku, name,
              retail_price, net_price, promo_price, promo_quantity,
              barcode, purchase_quantity, 
+             length, width, height, weight,
              prop65, hazmat, oversized,
              special_order)
      SELECT
