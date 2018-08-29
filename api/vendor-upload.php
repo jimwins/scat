@@ -38,7 +38,7 @@ $db->query($q)
 if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $base= basename($_FILES['src']['name'], '.zip');
 
-  $q= "LOAD DATA LOCAL INFILE 'zip:$fn#$base.txt'
+  $q= "LOAD DATA LOCAL INFILE 'zip://$fn#$base.txt'
             INTO TABLE vendor_upload
           CHARACTER SET 'latin1'
           FIELDS TERMINATED BY '\t'
