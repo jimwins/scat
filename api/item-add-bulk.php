@@ -15,9 +15,11 @@ $code= $db->escape($code);
 /* Add the items */
 $q= "INSERT INTO item (code, name, brand, retail_price,
                        discount_type, discount,
-                       active, minimum_quantity, purchase_quantity)
+                       active, minimum_quantity, purchase_quantity,
+                       prop65, hazmat, oversized)
      SELECT vi.code, vi.name, 0, vi.retail_price,
             NULL, NULL, 1, 0, vi.purchase_quantity
+            vi.prop65, vi.hazmat, vi.oversized
        FROM vendor_item vi
        LEFT JOIN item ON item = item.id
       WHERE vendor = $vendor
