@@ -101,7 +101,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            purchase_quantity,
            @dropship,
            barcode,
-           @weight, @length, @width, @height, @ship_truck,
+           weight, length, width, height, @ship_truck,
            @country_of_origin, @harmonized_code, @drop_ship_discount,
            @catalog_page, @vendor_item_number)
         SET vendor_sku = code,
@@ -190,7 +190,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            @x1, @x2, @x3, @x4, @x5, @x6, @x7, @x8,
            @retail_price, @net_price, @promo_price,
            @units, purchase_quantity,
-           @weight, barcode, @freight, @dim_weight,
+           weight, barcode, @freight, @dim_weight,
            @est_freight, @est_freight_case)
         SET code = CONCAT('MA', vendor_sku),
             retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
