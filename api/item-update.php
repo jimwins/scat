@@ -34,7 +34,8 @@ foreach(array('name', 'short_name', 'variation', 'tic', 'color') as $key) {
 
 /* Plain integer values */
 foreach(array('active', 'reviewed', 'product_id',
-              'purchase_quantity', 'minimum_quantity') as $key) {
+              'purchase_quantity', 'minimum_quantity',
+              'prop65', 'hazmat', 'oversized') as $key) {
   if (isset($_REQUEST[$key])) {
     $value= (int)$_REQUEST[$key];
     // $key is one of our hardcoded values

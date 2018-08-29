@@ -159,6 +159,9 @@ function item_find($db, $q, $options) {
     $item['stock']= (int)$item['stock'];
     $item['minimum_quantity']= (int)$item['minimum_quantity'];
     $item['purchase_quantity']= (int)$item['purchase_quantity'];
+    $item['prop65']= (int)$item['prop65'];
+    $item['hazmat']= (int)$item['hazmat'];
+    $item['oversized']= (int)$item['oversized'];
 
     $barcodes= explode(',', $item['barcodes']);
     $item['barcode']= $item['barcode_list']= array();

@@ -372,6 +372,64 @@ include 'item-searchform.php';
         </div>
       </div>
     </div>
+
+    <!-- Properties -->
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Properties</h3>
+      </div>
+
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="weight" class="col-sm-4 control-label">
+            Weight (lbs)
+          </label>
+          <div class="col-sm-8">
+            <p class="form-control-static" id="weight"
+               data-bind="jeditable: item.weight, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="length" class="col-sm-4 control-label">
+            Dimensions
+          </label>
+          <div class="col-sm-8">
+            <p class="form-control-static">
+              <span id="length"
+                 data-bind="jeditable: item.length, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel', style: 'display: inline', width: '4em' }"></span>"
+              &times;
+              <span id="width"
+                 data-bind="jeditable: item.width, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel', style: 'display: inline', width: '4em' }"></span>"
+              &times;
+              <span id="height"
+                 data-bind="jeditable: item.height, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel', style: 'display: inline', width: '4em' }"></span>"
+            </p>
+          </div>
+        </div>
+        <button id="prop65" type="button" class="btn btn-default"
+                data-bind="click: toggleProperty">
+          <i class="far"
+             data-bind="css: { 'fa-check-square' : item.prop65(),
+                              'fa-square' : !item.prop65() }"></i>
+          Prop. 65
+        </button>
+        <button id="hazmat" type="button" class="btn btn-default"
+                data-bind="click: toggleProperty">
+          <i class="far"
+             data-bind="css: { 'fa-check-square' : item.hazmat(),
+                              'fa-square' : !item.hazmat() }"></i>
+          Hazardous Material
+        </button>
+        <button id="oversized" type="button" class="btn btn-default"
+                data-bind="click: toggleProperty">
+          <i class="far"
+             data-bind="css: { 'fa-check-square' : item.oversized(),
+                              'fa-square' : !item.oversized() }"></i>
+          Oversized
+        </button>
+      </div>
+    </div>
+
     </div>
 
   </div><!-- /.row -->
@@ -790,6 +848,18 @@ itemModel.formatDiscount= function(discount_type, discount) {
       return Scat.amount(val);
   }
   return "???";
+}
+
+itemModel.toggleProperty= function(obj, ev) {
+  item= this.item;
+  prop= ev.target.id;
+  data= { item: item.id() };
+  data[prop]= item[prop]() ? 0 : 1;
+
+  Scat.api('item-update', data)
+      .done(function (data) {
+        loadItem(data.item);
+      });
 }
 
 ko.applyBindings(itemModel);
