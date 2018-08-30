@@ -1,6 +1,5 @@
 <?
 include '../scat.php';
-include '../lib/catalog.php';
 
 $term= $_REQUEST['term'];
 

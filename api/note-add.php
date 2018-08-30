@@ -1,6 +1,5 @@
 <?
 include '../scat.php';
-include '../lib/catalog.php';
 
 $content= $_REQUEST['content'];
 $kind= $_REQUEST['kind'];

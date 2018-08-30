@@ -1,5 +1,3 @@
-<?
-
 define('FIND_ALL', 1);
 define('FIND_OR', 2);
 define('FIND_SALES', 4);
@@ -108,6 +106,12 @@ function item_find($db, $q, $options) {
                WHERE txn_line.item = item.id
                  AND type = 'customer'
                  AND filled >= '$begin') sold,";
+  }
+  $order_by= "!(stock > 0), 2"; /* First items in stock, then by code */
+  $limit= "";
+  if ($options & FIND_RANDOM) {
+    $order_by= "RAND()";
+    $limit= "LIMIT 10";
   }
 
   $q= "SELECT

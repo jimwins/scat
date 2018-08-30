@@ -1,7 +1,6 @@
 <?
 require 'scat.php';
 require 'lib/item.php';
-require 'lib/catalog.php';
 
 $code= $_GET['code'];
 $id= (int)$_GET['id'];

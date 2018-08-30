@@ -1,6 +1,5 @@
 <?php
 require '../scat.php';
-require '../lib/catalog.php';
 
 $attach_id= (int)$_REQUEST['attach_id'];
 if ($attach_id) {

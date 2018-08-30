@@ -1,6 +1,5 @@
 <?
 require 'scat.php';
-require 'lib/catalog.php';
 
 head("Brands @ Scat", true);
 

@@ -1,6 +1,5 @@
 <?php
 require '../scat.php';
-require '../lib/catalog.php';
 
 $verbose= (int)$_REQUEST['verbose'];
 

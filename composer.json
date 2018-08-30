@@ -8,6 +8,11 @@
             "email": "jimw@trainedmonkey.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+          "Scat\\" : "lib/Scat/"
+        }
+    },
     "require": {
         "moment/moment": "^2.17",
         "components/jquery": "^3.1",

@@ -1,6 +1,5 @@
 <?php
 require '../scat.php';
-require '../lib/catalog.php';
 
 $brand_id= (int)$_REQUEST['brand'];
 $name= $db->escape($_REQUEST['name']);

@@ -1,6 +1,5 @@
 <?
 require 'scat.php';
-require 'lib/catalog.php';
 
 // XXX Use Knockout to make title dynamic
 head("Product @ Scat", true);

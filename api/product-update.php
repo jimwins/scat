@@ -1,6 +1,5 @@
 <?
 include '../scat.php';
-include '../lib/catalog.php';
 
 $id= (int)$_REQUEST['id'];
 $name= $_REQUEST['name'];

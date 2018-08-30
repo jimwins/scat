@@ -1,6 +1,5 @@
 <?
 include '../scat.php';
-include '../lib/catalog.php';
 
 $name= $_REQUEST['name'];
 $slug= $_REQUEST['slug'];

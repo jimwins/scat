@@ -1,6 +1,5 @@
 <?php
 require '../scat.php';
-require '../lib/catalog.php';
 
 $limit= (int)$_REQUEST['limit'];
 if (!$limit) $limit= 100;

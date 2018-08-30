@@ -1,4 +1,4 @@
-<?
+<?php
 include dirname(__FILE__).'/person.php';
 
 function txn_load_full($db, $id) {
@@ -486,34 +486,4 @@ class Transaction {
     $r= $this->db->query($q)
         or die_query($this->db, $q);
   }
-}
-
-/* XXX add relationships, but just using these raw for now */
-
-class Txn extends Model {
-}
-
-class TxnLine extends Model {
-}
-
-class Payment extends Model {
-  public static $methods= array(
-    'cash' => "Cash",
-    'change' => "Change",
-    'credit' => "Credit Card",
-    'square' => "Square",
-    'stripe' => "Stripe",
-    'gift' => "Gift Card",
-    'check' => "Check",
-    'dwolla' => "Dwolla",
-    'paypal' => "PayPal",
-    'discount' => "Discount",
-    'bad' => "Bad Debt",
-    'donation' => "Donation",
-    'withdrawal' => "Withdrawal",
-    'internal' => "Internal",
-  );
-}
-
-class PriceOverride extends Model {
 }

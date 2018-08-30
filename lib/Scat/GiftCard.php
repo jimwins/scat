@@ -1,8 +1,9 @@
 <?php
+namespace Scat;
 
-include '../lib/php-barcode.php';
+include dirname(__FILE__).'/../php-barcode.php';
 
-class Giftcard extends Model implements JsonSerializable {
+class Giftcard extends \Model implements \JsonSerializable {
   public function card() {
     return $self->id . $self->pin;
   }
@@ -120,7 +121,7 @@ class Giftcard extends Model implements JsonSerializable {
   }
 }
 
-class Giftcard_Txn extends Model {
+class Giftcard_Txn extends \Model {
   public function card() {
     return $this->belongs_to('Giftcard', 'card_id');
   }

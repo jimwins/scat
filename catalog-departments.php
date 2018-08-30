@@ -1,6 +1,5 @@
 <?
 require 'scat.php';
-require 'lib/catalog.php';
 
 $id= (int)$_REQUEST['id'];
 

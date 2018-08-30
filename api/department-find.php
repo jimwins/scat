@@ -1,6 +1,5 @@
 <?php
 require '../scat.php';
-require '../lib/catalog.php';
 
 $parent= (int)$_REQUEST['parent'];
 

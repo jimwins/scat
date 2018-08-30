@@ -19,6 +19,9 @@ require dirname(__FILE__).'/vendor/autoload.php';
 
 require dirname(__FILE__).'/lib/db.php';
 
+Model::$auto_prefix_models= '\\Scat\\';
+Model::$short_table_names= true;
+
 define('APP_NAME', 'ScatPOS');
 define('VERSION', '0.6.0');
 
@@ -489,7 +492,7 @@ function expand_field($data, $class, $meta = null) {
       return $data;
     return amount($data);
   case '$payment':
-    return \Payment::$methods[$data];
+    return \Scat\Payment::$methods[$data];
   case '$bool':
     if ($data) {
       return '<i data-truth="1" class="far fa-check-square"></i>';

@@ -75,7 +75,7 @@ $total= 0;
  <tr>
    <th>Date</th>
 <?
-foreach (\Payment::$methods as $method => $name) {
+foreach (\Scat\Payment::$methods as $method => $name) {
   if ($seen[$method])
     echo '<th>', $name, '</th>';
 }
@@ -87,7 +87,7 @@ foreach (\Payment::$methods as $method => $name) {
 <?
 foreach ($data as $date => $data) {
   echo '<tr><td>', $date, '</td>';
-  foreach (\Payment::$methods as $method => $name) {
+  foreach (\Scat\Payment::$methods as $method => $name) {
     if ($seen[$method])
       echo '<td>', $data[$method] ? amount($data[$method]) : '', '</td>';
   }

@@ -1,7 +1,6 @@
 <?php
 require '../scat.php';
 require '../lib/txn.php';
-require '../lib/catalog.php';
 
 $reason= $_REQUEST['reason'];
 if (!$reason)

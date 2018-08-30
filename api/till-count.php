@@ -1,7 +1,5 @@
 <?php
 require '../scat.php';
-require '../lib/txn.php';
-require '../lib/catalog.php';
 
 $count= $_REQUEST['count'];
 if (empty($count))
