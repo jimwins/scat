@@ -368,6 +368,12 @@ include 'item-searchform.php';
                 No price
               </a>
             </li>
+            <li>
+              <a data-bind="click: printBarcode"
+                 data-multiple="1" data-noprice="1">
+                Multiple, no price
+              </a>
+            </li>
           </ul>
         </div>
       </div>
