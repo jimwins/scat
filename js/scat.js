@@ -224,3 +224,5 @@ $.fn.editable.defaults.cancelcssclass= 'btn btn-default';
 $.fn.editable.defaults.submitcssclass= 'btn btn-primary';
 $.fn.editable.defaults.width=  'none';
 $.fn.editable.defaults.height= 'none';
+
+$.fn.select2.defaults.set( "theme", "bootstrap" );
