@@ -38,6 +38,7 @@ header("content-type: text/html;charset=utf-8");?>
  <link rel="stylesheet" type="text/css" href="components/font-awesome/css/fontawesome-all.min.css">
  <link rel="stylesheet" type="text/css" href="extern/bootstrap-datepicker-1.7.1/css/bootstrap-datepicker3.min.css">
  <link rel="stylesheet" type="text/css" href="vendor/select2/select2/dist/css/select2.min.css">
+ <link rel="stylesheet" type="text/css" href="extern/select2-bootstrap-theme-0.1.0-beta.10/dist/select2-bootstrap.min.css">
  <link rel="stylesheet" type="text/css" href="css/scat.css">
 <?if (!$allnew) {?>
   <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
