@@ -27,4 +27,17 @@ $products= Model::factory('Product')
              ->where('active', 1)
              ->find_array();
 
+/* Select2 */
+if ($_REQUEST['_type'] == 'query') {
+  $data= [ 'results' => [], 'pagination' => [ 'more' => false ]];
+
+  foreach ($products as $product) {
+    $data['results'][]= [ 'id' => $product['id'], 'text' => $product['name'] ];
+  }
+
+  echo jsonp($data);
+  exit;
+}
+
+/* Other queries */
 echo jsonp($products);
