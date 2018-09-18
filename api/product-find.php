@@ -6,7 +6,8 @@ $term= $_REQUEST['term'];
 $products= array();
 
 if (!$term) {
-  die_jsonp("Need to supply some search terms.");
+  die_jsonp([ 'error' => "Need to supply some search terms.",
+              'results' => [] ]);
 }
 
 $products= Model::factory('Product')
