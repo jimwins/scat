@@ -171,4 +171,11 @@ if (isset($_REQUEST['stock'])) {
 
 $item= item_load($db, $item_id);
 
-echo jsonp(array('item' => $item));
+$product= [];
+if ($item['product_id']) {
+  $product= Model::factory('Product')
+              ->find_one($item['product_id'])
+              ->as_array();
+}
+
+echo jsonp(array('item' => $item, 'product' => $product));
