@@ -8,6 +8,3 @@ class Txn extends \Model {
 
 class TxnLine extends \Model {
 }
-
-class PriceOverride extends \Model {
-}
