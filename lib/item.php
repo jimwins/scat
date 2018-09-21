@@ -1,3 +1,4 @@
+<?php
 define('FIND_ALL', 1);
 define('FIND_OR', 2);
 define('FIND_SALES', 4);
