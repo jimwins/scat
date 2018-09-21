@@ -154,7 +154,9 @@ Scat.alert= function (data) {
 
 Scat.getFocusedElement= function() {
   var elem = document.activeElement;
-  return $( elem && ( elem.type || elem.href ) ? elem : [] );
+  return $( elem &&
+            ( elem.type || elem.href ||
+              elem.className.includes("select2-selection") ) ? elem : [] );
 };
 
 $(function() {
@@ -218,6 +220,30 @@ ko.bindingHandlers.jeditable= {
   }
 };
 
+$.editable.addInputType('select2', {
+    element : function(settings, original) {
+        var input= $.editable.types.select.element.apply(this, [settings, original]);
+        return(input);
+    },
+    plugin : function(settings, original) {
+        var select= $("select", this);
+        select.select2(settings.select2);
+        select.on('select2:close', function(e) {
+          select.removeClass('select2-container-active');
+          select.blur();
+        });
+        return (select);
+    },
+    content : function(data, settings, original) {
+      if (!settings.submit) {
+        // XXX add our initial option
+        var form= this;
+        $(this).find('select').change(function() {
+          form.submit();
+        });
+      }
+    },
+});
 
 $.fn.editable.defaults.inputcssclass= 'form-control';
 $.fn.editable.defaults.cancelcssclass= 'btn btn-default';
