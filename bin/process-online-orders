@@ -2,7 +2,6 @@
 <?php
 require __DIR__.'/../scat.php';
 require __DIR__.'/../lib/txn.php';
-require __DIR__.'/../lib/catalog.php';
 
 $exit= 0;
 
