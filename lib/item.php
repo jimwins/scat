@@ -3,6 +3,7 @@ define('FIND_ALL', 1);
 define('FIND_OR', 2);
 define('FIND_SALES', 4);
 define('FIND_LIMITED', 8);
+define('FIND_RANDOM', 16);
 
 function item_terms_to_sql($db, $q, $options) {
   $andor= array();
@@ -150,7 +151,8 @@ function item_find($db, $q, $options) {
     LEFT JOIN barcode ON (item.id = barcode.item)
         WHERE $sql_criteria
      GROUP BY item.id
-     ORDER BY !(stock > 0), 2";
+     ORDER BY $order_by
+     $limit";
 
   $r= $db->query($q)
     or die($db->error);
