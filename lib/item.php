@@ -54,6 +54,8 @@ function item_terms_to_sql($db, $q, $options) {
     } elseif (preg_match('/^hazmat:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.hazmat)"
                         : "(NOT item.hazmat)";
+    } elseif (preg_match('/^inventoried:(.+)/i', $term, $dbt)) {
+      $andor[]= "(item.inventoried IS NULL OR item.inventoried < '{$dbt[1]}')";
     } elseif (preg_match('/^active:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.active)"
                         : "(NOT item.active)";
