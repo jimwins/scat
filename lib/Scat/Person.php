@@ -1,5 +1,5 @@
 <?php
 namespace Scat;
 
-class Person extends Model {
+class Person extends \Model {
 }
