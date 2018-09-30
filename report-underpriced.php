@@ -2,10 +2,16 @@
 require 'scat.php';
 require 'lib/item.php';
 
+$sql_criteria= "1=1";
+if (($items= $_REQUEST['items'])) {
+  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'],
+                                             FIND_OR|FIND_ALL);
+}
+
 $minimum= (float)$_REQUEST['minimum'];
 if (!$minimum) $minimum= 0.3;
 
-$q= "SELECT id, code, name,
+$q= "SELECT item.id, item.code, item.name,
             retail_price,
             sale_price(retail_price, discount_type, discount) sale_price,
             (SELECT MIN(IF(promo_price, IF(promo_price < net_price,
@@ -14,7 +20,9 @@ $q= "SELECT id, code, name,
                FROM vendor_item
               WHERE vendor_item.item = item.id AND vendor_item.active) net_price
        FROM item
+       LEFT JOIN brand ON item.brand = brand.id
       WHERE active AND NOT deleted
+        AND ($sql_criteria)
     HAVING (sale_price - net_price) / sale_price < $minimum
      ORDER BY 2";
 
@@ -23,6 +31,34 @@ $r= $db->query($q)
 
 head("Underpriced @ Scat", true);
 ?>
+<form id="report-params" class="form-horizontal" role="form"
+      action="<?=$_SERVER['PHP_SELF']?>">
+  <div class="form-group">
+    <label for="items" class="col-sm-2 control-label">
+      Items
+    </label>
+    <div class="col-sm-10">
+      <input id="items" name="items" type="text"
+             class="form-control" style="width: 20em"
+             value="<?=ashtml($items)?>">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="items" class="col-sm-2 control-label">
+      Minimum Margin
+    </label>
+    <div class="col-sm-10">
+      <input id="minimum" name="minimum" type="text"
+             class="form-control" style="width: 20em"
+             value="<?=ashtml($minimum)?>">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <input type="submit" class="btn btn-primary" value="Show">
+    </div>
+  </div>
+</form>
 <div id="results">
   <table class="table table-striped table-hover sortable">
     <thead>
