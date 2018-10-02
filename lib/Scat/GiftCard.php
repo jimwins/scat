@@ -100,10 +100,10 @@ class Giftcard extends \Model implements \JsonSerializable {
     $code= "RAW-$card";
     $type= "code39";
 
-    Barcode::fpdf($pdf, '000000',
-                  4.25, 5,
-                  0 /* angle */, $type,
-                  $code, (1/72), $basefontsize/2/72);
+    \Barcode::fpdf($pdf, '000000',
+                   4.25, 5,
+                   0 /* angle */, $type,
+                   $code, (1/72), $basefontsize/2/72);
 
     $pdf->SetFontSize(10);
     $width= $pdf->GetStringWidth($card);
