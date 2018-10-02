@@ -1,6 +1,5 @@
 <?
 include '../scat.php';
-include '../lib/giftcard.php';
 
 use Michelf\Markdown;
 

@@ -1,6 +1,5 @@
 <?php
 include '../scat.php';
-include '../lib/giftcard.php';
 
 $balance= (float)$_REQUEST['balance'];
 $txn_id= (int)$_REQUEST['txn'];

@@ -1,6 +1,5 @@
 <?php
 include '../scat.php';
-include '../lib/giftcard.php';
 
 $amount= (float)$_REQUEST['amount'];
 

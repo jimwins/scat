@@ -1,6 +1,5 @@
 <?php
 include '../scat.php';
-include '../lib/giftcard.php';
 
 $card= $_REQUEST['card'];
 $card= preg_replace('/^RAW-/', '', $card);
