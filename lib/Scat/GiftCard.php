@@ -72,7 +72,7 @@ class Giftcard extends \Model implements \JsonSerializable {
     $error_reporting= error_reporting(E_ALL ^ E_DEPRECATED);
 
     // initiate FPDI
-    $pdf = new FPDI('P', 'in', array(8.5, 11));
+    $pdf = new \FPDI('P', 'in', array(8.5, 11));
     // add a page
     $pdf->AddPage();
     // set the source file
