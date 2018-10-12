@@ -118,7 +118,7 @@ foreach ($sales as $summary) {
     $note= Model::factory('Note')->create();
     $note->kind= 'txn';
     $note->attach_id= $txn->id;
-    if ($sale->shipping_address_id == 1) {
+    if ($data->sale->shipping_address_id == 1) {
       $note->content= "Need to pick for in-store pick-up. Contact customer when ready!";
     } else {
       $note->content= "Need to pick & ship online order.";
