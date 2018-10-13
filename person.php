@@ -86,7 +86,9 @@ if ($id && !$person) {
     <label for="phone" class="col-sm-2 control-label">Phone</label>
     <div class="col-sm-6">
       <input type="text" class="form-control" id="phone" placeholder="Phone"
-             data-bind="value: person.phone">
+             data-bind="cleave: person.phone,
+                        cleaveOptions: { phone: true,
+                                         phoneRegionCode: 'US' }">
     </div>
     <div class="col-sm-4 checkbox disabled">
       <label>

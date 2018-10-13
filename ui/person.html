@@ -34,7 +34,9 @@
           <div class="form-group">
             <label for="phone">Phone</label>
             <input type="text" class="form-control" id="phone"
-                   data-bind="value: phone">
+                   data-bind="cleave: phone,
+                              cleaveOptions: { phone: true,
+                                               phoneRegionCode: 'US' }">
           </div>
           <div class="form-group">
             <label for="tax_id">Tax ID</label>

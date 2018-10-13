@@ -220,6 +220,26 @@ ko.bindingHandlers.jeditable= {
   }
 };
 
+ko.bindingHandlers.cleave= {
+  init: function(element, valueAccessor, allBindingsAccessor) {
+    var options= allBindingsAccessor().cleaveOptions || {};
+
+    options.onValueChanged= function (e) {
+      var value= valueAccessor();
+      value(e.target.rawValue);
+    }
+
+    var cleave= new Cleave(element, options);
+    element.cleave= cleave;
+
+    cleave.setRawValue(ko.unwrap(valueAccessor()));
+  },
+  update: function(element, valueAccessor, allBindingsAccessor) {
+    var value= valueAccessor();
+    element.cleave.setRawValue(ko.unwrap(value));
+  }
+};
+
 $.editable.addInputType('select2', {
     element : function(settings, original) {
         var input= $.editable.types.select.element.apply(this, [settings, original]);

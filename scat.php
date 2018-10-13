@@ -67,6 +67,8 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="components/moment/min/moment.min.js"></script>
  <script src="extern/chartjs-2.7.2/Chart.min.js"></script>
  <script src="extern/marked-0.3.12/marked.min.js"></script>
+ <script src="extern/cleave.js-1.4.4/dist/cleave.min.js"></script>
+ <script src="extern/cleave.js-1.4.4/dist/addons/cleave-phone.us.js"></script>
 <?if (!$allnew) {?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
