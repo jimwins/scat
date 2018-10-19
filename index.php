@@ -872,28 +872,28 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             <span class="val"
                   data-bind="text: person.display_name()"></span>
           </a>
-          <a data-bind="if: person.id() && !person.suppress_loyalty(),
-                        click: showPoints">
-            <i class="fa fa-star"></i>
-            <span data-bind="text: person.points_available()"></span>
-          </a>
-          <span data-bind="if: person.id() && !person.suppress_loyalty() &&
-                           person.points_pending() > 0">
-            + <i class="far fa-star"></i>
-            <span data-bind="text: person.points_pending()"></span>
-            = <span data-bind="text: person.points_available() + person.points_pending()"></span>
-          </span>
-          <span data-bind="if: person.id() && !person.suppress_loyalty() &&
-                           txn.due() > 0 && txn.subtotal()">
-            <span data-bind="if: loyaltyPointsUsed()">
-              - <i class="fa fa-star"></i>
-              <span data-bind="text: loyaltyPointsUsed()"></span>
-            </span>
-            <span data-bind="if: !txn.no_rewards()">
+          <span data-bind="if: txn.type() != 'vendor' &&
+                               person.id() && !person.suppress_loyalty()">
+            <a data-bind="click: showPoints">
+              <i class="fa fa-star"></i>
+              <span data-bind="text: person.points_available()"></span>
+            </a>
+            <span data-bind="if: person.points_pending() > 0">
               + <i class="far fa-star"></i>
-              <span data-bind="text: Math.max(1, Math.floor(txn.subtotal()))"></span>
+              <span data-bind="text: person.points_pending()"></span>
+              = <span data-bind="text: person.points_available() + person.points_pending()"></span>
             </span>
-            = <span data-bind="text: person.points_available() + person.points_pending() + (txn.no_rewards() ? 0 : Math.max(1, Math.floor(txn.subtotal()))) - loyaltyPointsUsed()"></span>
+            <span data-bind="if: txn.due() > 0 && txn.subtotal()">
+              <span data-bind="if: loyaltyPointsUsed()">
+                - <i class="fa fa-star"></i>
+                <span data-bind="text: loyaltyPointsUsed()"></span>
+              </span>
+              <span data-bind="if: !txn.no_rewards()">
+                + <i class="far fa-star"></i>
+                <span data-bind="text: Math.max(1, Math.floor(txn.subtotal()))"></span>
+              </span>
+              = <span data-bind="text: person.points_available() + person.points_pending() + (txn.no_rewards() ? 0 : Math.max(1, Math.floor(txn.subtotal()))) - loyaltyPointsUsed()"></span>
+            </span>
           </span>
           <a data-bind="if: person.id(), click: removePerson">
             <i class="far fa-trash-alt"></i>
