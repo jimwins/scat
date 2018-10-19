@@ -410,7 +410,7 @@ $(function() {
  </div>
  <div class="panel-footer">
   <div class="btn-group btn-group-lg">
-   <button id="print" type="button" class="btn btn-default"
+   <button type="button" class="btn btn-default"
            data-bind="enable: txn.id(), click: printReceipt">
     Print
    </button>
@@ -428,10 +428,17 @@ $(function() {
     </li>
    </ul>
   </div>
-  <button id="pay" type="button" class="pay-button btn btn-lg btn-default"
-          data-bind="visible: txn.type() != 'vendor',
-                     enable: txn.id() && !txn.paid()">
+  <button type="button" class="btn btn-lg btn-default"
+          data-bind="visible: txn.type() != 'vendor' && !txn.paid(),
+                     enable: txn.id(),
+                     click: payTransaction">
     Pay
+  </button>
+  <button type="button" class="btn btn-lg btn-default"
+          data-bind="visible: txn.type() != 'vendor' && txn.paid(),
+                     enable: txn.id(),
+                     click: returnTransaction">
+    Return
   </button>
   <button type="button" class="btn btn-lg btn-default"
           data-bind="visible: txn.type() == 'vendor' &&
@@ -547,7 +554,7 @@ $("#txn-load").submit(function(ev) {
     <div class="row">
       <div id="sale-buttons" class="col-md-6 col-md-push-6">
         <div class="pull-right">
-          <button id="notes" type="button" class="btn btn-default"
+          <button type="button" class="btn btn-default"
                   data-bind="enable: txn.id(), click: showNotes">
            <i class="fas fa-clipboard"></i>
            <span class="badge"
@@ -573,23 +580,6 @@ $("#txn-load").submit(function(ev) {
           </div>
         </div>
       </div>
-<script>
-$(".pay-button").on("click", function() {
-  var txn= Txn.id();
-  Txn.callAndLoad('txn-allocate', { txn: txn })
-      .done(function (data) {
-        Txn.choosePayMethod();
-      });
-});
-
-$(".return-button").on("click", function() {
-  var txn= Txn.id();
-  if (!txn || !confirm("Are you sure you want to create a return?")) {
-    return false;
-  }
-  Txn.callAndLoad('txn-return', { txn: txn });
-});
-</script>
 <form role="form" id="pay-cash" class="pay-method" style="display: none">
  <div class="form-group">
    <input class="amount form-control input-lg text-center"
@@ -1375,6 +1365,22 @@ viewModel.printGiftCard= function(item) {
                                         balance: data.balance,
                                         issued: data.latest });
             });
+}
+
+viewModel.payTransaction= function() {
+  var txn= Txn.id();
+  Txn.callAndLoad('txn-allocate', { txn: txn })
+      .done(function (data) {
+        Txn.choosePayMethod();
+      });
+}
+
+viewModel.returnTransaction= function() {
+  var txn= Txn.id();
+  if (!txn || !confirm("Are you sure you want to create a return?")) {
+    return false;
+  }
+  Txn.callAndLoad('txn-return', { txn: txn });
 }
 
 ko.applyBindings(viewModel);
