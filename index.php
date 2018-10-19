@@ -554,25 +554,6 @@ $("#txn-load").submit(function(ev) {
                  data-bind="text: notes().length, visible: notes().length">
            </span>
           </button>
-          <div class="btn-group">
-           <button id="print" type="button" class="print-button btn btn-default"
-                   data-bind="enable: txn.id(), click: printReceipt">
-            Print
-           </button>
-           <button type="button" class="btn btn-default dropdown-toggle" 
-                   data-bind="enable: txn.id()"
-                   data-toggle="dropdown" aria-expanded="false">
-            <span class="caret"></span>
-            <span class="sr-only">Toggle Dropdown</span>
-           </button>
-           <ul class="dropdown-menu">
-            <li><a data-bind="click: printInvoice">Invoice</a></li>
-            <li><a data-bind="click: printReceipt">Receipt</a></li>
-            <li data-bind="css: { 'disabled': person.email() == '' }">
-              <a data-bind="click: emailInvoice">Email</a>
-            </li>
-           </ul>
-          </div>
           <button id="delete" class="btn btn-default"
                   data-bind="enable: txn.id() && items().length == 0,
                              click: deleteTransaction">
@@ -583,15 +564,6 @@ $("#txn-load").submit(function(ev) {
                                      txn.type() == 'vendor',
                              click: exportTransaction">
             Export
-          </button>
-          <button id="pay" class="pay-button btn btn-default"
-                  data-bind="enable: txn.id() && !txn.paid(),
-                             visible: !txn.paid() && txn.type() != 'vendor'">
-            Pay
-          </button>
-          <button id="return" class="return-button btn btn-default"
-                  data-bind="visible: txn.id() && txn.paid()">
-            Return
           </button>
         </div>
       </div>
