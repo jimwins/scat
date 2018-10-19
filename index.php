@@ -549,22 +549,28 @@ $("#txn-load").submit(function(ev) {
         <div class="pull-right">
           <button id="notes" type="button" class="notes-button btn btn-default"
                   data-bind="enable: txn.id(), click: showNotes">
-           Notes
+           <i class="fas fa-clipboard"></i>
            <span class="badge"
                  data-bind="text: notes().length, visible: notes().length">
            </span>
           </button>
-          <button id="delete" class="btn btn-default"
-                  data-bind="enable: txn.id() && items().length == 0,
-                             click: deleteTransaction">
-            Delete
-          </button>
-          <button class="btn btn-default"
-                  data-bind="enable: txn.id() && items().length != 0 &&
-                                     txn.type() == 'vendor',
-                             click: exportTransaction">
-            Export
-          </button>
+          <div class="btn-group">
+           <button type="button" class="btn btn-default dropdown-toggle"
+                   data-bind="enable: txn.id()"
+                   data-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-cog"></i>
+            <span class="caret"></span>
+           </button>
+           <ul class="dropdown-menu" role="menu">
+            <li data-bind="css: { disabled: !txn.id() || items().length }">
+               <a data-bind="click: deleteTransaction">Delete</a>
+            </li>
+            <li data-bind="css: { disabled: !txn.id() || items().length ||
+                                            txn.type() != 'vendor' }">
+               <a data-bind="click: exportTransaction">Export</a>
+            </li>
+           </ul>
+          </div>
         </div>
       </div>
 <script>
