@@ -410,7 +410,7 @@ $(function() {
  </div>
  <div class="panel-footer">
   <div class="btn-group btn-group-lg">
-   <button id="print" type="button" class="print-button btn btn-default"
+   <button id="print" type="button" class="btn btn-default"
            data-bind="enable: txn.id(), click: printReceipt">
     Print
    </button>
@@ -547,7 +547,7 @@ $("#txn-load").submit(function(ev) {
     <div class="row">
       <div id="sale-buttons" class="col-md-6 col-md-push-6">
         <div class="pull-right">
-          <button id="notes" type="button" class="notes-button btn btn-default"
+          <button id="notes" type="button" class="btn btn-default"
                   data-bind="enable: txn.id(), click: showNotes">
            <i class="fas fa-clipboard"></i>
            <span class="badge"
