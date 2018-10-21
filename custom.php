@@ -156,7 +156,9 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: (Math.min(w(), h()) > 60)
                                    ? 'Too big!'
-                                   : amount(ui() * 0.99)"></p>
+                                   : (Math.min(w(), h()) >= 48)
+                                      ? amount(ui() * 1.99)
+                                      : amount(ui() * 0.99)"></p>
             </div>
           </div>
           <div class="form-group">
@@ -167,7 +169,9 @@ head("Custom @ Scat", true);
               <p class="form-control-static"
                  data-bind="text: (Math.min(w(), h()) > 60)
                                    ? 'Too big!'
-                                   : amount(ui() * 1.29)"></p>
+                                   : (Math.min(w(), h()) >= 48)
+                                      ? amount(ui() * 3.99)
+                                      : amount(ui() * 1.29)"></p>
             </div>
           </div>
         </div>
