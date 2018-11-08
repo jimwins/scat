@@ -961,7 +961,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
     <tr class="payment-row" data-bind="attr: { 'data-id': $data.id }">
       <th data-bind="attr: { colspan: $parent.showAllocated() ? 5 : 4 }"
           class="payment-buttons">
-        <a data-bind="visible: $parent.showAdmin()" name="remove">
+        <a data-bind="visible: $parent.showAdmin() || (method() == 'discount' && !$parent.txn.paid())" name="remove">
           <i class="far fa-trash-alt"></i>
         </a>
         <a data-bind="visible: method() == 'credit',
