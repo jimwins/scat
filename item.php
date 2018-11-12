@@ -791,7 +791,7 @@ itemModel.formatDiscount= function(discount_type, discount) {
       return '+' + val + '%';
 
     case 'relative':
-      return '-' + val;
+      return '-' + Scat.amount(val);
 
     case 'fixed':
       return Scat.amount(val);
