@@ -556,7 +556,7 @@ $("#txn-load").submit(function(ev) {
         <div class="pull-right">
           <button type="button" class="btn btn-default"
                   data-bind="enable: txn.id(), click: showNotes">
-           <i class="fas fa-clipboard"></i>
+           <i class="far fa-sticky-note"></i>
            <span class="badge"
                  data-bind="text: notes().length, visible: notes().length">
            </span>
