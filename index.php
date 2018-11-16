@@ -890,9 +890,9 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
               </span>
               <span data-bind="if: !txn.no_rewards()">
                 + <i class="far fa-star"></i>
-                <span data-bind="text: Math.max(1, Math.floor(txn.subtotal()))"></span>
+                <span data-bind="text: <?=defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1?> * Math.max(1, Math.floor(txn.subtotal()))"></span>
               </span>
-              = <span data-bind="text: person.points_available() + person.points_pending() + (txn.no_rewards() ? 0 : Math.max(1, Math.floor(txn.subtotal()))) - loyaltyPointsUsed()"></span>
+              = <span data-bind="text: person.points_available() + person.points_pending() + (txn.no_rewards() ? 0 : <?=defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1?> * Math.max(1, Math.floor(txn.subtotal()))) - loyaltyPointsUsed()"></span>
             </span>
           </span>
           <a data-bind="if: person.id(), click: removePerson">
