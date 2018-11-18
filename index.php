@@ -572,7 +572,7 @@ $("#txn-load").submit(function(ev) {
             <li data-bind="css: { disabled: !txn.id() || items().length }">
                <a data-bind="click: deleteTransaction">Delete</a>
             </li>
-            <li data-bind="css: { disabled: !txn.id() || items().length ||
+            <li data-bind="css: { disabled: !txn.id() || !items().length ||
                                             txn.type() != 'vendor' }">
                <a data-bind="click: exportTransaction">Export</a>
             </li>
