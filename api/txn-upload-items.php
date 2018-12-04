@@ -116,18 +116,17 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
 
   echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
-} elseif (preg_match('/^sls_sku	cust_sku/', $line)) {
+} elseif (preg_match('/^sls_sku.*asst_qty/', $line)) {
   // SLS assortment
+  # sls_sku,description,msrp,reg_price,reg_discount,upc1,min_ord_qty,asst_qty
+  $sep= preg_match("/,/", $line) ? "," : "\t";
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
-       FIELDS TERMINATED BY '\t'
+       FIELDS TERMINATED BY '$sep'
        LINES TERMINATED BY '\n'
        IGNORE 1 LINES
-       (item_no, @cust_sku, description, @vendor_name, msrp,
-        net, @reg_discount, @promo_price, @promo_discount,
-        barcode, @upc2, @upc2_qty, @upc3, @upc3_qty, @min_ord_qty,
-        @level1, @level2, @level3, @level4, @leve5, @ltl_only, @add_date,
-        @asst_qty)
+       (item_no, description, msrp, net, @reg_discount, barcode,
+        @min_ord_qty, @asst_qty)
        SET ordered = @asst_qty, shipped = @asst_qty";
   $db->query($q)
     or die_query($db, $q);
