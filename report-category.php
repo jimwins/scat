@@ -128,6 +128,7 @@ $q= "SELECT
             (SELECT SUM(amount) FROM report_previous WHERE department_id = id)
               AS previous_amount
        FROM department
+/*
       UNION
       SELECT
             'Unknown' AS name, 0 AS parent_id,
@@ -138,6 +139,7 @@ $q= "SELECT
             (SELECT SUM(amount) FROM report_previous
                                WHERE department_id IS NULL)
               AS previous_amount
+*/
       ORDER BY slug
       ";
 
