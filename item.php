@@ -428,6 +428,41 @@ include 'item-searchform.php';
 
     </div>
 
+    <div class="col-sm-3">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Sales</h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="form-group">
+            <label for="quarter" class="col-sm-6 control-label">
+             Last 3 Months
+            </label>
+            <div class="col-sm-6">
+              <p class="form-control-static" id="quarter">
+                <span data-bind="text: Scat.amount(sales.last3()[0])">$0.00</span>
+                (<span data-bind="text: sales.last3()[1]">0</span>)
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="year" class="col-sm-6 control-label">
+             Last Year
+            </label>
+            <div class="col-sm-6">
+              <p class="form-control-static" id="year">
+                <span data-bind="text:Scat.amount(sales.last12()[0])">$0.00</span>
+                (<span data-bind="text: sales.last12()[1]">0</span>)
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </div><!-- /.row -->
 
 </form>
@@ -650,7 +685,7 @@ var model= {
   vendor_items: <?=json_encode($vendor_items);?>,
   price_overrides: <?=json_encode($price_overrides);?>,
   brands: [],
-
+  sales: { last3: [ 0.00, 0], last12: [ 0.00, 0 ] },
 };
 
 var itemModel= ko.mapping.fromJS(model);
@@ -839,5 +874,17 @@ Scat.api('note-count', { kind: 'item', attach_id: model.item.id })
     .done(function(data) {
       $('#item-notes').text(data.notes);
     });
+
+$(function() {
+  Scat.api('item-sales', { id: model.item.id, days: 90 })
+      .done(function(data) {
+        itemModel.sales.last3([ data.sales.amount, data.sales.items ]);
+      });
+
+  Scat.api('item-sales', { id: model.item.id, days: 365 })
+      .done(function(data) {
+        itemModel.sales.last12([ data.sales.amount, data.sales.items ]);
+      });
+});
 
 </script>
