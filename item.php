@@ -657,7 +657,8 @@ var itemModel= ko.mapping.fromJS(model);
 itemModel.differentVendorPrice= function() {
   var ret= false;
   $.each(itemModel.vendor_items(), function (i, vi) {
-    if (vi.retail_price() != itemModel.item.retail_price()) {
+    if (vi.retail_price() != 0 &&
+        vi.retail_price() != itemModel.item.retail_price()) {
       ret= true;
     }
   });
