@@ -315,8 +315,9 @@ include 'item-searchform.php';
     </div>
     </div>
 
+    <div class="col-md-3">
+
     <!-- Barcodes -->
-    <div class="col-md-6">
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">Barcodes</h3>
