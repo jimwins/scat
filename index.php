@@ -97,9 +97,6 @@ Txn.addPayment= function (id, options) {
                   { type: 'GET', async: false })
       .done(function (data) {
         $.smodal.close();
-        if (options.method == 'credit' && options.amount >= 25.00) {
-          printChargeRecord(data.payment);
-        }
       });
 }
 
