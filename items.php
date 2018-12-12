@@ -297,6 +297,11 @@ dump_table($r);
       </a>
     </li>
     <li>
+      <a id="print-price-labels-trim">
+        Trim name
+      </a>
+    </li>
+    <li>
       <a id="print-price-labels-noprice">
         No price
       </a>
@@ -405,6 +410,16 @@ $('#print-price-labels-brush').on('click', function(ev) {
 
   if (trim) {
     Scat.printDirect('labels-price-brush', { q: q, trim: trim });
+  }
+});
+$('#print-price-labels-trim').on('click', function(ev) {
+  ev.preventDefault();
+  var q= $('#search').val();
+
+  var trim= window.prompt("Please enter the part of the name to trim from the labels", "");
+
+  if (trim) {
+    Scat.printDirect('labels-price', { q: q, trim: trim });
   }
 });
 
