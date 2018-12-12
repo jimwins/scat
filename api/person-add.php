@@ -10,7 +10,10 @@ if (empty($name) && empty($company) && empty($phone))
 $list= array();
 foreach(array('name', 'role', 'company', 'address',
               'email', 'phone', 'tax_id') as $field) {
-  $list[]= "$field = '" . $db->escape($_REQUEST[$field]) . "', ";
+  $value= trim($_REQUEST[$field]);
+  /* Turn empty strings into NULL, escape others and wrap in quotes */
+  $value= ($value != '') ?  "'" . $db->escape($value) . "'" : 'NULL';
+  $list[]= "$field = " . $value . ", ";
 }
 
 if ($_REQUEST['phone']) {
