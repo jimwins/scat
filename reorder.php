@@ -155,7 +155,7 @@ while (($row= $r->fetch_assoc())) {
     <button class="btn btn-default"
             data-bind="click: optimize">Optimize</button>
   </div>
-  <table class="table table-condensed table-striped" id="search-results"
+  <table class="table table-condensed table-striped"
          data-bind="if: results().length">
     <thead>
       <tr>
@@ -197,9 +197,8 @@ while (($row= $r->fetch_assoc())) {
       </tr>
     </tfoot>
 
-    <tbody data-bind="foreach: results">
-      <tr data-bind="css: { active: $data.id == $parent.activeRow() },
-                     click: $parent.selectRow">
+    <tbody data-bind="foreach: results" id="search-results">
+      <tr data-bind="click: $parent.selectRow">
         <td>
           <a data-bind="text: $data.code,
                         attr: { href: 'item.php?id=' + $data.id }"></a>
@@ -252,25 +251,27 @@ $(function() {
   function PageModel() {
     var self= this;
 
+    var i= 0;
     self.results= ko.observableArray(
                    $.map(<?=json_encode($results)?>,
                          function (a) {
+                           a.idx= i++;
                            a.order_quantity= ko.observable(a.order_quantity);
                            return a;
                          }));
-    self.activeRow= ko.observable(0);
+    self.activeRow= ko.observable(null);
 
-    self.activeRow.subscribe(function(newValue) {
-      var idx= pageModel.results().findIndex(function (a) {
-                                               return a.id == newValue;
-                                             });
-
-      if (idx < 0) {
-        console.log("Couldn't find active row!");
-        return true;
+    self.activeRow.subscribe(function(idx) {
+      var w= $(window);
+      var row= $('#search-results').find('tr')
+                                   .removeClass('active')
+                                   .eq(idx)
+                                   .addClass('active')
+                                   .find('input').select().focus();
+      if (row.length) {
+        $('html,body').animate({ scrollTop: row.offset().top - w.height()/2 },
+                               250);
       }
-
-      $('#search-results tbody tr:nth(' + idx + ') input').select().focus();
     });
 
     self.changeQuantity= function (item, event) {
@@ -278,7 +279,7 @@ $(function() {
                           $(event.currentTarget).data('value'));
     }
     self.selectRow= function (item, event) {
-      self.activeRow(item.id);
+      self.activeRow(item.idx);
       return true; // allow click to continue to buttons and links
     }
 
@@ -352,14 +353,11 @@ $(function() {
   ko.applyBindings(pageModel, document.getElementById('scat-page'));
 
   // Set first row active */
-  pageModel.activeRow(pageModel.results()[0].id);
+  pageModel.activeRow(0);
 
   Mousetrap.bind(['left', 'right', 'up', 'down', 'h', 'j', 'k', 'l', 'x', 'tab', 'enter', 'space' ],
                  function(ev, combo) {
-    var idx= pageModel.results().findIndex(function (a) {
-                                             return a.id ==
-                                                     pageModel.activeRow();
-                                           });
+    var idx= pageModel.activeRow();
     var item= (pageModel.results())[idx];
     if (idx < 0) {
       console.log("Couldn't find active row!");
@@ -379,14 +377,14 @@ $(function() {
     if (combo == 'up' || combo == 'k') {
       // previous one
       if (idx > 0) {
-        pageModel.activeRow((pageModel.results())[idx - 1].id);
+        pageModel.activeRow(idx - 1);
       }
       return false;
     }
     if (combo == 'down' || combo == 'j') {
       // next one
       if (idx < pageModel.results().length - 1) {
-        pageModel.activeRow((pageModel.results())[idx + 1].id);
+        pageModel.activeRow(idx + 1);
       }
       return false;
     }
@@ -394,14 +392,14 @@ $(function() {
       // zero, mark done and move on
       item.order_quantity(0);
       if (idx < pageModel.results().length - 1) {
-        pageModel.activeRow((pageModel.results())[idx + 1].id);
+        pageModel.activeRow(idx + 1);
       }
       return false;
     }
     if (combo == 'tab' || combo == 'space' || combo == 'enter') {
       // mark done and move on
       if (idx < pageModel.results().length - 1) {
-        pageModel.activeRow((pageModel.results())[idx + 1].id);
+        pageModel.activeRow(idx - 1);
       }
       return false;
     }
