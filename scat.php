@@ -70,11 +70,10 @@ header("content-type: text/html;charset=utf-8");?>
  <script src="extern/cleave.js-1.4.4/dist/cleave.min.js"></script>
  <script src="extern/cleave.js-1.4.4/dist/addons/cleave-phone.us.js"></script>
  <script src="extern/mousetrap-1.6.2/mousetrap.min.js"></script>
+ <script src="extern/mousetrap-1.6.2/plugins/global-bind/mousetrap-global-bind.min.js"></script>
 <?if (!$allnew) {?>
  <script src="js/jquery-ui.min.js"></script>
  <script src="js/jquery.simplemodal.1.4.4.min.js"></script>
- <!-- next 1 used in index.php -->
- <script src="js/jquery.hotkeys.js"></script>
  <script>
 $(document).ready(function() { 
   // Enable sorted tables

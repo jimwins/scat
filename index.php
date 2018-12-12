@@ -340,16 +340,11 @@ function printChargeRecord(id) {
 }
 
 $(function() {
-  $(document).bind('keydown', 'meta+p', function(ev) {
-    return printReceipt();
+  Mousetrap.bindGlobal('mod+p', function (ev) {
+    printReceipt();
+    return false;
   });
-  $('input').bind('keydown', 'meta+p', function(ev) {
-    return printReceipt();
-  });
-  $(document).bind('keydown', 'meta+shift+z', function(ev) {
-    viewModel.showAdmin(true);
-  });
-  $('input').bind('keydown', 'meta+shift+z', function(ev) {
+  Mousetrap.bindGlobal('mod+shift+z', function (ev) {
     viewModel.showAdmin(true);
   });
 
