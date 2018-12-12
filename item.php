@@ -236,7 +236,7 @@ include 'item-searchform.php';
          
           <div class="col-sm-8">
             <p class="form-control-static" id="product_id"
-               data-bind="jeditable: product.name, jeditableOptions: { type: 'select2', 'select2' : { debug: true, ajax: { url: 'api/product-find.php', dataType: 'json' } }, onupdate: saveItemProperty, onblur: 'cancel' }"></p>
+               data-bind="jeditable: product.name, jeditableOptions: { type: 'select2', 'select2' : { ajax: { url: 'api/product-find.php', dataType: 'json' } }, onupdate: saveItemProperty, onblur: 'cancel' }"></p>
           </div>
         </div>
 
