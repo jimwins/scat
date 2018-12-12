@@ -225,7 +225,7 @@ while (($row= $r->fetch_assoc())) {
               </button>
             </span>
             <input type="text"
-                   class="form-control input-sm text-center" size="3"
+                   class="form-control input-sm text-center mousetrap" size="3"
                    data-bind="textInput: $data.order_quantity">
             <span class="input-group-btn">
               <button class="btn btn-default btn-sm" type="button"
@@ -354,73 +354,56 @@ $(function() {
   // Set first row active */
   pageModel.activeRow(pageModel.results()[0].id);
 
-  $(document).keydown(function(ev) {
-    var el= Scat.getFocusedElement();
-    if ($(el).hasClass('autofocus')) {
+  Mousetrap.bind(['left', 'right', 'up', 'down', 'h', 'j', 'k', 'l', 'x', 'tab', 'enter', 'space' ],
+                 function(ev, combo) {
+    var idx= pageModel.results().findIndex(function (a) {
+                                             return a.id ==
+                                                     pageModel.activeRow();
+                                           });
+    var item= (pageModel.results())[idx];
+    if (idx < 0) {
+      console.log("Couldn't find active row!");
       return true;
     }
 
-    // left = 37, up = 38, right = 39, down = 40
-    if (pageModel.activeRow()) {
-      var idx= pageModel.results().findIndex(function (a) {
-                                               return a.id ==
-                                                       pageModel.activeRow();
-                                             });
-      var item= (pageModel.results())[idx];
-      if (idx < 0) {
-        console.log("Couldn't find active row!");
-        return true;
+    if (combo == 'left' || combo == 'h') {
+      // subtract one
+      item.order_quantity(Number(item.order_quantity()) - 1);
+      return false;
+    }
+    if (combo == 'right' || combo == 'l') {
+      // add one
+      item.order_quantity(Number(item.order_quantity()) + 1);
+      return false;
+    }
+    if (combo == 'up' || combo == 'k') {
+      // previous one
+      if (idx > 0) {
+        pageModel.activeRow((pageModel.results())[idx - 1].id);
       }
-
-      if (ev.keyCode == 37 || ev.keyCode == 72 /* H */) {
-        // subtract one
-        item.order_quantity(Number(item.order_quantity()) - 1);
-        return false;
+      return false;
+    }
+    if (combo == 'down' || combo == 'j') {
+      // next one
+      if (idx < pageModel.results().length - 1) {
+        pageModel.activeRow((pageModel.results())[idx + 1].id);
       }
-      if (ev.keyCode == 39 || ev.keyCode == 76 /* L */) {
-        // add one
-        item.order_quantity(Number(item.order_quantity()) + 1);
-        return false;
+      return false;
+    }
+    if (combo == 'x') {
+      // zero, mark done and move on
+      item.order_quantity(0);
+      if (idx < pageModel.results().length - 1) {
+        pageModel.activeRow((pageModel.results())[idx + 1].id);
       }
-      if (ev.keyCode == 38 || ev.keyCode == 75 /* K */) {
-        // previous one
-        if (idx > 0) {
-          pageModel.activeRow((pageModel.results())[idx - 1].id);
-        }
-        return false;
+      return false;
+    }
+    if (combo == 'tab' || combo == 'space' || combo == 'enter') {
+      // mark done and move on
+      if (idx < pageModel.results().length - 1) {
+        pageModel.activeRow((pageModel.results())[idx + 1].id);
       }
-      if (ev.keyCode == 40 || ev.keyCode == 74 /* J */) {
-        // next one
-        if (idx < pageModel.results().length - 1) {
-          pageModel.activeRow((pageModel.results())[idx + 1].id);
-        }
-        return false;
-      }
-      if (ev.keyCode >= 48 /* 0 */ && ev.keyCode <= 57 /* 9 */) {
-        // select and start entering
-        var el= $('#search-results tbody tr:nth(' + idx + ') input');
-        if (!el.is(':focus')) {
-          el.select().focus();
-        }
-        return true;
-      }
-      if (ev.keyCode == 88 /* X */) {
-        // zero, mark done and move on
-        item.order_quantity(0);
-        if (idx < pageModel.results().length - 1) {
-          pageModel.activeRow((pageModel.results())[idx + 1].id);
-        }
-        return false;
-      }
-      if (ev.keyCode == 13 || ev.keyCode == 32 /* space */) {
-        // mark done and move on
-        if (idx < pageModel.results().length - 1) {
-          pageModel.activeRow((pageModel.results())[idx + 1].id);
-        }
-        return false;
-      }
-
-      return true;
+      return false;
     }
   });
 });
