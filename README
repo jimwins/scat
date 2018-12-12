@@ -36,8 +36,8 @@ Scat includes the jQuery udraggable plugin:
 Scat includes the jQuery.scrollTo plugin:
   https://github.com/flesler/jquery.scrollTo
 
-Scat includes Keypress:
-  http://dmauro.github.io/Keypress/
+Scat includes Mousetrap for handling keyboard shortcuts:
+  https://craig.is/killing/mice
 
 Scat includes Chart.js for charting:
   http://chartjs.com/
