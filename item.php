@@ -861,6 +861,9 @@ function saveItemProperty(value, settings) {
   data[key]= value;
 
   item[key]("\0"); // force knockout to update this observable when item updated
+  if (key == 'product_id') { // and a special hack for product
+    itemModel.product.name("\0");
+  }
 
   Scat.api('item-update', data)
       .done(function (data) {
