@@ -569,6 +569,10 @@ $("#txn-load").submit(function(ev) {
             <li data-bind="css: { disabled: !txn.id() || items().length }">
                <a data-bind="click: deleteTransaction">Delete</a>
             </li>
+            <li data-bind="css: { visible: txn.type() == 'vendor',
+                                  disabled: !txn.id() || !items().length }">
+               <a data-bind="click: clearItems">Clear Items</a>
+            </li>
             <li data-bind="css: { disabled: !txn.id() || !items().length ||
                                             txn.type() != 'vendor' }">
                <a data-bind="click: exportTransaction">Export</a>
@@ -1148,6 +1152,13 @@ viewModel.loadReturnedFrom= function() {
 viewModel.deleteTransaction= function() {
   var txn= Txn.id();
   Txn.delete(txn);
+}
+
+viewModel.clearItems= function() {
+  if (!confirm("Are you sure you want to clear this order?")) {
+    return false;
+  }
+  Txn.callAndLoad('txn-clear', { txn: Txn.id() });
 }
 
 viewModel.exportTransaction= function() {
