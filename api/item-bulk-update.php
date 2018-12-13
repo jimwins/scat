@@ -15,6 +15,11 @@ if (isset($_REQUEST['brand_id']) && (int)$_REQUEST['brand_id']) {
   $props[]= "brand = $brand";
 }
 
+if (isset($_REQUEST['product_id']) && (int)$_REQUEST['product_id']) {
+  $product= (int) $_REQUEST['product_id'];
+  $props[]= "product_id = $product";
+}
+
 if (!empty($_REQUEST['retail_price'])) {
   $retail_price= preg_replace('/^\\$/', '', $_REQUEST['retail_price']);
   $retail_price= $db->real_escape_string($retail_price);

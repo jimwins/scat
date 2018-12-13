@@ -242,6 +242,16 @@ dump_table($r);
             </div>
           </div>
           <div class="form-group">
+            <label for="product_id" class="col-sm-2 control-label control-label">
+              Product
+            </label>
+            <div class="col-sm-10">
+              <select id="product_id" name="product_id" class="form-control">
+                <option value=""></option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
             <label for="retail_price" class="col-sm-2 control-label">
               List
             </label>
@@ -344,6 +354,14 @@ $('tbody tr .brand').editable(function(value, settings) {
   return "...";
 }, { event: 'click', style: 'display: inline', type: 'select', submit: 'OK',
 loadurl: 'api/brand-list.php', placeholder: '' });
+
+$('#product_id').select2({
+  ajax: {
+    url: 'api/product-find.php',
+    dataType: 'json'
+  }
+});
+
 $('tbody tr td#msrp').editable(function(value, settings) {
   var item= $(this).closest('tr').attr('class');
 
