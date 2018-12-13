@@ -77,8 +77,8 @@ if ($id && !$person) {
     </div>
     <div class="col-sm-4 checkbox disabled">
       <label>
-        Email OK?
         <input type="checkbox" id="email_ok" data-bind="value: person.email_ok" disabled>
+        Email OK?
       </label>
     </div>
   </div>
@@ -92,8 +92,8 @@ if ($id && !$person) {
     </div>
     <div class="col-sm-4 checkbox disabled">
       <label>
-        SMS OK?
         <input type="checkbox" id="sms_ok" data-bind="value: person.sms_ok" disabled>
+        SMS OK?
       </label>
     </div>
   </div>
