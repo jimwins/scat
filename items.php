@@ -354,6 +354,12 @@ $('tbody tr .brand').editable(function(value, settings) {
   return "...";
 }, { event: 'click', style: 'display: inline', type: 'select', submit: 'OK',
 loadurl: 'api/brand-list.php', placeholder: '' });
+$('#brand_id').select2({
+  ajax: {
+    url: 'api/brand-find.php',
+    dataType: 'json'
+  }
+});
 
 $('#product_id').select2({
   ajax: {
@@ -454,16 +460,6 @@ $('#bulk-edit-form').on('show.bs.collapse', function () {
       });
     })
   );
-
-  if ($('#bulk-edit-form select#brand_id option').length > 2) return;
-
-  Scat.api('brand-list', { verbose: 1})
-      .done(function (data) {
-        var brand_list= $('#bulk-edit-form select#brand_id');
-        $.each(data, function (i, row) {
-          brand_list.append($('<option>').val(row.id).text(row.name));
-        });
-      });
 });
 $('#bulk-edit-form').on('hide.bs.collapse', function () {
   $.each($("tbody tr"), function (i, row) {
