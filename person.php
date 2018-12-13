@@ -168,12 +168,23 @@ if ($id && !$person) {
                      visible: person.role() == 'vendor'">
     Price Changes
   </button>
-  <button class="btn btn-default"
-          id="upload-items"
-          data-loading-text="Processing..."
-          data-bind="click: uploadItems, visible: person.role() == 'vendor'">
-    Upload Items
-  </Button>
+  <div class="btn-group">
+    <button class="btn btn-default"
+            id="upload-items"
+            data-loading-text="Processing..."
+            data-bind="click: uploadItems, visible: person.role() == 'vendor'">
+      Upload Items
+    </button>
+    <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a data-bind="click: clearPromos">Clear Promos</a></li>
+      <li><a data-bind="click: markAllSpecial">Mark All Special Order</a></li>
+    </ul>
+  </div>
 </h2>
 
 <div data-bind="visible: loading()" class="progress progress-striped active" style="height: 1.5em">
@@ -425,6 +436,18 @@ $('body').on('dragbetterenter', function () {
 $('body').on('dragbetterleave', function () {
   $('#upload-items').removeClass("active btn-success");
 });
+
+function clearPromos(place, ev) {
+  Scat.api('vendor-item-clear-promos', { vendor: <?=$id?> })
+      .done(function (data) {
+      });
+}
+
+function markAllSpecial(place, ev) {
+  Scat.api('vendor-item-all-special', { vendor: <?=$id?> })
+      .done(function (data) {
+      });
+}
 
 function linkTransaction(components) {
   var m= components.split(/\|/);
