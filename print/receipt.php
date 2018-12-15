@@ -71,6 +71,8 @@ $id= (int)$_REQUEST['id'];
 
 if (!$id) die("No transaction specified.");
 
+$gift= (int)$_REQUEST['gift'];
+
 $txn= txn_load($db, $id);
 $items= txn_load_items($db, $id);
 $person= person_load($db, $txn['person']);
@@ -80,18 +82,26 @@ function pts($num) {
 }
 ?>
 <table id="products" cellspacing="0" cellpadding="0">
-  <tr><th class="qty">QTY</th><th class="left">PRODUCT</th><th class="price">PRICE</th></tr>
- <tbody>
+  <tr>
+    <th class="qty">QTY</th>
+    <th class="left">PRODUCT</th>
+<?if (!$gift) {?>
+    <th class="price">PRICE</th>
+<?}?>
+  </tr>
 <?
 foreach ($items as $item) {
   echo '<tr>',
        '<td class="qty">', $item['quantity'], '</td>',
        '<td class="left">', $item['name'],
        ($item['discount'] ? ('<div class="description">' . $item['discount'] . '</div>') : ''),
-       '</td>',
-       '<td class="price">', amount($item['ext_price']), '</td>',
-       "</tr>\n";
+       '</td>';
+  if (!$gift) {
+    echo '<td class="price">', amount($item['ext_price']), '</td>';
+  }
+  echo "</tr>\n";
 }
+if (!$gift) {
 ?>
   <tr class="sub">
    <td class="right" colspan="2">Subtotal:</td>
@@ -145,7 +155,6 @@ if (count($payments)) {
 <?
 }
 ?>
- </tbody>
 </table>
 <?
 $credit= $used_cash= 0;
@@ -169,13 +178,14 @@ foreach ($payments as $payment) {
  <tr><th>Ref #</th><td><?=$payment['cc_txn']?></td></tr>
 <?}?>
  <tr><th>Amount</th><td><?=amount($payment['amount'])?></td></tr>
-</table>
 <?
   }
 }
+}
 ?>
+</table>
 
-<?if (!$person['suppress_loyalty']) {?>
+<?if (!$gift && !$person['suppress_loyalty']) {?>
 <div id="loyalty">
 <?if ($person['id']) {
     $points= (int)$txn['subtotal'];
@@ -197,6 +207,10 @@ foreach ($payments as $payment) {
 <div id="doc_info">
 <?if ($credit) {?>
   CUSTOMER COPY
+  <br>
+<?}?>
+<?if ($gift) {?>
+  GIFT RECEIPT
   <br>
 <?}?>
   Invoice <?=ashtml($txn['formatted_number'])?>

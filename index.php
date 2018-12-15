@@ -310,7 +310,16 @@ function printReceipt() {
     Scat.alert("No sale to print.");
     return false;
   }
-  return Scat.print('receipt', { id: txn });
+  return Scat.print('receipt', { id: txn, gift: 0 });
+}
+
+function printGiftReceipt() {
+  var txn= Txn.id();
+  if (!txn) {
+    Scat.alert("No sale to print.");
+    return false;
+  }
+  return Scat.print('receipt', { id: txn, gift: 1 });
 }
 
 function printInvoice() {
@@ -415,6 +424,7 @@ $(function() {
    <ul class="dropdown-menu" role="menu">
     <li><a data-bind="click: printInvoice">Invoice</a></li>
     <li><a data-bind="click: printReceipt">Receipt</a></li>
+    <li><a data-bind="click: printGiftReceipt">Gift Receipt</a></li>
     <li data-bind="css: { 'disabled': person.email() == '' }">
       <a data-bind="click: emailInvoice">Email</a>
     </li>
