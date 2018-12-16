@@ -660,7 +660,7 @@ $("#pay-credit").on("submit", function (ev) {
       });
   $.smodal.close();
   $("#pay-credit-progress .amount").val(amount);
-  $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false });
+  $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false, escClose: false });
 });
 </script>
 <div id="pay-credit-manual" class="pay-method" style="display: none">
