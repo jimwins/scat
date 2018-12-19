@@ -16,7 +16,7 @@ $db->start_transaction();
 
 if (isset($_REQUEST['price'])) {
   $price= $_REQUEST['price'];
-  if (preg_match('/^\d*(\/|%)$/', $price)) {
+  if (preg_match('/^[\d.]*(\/|%)$/', $price)) {
     $discount = (float)$price;
     $discount_type = "'percentage'";
     $price= 'IF(item.retail_price, item.retail_price, txn_line.retail_price)';
