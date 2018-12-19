@@ -725,6 +725,9 @@ $("#pay-other").on("click", "button", function (ev) {
    <input class="amount form-control input-lg text-center"
           type="text" pattern="[-.0-9]*">
  </div>
+ <div id="change" class="alert alert-danger">
+   Remaining balance would be less than $10, so they can get that as change!
+ </div>
  <button class="btn btn-default" name="pay">Pay</button>
  <button class="btn btn-default" name="cancel">Cancel</button>
 </div>
@@ -746,9 +749,11 @@ $("#pay-gift").on("click", "button[name='lookup']", function (ev) {
               if (parseFloat(data.balance) < due) {
                 def= data.balance;
               }
-              // XXX can't get change from gift cert that expires
-              if (data.balance - due <= 10.00) {
+              $("#pay-gift-complete #change").hide();
+              // GC doesn't expire, and less than $10? Give them change.
+              if (data.balance - due <= 10.00 && !data.expires) {
                 def= data.balance;
+                $("#pay-gift-complete #change").show();
               }
               $("#pay-gift-complete .amount").val(def);
               $.smodal.close();
