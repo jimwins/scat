@@ -32,8 +32,11 @@
         "flesler/jquery.scrollto": "^2.1",
         "select2/select2": "^4.0",
         "michelf/php-markdown": "^1.8",
-        "mpdf/mpdf": "^6.1",
+        "mpdf/mpdf": "^7.1",
         "setasign/fpdf": "^1.8",
-        "oe/lukas": "dev-master"
+        "oe/lukas": "dev-master",
+        "smalot/cups-ipp": "^0.4.0",
+        "monolog/monolog": "^1.24",
+        "php-http/logger-plugin": "^1.0"
     }
 }
