@@ -113,7 +113,28 @@ if ($_REQUEST['DEBUG']) {
 
 $pdf->Output($tmpfname, 'F');
 
-$printer= LABEL_PRINTER;
-shell_exec("lpr -P$printer $tmpfname");
+if (!defined('CUPS_HOST')) {
+  $printer= LABEL_PRINTER;
+  shell_exec("lpr -P$printer $tmpfname");
+} else {
+
+  $client= new Client(CUPS_USER, CUPS_PASS,
+		      [ 'remote_socket' => 'tcp://' . CUPS_HOST ]);
+  $builder= new Builder();
+  $responseParser= new ResponseParser();
+
+  $printerManager= new PrinterManager($builder, $client, $responseParser);
+  $printer= $printerManager->findByUri('ipp://' . CUPS_HOST .
+				       '/printers/' . LABEL_PRINTER);
+
+  $jobManager= new JobManager($builder, $client, $responseParser);
+
+  $job= new Job();
+  $job->setName('job create file');
+  $job->setCopies(1);
+  $job->setPageRanges('1-1000');
+  $job->addFile($tmpfname);
+  $result= $jobManager->send($printer, $job);
+}
 
 echo jsonp(array("result" => "Printed."));

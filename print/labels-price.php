@@ -6,6 +6,13 @@ include '../lib/item.php';
 include '../lib/fpdf/alphapdf.php';
 include '../lib/php-barcode.php';
 
+use Smalot\Cups\Builder\Builder;
+use Smalot\Cups\Manager\JobManager;
+use Smalot\Cups\Manager\PrinterManager;
+use Smalot\Cups\Model\Job;
+use Smalot\Cups\Transport\Client;
+use Smalot\Cups\Transport\ResponseParser;
+
 if ($q= $_REQUEST['q']) {
   $items= item_find($db, $q, 0);
 
@@ -160,7 +167,28 @@ if ($_REQUEST['DEBUG']) {
 
 $pdf->Output($tmpfname, 'F');
 
-$printer= LABEL_PRINTER;
-shell_exec("lpr -P$printer $tmpfname");
+if (!defined('CUPS_HOST')) {
+  $printer= LABEL_PRINTER;
+  shell_exec("lpr -P$printer $tmpfname");
+} else {
+
+  $client= new Client(CUPS_USER, CUPS_PASS,
+		      [ 'remote_socket' => 'tcp://' . CUPS_HOST ]);
+  $builder= new Builder();
+  $responseParser= new ResponseParser();
+
+  $printerManager= new PrinterManager($builder, $client, $responseParser);
+  $printer= $printerManager->findByUri('ipp://' . CUPS_HOST .
+				       '/printers/' . LABEL_PRINTER);
+
+  $jobManager= new JobManager($builder, $client, $responseParser);
+
+  $job= new Job();
+  $job->setName('job create file');
+  $job->setCopies(1);
+  $job->setPageRanges('1-1000');
+  $job->addFile($tmpfname);
+  $result= $jobManager->send($printer, $job);
+}
 
 echo jsonp(array("result" => "Printed."));

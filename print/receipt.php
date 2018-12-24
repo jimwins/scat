@@ -2,6 +2,13 @@
 require '../scat.php';
 require '../lib/txn.php';
 
+use Smalot\Cups\Builder\Builder;
+use Smalot\Cups\Manager\JobManager;
+use Smalot\Cups\Manager\PrinterManager;
+use Smalot\Cups\Model\Job;
+use Smalot\Cups\Transport\Client;
+use Smalot\Cups\Transport\ResponseParser;
+
 ob_start();
 ?>
 <style type="text/css">
@@ -243,7 +250,12 @@ if (defined('PRINT_DIRECT')) {
   define('_MPDF_TTFONTDATAPATH', '/tmp/ttfontdata');
   @mkdir(_MPDF_TTFONTDATAPATH);
 
-  $mpdf= new \mPDF('utf8','letter',28,'',15,15,9,10,'P');
+  #$mpdf= new \Mpdf\Mpdf('utf8','letter',28,'',15,15,9,10,'P');
+  $mpdf= new \Mpdf\Mpdf([ 'mode' => 'utf-8', 'format' => 'letter',
+                          'tempDir' => '/tmp',
+                          'margin_left' => 15, 'margin_right' => 15,
+                          'margin_top' => 9, 'margin_bottom' => 10,
+                          'default_font_size' => 28  ]);
   $mpdf->writeHTML($html);
 
   $tmpfname= tempnam("/tmp", "rec");
@@ -255,13 +267,35 @@ if (defined('PRINT_DIRECT')) {
 
   $mpdf->Output($tmpfname, 'f');
 
-  $option= "";
-  if ($used_cash) {
-    $option= "-o CashDrawerSetting=1OpenDrawer1";
-  }
+  if (!defined('CUPS_HOST')) {
+    $printer= RECEIPT_PRINTER;
+    $option= "";
+    if ($used_cash) {
+      $option= "-o CashDrawerSetting=1OpenDrawer1";
+    }
+    shell_exec("lpr -P$printer $option $tmpfname");
+  } else {
+    $client= new Client(CUPS_USER, CUPS_PASS,
+                        [ 'remote_socket' => 'tcp://' . CUPS_HOST ]);
+    $builder= new Builder();
+    $responseParser= new ResponseParser();
 
-  $printer= RECEIPT_PRINTER;
-  shell_exec("lpr -P$printer $option $tmpfname");
+    $printerManager= new PrinterManager($builder, $client, $responseParser);
+    $printer= $printerManager->findByUri('ipp://' . CUPS_HOST .
+                                         '/printers/' . RECEIPT_PRINTER);
+
+    $jobManager= new JobManager($builder, $client, $responseParser);
+
+    $job= new Job();
+    $job->setName('job create file');
+    $job->setCopies(1);
+    $job->setPageRanges('1-1000');
+    $job->addFile($tmpfname);
+    if ($used_cash) {
+      $job->addAttribute('CashDrawerSetting', '1OpenDrawer1');
+    }
+    $result= $jobManager->send($printer, $job);
+  }
 
   echo jsonp(array("result" => "Printed."));
 } else {
