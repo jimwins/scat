@@ -417,7 +417,7 @@ $(function() {
   <div class="btn-group btn-group-lg">
    <button type="button" class="btn btn-default"
            data-bind="enable: txn.id(), click: printReceipt">
-    Print
+    <u>P</u>rint
    </button>
    <button type="button" class="btn btn-default dropdown-toggle" 
            data-bind="enable: txn.id()"
@@ -438,7 +438,7 @@ $(function() {
           data-bind="visible: txn.type() != 'vendor' && !txn.paid(),
                      enable: txn.id(),
                      click: payTransaction">
-    Pay
+    Pa<u>y</u>
   </button>
   <button type="button" class="btn btn-lg btn-default"
           data-bind="visible: txn.type() != 'vendor' && txn.paid(),
