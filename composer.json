@@ -17,6 +17,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/vojtabiberle/Lukas"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/jimwins/cups-ipp"
         }
     ],
     "require": {
@@ -35,7 +39,7 @@
         "mpdf/mpdf": "^7.1",
         "setasign/fpdf": "^1.8",
         "oe/lukas": "dev-master",
-        "smalot/cups-ipp": "^0.4.0",
+        "smalot/cups-ipp": "dev-dev-local",
         "monolog/monolog": "^1.24",
         "php-http/logger-plugin": "^1.0"
     }
