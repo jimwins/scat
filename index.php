@@ -353,6 +353,10 @@ $(function() {
     printReceipt();
     return false;
   });
+  Mousetrap.bindGlobal('mod+y', function (ev) {
+    viewModel.payTransaction();
+    return false;
+  });
   Mousetrap.bindGlobal('mod+shift+z', function (ev) {
     viewModel.showAdmin(true);
   });
