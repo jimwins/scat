@@ -90,7 +90,8 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
                 AND ($items)
               GROUP BY txn.id
             ) t
-      GROUP BY 1 DESC";
+      GROUP BY 1
+      ORDER BY 1 DESC";
 
 $r= $db->query($q)
   or die_query($db, $q);
