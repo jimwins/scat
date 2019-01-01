@@ -4,7 +4,7 @@ include '../lib/item.php';
 
 // build list of items
 $items= $_REQUEST['items'];
-if (!preg_match('/^(\d+)(,\d+)*$/', $items)) {
+if (!preg_match('/^(?:\d+)(?:,\d+)*$/', $items)) {
   die_jsonp("Invalid items specified.");
 }
 
