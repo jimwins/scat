@@ -120,7 +120,7 @@ if (!defined('CUPS_HOST')) {
 
   $client= new Client(CUPS_USER, CUPS_PASS,
 		      [ 'remote_socket' => 'tcp://' . CUPS_HOST ]);
-  $builder= new Builder();
+  $builder= new Builder(null, true);
   $responseParser= new ResponseParser();
 
   $printerManager= new PrinterManager($builder, $client, $responseParser);
