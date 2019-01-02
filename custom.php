@@ -92,7 +92,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-5">
               <p class="form-control-static"
-                 data-bind="text: (Math.max(w(), h()) > 90)
+                 data-bind="text: (Math.max(w(), h()) > 72)
                                    ? 'Too big!'
                                    : amount(ui() * 0.69)"></p>
             </div>
@@ -103,7 +103,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-5">
               <p class="form-control-static"
-                 data-bind="text: (Math.max(w(), h()) > 90)
+                 data-bind="text: (Math.max(w(), h()) > 72)
                                    ? 'Too big!'
                                    : amount(ui() * 0.89)"></p>
             </div>
@@ -114,7 +114,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-5">
               <p class="form-control-static"
-                 data-bind="text: (Math.max(w(), h()) > 90)
+                 data-bind="text: (Math.max(w(), h()) > 72)
                                    ? 'Too big!'
                                    : amount(ui() * 1.19)"></p>
             </div>
@@ -125,7 +125,7 @@ head("Custom @ Scat", true);
             </label>
             <div class="col-sm-5">
               <p class="form-control-static"
-                 data-bind="text: (Math.max(w(), h()) > 90)
+                 data-bind="text: (Math.max(w(), h()) > 72)
                                    ? 'Too big!'
                                    : amount(ui() * 1.49)"></p>
             </div>
