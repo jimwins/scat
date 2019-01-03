@@ -47,6 +47,9 @@ while ($row= $r->fetch_assoc()) {
     </div>
     <div class="col-sm-2">
       <input type="submit" class="btn btn-primary" value="Show">
+<?if ((int)$_REQUEST['vendor'] > 0) {?>
+      <button id="apply-all" class="btn btn-danger">Apply All</button>
+<?}?>
     </div>
   </div>
 </form>
@@ -175,5 +178,16 @@ $('#download').on('click', function(ev) {
   });
   $("#file").val(tsv);
   $("#post-csv").submit();
+});
+
+$('#apply-all').on('click', function(env) {
+  if (confirm("Are you sure you want to update all of these prices?")) {
+    Scat.api('vendor-apply-price-changes', { vendor: <?=$vendor?>,
+                                             items: <?=json_encode($items)?>})
+        .done(function (data) {
+          alert("Changes applied.");
+        });
+  }
+  return false;
 });
 </script>
