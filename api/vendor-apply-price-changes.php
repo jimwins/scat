@@ -7,17 +7,16 @@ if (!$vendor)
   die_jsonp("You need to specify a vendor.");
 
 $sql_criteria= "1=1";
-if (($items= $_REQUEST['items'])) {
+$items= $_REQUEST['items'];
+if (!empty($items)) {
   list($sql_criteria, $x)= item_terms_to_sql($db, $items, FIND_OR);
 }
 
-$q= "UPDATE item
-        SET retail_price = (SELECT retail_price
-                              FROM vendor_item
-                             WHERE vendor_item.item = item.id
-                               AND vendor = $vendor
-                             LIMIT 1)
-     WHERE $sql_criteria";
+$q= "UPDATE item, vendor_item
+        SET item.retail_price = vendor_item.retail_price
+     WHERE item.id = vendor_item.item
+       AND vendor = $vendor
+       AND $sql_criteria";
 
 $r= $db->query($q)
   or die_query($db, $q);
