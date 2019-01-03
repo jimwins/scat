@@ -43,7 +43,7 @@ foreach ($updates as $update) {
       $person->loyalty_number= $update->loyalty_number;
     $person->save();
 
-    echo "Created new person '{$person->name}'.\n";
+    echo "Created new person '{$person->name?:$person->email}'.\n";
   }
   /* Otherwise update name, email */
   else {
@@ -96,7 +96,7 @@ foreach ($updates as $update) {
                                         'id' => $update->id ]
                          ]);
 
-  echo "Completed update for {$update->name}.\n";
+  echo "Completed update for {$update->name?:$update->email}.\n";
 }
 
 exit($exit);
