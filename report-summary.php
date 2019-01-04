@@ -222,7 +222,8 @@ function get_sales_data($db, $format, $begin, $end= null) {
                   AND code NOT LIKE 'ZZ-gift%'
                 GROUP BY txn.id
               ) t
-        GROUP BY 1 DESC";
+        GROUP BY 1
+        ORDER BY 1 DESC";
 
   $r= $db->query($q)
     or die_query($db, $q);
