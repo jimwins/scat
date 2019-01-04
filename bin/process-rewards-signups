@@ -43,7 +43,7 @@ foreach ($updates as $update) {
       $person->loyalty_number= $update->loyalty_number;
     $person->save();
 
-    echo "Created new person '{$person->name?:$person->email}'.\n";
+    echo "Created new person '".($person->name?:$person->email)."'\n";
   }
   /* Otherwise update name, email */
   else {
@@ -51,7 +51,7 @@ foreach ($updates as $update) {
     if ($update->email) $person->email= $update->email;
     $person->save();
 
-    echo "Updated details for person '{$person->name}'.\n";
+    echo "Updated details for person '".($person->name?:$person->email)."'\n";
   }
 
   /* Handle code */
@@ -96,7 +96,7 @@ foreach ($updates as $update) {
                                         'id' => $update->id ]
                          ]);
 
-  echo "Completed update for {$update->name?:$update->email}.\n";
+  echo "Completed update for '".($update->name?:$update->email)."'.\n";
 }
 
 exit($exit);
