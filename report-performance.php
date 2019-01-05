@@ -217,7 +217,8 @@ $q= "SELECT DATE_FORMAT(created, '$format') AS span,
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
-      GROUP BY 1 DESC";
+      GROUP BY 1
+      ORDER BY 1 DESC";
 
 $r= $db->query($q)
   or die_query($db, $q);
