@@ -54,6 +54,11 @@ if (strlen($_REQUEST['minimum_quantity'])) {
   $props[]= "minimum_quantity = $minimum_quantity";
 }
 
+if (strlen($_REQUEST['purchase_quantity'])) {
+  $purchase_quantity= (int)$_REQUEST['purchase_quantity'];
+  $props[]= "purchase_quantity = $purchase_quantity";
+}
+
 // build query
 $set= join(', ', $props);
 $q= "UPDATE item SET $set

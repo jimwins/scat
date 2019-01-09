@@ -279,6 +279,15 @@ dump_table($r);
             </div>
           </div>
           <div class="form-group">
+            <label for="purchase_quantity" class="col-sm-2 control-label">
+              Purchase Quantity
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="purchase_quantity" class="form-control"
+                     placeholder="1">
+            </div>
+          </div>
+          <div class="form-group">
             <span class="col-sm-offset-2 col-sm-10">
               <button class="btn btn-primary">Submit</button>
             </span>
