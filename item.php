@@ -559,6 +559,10 @@ $vendor_items= item_load_vendor_items($db, $id);
                 data-bind="click: $parent.editVendorItem">
           <i class="fa fa-edit"></i>
         </button>
+        <button type="button" class="btn btn-default btn-xs"
+                data-bind="click: $parent.detachVendorItem">
+          <i class="fa fa-unlink"></i>
+        </button>
       </td>
       <td data-bind="text: $data.vendor_name"></td>
       <td data-bind="text: $data.code"></td>
@@ -809,6 +813,15 @@ itemModel.editVendorItem= function(item) {
     ko.applyBindings(vendorItemModel, panel[0]);
     panel.appendTo($('body')).modal();
   });
+}
+
+itemModel.detachVendorItem= function(item) {
+  Scat.api('vendor-item-update', { id: item.id, item: 0 })
+      .done(function (data) {
+        itemModel.vendor_items.remove(function (item) {
+           return item.id() == data.vendor_item.id;
+        });
+      });
 }
 
 itemModel.findVendorItem= function() {
