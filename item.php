@@ -745,7 +745,7 @@ itemModel.editVendorItem= function(item) {
                       vendor_sku: item.item.code(), name: item.item.name(),
                       retail_price: item.item.retail_price(),
                       net_price: 0.00, promo_price: null,
-                      purchase_quantity: 1};
+                      purchase_quantity: 1, barcode: null };
 
     vendorItem.vendors= [];
     vendorItem.error= '';

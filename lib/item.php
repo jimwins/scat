@@ -199,7 +199,7 @@ function item_load_vendor_items($db, $id) {
               code, vendor_sku, vendor_item.name,
               retail_price, net_price, promo_price,
               special_order,
-              purchase_quantity
+              purchase_quantity, barcode
          FROM vendor_item
          JOIN person ON vendor_item.vendor = person.id
         WHERE item = $id AND vendor_item.active";
