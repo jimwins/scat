@@ -215,9 +215,10 @@ if ($r->num_rows == 1) {
   exit;
 }
 ob_end_flush();
-
-dump_table($r);
 ?>
+<div id="results">
+  <?dump_table($r);?>
+</div>
 <div class="panel-group hidden-print" id="accordion">
   <div class="panel panel-default">
     <div class="panel-heading">
@@ -504,6 +505,35 @@ $('#bulk-edit-form form').on('submit', function(ev) {
 </script>
 <?
 dump_query($q);
-
+?>
+  <button id="download" class="btn btn-default">Download</button>
+<form id="post-csv" style="display: none"
+      method="post" action="api/encode-tsv.php">
+  <input type="hidden" name="fn" value="items.txt">
+  <textarea id="file" name="file"></textarea>
+</form>
+<?
 end:
 foot();
+?>
+<script>
+$('#download').on('click', function(ev) {
+  var tsv= "Code\tName\tBrand\tMSRP\tSale\tDiscount\tStock\tMinimum\tLast3\r\n";
+  $.each($("#results tr"), function (i, row) {
+    if (i > 0) {
+      tsv += $('td:nth(1) a', row).text() + "\t" +
+             $('td:nth(2)', row).text() + "\t" +
+             $('td:nth(3)', row).text() + "\t" +
+             $('td:nth(4)', row).text() + "\t" +
+             $('td:nth(5)', row).text() + "\t" +
+             $('td:nth(6)', row).text() + "\t" +
+             $('td:nth(7)', row).text() + "\t" +
+             $('td:nth(8)', row).text() + "\t" +
+             $('td:nth(9)', row).text() +
+             "\r\n";
+    }
+  });
+  $("#file").val(tsv);
+  $("#post-csv").submit();
+});
+</script>
