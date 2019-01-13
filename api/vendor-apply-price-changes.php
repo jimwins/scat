@@ -16,7 +16,8 @@ $q= "UPDATE item, vendor_item
         SET item.retail_price = vendor_item.retail_price
      WHERE item.id = vendor_item.item
        AND vendor = $vendor
-       AND $sql_criteria";
+       AND $sql_criteria
+       AND item.active AND vendor_item.active";
 
 $r= $db->query($q)
   or die_query($db, $q);
