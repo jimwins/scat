@@ -399,7 +399,7 @@ $(function() {
     if (combo == 'tab' || combo == 'space' || combo == 'enter') {
       // mark done and move on
       if (idx < pageModel.results().length - 1) {
-        pageModel.activeRow(idx - 1);
+        pageModel.activeRow(idx + 1);
       }
       return false;
     }
