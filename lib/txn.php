@@ -84,6 +84,12 @@ function txn_load($db, $id) {
 function txn_load_items($db, $id) {
   $q= "SELECT
               txn_line.id AS line_id, item.code, item.id AS item_id,
+              IF(type = 'vendor' && txn.person,
+                 (SELECT vendor_sku
+                    FROM vendor_item
+                   WHERE vendor = txn.person
+                     AND vendor_item.item = txn_line.item),
+                 NULL) vendor_sku,
               IFNULL(override_name, item.name) name, data,
               txn_line.retail_price msrp,
               sale_price(txn_line.retail_price, txn_line.discount_type,
