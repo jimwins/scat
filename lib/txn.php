@@ -88,7 +88,9 @@ function txn_load_items($db, $id) {
                  (SELECT vendor_sku
                     FROM vendor_item
                    WHERE vendor = txn.person
-                     AND vendor_item.item = txn_line.item),
+                     AND vendor_item.item = txn_line.item
+                   ORDER BY vendor_item.purchase_quantity <= txn_line.ordered
+                   LIMIT 1),
                  NULL) vendor_sku,
               IFNULL(override_name, item.name) name, data,
               txn_line.retail_price msrp,
