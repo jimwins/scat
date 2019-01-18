@@ -101,7 +101,7 @@ foreach ($items as $item) {
        '<td class="right">', amount($item['ext_price']), '</td>',
        "</tr>\n";
 }
-$span= 4;
+$span= $details['type'] == 'vendor' ? 5 : 4;
 ?>
   <tr class="sub">
    <td class="right" colspan="<?=$span?>">Subtotal:</td>
