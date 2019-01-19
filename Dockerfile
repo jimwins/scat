@@ -15,6 +15,7 @@ RUN apk add --no-cache \
 
 RUN docker-php-ext-install \
       bcmath \
+      gd \
       mysqli \
       pdo \
       pdo_mysql \
