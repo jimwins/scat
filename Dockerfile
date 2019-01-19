@@ -3,8 +3,11 @@ FROM php:7.3.0-fpm-alpine
 LABEL maintainer="Jim Winstead <jimw@trainedmonkey.com>"
 
 RUN apk add --no-cache \
+      freetype-dev \
       gifsicle \
       jpegoptim \
+      libjpeg-turbo-dev \
+      libpng-dev \
       libzip-dev \
       optipng \
       pngquant \
