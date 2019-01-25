@@ -111,7 +111,7 @@ function item_find($db, $q, $options) {
                  AND type = 'customer'
                  AND filled >= '$begin') sold,";
   }
-  $order_by= "!(stock > 0), 2"; /* First items in stock, then by code */
+  $order_by= "!(stock > 0), item.code"; /* First items in stock, then by code */
   $limit= "";
   if ($options & FIND_RANDOM) {
     $order_by= "RAND()";
