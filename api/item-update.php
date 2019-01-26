@@ -171,7 +171,7 @@ if (isset($_REQUEST['stock'])) {
 
 $item= item_load($db, $item_id);
 
-$product= [];
+$product= array('id' => 0, 'name' => ''); /* Bare necessities for KO */
 if ($item['product_id']) {
   $product= Model::factory('Product')
               ->find_one($item['product_id'])
