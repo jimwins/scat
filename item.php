@@ -874,7 +874,7 @@ function saveItemProperty(value, settings) {
   data[key]= value;
 
   item[key]("\0"); // force knockout to update this observable when item updated
-  if (key == 'product_id') { // hack for product
+  if (key == 'product_id' && itemModel.product.name) { // hack for product
     itemModel.product.name("\0");
   }
 
