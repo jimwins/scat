@@ -386,7 +386,6 @@ if (!$db) die("mysqli_init failed");
 
 if (!$db->real_connect(DB_SERVER,DB_USER,DB_PASSWORD,DB_SCHEMA))
   die('connect failed: ' . mysqli_connect_error());
-$db->set_charset('utf8');
 
 /* Configuration for Paris */
 ORM::configure('mysql:host=' . DB_SERVER . ';dbname=' . DB_SCHEMA . ';charset=utf8');
