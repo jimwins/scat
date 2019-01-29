@@ -185,12 +185,12 @@ foreach ($payments as $payment) {
  <tr><th>Ref #</th><td><?=$payment['cc_txn']?></td></tr>
 <?}?>
  <tr><th>Amount</th><td><?=amount($payment['amount'])?></td></tr>
+</table>
 <?
   }
 }
 }
 ?>
-</table>
 
 <?if (!$gift && !$person['suppress_loyalty']) {?>
 <div id="loyalty">
