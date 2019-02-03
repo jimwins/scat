@@ -143,6 +143,22 @@ viewModel.editProduct= function (self) {
       owner: panelModel
     }).extend({ notify: 'always' });
 
+    panel.html5Uploader({
+      name: 'src',
+      postUrl: function() { return 'api/image-add.php' },
+      onSuccess: function(e, file, response) {
+        data= $.parseJSON(response);
+        if (data.error) {
+          Scat.alert(data);
+          return;
+        }
+        panelModel.image('/i/st/' + data.uuid + '.jpg');
+      },
+      onServerError: function(e, file) {
+        Scat.alert("File upload failed.");
+      },
+    });
+
     ko.applyBindings(panelModel, panel[0]);
     panel.appendTo($('body')).modal();
   });
