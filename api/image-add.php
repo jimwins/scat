@@ -7,7 +7,7 @@ $fn= $_FILES['src']['tmp_name'];
 $url= $_REQUEST['url'];
 
 if ($fn) {
-  $file= fopen($fn, "r");
+  $file= \GuzzleHttp\PSR7\stream_for(fopen($fn, "r"));
   $name= basename($_FILES['src']['name']);
 } elseif ($url) {
   $client= new \GuzzleHttp\Client();
@@ -43,7 +43,7 @@ $image->uuid= $uuid;
 $image->width= $img->width();
 $image->height= $img->height();
 $image->ext= $ext;
-$image->name= $_REQUEST['name'];
+$image->name= $_REQUEST['name'] ?: $name;
 $image->alt_text= $_REQUEST['alt_text'];
 $image->save();
 
