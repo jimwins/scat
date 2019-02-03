@@ -41,6 +41,8 @@
         "oe/lukas": "dev-master",
         "smalot/cups-ipp": "dev-dev-local",
         "monolog/monolog": "^1.24",
-        "php-http/logger-plugin": "^1.0"
+        "php-http/logger-plugin": "^1.0",
+        "intervention/image": "^2.4",
+        "cwhite92/b2-sdk-php": "^1.3"
     }
 }
