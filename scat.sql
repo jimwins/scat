@@ -1,11 +1,12 @@
+--
 -- Database: scat
 -- ------------------------------------------------------
--- Server version	8.0.11
+-- Server version	8.0.13
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+ SET NAMES utf8mb4 ;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -19,14 +20,14 @@
 
 DROP TABLE IF EXISTS `barcode`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `barcode` (
   `code` varchar(255) NOT NULL,
   `item` int(10) unsigned NOT NULL,
   `quantity` int(10) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`item`,`code`),
   KEY `code` (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -35,14 +36,14 @@ CREATE TABLE `barcode` (
 
 DROP TABLE IF EXISTS `brand`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `brand` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
+  `name` varchar(128) NOT NULL,
   `slug` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -51,7 +52,7 @@ CREATE TABLE `brand` (
 
 DROP TABLE IF EXISTS `cc_trace`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `cc_trace` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `traced` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -70,7 +71,7 @@ CREATE TABLE `cc_trace` (
 
 DROP TABLE IF EXISTS `department`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `department` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -88,7 +89,7 @@ CREATE TABLE `department` (
 
 DROP TABLE IF EXISTS `giftcard`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `giftcard` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `pin` varchar(4) NOT NULL,
@@ -104,7 +105,7 @@ CREATE TABLE `giftcard` (
 
 DROP TABLE IF EXISTS `giftcard_txn`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `giftcard_txn` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `card_id` int(10) unsigned NOT NULL,
@@ -117,12 +118,32 @@ CREATE TABLE `giftcard_txn` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `image`
+--
+
+DROP TABLE IF EXISTS `image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `image` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(50) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `alt_text` mediumtext,
+  `width` int(10) unsigned DEFAULT NULL,
+  `height` int(10) unsigned DEFAULT NULL,
+  `ext` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uuid` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `item`
 --
 
 DROP TABLE IF EXISTS `item`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `item` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -166,7 +187,7 @@ CREATE TABLE `item` (
 
 DROP TABLE IF EXISTS `loyalty`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `loyalty` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `person_id` int(10) unsigned NOT NULL,
@@ -185,7 +206,7 @@ CREATE TABLE `loyalty` (
 
 DROP TABLE IF EXISTS `loyalty_reward`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `loyalty_reward` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `cost` int(11) NOT NULL DEFAULT '0',
@@ -200,7 +221,7 @@ CREATE TABLE `loyalty_reward` (
 
 DROP TABLE IF EXISTS `note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `note` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `kind` enum('general','txn','person','item') NOT NULL DEFAULT 'general',
@@ -225,7 +246,7 @@ CREATE TABLE `note` (
 
 DROP TABLE IF EXISTS `payment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `payment` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `txn` int(10) unsigned NOT NULL,
@@ -244,7 +265,7 @@ CREATE TABLE `payment` (
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`),
   KEY `processed` (`processed`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -253,13 +274,13 @@ CREATE TABLE `payment` (
 
 DROP TABLE IF EXISTS `person`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `person` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `role` enum('customer','employee','vendor') DEFAULT 'customer',
   `name` varchar(255) DEFAULT NULL,
   `company` varchar(255) DEFAULT NULL,
-  `address` text,
+  `address` mediumtext,
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `loyalty_number` varchar(32) DEFAULT NULL,
@@ -267,7 +288,7 @@ CREATE TABLE `person` (
   `sms_ok` tinyint(1) DEFAULT '0',
   `email_ok` tinyint(1) DEFAULT '0',
   `birthday` date DEFAULT NULL,
-  `notes` mediumtext,
+  `notes` longtext,
   `tax_id` varchar(255) DEFAULT NULL,
   `payment_account_id` varchar(50) DEFAULT NULL,
   `vendor_rebate` decimal(9,2) NOT NULL DEFAULT '0.00',
@@ -277,7 +298,7 @@ CREATE TABLE `person` (
   `modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `loyalty_number` (`loyalty_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -286,7 +307,7 @@ CREATE TABLE `person` (
 
 DROP TABLE IF EXISTS `price_override`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `price_override` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `pattern` varchar(255) NOT NULL,
@@ -308,7 +329,7 @@ CREATE TABLE `price_override` (
 
 DROP TABLE IF EXISTS `product`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `product` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `department_id` int(10) unsigned DEFAULT NULL,
@@ -335,7 +356,7 @@ CREATE TABLE `product` (
 
 DROP TABLE IF EXISTS `prop65_warning`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `prop65_warning` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `warning` mediumtext,
@@ -349,7 +370,7 @@ CREATE TABLE `prop65_warning` (
 
 DROP TABLE IF EXISTS `redirect`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `redirect` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `source` varchar(512) NOT NULL,
@@ -367,14 +388,14 @@ CREATE TABLE `redirect` (
 
 DROP TABLE IF EXISTS `saved_search`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `saved_search` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `search` varchar(255) NOT NULL,
   `last_checked` date DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -383,14 +404,14 @@ CREATE TABLE `saved_search` (
 
 DROP TABLE IF EXISTS `timeclock`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `timeclock` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `person` int(10) unsigned NOT NULL,
   `start` datetime NOT NULL,
   `end` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -399,7 +420,7 @@ CREATE TABLE `timeclock` (
 
 DROP TABLE IF EXISTS `timeclock_audit`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `timeclock_audit` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `entry` int(10) unsigned DEFAULT NULL,
@@ -408,7 +429,7 @@ CREATE TABLE `timeclock_audit` (
   `before_end` datetime DEFAULT NULL,
   `after_end` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -417,7 +438,7 @@ CREATE TABLE `timeclock_audit` (
 
 DROP TABLE IF EXISTS `txn`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `txn` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `uuid` varchar(50) DEFAULT NULL,
@@ -435,7 +456,7 @@ CREATE TABLE `txn` (
   UNIQUE KEY `uuid` (`uuid`),
   KEY `created` (`created`),
   KEY `person` (`person`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -444,7 +465,7 @@ CREATE TABLE `txn` (
 
 DROP TABLE IF EXISTS `txn_line`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `txn_line` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `txn` int(10) unsigned NOT NULL,
@@ -464,7 +485,7 @@ CREATE TABLE `txn_line` (
   PRIMARY KEY (`id`),
   KEY `txn` (`txn`,`line`),
   KEY `item` (`item`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -473,15 +494,15 @@ CREATE TABLE `txn_line` (
 
 DROP TABLE IF EXISTS `txn_note`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `txn_note` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `txn` int(10) unsigned NOT NULL,
   `entered` datetime NOT NULL,
-  `content` text,
+  `content` mediumtext,
   `public` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -490,7 +511,7 @@ CREATE TABLE `txn_note` (
 
 DROP TABLE IF EXISTS `vendor_item`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `vendor_item` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `vendor` int(10) unsigned NOT NULL,
@@ -521,7 +542,7 @@ CREATE TABLE `vendor_item` (
   KEY `vendor` (`vendor`),
   KEY `code` (`code`),
   KEY `vendor_sku` (`vendor_sku`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
