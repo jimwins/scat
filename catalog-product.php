@@ -159,6 +159,21 @@ viewModel.editProduct= function (self) {
       },
     });
 
+    panel.bind("drop", function (e) {
+      var items= e.originalEvent.dataTransfer.items;
+      for (var i= 0; i < items.length; i++) {
+        if (items[i].kind == 'string' && items[i].type == 'text/uri-list') {
+          items[i].getAsString(function (s) {
+            Scat.api('image-add', { url: s })
+                .done(function (data) {
+                  panelModel.image('/i/st/' + data.uuid + '.jpg');
+                });
+          });
+        }
+      }
+      return false;
+    });
+
     ko.applyBindings(panelModel, panel[0]);
     panel.appendTo($('body')).modal();
   });
