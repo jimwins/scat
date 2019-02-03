@@ -47,8 +47,8 @@ $image->name= $_REQUEST['name'] ?: $name;
 $image->alt_text= $_REQUEST['alt_text'];
 $image->save();
 
-// Generate the standard size image (max 750px)
-$img->resize(750, null, function ($constraint) {
+// Generate the standard size image (max 768px)
+$img->resize(768, null, function ($constraint) {
     $constraint->aspectRatio();
     $constraint->upsize();
 });
@@ -59,8 +59,8 @@ $upload= $b2->upload([
   'Body' => $img->stream('jpg', 75)
 ]);
 
-// Generate the thumbnail (max 125px)
-$img->resize(125, null, function ($constraint) {
+// Generate the thumbnail (max 128px)
+$img->resize(128, null, function ($constraint) {
     $constraint->aspectRatio();
     $constraint->upsize();
 });
