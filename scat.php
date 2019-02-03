@@ -13,7 +13,7 @@ $start_time= microtime();
 
 /* $DEBUG can be set by config.php, not in request */
 $DEBUG= false;
-require dirname(__FILE__).'/config.php';
+require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
 
 require dirname(__FILE__).'/vendor/autoload.php';
 
