@@ -142,12 +142,12 @@ $parent= 0;
 <table class="table table-striped sortable">
  <thead>
   <tr>
-   <th>Category</th>
+   <th>Brand</th>
    <th align="right">Current</th>
    <th align="right">Previous</th>
    <th align="right">Change</th>
  </thead>
- <tbody>
+ <tbody id="results">
 <?
 while ($row= $r->fetch_assoc()) {
   if ($row['parent'] && !$row['previous_amount'] && !$row['current_amount']) {
@@ -161,7 +161,7 @@ while ($row= $r->fetch_assoc()) {
   }
 ?>
   <tr class="XXX<?=($change < 0) ? 'danger' : ($change > 100) ? 'success' : ''?>">
-   <td><?=$row['parent'] ? ' &nbsp; ' . ashtml($row['name']) : '<b> ' . ashtml($row['name']) . '</b>' ?></td>
+   <td><?=ashtml($row['name'])?></td>
    <td align="right"><?=amount($row['current_amount'])?></td>
    <td align="right"><?=amount($row['previous_amount'])?></td>
    <td align="right"><?=sprintf("%.1f%%", $change)?></td>
@@ -169,7 +169,12 @@ while ($row= $r->fetch_assoc()) {
 <?}?>
  </tbody>
 </table>
-
+<button id="download" class="btn btn-default">Download</button>
+<form id="post-csv" style="display: none"
+      method="post" action="api/encode-tsv.php">
+  <input type="hidden" name="fn" value="brand-sales.txt">
+  <textarea id="file" name="file"></textarea>
+</form>
 <?
 foot();
 ?>
@@ -179,6 +184,20 @@ $(function() {
       format: "yyyy-mm-dd",
       todayHighlight: true
   });
+});
+$('#download').on('click', function(ev) {
+  var tsv= "Brand\tCurrent\tPrevious\tChange\r\n";
+  $.each($("#results tr"), function (i, row) {
+    if (i > 0) {
+      tsv += $('td:nth(0)', row).text() + "\t" +
+             $('td:nth(1)', row).text() + "\t" +
+             $('td:nth(2)', row).text() + "\t" +
+             $('td:nth(3)', row).text() +
+             "\r\n";
+    }
+  });
+  $("#file").val(tsv);
+  $("#post-csv").submit();
 });
 </script>
 
