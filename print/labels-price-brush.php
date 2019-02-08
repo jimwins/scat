@@ -6,6 +6,13 @@ include '../lib/item.php';
 include '../lib/fpdf/alphapdf.php';
 include '../lib/php-barcode.php';
 
+use Smalot\Cups\Builder\Builder;
+use Smalot\Cups\Manager\JobManager;
+use Smalot\Cups\Manager\PrinterManager;
+use Smalot\Cups\Model\Job;
+use Smalot\Cups\Transport\Client;
+use Smalot\Cups\Transport\ResponseParser;
+
 if ($q= $_REQUEST['q']) {
   $items= item_find($db, $q, 0);
 
