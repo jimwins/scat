@@ -113,43 +113,18 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 } elseif (preg_match('/C2F Pricer/', $line)) {
   // C2F Pricer
   $sep= preg_match("/\t/", $line) ? "\t" : ",";
-
-#Cat Desc,Prefix,Prod,Descrip,Unitstock,Mult,Status,Nonstockty,UPC,EAN,Effectdt,NewRetail,EffPrice1,EffQtyPrice,Retail,DealerNet,Qtybrk,QtyPrice,CaseQty,CasePrice 
+  # Prefix,Prices Subject to Change,Descrip,Unitstock,Mult,Status,UPC/EAN,Retail,Disc,Net,CatDescription,Effectdt,NewRetail,NewNet
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE vendor_upload
           FIELDS TERMINATED BY '$sep'
           OPTIONALLY ENCLOSED BY '\"'
           IGNORE 3 LINES
-          (@category, @prefix, code, name,
-           @uom, @purchase_quantity, @status, @nonstockty,
-           @upc, @ean, @effectdt, @newretail, @effprice1, @effqtyprice,
-           @retail_price, @net_price, @qty_brk, @qty_price, @case_qty,
-           @case_price)
-        SET vendor_sku = code, barcode= IF(@upc != '', @upc, @ean),
-            retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
-            net_price = IF(@qty_price, @qty_price, @net_price),
-            purchase_quantity = IF(@qty_brk, @qty_brk, @purchase_quantity),
-            promo_quantity = IF(@qty_brk, @qty_brk, @purchase_quantity)";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-
-} elseif (preg_match('/C2F Inc. Pricer/', $line)) {
-  // C2F Pricer (another version)
-  $sep= preg_match("/\t/", $line) ? "\t" : ",";
-
-#Prod	Unit	Descrip	Mult	Status	UPC/EAN	Retail	Disc	Net	CatDescription	Effectdt	NewRetail	Disc	NewNet		
-
-  $q= "LOAD DATA LOCAL INFILE '$fn'
-            INTO TABLE vendor_upload
-          FIELDS TERMINATED BY '$sep'
-          OPTIONALLY ENCLOSED BY '\"'
-          IGNORE 3 LINES
-          (code, @uom, name,
-           purchase_quantity, @status, barcode,
-           retail_price, @disc, net_price,
-           @cat_description, @effectdt, @newretail, @disc, @newnet)
-        SET vendor_sku = code";
+          (@prefix, code, name, @uom, purchase_quantity,
+           @status, barcode, @msrp, @disc, @net, @category,
+           @effectdt, @newretail, @newnet)
+        SET vendor_sku = code,
+            retail_price = REPLACE(REPLACE(@msrp, ',', ''), '$', ''),
+            net_price = REPLACE(REPLACE(@net, ',', ''), '$', '')";
 
   $r= $db->query($q)
     or die_query($db, $q);
