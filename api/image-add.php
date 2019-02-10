@@ -59,6 +59,18 @@ $upload= $b2->upload([
   'Body' => $img->stream('jpg', 75)
 ]);
 
+// Generate the medium size image (max 384px)
+$img->resize(384, null, function ($constraint) {
+    $constraint->aspectRatio();
+    $constraint->upsize();
+});
+
+$upload= $b2->upload([
+  'BucketName' => B2_BUCKET,
+  'FileName' => '/i/md/' . $uuid . '.jpg',
+  'Body' => $img->stream('jpg', 75)
+]);
+
 // Generate the thumbnail (max 128px)
 $img->resize(128, null, function ($constraint) {
     $constraint->aspectRatio();
