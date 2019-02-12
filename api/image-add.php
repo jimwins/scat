@@ -13,7 +13,7 @@ if ($fn) {
   $client= new \GuzzleHttp\Client();
   $res= $client->get($url);
   $file= $res->getBody();
-  $name= basename($url);
+  $name= basename(parse_url($url, PHP_URL_PATH));
 }
 
 if (!$file)
