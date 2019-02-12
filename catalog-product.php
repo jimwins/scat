@@ -161,6 +161,7 @@ viewModel.editProduct= function (self) {
 
     panel.bind("drop", function (e) {
       var items= e.originalEvent.dataTransfer.items;
+      if (e.originalEvent.dataTransfer.files.length) return;
       for (var i= 0; i < items.length; i++) {
         if (items[i].kind == 'string' && items[i].type == 'text/uri-list') {
           items[i].getAsString(function (s) {
