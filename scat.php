@@ -141,6 +141,8 @@ $(document).ready(function() {
             <li><a id="reports" href="#">Quick</a></li>
             <li><a href="report-summary.php">Daily Summary</a></li>
             <li><a href="report.php">Sales by Date</a></li>
+            <li><a href="report-brand.php">Sales by Brand</a></li>
+            <li><a href="report-category.php">Sales by Category</a></li>
             <li><a href="report-items.php">Sales by Item</a></li>
             <li><a href="report-dogs.php">Dogs</a></li>
             <li><a href="report-underpriced.php">Underpriced</a></li>
