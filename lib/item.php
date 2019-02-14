@@ -42,6 +42,9 @@ function item_terms_to_sql($db, $q, $options) {
     } elseif (preg_match('/^stocked:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.minimum_quantity)"
                         : "(NOT item.minimum_quantity)";
+    } elseif (preg_match('/^purchase_quantity:(.+)/i', $term, $dbt)) {
+      $andor[]= $dbt[1] ? "(item.purchase_quantity)"
+                        : "(NOT item.purchase_quantity)";
     } elseif (preg_match('/^reviewed:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.reviewed)"
                         : "(NOT item.reviewed)";
