@@ -262,6 +262,15 @@ ob_end_flush();
             </div>
           </div>
           <div class="form-group">
+            <label for="variation" class="col-sm-2 control-label">
+              Variation
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="variation" class="form-control"
+                     placeholder="">
+            </div>
+          </div>
+          <div class="form-group">
             <label for="retail_price" class="col-sm-2 control-label">
               List
             </label>

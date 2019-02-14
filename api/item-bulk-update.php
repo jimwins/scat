@@ -26,6 +26,11 @@ if (!empty($_REQUEST['name'])) {
   $props[]= "name = CONCAT('$name')";
 }
 
+if (!empty($_REQUEST['variation'])) {
+  $variation= $db->real_escape_string($_REQUEST['variation']);
+  $props[]= "variation = '$variation'";
+}
+
 if (!empty($_REQUEST['retail_price'])) {
   $retail_price= preg_replace('/^\\$/', '', $_REQUEST['retail_price']);
   $retail_price= $db->real_escape_string($retail_price);
