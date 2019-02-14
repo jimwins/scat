@@ -20,6 +20,12 @@ if (isset($_REQUEST['product_id']) && (int)$_REQUEST['product_id']) {
   $props[]= "product_id = $product";
 }
 
+if (!empty($_REQUEST['name'])) {
+  $name= $db->real_escape_string($_REQUEST['name']);
+  $name= preg_replace('/({{(\w+?)}})/', '\', \\2, \'', $name);
+  $props[]= "name = CONCAT('$name')";
+}
+
 if (!empty($_REQUEST['retail_price'])) {
   $retail_price= preg_replace('/^\\$/', '', $_REQUEST['retail_price']);
   $retail_price= $db->real_escape_string($retail_price);
