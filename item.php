@@ -143,7 +143,7 @@ include 'item-searchform.php';
           <div class="col-sm-8"
                data-bind="foreach: price_overrides">
             <p class="form-control-static">
-              <span data-bind="text: $parent.formatDiscount($data.discount_type(), $data.discount())"></span> for <span data-bind="text: $data.minimum_quantity"></span>
+              <span data-bind="text: $parent.formatDiscount($data.discount_type(), $data.discount(), $parent.item.retail_price())"></span> for <span data-bind="text: $data.minimum_quantity"></span>
             </p>
           </div>
         </div>
@@ -831,11 +831,12 @@ itemModel.findVendorItem= function() {
       });
 }
 
-itemModel.formatDiscount= function(discount_type, discount) {
+itemModel.formatDiscount= function(discount_type, discount, retail_price) {
   var val= parseFloat(discount).toFixed(2);
   switch (discount_type) {
     case 'percentage':
-      return val + '%';
+      var net= Scat.amount(retail_price * (100 - discount) / 100);
+      return val + '% (' + net + ')';
 
     case 'additional_percentage':
       return '+' + val + '%';
