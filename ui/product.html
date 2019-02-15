@@ -42,11 +42,22 @@
           </div>
           <div class="form-group">
             <label for="image">Image</label>
-            <input type="text" class="form-control" id="image"
-                   data-bind="value: image">
+            <div class="row">
+              <div class="col-xs-9">
+                <input type="text" class="form-control" id="image"
+                       data-bind="value: image">
+              </div>
+              <div class="col-xs-3">
+                <label id="upload-button" for="image-file"
+                       class="btn btn-default">
+                  Upload
+                </label>
+                <input type="file" id="image-file" style="display: none">
+              </div>
+            </div>
           </div>
           <div class="form-group">
-            <label for="image">Variation Style</label>
+            <label for="variation_style">Variation Style</label>
             <select class="form-control" id="department"
                     data-bind="value: variation_style">
               <option value="tabs">Tabs</option>

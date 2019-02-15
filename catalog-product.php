@@ -143,9 +143,22 @@ viewModel.editProduct= function (self) {
       owner: panelModel
     }).extend({ notify: 'always' });
 
-    panel.html5Uploader({
+    var uploaderOptions= {
       name: 'src',
       postUrl: function() { return 'api/image-add.php' },
+      /* Progress */
+      onClientLoadStart: function (e, file, response) {
+        $('#upload-button')
+          .html('<i class="fa fa-spinner fa-spin"></i> Reading...');
+      },
+      onServerLoadStart: function (e, file, response) {
+        $('#upload-button')
+          .html('<i class="fa fa-spinner fa-spin"></i> Uploading...');
+      },
+      onServerLoad: function (e, file, response) {
+        $('#upload-button')
+          .html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+      },
       onSuccess: function(e, file, response) {
         data= $.parseJSON(response);
         if (data.error) {
@@ -153,11 +166,17 @@ viewModel.editProduct= function (self) {
           return;
         }
         panelModel.image('/i/st/' + data.uuid + '.jpg');
+        $('#upload-button')
+          .html('Upload Items');
       },
       onServerError: function(e, file) {
         Scat.alert("File upload failed.");
+        $('#upload-button')
+          .html('Upload Items');
       },
-    });
+    };
+    panel.html5Uploader(uploaderOptions);
+    $('#image-file', panel).html5Uploader(uploaderOptions);
 
     panel.bind("drop", function (e) {
       var items= e.originalEvent.dataTransfer.items;
