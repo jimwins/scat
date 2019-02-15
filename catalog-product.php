@@ -171,12 +171,12 @@ viewModel.editProduct= function (self) {
         }
         panelModel.image('/i/st/' + data.uuid + '.jpg');
         $('#upload-button')
-          .html('Upload Items');
+          .html('Upload');
       },
       onServerError: function(e, file) {
         Scat.alert("File upload failed.");
         $('#upload-button')
-          .html('Upload Items');
+          .html('Upload');
       },
     };
     panel.html5Uploader(uploaderOptions);
