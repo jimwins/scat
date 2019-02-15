@@ -151,6 +151,10 @@ viewModel.editProduct= function (self) {
         $('#upload-button')
           .html('<i class="fa fa-spinner fa-spin"></i> Reading...');
       },
+      onClientLoadEnd: function (e, file, response) {
+        $('#upload-button')
+          .html('<i class="fa fa-spinner fa-spin"></i> Preparing...');
+      },
       onServerLoadStart: function (e, file, response) {
         $('#upload-button')
           .html('<i class="fa fa-spinner fa-spin"></i> Uploading...');
