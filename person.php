@@ -45,7 +45,14 @@ if ($id && !$person) {
     </div>
   </div>
   <div class="form-group" data-bind="if: person.role() != 'vendor'">
-    <label for="points" class="col-sm-2 control-label">Points</label>
+    <label for="points" class="col-sm-2 control-label">
+      <a data-bind="click: addPoints">
+        <i class="far fa-plus-square"></i>
+      </a>
+      <a data-bind="click: showPoints">
+        Points
+      </a>
+    </label>
     <div class="col-sm-4" data-bind="if: person.points_available()">
       <p class="form-control-static"
          data-bind="text: 'Available: ' + person.points_available()">
@@ -305,6 +312,64 @@ viewModel.downloadActivity= function (place) {
         $("#file").val(tsv);
         $("#post-csv").submit();
       });
+}
+
+viewModel.addPoints= function (place) {
+  Scat.dialog('add-points').done(function (html) {
+    var panel= $(html);
+
+    var points= { person: viewModel.person.id(),
+                   points: 0, note: '' };
+    points.error= '';
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    pointsModel= ko.mapping.fromJS(points);
+
+    pointsModel.addPoints= function(place, ev) {
+      var points= ko.mapping.toJS(pointsModel);
+      delete points.error;
+
+      Scat.api('loyalty-add', points)
+          .done(function (data) {
+            $(place).closest('.modal').modal('hide');
+          });
+    }
+
+    ko.applyBindings(pointsModel, panel[0]);
+    panel.appendTo($('body')).modal();
+  });
+}
+
+viewModel.showPoints= function(data, event) {
+  Scat.dialog('points').done(function (html) {
+    var panel= $(html);
+
+    panel.on('shown.bs.modal', function() {
+      $("#search", this).focus();
+    });
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    var model= {
+    };
+
+    var personModel= ko.mapping.fromJS(model);
+    personModel.activity= ko.observableArray();
+
+    Scat.api('person-load-loyalty', { person: data.person.id() })
+        .done(function (data) {
+          personModel.activity(data.activity);
+        });
+
+    ko.applyBindings(personModel, panel[0]);
+
+    panel.appendTo($('body')).modal();
+  });
 }
 
 viewModel.sendMessage= function (place) {
