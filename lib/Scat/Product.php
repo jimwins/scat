@@ -6,6 +6,10 @@ class Product extends \Model implements \JsonSerializable {
     return $this->belongs_to('Brand');
   }
 
+  public function dept() {
+    return $this->belongs_to('Department');
+  }
+
   public function items() {
     return $this->has_many('Item')
                 ->select('item.*')
@@ -17,6 +21,12 @@ class Product extends \Model implements \JsonSerializable {
                                   FROM txn_line
                                  WHERE txn_line.item = item.id)',
                               'stock');
+  }
+
+  public function full_slug() {
+    return
+      $this->dept()->find_one()->parent()->find_one()->slug . '/' .
+      $this->dept()->find_one()->slug . '/' . $this->slug;
   }
 
   public function jsonSerialize() {
