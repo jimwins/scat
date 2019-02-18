@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    {% block title %}Scat{% endblock %}
+    {% if not (block('title') matches '/Scat/') %}
+      @ Scat
+    {% endif %}
+  </title>
+
+  {# TODO import these into our repo #}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+
+<body class="has-navbar-fixed-top">
+
+<nav class="navbar is-fixed-top is-light"
+     role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/">
+      <span class="icon"><i data-feather="activity"></i></span>
+      &nbsp; Scat
+    </a>
+
+    <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarTop">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="navbarTop" class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item is-tab {{ current_path() starts with '/sale' ? 'is-active' }}"
+         href="/sale">
+        Sales
+      </a>
+
+      <a class="navbar-item is-tab {{ current_path() starts with '/catalog' ? 'is-active' }}"
+         href="/catalog">
+        Catalog
+      </a>
+
+      <a class="navbar-item is-tab {{ current_path() starts with '/person' ? 'is-active' }}"
+         href="/person">
+        People
+      </a>
+
+      <a class="navbar-item is-tab {{ current_path() starts with '/clock' ? 'is-active' }}"
+         href="/clock">
+        Clock
+      </a>
+
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Reports
+        </a>
+
+        <div class="navbar-dropdown">
+          <a class="navbar-item">
+            About
+          </a>
+          <a class="navbar-item">
+            Jobs
+          </a>
+          <a class="navbar-item">
+            Contact
+          </a>
+          <hr class="navbar-divider">
+          <a class="navbar-item">
+            Report an issue
+          </a>
+        </div>
+      </div>
+    </div>
+
+<!--
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons">
+          <a class="button is-primary">
+            <strong>Sign up</strong>
+          </a>
+          <a class="button is-light">
+            Log in
+          </a>
+        </div>
+      </div>
+    </div>
+-->
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="content has-text-centered">
+    <p>
+      Scat &copy; 2010-2019 Jim Winstead Jr.
+    </p>
+  </div>
+</footer>
+
+<script>
+{# Activate Feather icons #}
+feather.replace()
+
+{# Activate navbar-burger elements #}
+document.addEventListener('DOMContentLoaded', () => {
+  // Get all "navbar-burger" elements
+  const $navbarBurgers=
+    Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+  // Check if there are any navbar burgers
+  if ($navbarBurgers.length > 0) {
+    // Add a click event on each of them
+    $navbarBurgers.forEach(el => {
+      el.addEventListener('click', () => {
+        // Get the target from the "data-target" attribute
+        const target= el.dataset.target;
+        const $target= document.getElementById(target);
+
+	// Toggle the "is-active" class on both the "navbar-burger"
+        // and the "navbar-menu"
+        el.classList.toggle('is-active');
+        $target.classList.toggle('is-active');
+      });
+    });
+  }
+});
+</script>
+
+</body>
+
+</html>

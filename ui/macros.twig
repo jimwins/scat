@@ -1,0 +1,3 @@
+{% macro amount(d) %}
+  {{ d < 0 ? '(' }}${{ d | abs | number_format(2, '.', ',') }}{{ d < 0 ? ')' }}
+{% endmacro %}

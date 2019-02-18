@@ -1,0 +1,23 @@
+{% import 'macros.twig' as scat %}
+<table class="table is-striped is-hoverable is-fullwidth">
+  <thead>
+    <th>Item No.</th>
+    <th>Description</th>
+    <th>List</th>
+    <th>Sale</th>
+    <th>Stock</th>
+    <th>Minimum</th>
+  </thead>
+  <tbody>
+  {% for i in items %}
+    <tr class="{{ (item and item.id == i.id) ? 'is-selected' }}">
+      <td><a href="{{ product.slug ~ '/' ~ i.code }}">{{ i.code }}</a></td>
+      <td>{{ i.name }}</td>
+      <td>{{ scat.amount(i.retail_price) }}</td>
+      <td>{{ scat.amount(i.sale_price) }}</td>
+      <td>{{ i.stock }}</td>
+      <td>{{ i.minimum_quantity }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>

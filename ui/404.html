@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Error
+{% endblock %}
+
+{% block content %}
+
+  <h1 class="title">{{ block('title') }}</h1>
+
+  <p>An error occured. Something obviously went wrong.</p>
+
+  <p><b><a href="/">Try it again from the top.</a></b></p>
+
+{% endblock %}

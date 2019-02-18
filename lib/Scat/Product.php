@@ -10,7 +10,7 @@ class Product extends \Model implements \JsonSerializable {
     return $this->belongs_to('Department');
   }
 
-  public function items() {
+  public function items($only_active= true) {
     return $this->has_many('Item')
                 ->select('item.*')
                 ->select_expr('sale_price(item.retail_price,
@@ -20,7 +20,8 @@ class Product extends \Model implements \JsonSerializable {
                 ->select_expr('(SELECT IFNULL(SUM(allocated),0)
                                   FROM txn_line
                                  WHERE txn_line.item = item.id)',
-                              'stock');
+                              'stock')
+                ->where_gte('active', (int)$only_active);
   }
 
   public function full_slug() {

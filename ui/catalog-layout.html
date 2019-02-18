@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Catalog
+{% endblock %}
+
+{% block content %}
+
+<div class="columns">
+  <div class="column is-one-quarter">
+    {% include 'catalog-sidebar.twig' %}
+  </div>
+
+  <div class="column">
+    {% include 'catalog-searchform.twig' %}
+
+    <section class="section">
+      <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+          <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
+          {% block catalog_crumb %}
+            {% if dept %}
+              <li class="{{ not subdept ? 'is-active' }}">
+                <a href="{{ path_for('catalog', { 'dept' : dept.slug }) }}">
+                  {{ dept.name }}
+                </a>
+              </li>
+            {% endif %}
+            {% if subdept %}
+              <li class="{{ not product ? 'is-active' }}">
+                <a href="{{ path_for('catalog', {'dept': dept.slug,
+                                                 'subdept': subdept.slug }) }}">
+                  {{ subdept.name }}
+                </a>
+              </li>
+            {% endif %}
+            {% if product %}
+              <li class="{{ not item ? 'is-active' }}">
+                <a href="{{ path_for('catalog', { 'dept': dept.slug,
+                                                  'subdept': subdept.slug,
+                                                  'product': product.slug}) }}">
+                  {{ product.name }}
+                </a>
+              </li>
+            {% endif %}
+          {% endblock %}
+        </ul>
+      </nav>
+    </section>
+
+    {% block catalog_content %}
+      {% if products and not product %}
+        {% include 'catalog-products.twig' %}
+      {% endif %}
+
+      {% if product %}
+        {% include 'catalog-product.twig' %}
+
+        {# Item(s) #}
+        {% include 'catalog-items.twig' %}
+
+        {% if item %}
+          {% include 'catalog-item.twig' %}
+        {% endif %}
+      {% endif %}
+    {% endblock %}
+  </div>
+</div>
+
+{% endblock %}

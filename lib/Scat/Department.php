@@ -10,8 +10,8 @@ class Department extends \Model {
     return $this->has_many('Department', 'parent_id');
   }
 
-  public function products() {
-    return $this->has_many('Product');
+  public function products($only_active= true) {
+    return $this->has_many('Product')->where_gte('active', (int)$only_active);
   }
 }
 

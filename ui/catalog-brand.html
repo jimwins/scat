@@ -1,0 +1,42 @@
+{% extends 'catalog-layout.html' %}
+
+{% block title %}
+  Catalog Brand
+{% endblock %}
+
+{% block catalog_crumb %}
+  <li class="{{ not brand ? 'is-active' }}">
+    <a href="{{ path_for('catalog-brand') }}">Brands</a>
+  </li>
+  {% if brand %}
+    <li class="is-active">
+      <a href="{{ path_for('catalog-brand', { 'brand' : brand.slug }) }}">
+        {{ brand.name }}
+      </a>
+    </li>
+  {% endif %}
+{% endblock %}
+
+{% block catalog_content %}
+
+{% if brands|length %}
+  <ul>
+    {% for b in brands %}
+      <li>
+        <a href="{{ path_for('catalog-brand', { 'brand' : b.slug }) }}">
+          {{ b.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if brand %}
+  <h1 class="title">{{ brand.name }}</h1>
+{% endif %}
+
+{% if products %}
+  {% include 'catalog-products.twig' %}
+{% endif %}
+
+{% endblock %}
