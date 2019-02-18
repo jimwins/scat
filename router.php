@@ -10,7 +10,7 @@ date_default_timezone_set($_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ']);
 bcscale(2);
 
 $DEBUG= false;
-require 'config.php';
+require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
 
 $config= [
   'displayErrorDetails' => $DEBUG,
