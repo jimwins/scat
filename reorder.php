@@ -330,7 +330,7 @@ $(function() {
     self.optimize= function (form) {
       $.each(self.results(), function (i, item) {
         item.order_quantity(
-          (item.cheapest < 0 || item.cheapest === null) ?
+          (item.cheapest <= 0 || item.cheapest === null) ?
           Math.max(
             item.minimum_order_quantity,
             item.minimum_quantity > item.minimum_quantity - item.stock ?
