@@ -262,6 +262,15 @@ ob_end_flush();
             </div>
           </div>
           <div class="form-group">
+            <label for="short_name" class="col-sm-2 control-label">
+              Short Name
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="short_name" class="form-control"
+                     placeholder="">
+            </div>
+          </div>
+          <div class="form-group">
             <label for="variation" class="col-sm-2 control-label">
               Variation
             </label>

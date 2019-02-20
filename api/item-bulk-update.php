@@ -26,6 +26,12 @@ if (!empty($_REQUEST['name'])) {
   $props[]= "name = CONCAT('$name')";
 }
 
+if (!empty($_REQUEST['short_name'])) {
+  $short_name= $db->real_escape_string($_REQUEST['short_name']);
+  $short_name= preg_replace('/({{(\w+?)}})/', '\', \\2, \'', $short_name);
+  $props[]= "short_name = CONCAT('$short_name')";
+}
+
 if (!empty($_REQUEST['variation'])) {
   $variation= $db->real_escape_string($_REQUEST['variation']);
   $props[]= "variation = '$variation'";
