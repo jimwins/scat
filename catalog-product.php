@@ -164,7 +164,11 @@ viewModel.editProduct= function (self) {
           .html('<i class="fa fa-spinner fa-spin"></i> Processing...');
       },
       onSuccess: function(e, file, response) {
-        data= $.parseJSON(response);
+        try {
+          data= JSON.parse(response);
+        } catch (e) {
+          data= { error : e };
+        }
         if (data.error) {
           Scat.alert(data);
           return;
