@@ -168,6 +168,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]',
             function (Request $req, Response $res, array $args) {
+            try {
               $depts= $this->catalog_service->getDepartments();
               $dept= $args['dept'] ?
                 $this->catalog_service->getDepartmentBySlug($args['dept']):null;
@@ -216,6 +217,19 @@ $app->group('/catalog', function (Slim\App $app) {
                                            'products' => $products,
                                            'item' => $item,
                                            'items' => $items ]);
+             }
+             catch (\Slim\Exception\NotFoundException $ex) {
+               /* TODO figure out a way to not have to add/remove /catalog/ */
+               $path= preg_replace('!/catalog/!', '',
+                                   $req->getUri()->getPath());
+               $re= $this->catalog_service->getRedirectFrom($path);
+
+               if ($re) {
+                 return $res->withRedirect('/catalog/' . $re->dest, 301);
+               }
+
+               throw $ex;
+             }
             })->setName('catalog');
 });
 
