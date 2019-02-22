@@ -10,26 +10,7 @@ date_default_timezone_set($_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ']);
 bcscale(2);
 
 $DEBUG= false;
-require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
-
-$config= [
-  'displayErrorDetails' => $DEBUG,
-  'addContentLengthHeader' => false,
-  'Twig' => [
-    'timezone' => $_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ']
-  ],
-  'db' => [
-    'host' => DB_SERVER,
-    'user' => DB_USER,
-    'password' => DB_PASSWORD,
-    'dbname' => DB_SCHEMA
-  ],
-  'search' => [
-    'dsn' => SEARCH_DSN,
-    'user' => SEARCH_USER,
-    'password' => SEARCH_PASSWORD
-  ]
-];
+$config= require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
 
 /* Configure Idiorm & Paris */
 Model::$auto_prefix_models= '\\Scat\\';
