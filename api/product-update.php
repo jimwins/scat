@@ -13,8 +13,7 @@ try {
       ($product->department_id &&
        $_REQUEST['department_id'] != $product->department_id))
   {
-    // XXX handle rename
-    $old_slug= '';
+    $old_slug= $product->full_slug();
   }
 
   foreach ($_REQUEST as $k => $v) {
@@ -27,8 +26,14 @@ try {
 
   $product->save();
 
-  // XXX Save redirect information
+  // Save redirect information
   if ($old_slug) {
+    $new_slug= $product->full_slug();
+    error_log("Redirecting $old_slug to $new_slug");
+    $redir= Model::factory('Redirect')->create();
+    $redir->source= $old_slug;
+    $redir->dest= $new_slug;
+    $redir->save();
   }
 
 } catch (\PDOException $e) {
