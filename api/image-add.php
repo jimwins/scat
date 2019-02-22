@@ -49,8 +49,7 @@ $image->save();
 
 // Add a background color if it's a PNG
 if ($img->mime() == 'image/png') {
-  $new= Image::canvas($img->width, $img->height, '#ffffff')
-                   ->insert($img);
+  $new= Image::canvas($img->width(), $img->height(), '#ffffff')->insert($img);
   $img= $new;
 }
 
