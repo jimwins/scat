@@ -14,6 +14,30 @@ class Item extends \Model {
   public function barcodes() {
     return $this->has_many('Barcode', 'item');
   }
+
+  public function sale_price() {
+    switch ($this->discount_type) {
+    case 'percentage':
+      // TODO fix rounding
+      return bcmul($this->retail_price,
+                   bcdiv(bcsub(100, $this->discount),
+                         100));
+    case 'relative':
+      return bcsub($this->retail_price, $this->discount);
+    case 'fixed':
+      return $this->discount;
+    case '':
+    case null:
+      return $this->retail_price;
+    default:
+      throw new Exception('Did not understand discount for item.');
+    }
+  }
+
+  public function stock() {
+    return $this->has_many('TxnLine', 'item')
+                ->sum('allocated') ?: 0;
+  }
 }
 
 class Barcode extends \Model {
@@ -21,4 +45,3 @@ class Barcode extends \Model {
     return $this->belongs_to('Item', 'item');
   }
 }
-
