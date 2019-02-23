@@ -24,9 +24,3 @@ class Txn extends \Model implements \JsonSerializable {
     return $txn;
   }
 }
-
-class TxnLine extends \Model {
-  public function txn() {
-    return $this->belongs_to('Txn', 'txn');
-  }
-}
