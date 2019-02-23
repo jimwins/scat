@@ -146,8 +146,11 @@ $app->group('/catalog', function (Slim\App $app) {
             function (Request $req, Response $res, array $args) {
               $depts= $this->catalog_service->getDepartments();
 
+              $q= $req->getParam('q');
+
               return $this->view->render($res, 'catalog-searchresults.html',
-                                         [ 'depts' => $depts ]);
+                                         [ 'depts' => $depts,
+                                           'q' => $q ]);
             })->setName('catalog-search');
 
   $app->get('/brand[/{brand}]',
