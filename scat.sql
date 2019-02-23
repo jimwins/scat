@@ -546,6 +546,24 @@ CREATE TABLE `vendor_item` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `wordform`
+--
+
+DROP TABLE IF EXISTS `wordform`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `wordform` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `source` varchar(512) NOT NULL,
+  `dest` varchar(512) NOT NULL,
+  `added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `source` (`source`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping routines for database 'scat'
 --
 /*!50003 DROP FUNCTION IF EXISTS `ROUND_TO_EVEN` */;
