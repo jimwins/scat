@@ -55,14 +55,17 @@
 
       {% if product %}
         {% include 'catalog-product.twig' %}
-
-        {# Item(s) #}
-        {% include 'catalog-items.twig' %}
-
-        {% if item %}
-          {% include 'catalog-item.twig' %}
-        {% endif %}
       {% endif %}
+
+      {# Item(s) #}
+      {% if items|length %}
+        {% include 'catalog-items.twig' %}
+      {% endif %}
+
+      {% if item %}
+        {% include 'catalog-item.twig' %}
+      {% endif %}
+
     {% endblock %}
   </div>
 </div>
