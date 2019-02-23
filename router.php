@@ -140,17 +140,22 @@ $app->group('/sale', function (Slim\App $app) {
 $container['catalog_service']= function($c) {
   return new \Scat\CatalogService();
 };
+$container['search']= function($c) {
+  return new \Scat\SearchService();
+};
 
 $app->group('/catalog', function (Slim\App $app) {
   $app->get('/search',
             function (Request $req, Response $res, array $args) {
-              $depts= $this->catalog_service->getDepartments();
+              $q= trim($req->getParam('q'));
 
-              $q= $req->getParam('q');
+              $data= $this->search->search($q);
+
+              $data['depts']= $this->catalog_service->getDepartments();
+              $data['q']= $q;
 
               return $this->view->render($res, 'catalog-searchresults.html',
-                                         [ 'depts' => $depts,
-                                           'q' => $q ]);
+                                         $data);
             })->setName('catalog-search');
 
   $app->get('/brand[/{brand}]',

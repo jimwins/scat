@@ -1,5 +1,4 @@
 <?php
-
 namespace Scat;
 
 class CatalogService
