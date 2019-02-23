@@ -118,10 +118,6 @@ $container['notFoundHandler']= function ($c) {
   };
 };
 
-$container['catalog_service']= function($c) {
-  return new \Scat\CatalogService();
-};
-
 /* Info (DEBUG only) */
 if ($DEBUG) {
   $app->get('/info',
@@ -132,7 +128,19 @@ if ($DEBUG) {
             })->setName('info');
 }
 
+/* Sales */
+$app->group('/sale', function (Slim\App $app) {
+  $app->get('',
+            function (Request $req, Response $res, array $args) {
+              return $res->withRedirect('/');
+            });
+});
+
 /* Catalog */
+$container['catalog_service']= function($c) {
+  return new \Scat\CatalogService();
+};
+
 $app->group('/catalog', function (Slim\App $app) {
   $app->get('/search',
             function (Request $req, Response $res, array $args) {
@@ -231,6 +239,38 @@ $app->group('/catalog', function (Slim\App $app) {
                throw $ex;
              }
             })->setName('catalog');
+});
+
+/* People */
+$app->group('/person', function (Slim\App $app) {
+  $app->get('',
+            function (Request $req, Response $res, array $args) {
+              return $res->withRedirect('/people.php');
+            });
+});
+
+/* Clock */
+$app->group('/clock', function (Slim\App $app) {
+  $app->get('',
+            function (Request $req, Response $res, array $args) {
+              return $res->withRedirect('/clock.php');
+            });
+});
+
+/* Reports */
+$app->group('/report', function (Slim\App $app) {
+  $app->get('/{name}',
+            function (Request $req, Response $res, array $args) {
+              return $res->withRedirect("/report-{$args['name']}.php");
+            });
+});
+
+/* Till */
+$app->group('/till', function (Slim\App $app) {
+  $app->get('',
+            function (Request $req, Response $res, array $args) {
+              return $res->withRedirect("/till.php");
+            });
 });
 
 $app->run();
