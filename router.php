@@ -77,6 +77,8 @@ $container['view']= function ($container) {
   $engine= new Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine();
   $view->addExtension(new Aptoma\Twig\Extension\MarkdownExtension($engine));
 
+  $view->getEnvironment()->addGlobal('DEBUG', $GLOBALS['DEBUG']);
+
   return $view;
 };
 
