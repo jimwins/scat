@@ -55,15 +55,6 @@ $container['db']= function ($c) {
   return $pdo;
 };
 
-/* Search */
-$container['search']= function ($c) {
-  $db= $c['settings']['search'];
-  $pdo= new PDO($db['dsn'], $db['user'], $db['pass']);
-  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-  return $pdo;
-};
-
 /* Twig for templating */
 $container['view']= function ($container) {
   $view= new \Slim\Views\Twig('ui', [
@@ -141,7 +132,7 @@ $container['catalog_service']= function($c) {
   return new \Scat\CatalogService();
 };
 $container['search']= function($c) {
-  return new \Scat\SearchService();
+  return new \Scat\SearchService($c['settings']['search']);
 };
 
 $app->group('/catalog', function (Slim\App $app) {
