@@ -1,15 +1,19 @@
 <?php
 namespace Scat;
 
-use OE\Lukas\Parser\QueryParser;
-use OE\Lukas\Visitor\QueryItemPrinter;
-
 class SearchService
 {
   public function __construct() {
   }
 
   public function search($q) {
+    return [
+      'items' => $this->searchItems($q),
+      'products' => $this->searchProducts($q)
+    ];
+  }
+
+  public function searchItems($q) {
     $scanner= new \OE\Lukas\Parser\QueryScanner();
     $parser= new \OE\Lukas\Parser\QueryParser($scanner);
     $parser->readString($q);
@@ -30,6 +34,10 @@ class SearchService
                                    ->order_by_asc('code')
                                    ->find_many();
 
-    return [ 'items' => $items ];
+    return $items;
+  }
+
+  public function searchProducts($q) {
+    return [];
   }
 }
