@@ -6,10 +6,10 @@
     <thead>
       <th>Item No.</th>
       <th>Description</th>
-      <th>List</th>
-      <th>Sale</th>
-      <th>Stock</th>
-      <th>Minimum</th>
+      <th class="has-text-right">List</th>
+      <th class="has-text-right">Sale</th>
+      <th class="has-text-centered">Stock</th>
+      <th class="has-text-centered">Minimum</th>
     </thead>
     <tbody>
 {% endmacro %}
@@ -44,10 +44,16 @@
       <a href="/item.php?id={{ i.id }}"><span class="icon is-small"><i data-feather="edit" width="1rem" height="1rem"></i></span></a>
     </td>
     <td>{{ variations|length ? (i.short_name ?: i.name) : i.name }}</td>
-    <td>{{ scat.amount(i.retail_price) }}</td>
-    <td>{{ scat.amount(i.sale_price) }}</td>
-    <td>{{ i.stock }}</td>
-    <td>{{ i.minimum_quantity }}</td>
+    <td class="has-text-right">{{ scat.amount(i.retail_price) }}</td>
+    <td class="has-text-right">
+      {{ scat.amount(i.sale_price) }}
+      {% if i.discount_type in [ 'percentage', 'relative' ] %}
+        <br>
+        <span class="is-size-7">{{ scat.format_discount(i) }}</span>
+      {% endif %}
+    </td>
+    <td class="has-text-centered">{{ i.stock }}</td>
+    <td class="has-text-centered">{{ i.minimum_quantity }}</td>
   </tr>
 {% endfor %}
 {{ s.end_table() }}
