@@ -15,6 +15,14 @@ class Item extends \Model {
     return $this->has_many('Barcode', 'item');
   }
 
+  public function full_slug() {
+    return
+      $this->product()->find_one()->dept()->find_one()->parent()->find_one()->slug . '/' .
+      $this->product()->find_one()->dept()->find_one()->slug . '/' .
+      $this->product()->find_one()->slug . '/' .
+      $this->code;;
+  }
+
   public function sale_price() {
     switch ($this->discount_type) {
     case 'percentage':

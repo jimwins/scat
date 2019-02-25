@@ -11,7 +11,7 @@
   <tbody>
   {% for i in items %}
     <tr class="{{ (item and item.id == i.id) ? 'is-selected' }}">
-      <td><a href="{{ product.slug ~ '/' ~ i.code }}">{{ i.code }}</a></td>
+      <td><a href="{{ product ? product.slug ~ '/' ~ i.code : i.full_slug }}">{{ i.code }}</a></td>
       <td>{{ i.name }}</td>
       <td>{{ scat.amount(i.retail_price) }}</td>
       <td>{{ scat.amount(i.sale_price) }}</td>
