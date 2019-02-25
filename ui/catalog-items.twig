@@ -26,7 +26,11 @@
       <tbody>
   {% endif %}
     <tr class="{{ (item and item.id == i.id) ? 'is-selected' }}">
-      <td><a href="{{ product ? product.slug ~ '/' ~ i.code : i.full_slug }}">{{ i.code }}</a></td>
+      <td>
+        <a href="{{ product ? product.slug ~ '/' ~ i.code : i.full_slug }}">{{ i.code }}</a>
+        {# TODO get rid of this #}
+        <a href="/item.php?id={{ i.id }}"><span class="icon is-small"><i data-feather="edit" width="1rem" height="1rem"></i></span></a>
+      </td>
       <td>{{ variations ? (i.short_name ?: i.name) : i.name }}</td>
       <td>{{ scat.amount(i.retail_price) }}</td>
       <td>{{ scat.amount(i.sale_price) }}</td>
