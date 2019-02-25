@@ -1,23 +1,38 @@
 {% import 'macros.twig' as scat %}
-<table class="table is-striped is-hoverable is-fullwidth">
-  <thead>
-    <th>Item No.</th>
-    <th>Description</th>
-    <th>List</th>
-    <th>Sale</th>
-    <th>Stock</th>
-    <th>Minimum</th>
-  </thead>
-  <tbody>
-  {% for i in items %}
+
+{# A little convoluted because we chunk by variation sometimes #}
+
+{% set last_variation= null %}
+
+{% for i in items %}
+  {% if i.variation is not same as (last_variation) %}
+    {% if last_variation %}
+  </tbody>
+</table>
+    {% endif %}
+    {% set last_variation = i.variation %}
+    {% if i.variation %}
+      <h2 class="title is-4">{{ i.variation }}</h2>
+    {% endif %}
+    <table class="table is-striped is-hoverable is-fullwidth">
+      <thead>
+        <th>Item No.</th>
+        <th>Description</th>
+        <th>List</th>
+        <th>Sale</th>
+        <th>Stock</th>
+        <th>Minimum</th>
+      </thead>
+      <tbody>
+  {% endif %}
     <tr class="{{ (item and item.id == i.id) ? 'is-selected' }}">
       <td><a href="{{ product ? product.slug ~ '/' ~ i.code : i.full_slug }}">{{ i.code }}</a></td>
-      <td>{{ i.name }}</td>
+      <td>{{ variations ? (i.short_name ?: i.name) : i.name }}</td>
       <td>{{ scat.amount(i.retail_price) }}</td>
       <td>{{ scat.amount(i.sale_price) }}</td>
       <td>{{ i.stock }}</td>
       <td>{{ i.minimum_quantity }}</td>
     </tr>
-  {% endfor %}
+{% endfor %}
   </tbody>
 </table>

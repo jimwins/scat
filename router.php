@@ -207,8 +207,15 @@ $app->group('/catalog', function (Slim\App $app) {
 
               $items= $product ?
                 $product->items()
-                        ->order_by_asc('name')
+                        ->order_by_asc('variation')
+                        ->order_by_expr('minimum_quantity > 0 DESC')
+                        ->order_by_asc('code')
                         ->find_many():null;
+
+              $variations= array_unique(
+                array_map(function ($i) {
+                  return $i->variation;
+                }, $items));
 
               $item= $args['item'] ?
                 $product->items()
@@ -224,6 +231,7 @@ $app->group('/catalog', function (Slim\App $app) {
                                            'subdepts' => $subdepts,
                                            'product' => $product,
                                            'products' => $products,
+                                           'variations' => $variations,
                                            'item' => $item,
                                            'items' => $items ]);
              }
