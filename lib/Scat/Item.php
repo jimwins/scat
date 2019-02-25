@@ -16,11 +16,19 @@ class Item extends \Model {
   }
 
   public function full_slug() {
+    $product= $this->product()->find_one();
+    if ($product)
+      $subdept= $product->dept()->find_one();
+    if ($subdept)
+      $dept= $subdept->parent()->find_one();
+    if (!$product || !$subdept || !$dept)
+      return "";
+
     return
-      $this->product()->find_one()->dept()->find_one()->parent()->find_one()->slug . '/' .
-      $this->product()->find_one()->dept()->find_one()->slug . '/' .
-      $this->product()->find_one()->slug . '/' .
-      $this->code;;
+      $dept->slug . '/' .
+      $subdept->slug . '/' .
+      $product->slug . '/' .
+      $this->code;
   }
 
   public function sale_price() {
