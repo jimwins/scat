@@ -21,6 +21,15 @@ if (!$product) {
 }
 
 $items= $product->items()
+          ->select('item.*')
+          ->select_expr('sale_price(item.retail_price,
+                                  item.discount_type,
+                                  item.discount)',
+                      'sale_price')
+          ->select_expr('(SELECT IFNULL(SUM(allocated),0)
+                          FROM txn_line
+                         WHERE txn_line.item = item.id)',
+                      'stock')
           ->order_by_asc('variation')
           ->order_by_desc('active')
           ->order_by_expr('IF(minimum_quantity OR stock, 0, 1)')
