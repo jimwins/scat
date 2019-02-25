@@ -133,6 +133,7 @@ $(document).ready(function() {
           <ul class="dropdown-menu">
             <li><a href="catalog-brands.php">Brands</a></li>
             <li><a href="catalog-departments.php">Departments</a></li>
+            <li><a href="catalog">New</a></li>
           </ul>
         </li>
         <li class="dropdown">
