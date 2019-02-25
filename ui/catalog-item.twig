@@ -17,10 +17,12 @@
           </div>
         </div>
         <div class="level-item has-text-centered">
-          <div>
-            <p class="heading">Discount</p>
-            <p class="title">{{ scat.format_discount(item) }}</p>
-          </div>
+          {% if item.discount %}
+            <div>
+              <p class="heading">Discount</p>
+              <p class="title">{{ scat.format_discount(item) }}</p>
+            </div>
+          {% endif %}
         </div>
         <div class="level-item has-text-centered">
           <div>
