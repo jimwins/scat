@@ -1,3 +1,18 @@
+{% import _self as scat %}
 {% macro amount(d) %}
   {{ d < 0 ? '(' }}${{ d | abs | number_format(2, '.', ',') }}{{ d < 0 ? ')' }}
+{% endmacro %}
+{% macro format_discount(item) %}
+  {% if item.discount_type == 'percentage' %}
+    {{ item.discount|number_format(2) }}%
+  {% endif %}
+  {% if item.discount_type == 'additional_percentage' %}
+    +{{ item.discount|number_format(2) }}%
+  {% endif %}
+  {% if item.discount_type == 'relative' %}
+    -{{ scat.amount(item.discount) }}
+  {% endif %}
+  {% if item.discount_type == 'fixed' %}
+    {{ scat.amount(item.discount) }}
+  {% endif %}
 {% endmacro %}

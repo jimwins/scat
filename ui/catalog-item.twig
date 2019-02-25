@@ -1,3 +1,4 @@
+{% import 'macros.twig' as scat %}
 <div class="modal is-active">
   <div class="modal-background"></div>
   <div class="modal-card">
@@ -8,7 +9,26 @@
       <a class="delete" aria-label="close" href="./"></a>
     </header>
     <section class="modal-card-body">
-      Content.
+      <div class="level">
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">List Price</p>
+            <p class="title">{{ scat.amount(item.retail_price) }}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Discount</p>
+            <p class="title">{{ scat.format_discount(item) }}</p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">Sale Price</p>
+            <p class="title">{{ scat.amount(item.sale_price) }}</p>
+          </div>
+        </div>
+      </div>
     </section>
     <footer class="modal-card-foot">
       <a href="./" class="button">Close</a>
