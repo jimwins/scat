@@ -73,6 +73,8 @@ function txn_load($db, $id) {
     or die_query($db, $q);
 
   $txn= $r->fetch_assoc();
+  $txn['taxed']= (float)$txn['taxed'];
+  $txn['untaxed']= (float)$txn['untaxed'];
   $txn['subtotal']= (float)$txn['subtotal'];
   $txn['total']= (float)$txn['total'];
   $txn['total_paid']= (float)$txn['total_paid'];
