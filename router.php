@@ -196,7 +196,14 @@ $app->group('/catalog', function (Slim\App $app) {
                 throw new \Slim\Exception\NotFoundException($req, $res);
 
               $products= $subdept ?
-                $subdept->products()->order_by_asc('name')->find_many():null;
+                $subdept->products()
+                        ->select('product.*')
+                        ->left_outer_join('brand',
+                                          array('product.brand_id', '=',
+                                                 'brand.id'))
+                        ->order_by_asc('brand.name')
+                        ->order_by_asc('product.name')
+                        ->find_many():null;
 
               $product= $args['product'] ?
                 $subdept->products()
