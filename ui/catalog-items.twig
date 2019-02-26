@@ -6,10 +6,11 @@
     <thead>
       <th>Item No.</th>
       <th>Description</th>
-      <th class="has-text-right">List</th>
-      <th class="has-text-right">Sale</th>
+      <th class="has-text-centered">List</th>
+      <th class="has-text-centered">Sale</th>
       <th class="has-text-centered">Stock</th>
       <th class="has-text-centered">Minimum</th>
+      <th>&nbsp;</th>
     </thead>
     <tbody>
 {% endmacro %}
@@ -40,8 +41,6 @@
   <tr class="{{ (item and item.id == i.id) ? 'is-selected' }}">
     <td>
       <a href="{{ product ? product.slug ~ '/' ~ i.code : i.full_slug }}">{{ i.code }}</a>
-      {# TODO get rid of this #}
-      <a href="/item.php?id={{ i.id }}"><span class="icon is-small"><i data-feather="edit" width="1rem" height="1rem"></i></span></a>
     </td>
     <td>{{ variations|length ? (i.short_name ?: i.name) : i.name }}</td>
     <td class="has-text-right">{{ scat.amount(i.retail_price) }}</td>
@@ -54,6 +53,10 @@
     </td>
     <td class="has-text-centered">{{ i.stock }}</td>
     <td class="has-text-centered">{{ i.minimum_quantity }}</td>
+    <td>
+      {# TODO get rid of this #}
+      <a href="/item.php?id={{ i.id }}"><span class="icon is-small"><i data-feather="edit" width="1rem" height="1rem"></i></span></a>
+    </td>
   </tr>
 {% endfor %}
 {{ s.end_table() }}
