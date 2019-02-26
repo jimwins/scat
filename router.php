@@ -219,10 +219,12 @@ $app->group('/catalog', function (Slim\App $app) {
                         ->order_by_asc('code')
                         ->find_many():null;
 
-              $variations= array_unique(
-                array_map(function ($i) {
-                  return $i->variation;
-                }, $items));
+              if ($items) {
+                $variations= array_unique(
+                  array_map(function ($i) {
+                    return $i->variation;
+                  }, $items));
+              }
 
               $item= $args['item'] ?
                 $product->items()
