@@ -898,16 +898,16 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
               <span data-bind="text: person.points_pending()"></span>
               = <span data-bind="text: person.points_available() + person.points_pending()"></span>
             </span>
-            <span data-bind="if: txn.due() > 0 && txn.subtotal()">
+            <span data-bind="if: txn.due() > 0 && txn.taxed() > 0">
               <span data-bind="if: loyaltyPointsUsed()">
                 - <i class="fa fa-star"></i>
                 <span data-bind="text: loyaltyPointsUsed()"></span>
               </span>
               <span data-bind="if: !txn.no_rewards()">
                 + <i class="far fa-star"></i>
-                <span data-bind="text: <?=defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1?> * Math.max(1, Math.floor(txn.subtotal()))"></span>
+                <span data-bind="text: <?=defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1?> * Math.max(1, Math.floor(txn.taxed()))"></span>
               </span>
-              = <span data-bind="text: person.points_available() + person.points_pending() + (txn.no_rewards() ? 0 : <?=defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1?> * Math.max(1, Math.floor(txn.subtotal()))) - loyaltyPointsUsed()"></span>
+              = <span data-bind="text: person.points_available() + person.points_pending() + (txn.no_rewards() ? 0 : <?=defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1?> * Math.max(1, Math.floor(txn.taxed()))) - loyaltyPointsUsed()"></span>
             </span>
           </span>
           <a data-bind="if: person.id(), click: removePerson">
@@ -929,7 +929,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
   <table class="table table-condensed" style="width: 95%">
     <tbody data-bind="foreach: person.rewards">
       <tr data-bind="css: { stocked: $data.retail_price() +
-                                     $root.txn.subtotal() > 0.00 },
+                                     $root.txn.taxed() > 0.00 },
                      click: function (data) { Txn.addItem(Txn.id(), data) }">
         <td data-bind="text: $data.name">Reward Name</td>
         <td align="right"><span data-bind="text: $data.cost">#</span> pts</td>

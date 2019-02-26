@@ -473,9 +473,9 @@ class Transaction {
       return;
 
     // Award new points
-    $points= (int)$this->subtotal *
+    $points= (int)$this->taxed *
               (defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1);
-    if ($points == 0 && $this->subtotal > 0) $points= 1;
+    if ($points == 0 && $this->taxed > 0) $points= 1;
 
     $q= "INSERT INTO loyalty
             SET txn_id= {$this->id},
