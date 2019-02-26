@@ -10,7 +10,9 @@
         {{ brand.name }}
       </a>
     </h2>
-    {{ product.description | markdown }}
+    <div class="content">
+      {{ product.description | markdown }}
+    </div>
   </div>
   <div class="column is-one-quarter">
     <figure class="image is-square">
