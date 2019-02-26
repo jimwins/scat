@@ -53,7 +53,16 @@
     </td>
     <td class="has-text-centered">{{ i.stock }}</td>
     <td class="has-text-centered">{{ i.minimum_quantity }}</td>
-    <td>
+    <td class="has-text-right">
+      {% if i.prop65 %}
+        <span class="icon is-small" title="WARNING: This product can expose you to chemicals which are known to the state of California to cause cancer and/or to cause birth defects or other reproductive harm."><img src="//rawmaterials.b-cdn.net/msds/warning.svg" width="20" alt="WARNING"></span>
+      {% endif %}
+      {% if i.hazmat %}
+        <span class="icon is-small" title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="//rawmaterials.b-cdn.net/msds/dot-limited-quantity-surface.svg" width="20" alt="Hazardous Materials"></span>
+      {% endif %}
+      {% if i.oversized %}
+        <span class="icon is-small" title="Oversized item: special shipping is required, and there will be additional costs."><i data-feather="truck" width="1rem" height="1rem" ></i></span>
+      {% endif %}
       {# TODO get rid of this #}
       <a href="/item.php?id={{ i.id }}"><span class="icon is-small"><i data-feather="edit" width="1rem" height="1rem"></i></span></a>
     </td>
