@@ -4,7 +4,7 @@ require 'lib/item.php';
 
 $sql_criteria= "1=1";
 if (($items= $_REQUEST['items'])) {
-  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'], 0);
+  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'], FIND_LIMITED);
 }
 
 $vendor= (int)$_REQUEST['vendor'];

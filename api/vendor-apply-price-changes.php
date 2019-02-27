@@ -9,7 +9,7 @@ if (!$vendor)
 $sql_criteria= "1=1";
 $items= $_REQUEST['items'];
 if (!empty($items)) {
-  list($sql_criteria, $x)= item_terms_to_sql($db, $items, FIND_OR);
+  list($sql_criteria, $x)= item_terms_to_sql($db, $items, FIND_LIMITED);
 }
 
 $q= "UPDATE item, vendor_item
