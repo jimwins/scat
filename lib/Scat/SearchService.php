@@ -37,7 +37,9 @@ class SearchService
                                                      array('barcode.item', '=',
                                                            'item.id'))
                                    ->where_raw($v->where_clause())
-                                   ->where_gte('item.active', 1)
+                                   ->where_gte('item.active',
+                                               $v->force_all ? 0 : 1)
+                                   ->where_not_equal('item.deleted', 1)
                                    ->order_by_asc('code')
                                    ->find_many();
 

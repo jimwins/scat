@@ -14,6 +14,7 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
 {
   private $terms= [];
   private $current;
+  public $force_all;
 
   public function __construct()
   {
@@ -28,14 +29,14 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     // We just ignore AND, it's noise
     if ($word->getWord() != 'AND') {
       $term= addslashes($word->getWord());
-      $this->current[]= "(item.name LIKE '%$term%' OR brand.name LIKE '%$term%' OR item.code LIKE '%$term%' OR barcode.code LIKE '%$term%')";
+      $this->current[]= "(item.name LIKE '%$term%' OR (brand.name IS NOT NULL AND brand.name LIKE '%$term%') OR item.code LIKE '%$term%' OR (barcode.code IS NOT NULL AND barcode.code LIKE '%$term%'))";
     }
   }
 
   public function visitText(Text $text)
   {
     $term= addslashes($text->getText());
-    $this->current[]= "(item.name LIKE '%$term%' OR brand.name LIKE '%$term%' OR item.code LIKE '%$term%' OR barcode.code LIKE '%$term%')";
+      $this->current[]= "(item.name LIKE '%$term%' OR (brand.name IS NOT NULL AND brand.name LIKE '%$term%') OR item.code LIKE '%$term%' OR (barcode.code IS NOT NULL AND barcode.code LIKE '%$term%'))";
   }
 
   public function visitExplicitTerm(ExplicitTerm $term)
@@ -44,6 +45,10 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     $value= $term->getTerm()->getToken();
     /* TODO handle different terms here */
     switch ($name) {
+    case 'active':
+      $this->current[]= (bool)$value ? "(item.active)" : "(NOT item.active)";
+      $this->force_all= true;
+      break;
     case 'code':
       $this->current[]= "(item.code LIKE '$value%')";
       break;
