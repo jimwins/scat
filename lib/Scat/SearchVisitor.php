@@ -29,6 +29,13 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     // We just ignore AND, it's noise
     if ($word->getWord() != 'AND') {
       $term= addslashes($word->getWord());
+
+      /* Special case: generated UPC codes */
+      if (preg_match('/^400400(\d+)\d$/i', $term, $dbt)) {
+        $this->current[]= "(item.id = '{$dbt[1]}')";
+        return;
+      }
+
       $this->current[]= "(item.name LIKE '%$term%' OR (brand.name IS NOT NULL AND brand.name LIKE '%$term%') OR item.code LIKE '%$term%' OR (barcode.code IS NOT NULL AND barcode.code LIKE '%$term%'))";
     }
   }
