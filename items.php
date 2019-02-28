@@ -161,18 +161,13 @@ if (!$search) {
   goto end;
 }
 
-$begin= false;
-
 $options= 0;
 if ($_REQUEST['all'])
   $options|= FIND_ALL;
 
-list($sql_criteria, $begin) = item_terms_to_sql($db, $search, $options);
+list($sql_criteria, $x) = item_terms_to_sql($db, $search, $options);
 
 $extra= "";
-if (!$begin) {
-  $begin= date("Y-m-d", time() - 90*24*3600);
-}
 if (!$_REQUEST['all'])
   $criteria[]= "(item.active AND NOT item.deleted)";
 

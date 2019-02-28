@@ -1,14 +1,12 @@
 <?php
 define('FIND_ALL', 1);
 define('FIND_OR', 2);
-define('FIND_SALES', 4);
 define('FIND_LIMITED', 8);
 define('FIND_RANDOM', 16);
 
 function item_terms_to_sql($db, $q, $options) {
   $andor= array();
   $not= array();
-  $begin= false;
 
   $terms= preg_split('/\s+/', $q);
   foreach ($terms as $term) {
@@ -27,8 +25,6 @@ function item_terms_to_sql($db, $q, $options) {
       }
     } elseif (preg_match('/^product:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.product_id = '{$dbt[1]}')";
-    } elseif (preg_match('/^begin:([-0-9]+)/i', $term, $dbt)) {
-      $begin= $dbt[1];
     } elseif (preg_match('/^-(.+)/i', $term, $dbt)) {
       $not[]= "(item.code NOT LIKE '{$dbt[1]}%')";
     } elseif (preg_match('/^name:(.+)/i', $term, $dbt)) {
@@ -97,23 +93,13 @@ function item_terms_to_sql($db, $q, $options) {
   if (!($options & FIND_ALL))
     $sql_criteria= "($sql_criteria) AND (item.active AND NOT item.deleted)";
 
-  return array($sql_criteria, $begin);
+  return array($sql_criteria, false);
 }
 
 function item_find($db, $q, $options) {
-  list($sql_criteria, $begin) = item_terms_to_sql($db, $q, $options);
+  list($sql_criteria, $x) = item_terms_to_sql($db, $q, $options);
 
   $extra= "";
-  if (!$begin) {
-    $begin= date("Y-m-d", time() - 7*24*3600);
-  }
-  if ($options & FIND_SALES) {
-    $extra= "(SELECT SUM(allocated) * -1
-                FROM txn_line JOIN txn ON txn.id = txn_line.txn
-               WHERE txn_line.item = item.id
-                 AND type = 'customer'
-                 AND filled >= '$begin') sold,";
-  }
   $order_by= "!(stock > 0), item.code"; /* First items in stock, then by code */
   $limit= "";
   if ($options & FIND_RANDOM) {
