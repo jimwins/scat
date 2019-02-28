@@ -168,8 +168,6 @@ if ($_REQUEST['all'])
 list($sql_criteria, $x) = item_terms_to_sql($db, $search, $options);
 
 $extra= "";
-if (!$_REQUEST['all'])
-  $criteria[]= "(item.active AND NOT item.deleted)";
 
 $q= "SELECT
             item.id AS meta,
