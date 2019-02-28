@@ -56,6 +56,9 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
       $this->current[]= (bool)$value ? "(item.active)" : "(NOT item.active)";
       $this->force_all= true;
       break;
+    case 'barcode':
+      $this->current[]= "(barcode.code IS NOT NULL AND barcode.code = '$value')";
+      break;
     case 'code':
       $this->current[]= "(item.code LIKE '$value%')";
       break;
