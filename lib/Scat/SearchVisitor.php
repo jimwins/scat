@@ -83,11 +83,34 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     case 'min':
       $this->current[]= "(item.minimum_quantity = '$value')";
       break;
+    case 'stocked':
+      $this->current[]= (bool)$value ? "(item.minimum_quantity)" :
+                                       "(NOT item.minimum_quantity)";
+      break;
     case 're':
       $this->current[]= "(item.code RLIKE '$value')";
       break;
-    default:
+    case 'vendor':
+      $vendor= (int)$value;
+      $this->current[]= $vendor ? "(EXISTS (SELECT id
+                                              FROM vendor_item
+                                             WHERE item = item.id
+                                               AND vendor = $vendor
+                                               AND vendor_item.active))"
+                                : "(NOT EXISTS (SELECT id
+                                                  FROM vendor_item
+                                                 WHERE item = item.id
+                                                   AND vendor_item.active))";
+      break;
+    case 'purchase_quantity':
+    case 'reviewed':
+    case 'prop65':
+    case 'hazmat':
+    case 'oversized':
       $this->current[]= "(item.$name = '$value')";
+      break;
+    default:
+      throw new \Exception("Don't know how to handle '$name'");
     }
   }
 
