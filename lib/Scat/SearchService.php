@@ -40,7 +40,8 @@ class SearchService
                                    ->where_gte('item.active',
                                                $v->force_all ? 0 : 1)
                                    ->where_not_equal('item.deleted', 1)
-                                   ->order_by_asc('code')
+                                   ->group_by('item.id')
+                                   ->order_by_asc('item.code')
                                    ->find_many();
 
     return $items;
