@@ -1189,12 +1189,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jimwins/Lukas.git",
-                "reference": "3cb685a5a552f6b3acfa889faecc60032407862e"
+                "reference": "4d9be8b7f573318fe979de2b25c73a1b797443b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jimwins/Lukas/zipball/3cb685a5a552f6b3acfa889faecc60032407862e",
-                "reference": "3cb685a5a552f6b3acfa889faecc60032407862e",
+                "url": "https://api.github.com/repos/jimwins/Lukas/zipball/4d9be8b7f573318fe979de2b25c73a1b797443b8",
+                "reference": "4d9be8b7f573318fe979de2b25c73a1b797443b8",
                 "shasum": ""
             },
             "require": {
@@ -1231,7 +1231,7 @@
             "support": {
                 "source": "https://github.com/jimwins/Lukas/tree/master"
             },
-            "time": "2016-05-02T06:32:59+00:00"
+            "time": "2019-03-02T02:42:20+00:00"
         },
         {
             "name": "paragonie/random_compat",
