@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "19332be453d66e06a6ddd7e3ca577b84",
+    "content-hash": "e3d16e68286167f336e40d7cf2bd138d",
     "packages": [
         {
             "name": "aptoma/twig-markdown",
@@ -1188,13 +1188,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/vojtabiberle/Lukas.git",
-                "reference": "54ec865dde6a902f51fc70acd711386e6f4a5098"
+                "url": "https://github.com/jimwins/Lukas.git",
+                "reference": "3cb685a5a552f6b3acfa889faecc60032407862e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vojtabiberle/Lukas/zipball/54ec865dde6a902f51fc70acd711386e6f4a5098",
-                "reference": "54ec865dde6a902f51fc70acd711386e6f4a5098",
+                "url": "https://api.github.com/repos/jimwins/Lukas/zipball/3cb685a5a552f6b3acfa889faecc60032407862e",
+                "reference": "3cb685a5a552f6b3acfa889faecc60032407862e",
                 "shasum": ""
             },
             "require": {
@@ -1229,9 +1229,9 @@
                 "search"
             ],
             "support": {
-                "source": "https://github.com/vojtabiberle/Lukas/tree/master"
+                "source": "https://github.com/jimwins/Lukas/tree/master"
             },
-            "time": "2016-02-11T13:37:54+00:00"
+            "time": "2016-05-02T06:32:59+00:00"
         },
         {
             "name": "paragonie/random_compat",
