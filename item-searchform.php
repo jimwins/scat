@@ -6,7 +6,8 @@
     <input type="search" class="autofocus form-control" size="60"
            id="search" name="search" data-bind="value: search"
            placeholder="Enter keywords or scan barcode"
-           autocorrect="off" autocapitalize="off"
+           autocomplete="off" autocorrect="off" autocapitalize="off"
+           spellcheck="false"
            value="<?=ashtml($search)?>">
     <span class="input-group-addon checkbox">
       <label>

@@ -529,6 +529,7 @@ $("#txn-load").submit(function(ev) {
     <input type="text" class="form-control autofocus"
            name="q"
            autocomplete="off" autocorrect="off" autocapitalize="off"
+           spellcheck="false"
            placeholder="Scan item or enter search terms"
            value="" size="200">
     <span class="input-group-btn">
