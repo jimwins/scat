@@ -288,6 +288,8 @@ CREATE TABLE `person` (
   `sms_ok` tinyint(1) DEFAULT '0',
   `email_ok` tinyint(1) DEFAULT '0',
   `birthday` date DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `instagram` varchar(255) DEFAULT NULL,
   `notes` longtext,
   `tax_id` varchar(255) DEFAULT NULL,
   `payment_account_id` varchar(50) DEFAULT NULL,

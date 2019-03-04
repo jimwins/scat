@@ -32,6 +32,7 @@ function person_find($db, $q, $options= null) {
               tax_id, payment_account_id,
               vendor_rebate,
               birthday, notes,
+              url, instagram,
               active, deleted,
               suppress_loyalty,
               IF(suppress_loyalty, 0, 
