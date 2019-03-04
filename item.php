@@ -564,7 +564,11 @@ $vendor_items= item_load_vendor_items($db, $id);
           <i class="fa fa-unlink"></i>
         </button>
       </td>
-      <td data-bind="text: $data.vendor_name"></td>
+      <td>
+        <a data-bind="attr: { href : $data.url }" target="_blank">
+          <span data-bind="text: $data.vendor_name"></span>
+        </a>
+      </td>
       <td data-bind="text: $data.code"></td>
       <td data-bind="text: amount($data.retail_price())"></td>
       <td data-bind="text: amount($data.net_price())"></td>

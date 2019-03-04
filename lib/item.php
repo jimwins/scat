@@ -184,7 +184,8 @@ function item_load($db, $id) {
 }
 
 function item_load_vendor_items($db, $id) {
-  $q= "SELECT vendor_item.id, vendor_item.item, vendor, company vendor_name,
+  $q= "SELECT vendor_item.id, vendor_item.item, vendor,
+              company vendor_name, url,
               code, vendor_sku, vendor_item.name,
               retail_price, net_price, promo_price,
               special_order,
