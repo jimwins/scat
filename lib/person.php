@@ -8,8 +8,9 @@ function person_find($db, $q, $options= null) {
 
   $terms= preg_split('/\s+/', trim($q));
   foreach ($terms as $term) {
-    if (preg_match('/id:(\d+)/', $term, $m)) {
-      $criteria[]= "(person.id = $m[1])";
+    if (preg_match('/id:(\d*)/', $term, $m)) {
+      $id= (int)$m[1];
+      $criteria[]= "(person.id = $id)";
       $options |= PERSON_FIND_ALL;
     } else if (preg_match('/role:(.+)/', $term, $m)) {
       $role= $db->escape($m[1]);
