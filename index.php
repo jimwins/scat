@@ -1107,6 +1107,8 @@ var model= {
     loyalty_number: '',
     pretty_phone: '',
     notes: '',
+    url: '',
+    instagram: '',
     points_available: 0,
     points_pending: 0,
     suppress_loyalty: 0,
@@ -1266,6 +1268,8 @@ viewModel.changePerson= function(data, event) {
         company: '',
         email: s.match(/@/) ? s : '',
         phone: !s.match(/[^-\d() ]/) ? s : '',
+        url: '',
+        instagram: '',
         address: '',
         tax_id: '',
       };
