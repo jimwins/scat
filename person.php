@@ -105,6 +105,22 @@ if ($id && !$person) {
     </div>
   </div>
   <div class="form-group">
+    <label for="instagram" class="col-sm-2 control-label">Instagram</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="instagram"
+             placeholder="rawmaterialsartsupplies"
+             data-bind="value: person.instagram">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="url" class="col-sm-2 control-label">URL</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="url"
+             placeholder="http://www.example.com/"
+             data-bind="value: person.url">
+    </div>
+  </div>
+  <div class="form-group">
     <label for="address" class="col-sm-2 control-label">Address</label>
     <div class="col-sm-8">
       <textarea class="form-control" id="address" placeholder="Address"
