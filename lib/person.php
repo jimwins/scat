@@ -12,6 +12,8 @@ function person_find($db, $q, $options= null) {
     } else if (preg_match('/role:(.+)/', $term, $m)) {
       $role= $db->escape($m[1]);
       $criteria[]= "(person.role = '$role')";
+    } elseif (preg_match('/^active:(.+)/i', $term, $dbt)) {
+      $criteria[]= $dbt[1] ? "(person.active)" : "(NOT person.active)";
     } else {
       $term= $db->escape($term);
       $criteria[]= "(person.name LIKE '%$term%'

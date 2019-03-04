@@ -6,14 +6,16 @@ $search= $_REQUEST['search'];
 
 $people= array();
 
-if (!empty($search)) {
-  $people= person_find($db, $search);
+if (empty($search)) {
+  $search="role:vendor active:1";
+}
 
-  /* If only one person matches, redirect to that */
-  if (count($people) == 1) {
-    header("Location: person.php?id=" . $people[0]['id'] . '&search=' . urlencode($search));
-    exit;
-  }
+$people= person_find($db, $search);
+
+/* If only one person matches, redirect to that */
+if (count($people) == 1) {
+  header("Location: person.php?id=" . $people[0]['id'] . '&search=' . urlencode($search));
+  exit;
 }
 
 head("People @ Scat", true);
@@ -32,7 +34,7 @@ include 'ui/person-search.html';
  </thead>
  <tbody data-bind="foreach: people">
   <tr data-bind="click: function(d, e) { window.location.href= 'person.php?id=' + $data.id() }" style="cursor: pointer">
-   <td data-bind="text: $index() + 1"></td>
+   <td class="num" data-bind="text: $index() + 1"></td>
    <td data-bind="text: $data.name"></td>
    <td data-bind="text: $data.company"></td>
    <td data-bind="text: $data.pretty_phone"></td>
