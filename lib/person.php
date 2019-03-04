@@ -30,7 +30,7 @@ function person_find($db, $q, $options= null) {
   }
 
   if (!($options & PERSON_FIND_ALL)) {
-    $criteria[]= array("person.active AND NOT person.deleted");
+    $criteria[]= "person.active AND NOT person.deleted";
   }
 
   $sql_criteria= join(' AND ', $criteria);
