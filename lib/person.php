@@ -1,19 +1,22 @@
 <?
 
 define('PERSON_FIND_EMPTY', 1);
+define('PERSON_FIND_ALL', 2);
 
 function person_find($db, $q, $options= null) {
-  $criteria= array("person.active AND NOT person.deleted");
+  $criteria= [];
 
   $terms= preg_split('/\s+/', trim($q));
   foreach ($terms as $term) {
     if (preg_match('/id:(\d+)/', $term, $m)) {
       $criteria[]= "(person.id = $m[1])";
+      $options |= PERSON_FIND_ALL;
     } else if (preg_match('/role:(.+)/', $term, $m)) {
       $role= $db->escape($m[1]);
       $criteria[]= "(person.role = '$role')";
     } elseif (preg_match('/^active:(.+)/i', $term, $dbt)) {
       $criteria[]= $dbt[1] ? "(person.active)" : "(NOT person.active)";
+      $options |= PERSON_FIND_ALL;
     } else {
       $term= $db->escape($term);
       $criteria[]= "(person.name LIKE '%$term%'
@@ -23,6 +26,10 @@ function person_find($db, $q, $options= null) {
                  OR person.phone LIKE '%$term%'
                  OR person.notes LIKE '%$term%')";
     }
+  }
+
+  if (!($options & PERSON_FIND_ALL)) {
+    $criteria[]= array("person.active AND NOT person.deleted");
   }
 
   $sql_criteria= join(' AND ', $criteria);
@@ -65,6 +72,7 @@ function person_find($db, $q, $options= null) {
     $person['suppress_loyalty']= (int)$person['suppress_loyalty'];
     $person['rewards']= available_loyalty_items($db,
                                                 $person['points_available']);
+    $person['active']= (int)$person['active'];
     $people[]= $person;
   }
 

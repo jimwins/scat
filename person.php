@@ -21,7 +21,14 @@ if ($id && !$person) {
 <form class="form-horizontal" role="form"
       data-bind="submit: savePerson">
   <div class="form-group">
-    <label for="name" class="col-sm-2 control-label">Name</label>
+    <label for="name" class="col-sm-2 control-label">
+      <a data-bind="click: toggleActive">
+        <i class="far"
+           data-bind="css: { 'fa-check-square' : person.active(),
+                             'fa-square' : !person.active() }"></i>
+      </a>
+      Name
+    </label>
     <div class="col-sm-8">
       <input type="text" class="form-control" id="name" placeholder="Name"
              data-bind="value: person.name">
@@ -453,6 +460,14 @@ function loadPerson(person) {
 function savePerson(place) {
   Scat.api(viewModel.person.id() ? 'person-update' : 'person-add',
            ko.mapping.toJS(viewModel.person))
+      .done(function (data) {
+              loadPerson(data.person);
+            });
+}
+
+function toggleActive(place) {
+  Scat.api(this.person.id() ? 'person-update' : 'person-add',
+           { id: this.person.id(), active: this.person.active() ? 0 : 1 })
       .done(function (data) {
               loadPerson(data.person);
             });
