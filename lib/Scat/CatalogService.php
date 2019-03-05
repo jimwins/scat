@@ -26,4 +26,9 @@ class CatalogService
   public function getDepartmentBySlug($slug) {
     return \Model::factory('Department')->where('slug', $slug)->find_one();
   }
+
+  public function GetRedirectFrom($source) {
+    $dst=\Model::factory('Redirect')->where_like('source', $source)->find_one();
+    return $dst;
+  }
 }
