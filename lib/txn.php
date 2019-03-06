@@ -91,6 +91,7 @@ function txn_load_items($db, $id) {
                     FROM vendor_item
                    WHERE vendor = txn.person
                      AND vendor_item.item = txn_line.item
+                     AND vendor_item.active
                    ORDER BY vendor_item.purchase_quantity <= txn_line.ordered
                    LIMIT 1),
                  NULL) vendor_sku,
