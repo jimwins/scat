@@ -113,16 +113,17 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 } elseif (preg_match('/C2F Pricer/', $line)) {
   // C2F Pricer
   $sep= preg_match("/\t/", $line) ? "\t" : ",";
-  # Prefix,Prices Subject to Change,Descrip,Unitstock,Mult,Status,UPC/EAN,Retail,Disc,Net,CatDescription,Effectdt,NewRetail,NewNet
+  # Prefix,Prod,Unitstock,Descrip,Mult,Status,UPC,EAN,Retail,Net,CatDescription,Efectdt,NewRetail,NewNet
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE vendor_upload
           FIELDS TERMINATED BY '$sep'
           OPTIONALLY ENCLOSED BY '\"'
-          IGNORE 3 LINES
-          (@prefix, code, name, @uom, purchase_quantity,
-           @status, barcode, @msrp, @disc, @net, @category,
+          IGNORE 2 LINES
+          (@prefix, code, @uom, name, purchase_quantity,
+           @status, @upc, @ean, @msrp, @disc, @net, @category,
            @effectdt, @newretail, @newnet)
         SET vendor_sku = code,
+            barcode = IF(upc, upc, ean),
             retail_price = REPLACE(REPLACE(@msrp, ',', ''), '$', ''),
             net_price = REPLACE(REPLACE(@net, ',', ''), '$', '')";
 
