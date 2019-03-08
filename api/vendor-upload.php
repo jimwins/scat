@@ -123,7 +123,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            @status, @upc, @ean, @msrp, @disc, @net, @category,
            @effectdt, @newretail, @newnet)
         SET vendor_sku = code,
-            barcode = IF(upc, upc, ean),
+            barcode = IF(@upc, @upc, @ean),
             retail_price = REPLACE(REPLACE(@msrp, ',', ''), '$', ''),
             net_price = REPLACE(REPLACE(@net, ',', ''), '$', '')";
 
