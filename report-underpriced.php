@@ -4,8 +4,7 @@ require 'lib/item.php';
 
 $sql_criteria= "1=1";
 if (($items= $_REQUEST['items'])) {
-  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'],
-                                             FIND_OR|FIND_ALL);
+  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items']);
 }
 
 $minimum= (float)$_REQUEST['minimum'];
