@@ -90,6 +90,9 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     case 'discount':
       $this->current[]= "(item.discount = '$value')";
       break;
+    case 'discount_type':
+      $this->current[]= "(item.discount_type = '$value')";
+      break;
     case 'min':
       $this->current[]= "(item.minimum_quantity = '$value')";
       break;
