@@ -93,6 +93,9 @@ if (isset($_REQUEST['discount']) && $_REQUEST['discount'] !== '') {
   } elseif (preg_match('/^\$?(\d*\.?\d*)( off)?$/', $discount, $m)) {
     $discount = (float)$m[1];
     $discount_type = "'relative'";
+  } elseif (preg_match('/^-\$?(\d*\.?\d*)$/', $discount, $m)) {
+    $discount = (float)$m[1];
+    $discount_type = "'relative'";
   } elseif (preg_match('/^(def|\.\.\.)$/', $discount)) {
     $discount = 'NULL';
     $discount_type = 'NULL';
