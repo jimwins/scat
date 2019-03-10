@@ -7,9 +7,11 @@
 {% block content %}
 
 <div class="columns">
-  <div class="column is-one-quarter">
-    {% include 'catalog-sidebar.twig' %}
-  </div>
+  {% block catalog_sidebar %}
+    <div class="column is-one-quarter">
+      {% include 'catalog-sidebar.twig' %}
+    </div>
+  {% endblock %}
 
   <div class="column">
     {% include 'catalog-searchform.twig' %}
