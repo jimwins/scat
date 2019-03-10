@@ -23,6 +23,14 @@ if (!$search)
 
 $items= item_find($db, $search, $_REQUEST['all'] ? FIND_ALL : 0);
 
+/*
+  Fallback: if we found nothing, try searching for an exact match on the
+  barcode to catch items inadvertantly set inactive.
+*/
+if (count($items) == 0) {
+  $items= item_find($db, "barcode:\"$search\"", FIND_ALL);
+}
+
 /* if it is just one item, go ahead and add it to the invoice */
 if (count($items) == 1) {
   if (!$txn_id) {
