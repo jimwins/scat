@@ -5,13 +5,13 @@
 {% macro format_discount(item) %}
   {% import _self as scat %}
   {% if item.discount_type == 'percentage' %}
-    {{ item.discount|number_format(2) }}%
+    {{ item.discount|number_format(0) }}% off
   {% endif %}
   {% if item.discount_type == 'additional_percentage' %}
-    +{{ item.discount|number_format(2) }}%
+    +{{ item.discount|number_format(0) }}% off
   {% endif %}
   {% if item.discount_type == 'relative' %}
-    -{{ scat.amount(item.discount) }}
+    {{ scat.amount(item.discount) }} off
   {% endif %}
   {% if item.discount_type == 'fixed' %}
     {{ scat.amount(item.discount) }}
