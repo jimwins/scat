@@ -5,6 +5,20 @@ define('FIND_LIMITED', 8);
 define('FIND_RANDOM', 16);
 
 function item_terms_to_sql($db, $q, $options) {
+if ($GLOBALS['DEBUG']) {
+  $scanner= new \OE\Lukas\Parser\QueryScanner();
+  $parser= new \OE\Lukas\Parser\QueryParser($scanner);
+  $parser->readString($q);
+  $query= $parser->parse();
+
+  $v= new \Scat\SearchVisitor();
+  $query->accept($v);
+
+  return [ '(' . $v->where_clause() . ')' .
+           (($v->force_all || ($options & FIND_ALL)) ? '' :
+            ' AND (item.active AND NOT item.deleted)'),
+           false ];
+} else {
   $andor= array();
   $not= array();
 
@@ -96,6 +110,7 @@ function item_terms_to_sql($db, $q, $options) {
     $sql_criteria= "($sql_criteria) AND (item.active AND NOT item.deleted)";
 
   return array($sql_criteria, false);
+}
 }
 
 function item_find($db, $q, $options) {
