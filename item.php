@@ -563,6 +563,12 @@ $vendor_items= item_load_vendor_items($db, $id);
                 data-bind="click: $parent.detachVendorItem">
           <i class="fa fa-unlink"></i>
         </button>
+        <span data-bind="if: $data.vendor() == 7">
+          <button type="button" class="btn btn-default btn-xs"
+                  data-bind="click: $parent.checkMacStock">
+            <i class="fa fa-search"></i>
+          </button>
+        </span>
       </td>
       <td>
         <a data-bind="attr: { href : $data.url }" target="_blank">
@@ -825,6 +831,13 @@ itemModel.detachVendorItem= function(item) {
         itemModel.vendor_items.remove(function (item) {
            return item.id() == data.vendor_item.id;
         });
+      });
+}
+
+itemModel.checkMacStock= function(item) {
+  Scat.api('check-mac-stock', { code: item.code })
+      .done(function (data) {
+        alert("" + data.status.Reno + " in Reno, " + data.status.Atlanta + " in Atlanta");
       });
 }
 
