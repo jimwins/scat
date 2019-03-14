@@ -202,7 +202,7 @@ include 'item-searchform.php';
           </label>
           <div class="col-sm-4">
             <p class="form-control-static" id="inventoried"
-               data-bind="text: moment(item.inventoried()).calendar()"></p>
+               data-bind="text: item.inventoried() ? moment(item.inventoried()).calendar() : 'Not yet'"></p>
           </div>
         </div>
       </div>
