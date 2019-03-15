@@ -62,7 +62,7 @@ function check_sls_stock($code) {
 
   $res= $client->request('POST', $url,
                          [
-                         'debug' => true,
+                         //'debug' => true,
                            'cookies' => $jar,
                            'form_params' => [
                              'level1' => '',
