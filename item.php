@@ -563,9 +563,9 @@ $vendor_items= item_load_vendor_items($db, $id);
                 data-bind="click: $parent.detachVendorItem">
           <i class="fa fa-unlink"></i>
         </button>
-        <span data-bind="if: $data.vendor() == 7">
+        <span data-bind="if: $data.vendor() == 7 || $data.vendor() == 3757">
           <button type="button" class="btn btn-default btn-xs"
-                  data-bind="click: $parent.checkMacStock">
+                  data-bind="click: $parent.checkVendorStock">
             <i class="fa fa-search"></i>
           </button>
         </span>
@@ -834,10 +834,14 @@ itemModel.detachVendorItem= function(item) {
       });
 }
 
-itemModel.checkMacStock= function(item) {
-  Scat.api('check-mac-stock', { code: item.code })
+itemModel.checkVendorStock= function(item) {
+  Scat.api('check-vendor-stock', { vendor: item.vendor, code: item.code })
       .done(function (data) {
-        alert("" + data.status.Reno + " in Reno, " + data.status.Atlanta + " in Atlanta");
+        message= "";
+        for (const [key, value] of Object.entries(data.status)) {
+          message+= `${value} in ${key}` + "\n";
+        }
+        alert(message);
       });
 }
 
