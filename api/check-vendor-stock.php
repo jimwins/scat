@@ -22,6 +22,7 @@ function check_mac_stock($code) {
   $url= 'https://www.macphersonart.com/cgi-bin/maclive/wam_tmpl/mac_cart.p';
 
   $client= new \GuzzleHttp\Client();
+  $client->setUserAgent(APP_NAME . '/' . VERSION, true);
   $jar= \GuzzleHttp\Cookie\CookieJar::fromArray(['liveWAMSession' => MAC_KEY],
                                                 parse_url($url, PHP_URL_HOST));
 
@@ -58,6 +59,7 @@ function check_sls_stock($code) {
   $url= 'https://www.slsarts.com/viewcarttop.asp';
 
   $client= new \GuzzleHttp\Client();
+  $client->setUserAgent(APP_NAME . '/' . VERSION, true);
   $jar= \GuzzleHttp\Cookie\CookieJar::fromArray(['ASPSESSIONIDAETTQDRC'
                                                    => SLS_KEY],
                                                 parse_url($url, PHP_URL_HOST));
@@ -113,6 +115,7 @@ function check_c2f_stock($code) {
   $url= 'https://www.c2f.com/exhtml/productdetail.asp';
 
   $client= new \GuzzleHttp\Client();
+  $client->setUserAgent(APP_NAME . '/' . VERSION, true);
   $jar= \GuzzleHttp\Cookie\CookieJar::fromArray(['ASPSESSIONIDSEBSDQTA'
                                                    => C2F_KEY,
                                                  'C2FDealerID'
