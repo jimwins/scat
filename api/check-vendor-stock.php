@@ -83,7 +83,7 @@ function check_sls_stock($code) {
   $url= 'https://www.slsarts.com/viewcarttop.asp';
   $res= $client->request('POST', $url,
                          [
-                         'debug' => true,
+                         //'debug' => true,
                            'cookies' => $jar,
                            'form_params' => [
                              'defwh' => 2,
