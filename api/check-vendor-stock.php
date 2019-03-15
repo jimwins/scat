@@ -55,16 +55,35 @@ function check_mac_stock($code) {
 }
 
 function check_sls_stock($code) {
-  $url= 'https://www.slsarts.com/viewcarttop.asp';
-
   $client= new \GuzzleHttp\Client();
-  $jar= \GuzzleHttp\Cookie\CookieJar::fromArray(['ASPSESSIONIDAETTQDRC'
-                                                   => SLS_KEY],
-                                                parse_url($url, PHP_URL_HOST));
+  $jar= new \GuzzleHttp\Cookie\CookieJar();
+
+  $url= 'https://www.slsarts.com/loginpage.asp';
 
   $res= $client->request('POST', $url,
                          [
-                         //'debug' => true,
+                         'debug' => true,
+                           'cookies' => $jar,
+                           'form_params' => [
+                             'level1' => '',
+                             'level2' => '',
+                             'level3' => '',
+                             'level4' => '',
+                             'level5' => '',
+                             'skuonly' => '',
+                             'txtfind' => '',
+                             'snum' => '',
+                             'skey' => '',
+                             'username' => SLS_USER,
+                             'password' => SLS_PASSWORD,
+                             'btnlogin' => 'Login'
+                           ]
+                         ]);
+
+  $url= 'https://www.slsarts.com/viewcarttop.asp';
+  $res= $client->request('POST', $url,
+                         [
+                         'debug' => true,
                            'cookies' => $jar,
                            'form_params' => [
                              'defwh' => 2,
