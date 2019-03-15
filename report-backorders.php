@@ -25,40 +25,59 @@ $r= $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 $txn= 0;
 ?>
-<table class="table table-striped">
- <thead>
-  <tr>
-   <th></th>
-   <th>Code</th>
-   <th>Name</th>
-   <th>Ordered</th>
-   <th>Received</th>
-  </tr>
- </thead>
- <tbody>
+<style type="text/css">
+table.collapse.in {
+   display: table;
+}
+</style>
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 <?
 while ($row= $r->fetch_assoc()) {
   if ($row['txn'] != $txn) {
+    if ($txn) {?>
+      </tbody>
+    </table>
+  </div>
+<?}
     $txn= $row['txn'];
 ?>
-  <tr class="active">
-    <td colspan="5">
-      <a href="./?id=<?=$row['txn']?>"><?=$row['formatted_number']?></a>
-  /    <?=$row['created']?>
-  /    <a href="person.php?id=<?=$row['person']?>"><?=ashtml($row['person_name'])?></a>
-    </td>
-  </tr>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading<?=$row['txn']?>">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<?=$row['txn']?>" aria-expanded="true" aria-controls="collapse<?=$row['txn']?>">
+	  PO <?=$row['formatted_number']?>
+          / <?=$row['created']?>
+          / <?=ashtml($row['person_name'])?>
+        </a>
+      </h4>
+    </div>
+    <table id="collapse<?=$row['txn']?>" class="table table-striped collapse" role="tabpanel" aria-labelledby="heading<?=$row['txn']?>">
+      <caption>
+        <a class="btn btn-default" href="./?id=<?=$row['txn']?>">Invoice</a>
+      </caption>
+      <thead>
+	<tr>
+	  <th></th>
+	  <th>Code</th>
+	  <th>Name</th>
+	  <th>Ordered</th>
+	  <th>Received</th>
+	</tr>
+      </thead>
+      <tbody>
 <?}?>
-  <tr>
-   <td> &nbsp; </td>
-   <td><a href="item.php?id=<?=$row['item']?>"><?=ashtml($row['code'])?></td>
-   <td><?=ashtml($row['item_name'])?></td>
-   <td><?=ashtml($row['ordered'])?></td>
-   <td><?=ashtml($row['allocated'])?></td>
-  </tr>
+        <tr>
+          <td> &nbsp; </td>
+	  <td><a href="item.php?id=<?=$row['item']?>"><?=ashtml($row['code'])?></td>
+	  <td><?=ashtml($row['item_name'])?></td>
+	  <td><?=ashtml($row['ordered'])?></td>
+	  <td><?=ashtml($row['allocated'])?></td>
+        </tr>
 <?}?>
- </tbody>
-</table>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <?
 foot();
