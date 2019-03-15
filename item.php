@@ -563,7 +563,7 @@ $vendor_items= item_load_vendor_items($db, $id);
                 data-bind="click: $parent.detachVendorItem">
           <i class="fa fa-unlink"></i>
         </button>
-        <span data-bind="if: $data.vendor() == 7 || $data.vendor() == 3757">
+        <span data-bind="if: ['7', '50', '3757'].includes($data.vendor())">
           <button type="button" class="btn btn-default btn-xs"
                   data-bind="click: $parent.checkVendorStock">
             <i class="fa fa-search"></i>

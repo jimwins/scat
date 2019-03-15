@@ -108,3 +108,34 @@ function check_sls_stock($code) {
 
   return [ 'Vegas' => $vg, 'New Orleans' => $no ];
 }
+
+function check_c2f_stock($code) {
+  $url= 'https://www.c2f.com/exhtml/productdetail.asp';
+
+  $client= new \GuzzleHttp\Client();
+  $jar= \GuzzleHttp\Cookie\CookieJar::fromArray(['ASPSESSIONIDSEBSDQTA'
+                                                   => C2F_KEY,
+                                                 'C2FDealerID'
+                                                   => C2F_ID ],
+                                                parse_url($url, PHP_URL_HOST));
+
+  $res= $client->request('GET', $url,
+                         [
+                         //'debug' => true,
+                           'cookies' => $jar,
+                           'query' => [
+                             'p' => $code,
+                           ]
+                         ]);
+
+  $body= $res->getBody();
+
+  $dom= new DOMDocument();
+  libxml_use_internal_errors(true);
+  $dom->loadHTML($body);
+
+  $xp= new DOMXpath($dom);
+  $bv= $xp->query('//div[@class="stock"]/strong')->item(0)->textContent;
+
+  return [ 'Beaverton' => $bv ];
+}
