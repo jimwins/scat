@@ -13,12 +13,27 @@ $product= Model::factory('Product')
                               FROM item
                               WHERE item.product_id = product.id)',
                           'variations')
+            ->select_expr('JSON_ARRAYAGG(JSON_OBJECT("id", image.id,
+                                                     "uuid", image.uuid,
+                                                     "name", image.name,
+                                                     "alt_text", image.alt_text,
+                                                     "width", image.width,
+                                                     "height", image.height,
+                                                     "ext", image.ext))',
+                          'media')
             ->join('brand', array('product.brand_id', '=', 'brand.id'))
+            ->left_outer_join('product_to_image',
+                              array('product.id', '=',
+                                    'product_to_image.product_id'))
+            ->left_outer_join('image',
+                              array('product_to_image.image_id', '=',
+                                    'image.id'))
             ->find_one($id);
 
 if (!$product) {
   die("No such product.");
 }
+$product->media= json_decode($product->media);
 
 $items= $product->items()
           ->select('item.*')
@@ -257,7 +272,33 @@ ko.applyBindings(viewModel);
 <div class="row">
   <div class="col-sm-9" data-bind="html: marked(product.description().replace(/{{\s*@STATIC\s*}}/, '<?=ORDURE_STATIC?>'))"></div>
 
-  <div class="col-sm-3" data-bind="if: product.image">
+  <div class="col-sm-3" data-bind="if: product.media">
+    <div id="carousel-product" class="carousel slide" data-ride="carousel"
+         style="width: 240px; height: 240px; overflow: hidden">
+      <ol class="carousel-indicators" data-bind="foreach: product.media">
+        <li data-target="#carousel-product" data-slide-to="" class="" data-bind="attr: { 'data-slide-to' : $index }, css: { 'active' : $index() == 0 }">
+      </ol>
+      <div class="carousel-inner" role="listbox"
+           data-bind="foreach: product.media">
+	<div class="item" data-bind="css: { 'active' : $index() == 0 }">
+	    <img class="center-block" data-bind="attr: { src: '<?=ORDURE_STATIC?>' + '/i/st/' + $data.uuid() + '.jpg', alt: $data.alt_text }" style="width: auto; height: 240px; max-height:240px">
+            <!-- <div class="carousel-caption" data-bind="text: $data.alt_text"></div> -->
+	</div>
+      </div>
+      <a class="left carousel-control" href="#carousel-product"
+         role="button" data-slide="prev">
+	<i class="fa fa-chevron-left" aria-hidden="true"></i>
+	<span class="sr-only">Previous</span>
+      </a>
+      <a class="right carousel-control" href="#carousel-product"
+         role="button" data-slide="next">
+	<i class="fa fa-chevron-right" aria-hidden="true"></i>
+	<span class="sr-only">Next</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-sm-3" data-bind="if: !product.media && product.image">
     <div class="thumbnail pull-right">
       <img width="240"
            data-bind="attr: { src: '<?=ORDURE_STATIC?>' + product.image() }">
