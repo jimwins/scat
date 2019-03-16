@@ -353,6 +353,20 @@ CREATE TABLE `product` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `product_to_image`
+--
+
+DROP TABLE IF EXISTS `product_to_image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `product_to_image` (
+  `product_id` int(10) unsigned NOT NULL,
+  `image_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`,`image_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `prop65_warning`
 --
 
