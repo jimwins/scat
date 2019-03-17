@@ -261,18 +261,18 @@ $(document).bind("drop", function (e) {
 
 <!-- Product description -->
 <div class="row">
-  <div class="col-sm-9" data-bind="html: marked(product.description().replace(/{{\s*@STATIC\s*}}/, '<?=ORDURE_STATIC?>'))"></div>
+  <div class="col-sm-7" data-bind="html: marked(product.description().replace(/{{\s*@STATIC\s*}}/, '<?=ORDURE_STATIC?>'))"></div>
 
-  <div class="col-sm-3" data-bind="if: product.media">
+  <div class="col-sm-5" data-bind="if: product.media">
     <div id="carousel-product" class="carousel slide" data-ride="carousel"
-         style="width: 240px; height: 240px; overflow: hidden">
+         style="width: 384px; height: 384px; overflow: hidden">
       <ol class="carousel-indicators" data-bind="foreach: product.media">
         <li data-target="#carousel-product" data-slide-to="" class="" data-bind="attr: { 'data-slide-to' : $index }, css: { 'active' : $index() == 0 }">
       </ol>
       <div class="carousel-inner" role="listbox"
            data-bind="foreach: product.media">
 	<div class="item" data-bind="css: { 'active' : $index() == 0 }">
-	    <img class="center-block" data-bind="attr: { src: '<?=ORDURE_STATIC?>' + ($data.uuid ? '/i/st/' + $data.uuid() + '.jpg' : $data.src()), alt: $data.alt_text }" style="width: auto; height: 240px; max-height:240px">
+	    <img class="center-block" data-bind="attr: { src: '<?=ORDURE_STATIC?>' + ($data.uuid ? '/i/st/' + $data.uuid() + '.jpg' : $data.src()), alt: $data.alt_text }" style="width: auto; height: 384px; max-height:384px">
             <div class="carousel-caption">
               <button class="btn btn-danger btn-xs"
                       data-bind="click: $parent.removeImage">
@@ -294,9 +294,9 @@ $(document).bind("drop", function (e) {
     </div>
   </div>
 
-  <div class="col-sm-3" data-bind="if: !product.media && product.image">
+  <div class="col-sm-4" data-bind="if: !product.media && product.image">
     <div class="thumbnail pull-right">
-      <img width="240"
+      <img width="384"
            data-bind="attr: { src: '<?=ORDURE_STATIC?>' + product.image() }">
     </div>
   </div>
