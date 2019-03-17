@@ -125,7 +125,11 @@ if ($DEBUG) {
 $app->group('/sale', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect('/');
+              return $res->withRedirect('/txns.php');
+            });
+  $app->get('/{id}',
+            function (Request $req, Response $res, array $args) {
+              return $res->withRedirect("/?id={$args['id']}");
             });
 });
 
