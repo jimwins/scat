@@ -50,7 +50,7 @@ input[type=search]::-webkit-search-cancel-button {
 /* Add chevrons to accordion toggles */
 .panel-heading .accordion-toggle .panel-title:after {
     /* symbol for "opening" panels */
-    font-family: 'FontAwesome';
+    font-family: 'ForkAwesome', 'FontAwesome';
     content: "\f078";    /* adjust as needed, taken from bootstrap.css */
     float: right;        /* adjust as needed */
     color: grey;         /* adjust as needed */
