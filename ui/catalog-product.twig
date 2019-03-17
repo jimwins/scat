@@ -16,8 +16,38 @@
   </div>
   <div class="col-sm-3">
     <figure class="thumbnail is-square">
-      {% if product.image %}
+      {% if not product.media and product.image %}
         <img src="//rawmaterials.b-cdn.net{{ product.image }}" style="max-width: 100%; max-height:100%; width: auto; height: auto; margin: auto">
+      {% endif %}
+      {% if product.media %}
+        <div id="carousel-product" class="carousel slide" data-ride="carousel">
+          <ol class="carousel-indicators">
+            {% for item in product.media %}
+              <li data-target="#carousel-product"
+                  data-slide-to="{{ loop.index0 }}"
+                  class="{{ loop.index0 == 0 ? 'active' }}"></li>
+            {% endfor %}
+          </ol>
+          <div class="carousel-inner" role="listbox">
+            {% for item in product.media %}
+              <div class="item {{ loop.index0 == 0 ? 'active' }}">
+                <img class="center-block"
+                     src="//rawmaterials.b-cdn.net{{ item.uuid ? ('/i/st/' ~ item.uuid ~ '.jpg') : item.src }}"
+                     alt="{{ item.alt_text }}">
+              </div>
+            {% endfor %}
+          </div>
+          <a class="left carousel-control" href="#carousel-product"
+             role="button" data-slide="prev">
+            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="right carousel-control" href="#carousel-product"
+             role="button" data-slide="next">
+            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
       {% endif %}
     </figure>
   </div>

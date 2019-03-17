@@ -26,6 +26,11 @@ class Product extends \Model implements \JsonSerializable {
     return $this->asArray();
   }
 
+  public function media() {
+    return $this->has_many_through('Image')
+                ->find_many();
+  }
+
   public static function getById($id) {
     $product= \Model::factory('Product')
                 ->select('product.*')
@@ -69,5 +74,4 @@ class Product extends \Model implements \JsonSerializable {
 
     return $product;
   }
-
 }
