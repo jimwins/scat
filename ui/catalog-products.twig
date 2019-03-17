@@ -1,34 +1,35 @@
 {% for p in products %}
   {% set slug = path_for('catalog') ~ '/' ~ p.full_slug %}
   <div class="media">
-    <figure class="media-left">
-      <p class="image is-128x128">
+    <div class="media-left">
+      <div class="thumbnail"
+           style="border-color: rgba(0,0,0,0.4); background: white">
         <a href="{{ slug }}">
           {% if p.image %}
-            <img src="//rawmaterials.b-cdn.net{{ p.image }}" style="max-width: 100%; max-height:100%; width: auto; height: auto; margin: auto">
+            <img class="media-object"
+                 style="width:120px; max-width: 120px"
+                 src="//rawmaterials.b-cdn.net{{ p.image }}"
+                 alt="">
           {% endif %}
         </a>
-      </p>
-    </figure>
-    <div class="media-content">
-      <div class="content">
-        <p>
-          <p class="title is-4">
-            <a href="{{ slug }}">
-              {{ p.name }}
-            </a></p>
-          {% set brand = p.brand.find_one %}
-          <p class="subtitle is-6">
-            <a href="{{ path_for('catalog-brand', { 'brand': brand.slug }) }}">
-              {{ brand.name }}
-            </a>
-          </p>
-          {# Just extract the first paragraph #}
-          {% set paragraphs= p.description|markdown|split('</p>', 2) %}
-          {% set firstParagraph= paragraphs|first ~ '</p>' %}
-          {{ firstParagraph | raw }}
-        </p>
       </div>
+    </div>
+    <div class="media-body">
+      <h4 class="media-heading">
+        <a href="{{ slug }}">
+          {{ p.name }}
+        </a>
+        {% set brand = p.brand.find_one %}
+        <small>
+          <a href="{{ path_for('catalog-brand', { 'brand': brand.slug }) }}">
+            {{ brand.name }}
+          </a>
+        </small>
+      </h4>
+      {# Just extract the first paragraph #}
+      {% set paragraphs= p.description|markdown|split('</p>', 2) %}
+      {% set firstParagraph= paragraphs|first ~ '</p>' %}
+      {{ firstParagraph | raw }}
     </div>
   </div>
 {% endfor %}

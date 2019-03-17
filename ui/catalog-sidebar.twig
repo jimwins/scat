@@ -1,26 +1,30 @@
-<aside class="menu">
-  <a class="menu-label" href="{{ path_for('catalog') }}">
-    Catalog
-  </a>
-  <ul class="menu-list">
+<style>
+.sidebar .nav>li>a {
+  padding: 0.2rem 1rem;
+}
+.sidebar .nav .nav>li>a {
+  padding-left: 2rem;
+}
+</style>
+<nav class="menu sidebar">
+  <ul class="nav nav-pills nav-stacked">
   {% for d in depts %}
-    <li>
-      <a href="{{ path_for('catalog', { 'dept' : d.slug }) }}"
-         class="{{ (dept and dept.id == d.id) ? 'is-active' }}">
+    <li class="{{ (dept and dept.id == d.id) ? 'active' }}">
+      <a href="{{ path_for('catalog', { 'dept' : d.slug }) }}">
         {{ d.name }}
       </a>  
       {% if dept and dept.id == d.id %}
-        <ul class="menu-list">
+        <ul class="nav nav-pills nav-stacked">
           {% for s in subdepts %}
-            <li>
+            <li class="{{ (subdept and subdept.id == s.id) ? 'active' }}">
               <a href="{{ path_for('catalog', { 'dept' : d.slug,
-                                                'subdept' : s.slug }) }}"
-                 class="{{ (subdept and subdept.id == s.id) ? 'is-active' }}">
+                                                'subdept' : s.slug }) }}">
                 {{ s.name }}
               </a>
           {% endfor %}
         </ul>
       {% endif %}
+    </li>
   {% endfor %}
   </ul>
-</aside>
+</nav>

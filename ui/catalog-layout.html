@@ -6,49 +6,47 @@
 
 {% block content %}
 
-<div class="columns">
+<div class="row">
   {% block catalog_sidebar %}
-    <div class="column is-one-quarter">
+    <div class="col-md-3">
+      {% include 'catalog-searchform.twig' %}
+      <br>
       {% include 'catalog-sidebar.twig' %}
     </div>
   {% endblock %}
 
-  <div class="column">
-    {% include 'catalog-searchform.twig' %}
+  <div class="col-md-{% block catalog_width "9" %}">
+    {% block catalog_crumb %}
+      <ol class="breadcrumb">
+        <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
+        {% if dept %}
+          <li class="{{ not subdept ? 'active' }}">
+            <a href="{{ path_for('catalog', { 'dept' : dept.slug }) }}">
+              {{ dept.name }}
+            </a>
+          </li>
+        {% endif %}
+        {% if subdept %}
+          <li class="{{ not product ? 'active' }}">
+            <a href="{{ path_for('catalog', {'dept': dept.slug,
+                                             'subdept': subdept.slug }) }}">
+              {{ subdept.name }}
+            </a>
+          </li>
+        {% endif %}
+        {% if product %}
+          <li class="{{ not item ? 'active' }}">
+            <a href="{{ path_for('catalog', { 'dept': dept.slug,
+                                              'subdept': subdept.slug,
+                                              'product': product.slug}) }}">
+              {{ product.name }}
+            </a>
+          </li>
+        {% endif %}
+      </ol>
+    {% endblock %}
 
-    <section class="section">
-      <nav class="breadcrumb" aria-label="breadcrumbs">
-        <ul>
-          <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
-          {% block catalog_crumb %}
-            {% if dept %}
-              <li class="{{ not subdept ? 'is-active' }}">
-                <a href="{{ path_for('catalog', { 'dept' : dept.slug }) }}">
-                  {{ dept.name }}
-                </a>
-              </li>
-            {% endif %}
-            {% if subdept %}
-              <li class="{{ not product ? 'is-active' }}">
-                <a href="{{ path_for('catalog', {'dept': dept.slug,
-                                                 'subdept': subdept.slug }) }}">
-                  {{ subdept.name }}
-                </a>
-              </li>
-            {% endif %}
-            {% if product %}
-              <li class="{{ not item ? 'is-active' }}">
-                <a href="{{ path_for('catalog', { 'dept': dept.slug,
-                                                  'subdept': subdept.slug,
-                                                  'product': product.slug}) }}">
-                  {{ product.name }}
-                </a>
-              </li>
-            {% endif %}
-          {% endblock %}
-        </ul>
-      </nav>
-    </section>
+    <hr style="border-color: rgba(0,0,0,0.1)">
 
     {% block catalog_content %}
       {% if products and not product %}

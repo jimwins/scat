@@ -8,5 +8,7 @@
 {% endblock %}
 
 {% block catalog_crumb %}
-  <li class="is-active"><a href="{{ path_for('catalog-search') }}">Search</a>
+  {% include 'catalog-searchform.twig' %}
 {% endblock %}
+
+{% block catalog_width "12" %}

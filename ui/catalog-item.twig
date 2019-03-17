@@ -1,39 +1,71 @@
 {% import 'macros.twig' as scat %}
-<div class="modal is-active">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title">
-        {{ item.name }}
-      </p>
-      <a class="delete" aria-label="close" href="./"></a>
-    </header>
-    <section class="modal-card-body">
-      <div class="level">
-        <div class="level-item has-text-centered">
-          <div>
-            <p class="heading">List Price</p>
-            <p class="title">{{ scat.amount(item.retail_price) }}</p>
-          </div>
-        </div>
-        <div class="level-item has-text-centered">
-          {% if item.discount %}
+<style>
+.heading {
+  text-transform: uppercase;
+  margin-bottom: 0px;
+}
+.title {
+  font-weight: bold;
+  font-size: 4rem;
+}
+.modal {
+  text-align: center;
+  padding: 0!important;
+}
+.modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+</style>
+<div class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">
+          {{ item.name }}
+        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xs-4 text-center">
             <div>
-              <p class="heading">Discount</p>
-              <p class="title">{{ scat.format_discount(item) }}</p>
+              <p class="heading">List Price</p>
+              <p class="title">{{ scat.amount(item.retail_price) }}</p>
             </div>
-          {% endif %}
-        </div>
-        <div class="level-item has-text-centered">
-          <div>
-            <p class="heading">Sale Price</p>
-            <p class="title">{{ scat.amount(item.sale_price) }}</p>
+          </div>
+          <div class="col-xs-4 text-center">
+            {% if item.discount %}
+              <div>
+                <p class="heading">Discount</p>
+                <p class="title">{{ scat.format_discount(item) }}</p>
+              </div>
+            {% endif %}
+          </div>
+          <div class="col-xs-4 text-center">
+            <div>
+              <p class="heading">Sale Price</p>
+              <p class="title">{{ scat.amount(item.sale_price) }}</p>
+            </div>
           </div>
         </div>
       </div>
-    </section>
-    <footer class="modal-card-foot">
-      <a href="./" class="button">Close</a>
-    </footer>
+      <div class="modal-footer">
+        <a href="./" class="btn btn-primary">Close</a>
+      </div>
+    </div>
   </div>
 </div>
+<script>
+$(function() {
+  $('.modal').modal();
+});
+</script>

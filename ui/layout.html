@@ -11,145 +11,124 @@
     {% endif %}
   </title>
 
-  {# TODO import these into our repo #}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
-  <script src="https://unpkg.com/feather-icons"></script>
+  <link rel="stylesheet" type="text/css" href="/extern/bootstrap/css/bootstrap.min.css">
+  {# TODO import this into our repo #}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" integrity="sha256-gsmEoJAws/Kd3CjuOQzLie5Q3yshhvmo7YNtBG7aaEY=" crossorigin="anonymous">
+
+  <link rel="stylesheet" type="text/css" href="/css/scat.css">
+  <style type="text/css">
+    body.page {
+      padding-top: 70px;
+    }
+  </style>
+
+  <script src="/components/jquery/jquery.min.js"></script>
+  <script src="/extern/bootstrap/js/bootstrap.min.js"></script>
 </head>
 
-<body class="has-navbar-fixed-top">
+<body class="page">
 
-<nav class="navbar is-fixed-top {{ DEBUG ? 'is-warning' : 'is-light' }}"
-     role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a class="navbar-item" href="/">
-      <span class="icon"><i data-feather="activity"></i></span>
-      &nbsp; Scat
-    </a>
-
-    <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarTop">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-
-  <div id="navbarTop" class="navbar-menu">
-    <div class="navbar-start">
-      <a class="navbar-item is-tab {{ current_path() starts with '/sale' ? 'is-active' }}"
-         href="/sale">
-        Sales
-      </a>
-
-      <a class="navbar-item is-tab {{ current_path() starts with '/catalog' ? 'is-active' }}"
-         href="/catalog">
-        Catalog
-      </a>
-
-      <a class="navbar-item is-tab {{ current_path() starts with '/person' ? 'is-active' }}"
-         href="/person">
-        People
-      </a>
-
-      <a class="navbar-item is-tab {{ current_path() starts with '/clock' ? 'is-active' }}"
-         href="/clock">
-        Clock
-      </a>
-
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          Reports
-        </a>
-
-        <div class="navbar-dropdown">
-          <a class="navbar-item" href="/report/summary">
-            Summary
-          </a>
-          <a class="navbar-item" href="/report/brand">
-            Brand
-          </a>
-          <a class="navbar-item" href="/report/daily">
-            Cashflow
-          </a>
-          <a class="navbar-item" href="/report/category">
-            Category
-          </a>
-          <a class="navbar-item" href="/report/dogs">
-            Dogs
-          </a>
-          <a class="navbar-item" href="/report/items">
-            Items
-          </a>
-          <a class="navbar-item" href="/report/underpriced">
-            Underpriced
-          </a>
-          <hr class="navbar-divider">
-          <a class="navbar-item" href="/till">
-            Till
-          </a>
-        </div>
-      </div>
-    </div>
-
-<!--
-    <div class="navbar-end">
-      <div class="navbar-item">
-        <div class="buttons">
-          <a class="button is-primary">
-            <strong>Sign up</strong>
-          </a>
-          <a class="button is-light">
-            Log in
-          </a>
-        </div>
-      </div>
-    </div>
--->
-  </div>
-</nav>
-
-<section class="section">
+<header class="navbar navbar-default navbar-fixed-top" role="navigation"
+        style='{{ DEBUG ? "background: #fcc" }}'>
   <div class="container">
-    {% block content %}{% endblock %}
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">
+        <i class="fa fa-barcode"></i>
+        Scat
+      </a>
+    </div>
+    <div class="collapse navbar-collapse">
+      <ul id="navbar" class="nav navbar-nav">
+        <li>
+          <a class="{{ current_path() starts with '/sale' ? 'is-active' }}"
+             href="/sale">
+            Sales
+          </a>
+        </li>
+        <li>
+          <a class="{{ current_path() starts with '/catalog' ? 'is-active' }}"
+             href="/catalog">
+            Catalog
+          </a>
+        </li>
+        <li>
+          <a class="{{ current_path() starts with '/person' ? 'is-active' }}"
+             href="/person">
+            People
+          </a>
+        </li>
+        <li>
+          <a class="{{ current_path() starts with '/clock' ? 'is-active' }}"
+             href="/clock">
+            Clock
+          </a>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="/report/summary">
+                Summary
+              </a>
+            </li>
+            <li>
+              <a href="/report/brand">
+                Brand
+              </a>
+            </li>
+            <li>
+              <a href="/report/daily">
+                Cashflow
+              </a>
+            </li>
+            <li>
+              <a href="/report/category">
+                Category
+              </a>
+            </li>
+            <li>
+              <a href="/report/dogs">
+                Dogs
+              </a>
+            </li>
+            <li>
+              <a href="/report/items">
+                Items
+              </a>
+            </li>
+            <li>
+              <a href="/report/underpriced">
+                Underpriced
+              </a>
+            </li>
+            <li role="presentation" class="divider"></li>
+            <li role="presentation" class="dropdown-header">Money</li>
+            <li>
+              <a href="/till">
+                Till
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </div>
-</section>
+</header>
 
-<footer class="footer">
-  <div class="content has-text-centered">
-    <p>
-      Scat &copy; 2010-2019 Jim Winstead Jr.
-    </p>
-  </div>
+<div id="scat-page" class="container">
+  {% block content %}{% endblock %}
+</div>
+
+<footer>
+ <span id="status">&nbsp;</span>
+ <span class="pull-right">Scat &copy; 2010-2019 Jim Winstead Jr.</span>
 </footer>
 
-<script>
-{# Activate Feather icons #}
-feather.replace()
-
-{# Activate navbar-burger elements #}
-document.addEventListener('DOMContentLoaded', () => {
-  // Get all "navbar-burger" elements
-  const $navbarBurgers=
-    Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-
-  // Check if there are any navbar burgers
-  if ($navbarBurgers.length > 0) {
-    // Add a click event on each of them
-    $navbarBurgers.forEach(el => {
-      el.addEventListener('click', () => {
-        // Get the target from the "data-target" attribute
-        const target= el.dataset.target;
-        const $target= document.getElementById(target);
-
-	// Toggle the "is-active" class on both the "navbar-burger"
-        // and the "navbar-menu"
-        el.classList.toggle('is-active');
-        $target.classList.toggle('is-active');
-      });
-    });
-  }
-});
-</script>
-
 </body>
-
 </html>

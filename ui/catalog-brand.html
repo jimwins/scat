@@ -5,24 +5,27 @@
 {% endblock %}
 
 {% block catalog_crumb %}
-  <li class="{{ not brand ? 'is-active' }}">
-    <a href="{{ path_for('catalog-brand') }}">Brands</a>
-  </li>
-  {% if brand %}
-    <li class="is-active">
-      <a href="{{ path_for('catalog-brand', { 'brand' : brand.slug }) }}">
-        {{ brand.name }}
-      </a>
+  <ol class="breadcrumb">
+    <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
+    <li class="{{ not brand ? 'active' }}">
+      <a href="{{ path_for('catalog-brand') }}">Brands</a>
     </li>
-  {% endif %}
+    {% if brand %}
+      <li class="active">
+        <a href="{{ path_for('catalog-brand', { 'brand' : brand.slug }) }}">
+          {{ brand.name }}
+        </a>
+      </li>
+    {% endif %}
+  </ol>
 {% endblock %}
 
 {% block catalog_content %}
 
 {% if brands|length %}
-  <ul>
+  <ul style="column-count: 3" class="list-group">
     {% for b in brands %}
-      <li>
+      <li class="list-group-item" style="break-inside: avoid-column">
         <a href="{{ path_for('catalog-brand', { 'brand' : b.slug }) }}">
           {{ b.name }}
         </a>

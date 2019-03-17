@@ -1,21 +1,21 @@
 {# Product details #}
-<div class="columns">
-  <div class="column">
-    <h1 class="title">
+<div class="row">
+  <div class="col-sm-9">
+    <h2>
       {{ product.name }}
-    </h1>
-    <h2 class="subtitle">
-      {% set brand = product.brand.find_one %}
-      <a href="{{ path_for('catalog-brand', { 'brand' : brand.slug }) }}">
-        {{ brand.name }}
-      </a>
+      <small>
+        {% set brand = product.brand.find_one %}
+        <a href="{{ path_for('catalog-brand', { 'brand' : brand.slug }) }}">
+          {{ brand.name }}
+        </a>
+      </small>
     </h2>
     <div class="content">
       {{ product.description | markdown }}
     </div>
   </div>
-  <div class="column is-one-quarter">
-    <figure class="image is-square">
+  <div class="col-sm-3">
+    <figure class="thumbnail is-square">
       {% if product.image %}
         <img src="//rawmaterials.b-cdn.net{{ product.image }}" style="max-width: 100%; max-height:100%; width: auto; height: auto; margin: auto">
       {% endif %}
