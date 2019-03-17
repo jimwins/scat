@@ -6,34 +6,7 @@ head("Product @ Scat", true);
 
 $id= (int)$_REQUEST['id'];
 
-$product= Model::factory('Product')
-            ->select('product.*')
-            ->select('brand.name', 'brand_name')
-            ->select_expr('(SELECT COUNT(DISTINCT variation)
-                              FROM item
-                              WHERE item.product_id = product.id)',
-                          'variations')
-            ->select_expr('JSON_ARRAYAGG(JSON_OBJECT("id", image.id,
-                                                     "uuid", image.uuid,
-                                                     "name", image.name,
-                                                     "alt_text", image.alt_text,
-                                                     "width", image.width,
-                                                     "height", image.height,
-                                                     "ext", image.ext))',
-                          'media')
-            ->join('brand', array('product.brand_id', '=', 'brand.id'))
-            ->left_outer_join('product_to_image',
-                              array('product.id', '=',
-                                    'product_to_image.product_id'))
-            ->left_outer_join('image',
-                              array('product_to_image.image_id', '=',
-                                    'image.id'))
-            ->find_one($id);
-
-if (!$product) {
-  die("No such product.");
-}
-$product->media= json_decode($product->media);
+$product= \Scat\Product::getbyId($id);
 
 $items= $product->items()
           ->select('item.*')
@@ -167,71 +140,89 @@ viewModel.editProduct= function (self) {
       owner: panelModel
     }).extend({ notify: 'always' });
 
-    var uploaderOptions= {
-      name: 'src',
-      postUrl: function() { return 'api/image-add.php' },
-      /* Progress */
-      onClientLoadStart: function (e, file, response) {
-        $('#upload-button')
-          .html('<i class="fa fa-spinner fa-spin"></i> Reading...');
-      },
-      onClientLoadEnd: function (e, file, response) {
-        $('#upload-button')
-          .html('<i class="fa fa-spinner fa-spin"></i> Preparing...');
-      },
-      onServerLoadStart: function (e, file, response) {
-        $('#upload-button')
-          .html('<i class="fa fa-spinner fa-spin"></i> Uploading...');
-      },
-      onServerLoad: function (e, file, response) {
-        $('#upload-button')
-          .html('<i class="fa fa-spinner fa-spin"></i> Processing...');
-      },
-      onSuccess: function(e, file, response) {
-        try {
-          data= JSON.parse(response);
-        } catch (e) {
-          data= { error : e };
-        }
-        if (data.error) {
-          Scat.alert(data);
-          return;
-        }
-        panelModel.image('/i/st/' + data.uuid + '.jpg');
-        $('#upload-button')
-          .html('Upload');
-      },
-      onServerError: function(e, file) {
-        Scat.alert("File upload failed.");
-        $('#upload-button')
-          .html('Upload');
-      },
-    };
-    panel.html5Uploader(uploaderOptions);
-    $('#image-file', panel).html5Uploader(uploaderOptions);
-
-    panel.bind("drop", function (e) {
-      var items= e.originalEvent.dataTransfer.items;
-      if (e.originalEvent.dataTransfer.files.length) return;
-      for (var i= 0; i < items.length; i++) {
-        if (items[i].kind == 'string' && items[i].type == 'text/uri-list') {
-          items[i].getAsString(function (s) {
-            Scat.api('image-add', { url: s })
-                .done(function (data) {
-                  panelModel.image('/i/st/' + data.uuid + '.jpg');
-                });
-          });
-        }
-      }
-      return false;
-    });
-
     ko.applyBindings(panelModel, panel[0]);
     panel.appendTo($('body')).modal();
   });
 }
 
+viewModel.addImage= function (image) {
+  Scat.api('product-add-image',
+           { product_id: viewModel.product.id(),
+             image_id: image.id })
+      .done(function (data) {
+        ko.mapping.fromJS(data, {}, viewModel.product);
+      });
+}
+
+viewModel.removeImage= function (image) {
+  Scat.api('product-remove-image',
+           { product_id: viewModel.product.id(),
+             image_id: image.id() })
+      .done(function (data) {
+        ko.mapping.fromJS(data, {}, viewModel.product);
+      });
+}
+
 ko.applyBindings(viewModel);
+
+var uploaderOptions= {
+  name: 'src',
+  postUrl: function() { return 'api/image-add.php' },
+  /* Progress */
+  onClientLoadStart: function (e, file, response) {
+    $('#upload-button')
+      .html('<i class="fa fa-spinner fa-spin"></i> Reading...');
+  },
+  onClientLoadEnd: function (e, file, response) {
+    $('#upload-button')
+      .html('<i class="fa fa-spinner fa-spin"></i> Preparing...');
+  },
+  onServerLoadStart: function (e, file, response) {
+    $('#upload-button')
+      .html('<i class="fa fa-spinner fa-spin"></i> Uploading...');
+  },
+  onServerLoad: function (e, file, response) {
+    $('#upload-button')
+      .html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+  },
+  onSuccess: function(e, file, response) {
+    try {
+      data= JSON.parse(response);
+    } catch (e) {
+      data= { error : e };
+    }
+    if (data.error) {
+      Scat.alert(data);
+      return;
+    }
+    viewModel.addImage(data);
+    $('#upload-button')
+      .html('Upload');
+  },
+  onServerError: function(e, file) {
+    Scat.alert("File upload failed.");
+    $('#upload-button')
+      .html('Upload');
+  },
+};
+$(document).html5Uploader(uploaderOptions);
+
+$(document).bind("drop", function (e) {
+  var items= e.originalEvent.dataTransfer.items;
+  if (e.originalEvent.dataTransfer.files.length) return;
+  for (var i= 0; i < items.length; i++) {
+    if (items[i].kind == 'string' && items[i].type == 'text/uri-list') {
+      items[i].getAsString(function (s) {
+        Scat.api('image-add', { url: s })
+            .done(function (data) {
+              viewModel.addImage(data);
+            });
+      });
+    }
+  }
+  return false;
+});
+
 });
 </script>
 
@@ -281,8 +272,13 @@ ko.applyBindings(viewModel);
       <div class="carousel-inner" role="listbox"
            data-bind="foreach: product.media">
 	<div class="item" data-bind="css: { 'active' : $index() == 0 }">
-	    <img class="center-block" data-bind="attr: { src: '<?=ORDURE_STATIC?>' + '/i/st/' + $data.uuid() + '.jpg', alt: $data.alt_text }" style="width: auto; height: 240px; max-height:240px">
-            <!-- <div class="carousel-caption" data-bind="text: $data.alt_text"></div> -->
+	    <img class="center-block" data-bind="attr: { src: '<?=ORDURE_STATIC?>' + ($data.uuid ? '/i/st/' + $data.uuid() + '.jpg' : $data.src()), alt: $data.alt_text }" style="width: auto; height: 240px; max-height:240px">
+            <div class="carousel-caption">
+              <button class="btn btn-danger btn-xs"
+                      data-bind="click: $parent.removeImage">
+                Remove
+              </button>
+            </div>
 	</div>
       </div>
       <a class="left carousel-control" href="#carousel-product"

@@ -25,4 +25,49 @@ class Product extends \Model implements \JsonSerializable {
   public function jsonSerialize() {
     return $this->asArray();
   }
+
+  public static function getById($id) {
+    $product= \Model::factory('Product')
+                ->select('product.*')
+                ->select('brand.name', 'brand_name')
+                ->select_expr('(SELECT COUNT(DISTINCT variation)
+                                  FROM item
+                                  WHERE item.product_id = product.id)',
+                              'variations')
+                ->select_expr('JSON_ARRAYAGG(JSON_OBJECT("id", image.id,
+                                                         "uuid", image.uuid,
+                                                         "name", image.name,
+                                                         "alt_text", image.alt_text,
+                                                         "width", image.width,
+                                                         "height", image.height,
+                                                         "ext", image.ext))',
+                              'media')
+                ->join('brand', array('product.brand_id', '=', 'brand.id'))
+                ->left_outer_join('product_to_image',
+                                  array('product.id', '=',
+                                        'product_to_image.product_id'))
+                ->left_outer_join('image',
+                                  array('product_to_image.image_id', '=',
+                                        'image.id'))
+                ->find_one($id);
+
+    if (!$product) {
+      throw new \Exception("No such product.");
+    }
+
+    /* Turn media back into an array of information (or fake it) */
+    $product->media= json_decode($product->media);
+    if (!$product->media[0]->id) {
+      $product->media=
+        [
+          [
+            'src' => $product->image,
+            'alt_text' => $product->name
+          ]
+        ];
+    }
+
+    return $product;
+  }
+
 }
