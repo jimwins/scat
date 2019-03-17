@@ -30,12 +30,11 @@
             <div class="caption">
               <small>{{ p.name }}</small>
             </div>
-            {% if p.image %}
-              <img class="media-object"
-                   style="width:120px; max-width: 120px"
-                   src="//rawmaterials.b-cdn.net{{ p.image }}"
-                   alt="">
-            {% endif %}
+            {% set i = p.media[0] %}
+            <img class="media-object"
+                 style="width:120px; max-width: 120px"
+                 src="//rawmaterials.b-cdn.net{{ i.thumbnail }}"
+                 alt="{{ i.alt_text }}">
           </a>
         </li>
       {% endfor %}

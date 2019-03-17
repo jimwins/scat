@@ -27,8 +27,17 @@ class Product extends \Model implements \JsonSerializable {
   }
 
   public function media() {
-    return $this->has_many_through('Image')
-                ->find_many();
+    $media = $this->has_many_through('Image')->find_many();
+    if (!$media[0]->id) {
+      return
+        [
+          [
+            'src' => $this->image,
+            'thumbnail' => $this->image,
+            'alt_text' => $this->name
+          ]
+        ];
+    }
   }
 
   public static function getById($id) {
@@ -67,6 +76,7 @@ class Product extends \Model implements \JsonSerializable {
         [
           [
             'src' => $product->image,
+            'thumbnail' => $product->image,
             'alt_text' => $product->name
           ]
         ];
