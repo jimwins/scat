@@ -4,6 +4,12 @@
   Catalog Search
 {% endblock %}
 
+{% block extra_head %}
+  <link type="text/css" rel="stylesheet"
+        href="/extern/lightslider-1.1.6/dist/css/lightslider.min.css" />
+  <script src="/extern/lightslider-1.1.6/dist/js/lightslider.min.js"></script>
+{% endblock %}
+
 {% block catalog_sidebar %}
 {% endblock %}
 
@@ -12,3 +18,41 @@
 {% endblock %}
 
 {% block catalog_width "12" %}
+
+{% block catalog_content %}
+  {# Product(s) #}
+  {% if products|length %}
+    <ul id="product-slider">
+      {% for p in products %}
+        {% set slug = path_for('catalog') ~ '/' ~ p.full_slug %}
+        <li>
+          <a href="{{ slug }}" class="thumbnail">
+            <div class="caption">
+              <small>{{ p.name }}</small>
+            </div>
+            {% if p.image %}
+              <img class="media-object"
+                   style="width:120px; max-width: 120px"
+                   src="//rawmaterials.b-cdn.net{{ p.image }}"
+                   alt="">
+            {% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+<script>
+$(function() {
+  $('#product-slider').lightSlider({
+    item: 6,
+    auto: false
+  });
+});
+</script>
+
+  {# Item(s) #}
+  {% if items|length %}
+    {% include 'catalog-items.twig' %}
+  {% endif %}
+{% endblock %}
