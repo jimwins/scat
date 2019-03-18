@@ -29,14 +29,14 @@ class Product extends \Model implements \JsonSerializable {
   public function media() {
     $media = $this->has_many_through('Image')->find_many();
     if (!$media[0]->id) {
-      return
+      return $this->image ?
         [
           [
             'src' => $this->image,
             'thumbnail' => $this->image,
             'alt_text' => $this->name
           ]
-        ];
+        ] : null;
     }
   }
 
