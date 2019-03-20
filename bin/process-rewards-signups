@@ -70,13 +70,13 @@ foreach ($updates as $update) {
     }
 
     if ($txn->person && $txn->person != $person->id) {
-      echo "Transaction already assigned to someone else.\n";
+      echo "Transaction {$id} already assigned to someone else.\n";
       $exit= 1;
       continue;
     }
 
     if ($txn->created != $created) {
-      echo "Timestamps for transactions don't match. '{$created}' != '{$txn->created}'\n";
+      echo "Timestamps for transaction {$id} don't match. '{$created}' != '{$txn->created}'\n";
       $exit= 1;
       continue;
     }
