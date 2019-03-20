@@ -77,7 +77,7 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
   echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
 // C2F order (CSV)
-} elseif (preg_match('/^LineNumber/', $line)) {
+} elseif (preg_match('/^"?LineNumber/', $line)) {
   //LineNumber,ProductID,ProductDesc,UOM,UPC_EAN,QtyOrdered,QtyShipped,QtyBackOrdered,RetailPrice,UnitAmt
   $sep= preg_match("/,/", $line) ? "," : "\t";
   $q= "LOAD DATA LOCAL INFILE '$fn'
