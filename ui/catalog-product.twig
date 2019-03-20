@@ -1,6 +1,14 @@
 {# Product details #}
 <div class="row">
   <div class="col-sm-9">
+    <div class="btn-group" role="group">
+      <a class="btn btn-default"
+         target="_blank"
+         href="{{ PUBLIC_CATALOG ~ '/' ~ product.full_slug }}">
+        <i class="fa fa-external-link"></i>
+        View on Website
+      </a>
+    </div>
     <h2>
       {{ product.name }}
       <small>
