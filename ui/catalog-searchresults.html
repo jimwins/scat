@@ -56,4 +56,14 @@ $(function() {
   {% if items|length %}
     {% include 'catalog-items.twig' %}
   {% endif %}
+
+  {% if not items|length and not products|length %}
+    <p class="lead">
+      <strong>No results found.</strong>
+      Nothing was found for those search parameters.
+      {% if not (q matches '/active:0/') %}
+        <a href="{{ current_path(true) ~ ' active:0' }}">Try again with inactive items.</a>
+      {% endif %}
+    </p>
+  {% endif %}
 {% endblock %}
