@@ -19,6 +19,12 @@
   </table>
 {% endmacro %}
 
+<style>
+.inactive a {
+  color: #933;
+}
+</style>
+
 {# A little convoluted because we chunk by variation sometimes #}
 
 {% set last_variation= null %}
@@ -38,7 +44,7 @@
     {% endif %}
     {{ s.begin_table() }}
   {% endif %}
-  <tr class="{{ (item and item.id == i.id) ? 'is-selected' }}">
+  <tr class="{{ (item and item.id == i.id) ? 'is-selected' }} {{ not i.active ? 'inactive' }}">
     <td>
       <a href="{{ product ? product.slug ~ '/' ~ i.code : i.full_slug }}">{{ i.code }}</a>
     </td>
