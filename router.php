@@ -78,6 +78,9 @@ $container['view']= function ($container) {
   $view->addExtension(new Aptoma\Twig\Extension\MarkdownExtension($engine));
 
   $view->getEnvironment()->addGlobal('DEBUG', $GLOBALS['DEBUG']);
+  $view->getEnvironment()->addGlobal('PUBLIC', ORDURE);
+  $view->getEnvironment()->addGlobal('PUBLIC_CATALOG', ORDURE.'/art-supplies');
+  $view->getEnvironment()->addGlobal('STATIC', ORDURE_STATIC);
 
   return $view;
 };
