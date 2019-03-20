@@ -9,7 +9,7 @@
           {% if media is not empty %}
             <img class="media-object"
                  style="width:120px; max-width: 120px"
-                 src="//rawmaterials.b-cdn.net{{ media[0].thumbnail }}"
+                 src="{{ STATIC ~ media[0].thumbnail }}"
                  alt="{{ media[0].alt_text }}">
           {% endif %}
         </a>
