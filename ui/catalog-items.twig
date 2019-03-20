@@ -40,11 +40,11 @@
     {% endif %}
     {% set last_variation = i.variation %}
     {% if i.variation %}
-      <h2 class="title is-4">{{ i.variation }}</h2>
+      <h3>{{ i.variation }}</h3>
     {% endif %}
     {{ s.begin_table() }}
   {% endif %}
-  <tr class="{{ (item and item.id == i.id) ? 'is-selected' }} {{ not i.active ? 'inactive' }}">
+  <tr class="{{ (item and item.id == i.id) ? 'info' }} {{ not i.active ? 'inactive' }}">
     <td>
       <a href="{{ product ? product.slug ~ '/' ~ i.code : i.full_slug }}">{{ i.code }}</a>
     </td>
