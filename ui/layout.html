@@ -27,12 +27,22 @@
 
   {% block extra_head %}
   {% endblock %}
+  {% if DEBUG %}
+    <style>
+      .navbar {
+        background: #fcc;
+      }
+      .navbar-default .navbar-nav>.active>a,
+      .navbar-default .navbar-nav>.active>a:hover {
+        background: #caa;
+      }
+    </style>
+  {% endif %}
 </head>
 
 <body class="page">
 
-<header class="navbar navbar-default navbar-fixed-top" role="navigation"
-        style='{{ DEBUG ? "background: #fcc" }}'>
+<header class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
