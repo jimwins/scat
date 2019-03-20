@@ -5,11 +5,12 @@
       <div class="thumbnail"
            style="border-color: rgba(0,0,0,0.4); background: white">
         <a href="{{ slug }}">
-          {% if p.image %}
+          {% set media = p.media %}
+          {% if media is not empty %}
             <img class="media-object"
                  style="width:120px; max-width: 120px"
-                 src="//rawmaterials.b-cdn.net{{ p.image }}"
-                 alt="">
+                 src="//rawmaterials.b-cdn.net{{ media[0].thumbnail }}"
+                 alt="{{ media[0].alt_text }}">
           {% endif %}
         </a>
       </div>
@@ -17,12 +18,12 @@
     <div class="media-body">
       <h4 class="media-heading">
         <a href="{{ slug }}">
-          {{ p.name }}
+          {{- p.name -}}
         </a>
         {% set brand = p.brand.find_one %}
         <small>
           <a href="{{ path_for('catalog-brand', { 'brand': brand.slug }) }}">
-            {{ brand.name }}
+            {{- brand.name -}}
           </a>
         </small>
       </h4>
