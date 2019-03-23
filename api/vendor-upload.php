@@ -58,9 +58,10 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-} elseif (preg_match('/^sls_sku(,|\t)/', $line, $m)) {
+} elseif (preg_match('/^"?sls_sku(,|\t)/', $line, $m)) {
   // SLS
 #sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date,ormd,prop65,no_calif,no_canada,
+
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE vendor_upload
           FIELDS TERMINATED BY '$m[1]'
