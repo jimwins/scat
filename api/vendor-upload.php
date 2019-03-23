@@ -131,7 +131,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
-} elseif (preg_match('/^Category/', $line)) {
+} elseif (preg_match('/^"?Category/', $line)) {
   // C2F promotion
   $sep= preg_match("/\t/", $line) ? "\t" : ",";
 
@@ -189,7 +189,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 } else {
   // Generic
   if (preg_match('/\t/', $line)) {
-    $format= "FIELDS TERMINATED BY '\t'";
+    $format= "FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'";
   } else {
     $format= "FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'";
   }
