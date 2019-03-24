@@ -1,0 +1,30 @@
+<div class="modal fade" role="dialog">
+  <div class="modal-dialog {% block size '' %}">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+          {% block title %}Title{% endblock %}
+        </h4>
+      </div>
+
+      {% block body %}
+        <div class="modal-body">
+          <p>Body goes here.</p>
+        </div>
+      {% endblock %}
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+        {% block submit %}
+          <button type="submit" class="btn btn-primary">
+            Submit
+          </button>
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</div>

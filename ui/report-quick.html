@@ -1,0 +1,29 @@
+{% extends 'modal-layout.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block size 'modal-sm' %}
+
+{% block title %}
+  Quick Report
+{% endblock %}
+
+{% block body %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Day</th>
+      <th>Sales</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for day in sales %}
+      <tr>
+        <td>{{ day.span }}</td>
+        <td>{{ scat.amount(day.total) }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block submit %}{% endblock %}

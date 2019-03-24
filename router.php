@@ -143,6 +143,9 @@ $container['catalog_service']= function($c) {
 $container['search']= function($c) {
   return new \Scat\SearchService($c['settings']['search']);
 };
+$container['report']= function($c) {
+  return new \Scat\ReportService($c['settings']['report']);
+};
 
 $app->group('/catalog', function (Slim\App $app) {
   $app->get('/search',
@@ -291,6 +294,12 @@ $app->group('/clock', function (Slim\App $app) {
 
 /* Reports */
 $app->group('/report', function (Slim\App $app) {
+  $app->get('/quick',
+            function (Request $req, Response $res, array $args) {
+              $data= $this->report->sales();
+              return $this->view->render($res, 'report-quick.html',
+                                         $data);
+            });
   $app->get('/{name}',
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect("/report-{$args['name']}.php");

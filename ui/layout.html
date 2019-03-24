@@ -24,6 +24,7 @@
 
   <script src="/components/jquery/jquery.min.js"></script>
   <script src="/extern/bootstrap/js/bootstrap.min.js"></script>
+  <script src="/js/scat.main.js"></script>
 
   {% block extra_head %}
   {% endblock %}
@@ -57,7 +58,7 @@
       </a>
     </div>
     <div class="collapse navbar-collapse">
-      <ul id="navbar" class="nav navbar-nav">
+      <ul class="nav navbar-nav">
         <li class="{{ current_path() starts with '/sale' ? 'active' }}">
           <a href="/sale">
             Sales
@@ -124,6 +125,13 @@
               </a>
             </li>
           </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a onclick="scat.dialog('/report/quick')">
+            <i class="fa fa-line-chart"></i>
+          </a>
         </li>
       </ul>
     </div>
