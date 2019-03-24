@@ -7,15 +7,7 @@
 {% block content %}
 
 <div class="row">
-  {% block catalog_sidebar %}
-    <div class="col-md-3">
-      {% include 'catalog-searchform.twig' %}
-      <br>
-      {% include 'catalog-sidebar.twig' %}
-    </div>
-  {% endblock %}
-
-  <div class="col-md-{% block catalog_width "9" %}">
+  <div class="col-md-{% block catalog_width "9 col-md-push-3" %}">
     {% block catalog_crumb %}
       <ol class="breadcrumb">
         <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
@@ -68,6 +60,15 @@
 
     {% endblock %}
   </div>
+
+  {% block catalog_sidebar %}
+    <div class="col-md-3 col-md-pull-9">
+      {% include 'catalog-searchform.twig' %}
+      <br>
+      {% include 'catalog-sidebar.twig' %}
+    </div>
+  {% endblock %}
+
 </div>
 
 {% endblock %}
