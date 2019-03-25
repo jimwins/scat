@@ -6,8 +6,14 @@
 
 {% block content %}
 
+<style>
+.breadcrumb>.active>a { color: #333 }
+</style>
+
 <div class="row">
   <div class="col-md-{% block catalog_width "9 col-md-push-3" %}">
+    {% include 'catalog-searchform.twig' %}
+    <hr style="border-color: rgba(0,0,0,0.1)">
     {% block catalog_crumb %}
       <ol class="breadcrumb">
         <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
@@ -38,8 +44,6 @@
       </ol>
     {% endblock %}
 
-    <hr style="border-color: rgba(0,0,0,0.1)">
-
     {% block catalog_content %}
       {% if products and not product %}
         {% include 'catalog-products.twig' %}
@@ -63,8 +67,6 @@
 
   {% block catalog_sidebar %}
     <div class="col-md-3 col-md-pull-9">
-      {% include 'catalog-searchform.twig' %}
-      <br>
       {% include 'catalog-sidebar.twig' %}
     </div>
   {% endblock %}
