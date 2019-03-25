@@ -11,8 +11,11 @@ class ScatUtils {
   }
 
   // Pop up a dialog
-  dialog (name, data= {}) {
+  dialog (from, name, data= {}) {
     let url= name;
+
+    if (from.disabled) return false
+    from.disabled= true
 
     fetch(url)
       .then(res => {
@@ -25,6 +28,7 @@ class ScatUtils {
           let modal = this.htmlToElement(text);
           document.body.insertAdjacentElement('beforeend', modal);
           $(modal).modal();
+          from.disabled= false;
         });
       })
       .catch (error => {
