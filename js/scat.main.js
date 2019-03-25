@@ -28,6 +28,9 @@ class ScatUtils {
           let modal = this.htmlToElement(text);
           document.body.insertAdjacentElement('beforeend', modal);
           $(modal).modal();
+          $(modal).on('hidden.bs.modal', function(e) {
+            $(this).remove();
+          });
           from.disabled= false;
         });
       })
