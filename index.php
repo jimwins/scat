@@ -579,6 +579,14 @@ $("#txn-load").submit(function(ev) {
             <li data-bind="css: { disabled: !txn.id() || items().length }">
                <a data-bind="click: deleteTransaction">Delete</a>
             </li>
+            <li data-bind="visible: txn.type() == 'customer'">
+               <a data-bind="click: toggleNoRewards">
+                 <i class="far"
+                    data-bind="css: { 'fa-square': txn.no_rewards(),
+                                      'fa-check-square': !txn.no_rewards()
+                                    }"></i>
+                   Earns Points
+            </li>
             <li data-bind="visible: txn.type() == 'vendor',
                            css: { disabled: !txn.id() || !items().length }">
                <a data-bind="click: clearItems">Clear Items</a>
@@ -1172,6 +1180,14 @@ viewModel.loadReturnedFrom= function() {
 viewModel.deleteTransaction= function() {
   var txn= Txn.id();
   Txn.delete(txn);
+}
+
+viewModel.toggleNoRewards= function() {
+  let txn= viewModel.txn.id();
+  let no_rewards= viewModel.txn.no_rewards();
+  Txn.callAndLoad('txn-update', {
+    txn: txn, no_rewards: no_rewards ? '0' : '1'
+  });
 }
 
 viewModel.clearItems= function() {
