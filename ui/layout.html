@@ -129,6 +129,12 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
+          <a onclick="scat.dialog(this, '/notes')">
+            <i class="fa fa-sticky-note-o"></i>
+            <span class="badge">{{ notes()|length }}</span>
+          </a>
+        </li>
+        <li>
           <a onclick="scat.dialog(this, '/report/quick')">
             <i class="fa fa-line-chart"></i>
           </a>

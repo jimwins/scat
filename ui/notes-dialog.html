@@ -1,0 +1,46 @@
+{% extends 'modal-layout.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Notes
+{% endblock %}
+
+{% block body %}
+  <table class="table table-striped">
+    {% for note in notes %}
+      <tr>
+        <td class="col-xs-4 text-right">
+          {% if note.kind == 'txn' %}
+            {% set txn= note.txn %}
+            <a href="{{ path_for('sale', { 'id' : txn.id }) }}">
+              Invoice {{ txn.formatted_number }}
+            </a>
+            <a class="clearfix" href="{{ path_for('person', { 'id' : txn.person_id }) }}">
+              {{ txn.owner.friendly_name }}
+            </a>
+          {% endif %}
+        </td>
+        <td class="col-xs-8">
+          <small>
+            {{ note.added | date("l, F j") }}
+            {% set person= note.person.find_one() %}
+            {% if person %}
+              ({{ person.friendly_name }})
+            {% endif %}
+          </small>
+          <p style="padding-left: 1em">{{ note.content }}</p>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
+
+{% block submit %}
+  <a onclick="this.dialog.addNote()" class="btn btn-default">Add</a>
+{% endblock %}
+
+{% block script %}
+  dialog.addNote= () => {
+    alert("This is a new alert.")
+  }
+{% endblock %}

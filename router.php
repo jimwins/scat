@@ -77,10 +77,8 @@ $container['view']= function ($container) {
   $engine= new Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine();
   $view->addExtension(new Aptoma\Twig\Extension\MarkdownExtension($engine));
 
-  $view->getEnvironment()->addGlobal('DEBUG', $GLOBALS['DEBUG']);
-  $view->getEnvironment()->addGlobal('PUBLIC', ORDURE);
-  $view->getEnvironment()->addGlobal('PUBLIC_CATALOG', ORDURE.'/art-supplies');
-  $view->getEnvironment()->addGlobal('STATIC', ORDURE_STATIC);
+  // Add our Twig extensions
+  $view->addExtension(new \Scat\TwigExtension());
 
   return $view;
 };
@@ -133,7 +131,7 @@ $app->group('/sale', function (Slim\App $app) {
   $app->get('/{id}',
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect("/?id={$args['id']}");
-            });
+            })->setName('sale');
 });
 
 /* Catalog */
@@ -282,6 +280,10 @@ $app->group('/person', function (Slim\App $app) {
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect('/people.php');
             });
+  $app->get('/{id}',
+            function (Request $req, Response $res, array $args) {
+              return $res->withRedirect("/person.php?id={$args['id']}");
+            })->setName('person');
 });
 
 /* Clock */
@@ -305,6 +307,18 @@ $app->group('/report', function (Slim\App $app) {
               return $res->withRedirect("/report-{$args['name']}.php");
             });
 });
+
+/* Notes */
+$app->get('/notes',
+          function (Request $req, Response $res, array $args) {
+            $notes= \Model::factory('Note')
+                      ->where('parent_id', 0)
+                      ->where('todo', 1)
+                      ->order_by_asc('id')
+                      ->find_many();
+            return $this->view->render($res, 'notes-dialog.html',
+                                       [ 'notes' => $notes ]);
+          });
 
 /* Till */
 $app->group('/till', function (Slim\App $app) {
