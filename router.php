@@ -144,6 +144,9 @@ $container['search']= function($c) {
 $container['report']= function($c) {
   return new \Scat\ReportService($c['settings']['report']);
 };
+$container['phone']= function($c) {
+  return new \Scat\PhoneService($c['settings']['phone']);
+};
 
 $app->group('/catalog', function (Slim\App $app) {
   $app->get('/search',
@@ -327,5 +330,13 @@ $app->group('/till', function (Slim\App $app) {
               return $res->withRedirect("/till.php");
             });
 });
+
+/* SMS TODO just testing right now */
+$app->get('/sms',
+            function (Request $req, Response $res, array $args) {
+              $data= $this->phone->sendSMS($req->getParam('to'),
+                                           $req->getParam('text'));
+              return $res->withJson($data);
+            });
 
 $app->run();
