@@ -6,7 +6,10 @@
 {% endblock %}
 
 {% block body %}
-  <table class="table table-striped">
+  {# TODO hardcoded height in here, should be smarter #}
+  <table class="table table-striped"
+         style="display: block;
+                max-height: 500px; overflow: auto; margin-bottom: 0px">
     {% for note in notes %}
       <tr>
         <td class="col-xs-4 text-right">
