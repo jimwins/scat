@@ -23,6 +23,10 @@ class CatalogService
                                         ->find_many();
   }
 
+  public function getDepartmentById($id) {
+    return \Model::factory('Department')->where('id', $id)->find_one();
+  }
+
   public function getDepartmentBySlug($slug) {
     return \Model::factory('Department')->where('slug', $slug)->find_one();
   }
