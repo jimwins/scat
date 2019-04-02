@@ -170,20 +170,16 @@ var uploaderOptions= {
   postUrl: function() { return 'api/image-add.php' },
   /* Progress */
   onClientLoadStart: function (e, file, response) {
-    $('#upload-button')
-      .html('<i class="fa fa-spinner fa-spin"></i> Reading...');
+    console.log("Reading...")
   },
   onClientLoadEnd: function (e, file, response) {
-    $('#upload-button')
-      .html('<i class="fa fa-spinner fa-spin"></i> Preparing...');
+    console.log("Preparing...")
   },
   onServerLoadStart: function (e, file, response) {
-    $('#upload-button')
-      .html('<i class="fa fa-spinner fa-spin"></i> Uploading...');
+    console.log("Uploading...")
   },
   onServerLoad: function (e, file, response) {
-    $('#upload-button')
-      .html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+    console.log("Processing...")
   },
   onSuccess: function(e, file, response) {
     try {
@@ -196,13 +192,10 @@ var uploaderOptions= {
       return;
     }
     viewModel.addImage(data);
-    $('#upload-button')
-      .html('Upload');
+    console.log("Uploade!")
   },
   onServerError: function(e, file) {
     Scat.alert("File upload failed.");
-    $('#upload-button')
-      .html('Upload');
   },
 };
 $(document).html5Uploader(uploaderOptions);
