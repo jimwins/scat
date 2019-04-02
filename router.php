@@ -135,7 +135,7 @@ $app->group('/sale', function (Slim\App $app) {
 });
 
 /* Catalog */
-$container['catalog_service']= function($c) {
+$container['catalog']= function($c) {
   return new \Scat\CatalogService();
 };
 $container['search']= function($c) {
@@ -155,7 +155,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
               $data= $this->search->search($q);
 
-              $data['depts']= $this->catalog_service->getDepartments();
+              $data['depts']= $this->catalog->getDepartments();
               $data['q']= $q;
 
               return $this->view->render($res, 'catalog-searchresults.html',
@@ -164,10 +164,10 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->get('/brand[/{brand}]',
             function (Request $req, Response $res, array $args) {
-              $depts= $this->catalog_service->getDepartments();
+              $depts= $this->catalog->getDepartments();
 
               $brand= $args['brand'] ?
-                $this->catalog_service->getBrandBySlug($args['brand']) : null;
+                $this->catalog->getBrandBySlug($args['brand']) : null;
               if ($args['brand'] && !$brand)
                 throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -176,7 +176,7 @@ $app->group('/catalog', function (Slim\App $app) {
                                  ->order_by_asc('name')
                                  ->find_many();
 
-              $brands= $brand ? null : $this->catalog_service->getBrands();
+              $brands= $brand ? null : $this->catalog->getBrands();
 
 
               return $this->view->render($res, 'catalog-brand.html',
@@ -189,9 +189,9 @@ $app->group('/catalog', function (Slim\App $app) {
   $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]',
             function (Request $req, Response $res, array $args) {
             try {
-              $depts= $this->catalog_service->getDepartments();
+              $depts= $this->catalog->getDepartments();
               $dept= $args['dept'] ?
-                $this->catalog_service->getDepartmentBySlug($args['dept']):null;
+                $this->catalog->getDepartmentBySlug($args['dept']):null;
 
               if ($args['dept'] && !$dept)
                 throw new \Slim\Exception\NotFoundException($req, $res);
@@ -266,7 +266,7 @@ $app->group('/catalog', function (Slim\App $app) {
                /* TODO figure out a way to not have to add/remove /catalog/ */
                $path= preg_replace('!/catalog/!', '',
                                    $req->getUri()->getPath());
-               $re= $this->catalog_service->getRedirectFrom($path);
+               $re= $this->catalog->getRedirectFrom($path);
 
                if ($re) {
                  return $res->withRedirect('/catalog/' . $re->dest, 301);
