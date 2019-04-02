@@ -14,6 +14,14 @@ class ScatUtils {
   dialog (from, name, data= {}) {
     let url= name
 
+    if (Object.keys(data)) {
+      let query= Object.keys(data)
+                   .map(k => encodeURIComponent(k) + '=' +
+                             encodeURIComponent(data[k]))
+                   .join('&')
+      url+= '?' + query
+    }
+
     if (from.disabled) return false
     from.disabled= true
 
