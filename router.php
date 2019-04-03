@@ -162,6 +162,29 @@ $app->group('/catalog', function (Slim\App $app) {
                                          $data);
             })->setName('catalog-search');
 
+  $app->get('/department-form',
+            function (Request $req, Response $res, array $args) {
+              $depts= $this->catalog->getDepartments();
+              $dept= $this->catalog->getDepartmentById($req->getParam('id'));
+              return $this->view->render($res, 'department-dialog.html',
+                                         [
+                                           'depts' => $depts,
+                                           'dept' => $dept
+                                         ]);
+            });
+
+  $app->post('/department-form',
+             function (Request $req, Response $res, array $args) {
+               $dept= $this->catalog->getDepartmentById($req->getParam('id'));
+               if (!$dept)
+                 $dept= $this->catalog->createDepartment();
+               $dept->name= $req->getParam('name');
+               $dept->slug= $req->getParam('slug');
+               $dept->parent_id= $req->getParam('parent_id');
+               $dept->save();
+               return $res->withJson($dept);
+             });
+
   $app->get('/brand[/{brand}]',
             function (Request $req, Response $res, array $args) {
               $depts= $this->catalog->getDepartments();

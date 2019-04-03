@@ -16,31 +16,48 @@
     <hr style="border-color: rgba(0,0,0,0.1)">
     {% block catalog_crumb %}
       {% if dept %}
-        <ol class="breadcrumb">
-          <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
-          <li class="{{ not subdept ? 'active' }}">
-            <a href="{{ path_for('catalog', { 'dept' : dept.slug }) }}">
-              {{ dept.name }}
-            </a>
-          </li>
-          {% if subdept %}
-            <li class="{{ not product ? 'active' }}">
-              <a href="{{ path_for('catalog', {'dept': dept.slug,
-                                               'subdept': subdept.slug }) }}">
-                {{ subdept.name }}
-              </a>
-            </li>
-          {% endif %}
-          {% if product %}
-            <li class="{{ not item ? 'active' }}">
-              <a href="{{ path_for('catalog', { 'dept': dept.slug,
-                                                'subdept': subdept.slug,
-                                                'product': product.slug}) }}">
-                {{ product.name }}
-              </a>
-            </li>
-          {% endif %}
-        </ol>
+        <div class="row">
+          <div class="col-xs-10">
+            <ol class="breadcrumb">
+              <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
+              <li class="{{ not subdept ? 'active' }}">
+                <a href="{{ path_for('catalog', { 'dept' : dept.slug }) }}">
+                  {{ dept.name }}
+                </a>
+              </li>
+              {% if subdept %}
+                <li class="{{ not product ? 'active' }}">
+                  <a href="{{ path_for('catalog', {'dept': dept.slug,
+                                                   'subdept': subdept.slug }) }}">
+                    {{ subdept.name }}
+                  </a>
+                </li>
+              {% endif %}
+              {% if product %}
+                <li class="{{ not item ? 'active' }}">
+                  <a href="{{ path_for('catalog', { 'dept': dept.slug,
+                                                    'subdept': subdept.slug,
+                                                    'product': product.slug}) }}">
+                    {{ product.name }}
+                  </a>
+                </li>
+              {% endif %}
+            </ol>
+          </div>
+          <div class="col-xs-2">
+            {% if product %}
+              {# TODO product editing dialog #}
+            {% else %}
+              <button class="btn btn-primary"
+                      onclick="scat.dialog(this, '/catalog/department-form',
+                                           { id : {{ subdept ?
+                                                      subdept.id :
+                                                      dept.id }} })">
+                Edit Department
+              </button>
+            {% endif %}
+          </div>
+        </div>
       {% endif %}
     {% endblock %}
 
