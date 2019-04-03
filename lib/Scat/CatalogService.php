@@ -15,6 +15,10 @@ class CatalogService
     return \Model::factory('Brand')->where('slug', $slug)->find_one();
   }
 
+  public function createDepartment() {
+    return \Model::factory('Department')->create();
+  }
+
   public function getDepartments($parent_id= 0, $only_active= true) {
     // TODO restrict to active departments (but not in model yet)
     return \Model::factory('Department')->where('parent_id', $parent_id)
