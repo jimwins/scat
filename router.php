@@ -340,7 +340,7 @@ $app->get('/notes',
             $notes= \Model::factory('Note')
                       ->where('parent_id', 0)
                       ->where('todo', 1)
-                      ->order_by_asc('id')
+                      ->order_by_desc('id')
                       ->find_many();
             return $this->view->render($res, 'notes-dialog.html',
                                        [ 'notes' => $notes ]);
