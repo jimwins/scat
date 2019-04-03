@@ -1,0 +1,104 @@
+{% extends 'modal-layout.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Product
+{% endblock %}
+
+{% block body %}
+  <form class="modal-body">
+    {% if product.id %}
+      <input type="hidden" name="id" value="{{ product.id }}">
+    {% endif %}
+
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" class="form-control" autofocus
+             name="name" value="{{ product.name }}">
+    </div>
+    <div class="form-group">
+      <label for="brand">Brand</label>
+      <select class="form-control" name="brand_id" required>
+        <option value=""></option>
+        {% for brand in brands %}
+          <option value="{{ brand.id }}"
+                  {{ brand.id == product.brand_id ? 'selected' }}>
+            {{ brand.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="slug">Slug</label>
+      <div class="input-group">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button"
+                  data-bind="click: generateSlug">
+            <i class="fa fa-cog"></i>
+          </button>
+        </span>
+        <input type="text" class="form-control"
+               name="slug" value="{{ product.slug }}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea class="form-control" rows="10" name="description">
+        {{- product.description -}}
+      </textarea>
+    </div>
+    <div class="form-group">
+      <label for="variation_style">Variation Style</label>
+      <select class="form-control" name="variation_style">
+        <option value="flat"
+                {{ product.variation_style == 'flat' ? 'selected' }}>
+          Flat
+        </option>
+        <option value="tabs"
+                {{ product.variation_style == 'tabs' ? 'selected' }}>
+          Tabs
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="parent">Department</label>
+      <select class="form-control" name="department_id">
+        {% for d in depts %}
+          <optgroup label="{{ d.name }}">
+            {% for sub in d.departments.find_many() %}
+              <option value="{{ sub.id }}"
+                      {{ sub.id == (product.department_id ?: department_id) ? 'selected' }}>
+                {{ sub.name }}
+              </option>
+            {% endfor %}
+          </optgroup>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+{% endblock %}
+
+{% block submit %}
+  <a onclick="this.dialog.updateProduct()" class="btn btn-default">
+    {{- product.id ? 'Update' : 'Add' -}}
+  </a>
+{% endblock %}
+
+{% block script %}
+  dialog.updateProduct= () => {
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    fetch("/catalog/product-form", {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => {
+      debugger
+        if (res.ok) {
+          window.location.reload()
+        } else {
+          alert(res.statusText)
+        }
+      })
+  }
+{% endblock %}
