@@ -55,7 +55,12 @@
               <ul class="dropdown-menu dropdown-menu-right"
                   aria-labelledby="settingsMenu">
                 {% if product %}
-                  {# TODO product editing dialog #}
+                  <li>
+                    <a onclick="scat.dialog(this, '/catalog/product-form',
+                                            { id : {{ product.id }} })">
+                      Edit Product
+                    </a>
+                  </li>
                 {% else %}
                   <li>
                     <a onclick="scat.dialog(this, '/catalog/department-form',
@@ -65,6 +70,15 @@
                       Edit Department
                     </a>
                   </li>
+                  {% if subdept %}
+                    <li>
+                      <a onclick="scat.dialog(this, '/catalog/product-form',
+                                              { department_id:
+                                                 {{ subdept.id }} })">
+                        Add Product
+                      </a>
+                    </li>
+                  {% endif %}
                 {% endif %}
               </ul>
             </div>

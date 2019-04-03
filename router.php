@@ -185,6 +185,36 @@ $app->group('/catalog', function (Slim\App $app) {
                return $res->withJson($dept);
              });
 
+  $app->get('/product-form',
+            function (Request $req, Response $res, array $args) {
+              $depts= $this->catalog->getDepartments();
+              $product= $this->catalog->getProductById($req->getParam('id'));
+              $brands= $this->catalog->getBrands();
+              return $this->view->render($res, 'product-dialog.html',
+                                         [
+                                           'depts' => $depts,
+                                           'brands' => $brands,
+                                           'product' => $product,
+                                           'department_id' =>
+                                             $req->getParam('department_id'),
+                                         ]);
+            });
+
+  $app->post('/product-form',
+             function (Request $req, Response $res, array $args) {
+               $product= $this->catalog->getProductById($req->getParam('id'));
+               if (!$product)
+                 $product= $this->catalog->createProduct();
+               foreach ($product->fields() as $field) {
+                 $value= $req->getParam($field);
+                 if (isset($value)) {
+                   $product->set($field, $value);
+                 }
+               }
+               $product->save();
+               return $res->withJson($product);
+             });
+
   $app->get('/brand[/{brand}]',
             function (Request $req, Response $res, array $args) {
               $depts= $this->catalog->getDepartments();
