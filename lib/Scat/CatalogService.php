@@ -35,6 +35,14 @@ class CatalogService
     return \Model::factory('Department')->where('slug', $slug)->find_one();
   }
 
+  public function createProduct() {
+    return \Model::factory('Product')->create();
+  }
+
+  public function getProductById($id) {
+    return \Model::factory('Product')->where('id', $id)->find_one();
+  }
+
   public function GetRedirectFrom($source) {
     $dst=\Model::factory('Redirect')->where_like('source', $source)->find_one();
     return $dst;
