@@ -17,7 +17,7 @@
     {% block catalog_crumb %}
       {% if dept %}
         <div class="row">
-          <div class="col-xs-10">
+          <div class="col-xs-11">
             <ol class="breadcrumb">
               <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
               <li class="{{ not subdept ? 'active' }}">
@@ -44,18 +44,30 @@
               {% endif %}
             </ol>
           </div>
-          <div class="col-xs-2">
-            {% if product %}
-              {# TODO product editing dialog #}
-            {% else %}
-              <button class="btn btn-primary"
-                      onclick="scat.dialog(this, '/catalog/department-form',
-                                           { id : {{ subdept ?
-                                                      subdept.id :
-                                                      dept.id }} })">
-                Edit Department
+          <div class="col-xs-1">
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle"
+                      type="button" id="settingsMenu" data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="true">
+                <i class="fa fa-cog"></i>
+                <span class="caret"></span>
               </button>
-            {% endif %}
+              <ul class="dropdown-menu dropdown-menu-right"
+                  aria-labelledby="settingsMenu">
+                {% if product %}
+                  {# TODO product editing dialog #}
+                {% else %}
+                  <li>
+                    <a onclick="scat.dialog(this, '/catalog/department-form',
+                                            { id : {{ subdept ?
+                                                       subdept.id :
+                                                       dept.id }} })">
+                      Edit Department
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
           </div>
         </div>
       {% endif %}
