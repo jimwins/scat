@@ -2,6 +2,12 @@
 namespace Scat;
 
 class Product extends \Model implements \JsonSerializable {
+  public function fields() {
+    return [ 'id', 'department_id', 'brand_id', 'name',
+             'description', 'slug', 'variation_style',
+             'active' ];
+  }
+
   public function brand() {
     return $this->belongs_to('Brand');
   }
