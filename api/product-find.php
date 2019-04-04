@@ -33,7 +33,9 @@ if ($_REQUEST['_type'] == 'query') {
   $data= [ 'results' => [], 'pagination' => [ 'more' => false ]];
 
   foreach ($products as $product) {
-    $data['results'][]= [ 'id' => $product['id'], 'text' => $product['name'] ];
+    $data['results'][]= [ 'id' => $product['id'],
+                          'text' => $product['name'] . ' / ' .
+                                    $product['brand_name'] ];
   }
 
   echo jsonp($data);
