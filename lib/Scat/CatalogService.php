@@ -6,9 +6,17 @@ class CatalogService
   public function __construct() {
   }
 
+  public function createBrand() {
+    return \Model::factory('Brand')->create();
+  }
+
   public function getBrands($only_active= true) {
     // TODO restrict to active brands (but not in model yet)
     return \Model::factory('Brand')->order_by_asc('name')->find_many();
+  }
+
+  public function getBrandById($id) {
+    return \Model::factory('Brand')->where('id', $id)->find_one();
   }
 
   public function getBrandBySlug($slug) {
