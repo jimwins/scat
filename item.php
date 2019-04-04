@@ -287,23 +287,20 @@ include 'item-searchform.php';
         </div>
 
         <div class="form-group">
-          <div class="col-sm-12">
+          <div class="col-sm-12" data-bind="if: item.product_id()">
             <a class="btn btn-default"
-               data-bind="visible: item.product_id(),
-                          attr: { href: '/catalog/' + product.full_slug() }">
+               data-bind="attr: { href: '/catalog/' + product.full_slug() }">
               <i class="fa fa-cubes"></i> Product
             </a>
 
             <a class="btn btn-default"
-               data-bind="visible: item.product_id(),
-                          attr: { href: 'items.php?search=product:' +
+               data-bind="attr: { href: 'items.php?search=product:' +
                                          item.product_id() }">
               <i class="far fa-clipboard"></i> Product List
             </a>
 
             <a class="btn btn-default"
-               data-bind="visible: item.product_id(),
-                          attr: { href: 'report-performance.php?product=' +
+               data-bind="attr: { href: 'report-performance.php?product=' +
                                          item.product_id() }">
               <i class="far fa-chart-bar"></i> Performance
             </a>
