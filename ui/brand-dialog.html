@@ -1,0 +1,53 @@
+{% extends 'modal-layout.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Brand
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    {% if brand.id %}
+      <input type="hidden" name="id" value="{{ brand.id }}">
+    {% endif %}
+
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" class="form-control" autofocus
+             name="name" value="{{ brand.name }}">
+    </div>
+
+    <div class="form-group">
+      <label for="slug">Slug</label>
+      <input type="text" class="form-control"
+             name="slug" value="{{ brand.slug }}">
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-default">
+    {{- brand.id ? 'Update' : 'Add' -}}
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    fetch("/catalog/brand-form", {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => {
+        if (res.ok) {
+          window.location.reload()
+        } else {
+          alert(res.statusText)
+        }
+      })
+  }
+{% endblock %}

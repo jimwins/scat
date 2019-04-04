@@ -162,6 +162,26 @@ $app->group('/catalog', function (Slim\App $app) {
                                          $data);
             })->setName('catalog-search');
 
+  $app->get('/brand-form',
+            function (Request $req, Response $res, array $args) {
+              $brand= $this->catalog->getBrandById($req->getParam('id'));
+              return $this->view->render($res, 'brand-dialog.html',
+                                         [
+                                           'brand' => $brand
+                                         ]);
+            });
+
+  $app->post('/brand-form',
+             function (Request $req, Response $res, array $args) {
+               $brand= $this->catalog->getBrandById($req->getParam('id'));
+               if (!$brand)
+                 $brand= $this->catalog->createBrand();
+               $brand->name= $req->getParam('name');
+               $brand->slug= $req->getParam('slug');
+               $brand->save();
+               return $res->withJson($brand);
+             });
+
   $app->get('/department-form',
             function (Request $req, Response $res, array $args) {
               $depts= $this->catalog->getDepartments();
