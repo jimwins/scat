@@ -24,9 +24,9 @@ $product= array('id' => 0, 'name' => ''); /* Bare necessities for KO */
 $item= item_load($db, $id);
 
 if ($item['product_id']) {
-  $product= Model::factory('Product')
-              ->find_one($item['product_id'])
-              ->as_array();
+  $prod= \Scat\Product::getById($item['product_id']);
+  $product= $prod->as_array();
+  $product['full_slug']= $prod->full_slug();
 }
 
 $q= "SELECT pattern_type, minimum_quantity, discount_type, discount, expires
@@ -290,8 +290,7 @@ include 'item-searchform.php';
           <div class="col-sm-12">
             <a class="btn btn-default"
                data-bind="visible: item.product_id(),
-                          attr: { href: 'catalog-product.php?id=' +
-                                         item.product_id() }">
+                          attr: { href: '/catalog/' + product.full_slug() }">
               <i class="fa fa-cubes"></i> Product
             </a>
 
