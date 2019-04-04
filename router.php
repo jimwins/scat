@@ -250,7 +250,6 @@ $app->group('/catalog', function (Slim\App $app) {
 
               $brands= $brand ? null : $this->catalog->getBrands();
 
-
               return $this->view->render($res, 'catalog-brand.html',
                                          [ 'depts' => $depts,
                                            'brands' => $brands,
@@ -323,8 +322,11 @@ $app->group('/catalog', function (Slim\App $app) {
               if ($args['item'] && !$item)
                 throw new \Slim\Exception\NotFoundException($req, $res);
 
+              $brands= $dept ? null : $this->catalog->getBrands();
+
               return $this->view->render($res, 'catalog-layout.html',
-                                         [ 'dept' => $dept,
+                                         [ 'brands' => $brands,
+                                           'dept' => $dept,
                                            'depts' => $depts,
                                            'subdept' => $subdept,
                                            'subdepts' => $subdepts,

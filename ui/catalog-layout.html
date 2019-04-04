@@ -105,6 +105,18 @@
         {% include 'catalog-item.twig' %}
       {% endif %}
 
+      {% if brands|length %}
+        <ul style="column-count: 3" class="list-group">
+          {% for b in brands %}
+            <li class="list-group-item" style="break-inside: avoid-column">
+              <a href="{{ path_for('catalog-brand', { 'brand' : b.slug }) }}">
+                {{ b.name }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
     {% endblock %}
   </div>
 
