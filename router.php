@@ -215,6 +215,25 @@ $app->group('/catalog', function (Slim\App $app) {
                return $res->withJson($product);
              });
 
+  $app->post('/product/add-image',
+             function (Request $req, Response $res, array $args) {
+               $product= $this->catalog->getProductById($req->getParam('id'));
+
+               $url= $req->getParam('url');
+               if ($url) {
+                 $image= \Scat\Image::createFromUrl($url);
+                 $product->addImage($image);
+               } else {
+                 foreach ($req->getUploadedFiles() as $file) {
+                   $image= \Scat\Image::createFromFile($file->getStream(),
+                                                       $file->getClientFilename());
+                   $product->addImage($image);
+                 }
+               }
+
+               return $res->withJson($product);
+             });
+
   $app->get('/brand[/{brand}]',
             function (Request $req, Response $res, array $args) {
               $depts= $this->catalog->getDepartments();

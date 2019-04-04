@@ -117,3 +117,68 @@
 </div>
 
 {% endblock %}
+
+{% block extra_head %}
+  {% if product %}
+    <script src="/js/jquery.html5uploader.js"></script>
+    <script>
+    $(function() {
+      var uploaderOptions= {
+        name: 'src',
+        postUrl: function() {
+          return '/catalog/product/add-image?id={{ product.id }}'
+        },
+        /* Progress */
+        onClientLoadStart: function (e, file, response) {
+          $('#status').text("Reading...")
+        },
+        onClientLoadEnd: function (e, file, response) {
+          $('#status').text("Preparing...")
+        },
+        onServerLoadStart: function (e, file, response) {
+          $('#status').text("Uploading...")
+        },
+        onServerLoad: function (e, file, response) {
+          $('#status').text("Processing...")
+        },
+        onSuccess: function(e, file, response) {
+          try {
+            data= JSON.parse(response);
+          } catch (e) {
+            data= { error : e };
+          }
+          if (data.error) {
+            alert(data);
+            return;
+          }
+          $('#status').text("Uploaded!")
+          window.location.reload();
+        },
+        onServerError: function(e, file) {
+          alert("File upload failed.");
+          $('#status').text('Failed.');
+        },
+      };
+      $(document).html5Uploader(uploaderOptions);
+
+      /*
+      $(document).bind("drop", function (e) {
+        var items= e.originalEvent.dataTransfer.items;
+        if (e.originalEvent.dataTransfer.files.length) return;
+        for (var i= 0; i < items.length; i++) {
+          if (items[i].kind == 'string' && items[i].type == 'text/uri-list') {
+            items[i].getAsString(function (s) {
+              Scat.api('image-add', { url: s })
+                  .done(function (data) {
+                    viewModel.addImage(data);
+                  });
+            });
+          }
+        }
+        return false;
+      });
+      */
+    });
+    </script>
+  {% endif %}
+{% endblock %}
