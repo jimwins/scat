@@ -47,6 +47,13 @@ class Product extends \Model implements \JsonSerializable {
     return $media;
   }
 
+  public function addImage($image) {
+    $rel= \Model::factory('ImageProduct')->create();
+    $rel->image_id= $image->id;
+    $rel->product_id= $this->id;
+    $rel->save();
+  }
+
   public static function getById($id) {
     $product= \Model::factory('Product')
                 ->select('product.*')
