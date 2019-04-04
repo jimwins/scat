@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block body %}
-  <form class="modal-body">
+  <div class="modal-body">
     {% if dept.id %}
       <input type="hidden" name="id" value="{{ dept.id }}">
     {% endif %}
@@ -33,17 +33,19 @@
         {% endfor %}
       </select>
     </div>
-  </form>
+  </div>
 {% endblock %}
 
 {% block submit %}
-  <a onclick="this.dialog.updateDepartment()" class="btn btn-default">
+  <button class="btn btn-primary">
     {{- dept.id ? 'Update' : 'Add' -}}
   </a>
 {% endblock %}
 
 {% block script %}
-  dialog.updateDepartment= () => {
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
     fetch("/catalog/department-form", {

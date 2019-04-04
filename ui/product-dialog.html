@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block body %}
-  <form class="modal-body">
+  <div class="modal-body">
     {% if product.id %}
       <input type="hidden" name="id" value="{{ product.id }}">
     {% endif %}
@@ -75,17 +75,19 @@
         {% endfor %}
       </select>
     </div>
-  </form>
+  </div>
 {% endblock %}
 
 {% block submit %}
-  <a onclick="this.dialog.updateProduct()" class="btn btn-default">
+  <button type="submit" class="btn btn-primary">
     {{- product.id ? 'Update' : 'Add' -}}
   </a>
 {% endblock %}
 
 {% block script %}
-  dialog.updateProduct= () => {
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
     fetch("/catalog/product-form", {
@@ -93,7 +95,6 @@
       body: formData
     })
       .then(res => {
-      debugger
         if (res.ok) {
           window.location.reload()
         } else {
