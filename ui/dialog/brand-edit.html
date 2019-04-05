@@ -1,45 +1,35 @@
-{% extends 'modal-layout.html' %}
+{% extends 'layout/dialog.html' %}
 {% import 'macros.twig' as scat %}
 
 {% block title %}
-  Department
+  Brand
 {% endblock %}
 
 {% block body %}
   <div class="modal-body">
-    {% if dept.id %}
-      <input type="hidden" name="id" value="{{ dept.id }}">
+    {% if brand.id %}
+      <input type="hidden" name="id" value="{{ brand.id }}">
     {% endif %}
 
     <div class="form-group">
       <label for="name">Name</label>
       <input type="text" class="form-control" autofocus
-             name="name" value="{{ dept.name }}">
+             name="name" value="{{ brand.name }}">
     </div>
 
     <div class="form-group">
       <label for="slug">Slug</label>
-      <input type="text" class="form-control" name="slug" value="{{ dept.slug }}">
+      <input type="text" class="form-control"
+             name="slug" value="{{ brand.slug }}">
     </div>
 
-    <div class="form-group">
-      <label for="parent">Parent</label>
-      <select class="form-control" name="parent_id">
-        <option value="0">Top</option>
-        {% for d in depts %}
-          <option value="{{ d.id }}" {{ d.id == dept.parent_id ? 'selected' }}>
-            {{ d.name }}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
   </div>
 {% endblock %}
 
 {% block submit %}
-  <button class="btn btn-primary">
-    {{- dept.id ? 'Update' : 'Add' -}}
-  </a>
+  <button type="submit" class="btn btn-default">
+    {{- brand.id ? 'Update' : 'Add' -}}
+  </button>
 {% endblock %}
 
 {% block script %}
@@ -48,7 +38,7 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    fetch("/catalog/department-form", {
+    fetch("/catalog/brand-form", {
       method: 'POST',
       body: formData
     })

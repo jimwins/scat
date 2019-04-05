@@ -165,7 +165,7 @@ $app->group('/catalog', function (Slim\App $app) {
   $app->get('/brand-form',
             function (Request $req, Response $res, array $args) {
               $brand= $this->catalog->getBrandById($req->getParam('id'));
-              return $this->view->render($res, 'brand-dialog.html',
+              return $this->view->render($res, 'dialog/brand-edit.html',
                                          [
                                            'brand' => $brand
                                          ]);
@@ -186,7 +186,7 @@ $app->group('/catalog', function (Slim\App $app) {
             function (Request $req, Response $res, array $args) {
               $depts= $this->catalog->getDepartments();
               $dept= $this->catalog->getDepartmentById($req->getParam('id'));
-              return $this->view->render($res, 'department-dialog.html',
+              return $this->view->render($res, 'dialog/department-edit.html',
                                          [
                                            'depts' => $depts,
                                            'dept' => $dept
@@ -210,7 +210,7 @@ $app->group('/catalog', function (Slim\App $app) {
               $depts= $this->catalog->getDepartments();
               $product= $this->catalog->getProductById($req->getParam('id'));
               $brands= $this->catalog->getBrands();
-              return $this->view->render($res, 'product-dialog.html',
+              return $this->view->render($res, 'dialog/product-edit.html',
                                          [
                                            'depts' => $depts,
                                            'brands' => $brands,
@@ -413,7 +413,7 @@ $app->get('/notes',
                       ->where('todo', 1)
                       ->order_by_desc('id')
                       ->find_many();
-            return $this->view->render($res, 'notes-dialog.html',
+            return $this->view->render($res, 'dialog/notes.html',
                                        [ 'notes' => $notes ]);
           });
 
