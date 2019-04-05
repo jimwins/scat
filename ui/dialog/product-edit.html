@@ -33,7 +33,7 @@
       <div class="input-group">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button"
-                  data-bind="click: generateSlug">
+                  onclick="form.generateSlug(event, this)">
             <i class="fa fa-cog"></i>
           </button>
         </span>
@@ -101,5 +101,13 @@
           alert(res.statusText)
         }
       })
+  }
+
+  form.generateSlug= (event) => {
+    scat.generateSlug(form.brand_id.options[form.brand_id.selectedIndex].text,
+                      form.name.value)
+        .then((val) => {
+          form.slug.value= val
+        })
   }
 {% endblock %}

@@ -63,6 +63,19 @@ class ScatUtils {
                     error.message)
       })
   }
+
+  generateSlug (...parts) {
+    return import('/js/url_slug.js')
+      .then(m => {
+          return m.url_slug(parts.join('-'),
+                            {
+                              replacements : {
+                                '&': 'and',
+                                '#': 'hashbrown-'
+                              }
+                            })
+      })
+  }
 }
 
 let scat= new ScatUtils()
