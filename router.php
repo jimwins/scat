@@ -396,7 +396,7 @@ $app->group('/report', function (Slim\App $app) {
   $app->get('/quick',
             function (Request $req, Response $res, array $args) {
               $data= $this->report->sales();
-              return $this->view->render($res, 'report-quick.html',
+              return $this->view->render($res, 'dialog/report-quick.html',
                                          $data);
             });
   $app->get('/{name}',
