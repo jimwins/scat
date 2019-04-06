@@ -19,7 +19,7 @@
       </small>
     </h2>
     <div class="content">
-      {{ product.description | markdown }}
+      {{ product.description | replace({'{{ @STATIC }}' : STATIC}) | markdown }}
     </div>
   </div>
   <div class="col-sm-3">
