@@ -59,7 +59,7 @@ foreach ($items as $item) {
   $name= utf8_decode($item['name']);
 
   if ($trim)
-    $name= preg_replace("/$trim/i", '', $name);
+    $name= trim(preg_replace("!$trim!i", '', $name));
 
   $width= $pdf->GetStringWidth($name);
   while ($width > ($label_width - $left_margin * 2) && $size) {
