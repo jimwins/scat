@@ -317,13 +317,12 @@ $app->group('/catalog', function (Slim\App $app) {
               $items= $product ?
                 $product->items()
                         # A crude implementation of a numsort
-                        ->order_by_expr('CONVERT(IF(CONVERT(variation, SIGNED),
-                                                    CONVERT(variation, SIGNED),
-                                                    CONCAT(9999,
-                                                           HEX(SUBSTRING(
-                                                                 variation,
-                                                                 1,4)))),
-                                                 SIGNED) ASC')
+                        ->order_by_expr('IF(CONVERT(variation, SIGNED),
+                                            CONCAT(LPAD(CONVERT(variation,
+                                                                SIGNED),
+                                                        10, "0"),
+                                                   variation),
+                                            variation) ASC')
                         ->order_by_expr('minimum_quantity > 0 DESC')
                         ->order_by_asc('code')
                         ->find_many():null;
