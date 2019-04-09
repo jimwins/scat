@@ -309,6 +309,54 @@ ob_end_flush();
             </div>
           </div>
           <div class="form-group">
+            <label for="prop65" class="col-sm-2 control-label">
+              Prop. 65
+            </label>
+            <div class="col-sm-10">
+              <select name="prop65" class="form-control">
+                <option value=""></option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="hazmat" class="col-sm-2 control-label">
+              Hazardous Material
+            </label>
+            <div class="col-sm-10">
+              <select name="hazmat" class="form-control">
+                <option value=""></option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="oversized" class="col-sm-2 control-label">
+              Oversized
+            </label>
+            <div class="col-sm-10">
+              <select name="oversized" class="form-control">
+                <option value=""></option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="active" class="col-sm-2 control-label">
+              Active
+            </label>
+            <div class="col-sm-10">
+              <select name="active" class="form-control">
+                <option value=""></option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
             <span class="col-sm-offset-2 col-sm-10">
               <button class="btn btn-primary">Submit</button>
             </span>

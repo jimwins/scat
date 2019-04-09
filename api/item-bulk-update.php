@@ -77,6 +77,12 @@ if (strlen($_REQUEST['purchase_quantity'])) {
   $props[]= "purchase_quantity = $purchase_quantity";
 }
 
+foreach (array('active','oversized','hazmat','prop65') as $key) {
+  if (strlen($_REQUEST[$key])) {
+    $props[]= "$key = " . (int)$_REQUEST[$key];
+  }
+}
+
 // build query
 $set= join(', ', $props);
 $q= "UPDATE item SET $set
