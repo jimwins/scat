@@ -48,6 +48,7 @@
         "twig/twig": "^2.6",
         "slim/twig-view": "^2.4",
         "slim/http-cache": "^0.4.0",
-        "aptoma/twig-markdown": "^3.0"
+        "aptoma/twig-markdown": "^3.0",
+        "graylog2/gelf-php": "^1.6"
     }
 }
