@@ -345,6 +345,7 @@ function foot() {
  <div id="time">Page generated in $time seconds.</div>
  <div id="status">&nbsp;</div>
 </footer>
+</div>
 <script>
 $(function() {
   Scat.api('note-count', { todo: 1})
