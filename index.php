@@ -1459,4 +1459,44 @@ $("body").html5Uploader({
     Scat.alert("File upload failed.");
   },
 });
+
+$("body")
+.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+})
+.on('dragover dragenter', function(e) {
+  if (Txn.id() && viewModel.txn.type() == 'vendor') {
+    $('#droptarget').show();
+  }
+})
+.on('dragleave dragend drop', function(e) {
+  $('#droptarget').hide();
+});
 </script>
+<style>
+#droptarget {
+  position: absolute;
+  z-index: 100000;
+  top: 0; left; 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0,0,0,0.6);
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#droptarget h1 {
+  color: #fff;
+  font-size: 6em;
+  max-width: 50%;
+}
+#droptarget, #droptarget * {
+  pointer-events: none;
+}
+</style>
+<div id="droptarget" style="display:none">
+  <h1>Drop order file to upload.</h1>
+</div>
