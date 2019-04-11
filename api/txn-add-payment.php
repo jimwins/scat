@@ -12,7 +12,7 @@ $amount= $_REQUEST['amount'];
 
 // validate method
 if (!in_array($method,
-              array('cash','credit','square','stripe','dwolla','paypal','gift','check','discount','bad','donation','internal'))) {
+              array('cash','credit','square','stripe','dwolla','amazon','paypal','gift','check','discount','bad','donation','internal'))) {
   die_jsonp("Invalid method specified.");
 }
 
