@@ -250,7 +250,7 @@ DROP TABLE IF EXISTS `payment`;
 CREATE TABLE `payment` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `txn` int(10) unsigned NOT NULL,
-  `method` enum('cash','change','credit','square','stripe','gift','check','dwolla','paypal','discount','withdrawal','bad','donation','internal') NOT NULL,
+  `method` enum('cash','change','credit','square','stripe','gift','check','dwolla','paypal','amazon','discount','withdrawal','bad','donation','internal') NOT NULL,
   `amount` decimal(9,3) NOT NULL,
   `cc_txn` varchar(32) DEFAULT NULL,
   `cc_refid` varchar(32) DEFAULT NULL,
