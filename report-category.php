@@ -128,6 +128,7 @@ $q= "SELECT
             (SELECT SUM(amount) FROM report_previous WHERE department_id = id)
               AS previous_amount
        FROM department
+     HAVING NOT parent_id OR current_amount OR previous_amount
 /*
       UNION
       SELECT
