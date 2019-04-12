@@ -16,7 +16,7 @@
         Active
         <select name="active" class="form-control">
           <option value="1" {{ product.active ? 'selected' }}>Yes</option>
-          <option value="0" {{ not product.active ? 'selected' }}>No</option>
+          <option value="0" {{ product.id and not product.active ? 'selected' }}>No</option>
         </select>
       </label>
     </div>
