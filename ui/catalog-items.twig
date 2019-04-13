@@ -49,8 +49,8 @@
       <a href="{{ product ? product.slug ~ '/' ~ i.code : i.full_slug }}">{{ i.code }}</a>
     </td>
     <td>{{ variations|length ? (i.short_name ?: i.name) : i.name }}</td>
-    <td class="text-right">{{ scat.amount(i.retail_price) }}</td>
-    <td class="text-right">
+    <td class="text-right" nowrap>{{ scat.amount(i.retail_price) }}</td>
+    <td class="text-right" nowrap>
       {{ scat.amount(i.sale_price) }}
       {% if i.discount_type in [ 'percentage', 'relative' ] %}
         <br>
