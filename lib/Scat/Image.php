@@ -8,6 +8,10 @@ class Image extends \Model {
     return '/i/th/' . $this->uuid . '.jpg';
   }
 
+  public function medium() {
+    return '/i/md/' . $this->uuid . '.jpg';
+  }
+
   public static function createFromUrl($url) {
     $client= new \GuzzleHttp\Client();
     $res= $client->get($url);
