@@ -133,67 +133,41 @@
 
 {% endblock %}
 
-{% block extra_head %}
+{% block script %}
   {% if product %}
-    <script src="/js/jquery.html5uploader.js"></script>
     <script>
-    $(function() {
-      var uploaderOptions= {
-        name: 'src',
-        postUrl: function() {
-          return '/catalog/product/add-image?id={{ product.id }}'
-        },
-        /* Progress */
-        onClientLoadStart: function (e, file, response) {
-          $('#status').text("Reading...")
-        },
-        onClientLoadEnd: function (e, file, response) {
-          $('#status').text("Preparing...")
-        },
-        onServerLoadStart: function (e, file, response) {
-          $('#status').text("Uploading...")
-        },
-        onServerLoad: function (e, file, response) {
-          $('#status').text("Processing...")
-        },
-        onSuccess: function(e, file, response) {
-          try {
-            data= JSON.parse(response);
-          } catch (e) {
-            data= { error : e };
-          }
-          if (data.error) {
-            alert(data);
-            return;
-          }
-          $('#status').text("Uploaded!")
-          window.location.reload();
-        },
-        onServerError: function(e, file) {
-          alert("File upload failed.");
-          $('#status').text('Failed.');
-        },
-      };
-      $(document).html5Uploader(uploaderOptions);
+      let dropArea= document.currentScript.parentNode;
 
-      /*
-      $(document).bind("drop", function (e) {
-        var items= e.originalEvent.dataTransfer.items;
-        if (e.originalEvent.dataTransfer.files.length) return;
-        for (var i= 0; i < items.length; i++) {
-          if (items[i].kind == 'string' && items[i].type == 'text/uri-list') {
-            items[i].getAsString(function (s) {
-              Scat.api('image-add', { url: s })
-                  .done(function (data) {
-                    viewModel.addImage(data);
-                  });
-            });
-          }
-        }
-        return false;
-      });
-      */
-    });
+      ['dragenter', 'dragleave', 'dragover', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, (ev) => {
+          ev.preventDefault()
+          ev.stopPropagation()
+        })
+      })
+
+      dropArea.addEventListener('drop', (ev) => {
+        let dt= ev.dataTransfer
+        let files= dt.files;
+
+        [...files].forEach((file) => {
+          let url= '/catalog/product/add-image?id={{ product.id }}'
+          let formData= new FormData()
+          formData.append('file', file)
+          fetch(url, { method: 'POST', body: formData })
+            .then((res) => {
+              if (!res.ok) {
+                // TODO some real error handling would be good
+                alert("Sorry, there was a problem with the upload.")
+              } else {
+                window.location.reload()
+              }
+            })
+            .catch((res) => {
+              debugger
+              alert("Sorry, there was a problem with the upload.")
+            })
+        })
+      })
     </script>
   {% endif %}
 {% endblock %}
