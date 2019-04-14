@@ -432,4 +432,9 @@ $app->get('/sms',
               return $res->withJson($data);
             });
 
+$app->get('/dialog/{dialog}',
+          function (Request $req, Response $res, array $args) {
+            return $this->view->render($res, "dialog/{$args['dialog']}");
+          });
+
 $app->run();
