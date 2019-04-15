@@ -76,6 +76,24 @@ class ScatUtils {
                             })
       })
   }
+
+  // format number as $3.00 or ($3.00)
+  amount (val) {
+    if (typeof(val) == 'function') {
+      val= val()
+    }
+    if (typeof(val) == 'undefined' || val == null) {
+      return ''
+    }
+    if (typeof(val) == 'string') {
+      val= parseFloat(val)
+    }
+    if (val < 0.0) {
+      return '($' + Math.abs(val).toFixed(2) + ')'
+    } else {
+      return '$' + val.toFixed(2)
+    }
+  }
 }
 
 let scat= new ScatUtils()
