@@ -196,19 +196,22 @@
           let url= '/catalog/product/add-image?id={{ product.id }}'
           let formData= new FormData()
           formData.append('file', file)
-          fetch(url, { method: 'POST', body: formData })
-            .then((res) => {
-              if (!res.ok) {
-                // TODO some real error handling would be good
-                alert("Sorry, there was a problem with the upload.")
-              } else {
-                window.location.reload()
-              }
-            })
-            .catch((res) => {
-              debugger
+          fetch(url, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json' },
+            body: formData
+          })
+          .then((res) => {
+            if (!res.ok) {
+              // TODO some real error handling would be good
               alert("Sorry, there was a problem with the upload.")
-            })
+            } else {
+              window.location.reload()
+            }
+          })
+          .catch((res) => {
+            alert("Sorry, there was a problem with the upload.")
+          })
         })
       })
     </script>
