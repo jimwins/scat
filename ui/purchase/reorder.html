@@ -196,8 +196,9 @@
       for (let input of inputs) {
         input.addEventListener('keydown', handleKeyDown)
         input.addEventListener('input', handleChangeEvent)
-        input.addEventListener('focus', handleFocus)
-        input.addEventListener('blur', handleBlur)
+        // XXX performance killer on large orders
+        //input.addEventListener('focus', handleFocus)
+        //input.addEventListener('blur', handleBlur)
       }
 
       form.querySelector('#zero').addEventListener('click', (ev) => {
