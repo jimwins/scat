@@ -1,0 +1,221 @@
+{% extends 'layout/page.html' %}
+  
+{% block title %}
+  Reorder
+{% endblock %}
+
+{% block content %}
+
+  <form class="form-inline" action="reorder" method="POST">
+    <div class="pull-right">
+      <button type="button" class="btn btn-default" id="zero">
+        Zero
+      </button>
+      <button type="button" class="btn btn-default" id="optimize">
+        Optimize
+      </button>
+    </div>
+    <table class="table table-condensed table-striped">
+      <thead>
+        <tr>
+          <th width="3%" class="num">#</th>
+          <th>Code</th>
+          <th>Name</th>
+          <th width="5%" class="text-center">Stock</th>
+          <th width="5%" class="text-center">Min</th>
+          <th width="5%" class="text-center">Last 3</th>
+          <th width="5%" class="text-center">MOQ</th>
+          <th width="5%" class="text-center">Best?</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for item in items %}
+          <tr>
+            <td class="num">{{ loop.index }}</td>
+            <td>
+              <a href="/catalog/item/{{ item.code | url_encode }}">
+                {{- item.code -}}
+              </a>
+            </td>
+            <td>{{ item.name }}</td>
+            <td align="center">{{ item.stock }}</td>
+            <td align="center">{{ item.minimum_quantity }}</td>
+            <td align="center">{{ item.last3months }}</td>
+            <td align="center">{{ item.minimum_order_quantity }}</td>
+            <td align="center">
+              {% if item.cheapest is defined %}
+                <i class="fa {{ item.cheapest < 0 ? 'fa-check-square-o' :
+                                 (item.cheapest == 0 ? 'fa-minus-square-o' :
+                                   'fa-square-o') }}"></i>
+              {% endif %}
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <input class="form-control text-center"
+                       type="text" size="4" name="item[{{ item.id }}]"
+                       data-moq="{{ item.minimum_order_quantity }}"
+                       data-cost="{{ item.cost }}"
+                       data-opt="{{ item.cheapest <= 0 ?
+                                     min(item.minimum_order_quantity,
+                                         item.minimum_quantity - item.stock ) }}">
+                <span class="input-group-addon" style="min-width: 7em"></span>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">
+            <input type="hidden" name="vendor" value="{{ vendor }}">
+            <button role="submit" class="btn btn-primary">
+              Create Order
+            </button>
+          </td>
+          <td colspan="4" align="right">
+            <strong>
+              Total: &nbsp;
+            </strong>
+          </td>
+          </td>
+          <td id="total" align="center">
+            $0.00
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <script>
+      const form= document.currentScript.parentNode
+      const inputs= form.querySelectorAll('input[type="text"]')
+
+      const focusNextInput= (document, direction= 1) => {
+	// all the elements that can be focused
+	const focusableElements=
+          'button:not([disabled]), ' +
+          'input[type=text]:not([disabled]), ' +
+          '[tabindex]:not([disabled]):not([tabindex="-1"])';
+
+        if (document.activeElement && document.activeElement.form) {
+          let elements=
+            Array.prototype.filter.call(
+              document.activeElement.form.querySelectorAll(focusableElements),
+              (element) => {
+                //check for visibility, but always include activeElement
+                return element.offsetWidth > 0 ||
+                       element.offsetHeight > 0 ||
+                       element === document.activeElement
+              }
+            )
+
+          const index= elements.indexOf(document.activeElement);
+          if (index > -1) {
+           let nextElement= elements[index + direction] ||
+                            elements[direction < 0 ? elements.length - 1 : 0];
+           nextElement.focus();
+          }                    
+        }
+      }
+      const focusPrevInput= (document) => {
+        focusNextInput(document, -1)
+      }
+
+      const handleKeyDown= (ev) => {
+        const val= ev.currentTarget.value ? parseInt(ev.currentTarget.value) : 0
+        let handled= true
+
+        switch (ev.key) {
+        case "ArrowLeft":
+          if (!ev.shiftKey) {
+            ev.currentTarget.value= Math.max(0,-1 + val)
+          } else {
+            handled= false
+          }
+          break;
+        case "ArrowRight":
+          if (!ev.shiftKey) {
+            ev.currentTarget.value= 1 + val
+          } else {
+            handled= false
+          }
+          break;
+        case "ArrowUp":
+          focusPrevInput(document)
+          break;
+        case "ArrowDown":
+          focusNextInput(document)
+          break;
+        case "x":
+          ev.currentTarget.value= 0;
+          focusNextInput(document)
+          break;
+        case " ":
+        case "Enter":
+          focusNextInput(document, ev.shiftKey ? -1 : 1)
+          break;
+        default:
+          handled= false
+        }
+        if (handled) {
+          ev.preventDefault()
+          ev.stopPropagation()
+          handleChange(ev.currentTarget)
+        }
+      }
+
+      const updateTotal= (form) => {
+        let total= 0.00
+        for (let input of inputs) {
+          total+= input.attributes['data-cost'].value * input.value
+        }
+        form.querySelector('#total').innerHTML=
+          scat.amount(total)
+      }
+
+      const handleChange= (input, doUpdateTotal= true) => {
+        const val= input.attributes['data-cost'].value * input.value
+        input.nextElementSibling.innerHTML= scat.amount(val)
+        if (doUpdateTotal) {
+          updateTotal(input.form)
+        }
+      }
+
+      const handleChangeEvent= (ev) => {
+        handleChange(ev.currentTarget)
+      }
+
+      const handleFocus= (ev) => {
+        ev.currentTarget.closest('tr').classList.add('active')
+      }
+      const handleBlur= (ev) => {
+        ev.currentTarget.closest('tr').classList.remove('active')
+      }
+
+      for (let input of inputs) {
+        input.addEventListener('keydown', handleKeyDown)
+        input.addEventListener('input', handleChangeEvent)
+        input.addEventListener('focus', handleFocus)
+        input.addEventListener('blur', handleBlur)
+      }
+
+      form.querySelector('#zero').addEventListener('click', (ev) => {
+        for (let input of inputs) {
+          input.value= 0
+          handleChange(input, false)
+        }
+        updateTotal(inputs[0].form)
+      })
+
+      form.querySelector('#optimize').addEventListener('click', (ev) => {
+        for (let input of inputs) {
+          input.value= input.attributes['data-opt'].value
+          handleChange(input, false)
+        }
+        updateTotal(inputs[0].form)
+      })
+    </script>
+  </form>
+
+{% endblock %}

@@ -134,6 +134,128 @@ $app->group('/sale', function (Slim\App $app) {
             })->setName('sale');
 });
 
+/* Sales */
+$app->group('/purchase', function (Slim\App $app) {
+  $app->get('',
+            function (Request $req, Response $res, array $args) {
+              return $res->withRedirect('/txns.php');
+            });
+  $app->get('/reorder',
+            function (Request $req, Response $res, array $args) {
+
+/* XXX This needs to move into a service or something. */
+$extra= $extra_field= $extra_field_name= '';
+$code_field= "code";
+
+$all= (int)$req->getParam('all');
+
+$vendor= (int)$req->getParam('vendor');
+if ($vendor > 0) {
+  $code_field= "(SELECT code FROM vendor_item WHERE vendor = $vendor AND item = item.id AND vendor_item.active LIMIT 1)";
+  $extra= "AND EXISTS (SELECT id
+                         FROM vendor_item
+                        WHERE vendor = $vendor
+                          AND item = item.id
+                          AND vendor_item.active)";
+  $extra_field= "(SELECT MIN(IF(promo_quantity, promo_quantity,
+                                purchase_quantity))
+                    FROM vendor_item
+                   WHERE item = item.id
+                     AND vendor = $vendor
+                     AND vendor_item.active)
+                  AS minimum_order_quantity,
+                 (SELECT MIN(IF(promo_price, promo_price, net_price))
+                    FROM vendor_item
+                    JOIN person ON vendor_item.vendor = person.id
+                  WHERE item = item.id
+                    AND vendor = $vendor
+                    AND vendor_item.active)
+                  AS cost,
+                 (SELECT MIN(IF(promo_price, promo_price, net_price)
+                             * ((100 - vendor_rebate) / 100))
+                    FROM vendor_item
+                    JOIN person ON vendor_item.vendor = person.id
+                  WHERE item = item.id
+                    AND NOT special_order
+                    AND vendor = $vendor
+                    AND vendor_item.active) -
+                 (SELECT MIN(IF(promo_price, promo_price, net_price)
+                             * ((100 - vendor_rebate) / 100))
+                    FROM vendor_item
+                    JOIN person ON vendor_item.vendor = person.id
+                   WHERE item = item.id
+                     AND NOT special_order
+                     AND vendor != $vendor
+                     AND vendor_item.active)
+                 cheapest, ";
+  $extra_field_name= "minimum_order_quantity, cheapest, cost,";
+} else if ($vendor < 0) {
+  // No vendor
+  $extra= "AND NOT EXISTS (SELECT id
+                             FROM vendor_item
+                            WHERE item = item.id
+                              AND vendor_item.active)";
+}
+
+$code= trim($req->getParam('code'));
+if ($code) {
+  $extra.= " AND code LIKE " . ORM::get_db()->quote($code.'%');
+}
+$criteria= ($all ? '1=1'
+                 : '(ordered IS NULL OR NOT ordered)
+                    AND IFNULL(stock, 0) < minimum_quantity');
+$q= "SELECT id, code, name, stock,
+            minimum_quantity, last3months,
+            $extra_field_name
+            order_quantity
+       FROM (SELECT item.id,
+                    $code_field code,
+                    name,
+                    SUM(allocated) stock,
+                    minimum_quantity,
+                    (SELECT -1 * SUM(allocated)
+                       FROM txn_line JOIN txn ON (txn = txn.id)
+                      WHERE type = 'customer'
+                        AND txn_line.item = item.id
+                        AND filled > NOW() - INTERVAL 3 MONTH)
+                    AS last3months,
+                    (SELECT SUM(ordered - allocated)
+                       FROM txn_line JOIN txn ON (txn = txn.id)
+                      WHERE type = 'vendor'
+                        AND txn_line.item = item.id
+                        AND created > NOW() - INTERVAL 12 MONTH)
+                    AS ordered,
+                    $extra_field
+                    IF(minimum_quantity > minimum_quantity - SUM(allocated),
+                       minimum_quantity,
+                       minimum_quantity - IFNULL(SUM(allocated), 0))
+                      AS order_quantity
+               FROM item
+               LEFT JOIN txn_line ON (item = item.id)
+              WHERE purchase_quantity
+                AND item.active AND NOT item.deleted
+                $extra
+              GROUP BY item.id
+              ORDER BY code) t
+       WHERE $criteria
+       ORDER BY code
+      ";
+
+$items= ORM::for_table('item')->raw_query($q)->find_many();
+
+              return $this->view->render($res, 'purchase/reorder.html', [
+                'items' => $items,
+                'all' => $all,
+                'code' => $code,
+                'vendor' => $vendor,
+              ]);
+            })->setName('sale');
+  $app->get('/{id}',
+            function (Request $req, Response $res, array $args) {
+              return $res->withRedirect("/?id={$args['id']}");
+            })->setName('sale');
+});
+
 /* Catalog */
 $container['catalog']= function($c) {
   return new \Scat\CatalogService();
