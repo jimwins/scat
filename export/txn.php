@@ -24,7 +24,8 @@ if ($txn['txn']['type'] == 'vendor') {
     $row+=1;
 
     foreach ($txn['items'] as $item) {
-      $xls->getActiveSheet()->setCellValueByColumnAndRow(1, $row, $item['code'])
+      $code= $item['vendor_sku'] ?: $item['code'];
+      $xls->getActiveSheet()->setCellValueByColumnAndRow(1, $row, $code)
                             ->setCellValueByColumnAndRow(2, $row, "")
                             ->setCellValueByColumnAndRow(3, $row,
                                                          $item['quantity']);
@@ -46,7 +47,7 @@ if ($txn['txn']['type'] == 'vendor') {
     echo "code\tqty\r\n";
 
     foreach ($txn['items'] as $item) {
-      echo $item['code'], "\t",
+      echo $item['vendor_sku'] ?: $item['code'], "\t",
            $item['quantity'], "\r\n";
     }
   }
