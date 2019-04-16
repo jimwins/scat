@@ -29,7 +29,7 @@ if ($q= $_REQUEST['q']) {
   }
 }
 
-$trim= $_REQUEST['trim'];
+$trim= trim($_REQUEST['trim']);
 $noprice= (int)$_REQUEST['noprice'];
 
 $left_margin= 0.2;
