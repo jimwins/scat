@@ -58,8 +58,12 @@
                        data-moq="{{ item.minimum_order_quantity }}"
                        data-cost="{{ item.cost }}"
                        data-opt="{{ item.cheapest <= 0 ?
-                                     min(item.minimum_order_quantity,
-                                         item.minimum_quantity - item.stock ) }}">
+                                     max(item.minimum_order_quantity,
+                                         item.minimum_quantity >
+                                           item.minimum_quantity - item.stock ?
+                                           item.minimum_quantity :
+                                           item.minimum_quantity - item.stock)
+                                 }}">
                 <span class="input-group-addon" style="min-width: 7em"></span>
               </div>
             </td>
