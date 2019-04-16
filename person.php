@@ -483,7 +483,7 @@ function createPurchaseOrder(place, ev) {
 
 function reorder(place, ev) {
   $(ev.target).button('loading');
-  window.location= 'reorder.php?vendor=' + place.person.id();
+  window.location= '/purchase/reorder?vendor=' + place.person.id();
 }
 
 function checkPriceChanges(place, ev) {
