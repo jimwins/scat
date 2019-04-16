@@ -250,10 +250,67 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                 'vendor' => $vendor,
               ]);
             })->setName('sale');
+  $app->post('/reorder',
+             function (Request $req, Response $res, array $args) {
+               $vendor_id= $req->getParam('vendor');
+
+               \ORM::get_db()->beginTransaction();
+
+               $purchase= \Scat\Txn::create([
+                 'type' => 'vendor',
+                 'person' => $vendor_id,
+                 'tax_rate' => 0,
+               ]);
+
+               $items= $req->getParam('item');
+               foreach ($items as $item_id => $quantity) {
+                 if (!$quantity) {
+                   continue;
+                 }
+
+                 $vendor_items=
+                   \Scat\VendorItem::findByItemIdForVendor($item_id,
+                                                           $vendor_id);
+
+                 // Get the lowest available price for our quantity
+                 $price= array_reduce($vendor_items,
+                                      function ($carry, $item) {
+                                        $p= ($item->promo_price &&
+                                             $quantity > $item->promo_quantity)?
+                                              $item->promo_price :
+                                              $item->net_price;
+                                        if (($carry == 0.00) ||
+                                            (($quantity >
+                                               $item->purchase_quantity) &&
+                                             ($carry > $p)))
+                                        {
+                                          return $p;
+                                        }
+                                        return $carry;
+                                      }, 0);
+                 if (!$price) {
+                   throw new \Exception("Failed to get price for $item_id");
+                 }
+
+                 $item= $purchase->items()->create();
+                 $item->txn= $purchase->id;
+                 $item->item= $item_id;
+                 $item->ordered= $quantity;
+                 $item->retail_price= $price;
+                 $item->save();
+               }
+
+               \ORM::get_db()->commit();
+
+               $path= $this->router->pathFor('purchase', [
+                 'id' => $purchase->id
+               ]);
+               return $res->withRedirect($path);
+             });
   $app->get('/{id}',
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect("/?id={$args['id']}");
-            })->setName('sale');
+            })->setName('purchase');
 });
 
 /* Catalog */
