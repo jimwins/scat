@@ -155,6 +155,10 @@
             handled= false
           }
           break;
+        case "o":
+          ev.currentTarget.value= ev.currentTarget.attributes['data-opt'].value
+          focusNextInput(document)
+          break;
         case "x":
           ev.currentTarget.value= 0;
           focusNextInput(document)
