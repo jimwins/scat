@@ -385,13 +385,18 @@ ob_end_flush();
       </a>
     </li>
     <li>
+      <a id="print-price-labels-noprice">
+        No price
+      </a>
+    </li>
+    <li>
       <a id="print-price-labels-trim">
         Trim name
       </a>
     </li>
     <li>
-      <a id="print-price-labels-noprice">
-        No price
+      <a id="print-price-labels-trim-noprice">
+        Trim name, no price
       </a>
     </li>
   </ul>
@@ -522,6 +527,17 @@ $('#print-price-labels-trim').on('click', function(ev) {
 
   if (trim) {
     Scat.printDirect('labels-price', { q: q, trim: trim });
+  }
+});
+
+$('#print-price-labels-trim-noprice').on('click', function(ev) {
+  ev.preventDefault();
+  var q= $('#search').val();
+
+  var trim= window.prompt("Please enter the part of the name to trim from the labels", "");
+
+  if (trim) {
+    Scat.printDirect('labels-price', { q: q, trim: trim, noprice: 1 });
   }
 });
 
