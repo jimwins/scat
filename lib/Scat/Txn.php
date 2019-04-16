@@ -2,6 +2,23 @@
 namespace Scat;
 
 class Txn extends \Model implements \JsonSerializable {
+  public static function create($options) {
+    $txn= \Model::factory('Txn')->create();
+
+    foreach ($options as $key => $value) {
+      $txn->$key= $value;
+    }
+
+    // Generate number based on transaction type
+    $q= "SELECT 1 + MAX(number) AS number FROM txn WHERE type = '{$txn->type}'";
+    $res= \ORM::for_table('txn')->raw_query($q)->find_one();
+    $txn->number= $res->number;
+
+    $txn->save();
+
+    return $txn;
+  }
+
   public function formatted_number() {
     $created= new \DateTime($this->created);
     return $this->type == 'vendor' ?
