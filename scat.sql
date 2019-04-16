@@ -459,7 +459,7 @@ CREATE TABLE `txn` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `uuid` varchar(50) DEFAULT NULL,
   `number` int(10) unsigned NOT NULL,
-  `created` datetime NOT NULL,
+  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `filled` datetime DEFAULT NULL,
   `paid` datetime DEFAULT NULL,
   `type` enum('correction','vendor','customer','drawer') NOT NULL,
