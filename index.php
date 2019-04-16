@@ -586,6 +586,7 @@ $("#txn-load").submit(function(ev) {
                                       'fa-check-square': !txn.no_rewards()
                                     }"></i>
                    Earns Points
+               </a>
             </li>
             <li data-bind="visible: txn.type() == 'vendor',
                            css: { disabled: !txn.id() || !items().length }">
