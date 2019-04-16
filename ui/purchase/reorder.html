@@ -128,24 +128,32 @@
 
         switch (ev.key) {
         case "ArrowLeft":
-          if (!ev.shiftKey) {
+          if (!ev.shiftKey && !ev.metaKey && !ev.altKey && !ev.ctrlKey) {
             ev.currentTarget.value= Math.max(0,-1 + val)
           } else {
             handled= false
           }
           break;
         case "ArrowRight":
-          if (!ev.shiftKey) {
+          if (!ev.shiftKey && !ev.metaKey && !ev.altKey && !ev.ctrlKey) {
             ev.currentTarget.value= 1 + val
           } else {
             handled= false
           }
           break;
         case "ArrowUp":
-          focusPrevInput(document)
+          if (!ev.shiftKey && !ev.metaKey && !ev.altKey && !ev.ctrlKey) {
+            focusPrevInput(document)
+          } else {
+            handled= false
+          }
           break;
         case "ArrowDown":
-          focusNextInput(document)
+          if (!ev.shiftKey && !ev.metaKey && !ev.altKey && !ev.ctrlKey) {
+            focusNextInput(document)
+          } else {
+            handled= false
+          }
           break;
         case "x":
           ev.currentTarget.value= 0;
