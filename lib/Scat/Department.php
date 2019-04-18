@@ -30,11 +30,14 @@ class Department extends \Model implements \JsonSerializable {
   // XXX A gross hack to find when slug changes.
   function set_orm($orm) {
     parent::set_orm($orm);
-    $this->old_slug= $this->full_slug();
+    if ($this->id) {
+      $this->old_slug= $this->full_slug();
+    }
   }
 
   function save() {
-    if ($this->is_dirty('slug') || $this->is_dirty('parent_id')) {
+    if ($this->id &&
+        ($this->is_dirty('slug') || $this->is_dirty('parent_id'))) {
       $new_slug= $this->full_slug();
       error_log("Redirecting {$this->old_slug} to $new_slug");
       $redir= \Model::factory('Redirect')->create();
