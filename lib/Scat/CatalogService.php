@@ -52,7 +52,18 @@ class CatalogService
   }
 
   public function GetRedirectFrom($source) {
+    // Whole product moved?
     $dst=\Model::factory('Redirect')->where_like('source', $source)->find_one();
+    // Category moved?
+    if (!$dst) {
+      $dst=\Model::factory('Redirect')
+             ->where_raw('? LIKE CONCAT(source, "/%")', array($source))
+             ->find_one();
+      if ($dst) {
+        $dst->dest= preg_replace("!^({$dst->source})/!",
+                                 $dst->dest . '/', $source);
+      }
+    }
     return $dst;
   }
 }

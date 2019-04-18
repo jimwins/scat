@@ -2,6 +2,8 @@
 namespace Scat;
 
 class Product extends \Model implements \JsonSerializable {
+  private $old_slug;
+
   public function fields() {
     return [ 'id', 'department_id', 'brand_id', 'name',
              'description', 'slug', 'variation_style',
@@ -97,5 +99,23 @@ class Product extends \Model implements \JsonSerializable {
     }
 
     return $product;
+  }
+
+  // XXX A gross hack to find when slug changes.
+  function set_orm($orm) {
+    parent::set_orm($orm);
+    $this->old_slug= $this->full_slug();
+  }
+
+  function save() {
+    if ($this->is_dirty('slug') || $this->is_dirty('department_id')) {
+      $new_slug= $this->full_slug();
+      error_log("Redirecting {$this->old_slug} to $new_slug");
+      $redir= \Model::factory('Redirect')->create();
+      $redir->source= $this->old_slug;
+      $redir->dest= $new_slug;
+      $redir->save();
+    }
+    parent::save();
   }
 }
