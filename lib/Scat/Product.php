@@ -104,7 +104,9 @@ class Product extends \Model implements \JsonSerializable {
   // XXX A gross hack to find when slug changes.
   function set_orm($orm) {
     parent::set_orm($orm);
-    $this->old_slug= $this->full_slug();
+    if ($this->id) {
+      $this->old_slug= $this->full_slug();
+    }
   }
 
   function save() {
