@@ -108,7 +108,8 @@ class Product extends \Model implements \JsonSerializable {
   }
 
   function save() {
-    if ($this->is_dirty('slug') || $this->is_dirty('department_id')) {
+    if ($this->id &&
+        ($this->is_dirty('slug') || $this->is_dirty('department_id'))) {
       $new_slug= $this->full_slug();
       error_log("Redirecting {$this->old_slug} to $new_slug");
       $redir= \Model::factory('Redirect')->create();
