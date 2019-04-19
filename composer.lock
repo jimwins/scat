@@ -1408,12 +1408,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jimwins/Lukas.git",
-                "reference": "4d9be8b7f573318fe979de2b25c73a1b797443b8"
+                "reference": "8413a7af01cef74120cec8dcae1fc0437b2b99f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jimwins/Lukas/zipball/4d9be8b7f573318fe979de2b25c73a1b797443b8",
-                "reference": "4d9be8b7f573318fe979de2b25c73a1b797443b8",
+                "url": "https://api.github.com/repos/jimwins/Lukas/zipball/8413a7af01cef74120cec8dcae1fc0437b2b99f0",
+                "reference": "8413a7af01cef74120cec8dcae1fc0437b2b99f0",
                 "shasum": ""
             },
             "require": {
@@ -1450,7 +1450,7 @@
             "support": {
                 "source": "https://github.com/jimwins/Lukas/tree/master"
             },
-            "time": "2019-03-02T02:42:20+00:00"
+            "time": "2019-04-19T22:05:55+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
