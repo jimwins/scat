@@ -46,7 +46,9 @@
   {% endif %}
   <tr class="{{ (item and item.id == i.id) ? 'info' }} {{ not i.active ? 'inactive' }}">
     <td>
-      <a href="{{ product ? product.slug ~ '/' ~ i.code : i.full_slug }}">{{ i.code }}</a>
+      <a href="{{ path_for('catalog-item', { 'code' : i.code }) }}">
+        {{- i.code -}}
+      </a>
     </td>
     <td>{{ variations|length ? (i.short_name ?: i.name) : i.name }}</td>
     <td class="text-right" nowrap>{{ scat.amount(i.retail_price) }}</td>
@@ -69,8 +71,6 @@
       {% if i.oversized %}
         <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="fa fa-truck"></i></span>
       {% endif %}
-      {# TODO get rid of this #}
-      <a class="btn btn-xs btn-link" href="/item.php?id={{ i.id }}"><i class="fa fa-edit"></i></a>
     </td>
   </tr>
 {% endfor %}
