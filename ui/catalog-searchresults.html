@@ -19,6 +19,15 @@
 {% block catalog_width "12" %}
 
 {% block catalog_content %}
+  {# Error(s) #}
+  {% if errors|length %}
+    {% for e in errors %}
+      <div class="alert alert-danger">
+        {{ e }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
   {# Product(s) #}
   {% if products|length %}
     <ul id="product-slider">
