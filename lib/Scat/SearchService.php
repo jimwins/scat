@@ -15,14 +15,21 @@ class SearchService
 
   public function search($q) {
     $items= $products= $errors= [];
+
     try {
       $items= $this->searchItems($q);
+    } catch (\Exception $e) {
+      $errors[]= $e->getMessage();
+    }
+
+    try {
       # / trips up SphinxSearch parser, but we like to use it
       $q= preg_replace('#([/])#', '\\/', $q);
       $products= $this->searchProducts($q);
     } catch (\Exception $e) {
       $errors[]= $e->getMessage();
     }
+
     return [
       'items' => $items,
       'products' => $products,
