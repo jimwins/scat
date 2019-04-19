@@ -14,9 +14,19 @@ class SearchService
   }
 
   public function search($q) {
+    $items= $products= $errors= [];
+    try {
+      $items= $this->searchItems($q);
+      # / trips up SphinxSearch parser, but we like to use it
+      $q= preg_replace('#([/])#', '\\/', $q);
+      $products= $this->searchProducts($q);
+    } catch (\Exception $e) {
+      $errors[]= $e->getMessage();
+    }
     return [
-      'items' => $this->searchItems($q),
-      'products' => $this->searchProducts($q)
+      'items' => $items,
+      'products' => $products,
+      'errors' => $errors,
     ];
   }
 
@@ -25,6 +35,14 @@ class SearchService
     $parser= new \OE\Lukas\Parser\QueryParser($scanner);
     $parser->readString($q);
     $query= $parser->parse();
+
+    if (!$query) {
+      $feedback= $parser->getFeedback();
+      foreach ($feedback as $msg) {
+        error_log($msg);
+      }
+      throw new \Exception($msg);
+    }
 
     $v= new \Scat\SearchVisitor();
     $query->accept($v);
