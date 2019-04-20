@@ -41,6 +41,11 @@ class Image extends \Model {
     // replaced with a server-id to further avoid collisions
     $uuid= sprintf("%08x%02x%s", time(), 1, bin2hex(random_bytes(8)));
 
+    // Make debug uploads easier to find
+    if ($GLOBALS['DEBUG']) {
+      $uuid= "DEBUG" . substr($uuid, 5);
+    }
+
     // Upload the original
     $b2= new \ChrisWhite\B2\Client(B2_ACCOUNT_ID, B2_APPLICATION_KEY);
 
