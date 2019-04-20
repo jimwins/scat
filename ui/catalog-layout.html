@@ -192,26 +192,33 @@
         let dt= ev.dataTransfer
         let files= dt.files;
 
-        [...files].forEach((file) => {
-          let url= '/catalog/product/add-image?id={{ product.id }}'
-          let formData= new FormData()
+        scat.dialog([], '/dialog/file-upload.html')
+        .then((modal) => {
+          // TODO We really only handle one file upload right now
+          const file= files[0]
+          const url= '/catalog/product/add-image?id={{ product.id }}'
+          const formData= new FormData()
           formData.append('file', file)
-          fetch(url, {
+          return fetch(url, {
             method: 'POST',
             headers: { 'Accept': 'application/json' },
             body: formData
           })
-          .then((res) => {
-            if (!res.ok) {
-              // TODO some real error handling would be good
-              alert("Sorry, there was a problem with the upload.")
-            } else {
-              window.location.reload()
+          .then((response) => {
+            if (response.status >= 200 && response.status < 300) {
+              return Promise.resolve(response)
             }
+            return Promise.reject(new Error(response.statusText))
           })
-          .catch((res) => {
-            alert("Sorry, there was a problem with the upload.")
+          .finally((res) => {
+            modal.modal('hide')
           })
+        })
+        .then((res) => {
+          window.location.reload()
+        })
+        .catch((res) => {
+          alert("Sorry, there was a problem with the upload.")
         })
       })
     </script>

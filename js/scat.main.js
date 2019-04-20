@@ -25,42 +25,40 @@ class ScatUtils {
     if (from.disabled) return false
     from.disabled= true
 
-    fetch(url)
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Network response was not ok.')
+    return fetch(url)
+      .then((response) => {
+        if (response.status >= 200 && response.status < 300) {
+          return Promise.resolve(response)
         }
-
-        res.text().then(text => {
-          console.log("Loaded '" + url + "'.")
-          let modal= this.htmlToElement(text)
-          document.body.insertAdjacentElement('beforeend', modal)
-          $(modal).on('show.bs.modal', function(e) {
-            // Re-inject the script to get it to execute
-            let code= this.getElementsByTagName('script')[0].innerHTML
-            let script= document.createElement('script')
-            script.modal= this
-            script.appendChild(document.createTextNode(code))
-            this.appendChild(script).parentNode.removeChild(script)
-            /* Attach dialog to each object with event handler */
-            this.querySelectorAll('*').forEach((el) => {
-              if (typeof el.onclick === 'function' ||
-                  typeof el.onsubmit === 'function') {
-                el.dialog= this
-              }
-            })
-          })
-          $(modal).on('hidden.bs.modal', function(e) {
-            $(this.script).remove()
-            $(this).remove()
-          });
-          $(modal).modal()
-          from.disabled= false
-        })
+        return Promise.reject(new Error(response.statusText))
       })
-      .catch (error => {
-        console.log('There has been a problem with your fetch operation: ',
-                    error.message)
+      .then((res) => { return res.text() })
+      .then((text) => {
+        console.log("Loaded '" + url + "'.")
+        let modal= this.htmlToElement(text)
+        document.body.insertAdjacentElement('beforeend', modal)
+        $(modal).on('show.bs.modal', function(e) {
+          // Re-inject the script to get it to execute
+          let code= this.getElementsByTagName('script')[0].innerHTML
+          let script= document.createElement('script')
+          script.modal= this
+          script.appendChild(document.createTextNode(code))
+          this.appendChild(script).parentNode.removeChild(script)
+          /* Attach dialog to each object with event handler */
+          this.querySelectorAll('*').forEach((el) => {
+            if (typeof el.onclick === 'function' ||
+                typeof el.onsubmit === 'function') {
+              el.dialog= this
+            }
+          })
+        })
+        $(modal).on('hidden.bs.modal', function(e) {
+          $(this.script).remove()
+          $(this).remove()
+        });
+        $(modal).modal()
+        from.disabled= false
+        return Promise.resolve($(modal))
       })
   }
 
