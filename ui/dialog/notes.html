@@ -38,12 +38,56 @@
   </table>
 {% endblock %}
 
-{% block submit %}
-  <a onclick="this.dialog.addNote()" class="btn btn-default">Add</a>
+{% block form_class 'form-inline' %}
+
+{% block footer %}
+  <div class="modal-footer">
+    <div class="form-group">
+      <div class="input-group">
+        <input type="text" class="form-control" name="content"
+               placeholder="Enter your comment..." size="500">
+        <div class="input-group-btn">
+          <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+      </div>
+    </div>
+    <div class="checkbox">
+      <span data-bind="text: parent_id() != '0' ? 'Replying...' : ''"></span>
+      <input type="hidden" name="parent_id" value="{{ parent_id }}">
+      <div class="form-group">
+        <select class="form-control input-sm" name="person_id">
+          <option value="">Select...</option>
+          {% for person in staff %}
+            <option value="{{ person.id }}">{{ person.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <label>
+        <input type="checkbox" name="todo" value="1">
+        Todo?
+      </label>
+      <label>
+        <input type="checkbox" name="public" value="1">
+        Public?
+      </label>
+    </div>
+  </div>
 {% endblock %}
 
 {% block script %}
-  dialog.addNote= () => {
-    alert("This is a new alert.")
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    fetch("/notes/add", {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: formData
+    })
+    .then((res) => {
+      debugger
+    })
   }
 {% endblock %}

@@ -607,6 +607,17 @@ $app->get('/notes',
                                          'notes' => $notes
                                        ]);
           });
+$app->post('/notes/add',
+           function (Request $req, Response $res, array $args) {
+             $note= \Model::factory('Note')->create();
+             $note->parent_id= (int)$req->getParam('parent_id');
+             $note->person_id= (int)$req->getParam('person_id');
+             $note->content= $req->getParam('content');
+             $note->todo= (int)$req->getParam('todo');
+             $note->public= (int)$req->getParam('public');
+             $note->save();
+             return $res->withJson($note);
+           });
 
 /* Till */
 $app->group('/till', function (Slim\App $app) {
