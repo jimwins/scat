@@ -1,4 +1,4 @@
-{% extends 'layout/dialog.html' %}
+{% extends body_only ? 'layout/body.html' : 'layout/dialog.html' %}
 {% import 'macros.twig' as scat %}
 
 {% block title %}
@@ -87,7 +87,15 @@
       body: formData
     })
     .then((res) => {
-      debugger
+      fetch('/notes/?body_only=1')
+      .then((res) => {
+        return res.text()
+      })
+      .then((text) => {
+        let body= scat.htmlToElement(text)
+        let old= form.getElementsByTagName('table')[0]
+        old.replaceWith(body)
+      })
     })
   }
 {% endblock %}

@@ -591,18 +591,21 @@ $app->group('/report', function (Slim\App $app) {
 /* Notes */
 $app->get('/notes',
           function (Request $req, Response $res, array $args) {
+            $parent_id= (int)$req->getParam('parent_id');
             $staff= \Model::factory('Person')
                       ->where('role', 'employee')
                       ->where('active', 1)
                       ->order_by_asc('name')
                       ->find_many();
             $notes= \Model::factory('Note')
-                      ->where('parent_id', 0)
+                      ->where('parent_id', $parent_id)
                       ->where('todo', 1)
                       ->order_by_desc('id')
                       ->find_many();
             return $this->view->render($res, 'dialog/notes.html',
                                        [
+                                         'body_only' =>
+                                           (int)$req->getParam('body_only'),
                                          'staff' => $staff,
                                          'notes' => $notes
                                        ]);
