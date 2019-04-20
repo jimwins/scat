@@ -107,16 +107,16 @@
 
       {% if brands|length %}
         <div style="column-count: 3" class="list-group">
-          <a class="list-group-item list-group-item-info"
-             onclick="scat.dialog(this, '/catalog/brand-form')">
-            Add Brand
-          </a>
           {% for b in brands %}
             <a class="list-group-item" style="break-inside: avoid-column"
                href="{{ path_for('catalog-brand', { 'brand' : b.slug }) }}">
               {{ b.name }}
             </a>
           {% endfor %}
+          <a class="btn btn-default btn-block"
+             onclick="scat.dialog(this, '/catalog/brand-form')">
+            Add Brand
+          </a>
         </div>
       {% endif %}
 
