@@ -126,7 +126,7 @@ if ($DEBUG) {
 $app->group('/sale', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect('/txns.php');
+              return $res->withRedirect('/txns.php?type=customer');
             });
   $app->get('/{id}',
             function (Request $req, Response $res, array $args) {
@@ -138,7 +138,7 @@ $app->group('/sale', function (Slim\App $app) {
 $app->group('/purchase', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect('/txns.php');
+              return $res->withRedirect('/txns.php?type=vendor');
             });
   $app->get('/reorder',
             function (Request $req, Response $res, array $args) {
