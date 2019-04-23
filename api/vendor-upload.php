@@ -43,7 +43,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
           CHARACTER SET 'latin1'
           FIELDS TERMINATED BY '\t'
           IGNORE 1 LINES
-          (@changed, @change_date, code, vendor_sku, name, @unit_of_sale,
+          (@changed, @change_date, code, @vendor_sku, name, @unit_of_sale,
            retail_price, net_price, @customer, @product_code_type,
            barcode, @reno, @elgin, @atl, @catalog_code,
            @purchase_unit, purchase_quantity,
@@ -52,7 +52,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            @abc_flag, @vendor, @group_code, @catalog_description,
            weight, @cm_product_line, @cm_product_line_desc,
            @category_manager, @price_contract, @case_qty, @case_net)
-        SET special_order = IF(@abc_flag = 'S', 1, 0),
+        SET vendor_sku = code, special_order = IF(@abc_flag = 'S', 1, 0),
             promo_quantity = purchase_quantity";
 
   $r= $db->query($q)
