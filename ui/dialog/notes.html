@@ -51,17 +51,11 @@
         </td>
         <td width="10%">
           {% if not note.parent_id %}
-            {% if note.todo %}
-              <a onclick="event.currentTarget.closest('form').markDone({{ note.id }})"
-                 class="label label-primary">
-                TODO
-              </a>
-            {% else %}
-              <a onclick="event.currentTarget.closest('form').markDone({{ note.id }})"
-                 class="label label-success">
-                DONE
-              </a>
-            {% endif %}
+            <a data-id="{{ note.id }}" data-todo="{{ note.todo }}"
+               class="todo-link label
+                      {{ note.todo ? 'label-primary' : 'label-success' }}">
+              {{ note.todo ? 'TODO' : 'DONE' }}
+            </a>
           {% endif %}
         </td>
       </tr>
@@ -99,6 +93,36 @@
 {% endblock %}
 
 {% block script %}
+  const enableTodoLinks= (form) => {
+    let todoLink= form.querySelector('.todo-link')
+    todoLink.addEventListener('click', (ev) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+
+      const id= ev.currentTarget.attributes['data-id'].value
+      const todo= ev.currentTarget.attributes['data-todo'].value
+
+      let formData= new FormData();
+      formData.append('todo', todo == '1' ? 0 : 1);
+      fetch('/notes/' + id + '/update', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: formData
+      })
+      .then((res) => {
+        return res.json()
+      })
+      .then((note) => {
+        todoLink.attributes['data-todo'].value= note.todo
+        todoLink.text= note.todo ? 'TODO' : 'DONE'
+        todoLink.classList.remove('label-primary','label-success')
+        todoLink.classList.add(note.todo ? 'label-primary' : 'label-success')
+      })
+    })
+  }
+
+  enableTodoLinks(form)
+
   form.loadNotes= (id) => {
     fetch('/notes/?body_only=1' + (id ? '&parent_id=' + id : ''), {
       method: 'GET',
@@ -112,22 +136,7 @@
       let old= form.getElementsByTagName('table')[0]
       old.replaceWith(body)
       form.parent_id.value= id
-    })
-  }
-
-  form.markDone= (id) => {
-    let formData= new FormData();
-    formData.append('todo', 0);
-    fetch('/notes/' + id + '/update', {
-      method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      body: formData
-    })
-    .then((res) => {
-      return res.json()
-    })
-    .then((note) => {
-      debugger
+      enableTodoLinks(form)
     })
   }
 
