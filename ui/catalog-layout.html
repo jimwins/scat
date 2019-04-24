@@ -184,7 +184,7 @@
       let handleExit= (ev) => {
         document.getElementById('droptarget').style.display= 'none'
       }
-      ['dragleave', 'dragend', 'drop'].forEach(eventName => {
+      ['dragleave', 'dragend'].forEach(eventName => {
         dropArea.addEventListener(eventName, handleExit)
       })
 
@@ -192,13 +192,28 @@
         let dt= ev.dataTransfer
         let files= dt.files;
 
+        document.getElementById('droptarget').style.display= 'none'
+
+        const url= '/catalog/product/add-image?id={{ product.id }}'
+        const formData= new FormData()
+
+        // TODO We only handle one file upload at a time right now
+        if (files.length) {
+          const file= files[0]
+          formData.append('file', file)
+        } else {
+          let fileUrl= dt.getData('text/plain')
+          if (fileUrl) {
+            formData.append('url', fileUrl)
+          }
+        }
+
+        if (!formData.has('file') && !formData.has('url')) {
+          return Promise.reject(new Error("No file dropped."))
+        }
+
         scat.dialog([], '/dialog/file-upload.html')
         .then((modal) => {
-          // TODO We really only handle one file upload right now
-          const file= files[0]
-          const url= '/catalog/product/add-image?id={{ product.id }}'
-          const formData= new FormData()
-          formData.append('file', file)
           return fetch(url, {
             method: 'POST',
             headers: { 'Accept': 'application/json' },
