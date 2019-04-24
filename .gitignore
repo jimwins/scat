@@ -2,3 +2,4 @@ config.php
 /vendor/
 /components/
 lib/cc-terminal.php
+hosts.yml
