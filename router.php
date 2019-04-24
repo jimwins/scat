@@ -597,11 +597,28 @@ $app->get('/notes',
                       ->where('active', 1)
                       ->order_by_asc('name')
                       ->find_many();
-            $notes= \Model::factory('Note')
-                      ->where('parent_id', $parent_id)
-                      ->where('todo', 1)
-                      ->order_by_desc('id')
-                      ->find_many();
+            if ($parent_id) {
+              $notes= \Model::factory('Note')
+                        ->select('*')
+                        ->select_expr('0', 'children')
+                        ->where_any_is([
+                          [ 'id' => $parent_id ],
+                          [ 'parent_id' => $parent_id ]
+                        ])
+                        ->order_by_asc('id')
+                        ->find_many();
+            } else {
+              $notes= \Model::factory('Note')
+                        ->select('*')
+                        ->select_expr('(SELECT COUNT(*)
+                                          FROM note children
+                                         WHERE children.parent_id = note.id)',
+                                      'children')
+                        ->where('parent_id', $parent_id)
+                        ->where('todo', 1)
+                        ->order_by_desc('id')
+                        ->find_many();
+            }
             return $this->view->render($res, 'dialog/notes.html',
                                        [
                                          'body_only' =>
@@ -619,6 +636,41 @@ $app->post('/notes/add',
              $note->todo= (int)$req->getParam('todo');
              $note->public= (int)$req->getParam('public');
              $note->save();
+             return $res->withJson($note);
+           });
+$app->post('/notes/{id}/update',
+           function (Request $req, Response $res, array $args) {
+             \ORM::get_db()->beginTransaction();
+
+             $note= \Model::factory('Note')->find_one($args['id']);
+             if (!$note) {
+               throw new \Slim\Exception\NotFoundException($req, $res);
+             }
+
+             $todo= $req->getParam('todo');
+             if ($todo !== null && $todo != $note->todo) {
+               $note->todo= (int)$req->getParam('todo');
+               $update= \Model::factory('Note')->create();
+               // TODO who did this?
+               $update->parent_id= $note->parent_id ?: $note->id;
+               $update->content= $todo ? "Marked todo." : "Marked done.";
+               $update->save();
+             }
+
+             $public= $req->getParam('public');
+             if ($public !== null && $public != $note->public) {
+               $note->public= (int)$req->getParam('public');
+               $update= \Model::factory('Note')->create();
+               // TODO who did this?
+               $update->parent_id= $note->parent_id ?: $note->id;
+               $update->content= $public ? "Marked public." : "Marked private.";
+               $update->save();
+             }
+
+             $note->save();
+
+             \ORM::get_db()->commit();
+
              return $res->withJson($note);
            });
 

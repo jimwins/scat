@@ -1,18 +1,22 @@
 {% extends body_only ? 'layout/body.html' : 'layout/dialog.html' %}
 {% import 'macros.twig' as scat %}
 
+{% block size 'modal-lg' %}
+
 {% block title %}
-  Notes
+  <a onclick="event.currentTarget.closest('form').loadNotes(0)">
+    Notes
+  </a>
 {% endblock %}
 
 {% block body %}
   {# TODO hardcoded height in here, should be smarter #}
   <table class="table table-striped"
-         style="display: block;
+         style="display: block; width: 100%;
                 max-height: 500px; overflow: auto; margin-bottom: 0px">
     {% for note in notes %}
       <tr>
-        <td class="col-xs-4 text-right">
+        <td class="text-right" width="20%">
           {% if note.kind == 'txn' %}
             {% set txn= note.txn %}
             <a href="{{ path_for('sale', { 'id' : txn.id }) }}">
@@ -23,7 +27,7 @@
             </a>
           {% endif %}
         </td>
-        <td class="col-xs-8">
+        <td width="100%">
           <small>
             {{ note.added | date("l, F j") }}
             {% set person= note.person.find_one() %}
@@ -32,6 +36,33 @@
             {% endif %}
           </small>
           <p style="padding-left: 1em">{{ note.content }}</p>
+          {% if not note.parent_id %}
+            <div class="small">
+              <a onclick="event.currentTarget.closest('form').loadNotes({{ note.id }})">
+              {% if note.children %}
+                View {{ note.children }}
+                repl{{ note.children != '1' ? 'ies' : 'y' }}
+              {% else %}
+                Reply
+              {% endif %}
+              </a>
+            </div>
+          {% endif %}
+        </td>
+        <td width="10%">
+          {% if not note.parent_id %}
+            {% if note.todo %}
+              <a onclick="event.currentTarget.closest('form').markDone({{ note.id }})"
+                 class="label label-primary">
+                TODO
+              </a>
+            {% else %}
+              <a onclick="event.currentTarget.closest('form').markDone({{ note.id }})"
+                 class="label label-success">
+                DONE
+              </a>
+            {% endif %}
+          {% endif %}
         </td>
       </tr>
     {% endfor %}
@@ -54,6 +85,7 @@
     <div class="checkbox">
       <span data-bind="text: parent_id() != '0' ? 'Replying...' : ''"></span>
       <input type="hidden" name="parent_id" value="{{ parent_id }}">
+      <input type="hidden" name="todo" value="1">
       <div class="form-group">
         <select class="form-control input-sm" name="person_id">
           <option value="">Select...</option>
@@ -62,20 +94,43 @@
           {% endfor %}
         </select>
       </div>
-
-      <label>
-        <input type="checkbox" name="todo" value="1">
-        Todo?
-      </label>
-      <label>
-        <input type="checkbox" name="public" value="1">
-        Public?
-      </label>
     </div>
   </div>
 {% endblock %}
 
 {% block script %}
+  form.loadNotes= (id) => {
+    fetch('/notes/?body_only=1' + (id ? '&parent_id=' + id : ''), {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    })
+    .then((res) => {
+      return res.text()
+    })
+    .then((text) => {
+      let body= scat.htmlToElement(text)
+      let old= form.getElementsByTagName('table')[0]
+      old.replaceWith(body)
+      form.parent_id.value= id
+    })
+  }
+
+  form.markDone= (id) => {
+    let formData= new FormData();
+    formData.append('todo', 0);
+    fetch('/notes/' + id + '/update', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: formData
+    })
+    .then((res) => {
+      return res.json()
+    })
+    .then((note) => {
+      debugger
+    })
+  }
+
   form.onsubmit= (event) => {
     event.preventDefault()
 
@@ -87,15 +142,11 @@
       body: formData
     })
     .then((res) => {
-      fetch('/notes/?body_only=1')
-      .then((res) => {
-        return res.text()
-      })
-      .then((text) => {
-        let body= scat.htmlToElement(text)
-        let old= form.getElementsByTagName('table')[0]
-        old.replaceWith(body)
-      })
+      return res.json()
+    })
+    .then((note) => {
+      form.reset()
+      form.loadNotes(note.parent_id)
     })
   }
 {% endblock %}
