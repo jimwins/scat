@@ -2,6 +2,11 @@
 <div class="row">
   <div class="col-sm-9">
     <div class="btn-group" role="group">
+      {% if not product.active %}
+        <button type="button" class="btn btn-danger" disabled>
+          Inactive
+        </button>
+      {% endif %}
       <a class="btn btn-default"
          target="_blank"
          href="{{ PUBLIC_CATALOG ~ '/' ~ product.full_slug }}">

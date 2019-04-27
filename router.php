@@ -492,7 +492,7 @@ $app->group('/catalog', function (Slim\App $app) {
                         ->find_many():null;
 
               $product= $args['product'] ?
-                $subdept->products()
+                $subdept->products(false)
                         ->where('slug', $args['product'])
                         ->find_one():null;
               if ($args['product'] && !$product)
