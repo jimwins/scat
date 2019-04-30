@@ -145,13 +145,13 @@ $app->group('/purchase', function (Slim\App $app) {
 
 /* XXX This needs to move into a service or something. */
 $extra= $extra_field= $extra_field_name= '';
-$code_field= "code";
 
 $all= (int)$req->getParam('all');
 
+$vendor_code= "NULL";
 $vendor= (int)$req->getParam('vendor');
 if ($vendor > 0) {
-  $code_field= "(SELECT code FROM vendor_item WHERE vendor = $vendor AND item = item.id AND vendor_item.active LIMIT 1)";
+  $vendor_code= "(SELECT code FROM vendor_item WHERE vendor = $vendor AND item = item.id AND vendor_item.active LIMIT 1)";
   $extra= "AND EXISTS (SELECT id
                          FROM vendor_item
                         WHERE vendor = $vendor
@@ -204,12 +204,13 @@ if ($code) {
 $criteria= ($all ? '1=1'
                  : '(ordered IS NULL OR NOT ordered)
                     AND IFNULL(stock, 0) < minimum_quantity');
-$q= "SELECT id, code, name, stock,
+$q= "SELECT id, code, vendor_code, name, stock,
             minimum_quantity, last3months,
             $extra_field_name
             order_quantity
        FROM (SELECT item.id,
-                    $code_field code,
+                    item.code,
+                    $vendor_code AS vendor_code,
                     name,
                     SUM(allocated) stock,
                     minimum_quantity,

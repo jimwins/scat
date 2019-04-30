@@ -36,7 +36,7 @@
             <td class="num">{{ loop.index }}</td>
             <td>
               <a href="{{ path_for('catalog-item', { 'code' : item.code }) }}">
-                {{- item.code -}}
+                {{- item.vendor_code ?: item.code -}}
               </a>
             </td>
             <td>{{ item.name }}</td>
