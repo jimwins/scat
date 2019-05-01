@@ -1,0 +1,187 @@
+{% import 'macros.twig' as scat %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+  {# Not yet.
+    <h3 class="panel-title">
+      Sale {{ "%07d" | format(sale.id) }}
+    </h3>
+  #}
+    <p>
+      <small>
+        Created: {{ sale.created }} /
+        Last Modified: {{ sale.modified }}
+      </small>
+    </p>
+    <p>
+      <i class="fa fa-user-o fa-border"></i>
+      {{ sale.name }}
+      &lt;{{ sale.email }}&gt;
+    </p>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Quantity</th>
+        <th>Code</th>
+        <th>Name</th>
+        <th class="text-right">Price</th>
+        <th class="text-right">Ext</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for data in items %}
+        <tr valign="top">
+          <td></td>
+          <td>{{ data.quantity }}</td>
+          <td><small>{{ data.code }}</small></td>
+          <td>
+            <span>{{ data.name }}</span>
+            <div class="small">{{ data.detail }}</div>
+          </td>
+          <td class="text-right">{{ scat.amount(data.sale_price) }}</td>
+          <td class="text-right">
+            {{ scat.amount(data.sale_price * data.quantity) }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="3">
+        </th>
+        <th colspan="2" class="text-right">Subtotal:</th>
+        <td class="text-right">{{ scat.amount(sale.subtotal) }}</td>
+      </tr>
+      <tr>
+        <th colspan="5" class="text-right">
+          {% if sale.shipping == 50.00 %}
+            Local delivery:
+          {% else %}
+            Shipping &amp; handling:
+          {% endif %}
+        </th>
+        <td class="text-right">{{ scat.amount(sale.shipping) }}</td>
+      </tr>
+      <tr>
+        <th colspan="5" class="text-right">
+          {% if sale.status in [ 'cart', 'unpaid', 'review' ] %}
+            Estimated tax:
+          {% else %}
+            Tax:
+          {% endif %}
+        </th>
+        <td class="text-right" id="tax">
+          {% if sale.status == cart and not sale.tax_calculated %}
+            <span class="text-danger">TBD</span>
+          {% else %}
+            {{ scat.amount(sale.tax) }}
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th colspan="5" class="text-right">Total:</th>
+        <td class="text-right" id="total">
+          {% if sale.status == 'cart' and not sale.tax_calculated %}
+            <span class="text-danger">TBD</span>
+          {% else %}
+            {{ scat.amount(sale.total) }}
+          {% endif %}
+        </td>
+      </tr>
+      {% for data in payments %}
+        <tr>
+          <th colspan="5" class="text-right">
+            {% if data.method == 'credit' %}
+              Paid by {{ data.data.cc_brand }}
+              ending in {{ data.data.cc_last4 }}
+            {% endif %}
+            {% if data.method == 'paypal' %}
+              Paid by PayPal
+            {% endif %}
+            {% if data.method == 'amazon' %}
+              Paid with Amazon Pay
+            {% endif %}
+            {% if data.method == 'gift' %}
+              Paid with Gift Card 
+            {% endif %}
+            {% if data.method == 'other' %}
+              Paid
+            {% endif %}
+            ({{ data.processed }}):
+          </th>
+          <td colspan="5" class="text-right">{{ scat.amount(data.amount) }}</td>
+        </tr>
+      {% endfor %}
+      {% if sale.status != 'cart' %}
+        <tr>
+          <th colspan="5" class="text-right">Due:</th>
+          <td class="text-right">{{ scat.amount(sale.total - sale.paid) }}</td>
+        </tr>
+      {% endif %}
+    </tfoot>
+  </table>
+  <div class="panel-footer">
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              <i class="fa fa-address-card-o"></i>
+              Shipping Address
+            </h3>
+          </div>
+          <div class="panel-body">
+            {% if shipping_address.id %}
+              <div>{{ shipping_address.name }}</div>
+              <div>{{ shipping_address.company }}</div>
+              <div>{{ shipping_address.phone }}</div>
+              <div>{{ shipping_address.address1 }}</div>
+              <div>{{ shipping_address.address2 }}</div>
+              <div>
+                {{ shipping_address.city }}, {{ shipping_address.state }}
+                {{ shipping_address.zip5 }}{{ shipping_address.zip4 ? "-" ~ shipping_address.zip4 : "" }}
+              </div>
+            {% else %}
+              Not specified.
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              <i class="fa fa-address-card-o"></i>
+              Billing Address
+            </h3>
+          </div>
+          <div class="panel-body">
+            {% if not billing_address.id %}
+              Not specified.
+            {% else %}
+              {% if shipping.address_id == billing_address.id %}
+                <div>
+                  Same as shipping address.
+                </div>
+              {% else %}
+                <div>{{ billing_address.name }}</div>
+                <div>{{ billing_address.company }}</div>
+                <div>{{ billing_address.phone }}</div>
+                <div>{{ billing_address.address1 }}</div>
+                <div>{{ billing_address.address2 }}</div>
+                <div>
+                  {{ billing_address.city }}, {{ billing_address.state }}
+                  {{ billing_address.zip5 }}{{ billing_address.zip4 ? "-" ~ billing_address.zip4 : "" }}
+                </div>
+              {% endif %}
+            {% endif %}
+            {% if action == 'pay' and sale.status == 'unpaid' %}
+              <small><a href="./checkout?billing=1">(change)</a></small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

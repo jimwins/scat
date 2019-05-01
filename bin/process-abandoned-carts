@@ -1,0 +1,97 @@
+#!/usr/bin/env php
+<?php
+require __DIR__.'/../scat.php';
+require __DIR__.'/../lib/txn.php';
+
+$loader= new \Twig\Loader\FilesystemLoader(__DIR__.'/../ui');
+$twig= new \Twig\Environment($loader, [
+  'cache' => false
+]);
+
+$exit= 0;
+
+$client= new \GuzzleHttp\Client();
+
+$url= ORDURE . '/sale/list';
+$res= $client->request('GET', $url,
+                       [
+                         'debug' => $DEBUG,
+                         'query' => [ 'key' => ORDURE_KEY,
+                                      'carts' => 1,
+                                      'yesterday' => 1,
+                                      'json' => 1 ]
+                       ]);
+
+$sales= json_decode($res->getBody());
+
+foreach ($sales as $summary) {
+  if ($summary->status != 'cart') {
+    continue;
+  }
+
+  $url= ORDURE . '/sale/' . $summary->uuid . '/json';
+  $res= $client->request('GET', $url,
+                         [
+                           'debug' => $DEBUG,
+                           'query' => [ 'key' => ORDURE_KEY ]
+                         ]);
+
+  $data= json_decode($res->getBody(), true);
+
+  if (!count($data['items']) || !$data['sale']['email']) {
+    continue;
+  }
+
+  $data['call_to_action_url']= ORDURE . '/cart?uuid=' . $data['sale']['uuid'];
+
+  $template= $twig->load('email/abandoned-cart.html');
+
+  $httpClient= new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client());
+  $sparky= new \SparkPost\SparkPost($httpClient,
+                                    [ 'key' => SPARKPOST_KEY ]);
+
+  $promise= $sparky->transmissions->post([
+    'content' => [
+      'html' => $template->render($data),
+      'subject' => $template->renderBlock('title', $data),
+      'from' => array('name' => "Raw Materials Art Supplies",
+                      'email' => OUTGOING_EMAIL_ADDRESS),
+      'inline_images' => [
+        [
+          'name' => 'logo.png',
+          'type' => 'image/png',
+          'data' => base64_encode(file_get_contents(basename(__DIR__).
+                                                    '/../ui/logo.png')),
+        ],
+      ],
+    ],
+    'recipients' => [
+      [
+        'address' => [
+          'name' => $data['sale']['name'],
+          'email' => $data['sale']['email'],
+        ],
+      ],
+      [
+        // BCC ourselves
+        'address' => [
+          'header_to' => $data['sale']['email'],
+          'email' => OUTGOING_EMAIL_ADDRESS,
+        ],
+      ],
+    ],
+    'options' => [
+      'inlineCss' => true,
+    ],
+  ]);
+
+  try {
+    $response= $promise->wait();
+
+  } catch (\Exception $e) {
+    error_log(sprintf("SparkPost failure: %s (%s)",
+                      $e->getMessage(), $e->getCode()));
+  }
+}
+
+exit($exit);
