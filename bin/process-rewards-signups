@@ -55,38 +55,36 @@ foreach ($updates as $update) {
   }
 
   /* Handle code */
-  if ($update->code) {
-    $code= preg_replace('/[^0-9A-F]/i', '', $update->code);
-    $created= substr($code, 0, 8);
-    $id= substr($code, -8);
-    $created= date("Y-m-d H:i:s", hexdec($created));
-    $id= hexdec($id);
+  try {
+    if ($update->code) {
+      $code= preg_replace('/[^0-9A-F]/i', '', $update->code);
+      $created= substr($code, 0, 8);
+      $id= substr($code, -8);
+      $created= date("Y-m-d H:i:s", hexdec($created));
+      $id= hexdec($id);
 
-    $txn= Model::factory('Txn')->find_one($id);
-    if (!$txn) {
-      echo "No such transaction found for '{$update->code}'\n";
-      $exit= 1;
-      continue;
+      $txn= Model::factory('Txn')->find_one($id);
+      if (!$txn) {
+        throw new \Exception("No such transaction found for '{$update->code}'");
+      }
+
+      if ($txn->person && $txn->person != $person->id) {
+        throw new \Exception("Transaction {$id} already assigned to someone else.");
+      }
+
+      if ($txn->created != $created) {
+        throw new \Exception("Timestamps for transaction {$id} don't match. '{$created}' != '{$txn->created}'");
+      }
+
+      $txn->person= $person->id;
+      $txn->save();
+
+      echo "Attached transaction {$id} to person.\n";
     }
-
-    if ($txn->person && $txn->person != $person->id) {
-      echo "Transaction {$id} already assigned to someone else.\n";
-      $exit= 1;
-      continue;
-    }
-
-    if ($txn->created != $created) {
-      echo "Timestamps for transaction {$id} don't match. '{$created}' != '{$txn->created}'\n";
-      $exit= 1;
-      continue;
-    }
-
-    $txn->person= $person->id;
-    $txn->save();
-
-    echo "Attached transaction {$id} to person.\n";
+  } catch (\Exception $e) {
+    echo "Exception: ", $e->getMessage(), "\n";
+    $exit= 1;
   }
-
 
   $url= ORDURE . '/mark-rewards-processed';
   $res= $client->request('GET', $url,
