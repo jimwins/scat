@@ -54,10 +54,17 @@ class Item extends \Model {
     return $this->has_many('TxnLine', 'item')
                 ->sum('allocated') ?: 0;
   }
+
+  public function prop65_warning() {
+    return $this->belongs_to('Prop65_Warning', 'prop65')->find_one();
+  }
 }
 
 class Barcode extends \Model {
   public function item() {
     return $this->belongs_to('Item', 'item');
   }
+}
+
+class Prop65_Warning extends \Model {
 }
