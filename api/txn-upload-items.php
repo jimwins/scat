@@ -148,13 +148,14 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
 
   echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
-} elseif (preg_match('/^sls_sku.*asst_qty/', $line)) {
+} elseif (preg_match('/^"?sls_sku.*asst_qty/', $line)) {
   // SLS assortment
   # sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date,asst_qty,
   $sep= preg_match("/,/", $line) ? "," : "\t";
   $q= "LOAD DATA LOCAL INFILE '$fn'
        INTO TABLE vendor_order
        FIELDS TERMINATED BY '$sep'
+       OPTIONALLY ENCLOSED BY '\"'
        LINES TERMINATED BY '\n'
        IGNORE 1 LINES
        (item_no, @cust_sku, description, @vendor_name,
