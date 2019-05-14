@@ -113,11 +113,13 @@ class Product extends \Model implements \JsonSerializable {
     if ($this->id &&
         ($this->is_dirty('slug') || $this->is_dirty('department_id'))) {
       $new_slug= $this->full_slug();
-      error_log("Redirecting {$this->old_slug} to $new_slug");
-      $redir= \Model::factory('Redirect')->create();
-      $redir->source= $this->old_slug;
-      $redir->dest= $new_slug;
-      $redir->save();
+      if ($new_slug != $this->old_slug) {
+        error_log("Redirecting {$this->old_slug} to $new_slug");
+        $redir= \Model::factory('Redirect')->create();
+        $redir->source= $this->old_slug;
+        $redir->dest= $new_slug;
+        $redir->save();
+      }
     }
     parent::save();
   }
