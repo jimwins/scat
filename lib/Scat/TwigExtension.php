@@ -20,6 +20,12 @@ class TwigExtension
     ];
   }
 
+  public function getFilters() {
+    return [
+      new \Twig_SimpleFilter('hexdec', 'hexdec')
+    ];
+  }
+
   public function getNotes() {
     return \Model::factory('Note')
              ->where('parent_id', 0)
