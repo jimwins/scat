@@ -255,6 +255,10 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
              function (Request $req, Response $res, array $args) {
                $vendor_id= $req->getParam('vendor');
 
+               if (!$vendor_id) {
+                 throw new \Exception("No vendor specified.");
+               }
+
                \ORM::get_db()->beginTransaction();
 
                $purchase= \Scat\Txn::create([
