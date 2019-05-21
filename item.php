@@ -19,7 +19,8 @@ if (!$id && $code) {
   $id= $id[0];
 }
 
-$product= array('id' => 0, 'name' => ''); /* Bare necessities for KO */
+/* Bare necessities for KO */
+$product= array('id' => 0, 'name' => '', 'full_slug' => '');
 
 $item= item_load($db, $id);
 
