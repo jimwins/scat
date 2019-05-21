@@ -9,7 +9,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 date_default_timezone_set($_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ']);
 bcscale(2);
 
-$DEBUG= false;
+$DEBUG= $ORM_DEBUG= false;
 $config= require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
 
 /* Configure Idiorm & Paris */
@@ -22,7 +22,7 @@ ORM::configure('logging', true);
 ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
 Model::$short_table_names= true;
 
-if ($DEBUG) {
+if ($DEBUG || $ORM_DEBUG) {
   ORM::configure('logger', function ($log_string, $query_time) {
     error_log('ORM: "' . $log_string . '" in ' . $query_time);
   });
