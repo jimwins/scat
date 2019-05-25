@@ -35,5 +35,7 @@ task('deploy', [
     'success'
 ]);
 
+after('cleanup', 'phinx:migrate');
+
 // [Optional] If deploy fails automatically unlock.
 after('deploy:failed', 'deploy:unlock');
