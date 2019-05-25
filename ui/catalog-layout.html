@@ -88,6 +88,11 @@
     {% endblock %}
 
     {% block catalog_content %}
+      {% if dept and not subdept  %}
+        <p>
+          {{ dept.description | markdown }}
+        </p>
+      {% endif %}
       {% if products and not product %}
         {% include 'catalog-products.twig' %}
       {% endif %}

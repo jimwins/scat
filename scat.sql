@@ -77,6 +77,7 @@ CREATE TABLE `department` (
   `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL,
   `slug` varchar(80) NOT NULL,
+  `description` mediumtext,
   PRIMARY KEY (`id`),
   UNIQUE KEY `parent` (`parent_id`,`slug`),
   KEY `name` (`name`)

@@ -385,6 +385,7 @@ $app->group('/catalog', function (Slim\App $app) {
                $dept->name= $req->getParam('name');
                $dept->slug= $req->getParam('slug');
                $dept->parent_id= $req->getParam('parent_id');
+               $dept->description= $req->getParam('description');
                $dept->save();
                return $res->withJson($dept);
              });
