@@ -162,7 +162,7 @@ $("header #reports").on('click', function(ev) {
   ev.preventDefault();
   Scat.api('report-sales', { days: 7 })
       .done(function(data) {
-        var t= $("<table class='table table-striped' style='width: 100%'><tr><th>Day<th>Sales<th class='text-right'>Average<th class='text-right'>Total</tr>");
+        var t= $("<table class='table table-striped' style='width: 100%'><tr><th>Day<th class='text-right'>Sales<th class='text-right'>Average<th class='text-right'>Total</tr>");
         $.each(data.sales, function(i, sales) {
           t.append($('<tr><td>' + sales.span +
                      '<td align="right">' + sales.transactions +
