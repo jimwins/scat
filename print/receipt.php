@@ -100,9 +100,11 @@ function pts($num) {
 foreach ($items as $item) {
   echo '<tr>',
        '<td class="qty">', $item['quantity'], '</td>',
-       '<td class="left">', $item['name'],
-       ($item['discount'] ? ('<div class="description">' . $item['discount'] . '</div>') : ''),
-       '</td>';
+       '<td class="left">', $item['name'];
+  if (!$gift && $item['discount']) {
+    echo '<div class="description">', $item['discount'], '</div>';
+  }
+  echo '</td>';
   if (!$gift) {
     echo '<td class="price">', amount($item['ext_price']), '</td>';
   }
