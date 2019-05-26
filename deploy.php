@@ -2,6 +2,7 @@
 namespace Deployer;
 
 require 'recipe/common.php';
+require 'vendor/deployer/recipes/recipe/phinx.php';
 
 // Project name
 set('application', 'scat');
