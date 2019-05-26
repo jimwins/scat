@@ -162,13 +162,16 @@ $("header #reports").on('click', function(ev) {
   ev.preventDefault();
   Scat.api('report-sales', { days: 7 })
       .done(function(data) {
-        var t= $("<table class='table table-condensed table-striped' style='width: auto'><tr><th>Day<th>Sales</tr>");
+        var t= $("<table class='table table-striped' style='width: 100%'><tr><th>Day<th>Sales<th class='text-right'>Average<th class='text-right'>Total</tr>");
         $.each(data.sales, function(i, sales) {
           t.append($('<tr><td>' + sales.span +
+                     '<td align="right">' + sales.transactions +
+                     '<td align="right">' + amount((sales.total / sales.transactions).toFixed(2)) +
                      '<td align="right">' + amount(sales.total.toFixed(2)) +
                      '</tr>'));
         });
-        $('#quick-report .modal-body').empty().append(t);
+        $('#quick-report .modal-content table').remove();
+        $('#quick-report .modal-content').append(t);
         $('#quick-report').modal('show');
       });
 });
@@ -314,8 +317,6 @@ Scat.showNotes= function (options) {
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title">Quick Report</h4>
-      </div>
-      <div class="modal-body">
       </div>
     </div>
   </div>

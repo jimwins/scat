@@ -57,7 +57,8 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
             SUM(IF(uuid, untaxed + taxed + tax,
                    ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed))
               AS total_taxed,
-            MIN(DATE(filled)) AS raw_date
+            MIN(DATE(filled)) AS raw_date,
+            COUNT(*) AS transactions
        FROM (SELECT 
                     txn.uuid,
                     filled,

@@ -61,7 +61,15 @@ head("Sales Report @ Scat", true);
   </div>
   <table class="table">
    <thead>
-    <tr><th>When</th><th>Subtotal</th><th>Resale</th><th>Tax</th><th>Total</th></tr>
+    <tr>
+      <th>When</th>
+      <th class="text-right">Subtotal</th>
+      <th class="text-right">Transactions</th>
+      <th class="text-right">Average</th>
+      <th class="text-right">Resale</th>
+      <th class="text-right">Tax</th>
+      <th class="text-right">Total</th>
+    </tr>
    </thead>
    <tbody>
    </tbody>
@@ -90,6 +98,8 @@ $("#report-params").on('submit', function(ev) {
         $.each(data.sales, function(i, sales) {
           t.append($('<tr><td>' + sales.span +
                      '<td align="right">' + amount(sales.total) +
+                     '<td align="right">' + sales.transactions +
+                     '<td align="right">' + amount(sales.total / sales.transactions) +
                      '<td align="right">' + amount(sales.resale) +
                      '<td align="right">' + amount(sales.tax) +
                      '<td align="right">' + amount(sales.total_taxed) +
