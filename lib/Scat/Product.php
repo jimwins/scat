@@ -30,6 +30,13 @@ class Product extends \Model implements \JsonSerializable {
       $this->dept()->find_one()->slug . '/' . $this->slug;
   }
 
+  public function stocked() {
+    return $this->has_many('Item')
+                ->where_gte('active', 1)
+                ->where_gte('minimum_quantity', 1)
+                ->count();
+  }
+
   public function jsonSerialize() {
     return $this->asArray();
   }

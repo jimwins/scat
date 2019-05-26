@@ -50,6 +50,11 @@
             {{- brand.name -}}
           </a>
         </small>
+        {% if not p.stocked %}
+          <small class="pull-right">
+            <i class="fa fa-globe"></i> Online Only
+          </small>
+        {% endif %}
       </h4>
       {# Just extract the first paragraph #}
       {% set paragraphs= p.description|markdown|split('</p>', 2) %}
