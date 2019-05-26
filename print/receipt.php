@@ -189,6 +189,8 @@ foreach ($payments as $payment) {
 <?
   }
 }
+} else {
+  echo '</table>';
 }
 ?>
 
