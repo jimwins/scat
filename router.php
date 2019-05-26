@@ -467,6 +467,18 @@ $app->group('/catalog', function (Slim\App $app) {
               return $res->withRedirect("/item.php?code={$args['code']}");
             })->setName('catalog-item');
 
+  $app->get('/whats-new',
+            function (Request $req, Response $res, array $args) {
+              $products= $this->catalog->getNewProducts();
+              $depts= $this->catalog->getDepartments();
+
+              return $this->view->render($res, 'catalog-whatsnew.html',
+                                         [
+                                           'products' => $products,
+                                           'depts' => $depts,
+                                         ]);
+            })->setName('catalog-whats-new');
+
   $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]',
             function (Request $req, Response $res, array $args) {
             try {

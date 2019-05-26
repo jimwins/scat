@@ -51,6 +51,13 @@ class CatalogService
     return \Model::factory('Product')->where('id', $id)->find_one();
   }
 
+  public function getNewProducts($limit= 12) {
+    return \Model::factory('Product')->where_gte('product.active', 1)
+                                     ->order_by_desc('product.added')
+                                     ->limit($limit)
+                                     ->find_many();
+  }
+
   public function GetRedirectFrom($source) {
     // Whole product moved?
     $dst=\Model::factory('Redirect')->where_like('source', $source)->find_one();

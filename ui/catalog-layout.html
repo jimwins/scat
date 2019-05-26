@@ -112,6 +112,10 @@
 
       {% if brands|length %}
         <div style="column-count: 3" class="list-group">
+          <a class="list-group-item active" style="break-inside: avoid-column"
+             href="{{ path_for('catalog-whats-new') }}">
+            What's New
+          </a>
           {% for b in brands %}
             <a class="list-group-item" style="break-inside: avoid-column"
                href="{{ path_for('catalog-brand', { 'brand' : b.slug }) }}">
