@@ -428,6 +428,7 @@ $app->group('/catalog', function (Slim\App $app) {
                  }
                }
                $product->save();
+               $this->search->indexProduct($product);
                return $res->withJson($product);
              });
 

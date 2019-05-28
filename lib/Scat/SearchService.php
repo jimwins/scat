@@ -98,8 +98,8 @@ class SearchService
 
   public function indexProduct($product) {
     if (!isset($this->insert)) {
-      $query= "INSERT INTO scat (id, group_id, items, is_deleted, date_added,
-                                 title, content, brand_name)
+      $query= "REPLACE INTO scat (id, group_id, items, is_deleted, date_added,
+                                  title, content, brand_name)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
       $this->insert= $this->pdo->prepare($query);
     }
