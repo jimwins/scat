@@ -346,6 +346,17 @@ $app->group('/catalog', function (Slim\App $app) {
                                          $data);
             })->setName('catalog-search');
 
+  $app->get('/~reindex', function (Request $req, Response $res, array $args) {
+    $this->search->flush();
+
+    $rows= 0;
+    foreach ($this->catalog->getProducts() as $product) {
+      $rows+= $this->search->indexProduct($product);
+    }
+
+    return $res->getBody()->write("Indexed $rows rows.");
+  });
+
   $app->get('/brand-form',
             function (Request $req, Response $res, array $args) {
               $brand= $this->catalog->getBrandById($req->getParam('id'));

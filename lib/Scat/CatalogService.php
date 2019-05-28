@@ -51,6 +51,11 @@ class CatalogService
     return \Model::factory('Product')->where('id', $id)->find_one();
   }
 
+  public function getProducts($active= 1) {
+    return \Model::factory('Product')->where_gte('product.active', $active)
+                                     ->find_many();
+  }
+
   public function getNewProducts($limit= 12) {
     return \Model::factory('Product')->where_gte('product.active', 1)
                                      ->order_by_desc('product.added')

@@ -6,6 +6,7 @@ use PDO;
 class SearchService
 {
   private $pdo;
+  private $insert;
 
   public function __construct(array $config) {
     $this->pdo= new PDO($config['dsn'], $config['user'], $config['pass']);
@@ -75,7 +76,7 @@ class SearchService
   public function searchProducts($terms) {
     // This should rank products for which we stock items higher
     $q= "SELECT id, WEIGHT() weight
-           FROM ordure
+           FROM scat
           WHERE MATCH(?)
          OPTION ranker=expr('sum(lcs*user_weight)*1000+bm25+if(items, 4000, 0)')";
 
@@ -89,5 +90,31 @@ class SearchService
                                      ->where_gte('product.active', 1)
                                      ->order_by_asc('product.name')
                                      ->find_many() : [];
+  }
+
+  public function flush() {
+    return $this->pdo->query("DELETE FROM scat WHERE id > 0");
+  }
+
+  public function indexProduct($product) {
+    if (!isset($this->insert)) {
+      $query= "INSERT INTO scat (id, group_id, items, is_deleted, date_added,
+                                 title, content, brand_name)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+      $this->insert= $this->pdo->prepare($query);
+    }
+
+    $this->insert->execute([
+      $product->id,
+      $product->department_id,
+      $product->stocked ?: 0,
+      $product->active ? 0 : 1,
+      $product->added,
+      $product->name,
+      $product->description,
+      $product->brand_name ?: '',
+    ]);
+
+    return $this->insert->rowCount();
   }
 }

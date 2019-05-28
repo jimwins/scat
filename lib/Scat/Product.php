@@ -14,6 +14,10 @@ class Product extends \Model implements \JsonSerializable {
     return $this->belongs_to('Brand');
   }
 
+  public function brand_name() {
+    return $this->brand()->find_one()->name;
+  }
+
   public function dept() {
     return $this->belongs_to('Department');
   }
