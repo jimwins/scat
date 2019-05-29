@@ -236,7 +236,7 @@ foreach ($payments as $payment) {
 <?}?>
   <br><br>
 <?if (defined('PRINT_DIRECT')) {?>
-  <barcode code="@INV-<?=ashtml($txn['id'])?>" type="C39E" class="barcode" size="2" />
+  <barcode code="@INV-<?=ashtml($txn['id'])?>" type="C128B" class="barcode" size="2" />
 <?} else {?>
   <span style="font-family: Aatrix3of9Reg; font-size: 2em">*@INV-<?=ashtml($txn['id'])?>*</span>
 <?}?>
