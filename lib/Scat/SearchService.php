@@ -107,12 +107,12 @@ class SearchService
     $this->insert->execute([
       $product->id,
       $product->department_id,
-      $product->stocked ?: 0,
+      $product->stocked() ?: 0,
       $product->active ? 0 : 1,
       $product->added,
       $product->name,
       $product->description,
-      $product->brand_name ?: '',
+      $product->brand_name() ?: '',
     ]);
 
     return $this->insert->rowCount();
