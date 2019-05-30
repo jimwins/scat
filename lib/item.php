@@ -51,6 +51,10 @@ if ($GLOBALS['DEBUG']) {
       $andor[]= "(item.discount = '{$dbt[1]}')";
     } elseif (preg_match('/^min:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.minimum_quantity = '{$dbt[1]}')";
+    } elseif (preg_match('/^width:(.+)/i', $term, $dbt)) {
+      $andor[]= "(item.width = '{$dbt[1]}')";
+    } elseif (preg_match('/^weight:(.+)/i', $term, $dbt)) {
+      $andor[]= "(item.weight = '{$dbt[1]}')";
     } elseif (preg_match('/^stocked:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.minimum_quantity)"
                         : "(NOT item.minimum_quantity)";
