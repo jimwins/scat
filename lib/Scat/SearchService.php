@@ -109,7 +109,7 @@ class SearchService
       $product->department_id,
       $product->stocked() ?: 0,
       $product->active ? 0 : 1,
-      $product->added,
+      strtotime($product->added),
       $product->name,
       $product->description,
       $product->brand_name() ?: '',
