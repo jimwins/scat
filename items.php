@@ -309,6 +309,24 @@ ob_end_flush();
             </div>
           </div>
           <div class="form-group">
+            <label for="dimensions" class="col-sm-2 control-label">
+              Dimensions
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="dimensions" class="form-control"
+                     placeholder="LxWxH">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="weight" class="col-sm-2 control-label">
+              Weight
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="weight" class="form-control"
+                     placeholder="# lbs.">
+            </div>
+          </div>
+          <div class="form-group">
             <label for="prop65" class="col-sm-2 control-label">
               Prop. 65
             </label>

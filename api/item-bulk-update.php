@@ -77,6 +77,18 @@ if (strlen($_REQUEST['purchase_quantity'])) {
   $props[]= "purchase_quantity = $purchase_quantity";
 }
 
+if (strlen($_REQUEST['dimensions'])) {
+  list($l, $w, $h)= preg_split('/\s*x\s*/', $_REQUEST['dimensions']);
+  $props[]= "length = " . (float)$l;
+  $props[]= "width = " . (float)$w;
+  $props[]= "height = " . (float)$h;
+}
+
+if (strlen($_REQUEST['weight'])) {
+  $weight= (float)$_REQUEST['weight'];
+  $props[]= "weight = $weight";
+}
+
 foreach (array('active','oversized','hazmat','prop65') as $key) {
   if (strlen($_REQUEST[$key])) {
     $props[]= "$key = " . (int)$_REQUEST[$key];
