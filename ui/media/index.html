@@ -1,0 +1,180 @@
+{% extends 'layout/page.html' %}
+
+{% block title %}
+  Media
+{% endblock %}
+
+{% block content %}
+
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if page > 0 %}
+        <li>
+          <a href="media?page={{ page - 1 }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      {% endif %}
+      {% for p in 0..(total / page_size) %}
+        {% if p == page %}
+          <li class="active"><span>{{ p + 1 }}</span></li>
+        {% else %}
+          <li><a href="media?page={{ p }}">{{ p + 1 }}</a></li>
+        {% endif %}
+      {% endfor %}
+      {% if page < (total / page_size)|round(0,'floor') %}
+        <li>
+          <a href="media?page={{ page + 1 }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  <div class="row">
+    {% for i in media %}
+      <div class="col-sm-3">
+        <div class="thumbnail" data-id="{{ i.id }}">
+          <img class="img-responsive"
+               src="{{ STATIC ~ (i.medium ?: i.thumbnail) }}">
+          <div class="caption">{{ i.alt_text }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+{% endblock %}
+
+{% block script %}
+<style>
+#droptarget {
+  position: absolute;
+  z-index: 100000;
+  top: 0; left; 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0,0,0,0.6);
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#droptarget h1 {
+  color: #fff;
+  font-size: 6em;
+  max-width: 50%;
+}
+#droptarget, #droptarget * {
+  pointer-events: none;
+}
+</style>
+<div id="droptarget" style="display:none">
+  <h1>Drop image to upload.</h1>
+</div>
+<script>
+  let dropArea= document.currentScript.parentNode
+
+  let preventDefaults= (ev) => {
+    ev.preventDefault()
+    ev.stopPropagation()
+  }
+
+  ['dragenter', 'dragleave', 'dragend','dragover', 'drop']
+  .forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults)
+  })
+
+  let handleEnter= (ev) => {
+    document.getElementById('droptarget').style.display= 'flex'
+  }
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, handleEnter)
+  })
+
+  let handleExit= (ev) => {
+    document.getElementById('droptarget').style.display= 'none'
+  }
+  ['dragleave', 'dragend'].forEach(eventName => {
+    dropArea.addEventListener(eventName, handleExit)
+  })
+
+  dropArea.addEventListener('drop', (ev) => {
+    let dt= ev.dataTransfer
+    let files= dt.files;
+
+    document.getElementById('droptarget').style.display= 'none'
+
+    const url= '/media/add'
+    const formData= new FormData()
+
+    // TODO We only handle one file upload at a time right now
+    if (files.length) {
+      const file= files[0]
+      formData.append('file', file)
+    } else {
+      let fileUrl= dt.getData('text/plain')
+      if (fileUrl) {
+        formData.append('url', fileUrl)
+      }
+    }
+
+    if (!formData.has('file') && !formData.has('url')) {
+      return Promise.reject(new Error("No file dropped."))
+    }
+
+    scat.dialog([], '/dialog/file-upload.html')
+    .then((modal) => {
+      return fetch(url, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: formData
+      })
+      .then((response) => {
+        if (response.status >= 200 && response.status < 300) {
+          return Promise.resolve(response)
+        }
+        return Promise.reject(new Error(response.statusText))
+      })
+      .finally((res) => {
+        modal.modal('hide')
+      })
+    })
+    .then((res) => {
+      window.location.reload()
+    })
+    .catch((res) => {
+      alert("Sorry, there was a problem with the upload.")
+    })
+  })
+
+  let changeCaption= (ev) => {
+    let id= ev.currentTarget.getAttribute('data-id')
+    let current= ev.currentTarget.getElementsByClassName('caption')[0].textContent
+    let caption= window.prompt("Please enter a caption:", current)
+    if (caption) {
+      const formData= new FormData()
+      formData.append('caption', caption)
+
+      fetch('/media/' + id + '/update', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: formData
+      })
+      .then((response) => {
+        if (response.status >= 200 && response.status < 300) {
+          window.location.reload()
+        }
+        return Promise.reject(new Error(response.statusText))
+      })
+    }
+  }
+
+  let els= document.getElementsByClassName('thumbnail');
+  for (let i= 0; i < els.length; i++) {
+    els[i].addEventListener("click", changeCaption, false);
+  }
+
+</script>
+{% endblock %}

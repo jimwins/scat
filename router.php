@@ -618,6 +618,54 @@ $app->group('/report', function (Slim\App $app) {
             });
 });
 
+/* Media */
+$app->get('/media',
+          function (Request $req, Response $res, array $args) {
+            $page= (int)$req->getParam('page');
+            $page_size= 20;
+            $media= \Model::factory('Image')
+              ->order_by_desc('created_at')
+              ->limit($page_size)->offset($page * $page_size)
+              ->find_many();
+            $total= \Model::factory('Image')->count();
+
+            return $this->view->render($res, 'media/index.html', [
+                                         'media' => $media,
+                                         'page' => $page,
+                                         'page_size' => $page_size,
+                                         'total' => $total,
+                                        ]);
+          });
+$app->post('/media/add',
+           function (Request $req, Response $res, array $args) {
+             $url= $req->getParam('url');
+             if ($url) {
+               $image= \Scat\Image::createFromUrl($url);
+             } else {
+               foreach ($req->getUploadedFiles() as $file) {
+                 $image= \Scat\Image::createFromFile($file->getStream(),
+                                                     $file->getClientFilename());
+               }
+             }
+
+             return $res->withJson($image);
+           });
+$app->post('/media/{id}/update',
+           function (Request $req, Response $res, array $args) {
+             \ORM::get_db()->beginTransaction();
+
+             $image= \Model::factory('Image')->find_one($args['id']);
+             if (!$image) {
+               throw new \Slim\Exception\NotFoundException($req, $res);
+             }
+             $image->alt_text= $req->getParam('caption');
+             $image->save();
+
+             \ORM::get_db()->commit();
+
+             return $res->withJson($image);
+           });
+
 /* Notes */
 $app->get('/notes',
           function (Request $req, Response $res, array $args) {
