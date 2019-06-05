@@ -58,6 +58,19 @@ foreach(array('length', 'width', 'height', 'weight') as $key) {
   }
 }
 
+if (strlen($_REQUEST['dimensions'])) {
+  $dimensions= $db->real_escape_string($_REQUEST['dimensions']);
+  list($l, $w, $h)= preg_split('/\s*x\s*/', $dimensions);
+  $q= "UPDATE item
+          SET length = CAST('$l' AS DECIMAL(9,3)),
+              width = CAST('$w' AS DECIMAL(9,3)),
+              height = CAST('$h' AS DECIMAL(9,3))
+        WHERE id = $item_id";
+  $r= $db->query($q)
+    or die_query($db, $q);
+}
+
+
 // Workaround for jEditable sorting: id may be prefixed with _
 $brand_id= isset($_REQUEST['brand_id']) ? ltrim($_REQUEST['brand_id'], '_') : 0;
 if ((int)$brand_id) {

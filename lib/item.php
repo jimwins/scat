@@ -153,6 +153,7 @@ function item_find($db, $q, $options) {
               GROUP_CONCAT(CONCAT(barcode.code, '!', barcode.quantity)
                            SEPARATOR ',') barcodes,
               length, width, height, weight, color,
+              CONCAT(length, 'x', width, 'x', height) AS dimensions,
               item.tic,
               $extra
               item.added, item.modified, item.inventoried,

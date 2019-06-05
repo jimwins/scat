@@ -387,16 +387,8 @@ include 'item-searchform.php';
             Dimensions
           </label>
           <div class="col-sm-8">
-            <p class="form-control-static">
-              <span id="length"
-                 data-bind="jeditable: item.length, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel', style: 'display: inline', width: '4em' }"></span>"
-              &times;
-              <span id="width"
-                 data-bind="jeditable: item.width, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel', style: 'display: inline', width: '4em' }"></span>"
-              &times;
-              <span id="height"
-                 data-bind="jeditable: item.height, jeditableOptions: { onupdate: saveItemProperty, onblur: 'cancel', style: 'display: inline', width: '4em' }"></span>"
-            </p>
+            <p class="form-control-static" id="dimensions"
+               data-bind="jeditable: item.dimensions, jeditableOptions: { textType: 'dimensions', onupdate: saveItemProperty, onblur: 'cancel' }"></p>
           </div>
         </div>
         <button id="prop65" type="button" class="btn btn-default"
