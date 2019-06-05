@@ -97,10 +97,12 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
       $this->current[]= "(item.minimum_quantity = '$value')";
       break;
     case 'width':
-      $this->current[]= "(item.width = '$value')";
+      $this->current[]= $value ? "(item.width = '$value')" :
+                                 "(NOT item.width OR item.width IS NULL)";
       break;
     case 'weight':
-      $this->current[]= "(item.weight = '$value')";
+      $this->current[]= $value ? "(item.weight = '$value')" :
+                                 "(NOT item.weight OR item.weight IS NULL)";
       break;
     case 'stocked':
       $this->current[]= (bool)$value ? "(item.minimum_quantity)" :
