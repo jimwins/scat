@@ -242,15 +242,27 @@ function txn_apply_discounts($db, $id) {
       }
     }
 
-    // XXX handle additional_percentage discount type
-
     if ($new_discount) {
-      $q= "UPDATE txn_line, item
-              SET txn_line.discount = $new_discount,
-                  txn_line.discount_type = '$new_discount_type'
-            WHERE txn = $id AND txn_line.item = item.id
-              AND $condition
-              AND NOT discount_manual";
+      if ($new_discount_type != 'additional_percentage') {
+        $q= "UPDATE txn_line, item
+                SET txn_line.discount = $new_discount,
+                    txn_line.discount_type = '$new_discount_type'
+              WHERE txn = $id AND txn_line.item = item.id
+                AND $condition
+                AND NOT discount_manual";
+      } else {
+        $q= "UPDATE txn_line, item
+                SET txn_line.discount =
+                      sale_price(sale_price(txn_line.retail_price,
+                                            txn_line.discount_type,
+                                            txn_line.discount),
+                                 'percentage',
+                                 $new_discount),
+                    txn_line.discount_type = 'fixed'
+              WHERE txn = $id AND txn_line.item = item.id
+                AND $condition
+                AND NOT discount_manual";
+      }
     } else {
       $q= "UPDATE txn_line, item
               SET txn_line.discount = item.discount,
