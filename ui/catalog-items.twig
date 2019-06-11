@@ -37,7 +37,7 @@
 
 {# A little convoluted because we chunk by variation sometimes #}
 
-{% set last_variation= null %}
+{% set last_variation= -1 %}
 
 {% if not variations|length %}
   {{ s.begin_table() }}
@@ -45,7 +45,7 @@
 
 {% for i in items %}
   {% if variations|length and i.variation is not same as (last_variation) %}
-    {% if last_variation %}
+    {% if last_variation != -1 %}
       {{ s.end_table() }}
     {% endif %}
     {% set last_variation = i.variation %}
