@@ -17,6 +17,12 @@ class Note extends \Model implements \JsonSerializable {
     }
   }
 
+  public function item() {
+    if ($this->kind == 'item') {
+      return $this->belongs_to('Item', 'attach_id')->find_one();
+    }
+  }
+
   public function person() {
     return $this->belongs_to('Person');
   }
