@@ -22,7 +22,9 @@ class TwigExtension
 
   public function getFilters() {
     return [
-      new \Twig_SimpleFilter('hexdec', 'hexdec')
+      new \Twig_SimpleFilter('hexdec', 'hexdec'),
+      new \Twig_SimpleFilter('phone_number_format',
+                             [ $this, 'phone_number_format' ])
     ];
   }
 
@@ -32,5 +34,17 @@ class TwigExtension
              ->where('todo', 1)
              ->order_by_asc('id')
              ->find_many();
+  }
+
+  public function phone_number_format($phone, $country_code= 'US') {
+    try {
+      $phoneUtil= \libphonenumber\PhoneNumberUtil::getInstance();
+      $num= $phoneUtil->parse($phone, $country_code);
+      return $phoneUtil->format($num,
+                                \libphonenumber\PhoneNumberFormat::NATIONAL);
+    } catch (Exception $e) {
+      // Punt!
+      return $phone;
+    }
   }
 }
