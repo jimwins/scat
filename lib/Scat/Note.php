@@ -8,6 +8,15 @@ class Note extends \Model implements \JsonSerializable {
     }
   }
 
+  public function about() {
+    if ($this->kind == 'txn') {
+      return $this->belongs_to('Txn', 'attach_id')->find_one()->owner();
+    }
+    if ($this->kind == 'person') {
+      return $this->belongs_to('Person', 'attach_id')->find_one();
+    }
+  }
+
   public function person() {
     return $this->belongs_to('Person');
   }
