@@ -28,7 +28,7 @@
            style="max-height: 30em; overflow: scroll; overflow-y: visible">
         <ul class="list-group" data-bind="foreach: people">
           <li class="list-group-item" data-bind="click: $parent.selectPerson">
-            <span data-bind="text: ($data.name ? $data.name : '') + ($data.name && $data.company ? ' / ' : '') + ($data.company ? $data.company : '')">
+            <span data-bind="text: ($data.name ? $data.name : $data.email ? $data.email : '') + (($data.name || $data.email) && $data.company ? ' / ' : '') + ($data.company ? $data.company : '')">
               Sample Person / Sample Company
             </span>
             <span class="pull-right" data-bind="text: $data.pretty_phone">
