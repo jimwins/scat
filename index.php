@@ -1264,7 +1264,7 @@ viewModel.changePerson= function(data, event) {
         return;
       }
 
-      Scat.api('person-list', { term: search })
+      Scat.api('person-list', { term: search, limit: 20 })
           .done(function (data) {
             personModel.people(data);
           });

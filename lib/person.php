@@ -3,7 +3,7 @@
 define('PERSON_FIND_EMPTY', 1);
 define('PERSON_FIND_ALL', 2);
 
-function person_find($db, $q, $options= null) {
+function person_find($db, $q, $options= null, $limit= null) {
   $criteria= [];
 
   $terms= preg_split('/\s+/', trim($q));
@@ -35,6 +35,8 @@ function person_find($db, $q, $options= null) {
 
   $sql_criteria= join(' AND ', $criteria);
 
+  $sql_limit= (int)$limit ? "LIMIT " . (int)$limit : '';
+
   $q= "SELECT id, name, role, company,
               address,
               email, email_ok,
@@ -59,7 +61,8 @@ function person_find($db, $q, $options= null) {
                            DATE(processed) = DATE(NOW())))) points_pending
          FROM person
         WHERE $sql_criteria
-        ORDER BY company, name, loyalty_number";
+        ORDER BY company, name, loyalty_number
+        $sql_limit";
 
   $r= $db->query($q)
     or die_query($db, $q);
