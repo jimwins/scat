@@ -22,8 +22,22 @@
             <a href="{{ path_for('sale', { 'id' : txn.id }) }}">
               Invoice {{ txn.formatted_number }}
             </a>
-            <a class="clearfix" href="{{ path_for('person', { 'id' : txn.person_id }) }}">
-              {{ txn.owner.friendly_name }}
+          {% endif %}
+          {% set about= note.about %}
+          {% if about %}
+            <a class="clearfix" href="{{ path_for('person', { 'id' : about.id() }) }}">
+              {{ about.friendly_name }}
+            </a>
+            {% if about.phone %}
+              <a class="clearfix" href="{{ path_for('person', { 'id' : about.id() }) }}">
+                {{ about.phone | phone_number_format }}
+              </a>
+            {% endif %}
+          {% endif %}
+          {% if note.kind == 'item' %}
+            {% set item= note.item %}
+            <a href="{{ path_for('catalog-item', { 'code' : item.code }) }}">
+              {{ item.name }}
             </a>
           {% endif %}
         </td>
