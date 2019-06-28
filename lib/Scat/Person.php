@@ -12,7 +12,15 @@ class Person extends \Model implements \JsonSerializable {
       return $this->email;
     }
     if ($this->phone) {
-      return $this->phone;
+      try {
+        $phoneUtil= \libphonenumber\PhoneNumberUtil::getInstance();
+        $num= $phoneUtil->parse($this->phone, 'US');
+        return $phoneUtil->format($num,
+                                  \libphonenumber\PhoneNumberFormat::NATIONAL);
+      } catch (Exception $e) {
+        // Punt!
+        return $this->phone;
+      }
     }
     return $this->id;
   }
