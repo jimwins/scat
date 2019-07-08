@@ -109,14 +109,19 @@ if (count($items) == 1) {
   // XXX error handling
   txn_apply_discounts($db, $txn_id);
 
-  if ($txn['type'] == 'customer' && $items[0]['sale_price']) {
-    pole_display_price($items[0]['name'], $items[0]['sale_price']);
-  }
-
   $new_line= $items['0']['line_id'];
 
   $ret= txn_load_full($db, $txn_id);
   $ret['new_line']= $new_line;
+
+  if ($txn['type'] == 'customer') {
+    foreach ($ret['items'] as $item) {
+      if ($item['line_id'] == $new_line && $item['price']) {
+        pole_display_price($item['name'], $item['price']);
+        break;
+      }
+    }
+  }
 
   echo jsonp($ret);
 } else {
