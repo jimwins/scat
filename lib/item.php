@@ -32,7 +32,9 @@ if ($GLOBALS['DEBUG']) {
     } elseif (preg_match('/^item:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.id = '{$dbt[1]}')";
     } elseif (preg_match('/^barcode:(.+)/i', $term, $dbt)) {
-      $andor[]= "(barcode.code = '{$dbt[1]}')";
+      // we use barcode:"code" ourselves, so work around that
+      $code= trim($dbt[1], '\\"');
+      $andor[]= "(barcode.code = '$code')";
     } elseif (preg_match('/^brand:(.+)/i', $term, $dbt)) {
       if ($dbt[1] === "0") {
         $andor[]= "(item.brand = 0)";
