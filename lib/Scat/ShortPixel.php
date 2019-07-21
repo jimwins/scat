@@ -6,7 +6,7 @@ namespace Scat;
  * less clever than the official PHP API wrapper, just providing bare-bones
  * access for processing a single URL or file.
  *
- * $sp= new ShortPixel(API_KEY, [ 'option' => 'value' ]);
+ * $sp= new \Scat\ShortPixel(API_KEY, [ 'option' => 'value' ]);
  * $result= $sp->reduceUrl($url, [ 'option2' => 'value' ]);
  * $result= $sp->reduceFile($file, [ 'option3' => 'value' ]);
  *
