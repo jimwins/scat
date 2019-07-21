@@ -65,6 +65,12 @@ class ShortPixel {
                                     $file->Status->Code);
     }
 
+    if ($file->Status->Code == 1) {
+      // Retry!
+      error_log("Retrying to see if it is ready!");
+      return $this->reduceUrl($file->OriginalURL);
+    }
+
     return $file;
   }
 
@@ -90,20 +96,20 @@ class ShortPixel {
   }
 
   function reduceFile($file, $options= []) {
-    $client= new \GuzzleHttp\Client();
+    $stream= @fopen($file, 'r');
+    if (!$fd)
+      throw new ShortPixelException("Unable to open file '$file'.");
+    return $this->reduceStream($fd, basename($file), $options);
+  }
 
-    if (!is_resource($file)) {
-      $fd= @fopen($file, 'r');
-      if (!$fd)
-        throw new ShortPixelException("Unable to open file '$file'.");
-      $file= $fd;
-    }
+  function reduceStream($file, $filename, $options= []) {
+    $client= new \GuzzleHttp\Client();
 
     $params= array_merge([
                           'key' => $this->api_key,
                           'plugin_version' => 'SCAT0',
                           'file_paths' => json_encode([
-                            'file1' => 'dummy_path.jpg'
+                            'file1' => $filename,
                           ]),
                           'file1' => $file
                          ],

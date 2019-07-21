@@ -643,8 +643,8 @@ $app->post('/media/add',
                $image= \Scat\Image::createFromUrl($url);
              } else {
                foreach ($req->getUploadedFiles() as $file) {
-                 $image= \Scat\Image::createFromFile($file->getStream(),
-                                                     $file->getClientFilename());
+                 $image= \Scat\Image::createFromStream($file->getStream(),
+                                                       $file->getClientFilename());
                }
              }
 
