@@ -442,8 +442,8 @@ $app->group('/catalog', function (Slim\App $app) {
                  $product->addImage($image);
                } else {
                  foreach ($req->getUploadedFiles() as $file) {
-                   $image= \Scat\Image::createFromFile($file->getStream(),
-                                                       $file->getClientFilename());
+                   $image= \Scat\Image::createFromStream($file->getStream(),
+                                                         $file->getClientFilename());
                    $product->addImage($image);
                  }
                }
