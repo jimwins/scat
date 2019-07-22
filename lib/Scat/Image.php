@@ -1,7 +1,7 @@
 <?php
 namespace Scat;
 
-class Image extends \Model {
+class Image extends \Model implements \JsonSerializable {
   public function thumbnail() {
     return '/i/th/' . $this->uuid . '.jpg';
   }
@@ -130,5 +130,9 @@ class Image extends \Model {
     ]);
 
     return $image;
+  }
+
+  public function jsonSerialize() {
+    return $this->as_array();
   }
 }
