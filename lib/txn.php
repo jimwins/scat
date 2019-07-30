@@ -253,9 +253,9 @@ function txn_apply_discounts($db, $id) {
       } else {
         $q= "UPDATE txn_line, item
                 SET txn_line.discount =
-                      sale_price(sale_price(txn_line.retail_price,
-                                            txn_line.discount_type,
-                                            txn_line.discount),
+                      sale_price(sale_price(item.retail_price,
+                                            item.discount_type,
+                                            item.discount),
                                  'percentage',
                                  $new_discount),
                     txn_line.discount_type = 'fixed'
