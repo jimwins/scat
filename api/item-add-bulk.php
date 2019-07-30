@@ -23,6 +23,7 @@ $q= "INSERT INTO item (code, name, brand, retail_price,
        FROM vendor_item vi
        LEFT JOIN item ON item = item.id
       WHERE vendor = $vendor
+        AND vi.active
         AND vi.code LIKE '$code'
         AND item.id IS NULL";
 
