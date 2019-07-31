@@ -3,7 +3,7 @@ namespace Scat;
 
 class Image extends \Model implements \JsonSerializable {
   public function original() {
-    return '/i/o/' . $this->uuid . '.jpg';
+    return '/i/o/' . $this->uuid . '.' . $this->ext;
   }
 
   public function thumbnail() {
