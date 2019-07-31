@@ -1,4 +1,5 @@
 {% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
 
 {% block title %}
   Catalog
@@ -144,107 +145,6 @@
 
 {% block script %}
   {% if product %}
-<style>
-#droptarget {
-  position: absolute;
-  z-index: 100000;
-  top: 0; left; 0;
-  height: 100%;
-  width: 100%;
-  background: rgba(0,0,0,0.6);
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#droptarget h1 {
-  color: #fff;
-  font-size: 6em;
-  max-width: 50%;
-}
-#droptarget, #droptarget * {
-  pointer-events: none;
-}
-</style>
-<div id="droptarget" style="display:none">
-  <h1>Drop image to upload.</h1>
-</div>
-    <script>
-      let dropArea= document.currentScript.parentNode
-
-      let preventDefaults= (ev) => {
-        ev.preventDefault()
-        ev.stopPropagation()
-      }
-
-      ['dragenter', 'dragleave', 'dragend','dragover', 'drop']
-      .forEach(eventName => {
-        dropArea.addEventListener(eventName, preventDefaults)
-      })
-
-      let handleEnter= (ev) => {
-        document.getElementById('droptarget').style.display= 'flex'
-      }
-      ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, handleEnter)
-      })
-
-      let handleExit= (ev) => {
-        document.getElementById('droptarget').style.display= 'none'
-      }
-      ['dragleave', 'dragend'].forEach(eventName => {
-        dropArea.addEventListener(eventName, handleExit)
-      })
-
-      dropArea.addEventListener('drop', (ev) => {
-        let dt= ev.dataTransfer
-        let files= dt.files;
-
-        document.getElementById('droptarget').style.display= 'none'
-
-        const url= '/catalog/product/add-image?id={{ product.id }}'
-        const formData= new FormData()
-
-        // TODO We only handle one file upload at a time right now
-        if (files.length) {
-          const file= files[0]
-          formData.append('file', file)
-        } else {
-          let fileUrl= dt.getData('text/plain')
-          if (fileUrl) {
-            formData.append('url', fileUrl)
-          }
-        }
-
-        if (!formData.has('file') && !formData.has('url')) {
-          return Promise.reject(new Error("No file dropped."))
-        }
-
-        scat.dialog([], '/dialog/file-upload.html')
-        .then((modal) => {
-          return fetch(url, {
-            method: 'POST',
-            headers: { 'Accept': 'application/json' },
-            body: formData
-          })
-          .then((response) => {
-            if (response.status >= 200 && response.status < 300) {
-              return Promise.resolve(response)
-            }
-            return Promise.reject(new Error(response.statusText))
-          })
-          .finally((res) => {
-            modal.modal('hide')
-          })
-        })
-        .then((res) => {
-          window.location.reload()
-        })
-        .catch((res) => {
-          alert("Sorry, there was a problem with the upload.")
-        })
-      })
-    </script>
+    {{ scat.file_upload('/catalog/product/add-image?id=' ~ product.id) }}
   {% endif %}
 {% endblock %}
