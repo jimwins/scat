@@ -665,6 +665,16 @@ $app->post('/media/{id}/update',
 
              return $res->withJson($image);
            });
+$app->post('/media/{id}/regenerate',
+           function (Request $req, Response $res, array $args) {
+             $image= \Model::factory('Image')->find_one($args['id']);
+             if (!$image) {
+               throw new \Slim\Exception\NotFoundException($req, $res);
+             }
+             $image->regenerate();
+
+             return $res->withJson($image);
+           });
 
 /* Notes */
 $app->get('/notes',

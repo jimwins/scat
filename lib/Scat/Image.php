@@ -2,12 +2,82 @@
 namespace Scat;
 
 class Image extends \Model implements \JsonSerializable {
+  public function original() {
+    return '/i/o/' . $this->uuid . '.jpg';
+  }
+
   public function thumbnail() {
     return '/i/th/' . $this->uuid . '.jpg';
   }
 
   public function medium() {
     return '/i/md/' . $this->uuid . '.jpg';
+  }
+
+  public function regenerate() {
+    $client= new \GuzzleHttp\Client();
+
+    $b2= new \ChrisWhite\B2\Client(B2_ACCOUNT_ID, B2_APPLICATION_KEY);
+
+    $short= new \Scat\ShortPixel(SHORTPIXEL_KEY, [
+      'convertto' => 'jpg',
+      'wait' => 30
+    ]);
+
+    // XXX must be a better way to do this, but this works for now
+    $original= 'https:' . ORDURE_STATIC . $this->original();
+    error_log("original: $original");
+
+    // Generate the standard size image (max 768px)
+    $res= $short->reduceUrl($original, [
+      'refresh' => 1,
+      'resize' => 3,
+      'resize_width' => 768,
+      'resize_height' => 768,
+    ]);
+
+    $res= $client->get($res->LossyURL);
+    $file= $res->getBody();
+
+    $upload= $b2->upload([
+      'BucketName' => B2_BUCKET,
+      'FileName' => '/i/st/' . $this->uuid . '.jpg',
+      'Body' => $file
+    ]);
+
+    // Generate the medium size image (max 384px)
+    $res= $short->reduceUrl($original, [
+      'refresh' => 1,
+      'resize' => 3,
+      'resize_width' => 384,
+      'resize_height' => 384,
+    ]);
+
+    $res= $client->get($res->LossyURL);
+    $file= $res->getBody();
+
+    $upload= $b2->upload([
+      'BucketName' => B2_BUCKET,
+      'FileName' => '/i/md/' . $this->uuid . '.jpg',
+      'Body' => $file
+    ]);
+
+    // Generate the thumbnail (max 128px)
+    $res= $short->reduceUrl($original, [
+      'refresh' => 1,
+      'resize' => 3,
+      'resize_width' => 128,
+      'resize_height' => 128,
+    ]);
+
+    $res= $client->get($res->LossyURL);
+    $file= $res->getBody();
+
+    $upload= $b2->upload([
+      'BucketName' => B2_BUCKET,
+      'FileName' => '/i/th/' . $this->uuid . '.jpg',
+      'Body' => $file
+    ]);
   }
 
   public static function createFromUrl($url) {
