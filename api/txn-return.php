@@ -16,14 +16,16 @@ if (!$r)
 $row= $r->fetch_assoc();
 
 $person= $txn['person'] ? $txn['person'] : 'NULL';
+$uuid= $txn['uuid'] ? "REVERSE('{$txn['uuid']}')" : 'NULL';
 
 $q= "INSERT INTO txn
         SET created= NOW(),
             type = 'customer',
             number = $row[number],
             person = $person,
+            uuid = $uuid,
             returned_from = $txn_id,
-            tax_rate = " . DEFAULT_TAX_RATE;
+            tax_rate = {$txn['tax_rate']}";
 $r= $db->query($q);
 if (!$r)
   die_query($db, $q);
@@ -31,14 +33,15 @@ if (!$r)
 $new_txn_id= $db->insert_id;
 
 $q= "INSERT INTO txn_line (txn, item, ordered, allocated, override_name,
-                           retail_price, discount_type, discount, taxfree)
+                           retail_price, discount_type, discount, taxfree,
+                           tic, tax)
      SELECT $new_txn_id AS txn,
             item,
             -ordered AS ordered,
             -allocated AS allocated,
             override_name,
             retail_price, discount_type, discount,
-            taxfree
+            taxfree, tic, -tax
        FROM txn_line WHERE txn = $txn_id";
 $r= $db->query($q);
 if (!$r)
