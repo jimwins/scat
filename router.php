@@ -280,7 +280,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                  // Get the lowest available price for our quantity
                  $price= array_reduce($vendor_items,
                                       function ($carry, $item) {
-                                        $p= ($item->promo_price &&
+                                        $p= ($item->promo_price > 0.00 &&
                                              $quantity >= $item->promo_quantity)?
                                               $item->promo_price :
                                               $item->net_price;
