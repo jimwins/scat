@@ -281,11 +281,11 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                  $price= array_reduce($vendor_items,
                                       function ($carry, $item) {
                                         $p= ($item->promo_price &&
-                                             $quantity > $item->promo_quantity)?
+                                             $quantity >= $item->promo_quantity)?
                                               $item->promo_price :
                                               $item->net_price;
                                         if (($carry == 0.00) ||
-                                            (($quantity >
+                                            (($quantity >=
                                                $item->purchase_quantity) &&
                                              ($carry > $p)))
                                         {
