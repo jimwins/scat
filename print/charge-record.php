@@ -51,8 +51,8 @@ tr.total td {border-top:solid #000 6px; text-align:right;}
 </style>
 <div id="doc_header">
   <div id="store_name">Raw Materials Art Supplies</div>
-  436 South Main Street<br>
-  Los Angeles, CA 90013<br>
+  645 South Los Angeles Street<br>
+  Los Angeles, CA 90014<br>
   (800) 729-7060<br>
   M-F 10-7, Sat 11-6, Sun 12-5<br>
   info@RawMaterialsLA.com<br>

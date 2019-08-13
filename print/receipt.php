@@ -65,8 +65,8 @@ tr.total td {border-top:6px solid #000; text-align:right; }
   <div id="store_name">
   <img src="data:<?=mime_content_type('../ui/logo.png')?>;base64,<?=base64_encode(file_get_contents('../ui/logo.png'))?>" width="80%">
   </div>
-  436 South Main Street<br>
-  Los Angeles, CA 90013<br>
+  645 South Los Angeles Street<br>
+  Los Angeles, CA 90014<br>
   (800) 729-7060<br>
   M-F 10-7, Sat 11-6, Sun 12-5<br>
   info@RawMaterialsLA.com<br>

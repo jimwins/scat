@@ -29,9 +29,9 @@ $fn= (($details['type'] == 'vendor') ? 'PO' : 'I') .
  </div>
  <div id="store_info">
   <small>From:</small><br>
-  <b>Raw Materials</b><br>
-  436 South Main Street<br>
-  Los Angeles, CA 90013<br>
+  <b>Raw Materials Art Supplies</b><br>
+  645 South Los Angeles Street<br>
+  Los Angeles, CA 90014<br>
   (800) 729-7060<br>
   info@RawMaterialsLA.com<br>
   http://RawMaterialsLA.com/
