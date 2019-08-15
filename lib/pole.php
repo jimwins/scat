@@ -10,7 +10,7 @@ function pole_display_price($label, $price) {
     return;
   }
 
-  $sock= fsockopen(POLE_SERVER, 1888, $errno, $errstr, 1);
+  $sock= @fsockopen(POLE_SERVER, 1888, $errno, $errstr, 1);
   if ($sock) {
     fwrite($sock, sprintf("\x0a\x0d%-19.19s\x0a\x0d$%18.2f ", $label, $price));
   }
