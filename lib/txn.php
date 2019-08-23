@@ -28,11 +28,11 @@ function txn_load($db, $id) {
               taxed, untaxed,
               CAST(tax_rate AS DECIMAL(9,2)) tax_rate, 
               taxed + untaxed subtotal,
-              IF(uuid, /* Tax calculated per-line */
+              IF(uuid IS NOT NULL, /* Tax calculated per-line */
                  tax,
                  CAST(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)
                       AS DECIMAL(9,2))) AS tax,
-              IF(uuid, 
+              IF(uuid IS NOT NULL,
                  taxed + untaxed + tax,
                  CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
                       AS DECIMAL(9,2))) total,
