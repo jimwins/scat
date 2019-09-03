@@ -28,7 +28,7 @@ if (!empty($_REQUEST['name'])) {
 
 if (!empty($_REQUEST['short_name'])) {
   $short_name= $db->real_escape_string($_REQUEST['short_name']);
-  $short_name= preg_replace('/({{size}})/', '\', CONCAT(REPLACE(LEFT(name, LOCATE(" ", name)-1), "x", "\" × "), "\""), \'', $short_name);
+  $short_name= preg_replace('/({{size}})/', '\', REPLACE(CONCAT(REPLACE(LEFT(name, LOCATE(" ", name)-1), "x", "\" × "), "\""), \'yd"\', " yds."), \'', $short_name);
   $short_name= preg_replace('/({{(\w+?)}})/', '\', \\2, \'', $short_name);
   $props[]= "short_name = CONCAT('$short_name')";
 }
