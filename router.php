@@ -286,7 +286,6 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                                (($quantity >= $item->purchase_quantity) ?
                                 $item->net_price :
                                 0);
-                   error_log("price $price contender $contender");
                    $price= ($price && $price < $contender) ?
                            $price :
                            $contender;
