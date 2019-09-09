@@ -292,7 +292,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                  }
 
                  if (!$price) {
-                   throw new \Exception("Failed to get price for $item_id");
+                   error_log("Failed to get price for $item_id");
                  }
 
                  $item= $purchase->items()->create();
