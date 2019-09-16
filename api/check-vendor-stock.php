@@ -41,6 +41,9 @@ function check_mac_stock($code) {
                          ]);
 
   $body= $res->getBody();
+  if ($GLOBALS['DEBUG']) {
+    error_log($body);
+  }
 
   $data= json_decode($body);
   $avail= [];
