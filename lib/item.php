@@ -3,6 +3,7 @@ define('FIND_ALL', 1);
 define('FIND_OR', 2);
 define('FIND_LIMITED', 8);
 define('FIND_RANDOM', 16);
+define('FIND_STOCKED_FIRST', 32);
 
 function item_terms_to_sql($db, $q, $options) {
 if ($GLOBALS['DEBUG']) {
@@ -123,7 +124,10 @@ function item_find($db, $q, $options) {
   list($sql_criteria, $x) = item_terms_to_sql($db, $q, $options);
 
   $extra= "";
-  $order_by= "!(stock > 0), item.code"; /* First items in stock, then by code */
+  $order_by= "item.code";
+  if ($options & FIND_STOCKED_FIRST) {
+    $order_by= "!(stock > 0), item.code";
+  }
   $limit= "";
   if ($options & FIND_RANDOM) {
     $order_by= "RAND()";

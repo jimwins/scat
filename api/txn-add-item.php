@@ -21,7 +21,7 @@ if ($txn_id) {
 if (!$search)
   $search= "item:$item";
 
-$items= item_find($db, $search, $_REQUEST['all'] ? FIND_ALL : 0);
+$items= item_find($db, $search, ($_REQUEST['all'] ? FIND_ALL : 0) | FIND_STOCKED_FIRST);
 
 /*
   Fallback: if we found nothing, try searching for an exact match on the
