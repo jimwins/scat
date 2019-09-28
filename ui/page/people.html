@@ -1,0 +1,44 @@
+{% extends 'layout/page.html' %}
+
+{% block title %}
+  People
+{% endblock %}
+
+{% block content %}
+  {% include 'person-searchform.twig' %}
+
+  {% if people %}
+    <table id="people" class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Company</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for person in people %}
+        <tr>
+          <td class="num">
+            <a href="/person/{{ person.id }}">{{ loop.index }}</a>
+          </td>
+          <td>
+            <a href="/person/{{ person.id }}">{{ person.name }}</a>
+          </td>
+          <td>
+            <a href="/person/{{ person.id }}">{{ person.company }}</a>
+          </td>
+          <td>
+            <a href="/person/{{ person.id }}">{{ person.pretty_phone }}</a>
+          </td>
+        </a>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <style>
+      #people a { display: block }
+    </style>
+  {% endif %}
+{% endblock %}
