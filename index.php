@@ -543,10 +543,6 @@ $("#txn-load").submit(function(ev) {
         <ul class="dropdown-menu">
           <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-GIFTCARD'); }">Gift Card</a></li>
           <li role="separator" class="divider"></li>
-          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-FRAME'); }">Custom Frame</a></li>
-          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-STRETCH'); }">Canvas Stretch</a></li>
-          <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-PRINT'); }">Digital Print</a></li>
-          <li role="separator" class="divider"></li>
           <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-FLOAT'); }">Floater Frame</a></li>
           <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-CANVAS'); }">Canvas</a></li>
           <li><a href="#" data-bind="click: function () { Txn.findAndAddItem('ZZ-PANEL'); }">Wood Panel</a></li>
