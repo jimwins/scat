@@ -1320,7 +1320,7 @@ viewModel.loyaltyPointsUsed= function() {
 }
 
 function displayPerson(person) {
-  Scat.dialog('person').done(function (html) {
+  Scat.dialog('person-modal').done(function (html) {
     var panel= $(html);
 
     panel.on('shown.bs.modal', function() {
