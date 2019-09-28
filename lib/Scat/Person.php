@@ -12,6 +12,13 @@ class Person extends \Model implements \JsonSerializable {
       return $this->email;
     }
     if ($this->phone) {
+      return $this->pretty_phone();
+    }
+    return $this->id;
+  }
+
+  function pretty_phone() {
+    if ($this->phone) {
       try {
         $phoneUtil= \libphonenumber\PhoneNumberUtil::getInstance();
         $num= $phoneUtil->parse($this->phone, 'US');
@@ -22,7 +29,6 @@ class Person extends \Model implements \JsonSerializable {
         return $this->phone;
       }
     }
-    return $this->id;
   }
 
   public function loyalty() {
