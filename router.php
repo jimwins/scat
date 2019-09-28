@@ -586,9 +586,18 @@ $app->group('/catalog', function (Slim\App $app) {
 $app->group('/person', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect('/people.php');
+              return $this->view->render($res, 'page/people.html');
             });
-  $app->get('/{id}',
+  $app->get('/search',
+            function (Request $req, Response $res, array $args) {
+              $q= trim($req->getParam('q'));
+
+              $people= \Scat\Person::find($q);
+
+              return $this->view->render($res, 'page/people.html',
+                                         [ 'people' => $people, 'q' => $q ]);
+            })->setName('person-search');
+  $app->get('/{id:[0-9]+}',
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect("/person.php?id={$args['id']}");
             })->setName('person');
