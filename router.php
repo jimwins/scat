@@ -472,7 +472,7 @@ $app->group('/catalog', function (Slim\App $app) {
                                            'products' => $products ]);
             })->setName('catalog-brand');
 
-  $app->get('/item[/{code}]',
+  $app->get('/item[/{code:.*}]',
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect("/item.php?code={$args['code']}");
             })->setName('catalog-item');
