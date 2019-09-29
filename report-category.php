@@ -78,6 +78,7 @@ $q= "CREATE TEMPORARY TABLE report_current
        LEFT JOIN txn_line ON txn.id = txn_line.txn
             JOIN item ON txn_line.item = item.id
             JOIN brand ON item.brand = brand.id
+       LEFT JOIN barcode ON item.id = barcode.item
        LEFT JOIN product ON product_id = product.id
       WHERE type = 'customer'
         AND ($sql_criteria)
