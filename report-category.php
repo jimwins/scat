@@ -69,7 +69,7 @@ $q= "CREATE TEMPORARY TABLE report_current
         amount DECIMAL(9,2) NOT NULL,
         KEY (department_id))
      SELECT
-            item, product_id, department_id,
+            txn_line.item, product_id, department_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
@@ -97,7 +97,7 @@ $q= "CREATE TEMPORARY TABLE report_previous
         amount DECIMAL(9,2) NOT NULL,
         KEY (department_id))
      SELECT
-            item, product_id, department_id,
+            txn_line.item, product_id, department_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
