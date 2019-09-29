@@ -83,7 +83,7 @@ $q= "CREATE TEMPORARY TABLE report_current
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
-        AND item IS NOT NULL
+        AND txn_line.item IS NOT NULL
       GROUP BY 1";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
@@ -112,7 +112,7 @@ $q= "CREATE TEMPORARY TABLE report_previous
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' - INTERVAL 1 YEAR
                        AND '$end' + INTERVAL 1 DAY - INTERVAL 1 YEAR
-        AND item IS NOT NULL
+        AND txn_line.item IS NOT NULL
       GROUP BY 1";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
