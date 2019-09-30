@@ -25,6 +25,7 @@
           <th>Name</th>
           <th>Company</th>
           <th>Phone</th>
+          <th>Email</th>
         </tr>
       </thead>
       <tbody>
@@ -41,6 +42,9 @@
           </td>
           <td>
             <a href="/person/{{ person.id }}">{{ person.pretty_phone }}</a>
+          </td>
+          <td>
+            <a href="/person/{{ person.id }}">{{ person.email }}</a>
           </td>
         </a>
         </tr>
