@@ -111,6 +111,21 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   $r= $db->query($q)
     or die_query($db, $q);
 
+} elseif (preg_match('/onhand/i', $_FILES['src']['name'])) {
+  // C2F Onhand report
+  $sep= preg_match("/\t/", $line) ? "\t" : ",";
+  $q= "LOAD DATA LOCAL INFILE '$fn'
+            INTO TABLE vendor_upload
+          FIELDS TERMINATED BY '$sep'
+          OPTIONALLY ENCLOSED BY '\"'
+          IGNORE 2 LINES
+          (code, name, @msrp, @sellmult, @available)
+        SET vendor_sku = code,
+            retail_price = REPLACE(REPLACE(@msrp, ',', ''), '$', '')";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
 } elseif (preg_match('/C2F Pricer/', $line)) {
   // C2F Pricer
   $sep= preg_match("/\t/", $line) ? "\t" : ",";
