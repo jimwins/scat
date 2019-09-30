@@ -118,6 +118,7 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
             INTO TABLE vendor_upload
           FIELDS TERMINATED BY '$sep'
           OPTIONALLY ENCLOSED BY '\"'
+          LINES TERMINATED BY '\r\n'
           IGNORE 2 LINES
           (code, name, @msrp, @sellmult, @available)
         SET vendor_sku = code,
@@ -125,6 +126,13 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
 
   $r= $db->query($q)
     or die_query($db, $q);
+
+  if ($db->warning_count) {
+    $e= $db->get_warnings();
+    do {
+      error_log("Warning: {$e->errno}: {$e->message}");
+    } while ($e->next());
+  }
 
 } elseif (preg_match('/C2F Pricer/', $line)) {
   // C2F Pricer
