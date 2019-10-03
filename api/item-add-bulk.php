@@ -4,11 +4,13 @@ include '../lib/item.php';
 
 $vendor= (int)$_REQUEST['vendor'];
 $code= $_REQUEST['code'];
+$name= $_REQUEST['name'];
 
 if (!$vendor)
   die_jsonp('Must specify a vendor.');
 if (!$code)
   die_jsonp('Must specify a code.');
+$constrain= $name ? " AND vi.name RLIKE '" . $name . "'" : '';
 
 $code= $db->escape($code);
 
@@ -25,6 +27,7 @@ $q= "INSERT INTO item (code, name, brand, retail_price,
       WHERE vendor = $vendor
         AND vi.active
         AND vi.code LIKE '$code'
+        $constrain
         AND item.id IS NULL";
 
 $r= $db->query($q)
