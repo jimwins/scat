@@ -90,7 +90,7 @@ $('#add-bulk-items').on('click', function(ev) {
   Scat.dialog('item-bulk-add').done(function (html) {
     var panel= $(html);
 
-    var vendorItem= { vendor: 0, code: '' };
+    var vendorItem= { vendor: 0, code: '', name: '' };
     vendorItem.vendors= [];
     vendorItem.error= '';
 
