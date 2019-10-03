@@ -7,7 +7,7 @@ $code= $_REQUEST['code'];
 
 if ($code) {
   $code= $db->escape($code);
-  $q= "SELECT id FROM vendor_item WHERE code = '$code'";
+  $q= "SELECT id FROM vendor_item WHERE code = '$code' ORDER BY active DESC";
   $id= $db->get_one($q);
 }
 
