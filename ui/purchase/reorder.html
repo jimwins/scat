@@ -83,9 +83,9 @@
               Total: &nbsp;
             </strong>
           </td>
-          </td>
-          <td id="total" align="center">
-            $0.00
+          <td>
+            <span id="total">$0.00</span> &nbsp;
+            (<span id="units">0</span>)
           </td>
         </tr>
       </tfoot>
@@ -183,11 +183,14 @@
 
       const updateTotal= (form) => {
         let total= 0.00
+        let units= 0
         for (let input of inputs) {
           total+= input.attributes['data-cost'].value * input.value
+          units+= input.value * 1
         }
         form.querySelector('#total').innerHTML=
           scat.amount(total)
+        form.querySelector('#units').innerHTML= units
       }
 
       const handleChange= (input, doUpdateTotal= true) => {
