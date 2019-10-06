@@ -8,6 +8,9 @@ $q= "SELECT id, code, name,
                JOIN txn_line ON txn.id = txn_line.txn
               WHERE txn_line.item = item.id 
                 AND type = 'vendor') first_seen,
+            (SELECT SUM(ordered)
+               FROM txn_line
+              WHERE txn_line.item = item.id) stocked,
             (SELECT MAX(paid)
                FROM txn
                JOIN txn_line ON txn.id = txn_line.txn
@@ -33,6 +36,7 @@ head("Dogs @ Scat", true);
         <th>Code</th>
         <th>Name</th>
         <th>Last</th>
+        <th>Stocked</th>
       </tr>
     </thead>
     <tbody>
@@ -47,6 +51,9 @@ head("Dogs @ Scat", true);
         </td>
         <td>
           <?=ashtml($row['last_sale'])?>
+        </td>
+        <td>
+          <?=ashtml($row['stocked'])?>
         </td>
       </tr>
 <?}?>
