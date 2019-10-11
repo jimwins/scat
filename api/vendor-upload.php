@@ -219,6 +219,9 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   if (preg_match('/promo/i', $line)) {
     $action= 'promo';
   }
+  if (preg_match('/extend/i', $line)) {
+    $action= 'extend';
+  }
 
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE vendor_upload
