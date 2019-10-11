@@ -417,8 +417,12 @@ $app->group('/catalog', function (Slim\App $app) {
   $app->post('/product-form',
              function (Request $req, Response $res, array $args) {
                $product= $this->catalog->getProductById($req->getParam('id'));
-               if (!$product)
+               if (!$product) {
+                 if (!$req->getParam('slug')) {
+                   throw \Exception("Must specify a slug.");
+                 }
                  $product= $this->catalog->createProduct();
+               }
                foreach ($product->fields() as $field) {
                  $value= $req->getParam($field);
                  if (isset($value)) {
