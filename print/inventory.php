@@ -9,11 +9,15 @@ $items= item_find($db, $q, 0);
 if (!$items) die_json("No items found.");
 
 $product= $items[0]['product_id'];
+$variation= $items[0]['variation'];
 $use_short_name= true;
+$use_variation= false;
 foreach ($items as $item) {
   if ($item['product_id'] != $product) {
     $use_short_name= false;
-    break;
+  }
+  if ($item['variation'] != $variation) {
+    $use_variation= true;
   }
 }
 
@@ -23,7 +27,8 @@ $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
 $template= $twig->load('print/inventory.html');
 $html= $template->render([
   'items' => $items,
-  'use_short_name' => $use_short_name
+  'use_short_name' => $use_short_name,
+  'use_variation' => $use_variation,
 ]);
 
 if (defined('PRINT_DIRECT')) {

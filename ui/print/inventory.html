@@ -10,8 +10,11 @@
   <thead>
     <tr>
       <th>Code</th>
+      {% if use_short_name and use_variation %}
+        <th>Variation</th>
+      {% endif %}
       <th>Name</th>
-      <th>Stock</th>
+      <th align="center">Stock</th>
       <th>Count</th>
     </tr>
   </thead>
@@ -19,10 +22,13 @@
     {% for item in items %}
       <tr>
         <td>{{ item.code }}</td>
+        {% if use_short_name and use_variation %}
+          <td>{{ item.variation }}</td>
+        {% endif %}
         <td>
           {{ use_short_name and item.short_name ? item.short_name : item.name }}
         </td>
-        <td>{{ item.stock }}</td>
+        <td align="center">{{ item.stock }}</td>
         <td>&nbsp;</td>
       </tr>
     {% endfor %}
