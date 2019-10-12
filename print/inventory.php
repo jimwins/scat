@@ -62,7 +62,7 @@ if (defined('PRINT_DIRECT')) {
                                                              $client,
                                                              $responseParser);
     $printer= $printerManager->findByUri('ipp://' . CUPS_HOST .
-                                         '/printers/' . RECEIPT_PRINTER);
+                                         '/printers/' . REPORT_PRINTER);
 
     $jobManager= new \Smalot\Cups\Manager\JobManager($builder,
                                                      $client,
