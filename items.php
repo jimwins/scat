@@ -14,16 +14,21 @@ head("Items @ Scat", true);
 
 // XXX can't add items on phone for now
 ?>
-<div class="hidden-xs btn-group hidden-print" style="float: right">
-  <button id="add-item" class="btn btn-default">Add New Item</button>
-  <button type="button" class="btn btn-default dropdown-toggle"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <span class="caret"></span>
-    <span class="sr-only">Toggle Dropdown</span>
+<div class="hidden-xs hidden-print" style="float: right">
+  <button id="inventory-report" class="btn btn-default">
+    <i class="fa fa-print"></i> Inventory
   </button>
-  <ul class="dropdown-menu">
-    <li><a href="#" id="add-bulk-items">Bulk Add</a></li>
-  </ul>
+  <div class="btn-group">
+    <button id="add-item" class="btn btn-default">Add New Item</button>
+    <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#" id="add-bulk-items">Bulk Add</a></li>
+    </ul>
+  </div>
 </div>
 <?include 'item-searchform.php';?>
 <div id="add-item-form" class="modal fade">
@@ -137,6 +142,12 @@ $('#add-bulk-items').on('click', function(ev) {
     ko.applyBindings(vendorItemModel, panel[0]);
     panel.appendTo($('body')).modal();
   });
+});
+$('#inventory-report').on('click', function(ev) {
+  ev.preventDefault();
+  var q= $('#search').val();
+
+  Scat.print('inventory', { q: q });
 });
 </script>
 <br>

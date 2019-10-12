@@ -1,0 +1,31 @@
+{% extends 'layout/print.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Inventory
+{% endblock %}
+
+{% block content %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Name</th>
+      <th>Stock</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+      <tr>
+        <td>{{ item.code }}</td>
+        <td>
+          {{ use_short_name and item.short_name ? item.short_name : item.name }}
+        </td>
+        <td>{{ item.stock }}</td>
+        <td>&nbsp;</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

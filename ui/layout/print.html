@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    {% block title 'Scat' %}
+    {% if not (block('title') matches '/Scat/') %}
+      @ Scat
+    {% endif %}
+  </title>
+  {% block extra_head %}
+  {% endblock %}
+  <link rel="stylesheet" type="text/css" href="/extern/bootstrap/css/bootstrap.min.css">
+  <style media="screen">
+    htmlpageheader, htmlpagefooter { display: none }
+  </style>
+</head>
+<body>
+  <htmlpageheader name="scat-header">
+  </htmlpageheader>
+  <htmlpagefooter name="scat-footer">
+    <table width="100%">
+      <tr>
+        <td width="33%">
+          <span style="font-weight: bold; font-style: italic;">
+            {DATE j-m-Y}
+          </span>
+        </td>
+        <td width="33%" align="center">
+          <span style="font-weight: bold; font-style: italic;">
+            {PAGENO}/{nbpg}
+          </span>
+        </td>
+        <td width="33%" style="text-align: right">{{ block('title') }}</td>
+      </tr>
+    </table>
+  </htmlpagefooter>
+  <sethtmlpageheader name="scat-header" value="on" show-this-page="1">
+  <sethtmlpagefooter name="scat-footer" value="on" show-this-page="1">
+
+  {% block content %}{% endblock %}
+</body>
+</html>

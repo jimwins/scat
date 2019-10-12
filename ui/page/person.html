@@ -1,0 +1,7 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block content %}
+  {% include 'person-searchform.twig' %}
+  <h1>{{ person.friendly_name() }}</h1>
+{% endblock %}
