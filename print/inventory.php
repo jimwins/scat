@@ -39,7 +39,7 @@ if (defined('PRINT_DIRECT')) {
                           'tempDir' => '/tmp',
                           'margin_left' => 15, 'margin_right' => 15,
                           'margin_top' => 9, 'margin_bottom' => 10,
-                          'default_font_size' => 28  ]);
+                          'default_font_size' => 11  ]);
   $mpdf->writeHTML($html);
 
   $tmpfname= tempnam("/tmp", "rec");
