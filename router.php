@@ -623,6 +623,12 @@ $app->group('/report', function (Slim\App $app) {
               return $this->view->render($res, 'dialog/report-quick.html',
                                          $data);
             });
+  $app->get('/empty-products',
+            function (Request $req, Response $res, array $args) {
+              $data= $this->report->emptyProducts();
+              return $this->view->render($res, 'report/empty-products.html',
+                                         $data);
+            });
   $app->get('/{name}',
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect("/report-{$args['name']}.php");

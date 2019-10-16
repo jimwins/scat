@@ -91,4 +91,17 @@ class ReportService
 
     return [ "sales" => $sales ];
   }
+
+  public function emptyProducts() {
+    return [ "products" => \Model::factory('Product')
+                             ->select('*')
+                             ->select_expr('(SELECT COUNT(*)
+                                               FROM item
+                                              WHERE product.id = product_id AND
+                                                    item.active)',
+                                           'items')
+                             ->where_gt('active', 0)
+                             ->having_equal('items', 0)
+                             ->find_many() ];
+  }
 }
