@@ -20,6 +20,7 @@
       <th class="text-right">Sale</th>
       <th class="text-center">Stock</th>
       <th class="text-center">Minimum</th>
+      <th class="text-center">Recent</th>
       <th>&nbsp;</th>
     </thead>
     <tbody>
@@ -73,6 +74,7 @@
     </td>
     <td class="text-center">{{ i.stock }}</td>
     <td class="text-center">{{ i.minimum_quantity }}</td>
+    <td class="text-center">{{ i.recent_sales }}</td>
     <td class="text-right" nowrap>
       {% if i.prop65 %}
         <span title="{{ i.prop65_warning.warning }}"><img src="{{ STATIC }}/msds/warning.svg" width="16" alt="WARNING"></span>

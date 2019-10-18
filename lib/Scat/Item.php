@@ -58,6 +58,21 @@ class Item extends \Model {
   public function prop65_warning() {
     return $this->belongs_to('Prop65_Warning', 'prop65')->find_one();
   }
+
+  public function recent_sales($days= 90) {
+    $days= (int)$days; // Make sure we have an integer
+    $q= "SELECT SUM(-1 * allocated) AS sold
+           FROM txn
+           JOIN txn_line ON txn.id = txn_line.txn
+          WHERE type = 'customer'
+            AND item = {$this->id}
+            AND created BETWEEN NOW() - INTERVAL $days DAY AND NOW()";
+
+    $res= \ORM::for_table('txn')->raw_query($q)->find_one();
+
+    error_log(json_encode($res));
+    return $res->sold;
+  }
 }
 
 class Barcode extends \Model {
