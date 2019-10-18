@@ -465,6 +465,7 @@ $app->group('/catalog', function (Slim\App $app) {
               if ($brand)
                 $products= $brand->products()
                                  ->order_by_asc('name')
+                                 ->where('active', 1)
                                  ->find_many();
 
               $brands= $brand ? null : $this->catalog->getBrands();
