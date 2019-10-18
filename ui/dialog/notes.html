@@ -90,17 +90,23 @@
         </div>
       </div>
     </div>
-    <div class="checkbox">
-      <span data-bind="text: parent_id() != '0' ? 'Replying...' : ''"></span>
-      <input type="hidden" name="parent_id" value="{{ parent_id }}">
-      <input type="hidden" name="todo" value="1">
-      <div class="form-group">
-        <select class="form-control input-sm" name="person_id">
-          <option value="">Select...</option>
-          {% for person in staff %}
-            <option value="{{ person.id }}">{{ person.name }}</option>
-          {% endfor %}
-        </select>
+    {% if parent_id > 0 %}
+      Replying...
+    {% endif %}
+    <input type="hidden" name="parent_id" value="{{ parent_id }}">
+    <input type="hidden" name="todo" value="1">
+    <div class="form-group">
+      <select class="form-control input-sm" name="person_id">
+        <option value="">Select...</option>
+        {% for person in staff %}
+          <option value="{{ person.id }}">{{ person.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" value="1" name="sms">
+          SMS
+        </label>
       </div>
     </div>
   </div>

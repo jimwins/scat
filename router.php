@@ -728,6 +728,7 @@ $app->get('/notes',
                                        [
                                          'body_only' =>
                                            (int)$req->getParam('body_only'),
+                                         'parent_id' => $parent_id,
                                          'staff' => $staff,
                                          'notes' => $notes
                                        ]);
@@ -741,6 +742,21 @@ $app->post('/notes/add',
              $note->todo= (int)$req->getParam('todo');
              $note->public= (int)$req->getParam('public');
              $note->save();
+
+             if ((int)$req->getParam('sms')) {
+               try {
+                 $txn= $note->parent()->find_one()->txn();
+                 $person= $txn->owner();
+                 error_log("Sending message to {$person->phone}");
+                 $data= $this->phone->sendSMS($person->phone,
+                                              $req->getParam('content'));
+                 $note->public= true;
+                 $note->save();
+                } catch (\Exception $e) {
+                  error_log("Got exception: " . $e->getMessage());
+                }
+             }
+
              return $res->withJson($note);
            });
 $app->post('/notes/{id}/update',
