@@ -5,6 +5,10 @@ require '../lib/item.php';
 $q= $_REQUEST['q'];
 if (!$q) die_json("Nothing to report.");
 
+if (!preg_match('/stocked:/i', $q)) {
+  $q= $q . " stocked:1";
+}
+
 $items= item_find($db, $q, 0);
 if (!$items) die_json("No items found.");
 
