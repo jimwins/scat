@@ -26,10 +26,9 @@
             {{ q }}
           </span>
         </td>
-        <td width="50%" align="center">
-          <barcode code="{{ q }}" type="C128B" class="barcode" size="2" />
+        <td width="50%" align="right">
+          <barcode code="{{ q }}" type="C128B" class="barcode" size="0.5" />
         </td>
-        <td width="33%" style="text-align: right">{{ block('title') }}</td>
       </tr>
     </table>
   </htmlpageheader>
@@ -38,7 +37,7 @@
       <tr>
         <td width="33%">
           <span style="font-weight: bold; font-style: italic;">
-            {DATE j-m-Y}
+            {DATE Y-m-d H:i:s}
           </span>
         </td>
         <td width="33%" align="center">

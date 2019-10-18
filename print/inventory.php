@@ -38,14 +38,14 @@ if (defined('PRINT_DIRECT')) {
 
   $mpdf= new \Mpdf\Mpdf([ 'mode' => 'utf-8', 'format' => 'letter',
                           'tempDir' => '/tmp',
-                          'margin_left' => 15, 'margin_right' => 15,
-                          'margin_top' => 9, 'margin_bottom' => 10,
                           'default_font_size' => 11  ]);
+  $mpdf->setAutoTopMargin= 'stretch';
+  $mpdf->setAutoBottomMargin= 'stretch';
   $mpdf->writeHTML($html);
 
   $tmpfname= tempnam("/tmp", "rec");
 
-  if ($_REQUEST['DEBUG']) {
+  if ($DEBUG) {
     $mpdf->Output();
     exit;
   }
