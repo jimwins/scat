@@ -83,6 +83,11 @@
       {% if i.oversized %}
         <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="fa fa-truck"></i></span>
       {% endif %}
+      {% if not product and i.product_id %}
+        <a href="{{ i.product.find_one.full_slug }}">
+          <i class="fa fa-cubes"></i>
+        </a>
+      {% endif %}
     </td>
   </tr>
 {% endfor %}
