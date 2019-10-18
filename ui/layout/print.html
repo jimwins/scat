@@ -19,6 +19,19 @@
 </head>
 <body>
   <htmlpageheader name="scat-header">
+    <table width="100%">
+      <tr>
+        <td width="50%">
+          <span style="font-weight: bold; font-style: italic;">
+            {{ q }}
+          </span>
+        </td>
+        <td width="50%" align="center">
+          <barcode code="{{ q }}" type="C128B" class="barcode" size="2" />
+        </td>
+        <td width="33%" style="text-align: right">{{ block('title') }}</td>
+      </tr>
+    </table>
   </htmlpageheader>
   <htmlpagefooter name="scat-footer">
     <table width="100%">

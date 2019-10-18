@@ -29,6 +29,7 @@ $html= $template->render([
   'items' => $items,
   'use_short_name' => $use_short_name,
   'use_variation' => $use_variation,
+  'q' => $q,
 ]);
 
 if (defined('PRINT_DIRECT')) {
