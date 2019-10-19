@@ -12,12 +12,12 @@ if (!preg_match('/stocked:/i', $q)) {
 $items= item_find($db, $q, 0);
 if (!$items) die_json("No items found.");
 
-$product= $items[0]['product_id'];
+$product_id= $items[0]['product_id'];
 $variation= $items[0]['variation'];
 $use_short_name= true;
 $use_variation= false;
 foreach ($items as $item) {
-  if ($item['product_id'] != $product) {
+  if ($item['product_id'] != $product_id) {
     $use_short_name= false;
   }
   if ($item['variation'] != $variation) {
@@ -25,12 +25,17 @@ foreach ($items as $item) {
   }
 }
 
+$product= ($use_short_name ?
+           \Model::factory('Product')->where('id', $product_id)->find_one() :
+           null);
+
 $loader= new \Twig\Loader\FilesystemLoader('../ui/');
 $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
 
 $template= $twig->load('print/inventory.html');
 $html= $template->render([
   'items' => $items,
+  'product' => $product,
   'use_short_name' => $use_short_name,
   'use_variation' => $use_variation,
   'q' => $q,
