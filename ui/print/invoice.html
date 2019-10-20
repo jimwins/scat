@@ -1,0 +1,153 @@
+{% extends 'layout/print.html' %}
+{% import 'macros.twig' as scat %}
+{% import _self as s %}
+{% macro payment_method(name, amount) %}
+{%- set methods= {
+    'cash' : 'Cash',
+    'change' : 'Change',
+    'credit' : 'Credit Card',
+    'square' : 'Square',
+    'stripe' : 'Stripe',
+    'dwolla' : 'Dwolla',
+    'paypal' : 'PayPal',
+    'gift' : 'Gift Card',
+    'check' : 'Check',
+    'discount' : 'Discount',
+    'bad' : 'Bad Debt'
+  } -%}
+
+  {%- if name == 'discount' -%}
+    Discount ({{ amount }}%) 
+  {%- else -%}
+    {{- methods[name] -}}
+  {%- endif -%}
+{% endmacro %}
+
+{% block title %}
+  {{ txn.type == 'vendor' ? 'PO' : 'Invoice' }}
+  {{ txn.formatted_number }}
+{% endblock %}
+
+{% block extra_head %}
+<link href="/print/style.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div id="doc_header">
+  <div id="doc_info">
+    <span id="doc_name">{{ block('title') }}</span><br>
+    <b>Created: {{ txn.created|date('F j, Y g:i A') }}<br>
+    {% if txn.paid %}
+      <b>Paid: {{ txn.paid|date('F j, Y g:i A') }}<br>
+    {% endif %}
+  </div>
+  <div id="store_info">
+    <small>From:</small><br>
+    <b>Raw Materials Art Supplies</b><br>
+    645 South Los Angeles Street<br>
+    Los Angeles, CA 90014<br>
+    (800) 729-7060<br>
+    info@RawMaterialsLA.com<br>
+    http://RawMaterialsLA.com/
+  </div>
+  <div id="client_info">
+  {% if person and person.id %}
+    <small>To:</small><br>
+    <b>
+      {{ person.company }}
+      {% if person.company and person.name %}<br>{% endif %}
+      {{ person.name }}
+    </b><br>
+    {{ person.address | nl2br }}<br>
+    {% if person.phone %}
+      {{ person.phone }}<br>
+    {% endif %}
+    {% if person.email %}
+      {{ person.email }}<br>
+    {% endif %}
+  {% endif %}
+  {% for note in notes %}
+    {% if note.content starts with 'PO ' %}
+      {{ note.content }}
+    {% endif %}
+  {% endfor %}
+  </div>
+  <div style="clear:both;"></div>
+</div>
+<table id="products" cellspacing="0" cellpadding="0">
+  <thead>
+    <tr>
+      <th class="right">#</th>
+      {% if txn.type == 'vendor' %}
+        <th class="left">SKU</th>
+      {% endif %}
+      <th class="left">Code</th>
+      <th class="left">Name</th>
+      <th class="right">Price</th>
+      <th class="right">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for item in items %}
+    <tr valign="top">
+      <td class="right">{{ item.quantity }}</td>
+      {% if txn.type == 'vendor' %}
+        <td class="left" nowrap>{{ item.vendor_sku }}</td>
+      {% endif %}
+      <td class="left" nowrap>
+        {{ item.purchase_quantity ? item.code }}
+      </td>
+      <td class="left">
+        {{ item.name }}
+        {% if item.discount %}
+          <div class="description">{{ item.discount }}</div>
+        {% endif %}
+      </td>
+      <td class="right">{{ scat.amount(item.price) }}</td>
+      <td class="right">{{ scat.amount(item.ext_price) }}</td>
+    </tr>
+  {% endfor %}
+  {% set span= txn.type == 'vendor' ? 5 : 4 %}
+  <tr class="sub">
+    <td class="right" colspan="{{ span }}">Subtotal:</td>
+    <td class="price">{{ scat.amount(txn.subtotal) }}</td>
+  </tr>
+  <tr>
+    <td class="right" colspan="{{ span }}">
+      Sales Tax {% if txn.tax_rate %}({{ txn.tax_rate }}%){% endif %}:
+    </td>
+    <td class="price">{{ scat.amount(txn.total - txn.subtotal) }}</td>
+  </tr>
+  <tr class="total">
+    <td class="right" colspan="{{ span }}">Total:</td>
+    <td class="price">{{ scat.amount(txn.total) }}</td>
+  </tr>
+  {% for p in payments %} 
+    <tr>
+      <td class="right" colspan="{{ span }}">{{ s.payment_method(p.method, p.discount) }}:</td>
+      <td class="price">{{ scat.amount(p.amount) }}</td>
+    </tr>
+  {% endfor %}
+  {% if payments %}
+    <tr class="total">
+      <td class="right" colspan="{{ span }}">Total Due:</td>
+      <td class="price">{{ scat.amount(txn.total - txn.total_paid) }}</td>
+    </tr>
+  {% endif %}
+</table>
+{% for note in notes %}
+  {% if note.public %}
+    <p>
+      {{ note.content }}
+      <small>({{ note.entered }})</small>
+    </p>
+  {% endif %}
+{% endfor %}
+<div id="store_footer">
+{% if txn.type != 'vendor' %}
+Items purchased from stock may be returned in original condition and packaging
+within 30 days with receipt. No returns without original receipt.
+{% endif %}
+</div>
+
+{% endblock %}
