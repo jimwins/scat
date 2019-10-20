@@ -1,7 +1,7 @@
 <?
 namespace Scat;
 
-class Item extends \Model {
+class Item extends \Model implements \JsonSerializable {
   /* XXX Legacy, should get from parent product */
   public function brand() {
     return $this->belongs_to('Brand', 'brand');
@@ -72,6 +72,10 @@ class Item extends \Model {
 
     error_log(json_encode($res));
     return $res->sold;
+  }
+
+  public function jsonSerialize() {
+    return $this->asArray();
   }
 }
 
