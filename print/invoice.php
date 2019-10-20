@@ -9,8 +9,8 @@ date_default_timezone_set('America/Los_Angeles');
 
 $txn= txn_load_full($db, $id);
 
-$fn= (($txn['type'] == 'vendor') ? 'PO' : 'I') .
-     $txn['formatted_number'];
+$fn= (($txn['txn']['type'] == 'vendor') ? 'PO' : 'I') .
+     $txn['txn']['formatted_number'];
 
 $loader= new \Twig\Loader\FilesystemLoader('../ui/');
 $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
@@ -32,7 +32,7 @@ if (defined('PRINT_DIRECT')) {
   $tmpfname= tempnam("/tmp", "rec");
 
   // XXX hack: don't print vendor invoices directly
-  if ($DEBUG || $txn['type'] == 'vendor') {
+  if ($DEBUG || $txn['txn']['type'] == 'vendor') {
     $mpdf->Output($fn . '.pdf', \Mpdf\Output\Destination::INLINE);
     exit;
   }
