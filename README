@@ -62,4 +62,7 @@ Scat includes the Marked markdown parser and compiler for Javascript:
 Scat includes JQuery lightSlider:
   http://sachinchoolur.github.io/lightslider/
 
+Scat includes X-editable:
+ https://vitalets.github.io/x-editable/index.html
+
 See the LICENSE file for licensing information.
