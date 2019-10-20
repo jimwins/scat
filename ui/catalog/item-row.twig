@@ -1,0 +1,104 @@
+{% import 'macros.twig' as scat %}
+{% import _self as s %}
+
+{% macro style_item_color(color) %}
+  {% if color %}
+    {% set r= color[:2]|hexdec %}
+    {% set g= color[2:2]|hexdec %}
+    {% set b= color[4:2]|hexdec %}
+    background: #{{ color }};
+    color: #{{ ((r * 0.2126 + g * 0.7152 + b * 0.0722) > 179) ? '000' : 'fff' }}
+  {% endif %}
+{% endmacro %}
+
+<tr data-id="{{ i.id }}"
+    class="{{ (item and item.id == i.id) ? 'info' }}
+           {{ not i.active ? 'inactive' }}">
+  <td>
+    <a href="{{ path_for('catalog-item', { 'code' : i.code }) }}">
+      {{- i.code -}}
+    </a>
+  </td>
+  <td style="{{ s.style_item_color(i.color) }}">
+    {{ variations|length ? (i.short_name ?: i.name) : i.name }}
+  </td>
+  <td class="text-right" nowrap>
+    <span class="editable"
+          data-pk="{{ i.id }}"
+          data-name="retail_price" data-value="{{ i.retail_price }}">
+      {{ scat.amount(i.retail_price) }}
+    </span>
+  </td>
+  <td class="text-right" nowrap>
+    <span class="editable"
+          data-pk="{{ i.id }}"
+          data-name="discount" data-value="{{ i.discount }}">
+      {{ scat.amount(i.sale_price) }}
+      {% if i.discount_type in [ 'percentage', 'relative' ] %}
+        <br>
+        <small>{{ scat.format_discount(i) }}</small>
+      {% endif %}
+    </span>
+  </td>
+  <td class="text-center">
+    <span class="editable"
+          data-pk="{{ i.id }}"
+          data-name="stock" data-value="{{ i.stock }}">
+      {{ i.stock }}
+    </span>
+  </td>
+  <td class="text-center">
+    <span class="editable"
+          data-pk="{{ i.id }}"
+          data-name="minimum_quantity" data-value="{{ i.minimum_quantity }}">
+      {{ i.minimum_quantity }}
+    </span>
+  </td>
+  <td class="text-center">{{ i.recent_sales }}</td>
+  <td class="text-right" nowrap>
+    {% if i.prop65 %}
+      <span title="{{ i.prop65_warning.warning }}"><img src="{{ STATIC }}/msds/warning.svg" width="16" alt="WARNING"></span>
+    {% endif %}
+    {% if i.hazmat %}
+      <span title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"></span>
+    {% endif %}
+    {% if i.oversized %}
+      <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="fa fa-truck"></i></span>
+    {% endif %}
+    {% if not product and i.product_id %}
+      <a href="{{ i.product.find_one.full_slug }}">
+        <i class="fa fa-cubes"></i>
+      </a>
+    {% endif %}
+  </td>
+{# critical that <script> be inside tr so currentScript.parentNode works #}
+<script>
+{
+  let row= document.currentScript.parentNode
+  $('.editable', document.currentScript.parentNode).editable({
+    url: '/catalog/item-update',
+    params: {
+      variations: {{ variations|length ? "'XXX'" : "''" }},
+      product: {{ product ? 'true' : 'false' }}
+    },
+    success: (response, newValue) => {
+      if (response.error) { return response.error }
+      if (response.replaceRow) {
+        let replace= scat.htmlToElement(response.replaceRow)
+        row.replaceWith(replace)
+        // Re-inject the script to get it to execute
+        let code= replace.getElementsByTagName('script')[0].innerHTML
+        let script= document.createElement('script')
+        script.appendChild(document.createTextNode(code))
+        replace.appendChild(script).parentNode.removeChild(script)
+      }
+    }
+  }).on('shown', function (e, editable) {
+    // Can't just do this directly because $input isn't focused yet
+    setTimeout(function() {
+      editable.input.$input.select()
+    }, 1)
+  })
+}
+</script>
+</tr>

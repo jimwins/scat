@@ -1,16 +1,6 @@
 {% import 'macros.twig' as scat %}
 {% import _self as s %}
 
-{% macro style_item_color(color) %}
-  {% if color %}
-    {% set r= color[:2]|hexdec %}
-    {% set g= color[2:2]|hexdec %}
-    {% set b= color[4:2]|hexdec %}
-    background: #{{ color }};
-    color: #{{ ((r * 0.2126 + g * 0.7152 + b * 0.0722) > 179) ? '000' : 'fff' }}
-  {% endif %}
-{% endmacro %}
-
 {% macro begin_table() %}
   <table class="table table-striped table-hover table-condensed">
     <thead>
@@ -55,42 +45,6 @@
     {% endif %}
     {{ s.begin_table() }}
   {% endif %}
-  <tr class="{{ (item and item.id == i.id) ? 'info' }} {{ not i.active ? 'inactive' }}">
-    <td>
-      <a href="{{ path_for('catalog-item', { 'code' : i.code }) }}">
-        {{- i.code -}}
-      </a>
-    </td>
-    <td style="{{ s.style_item_color(i.color) }}">
-      {{ variations|length ? (i.short_name ?: i.name) : i.name }}
-    </td>
-    <td class="text-right" nowrap>{{ scat.amount(i.retail_price) }}</td>
-    <td class="text-right" nowrap>
-      {{ scat.amount(i.sale_price) }}
-      {% if i.discount_type in [ 'percentage', 'relative' ] %}
-        <br>
-        <small>{{ scat.format_discount(i) }}</small>
-      {% endif %}
-    </td>
-    <td class="text-center">{{ i.stock }}</td>
-    <td class="text-center">{{ i.minimum_quantity }}</td>
-    <td class="text-center">{{ i.recent_sales }}</td>
-    <td class="text-right" nowrap>
-      {% if i.prop65 %}
-        <span title="{{ i.prop65_warning.warning }}"><img src="{{ STATIC }}/msds/warning.svg" width="16" alt="WARNING"></span>
-      {% endif %}
-      {% if i.hazmat %}
-        <span title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"></span>
-      {% endif %}
-      {% if i.oversized %}
-        <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="fa fa-truck"></i></span>
-      {% endif %}
-      {% if not product and i.product_id %}
-        <a href="{{ i.product.find_one.full_slug }}">
-          <i class="fa fa-cubes"></i>
-        </a>
-      {% endif %}
-    </td>
-  </tr>
+  {% include 'catalog/item-row.twig' %}
 {% endfor %}
 {{ s.end_table() }}

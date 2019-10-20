@@ -482,6 +482,27 @@ $app->group('/catalog', function (Slim\App $app) {
               return $res->withRedirect("/item.php?code={$args['code']}");
             })->setName('catalog-item');
 
+  $app->post('/item-update',
+             function (Request $req, Response $res, array $args) {
+               $id= $req->getParam('pk');
+               $name= $req->getParam('name');
+               $value= $req->getParam('value');
+               $item= \Model::factory('Item')->find_one($id);
+               if (!$item)
+                 throw new \Slim\Exception\NotFoundException($req, $res);
+               // XXX need to be smarter here
+               $item->$name= $value;
+               $item->save();
+               return $res->withJson([
+                 'item' => $item,
+                 'replaceRow' => $this->view->fetch('catalog/item-row.twig', [
+                                  'i' => $item,
+                                  'variations' => $req->getParam('variations'),
+                                  'product' => $req->getParam('product')
+                                ])
+               ]);
+             });
+
   $app->get('/whats-new',
             function (Request $req, Response $res, array $args) {
               $products= $this->catalog->getNewProducts();
