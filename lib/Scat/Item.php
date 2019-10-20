@@ -74,6 +74,107 @@ class Item extends \Model implements \JsonSerializable {
     return $res->sold;
   }
 
+  public function setProperty($name, $value) {
+    switch ($name) {
+      case 'retail_price':
+        $value= preg_replace('/^\\$/', '', $value);
+        // passthrough
+      case 'code':
+      case 'name':
+      case 'short_name':
+      case 'variation':
+      case 'tic':
+      case 'color':
+      case 'active':
+      case 'product_id':
+      case 'purchase_quantity':
+      case 'minimum_quantity':
+      case 'prop65':
+      case 'hazmat':
+      case 'oversized':
+      case 'length':
+      case 'width':
+      case 'height':
+        $this->$name= $value;
+        break;
+      case 'discount':
+        $this->setDiscount($value);
+        break;
+      case 'stock':
+        $this->setStock($value);
+        break;
+      default:
+        throw \Exception("No way to set '$name' on an item.");
+    }
+  }
+
+  public function setDiscount($discount) {
+    $discount= preg_replace('/^\\$/', '', $discount);
+    if (preg_match('/^(\d*)(\/|%)( off)?$/', $discount, $m)) {
+      $discount = (float)$m[1];
+      $discount_type = "percentage";
+    } elseif (preg_match('/^(\d*\.?\d*)$/', $discount, $m)) {
+      $discount = (float)$m[1];
+      $discount_type = "fixed";
+    } elseif (preg_match('/^\$?(\d*\.?\d*)( off)?$/', $discount, $m)) {
+      $discount = (float)$m[1];
+      $discount_type = "relative";
+    } elseif (preg_match('/^-\$?(\d*\.?\d*)$/', $discount, $m)) {
+      $discount = (float)$m[1];
+      $discount_type = "relative";
+    } elseif (preg_match('/^(def|\.\.\.)$/', $discount)) {
+      $discount= null;
+      $discount_type= null;
+    } else {
+      throw \Exception("Did not understand discount.");
+    }
+    $this->discount= $discount;
+    $this->discount_type= $discount_type;
+  }
+
+  public function setStock($stock) {
+    $current= $this->stock();
+    if ($stock != $current) {
+      $cxn= \Model::factory('Txn')
+        ->where_raw("type = 'correction' AND DATE(NOW()) = DATE(created)")
+        ->find_one();
+      if (!$cxn) {
+        $cxn= \Scat\Txn::create([ 'type' => 'correction', 'tax_rate' => 0 ]);
+      }
+
+      $diff= $stock - $current;
+
+      // TODO should have a \Scat\Item method for this
+      $q= "SELECT retail_price AS cost
+             FROM txn_line
+             JOIN txn ON (txn_line.txn = txn.id)
+            WHERE item = {$this->id} AND type = 'vendor'
+            ORDER BY created DESC
+            LIMIT 1";
+      $res= \ORM::for_table('txn_line')->raw_query($q)->find_one();
+      $cost= $res ? $res->cost : 0.00;
+
+      $txn_line= \Model::factory('TxnLine')
+        ->where_equal('txn', $cxn->id)
+        ->where_equal('item', $this->id)
+        ->find_one();
+
+      if ($txn_line) {
+        $txn_line->ordered+= $diff;
+        $txn_line->allocated+= $diff;
+        $txn_line->retail_price= $txn_line->ordered < 0 ? $cost : 0.00;
+      } else {
+        $txn_line= \Model::factory('TxnLine')->create();
+        $txn_line->txn= $cxn->id;
+        $txn_line->item= $this->id;
+        $txn_line->ordered= $diff;
+        $txn_line->allocated= $diff;
+        $txn_line->retail_price= $cost;
+      }
+      $txn_line->save();
+    }
+  }
+
   public function jsonSerialize() {
     return $this->asArray();
   }

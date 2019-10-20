@@ -490,9 +490,10 @@ $app->group('/catalog', function (Slim\App $app) {
                $item= \Model::factory('Item')->find_one($id);
                if (!$item)
                  throw new \Slim\Exception\NotFoundException($req, $res);
-               // XXX need to be smarter here
-               $item->$name= $value;
+
+               $item->setProperty($name, $value);
                $item->save();
+
                return $res->withJson([
                  'item' => $item,
                  'replaceRow' => $this->view->fetch('catalog/item-row.twig', [
