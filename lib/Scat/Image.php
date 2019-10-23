@@ -162,8 +162,6 @@ class Image extends \Model implements \JsonSerializable {
   }
 
   public static function createFromStream($file, $name) {
-    $ext= pathinfo($name, PATHINFO_EXTENSION);
-
     // Could use real UUID() but this is shorter. Hardcoded '1' could be
     // replaced with a server-id to further avoid collisions
     $uuid= sprintf("%08x%02x%s", time(), 1, bin2hex(random_bytes(8)));
@@ -172,6 +170,32 @@ class Image extends \Model implements \JsonSerializable {
     if ($GLOBALS['DEBUG']) {
       $uuid= "DEBUG" . substr($uuid, 5);
     }
+
+    $publitio= new \Publitio\API(PUBLITIO_KEY, PUBLITIO_SECRET);
+
+    $res= $publitio->uploadFile($file, 'file', [
+      'public_id' => $uuid,
+      'privacy' => 1,
+      'option_ad' => 0,
+      'tags' => $GLOBALS['DEBUG'] ? 'debug' : '',
+    ]);
+
+    if (!$res->success) {
+      error_log(json_encode($res));
+      throw new \Exception($res->error->message ? $res->error->message :
+                           $res->message);
+    }
+
+    // Save the details
+    $image= \Model::factory('Image')->create();
+    $image->uuid= $uuid;
+    $image->width= $res->width;
+    $image->height= $res->height;
+    $image->ext= $res->extension;
+    $image->name= $res->title;
+    $image->save();
+
+    $ext= pathinfo($name, PATHINFO_EXTENSION);
 
     $short= new \Scat\ShortPixel(SHORTPIXEL_KEY, [
       'convertto' => 'jpg',
@@ -198,15 +222,6 @@ class Image extends \Model implements \JsonSerializable {
       'FileName' => '/i/o/' . $uuid . '.' . $ext,
       'Body' => $orig_file
     ]);
-
-    // Save the details
-    $image= \Model::factory('Image')->create();
-    $image->uuid= $uuid;
-    //$image->width= $img->width();
-    //$image->height= $img->height();
-    $image->ext= $ext;
-    $image->name= $name;
-    $image->save();
 
     // Generate the standard size image (max 768px)
     $res= $short->reduceUrl($original, [
