@@ -174,6 +174,7 @@ class Image extends \Model implements \JsonSerializable {
     $publitio= new \Publitio\API(PUBLITIO_KEY, PUBLITIO_SECRET);
 
     $res= $publitio->uploadFile($file, 'file', [
+      'title' => $name,
       'public_id' => $uuid,
       'privacy' => 1,
       'option_ad' => 0,
