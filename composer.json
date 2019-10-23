@@ -49,7 +49,8 @@
         "slim/http-cache": "^0.4.0",
         "aptoma/twig-markdown": "^3.0",
         "graylog2/gelf-php": "^1.6",
-        "robmorgan/phinx": "^0.10.7"
+        "robmorgan/phinx": "^0.10.7",
+        "publitio/publitio": "dev-master"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"

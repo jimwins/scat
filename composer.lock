@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d24d739a75831c74bb3cf50477eafb38",
+    "content-hash": "122ee992e13b019c3fd24aa8fe2cb5bd",
     "packages": [
         {
             "name": "aptoma/twig-markdown",
@@ -2690,6 +2690,36 @@
             "time": "2017-10-23T01:57:42+00:00"
         },
         {
+            "name": "publitio/publitio",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ob1y2k/publitio_php_sdk.git",
+                "reference": "564350cf6e501e6b2513c9ae5ff91daf78387d78"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ob1y2k/publitio_php_sdk/zipball/564350cf6e501e6b2513c9ae5ff91daf78387d78",
+                "reference": "564350cf6e501e6b2513c9ae5ff91daf78387d78",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Publitio\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "PHP language interface for the Publitio RESTful API",
+            "keywords": [
+                "publitio"
+            ],
+            "time": "2019-08-26T16:18:57+00:00"
+        },
+        {
             "name": "ralouphie/getallheaders",
             "version": "3.0.3",
             "source": {
@@ -3967,7 +3997,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "oe/lukas": 20,
-        "smalot/cups-ipp": 20
+        "smalot/cups-ipp": 20,
+        "publitio/publitio": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
