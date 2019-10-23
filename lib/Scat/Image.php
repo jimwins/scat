@@ -9,13 +9,13 @@ class Image extends \Model implements \JsonSerializable {
   public function thumbnail() {
     return PUBLITIO_BASE .
            '/file/w_128,h_128,c_fit' .
-           '/' . $this->uuid . '.' . $this->ext;
+           '/' . $this->uuid . '.jpg';
   }
 
   public function medium() {
     return PUBLITIO_BASE .
            '/file/w_384,h_384,c_fit' .
-           '/' . $this->uuid . '.' . $this->ext;
+           '/' . $this->uuid . '.jpg';
   }
 
   public static function createFromUrl($url) {
