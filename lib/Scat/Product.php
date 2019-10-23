@@ -42,7 +42,9 @@ class Product extends \Model implements \JsonSerializable {
   }
 
   public function jsonSerialize() {
-    return $this->asArray();
+    return array_merge($this->asArray(), [
+      'full_slug' => $this->full_slug()
+    ]);
   }
 
   public function media() {

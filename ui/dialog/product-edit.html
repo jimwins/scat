@@ -104,13 +104,16 @@
       method: 'POST',
       body: formData
     })
-      .then(res => {
-        if (res.ok) {
-          window.location.reload()
-        } else {
-          alert(res.statusText)
-        }
-      })
+    .then(res => {
+      if (res.ok) {
+        return res.json()
+      } else {
+        alert(res.statusText)
+      }
+    })
+    .then(res => {
+      window.location.href= '/catalog/' + res.full_slug
+    })
   }
 
   form.generateSlug= (event) => {
