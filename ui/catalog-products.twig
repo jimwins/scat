@@ -33,7 +33,7 @@
           {% set media = p.media %}
           {% if media is not empty %}
             <img class="media-object"
-                 src="{{ STATIC ~ media[0].thumbnail }}"
+                 src="{{ media[0].thumbnail }}"
                  alt="{{ media[0].alt_text }}">
           {% endif %}
         </a>

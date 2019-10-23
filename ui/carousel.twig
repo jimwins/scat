@@ -79,7 +79,7 @@
     {% for image in images %}
       <li>
         <img class=""
-             src="{{ STATIC ~ (image.medium ?: image.thumbnail) }}"
+             src="{{(image.medium ?: image.thumbnail }}"
              alt="{{ image.alt_text }}">
       </li>
     {% endfor %}

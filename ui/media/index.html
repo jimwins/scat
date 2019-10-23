@@ -39,10 +39,9 @@
         <div class="thumbnail" data-id="{{ i.id }}">
           <div style="position: relative; width: 100%; height: 100%">
             <img class="img-responsive"
-                 src="{{ STATIC ~ (i.medium ?: i.thumbnail) }}">
+                 src="{{ i.medium ?: i.thumbnail }}">
             <div class="caption">{{ i.alt_text }}</div>
             <div class="controls" style="position: absolute; top: 0; right: 0">
-              <button class="regen btn btn-default btn-xs">Regen</button>
               <button class="edit btn btn-default btn-xs">Edit</button>
             </div>
           </div>
@@ -87,30 +86,9 @@
     }
   }
 
-  let regenImages= (ev) => {
-    let thumb= ev.currentTarget.closest('.thumbnail')
-    let id= thumb.getAttribute('data-id')
-
-    fetch('/media/' + id + '/regenerate', {
-      method: 'POST',
-      headers: { 'Accept': 'application/json' },
-    })
-    .then((response) => {
-      if (response.status >= 200 && response.status < 300) {
-        window.location.reload()
-      }
-      return Promise.reject(new Error(response.statusText))
-    })
-  }
-
   let els= document.getElementsByClassName('edit');
   for (let i= 0; i < els.length; i++) {
     els[i].addEventListener("click", changeCaption, false);
-  }
-
-  els= document.getElementsByClassName('regen');
-  for (let i= 0; i < els.length; i++) {
-    els[i].addEventListener("click", regenImages, false);
   }
 
 </script>

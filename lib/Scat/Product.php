@@ -54,7 +54,7 @@ class Product extends \Model implements \JsonSerializable {
         [
           [
             'src' => $this->image,
-            'thumbnail' => $this->image,
+            'thumbnail' => ORDURE_STATIC . $this->image,
             'alt_text' => $this->name
           ]
         ] : null;
