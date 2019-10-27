@@ -83,6 +83,23 @@ $container['view']= function ($container) {
   return $view;
 };
 
+/* Hook up our services */
+$container['catalog']= function($c) {
+  return new \Scat\CatalogService();
+};
+$container['search']= function($c) {
+  return new \Scat\SearchService($c['settings']['search']);
+};
+$container['report']= function($c) {
+  return new \Scat\ReportService($c['settings']['report']);
+};
+$container['phone']= function($c) {
+  return new \Scat\PhoneService($c['settings']['phone']);
+};
+$container['txn']= function($c) {
+  return new \Scat\TxnService();
+};
+
 /* Trim trailing slashes */
 $app->add(function (Request $request, Response $response, callable $next) {
     $uri = $request->getUri();
@@ -128,10 +145,82 @@ $app->group('/sale', function (Slim\App $app) {
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect('/txns.php?type=customer');
             });
-  $app->get('/{id}',
+  $app->get('/{id:[0-9]+}',
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect("/?id={$args['id']}");
             })->setName('sale');
+  $app->get('/email-invoice-form',
+            function (Request $req, Response $res, array $args) {
+              $txn= $this->txn->fetchById($req->getParam('id'));
+              return $this->view->render($res, 'dialog/email-invoice.html',
+                                         [
+                                           'txn' => $txn
+                                         ]);
+            });
+  $app->post('/email-invoice',
+            function (Request $req, Response $res, array $args) {
+              $txn= $this->txn->fetchById($req->getParam('id'));
+              $name= $req->getParam('name');
+              $email= $req->getParam('email');
+              error_log("Sending {$txn->id} to $email");
+              $httpClient= new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client());
+              $sparky= new \SparkPost\SparkPost($httpClient,
+                                                [ 'key' => SPARKPOST_KEY ]);
+	      $promise= $sparky->transmissions->post([
+		'content' => [
+                  'html' => $this->view->fetch('email/invoice.html',
+                                               [
+                                                 'txn' => $txn,
+                                                 'content' =>
+                                                   $req->getParam('content'),
+                                               ]),
+                  'subject' => $this->view->fetchBlock('email/invoice.html',
+                                                       'title',
+                                                       [ 'txn' => $txn ]),
+                  'from' => array('name' => "Raw Materials Art Supplies",
+                                  'email' => OUTGOING_EMAIL_ADDRESS),
+                  'inline_images' => [
+                    [
+                      'name' => 'logo.png',
+                      'type' => 'image/png',
+                      'data' => base64_encode(
+                                 file_get_contents('ui/logo.png')),
+                    ],
+                  ],
+                ],
+		'recipients' => [
+		  [
+		    'address' => [
+		      'name' => $name,
+		      'email' => $email,
+		    ],
+		  ],
+		  [
+		    // BCC ourselves
+		    'address' => [
+		      'header_to' => $name,
+		      'email' => OUTGOING_EMAIL_ADDRESS,
+		    ],
+		  ],
+		],
+		'options' => [
+		  'inlineCss' => true,
+		],
+	      ]);
+
+	      try {
+		$response= $promise->wait();
+                return $res->withJson([ "message" => "Email sent." ]);
+	      } catch (\Exception $e) {
+		error_log(sprintf("SparkPost failure: %s (%s)",
+				  $e->getMessage(), $e->getCode()));
+                return $res->withJson([
+                  "error" =>
+                    sprintf("SparkPost failure: %s (%s)",
+                            $e->getMessage(), $e->getCode())
+                ], 500);
+	      }
+            });
 });
 
 /* Sales */
@@ -261,7 +350,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
 
                \ORM::get_db()->beginTransaction();
 
-               $purchase= \Scat\Txn::create([
+               $purchase= $this->txn->create([
                  'type' => 'vendor',
                  'person' => $vendor_id,
                  'tax_rate' => 0,
@@ -317,19 +406,6 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
 });
 
 /* Catalog */
-$container['catalog']= function($c) {
-  return new \Scat\CatalogService();
-};
-$container['search']= function($c) {
-  return new \Scat\SearchService($c['settings']['search']);
-};
-$container['report']= function($c) {
-  return new \Scat\ReportService($c['settings']['report']);
-};
-$container['phone']= function($c) {
-  return new \Scat\PhoneService($c['settings']['phone']);
-};
-
 $app->group('/catalog', function (Slim\App $app) {
   $app->get('/search',
             function (Request $req, Response $res, array $args) {

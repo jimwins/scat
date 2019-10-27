@@ -337,10 +337,7 @@ function emailInvoice() {
     Scat.alert("No sale to email.");
     return false;
   }
-  Scat.api("txn-email-invoice", { txn: txn })
-      .done(function (data) {
-        Scat.alert({ title: "Success!", error: "Invoice emailed." });
-      });
+  scat.dialog({}, '/sale/email-invoice-form', { id: txn })
   return false;
 }
 

@@ -101,6 +101,7 @@ $(document).ready(function() {
  </script>
 <?}?>
  <script src="js/scat.js"></script>
+ <script src="js/scat.main.js"></script>
 </head>
 <body class="page">
 <header class="navbar navbar-default navbar-fixed-top" role="navigation">

@@ -334,6 +334,9 @@
                         {% if sale %}
                           {% include 'email/invoice.twig' %}
                         {% endif %}
+                        {% if txn %}
+                          {% include 'email/txn.twig' %}
+                        {% endif %}
                       </td>
                     </tr>
                   </table>

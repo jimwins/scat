@@ -1,0 +1,70 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Email {{ txn.type == 'vendor' ? 'PO' : 'Invoice' }} {{ txn.formatted_number }}
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    <input type="hidden" name="id" value="{{ txn.id }}">
+
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" class="form-control" autofocus
+             name="name" value="{{ txn.owner.name }}">
+    </div>
+
+    <div class="form-group">
+      <label for="name">Email</label>
+      <input type="text" class="form-control"
+             name="email" value="{{ txn.owner.email }}">
+    </div>
+
+    <div class="form-group">
+      <label for="description">Content</label>
+      <textarea class="form-control" rows="10" name="content"></textarea>
+    </div>
+
+    <div class="form-group">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" value="1" name="include_details" checked>
+          Include {{ txn.type == 'vendor' ? 'Purchase Order' : 'Invoice' }}
+        </label>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    Send
+  </a>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    fetch("/sale/email-invoice", {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: formData
+    })
+    .then(res => {
+      if (res.ok) {
+        return res.json()
+      } else {
+        alert(res.statusText)
+      }
+    })
+    .then(res => {
+      alert(res.message)
+      $(dialog).modal('hide')
+    })
+  }
+{% endblock %}
