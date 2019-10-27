@@ -24,7 +24,9 @@ class Txn extends \Model implements \JsonSerializable {
   public function formatted_number() {
     $created= new \DateTime($this->created);
     return $this->type == 'vendor' ?
-      ('') :
+      ($created->format('Y') > 2013 ?
+       $created->format('y') . $this->number : // Y3K
+       $created->format('Y') . '-' . $this->number) :
       ($created->format("Y") . "-" . $this->number);
   }
 
