@@ -30,6 +30,10 @@ class Txn extends \Model implements \JsonSerializable {
     return $this->has_many('TxnLine', 'txn');
   }
 
+  public function payments() {
+    return $this->has_many('Payment', 'txn');
+  }
+
   public function person_id() {
     return $this->person;
   }
