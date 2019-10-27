@@ -68,6 +68,9 @@
               Paid by {{ data.data.cc_brand }}
               ending in {{ data.data.cc_last4 }}
             {% endif %}
+            {% if data.method == 'cash' %}
+              Paid by Cash
+            {% endif %}
             {% if data.method == 'paypal' %}
               Paid by PayPal
             {% endif %}
@@ -79,6 +82,9 @@
             {% endif %}
             {% if data.method == 'other' %}
               Paid
+            {% endif %}
+            {% if data.method == 'change' %}
+              Change
             {% endif %}
             ({{ data.processed }}):
           </th>
