@@ -52,11 +52,6 @@ class Txn extends \Model implements \JsonSerializable {
   }
 
   public function jsonSerialize() {
-    $txn= $this->as_array();
-    $txn['subtotal']= (float)$txn['subtotal'];
-    $txn['total']= (float)$txn['total'];
-    $txn['total_paid']= (float)$txn['total_paid'];
-    $txn['no_rewards']= (int)$txn['no_rewards'];
-    return $txn;
+    return $this->as_array();
   }
 }
