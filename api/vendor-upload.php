@@ -120,8 +120,9 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
           OPTIONALLY ENCLOSED BY '\"'
           LINES TERMINATED BY '\r\n'
           IGNORE 2 LINES
-          (code, name, @msrp, @sellmult, @available)
+          (code, @vendor, name, @msrp, @upc, @sellmult, @list, @net, @available)
         SET vendor_sku = code,
+            net_price = REPLACE(REPLACE(@net, ',', ''), '$', ''),
             retail_price = REPLACE(REPLACE(@msrp, ',', ''), '$', '')";
 
   $r= $db->query($q)
