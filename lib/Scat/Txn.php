@@ -30,6 +30,10 @@ class Txn extends \Model implements \JsonSerializable {
       ($created->format("Y") . "-" . $this->number);
   }
 
+  public function items_source() {
+    return $this->has_many('TxnLine', 'txn');
+  }
+
   public function items() {
     return $this->has_many('TxnLine', 'txn')->find_many();
   }

@@ -384,7 +384,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                    error_log("Failed to get price for $item_id");
                  }
 
-                 $item= $purchase->items()->create();
+                 $item= $purchase->items_source()->create();
                  $item->txn= $purchase->id;
                  $item->item= $item_id;
                  $item->ordered= $quantity;

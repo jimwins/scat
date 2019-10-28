@@ -6,8 +6,8 @@ class TxnService
   public function __construct() {
   }
 
-  public function create() {
-    return \Model::factory('Txn')->create();
+  public function create($options) {
+    return \Scat\Txn::create($options);
   }
 
   public function fetchById($id) {
