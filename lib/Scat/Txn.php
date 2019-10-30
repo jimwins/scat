@@ -52,7 +52,7 @@ class Txn extends \Model implements \JsonSerializable {
 
   function clearItems() {
     $this->orm->get_db()->beginTransaction();
-    $this->items()->delete_many();
+    $this->items_source()->delete_many();
     $this->filled= null;
     $this->save();
     $this->orm->get_db()->commit();
