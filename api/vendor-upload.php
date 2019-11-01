@@ -330,7 +330,8 @@ $q= "UPDATE vendor_item
         SET item = IFNULL((SELECT id FROM item
                             WHERE vendor_item.code = item.code),
                           0)
-     WHERE vendor = $vendor_id AND item = 0";
+     WHERE vendor = $vendor_id
+       AND (item IS NULL OR item = 0)";
 $r= $db->query($q)
   or die_query($db, $q);
 
@@ -341,7 +342,7 @@ $q= "UPDATE vendor_item
                             LIMIT 1),
                           0)
      WHERE vendor = $vendor_id
-       AND item = 0
+       AND (item IS NULL OR item = 0)
        AND barcode IS NOT NULL
        AND barcode != ''";
 $r= $db->query($q)
