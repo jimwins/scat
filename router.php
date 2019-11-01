@@ -162,6 +162,7 @@ $app->group('/sale', function (Slim\App $app) {
               $txn= $this->txn->fetchById($req->getParam('id'));
               $name= $req->getParam('name');
               $email= $req->getParam('email');
+              $subject= trim($req->getParam('subject'));
               error_log("Sending {$txn->id} to $email");
               $httpClient= new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client());
               $sparky= new \SparkPost\SparkPost($httpClient,
@@ -171,12 +172,11 @@ $app->group('/sale', function (Slim\App $app) {
                   'html' => $this->view->fetch('email/invoice.html',
                                                [
                                                  'txn' => $txn,
+                                                 'subject' => $subject,
                                                  'content' =>
                                                    $req->getParam('content'),
                                                ]),
-                  'subject' => $this->view->fetchBlock('email/invoice.html',
-                                                       'title',
-                                                       [ 'txn' => $txn ]),
+                  'subject' => $subject,
                   'from' => array('name' => "Raw Materials Art Supplies",
                                   'email' => OUTGOING_EMAIL_ADDRESS),
                   'inline_images' => [

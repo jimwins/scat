@@ -1,11 +1,7 @@
 {% extends 'layout/email.html' %}
 
 {% block title -%}
-  {%- if txn.type == 'vendor' -%}
-    {{- txn.owner.company }} PO {{ txn.formatted_number -}}
-  {%- else -%}
-    Invoice {{ txn.formatted_number -}}
-  {%- endif -%}
+  {{ subject }}
 {%- endblock %}
 
 {% block content_top %}
