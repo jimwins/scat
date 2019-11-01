@@ -8,7 +8,8 @@ if (!$id)
 
 $q= "UPDATE vendor_item, item
         SET vendor_item.item = item.id
-      WHERE vendor_item.item = 0 AND vendor_item.code = item.code
+      WHERE (vendor_item.item IS NULL OR vendor_item.item = 0)
+        AND vendor_item.code = item.code
         AND item.id = $id";
 
 $r= $db->query($q)
@@ -16,7 +17,8 @@ $r= $db->query($q)
 
 $q= "UPDATE vendor_item, barcode
         SET vendor_item.item = barcode.item
-      WHERE vendor_item.item = 0 AND vendor_item.barcode = barcode.code
+      WHERE (vendor_item.item IS NULL OR vendor_item.item = 0)
+        AND vendor_item.barcode = barcode.code
         AND barcode.item = $id";
 
 $r= $db->query($q)
