@@ -331,6 +331,15 @@ function printInvoice() {
   return Scat.print('invoice', { id: txn });
 }
 
+function downloadInvoice() {
+  var txn= Txn.id();
+  if (!txn) {
+    Scat.alert("No sale to print.");
+    return false;
+  }
+  return Scat.print('invoice', { id: txn, download: true });
+}
+
 function emailInvoice() {
   var txn= Txn.id();
   if (!txn) {
@@ -426,9 +435,8 @@ $(function() {
     <li><a data-bind="click: printInvoice">Invoice</a></li>
     <li><a data-bind="click: printReceipt">Receipt</a></li>
     <li><a data-bind="click: printGiftReceipt">Gift Receipt</a></li>
-    <li data-bind="css: { 'disabled': person.email() == '' }">
-      <a data-bind="click: emailInvoice">Email</a>
-    </li>
+    <li><a data-bind="click: downloadInvoice">Download</a></li>
+    <li><a data-bind="click: emailInvoice">Email</a></li>
    </ul>
   </div>
   <button type="button" class="btn btn-lg btn-default"

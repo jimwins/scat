@@ -31,8 +31,7 @@ if (defined('PRINT_DIRECT')) {
 
   $tmpfname= tempnam("/tmp", "rec");
 
-  // XXX hack: don't print vendor invoices directly
-  if ($DEBUG || $txn['txn']['type'] == 'vendor') {
+  if ($DEBUG || $_REQUEST['download']) {
     $mpdf->Output($fn . '.pdf', \Mpdf\Output\Destination::INLINE);
     exit;
   }
