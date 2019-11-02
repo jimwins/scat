@@ -93,8 +93,8 @@
         <tr>
           <th colspan="5" class="text-right">
             {% if data.method == 'credit' %}
-              Paid by {{ data.data.cc_brand }}
-              ending in {{ data.data.cc_last4 }}
+              Paid by {{ data.cc_type }}
+              ending in {{ data.cc_lastfour }}
             {% endif %}
             {% if data.method == 'paypal' %}
               Paid by PayPal
