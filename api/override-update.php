@@ -9,6 +9,7 @@ $minimum_quantity= (int)$_REQUEST['minimum_quantity'];
 $discount_type= $_REQUEST['discount_type'];
 $discount= $_REQUEST['discount'];
 $expires= $_REQUEST['expires'];
+$in_stock= (int)$_REQUEST['in_stock'];
 if (empty($expires)) $expires= null;
 
 try {
@@ -19,6 +20,7 @@ try {
   $override->discount_type= $discount_type;
   $override->discount= $discount;
   $override->expires= $expires;
+  $override->in_stock= $in_stock;
   $override->save();
 } catch (\PDOException $e) {
   die_jsonp($e->getMessage());

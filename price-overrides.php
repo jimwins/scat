@@ -11,6 +11,7 @@ head("Price Overrides @ Scat", true);
       <th>Minimum</th>
       <th>Discount</th>
       <th>Expires</th>
+      <th>In Stock Only</th>
       <th></th>
     </tr>
   </thead>
@@ -33,6 +34,7 @@ head("Price Overrides @ Scat", true);
                                                   $data.discount)">+10%</td>
       <td data-bind="text: $data.expires ? $data.expires
                                          : 'Never'">Never</td>
+      <td data-bind="text: $data.in_stock != 0 ? 'Yes' : 'No'">Maybe</td>
       <td>
         <button role="button" class="btn btn-xs btn-default"
                 data-bind="click: $parent.editOverride">
