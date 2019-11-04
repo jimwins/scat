@@ -102,7 +102,7 @@ $(function() {
                                  pattern: '', pattern_type: 'like',
                                  minimum_quantity: 1,
                                  discount_type: 'fixed', discount: 0,
-                                 expires: null
+                                 expires: null, in_stock: 0
                                };
       override.error= '';
 
