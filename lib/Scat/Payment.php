@@ -13,6 +13,7 @@ class Payment extends \Model {
     'dwolla' => "Dwolla",
     'paypal' => "PayPal",
     'amazon' => "Amazon Pay",
+    'eventbrite' => "Eventbrite",
     'discount' => "Discount",
     'bad' => "Bad Debt",
     'donation' => "Donation",

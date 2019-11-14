@@ -127,26 +127,12 @@ if (!$gift) {
 <?
 $payments= txn_load_payments($db, $id);
 
-$methods= array(
-  'cash' => 'Cash',
-  'change' => 'Change',
-  'credit' => 'Credit Card',
-  'square' => 'Square',
-  'stripe' => 'Stripe',
-  'dwolla' => 'Dwolla',
-  'paypal' => 'PayPal',
-  'gift' => 'Gift Card',
-  'check' => 'Check',
-  'discount' => 'Discount',
-  'bad' => 'Bad Debt',
-);
-
 if (count($payments)) {
   foreach ($payments as $payment) {
     if ($payment['method'] == 'discount' && $payment['discount']) {
       $method= sprintf("Discount (%d%%)", $payment['discount']);
     } else {
-      $method= $methods[$payment['method']];
+      $method= \Scat\Payment::$methods[$payment['method']];
     }
     echo '<tr>',
          '<td class="right" colspan="2">',

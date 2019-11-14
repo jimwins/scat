@@ -714,6 +714,7 @@ $("#pay-credit-manual").on("click", "button", function (ev) {
  <button class="btn btn-default" data-value="stripe">Stripe</button>
  <button class="btn btn-default" data-value="dwolla">Dwolla</button>
  <button class="btn btn-default" data-value="amazon">Amazon Pay</button>
+ <button class="btn btn-default" data-value="eventbrite">Eventbrite</button>
  <button class="btn btn-default" data-value="paypal">PayPal</button>
  <button class="btn btn-default" data-value="cancel">Cancel</button>
 </form>

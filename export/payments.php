@@ -37,6 +37,7 @@ while ($pay= $r->fetch_assoc()) {
                   'square' => array('11180', '11200'),
                   'stripe' => array('11175', '11200'),
                   'amazon' => array('11171', '11200'),
+                  'eventbrite' => array('11173', '11200'),
                   'gift' =>   array('21700', '11200'),
                   'check' =>  array('11160', '11200'),
                   'dwolla'=>  array('11172', '11200'),

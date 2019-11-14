@@ -11,8 +11,7 @@ $method= $_REQUEST['method'];
 $amount= $_REQUEST['amount'];
 
 // validate method
-if (!in_array($method,
-              array('cash','credit','square','stripe','dwolla','amazon','paypal','gift','check','discount','bad','donation','internal'))) {
+if (!in_array($method, array_keys(\Scat\Payment::$methods))) {
   die_jsonp("Invalid method specified.");
 }
 
