@@ -219,25 +219,11 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
        FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
        IGNORE 1 LINES
        (item_no, @qty)
-       SET ordered = @qty, shipped = @qty";
+       SET sku = item_no, ordered = @qty, shipped = @qty";
   $db->query($q)
     or die_query($db, $q);
 
   echo "- Loaded ", $db->affected_rows, " rows from file.\n";
-
-  // Need to get price, item info from vendor info
-  $q= "UPDATE vendor_order, vendor_item
-          SET vendor_order.item = vendor_item.item,
-              msrp = vendor_item.retail_price,
-              net = vendor_item.net_price
-        WHERE vendor_order.item_no = vendor_item.code
-          AND vendor = $txn[person]
-          AND vendor_item.active";
-  $db->query($q)
-    or die_query($db, $q);
-
-  echo "- Updated ", $db->affected_rows, " rows from vendor info.\n";
-
 } elseif (($json= json_decode(file_get_contents($fn)))) {
   // JSON
   foreach ($json->items as $item) {
@@ -397,6 +383,19 @@ $q= "UPDATE vendor_item, vendor_order
 $db->query($q)
   or die_query($db, $q);
 echo "- Linked ", $db->affected_rows, " items to vendor items.\n";
+
+# Get pricing for items if vendor_order didn't have them
+$q= "UPDATE vendor_order, vendor_item
+        SET msrp = vendor_item.retail_price,
+            net = vendor_item.net_price
+      WHERE msrp IS NULL
+        AND vendor_order.item = vendor_item.item
+        AND vendor = $txn[person]
+        AND vendor_item.active";
+$db->query($q)
+  or die_query($db, $q);
+
+echo "- Updated ", $db->affected_rows, " rows from vendor info.\n";
 
 # Add items to order
 $q= "INSERT INTO txn_line (txn, item, ordered, allocated, retail_price)
