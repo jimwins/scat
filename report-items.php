@@ -78,8 +78,8 @@ $q= "SELECT
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
-      GROUP BY 1
-      ORDER BY 2";
+      GROUP BY meta
+      ORDER BY Code\$item";
 
 dump_table($db->query($q));
 
