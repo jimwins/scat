@@ -9,7 +9,12 @@
     <p>
       <i class="fa fa-user-o fa-border"></i>
       {{ txn.owner.name }}
-      &lt;{{ txn.owner.email }}&gt;
+      {% if txn.owner.email %}
+        &lt;{{ txn.owner.email }}&gt;
+      {% endif %}
+      {% if txn.owner.company %}
+        <br>{{ txn.owner.company }}
+      {% endif %}
     </p>
   </div>
   <table class="table table-striped">
