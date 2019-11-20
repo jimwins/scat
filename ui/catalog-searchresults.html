@@ -20,7 +20,8 @@
           <a href="{{ slug }}">
             {% if p.media|length %}
               {% set i = p.media[0] %}
-              <img src="{{ i.thumbnail }}" alt="{{ i.alt_text }}">
+              <img src="{{ i.thumbnail }}" alt="{{ i.alt_text }}"
+                   style="max-height: 128px">
             {% endif %}
             <div class="caption">
               <small>{{ p.name }}</small>
