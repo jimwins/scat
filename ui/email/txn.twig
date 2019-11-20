@@ -52,14 +52,13 @@
       {% endfor %}
     </tbody>
     <tfoot>
+      {% set span= txn.type == 'vendor' ? 6 : 5 %}
       <tr>
-        <th colspan="3">
-        </th>
-        <th colspan="2" class="text-right">Subtotal:</th>
+        <th colspan="{{ span }}" class="text-right">Subtotal:</th>
         <td class="text-right">{{ scat.amount(txn.subtotal) }}</td>
       </tr>
       <tr>
-        <th colspan="5" class="text-right">
+        <th colspan="{{ span }}" class="text-right">
           Tax:
         </th>
         <td class="text-right" id="tax">
@@ -67,14 +66,14 @@
         </td>
       </tr>
       <tr>
-        <th colspan="5" class="text-right">Total:</th>
+        <th colspan="{{ span }}" class="text-right">Total:</th>
         <td class="text-right" id="total">
           {{ scat.amount(txn.total) }}
         </td>
       </tr>
       {% for data in txn.payments %}
         <tr>
-          <th colspan="5" class="text-right">
+          <th colspan="{{ span }}" class="text-right">
             {% if data.method == 'credit' %}
               Paid by {{ data.cc_type }}
               ending in {{ data.cc_lastfour }}
@@ -102,11 +101,11 @@
             {% endif %}
             ({{ data.processed }}):
           </th>
-          <td colspan="5" class="text-right">{{ scat.amount(data.amount) }}</td>
+          <td class="text-right">{{ scat.amount(data.amount) }}</td>
         </tr>
       {% endfor %}
       <tr>
-        <th colspan="5" class="text-right">Due:</th>
+        <th colspan="{{ span }}" class="text-right">Due:</th>
         <td class="text-right">{{ scat.amount(txn.due) }}</td>
       </tr>
     </tfoot>
