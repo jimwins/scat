@@ -22,6 +22,9 @@
       <tr>
         <th></th>
         <th>Quantity</th>
+        {% if txn.type == 'vendor' %}
+          <th>SKU</th>
+        {% endif %}
         <th>Code</th>
         <th>Name</th>
         <th class="text-right">Price</th>
@@ -33,6 +36,9 @@
         <tr valign="top">
           <td></td>
           <td>{{ txn.type == 'vendor' ? data.ordered : -data.ordered }}</td>
+          {% if txn.type == 'vendor' %}
+            <td>{{ data.vendor_sku }}</td>
+          {% endif %}
           <td><small>{{ data.code }}</small></td>
           <td>
             <span>{{ data.name }}</span>

@@ -55,4 +55,21 @@ class TxnLine extends \Model {
       throw new Exception('Did not understand discount for item.');
     }
   }
+
+  public function vendor_sku() {
+    $vendor_id= $this->txn()->find_one()->person;
+    if (!$vendor_id) return '';
+    $vendor_items= $this->has_many('VendorItem', 'item', 'item')
+                        ->where('vendor', $vendor_id)
+                        ->order_by_asc('purchase_quantity')
+                        ->find_many();
+    if (!$vendor_items) return '';
+    $sku= '';
+    foreach ($vendor_items as $item) {
+      if ($item->purchase_quantity <= abs($this->ordered)) {
+        $sku= $item->vendor_sku;
+      }
+    }
+    return $sku;
+  }
 }
