@@ -11,12 +11,31 @@
 {% endblock %}
 
 {% block catalog_sidebar %}
+  {# Product(s) #}
+  {% if products|length %}
+    <div class="col-md-3 col-md-pull-9">
+      {% for p in products %}
+        {% set slug = path_for('catalog') ~ '/' ~ p.full_slug %}
+        <figure class="thumbnail is-square">
+          <a href="{{ slug }}">
+            {% if p.media|length %}
+              {% set i = p.media[0] %}
+              <img src="{{ i.thumbnail }}" alt="{{ i.alt_text }}">
+            {% endif %}
+            <div class="caption">
+              <small>{{ p.name }}</small>
+            </div>
+          </a>
+        </figure>
+      {% endfor %}
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block catalog_crumb %}
 {% endblock %}
 
-{% block catalog_width "12" %}
+{% block catalog_width products|length ? "9 col-md-push-3" : "12" %}
 
 {% block catalog_content %}
   {# Error(s) #}
@@ -27,38 +46,6 @@
       </div>
     {% endfor %}
   {% endif %}
-
-  {# Product(s) #}
-  {% if products|length %}
-    <ul id="product-slider">
-      {% for p in products %}
-        {% set slug = path_for('catalog') ~ '/' ~ p.full_slug %}
-        <li>
-          <a href="{{ slug }}" class="thumbnail">
-            <div class="caption">
-              <small>{{ p.name }}</small>
-            </div>
-            {% if p.media|length %}
-              {% set i = p.media[0] %}
-              <img class="media-object"
-                   style="width:120px; max-width: 120px"
-                   src="{{ i.thumbnail }}"
-                   alt="{{ i.alt_text }}">
-            {% endif %}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-<script>
-$(function() {
-  $('#product-slider').lightSlider({
-    item: 6,
-    auto: false
-  });
-});
-</script>
 
   {# Item(s) #}
   {% if items|length %}
