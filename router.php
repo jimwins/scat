@@ -447,6 +447,7 @@ $app->group('/catalog', function (Slim\App $app) {
                  $brand= $this->catalog->createBrand();
                $brand->name= $req->getParam('name');
                $brand->slug= $req->getParam('slug');
+               $brand->description= $req->getParam('description');
                $brand->save();
                return $res->withJson($brand);
              });

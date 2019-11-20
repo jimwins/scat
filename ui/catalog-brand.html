@@ -59,6 +59,7 @@
 
 {% if brand %}
   <h1 class="title">{{ brand.name }}</h1>
+  <p>{{ brand.description|markdown }}</p>
 {% endif %}
 
 {% if products %}
