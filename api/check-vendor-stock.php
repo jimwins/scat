@@ -8,9 +8,6 @@ switch ($vendor) {
 case 7: // Mac
   echo jsonp(array('status' => check_mac_stock($code)));
   break;
-case 50: // C2F
-  echo jsonp(array('status' => check_c2f_stock($code)));
-  break;
 case 3757: // SLS
   echo jsonp(array('status' => check_sls_stock($code)));
   break;
@@ -129,35 +126,4 @@ function check_sls_stock($code) {
   $vg= $xp->query('//input[@name="qoh2"]')->item(0)->getAttribute('value');
 
   return [ 'Vegas' => $vg, 'New Orleans' => $no ];
-}
-
-function check_c2f_stock($code) {
-  $url= 'https://www.c2f.com/exhtml/productdetail.asp';
-
-  $client= new \GuzzleHttp\Client();
-  $jar= \GuzzleHttp\Cookie\CookieJar::fromArray(['ASPSESSIONIDSEBSDQTA'
-                                                   => C2F_KEY,
-                                                 'C2FDealerID'
-                                                   => C2F_ID ],
-                                                parse_url($url, PHP_URL_HOST));
-
-  $res= $client->request('GET', $url,
-                         [
-                         //'debug' => true,
-                           'cookies' => $jar,
-                           'query' => [
-                             'p' => $code,
-                           ]
-                         ]);
-
-  $body= $res->getBody();
-
-  $dom= new DOMDocument();
-  libxml_use_internal_errors(true);
-  $dom->loadHTML($body);
-
-  $xp= new DOMXpath($dom);
-  $bv= $xp->query('//div[@class="stock"]/strong')->item(0)->textContent;
-
-  return [ 'Beaverton' => $bv ];
 }

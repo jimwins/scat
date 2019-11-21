@@ -76,60 +76,6 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
 
   echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
-// C2F order (CSV)
-} elseif (preg_match('/^"?LineNumber/', $line)) {
-  //LineNumber,ProductID,ProductDesc,UOM,UPC_EAN,QtyOrdered,QtyShipped,QtyBackOrdered,RetailPrice,UnitAmt
-  $sep= preg_match("/,/", $line) ? "," : "\t";
-  $q= "LOAD DATA LOCAL INFILE '$fn'
-       INTO TABLE vendor_order
-       FIELDS TERMINATED BY '$sep' OPTIONALLY ENCLOSED BY '\"'
-       IGNORE 1 LINES
-       (line, item_no, description, status, @upc,
-        @ordered, @shipped, @backordered, msrp, net)
-       SET barcode = REPLACE(@upc, 'UPC->', ''),
-           sku = item_no, cust_item = @uom,
-           ordered = @shipped, backordered = @shipped, shipped = 0";
-  $db->query($q)
-    or die_query($db, $q);
-
-  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
-
-  $db->query("DELETE FROM vendor_order WHERE cust_item IN ('AS','ASMT')");
-
-  echo "- Removed ", $db->affected_rows, " assortments from file.\n";
-
-// C2F order (XLS)
-} elseif (preg_match('/xls/', $_FILES['src']['name'])) {
-  $reader= new \PhpOffice\PhpSpreadsheet\Reader\Xls();
-  $reader->setReadDataOnly(true);
-
-  $spreadsheet= $reader->load($fn);
-  $sheet= $spreadsheet->getActiveSheet();
-  $i= 0; $rows= [];
-  foreach ($sheet->getRowIterator() as $row) {
-    if ($i++) {
-      $data= [];
-      $cellIterator= $row->getCellIterator();
-      $cellIterator->setIterateOnlyExistingCells(false);
-      foreach ($cellIterator as $cell) {
-        $data[]= "'" . $db->escape($cell->getValue()) . "'";
-      }
-      $rows[]= '(' . join(',', $data) . ')';
-    }
-  }
-
-  $q= "INSERT INTO vendor_order (line, item_no, description, unit, barcode, ordered, shipped, backordered, msrp, net) VALUES " . join(',', $rows);
-  $db->query($q)
-    or die_query($db, $q);
-
-  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
-
-  // Reset numbers to just what was shipped
-  $q= "UPDATE vendor_order
-          SET ordered = shipped, backordered = shipped, shipped = 0";
-  $db->query($q)
-    or die_query($db, $q);
-
 } elseif (preg_match('/^Vendor Name	Assortment Item Number/', $line)) {
   // MacPherson assortment
   $q= "LOAD DATA LOCAL INFILE '$fn'
@@ -168,37 +114,6 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
     or die_query($db, $q);
 
   echo "- Loaded ", $db->affected_rows, " rows from SLS assortment.\n";
-} elseif (preg_match('/^C2F Product #/', $line)) {
-  // C2F
-  $q= "LOAD DATA LOCAL INFILE '$fn'
-       INTO TABLE vendor_order
-       FIELDS TERMINATED BY '\t'
-       LINES TERMINATED BY '\r\n'
-       IGNORE 1 LINES
-       (item_no, @qty, status, description, msrp, net, barcode)
-       SET ordered = @qty, shipped = @qty";
-  $db->query($q)
-    or die_query($db, $q);
-
-  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
-
-  // Don't import assortments (have to do that manually)
-  $db->query("DELETE FROM vendor_order WHERE status = 'asmt' OR status = 'as'");
-
-  echo "- Deleted ", $db->affected_rows, " assortments from file.\n";
-} elseif (preg_match('/^Item #	Description	Qty	UPC/', $line)) {
-  // C2F Assortment
-  echo "- Loading C2F Assortment\n";
-  $q= "LOAD DATA LOCAL INFILE '$fn'
-       INTO TABLE vendor_order
-       FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
-       IGNORE 1 LINES
-       (item_no, description, @qty, barcode)
-       SET ordered = @qty, shipped = @qty, msrp = 1, net = 1";
-  $db->query($q)
-    or die_query($db, $q);
-
-  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 } elseif (preg_match('/^,Name,MSRP/', $line)) {
   // CSV
   $q= "LOAD DATA LOCAL INFILE '$fn'
