@@ -76,6 +76,35 @@ if (preg_match('/^linenum[,\t]qty/', $line)) {
 
   echo "- Loaded ", $db->affected_rows, " rows from file.\n";
 
+// SLS order (XLS)
+} elseif (preg_match('/K.*\\.xls/i', $_FILES['src']['name'])) {
+  $reader= new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+  $reader->setReadDataOnly(true);
+
+  $spreadsheet= $reader->load($fn);
+  $sheet= $spreadsheet->getActiveSheet();
+  $i= 0; $rows= [];
+  foreach ($sheet->getRowIterator() as $row) {
+    if ($i++) {
+      $data= [];
+      $cellIterator= $row->getCellIterator();
+      $cellIterator->setIterateOnlyExistingCells(false);
+      foreach ($cellIterator as $cell) {
+        $data[]= "'" . $db->escape($cell->getValue()) . "'";
+      }
+      $rows[]= '(' . join(',', $data) . ')';
+    }
+  }
+  $q= "INSERT INTO vendor_order (line, ordered, item_no, cust_item, description, barcode, msrp, net, box_no, ext, bo_no) VALUES " . join(',', $rows);
+  $db->query($q)
+    or die_query($db, $q);
+
+  echo "- Loaded ", $db->affected_rows, " rows from file.\n";
+
+  $q= "UPDATE vendor_order SET backordered = ordered, shipped = 0";
+  $db->query($q)
+    or die_query($db, $q);
+
 } elseif (preg_match('/^Vendor Name	Assortment Item Number/', $line)) {
   // MacPherson assortment
   $q= "LOAD DATA LOCAL INFILE '$fn'
