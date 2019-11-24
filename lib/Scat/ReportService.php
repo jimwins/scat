@@ -102,6 +102,7 @@ class ReportService
                                            'items')
                              ->where_gt('active', 0)
                              ->having_equal('items', 0)
+                             ->order_by_asc('name')
                              ->find_many() ];
   }
 }
