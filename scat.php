@@ -343,7 +343,7 @@ function foot() {
 
   echo <<<FOOTER
 </div><!-- .container -->
-<footer>
+<footer id="page-footer">
  <div id="time">Page generated in $time seconds.</div>
  <div id="status">&nbsp;</div>
 </footer>
