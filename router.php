@@ -583,7 +583,9 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->get('/whats-new',
             function (Request $req, Response $res, array $args) {
-              $products= $this->catalog->getNewProducts();
+              $limit= (int)$req->getParam('limit');
+              if (!$limit) $limit= 12;
+              $products= $this->catalog->getNewProducts($limit);
               $depts= $this->catalog->getDepartments();
 
               return $this->view->render($res, 'catalog-whatsnew.html',
