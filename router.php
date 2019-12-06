@@ -927,4 +927,20 @@ $app->get('/dialog/{dialog}',
             return $this->view->render($res, "dialog/{$args['dialog']}");
           });
 
+$app->get('/~ready-for-publish',
+          function (Request $req, Response $res, array $args) {
+            if (file_exists('/tmp/ready-for-publish')) {
+              $res->getBody()->write('OK');
+              unlink('/tmp/ready-for-publish');
+            } else {
+              $res->getBody()->write('NO');
+            }
+            return $res;
+          });
+$app->post('/~ready-for-publish',
+           function (Request $req, Response $res, array $args) {
+             touch('/tmp/ready-for-publish');
+             return $res;
+           });
+
 $app->run();
