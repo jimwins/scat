@@ -2,7 +2,7 @@
 {% import 'macros.twig' as scat %}
 
 {% block content %}
-  <h1>{{ person.friendly_name() }}</h1>
+  <h2>{{ person.friendly_name() }}</h2>
 
   <nav aria-label="Controls for Item List">
     <ul class="pager">
@@ -19,7 +19,7 @@
     </ul>
   </nav>
 
-  <table class="table table-striped table-hover">
+  <table class="table table-condensed table-striped table-hover">
   <thead>
     <tr>
       <th>Code</th>
