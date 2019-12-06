@@ -707,6 +707,25 @@ $app->group('/person', function (Slim\App $app) {
             function (Request $req, Response $res, array $args) {
               return $res->withRedirect("/person.php?id={$args['id']}");
             })->setName('person');
+  $app->get('/{id:[0-9]+}/items',
+            function (Request $req, Response $res, array $args) {
+              $person= \Model::factory('Person')->find_one($args['id']);
+              $page= (int)$req->getParam('page');
+              if ($person->role != 'vendor') {
+                throw new \Exception("That person is not a vendor.");
+              }
+              $limit= 25;
+              $items= $person->items()
+                             ->limit($limit)->offset($page * $limit)
+                             ->order_by_asc('code')
+                             ->find_many();
+              return $this->view->render($res, 'person/items.html', [
+                                           'person' => $person,
+                                           'items' => $items,
+                                           'page' => $page,
+                                           'page_size' => $page_size,
+                                          ]);
+            })->setName('vendor-items');
 });
 
 /* Clock */

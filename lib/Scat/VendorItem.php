@@ -11,8 +11,8 @@ class VendorItem extends \Model {
              ->find_many();
   }
 
-  public function item() {
-    return $this->belongs_to('Item', 'item');
+  public function real_item() {
+    return $this->belongs_to('Item', 'item')->find_one();
   }
 
   public function vendor() {

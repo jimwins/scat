@@ -79,4 +79,12 @@ class Person extends \Model implements \JsonSerializable {
 
     return $people;
   }
+
+  public function items($only_active= true) {
+    if ($this->role != 'vendor') {
+      throw new \Exception("People who are not vendors don't have items.");
+    }
+    return $this->has_many('VendorItem', 'vendor')
+                ->where_gte('active', (int)$only_active);
+  }
 }
