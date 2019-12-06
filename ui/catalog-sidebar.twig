@@ -22,6 +22,24 @@
 </style>
 <nav class="menu sidebar">
   <ul class="nav nav-pills nav-stacked">
+    <li>
+      <div class="btn-group">
+        <button class="btn btn-default publish">
+          Publish
+        </button>
+<!--
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#">Add Item</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a href="#">Separated link</a></li>
+        </ul>
+-->
+      </div>
+    </li>
   {% for d in depts %}
     <li class="{{ (dept and dept.id == d.id) ? 'active' }}">
       <a href="{{ path_for('catalog', { 'dept' : d.slug }) }}">
@@ -45,5 +63,20 @@
          onclick="scat.dialog(this, '/catalog/department-form')">
         Add Department
       </a>
+    </li>
   </ul>
+  <script>
+    let nav= document.currentScript.parentNode
+
+    let publish= nav.querySelector('.publish')
+    publish.addEventListener('click', (ev) => {
+      fetch('/~ready-for-publish', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' }
+      })
+      .then((res) => {
+        alert('Scheduled.')
+      })
+    })
+  </script>
 </nav>
