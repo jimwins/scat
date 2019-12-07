@@ -50,7 +50,7 @@
           {{ i.purchase_quantity }}
         </td>
         <td align="right">
-          {% if i.promo_price and i.promo_price != i.net_price %}
+          {% if i.promo_price > 0 and i.promo_price != i.net_price %}
             {{ scat.amount(i.promo_price) }} /
             {{ i.promo_quantity }}
           {% endif %}
