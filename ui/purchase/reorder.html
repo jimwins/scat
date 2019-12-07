@@ -45,10 +45,12 @@
             <td align="center">{{ item.last3months }}</td>
             <td align="center">{{ item.minimum_order_quantity }}</td>
             <td align="center">
-              {% if item.cheapest is defined %}
+              {% if item.cheapest is not null %}
                 <i class="fa {{ item.cheapest < 0 ? 'fa-check-square-o' :
                                  (item.cheapest == 0 ? 'fa-minus-square-o' :
                                    'fa-square-o') }}"></i>
+              {% else %}
+                <i class="fa fa-check-square-o text-success"></i>
               {% endif %}
             </td>
             <td>
