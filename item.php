@@ -560,7 +560,7 @@ $vendor_items= item_load_vendor_items($db, $id);
         </span>
       </td>
       <td>
-        <a data-bind="attr: { href : $data.url }" target="_blank">
+        <a data-bind="attr: { href : '/person/' + $data.vendor() }">
           <span data-bind="text: $data.vendor_name"></span>
         </a>
       </td>
