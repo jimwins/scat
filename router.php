@@ -716,13 +716,16 @@ $app->group('/person', function (Slim\App $app) {
               }
               $limit= 25;
               $items= $person->items()
+                             ->select('*')
+                             ->select_expr('COUNT(*) OVER()', 'total')
                              ->limit($limit)->offset($page * $limit)
-                             ->order_by_asc('code')
+                             ->order_by_asc('vendor_sku')
                              ->find_many();
               return $this->view->render($res, 'person/items.html', [
                                            'person' => $person,
                                            'items' => $items,
                                            'page' => $page,
+                                           'limit' => $limit,
                                            'page_size' => $page_size,
                                           ]);
             })->setName('vendor-items');

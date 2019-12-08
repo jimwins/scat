@@ -11,6 +11,11 @@
           <span aria-hidden="true">&larr;</span> Previous
         </a>
       </li>
+      <li>
+       {{ page * limit + 1 }} -
+       {{ min((page + 1) * limit + 1, items[0].total) }}
+       of {{ items[0].total }}
+      </li>
       <li class="next">
         <a href="?page={{ page + 1 }}">
           Next <span aria-hidden="true">&rarr;</span>
