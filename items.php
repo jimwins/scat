@@ -15,9 +15,23 @@ head("Items @ Scat", true);
 // XXX can't add items on phone for now
 ?>
 <div class="hidden-xs hidden-print" style="float: right">
-  <button id="inventory-report" class="btn btn-default">
-    <i class="fa fa-print"></i> Inventory
-  </button>
+  <div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Inventory <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li>
+        <a id="inventory-report" href="#">
+          <i class="fa fa-print"></i> Print
+        </a>
+      </li>
+      <li>
+        <a id="inventory-complete" href="#">
+          <i class="fa fa-check-circle"></i> Done
+        </a>
+      </li>
+    </ul>
+  </div>
   <div class="btn-group">
     <button id="add-item" class="btn btn-default">Add New Item</button>
     <button type="button" class="btn btn-default dropdown-toggle"
@@ -148,6 +162,15 @@ $('#inventory-report').on('click', function(ev) {
   var q= $('#search').val();
 
   Scat.print('inventory', { q: q });
+});
+$('#inventory-complete').on('click', function(ev) {
+  ev.preventDefault();
+  var q= $('#search').val();
+
+  Scat.api('item-mark-inventoried', { q: q })
+      .done(function (data) {
+        alert("Marked " + data.count + " item(s) inventoried.")
+      });
 });
 </script>
 <br>
