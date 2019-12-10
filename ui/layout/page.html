@@ -64,11 +64,6 @@
     </div>
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
-        <li class="{{ current_path() starts with '/sale' ? 'active' }}">
-          <a href="/sale">
-            Sales
-          </a>
-        </li>
         <li class="{{ current_path() starts with '/catalog' ? 'active' }}">
           <a href="/catalog">
             Catalog
@@ -77,6 +72,11 @@
         <li class="{{ current_path() starts with '/person' ? 'active' }}">
           <a href="/person">
             People
+          </a>
+        </li>
+        <li class="{{ current_path() starts with '/sale' ? 'active' }}">
+          <a href="/sale">
+            Sales
           </a>
         </li>
         <li class="{{ current_path() starts with '/purchase' ? 'active' }}">
