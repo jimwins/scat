@@ -25,7 +25,7 @@ class Product extends \Model implements \JsonSerializable {
   public function items($only_active= true) {
     return $this->has_many('Item')
                 ->select('item.*')
-                ->where_gte('active', (int)$only_active);
+                ->where_gte('item.active', (int)$only_active);
   }
 
   public function full_slug() {
@@ -36,7 +36,7 @@ class Product extends \Model implements \JsonSerializable {
 
   public function stocked() {
     return $this->has_many('Item')
-                ->where_gte('active', 1)
+                ->where_gte('item.active', 1)
                 ->where_gte('minimum_quantity', 1)
                 ->count();
   }

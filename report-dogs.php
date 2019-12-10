@@ -17,7 +17,7 @@ $q= "SELECT id, code, name,
               WHERE txn_line.item = item.id 
                 AND type = 'customer') last_sale
        FROM item
-      WHERE active AND NOT deleted
+      WHERE item.active AND NOT item.deleted
         AND minimum_quantity
      HAVING (first_seen < NOW() - INTERVAL 1 YEAR)
         AND (last_sale IS NULL OR last_sale < NOW() - INTERVAL 1 YEAR)

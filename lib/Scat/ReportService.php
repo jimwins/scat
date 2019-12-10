@@ -100,7 +100,7 @@ class ReportService
                                               WHERE product.id = product_id AND
                                                     item.active)',
                                            'items')
-                             ->where_gt('active', 0)
+                             ->where_gt('product.active', 0)
                              ->having_equal('items', 0)
                              ->order_by_asc('name')
                              ->find_many() ];

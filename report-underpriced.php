@@ -20,7 +20,7 @@ $q= "SELECT item.id, item.code, item.name,
               WHERE vendor_item.item = item.id AND vendor_item.active) net_price
        FROM item
        LEFT JOIN brand ON item.brand = brand.id
-      WHERE active AND NOT deleted
+      WHERE item.active AND NOT item.deleted
         AND ($sql_criteria)
     HAVING (sale_price - net_price) / sale_price < $minimum
      ORDER BY 2";

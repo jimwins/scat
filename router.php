@@ -541,7 +541,7 @@ $app->group('/catalog', function (Slim\App $app) {
               if ($brand)
                 $products= $brand->products()
                                  ->order_by_asc('name')
-                                 ->where('active', 1)
+                                 ->where('product.active', 1)
                                  ->find_many();
 
               $brands= $brand ? null : $this->catalog->getBrands();
@@ -714,15 +714,20 @@ $app->group('/person', function (Slim\App $app) {
                 throw new \Exception("That person is not a vendor.");
               }
               $limit= 25;
+              $q= $req->getParam('q');
               $items= $person->items()
                              ->select('*')
                              ->select_expr('COUNT(*) OVER()', 'total')
                              ->limit($limit)->offset($page * $limit)
-                             ->order_by_asc('vendor_sku')
-                             ->find_many();
+                             ->order_by_asc('vendor_sku');
+              if ($q) {
+                $items= $items->where_like('code', $q);
+              }
+              $items= $items->find_many();
               return $this->view->render($res, 'person/items.html', [
                                            'person' => $person,
                                            'items' => $items,
+                                           'q' => $q,
                                            'page' => $page,
                                            'limit' => $limit,
                                            'page_size' => $page_size,
@@ -812,7 +817,7 @@ $app->get('/notes',
             $parent_id= (int)$req->getParam('parent_id');
             $staff= \Model::factory('Person')
                       ->where('role', 'employee')
-                      ->where('active', 1)
+                      ->where('person.active', 1)
                       ->order_by_asc('name')
                       ->find_many();
             if ($parent_id) {

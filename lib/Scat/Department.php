@@ -19,7 +19,8 @@ class Department extends \Model implements \JsonSerializable {
   }
 
   public function products($only_active= true) {
-    return $this->has_many('Product')->where_gte('active', (int)$only_active);
+    return $this->has_many('Product')
+                ->where_gte('product.active', (int)$only_active);
   }
 
   public function jsonSerialize() {

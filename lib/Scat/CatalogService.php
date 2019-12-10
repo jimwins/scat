@@ -11,8 +11,10 @@ class CatalogService
   }
 
   public function getBrands($only_active= true) {
-    // TODO restrict to active brands (but not in model yet)
-    return \Model::factory('Brand')->order_by_asc('name')->find_many();
+    return \Model::factory('Brand')->where_gte('brand.active',
+                                               (int)$only_active)
+                                   ->order_by_asc('name')
+                                   ->find_many();
   }
 
   public function getBrandById($id) {
@@ -28,9 +30,9 @@ class CatalogService
   }
 
   public function getDepartments($parent_id= 0, $only_active= true) {
-    // TODO restrict to active departments (but not in model yet)
     return \Model::factory('Department')->where('parent_id', $parent_id)
-//                                      ->where_gte('active', (int)$only_active)
+                                        ->where_gte('department.active',
+                                                    (int)$only_active)
                                         ->order_by_asc('name')
                                         ->find_many();
   }
