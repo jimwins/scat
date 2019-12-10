@@ -265,7 +265,6 @@ if ($vendor > 0) {
                     FROM vendor_item
                     JOIN person ON vendor_item.vendor = person.id
                   WHERE item = item.id
-                    AND NOT special_order
                     AND vendor = $vendor
                     AND vendor_item.active) -
                  (SELECT MIN(IF(promo_price, promo_price, net_price)
