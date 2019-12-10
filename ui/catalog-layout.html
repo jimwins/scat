@@ -71,15 +71,6 @@
                       Edit Department
                     </a>
                   </li>
-                  {% if subdept %}
-                    <li>
-                      <a onclick="scat.dialog(this, '/catalog/product-form',
-                                              { department_id:
-                                                 {{ subdept.id }} })">
-                        Add Product
-                      </a>
-                    </li>
-                  {% endif %}
                 {% endif %}
               </ul>
             </div>
