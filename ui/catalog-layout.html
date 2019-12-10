@@ -99,6 +99,8 @@
       {% endif %}
 
       {% if product %}
+        <!-- don't show product link on items, we're already there -->
+        <style>a.product-link { display: none; }</style>
         {% include 'catalog-product.twig' %}
       {% endif %}
 
