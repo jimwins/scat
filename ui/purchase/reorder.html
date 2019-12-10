@@ -80,15 +80,6 @@
               Create Order
             </button>
           </td>
-          <td colspan="4" align="right">
-            <strong>
-              Total: &nbsp;
-            </strong>
-          </td>
-          <td>
-            <span id="total">$0.00</span> &nbsp;
-            (<span id="units">0</span>)
-          </td>
         </tr>
       </tfoot>
     </table>
@@ -190,9 +181,9 @@
           total+= input.attributes['data-cost'].value * input.value
           units+= input.value * 1
         }
-        form.querySelector('#total').innerHTML=
+        document.querySelector('#total').innerHTML=
           scat.amount(total)
-        form.querySelector('#units').innerHTML= units
+        document.querySelector('#units').innerHTML= units
       }
 
       const handleChange= (input, doUpdateTotal= true) => {
@@ -240,4 +231,10 @@
     </script>
   </form>
 
+{% endblock %}
+
+{% block status %}
+  <strong>Total: &nbsp;</strong>
+  <span id="total">$0.00</span>
+  (<span id="units">0</span>)
 {% endblock %}
