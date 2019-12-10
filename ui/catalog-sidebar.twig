@@ -21,25 +21,24 @@
 }
 </style>
 <nav class="menu sidebar">
+  <div class="btn-group btn-block">
+    <button class="btn btn-default col-sm-10 publish">
+      Publish
+    </button>
+    <button type="button" class="btn btn-default col-sm-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu btn-block">
+      <li><a class="add-department" href="#">Add Department</a></li>
+      <li><a class="add-product" href="#">Add Product</a></li>
+{# not yet
+      <li><a class="add-item" href="#">Add Item</a></li>
+#}
+    </ul>
+  </div>
+  <hr style="border-color: rgba(0,0,0,0.1)">
   <ul class="nav nav-pills nav-stacked">
-    <li>
-      <div class="btn-group">
-        <button class="btn btn-default publish">
-          Publish
-        </button>
-<!--
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span class="caret"></span>
-          <span class="sr-only">Toggle Dropdown</span>
-        </button>
-        <ul class="dropdown-menu">
-          <li><a href="#">Add Item</a></li>
-          <li role="separator" class="divider"></li>
-          <li><a href="#">Separated link</a></li>
-        </ul>
--->
-      </div>
-    </li>
   {% for d in depts %}
     <li class="{{ (dept and dept.id == d.id) ? 'active' }}">
       <a href="{{ path_for('catalog', { 'dept' : d.slug }) }}">
@@ -58,18 +57,13 @@
       {% endif %}
     </li>
   {% endfor %}
-    <li>
-      <a class="btn btn-default"
-         onclick="scat.dialog(this, '/catalog/department-form')">
-        Add Department
-      </a>
-    </li>
   </ul>
   <script>
     let nav= document.currentScript.parentNode
 
     let publish= nav.querySelector('.publish')
     publish.addEventListener('click', (ev) => {
+      ev.stopPropagation()
       fetch('/~ready-for-publish', {
         method: 'POST',
         headers: { 'Accept': 'application/json' }
@@ -77,6 +71,24 @@
       .then((res) => {
         alert('Scheduled.')
       })
+    })
+
+    nav.querySelector('.add-department').addEventListener('click', (ev) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      scat.dialog(ev.target, '/catalog/department-form')
+    })
+    nav.querySelector('.add-product').addEventListener('click', (ev) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      let department= {{ subdept ? subdept.id : 0 }}
+      scat.dialog(ev.target, '/catalog/product-form',
+                  { department_id: department })
+    })
+    nav.querySelector('.add-item').addEventListener('click', (ev) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      scat.dialog(ev.target, '/catalog/item-form')
     })
   </script>
 </nav>
