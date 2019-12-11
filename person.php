@@ -199,18 +199,17 @@ if ($id && !$person) {
     Price Changes
   </button>
   <div class="btn-group">
-    <button class="btn btn-default"
-            id="upload-items"
-            data-loading-text="Processing..."
-            data-bind="click: uploadItems, visible: person.role() == 'vendor'">
-      Upload Items
-    </button>
+    <a href="/person/<?=$person['id']?>/items"
+       class="btn btn-default">
+      Items
+    </a>
     <button type="button" class="btn btn-default dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="caret"></span>
       <span class="sr-only">Toggle Dropdown</span>
     </button>
     <ul class="dropdown-menu">
+      <li><a data-bind="click: uploadItems">Upload Items</a></li>
       <li><a data-bind="click: clearPromos">Clear Promos</a></li>
       <li><a data-bind="click: markAllSpecial">Mark All Special Order</a></li>
     </ul>
