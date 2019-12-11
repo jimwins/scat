@@ -28,7 +28,8 @@
               </li>
               {% if subdept %}
                 <li class="{{ not product ? 'active' }}">
-                  <a href="{{ path_for('catalog', {'dept': dept.slug,
+                  <a style="{{ not subdept.active ? 'text-decoration: line-through' }}"
+                     href="{{ path_for('catalog', {'dept': dept.slug,
                                                    'subdept': subdept.slug }) }}">
                     {{ subdept.name }}
                   </a>

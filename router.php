@@ -610,7 +610,7 @@ $app->group('/catalog', function (Slim\App $app) {
                 $dept->departments()->order_by_asc('name')->find_many():null;
 
               $subdept= $args['subdept'] ?
-                $dept->departments()
+                $dept->departments(false)
                      ->where('slug', $args['subdept'])
                      ->find_one():null;
               if ($args['subdept'] && !$subdept)
