@@ -84,14 +84,14 @@ class VendorItemSearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
         return;
       }
 
-      $this->current[]= "(vendor_item.name LIKE '%$term%' OR vendor_item.code LIKE '%$term%' OR vendor_item.sku LIKE '%$term%' OR (vendor_item.barcode LIKE '%$term%'))";
+      $this->current[]= "(vendor_item.name LIKE '%$term%' OR vendor_item.code LIKE '%$term%' OR vendor_item.vendor_sku LIKE '%$term%' OR (vendor_item.barcode LIKE '%$term%'))";
     }
   }
 
   public function visitText(Text $text)
   {
     $term= addslashes($text->getText());
-      $this->current[]= "(vendor_item.name LIKE '%$term%' OR vendor_item.code LIKE '%$term%' OR vendor_item.sku LIKE '%$term%' OR (vendor_item.barcode LIKE '%$term%'))";
+      $this->current[]= "(vendor_item.name LIKE '%$term%' OR vendor_item.code LIKE '%$term%' OR vendor_item.vendor_sku LIKE '%$term%' OR (vendor_item.barcode LIKE '%$term%'))";
   }
 
   public function visitExplicitTerm(ExplicitTerm $term)
