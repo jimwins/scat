@@ -2,7 +2,25 @@
 {% import 'macros.twig' as scat %}
 
 {% block content %}
-  <h2>{{ person.friendly_name() }}</h2>
+  <div class="row">
+    <div class="col-sm-6">
+      <h2 style="margin-top: 0.05em">{{ person.friendly_name() }}</h2>
+    </div>
+
+    <div class="col-sm-6">
+      <form action="" class="form">
+        <div class="input-group">
+          <input type="search" class="form-control" name="q" value="{{ q }}">
+          <span class="input-group-btn">
+            <input type="submit" class="btn btn-default" value="Search">
+          </span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <hr style="border-color: rgba(0,0,0,0.1)">
+
 
   <nav aria-label="Controls for Item List">
     <ul class="pager">

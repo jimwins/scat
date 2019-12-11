@@ -718,14 +718,9 @@ $app->group('/person', function (Slim\App $app) {
               }
               $limit= 25;
               $q= $req->getParam('q');
-              $items= $person->items()
-                             ->select('*')
-                             ->select_expr('COUNT(*) OVER()', 'total')
-                             ->limit($limit)->offset($page * $limit)
-                             ->order_by_asc('vendor_sku');
-              if ($q) {
-                $items= $items->where_like('code', $q);
-              }
+              $items= \Scat\VendorItem::search($person->id, $q);
+              $items= $items->select_expr('COUNT(*) OVER()', 'total')
+                            ->limit($limit)->offset($page * $limit);
               $items= $items->find_many();
               return $this->view->render($res, 'person/items.html', [
                                            'person' => $person,
