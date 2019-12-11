@@ -14,8 +14,9 @@ class Department extends \Model implements \JsonSerializable {
     return $this->belongs_to('Department', 'parent_id');
   }
 
-  public function departments() {
-    return $this->has_many('Department', 'parent_id');
+  public function departments($only_active= true) {
+    return $this->has_many('Department', 'parent_id')
+                ->where_gte('department.active', (int)$only_active);
   }
 
   public function products($only_active= true) {

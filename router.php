@@ -447,6 +447,7 @@ $app->group('/catalog', function (Slim\App $app) {
                $brand->name= $req->getParam('name');
                $brand->slug= $req->getParam('slug');
                $brand->description= $req->getParam('description');
+               $brand->active= (int)$req->getParam('active');
                $brand->save();
                return $res->withJson($brand);
              });
@@ -471,6 +472,7 @@ $app->group('/catalog', function (Slim\App $app) {
                $dept->slug= $req->getParam('slug');
                $dept->parent_id= $req->getParam('parent_id');
                $dept->description= $req->getParam('description');
+               $dept->active= (int)$req->getParam('active');
                $dept->save();
                return $res->withJson($dept);
              });
