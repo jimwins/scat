@@ -15,6 +15,9 @@
         Optimize
       </button>
     </div>
+    <h2>
+      <a tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" title="Notes" data-content="{{ person.notes }}">{{ person.friendly_name }}</a>
+    </h2>
     <table class="table table-condensed table-striped">
       <thead>
         <tr>
@@ -87,6 +90,8 @@
     <script>
       const form= document.currentScript.parentNode
       const inputs= form.querySelectorAll('input[type="text"]')
+
+      $('[data-toggle="popover"]').popover();
 
       const focusNextInput= (document, direction= 1) => {
 	// all the elements that can be focused

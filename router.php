@@ -337,6 +337,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                 'all' => $all,
                 'code' => $code,
                 'vendor' => $vendor,
+                'person' => \Model::factory('Person')->find_one($vendor)
               ]);
             })->setName('sale');
   $app->post('/reorder',
