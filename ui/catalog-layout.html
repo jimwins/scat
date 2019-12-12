@@ -98,11 +98,11 @@
 
       {# Item(s) #}
       {% if items|length %}
-        {% include 'catalog-items.twig' %}
+        {% include 'catalog/item-list.twig' %}
       {% endif %}
 
       {% if item %}
-        {% include 'catalog-item.twig' %}
+        {% include 'catalog/item-modal.twig' %}
       {% endif %}
 
       {% if brands|length %}
