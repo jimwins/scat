@@ -56,6 +56,12 @@ class SearchService
     $query->accept($v);
 
     $items= \Model::factory('Item')->select('item.*')
+                                   ->select_expr('IFNULL((SELECT SUM(allocated)
+                                                     FROM txn_line
+                                                    WHERE txn_line.item =
+                                                           item.id),
+                                                         0)',
+                                                    'stock')
                                    ->left_outer_join('brand',
                                                      array('brand.id', '=',
                                                            'item.brand'))
@@ -67,7 +73,7 @@ class SearchService
                                                $v->force_all ? 0 : 1)
                                    ->where_not_equal('item.deleted', 1)
                                    ->group_by('item.id')
-                                   ->order_by_asc('item.code')
+                                   ->order_by_expr('!(stock > 0), item.code')
                                    ->find_many();
 
     return $items;
