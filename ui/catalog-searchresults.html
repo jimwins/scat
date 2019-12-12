@@ -50,7 +50,7 @@
 
   {# Item(s) #}
   {% if items|length %}
-    {% include 'catalog-items.twig' %}
+    {% include 'catalog/item-list.twig' %}
   {% endif %}
 
   {% if not items|length and not products|length %}
