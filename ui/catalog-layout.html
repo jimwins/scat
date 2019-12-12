@@ -13,7 +13,7 @@
 
 <div class="row">
   <div class="col-md-{% block catalog_width "9 col-md-push-3" %}">
-    {% include 'catalog-searchform.twig' %}
+    {% include 'catalog/searchform.twig' %}
     <hr style="border-color: rgba(0,0,0,0.1)">
     {% block catalog_crumb %}
       {% if dept %}
@@ -129,7 +129,7 @@
 
   {% block catalog_sidebar %}
     <div class="col-md-3 col-md-pull-9">
-      {% include 'catalog-sidebar.twig' %}
+      {% include 'catalog/sidebar.twig' %}
     </div>
   {% endblock %}
 
