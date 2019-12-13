@@ -1,0 +1,164 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Bulk Edit Items
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    <div class="form-group">
+      <label for="brand_id">
+        Brand
+      </label>
+      <select id="brand_id" name="brand_id" class="form-control">
+        <option value=""></option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="product_id">
+        Product
+      </label>
+      <select id="product_id" name="product_id" class="form-control">
+        <option value=""></option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="name">
+        Name
+      </label>
+      <input type="text" name="name" class="form-control"
+             placeholder="Name including {{'{{short_name}}'}} and/or {{'{{variation}}'}}">
+    </div>
+    <div class="form-group">
+      <label for="short_name">
+        Short Name
+      </label>
+      <input type="text" name="short_name" class="form-control"
+             placeholder="">
+    </div>
+    <div class="form-group">
+      <label for="variation">
+        Variation
+      </label>
+      <input type="text" name="variation" class="form-control"
+             placeholder="">
+    </div>
+    <div class="form-group">
+      <label for="retail_price">
+        List
+      </label>
+      <input type="text" name="retail_price" class="form-control"
+             placeholder="$0.00">
+    </div>
+    <div class="form-group">
+      <label for="discount">
+        Discount
+      </label>
+      <input type="text" name="discount" class="form-control"
+             placeholder="$0.00 or 0%">
+    </div>
+    <div class="form-group">
+      <label for="minimum_quantity">
+        Minimum Quantity
+      </label>
+      <input type="text" name="minimum_quantity" class="form-control"
+             placeholder="1">
+    </div>
+    <div class="form-group">
+      <label for="purchase_quantity">
+        Purchase Quantity
+      </label>
+      <input type="text" name="purchase_quantity" class="form-control"
+             placeholder="1">
+    </div>
+    <div class="form-group">
+      <label for="dimensions">
+        Dimensions
+      </label>
+      <input type="text" name="dimensions" class="form-control"
+             placeholder="LxWxH">
+    </div>
+    <div class="form-group">
+      <label for="weight">
+        Weight
+      </label>
+      <input type="text" name="weight" class="form-control"
+             placeholder="# lbs.">
+    </div>
+    <div class="form-group">
+      <label for="prop65">
+        Prop. 65
+      </label>
+      <select name="prop65" class="form-control">
+        <option value=""></option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="hazmat">
+        Hazardous Material
+      </label>
+      <select name="hazmat" class="form-control">
+        <option value=""></option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="oversized">
+        Oversized
+      </label>
+      <select name="oversized" class="form-control">
+        <option value=""></option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="active">
+        Active
+      </label>
+      <select name="active" class="form-control">
+        <option value=""></option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    Submit Changes
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let items= list.querySelectorAll('.item-list tr[data-id]')
+    let item_param= Array.from(items)
+                         .filter((el) => { return !!el.querySelector(':checked') })
+                         .map((el) => { return el.attributes['data-id'].value })
+                         .join(',')
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    formData.append('items', item_param)
+    fetch("/catalog/bulk-update", {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => {
+        if (res.ok) {
+          window.location.reload()
+        } else {
+          alert(res.statusText)
+        }
+      })
+  }
+{% endblock %}
+

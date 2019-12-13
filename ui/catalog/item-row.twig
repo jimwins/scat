@@ -14,6 +14,9 @@
 <tr data-id="{{ i.id }}"
     class="{{ (item and item.id == i.id) ? 'info' }}
            {{ not i.active ? 'inactive' }}">
+  <td class="item-select">
+    <input type="checkbox" checked>
+  </td>
   <td>
     <a href="{{ path_for('catalog-item', { 'code' : i.code }) }}">
       {{- i.code -}}

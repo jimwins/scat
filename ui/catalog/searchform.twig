@@ -1,4 +1,12 @@
 <form method="GET" action="/catalog/search">
+  <div class="pull-right" style="padding-left: 1em">
+    <button class="btn btn-default toggle-select" type="button">
+      Select
+    </button>
+    <button class="btn btn-default bulk-edit" type="button">
+      Bulk Edit
+    </button>
+  </div>
   <div class="input-group">
     <input class="form-control" type="text" name="q" value="{{ q }}" autofocus
            autocomplete="off" autocorrect="off" autocapitalize="off"
@@ -10,4 +18,17 @@
       </button>
     </span>
   </div>
+  {# critical that <script> be inside div so currentScript.parentNode works #}
+  <script>
+    let form= document.currentScript.parentNode
+    form.querySelector('.toggle-select').addEventListener('click', (ev) => {
+      document.querySelectorAll('.item-list .item-select').forEach((item) => {
+        item.classList.toggle('visible')
+      })
+    })
+
+    form.querySelector('.bulk-edit').addEventListener('click', (ev) => {
+      scat.dialog([], '/dialog/bulk-edit.html')
+    })
+  </script>
 </form>

@@ -583,6 +583,32 @@ $app->group('/catalog', function (Slim\App $app) {
                ]);
              });
 
+  $app->post('/bulk-update',
+             function (Request $req, Response $res, array $args) {
+               $items= $req->getParam('items');
+
+               if (!preg_match('/^(?:\d+)(?:,\d+)*$/', $items)) {
+                 throw new \Exception("Invalid items specified.");
+               }
+
+               foreach (explode(',', $items) as $id) {
+                 $item= \Model::factory('Item')->find_one($id);
+                 if (!$item)
+                   throw new \Slim\Exception\NotFoundException($req, $res);
+
+                 foreach ([ 'brand_id','product_id','name','short_name','variation','retail_price','discount','minimum_quantity','purchase_quantity','dimensions','weight','prop65','hazmat','oversized','active' ] as $key) {
+                   $value= $req->getParam($key);
+                   if (strlen($value)) {
+                     $item->setProperty($key, $value);
+                   }
+                 }
+
+                 $item->save();
+               }
+
+               return $res->withJson([ 'message' => 'Okay.' ]);
+             });
+
   $app->get('/whats-new',
             function (Request $req, Response $res, array $args) {
               $limit= (int)$req->getParam('limit');
