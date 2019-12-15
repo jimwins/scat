@@ -340,6 +340,15 @@ function downloadInvoice() {
   return Scat.print('invoice', { id: txn, download: true });
 }
 
+function printPackingSlip() {
+  var txn= Txn.id();
+  if (!txn) {
+    Scat.alert("No sale to print.");
+    return false;
+  }
+  return Scat.print('invoice', { id: txn, variation: 'packing-slip' });
+}
+
 function emailInvoice() {
   var txn= Txn.id();
   if (!txn) {
@@ -435,6 +444,7 @@ $(function() {
     <li><a data-bind="click: printInvoice">Invoice</a></li>
     <li><a data-bind="click: printReceipt">Receipt</a></li>
     <li><a data-bind="click: printGiftReceipt">Gift Receipt</a></li>
+    <li><a data-bind="click: printPackingSlip">Packing Slip</a></li>
     <li><a data-bind="click: downloadInvoice">Download</a></li>
     <li><a data-bind="click: emailInvoice">Email</a></li>
    </ul>

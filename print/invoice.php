@@ -8,6 +8,7 @@ if (!$id) die("No transaction specified.");
 date_default_timezone_set('America/Los_Angeles');
 
 $txn= txn_load_full($db, $id);
+$txn['variation']= $_REQUEST['variation'];
 
 $fn= (($txn['txn']['type'] == 'vendor') ? 'PO' : 'I') .
      $txn['txn']['formatted_number'];

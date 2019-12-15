@@ -89,58 +89,67 @@
       {% endif %}
       <th class="left">Code</th>
       <th class="left">Name</th>
-      <th class="right">Price</th>
-      <th class="right">Total</th>
+      {% if variation != 'packing-slip' %}
+        <th class="right">Price</th>
+        <th class="right">Total</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
   {% for item in items %}
-    <tr valign="top">
-      <td class="right">{{ item.quantity }}</td>
-      {% if txn.type == 'vendor' %}
-        <td class="left" nowrap>{{ item.vendor_sku }}</td>
-      {% endif %}
-      <td class="left" nowrap>
-        {{ item.purchase_quantity ? item.code }}
-      </td>
-      <td class="left">
-        {{ item.name }}
-        {% if item.discount %}
-          <div class="description">{{ item.discount }}</div>
+    {% if variation != 'packing-slip' or not (item.code starts with 'ZZ-SHIP') %}
+      <tr valign="top">
+        <td class="right">{{ item.quantity }}</td>
+        {% if txn.type == 'vendor' %}
+          <td class="left" nowrap>{{ item.vendor_sku }}</td>
         {% endif %}
-      </td>
-      <td class="right">{{ scat.amount(item.price) }}</td>
-      <td class="right">{{ scat.amount(item.ext_price) }}</td>
-    </tr>
+        <td class="left" nowrap>
+          {{ item.purchase_quantity ? item.code }}
+        </td>
+        <td class="left">
+          {{ item.name }}
+          {% if item.discount %}
+            <div class="description">{{ item.discount }}</div>
+          {% endif %}
+        </td>
+        {% if variation != 'packing-slip' %}
+          <td class="right">{{ scat.amount(item.price) }}</td>
+          <td class="right">{{ scat.amount(item.ext_price) }}</td>
+        {% endif %}
+      </tr>
+    {% endif %}
   {% endfor %}
   {% set span= txn.type == 'vendor' ? 5 : 4 %}
-  <tr class="sub">
-    <td class="right" colspan="{{ span }}">Subtotal:</td>
-    <td class="price">{{ scat.amount(txn.subtotal) }}</td>
-  </tr>
-  <tr>
-    <td class="right" colspan="{{ span }}">
-      Sales Tax {% if txn.tax_rate %}({{ txn.tax_rate }}%){% endif %}:
-    </td>
-    <td class="price">{{ scat.amount(txn.total - txn.subtotal) }}</td>
-  </tr>
-  <tr class="total">
-    <td class="right" colspan="{{ span }}">Total:</td>
-    <td class="price">{{ scat.amount(txn.total) }}</td>
-  </tr>
-  {% for p in payments %} 
+  {% if variation != 'packing-slip' %}
+    <tr class="sub">
+      <td class="right" colspan="{{ span }}">Subtotal:</td>
+      <td class="price">{{ scat.amount(txn.subtotal) }}</td>
+    </tr>
     <tr>
-      <td class="right" colspan="{{ span }}">{{ s.payment_method(p.method, p.discount) }}:</td>
-      <td class="price">{{ scat.amount(p.amount) }}</td>
+      <td class="right" colspan="{{ span }}">
+        Sales Tax {% if txn.tax_rate %}({{ txn.tax_rate }}%){% endif %}:
+      </td>
+      <td class="price">{{ scat.amount(txn.total - txn.subtotal) }}</td>
     </tr>
-  {% endfor %}
-  {% if payments %}
     <tr class="total">
-      <td class="right" colspan="{{ span }}">Total Due:</td>
-      <td class="price">{{ scat.amount(txn.total - txn.total_paid) }}</td>
+      <td class="right" colspan="{{ span }}">Total:</td>
+      <td class="price">{{ scat.amount(txn.total) }}</td>
     </tr>
+    {% for p in payments %}
+      <tr>
+        <td class="right" colspan="{{ span }}">{{ s.payment_method(p.method, p.discount) }}:</td>
+        <td class="price">{{ scat.amount(p.amount) }}</td>
+      </tr>
+    {% endfor %}
+    {% if payments %}
+      <tr class="total">
+        <td class="right" colspan="{{ span }}">Total Due:</td>
+        <td class="price">{{ scat.amount(txn.total - txn.total_paid) }}</td>
+      </tr>
+    {% endif %}
   {% endif %}
 </table>
+
 {% for note in notes %}
   {% if note.public %}
     <p>
@@ -149,11 +158,13 @@
     </p>
   {% endif %}
 {% endfor %}
+
 <div id="store_footer">
-{% if txn.type != 'vendor' %}
-Items purchased from stock may be returned in original condition and packaging
-within 30 days with receipt. No returns without original receipt.
-{% endif %}
+  {% if txn.type != 'vendor' %}
+    Items purchased from stock may be returned in original condition and
+    packaging within 30 days with receipt. All easels are subject to a 25%
+    restocking fee. No returns without original receipt.
+  {% endif %}
 </div>
 
 {% endblock %}
