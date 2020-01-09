@@ -50,7 +50,8 @@
         "aptoma/twig-markdown": "^3.0",
         "graylog2/gelf-php": "^1.6",
         "robmorgan/phinx": "^0.10.7",
-        "publitio/publitio": "dev-master"
+        "publitio/publitio": "dev-master",
+        "easypost/easypost-php": "^3.4"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"
