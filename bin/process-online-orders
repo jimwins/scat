@@ -7,6 +7,8 @@ $exit= 0;
 
 $client= new \GuzzleHttp\Client();
 
+\EasyPost\EasyPost::setApiKey(EASYPOST_KEY);
+
 $url= ORDURE . '/sale/list';
 $res= $client->request('GET', $url,
                        [
@@ -125,6 +127,37 @@ foreach ($sales as $summary) {
     }
     $note->todo= 1;
     $note->save();
+
+    /* Add shipping address */
+    if ($data->sale->shipping_address_id != 1) {
+      $easypost_address= \EasyPost\Address::create([
+        'name' => $data->shipping_address->name,
+        'company' => $data->shipping_address->company,
+        'street1' => $data->shipping_address->address1,
+        'street2' => $data->shipping_address->address2,
+        'city' => $data->shipping_address->city,
+        'state' => $data->shipping_address->state,
+        'zip' => $data->shipping_address->zip,
+        'country' => 'US',
+        'phone' => $data->shipping_address->phone,
+      ]);
+
+      $address= Model::factory('Address')->create();
+      $address->easypost_id= $easypost_address->id;
+      $address->name= $easypost_address->name;
+      $address->company= $easypost_address->company;
+      $address->street1= $easypost_address->street1;
+      $address->street2= $easypost_address->street2;
+      $address->city= $easypost_address->city;
+      $address->state= $easypost_address->state;
+      $address->zip= $easypost_address->zip;
+      $address->country= $easypost_address->country;
+      $address->phone= $easypost_address->phone;
+      $address->save();
+
+      $txn->shipping_address_id= $address->id;
+      $txn->save();
+    }
 
     $url= ORDURE . '/sale/' . $summary->uuid . '/set-status';
     $res= $client->request('POST', $url,
