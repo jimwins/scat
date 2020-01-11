@@ -29,11 +29,12 @@ function check_mac_stock($code) {
                            'query' => [
                              'site' => 'MAC',
                              'layout' => 'Responsive',
-                             'nocache' => 45583,
+                             'nocache' => 66439,
                              'content' => 'JSON',
                              'page' => 'mac_cart',
                              'action' => 'getItemInfo',
-                             'itemNumber' => $code
+                             'itemNumber' => $code,
+                             'dropship' => 'false'
                            ]
                          ]);
 
