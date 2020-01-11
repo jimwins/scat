@@ -93,7 +93,7 @@
       <tr valign="top">
         <td class="right">{{ line.ordered * (txn.type == 'customer' ? -1 : 1) }}</td>
         {% if txn.type == 'vendor' %}
-          <td class="left" nowrap>{{ item.vendor_sku }}</td>
+          <td class="left" nowrap>{{ line.vendor_sku }}</td>
         {% endif %}
         <td class="left" nowrap>
           {{ item.purchase_quantity ? item.code }}
