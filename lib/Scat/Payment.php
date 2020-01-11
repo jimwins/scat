@@ -20,4 +20,17 @@ class Payment extends \Model {
     'withdrawal' => "Withdrawal",
     'internal' => "Internal",
   );
+
+  function pretty_method() {
+    switch ($this->method) {
+    case 'credit':
+      return 'Paid by ' . $this->cc_type . ' ending in ' . $this->cc_lastfour;
+    case 'discount':
+      return sprintf("Discount (%d%%)", $this->discount);
+    case 'change':
+      return 'Change';
+    default:
+      return 'Paid by ' . $this::methods($this->method);
+    }
+  }
 }

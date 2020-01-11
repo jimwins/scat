@@ -74,31 +74,7 @@
       {% for data in txn.payments %}
         <tr>
           <th colspan="{{ span }}" class="text-right">
-            {% if data.method == 'credit' %}
-              Paid by {{ data.cc_type }}
-              ending in {{ data.cc_lastfour }}
-            {% endif %}
-            {% if data.method == 'cash' %}
-              Paid by Cash
-            {% endif %}
-            {% if data.method == 'paypal' %}
-              Paid by PayPal
-            {% endif %}
-            {% if data.method == 'amazon' %}
-              Paid with Amazon Pay
-            {% endif %}
-            {% if data.method == 'eventbrite' %}
-              Paid with Eventbrite
-            {% endif %}
-            {% if data.method == 'gift' %}
-              Paid with Gift Card 
-            {% endif %}
-            {% if data.method == 'other' %}
-              Paid
-            {% endif %}
-            {% if data.method == 'change' %}
-              Change
-            {% endif %}
+            {{ data.pretty_method }}
             ({{ data.processed }}):
           </th>
           <td class="text-right">{{ scat.amount(data.amount) }}</td>

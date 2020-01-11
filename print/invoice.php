@@ -7,17 +7,17 @@ if (!$id) die("No transaction specified.");
 
 date_default_timezone_set('America/Los_Angeles');
 
-$txn= txn_load_full($db, $id);
-$txn['variation']= $_REQUEST['variation'];
+$txn= \Model::factory('Txn')->find_one($id);
+$variation= $_REQUEST['variation'];
 
-$fn= (($txn['txn']['type'] == 'vendor') ? 'PO' : 'I') .
-     $txn['txn']['formatted_number'];
+$fn= (($txn->type == 'vendor') ? 'PO' : 'I') .
+     $txn->formatted_number;
 
 $loader= new \Twig\Loader\FilesystemLoader('../ui/');
 $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
 
 $template= $twig->load('print/invoice.html');
-$html= $template->render($txn);
+$html= $template->render([ 'txn' => $txn, 'variation' => $variation ]);
 
 if (defined('PRINT_DIRECT')) {
   define('_MPDF_TTFONTDATAPATH', '/tmp/ttfontdata');

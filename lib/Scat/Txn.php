@@ -38,6 +38,10 @@ class Txn extends \Model implements \JsonSerializable {
     return $this->has_many('TxnLine', 'txn')->find_many();
   }
 
+  public function notes() {
+    return $this->has_many('Note', 'attach_id')->find_many();
+  }
+
   public function payments() {
     return $this->has_many('Payment', 'txn')->find_many();
   }
@@ -48,6 +52,10 @@ class Txn extends \Model implements \JsonSerializable {
 
   public function owner() {
     return $this->belongs_to('Person', 'person')->find_one();
+  }
+
+  public function shipping_address() {
+    return $this->belongs_to('Address', 'shipping_address_id')->find_one();
   }
 
   function clearItems() {

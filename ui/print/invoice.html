@@ -1,30 +1,6 @@
 {% extends 'layout/print.html' %}
 {% import 'macros.twig' as scat %}
 {% import _self as s %}
-{% macro payment_method(name, amount) %}
-{%- set methods= {
-    'cash' : 'Cash',
-    'change' : 'Change',
-    'credit' : 'Credit Card',
-    'square' : 'Square',
-    'stripe' : 'Stripe',
-    'dwolla' : 'Dwolla',
-    'amazon' : 'Amazon',
-    'eventbrite' : 'Eventbrite',
-    'dwolla' : 'Dwolla',
-    'paypal' : 'PayPal',
-    'gift' : 'Gift Card',
-    'check' : 'Check',
-    'discount' : 'Discount',
-    'bad' : 'Bad Debt'
-  } -%}
-
-  {%- if name == 'discount' -%}
-    Discount ({{ amount }}%) 
-  {%- else -%}
-    {{- methods[name] -}}
-  {%- endif -%}
-{% endmacro %}
 
 {% block title %}
   {{ txn.type == 'vendor' ? 'PO' : 'Invoice' }}
@@ -57,14 +33,29 @@
     http://RawMaterialsLA.com/
   </div>
   <div id="client_info">
-  {% if person and person.id %}
+  {% if txn.person_id %}
+    {% set person= txn.owner %}
     <small>To:</small><br>
-    <b>
-      {{ person.company }}
-      {% if person.company and person.name %}<br>{% endif %}
-      {{ person.name }}
-    </b><br>
-    {{ person.address | nl2br }}<br>
+    {% if txn.shipping_address_id %}
+      {% set addr= txn.shipping_address %}
+      <b>
+        {{ addr.company }}
+        {% if addr.company and addr.name %}<br>{% endif %}
+        {{ addr.name }}<br>
+      </b>
+      {{ addr.street1 }}<br>
+      {% if addr.street2 %} {{ addr.street2 }}<br>{% endif %}
+      {{ addr.city }}, {{ addr.state }}
+      {{ addr.zip }}<br>
+      {% if addr.phone %} {{ addr.phone }}<br>{% endif %}
+    {% else %}
+      <b>
+        {{ person.company }}
+        {% if person.company and person.name %}<br>{% endif %}
+        {{ person.name }}
+      </b><br>
+      {{ person.address | nl2br }}<br>
+    {% endif %}
     {% if person.phone %}
       {{ person.phone }}<br>
     {% endif %}
@@ -72,7 +63,7 @@
       {{ person.email }}<br>
     {% endif %}
   {% endif %}
-  {% for note in notes %}
+  {% for note in txn.notes %}
     {% if note.content starts with 'PO ' %}
       {{ note.content }}
     {% endif %}
@@ -96,10 +87,11 @@
     </tr>
   </thead>
   <tbody>
-  {% for item in items %}
+  {% for line in txn.items %}
+    {% set item= line.item() %}
     {% if variation != 'packing-slip' or not (item.code starts with 'ZZ-SHIP') %}
       <tr valign="top">
-        <td class="right">{{ item.quantity }}</td>
+        <td class="right">{{ line.ordered * (txn.type == 'customer' ? -1 : 1) }}</td>
         {% if txn.type == 'vendor' %}
           <td class="left" nowrap>{{ item.vendor_sku }}</td>
         {% endif %}
@@ -107,14 +99,14 @@
           {{ item.purchase_quantity ? item.code }}
         </td>
         <td class="left">
-          {{ item.name }}
-          {% if item.discount %}
-            <div class="description">{{ item.discount }}</div>
+          {{ line.name }}
+          {% if variation != 'packing-slip' and line.discount %}
+            <br><small>{{ line.pricing_detail }}</small>
           {% endif %}
         </td>
         {% if variation != 'packing-slip' %}
-          <td class="right">{{ scat.amount(item.price) }}</td>
-          <td class="right">{{ scat.amount(item.ext_price) }}</td>
+          <td class="right">{{ scat.amount(line.sale_price) }}</td>
+          <td class="right">{{ scat.amount(line.sale_price * line.ordered * (txn.type == 'customer' ? -1 : 1)) }}</td>
         {% endif %}
       </tr>
     {% endif %}
@@ -135,13 +127,15 @@
       <td class="right" colspan="{{ span }}">Total:</td>
       <td class="price">{{ scat.amount(txn.total) }}</td>
     </tr>
-    {% for p in payments %}
+    {% for p in txn.payments %}
       <tr>
-        <td class="right" colspan="{{ span }}">{{ s.payment_method(p.method, p.discount) }}:</td>
+        <td class="right" colspan="{{ span }}">
+          {{ p.pretty_method }} ({{ p.processed}}):
+        </td>
         <td class="price">{{ scat.amount(p.amount) }}</td>
       </tr>
     {% endfor %}
-    {% if payments %}
+    {% if txn.payments %}
       <tr class="total">
         <td class="right" colspan="{{ span }}">Total Due:</td>
         <td class="price">{{ scat.amount(txn.total - txn.total_paid) }}</td>
@@ -150,11 +144,11 @@
   {% endif %}
 </table>
 
-{% for note in notes %}
+{% for note in txn.notes %}
   {% if note.public %}
     <p>
       {{ note.content }}
-      <small>({{ note.entered }})</small>
+      <small>({{ note.added }})</small>
     </p>
   {% endif %}
 {% endfor %}
