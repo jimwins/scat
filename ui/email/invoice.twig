@@ -92,7 +92,25 @@
       {% for data in payments %}
         <tr>
           <th colspan="5" class="text-right">
-            {% data.pretty_method %}
+            {% if data.method == 'credit' %}
+              Paid by {{ data.data.cc_brand }}
+              ending in {{ data.data.cc_last4 }}
+            {% endif %}
+            {% if data.method == 'paypal' %}
+              Paid by PayPal
+            {% endif %}
+            {% if data.method == 'amazon' %}
+              Paid with Amazon Pay
+            {% endif %}
+            {% if data.method == 'eventbrite' %}
+              Paid with Eventbrite
+            {% endif %}
+            {% if data.method == 'gift' %}
+              Paid with Gift Card
+            {% endif %}
+            {% if data.method == 'other' %}
+              Paid
+            {% endif %}
             ({{ data.processed }}):
           </th>
           <td colspan="5" class="text-right">{{ scat.amount(data.amount) }}</td>
