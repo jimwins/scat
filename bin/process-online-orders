@@ -137,7 +137,7 @@ foreach ($sales as $summary) {
         'street2' => $data->shipping_address->address2,
         'city' => $data->shipping_address->city,
         'state' => $data->shipping_address->state,
-        'zip' => $data->shipping_address->zip,
+        'zip' => $data->shipping_address->zip5,
         'country' => 'US',
         'phone' => $data->shipping_address->phone,
       ]);
