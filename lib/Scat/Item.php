@@ -95,6 +95,7 @@ class Item extends \Model implements \JsonSerializable {
       case 'length':
       case 'width':
       case 'height':
+      case 'weight':
         $this->$name= $value;
         break;
       case 'discount':
