@@ -103,6 +103,9 @@ class Item extends \Model implements \JsonSerializable {
       case 'stock':
         $this->setStock($value);
         break;
+      case 'dimensions':
+        $this->setDimensions($value);
+        break;
       default:
         throw \Exception("No way to set '$name' on an item.");
     }
@@ -173,6 +176,13 @@ class Item extends \Model implements \JsonSerializable {
       }
       $txn_line->save();
     }
+  }
+
+  public function setDimensions($dimensions) {
+    list($l, $w, $h)= preg_split('/\s*x\s*/', $dimensions);
+    $this->length= $l;
+    $this->width= $w;
+    $this->height= $h;
   }
 
   public function jsonSerialize() {
