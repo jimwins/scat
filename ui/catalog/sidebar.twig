@@ -85,10 +85,12 @@
       scat.dialog(ev.target, '/catalog/product-form',
                   { department_id: department })
     })
+{# not yet
     nav.querySelector('.add-item').addEventListener('click', (ev) => {
       ev.preventDefault()
       ev.stopPropagation()
       scat.dialog(ev.target, '/catalog/item-form')
     })
+#}
   </script>
 </nav>
