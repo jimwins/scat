@@ -25,7 +25,7 @@
   <nav aria-label="Controls for Item List">
     <ul class="pager">
       <li class="previous {{ not page ? 'disabled' }}">
-        <a href="?page={{ page - 1 }}">
+        <a href="?page={{ page - 1 }}&amp;q={{ q }}">
           <span aria-hidden="true">&larr;</span> Previous
         </a>
       </li>
@@ -35,7 +35,7 @@
        of {{ items[0].total }}
       </li>
       <li class="next">
-        <a href="?page={{ page + 1 }}">
+        <a href="?page={{ page + 1 }}&amp;q={{ q }}">
           Next <span aria-hidden="true">&rarr;</span>
         </a>
       </li>
