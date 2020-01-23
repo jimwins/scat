@@ -30,7 +30,7 @@ class Payment extends \Model {
     case 'change':
       return 'Change';
     default:
-      return 'Paid by ' . $this::methods($this->method);
+      return 'Paid by ' . self::$methods[$this->method];
     }
   }
 }
