@@ -33,7 +33,6 @@ if ($_GET['code']) {
   \Scat\Config::setValue('qb.realmId', $_GET['realmId']);
 
   echo '<p>Obtained and saved token.</p>';
-  exit;
 } else {
 
   $accessToken= \Scat\Config::getValue('qb.accessToken');
