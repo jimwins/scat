@@ -115,7 +115,8 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
   // Masterpiece
   $sep= preg_match("/\t/", $line) ? "\t" : ",";
 
-#,SN,PK Sort,SKU Sort,,SKU,Golden Ratio,Size,Item Description,,,,,,,,,2016 Retail,Under $500 Net Order,Net $500 Order,Units Per Pkg,Pkgs Per Box,Weight,UPC,Freight Status,DIM. Weight,Est. Freight EACH,Est. Freight CASE
+#,SN,PK Sort,SKU Sort,,SKU,Golden Ratio,Size,Item Description,,,,,,,,,2020 Retail,Under $500 Net Order,Net $500 Order,Units Per Pkg,Pkgs Per Box,Weight,UPC,Freight Status,DIM. Weight,Est. Freight EACH,Est. Freight CASE,Item length,Item Width,Item Height,Carton Length,Carton Width,Carton Height,HTS,Origin,
+
   $q= "LOAD DATA LOCAL INFILE '$fn'
             INTO TABLE vendor_upload
           FIELDS TERMINATED BY '$sep'
@@ -127,7 +128,9 @@ if (preg_match('/MACITEM.*\.zip$/i', $_FILES['src']['name'])) {
            @retail_price, @net_price, @promo_price,
            @units, purchase_quantity,
            weight, barcode, @freight, @dim_weight,
-           @est_freight, @est_freight_case)
+           @est_freight, @est_freight_case,
+           length, width, height,
+           @carton_length, @carton_width, @carton_height, @hts, @origin)
         SET code = CONCAT('MA', vendor_sku),
             retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
             net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
