@@ -36,8 +36,7 @@
         "flesler/jquery.scrollto": "^2.1",
         "select2/select2": "^4.0",
         "michelf/php-markdown": "^1.8",
-        "mpdf/mpdf": "^7.1",
-        "setasign/fpdf": "^1.8",
+        "mpdf/mpdf": "^8.0",
         "oe/lukas": "dev-master",
         "smalot/cups-ipp": "dev-dev-local",
         "monolog/monolog": "^1.24",
@@ -52,7 +51,8 @@
         "robmorgan/phinx": "^0.10.7",
         "publitio/publitio": "dev-master",
         "easypost/easypost-php": "^3.4",
-        "quickbooks/v3-php-sdk": "^5.3"
+        "quickbooks/v3-php-sdk": "^5.3",
+        "setasign/fpdf": "^1.8"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"
