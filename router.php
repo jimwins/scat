@@ -96,6 +96,9 @@ $container['report']= function($c) {
 $container['phone']= function($c) {
   return new \Scat\PhoneService($c['settings']['phone']);
 };
+$container['push']= function($c) {
+  return new \Scat\PushService($c['settings']['push']);
+};
 $container['txn']= function($c) {
   return new \Scat\TxnService();
 };
@@ -944,6 +947,56 @@ $app->group('/till', function (Slim\App $app) {
               return $res->withRedirect("/till.php");
             });
 });
+
+/* Safari notifications */
+$app->get('/push',
+            function (Request $req, Response $res, array $args) {
+              return $this->view->render($res, "page/push.html");
+            });
+
+$app->post('/push/v2/pushPackages/{id}',
+           function (Request $req, Response $res, array $args) {
+             $zip= $this->push->getPushPackage();
+             return $res->withHeader("Content-type", "application/zip")
+                         ->withBody($zip);
+           });
+
+$app->post('/push/v1/devices/{token}/registrations/{id}',
+           function (Request $req, Response $res, array $args) {
+             error_log("PUSH: Registered device: '{$args['token']}'");
+             $device= \Scat\Device::register($args['token']);
+             return $res;
+           });
+$app->delete('/push/v1/devices/{token}/registrations/{id}',
+           function (Request $req, Response $res, array $args) {
+             error_log("PUSH: Forget device: '{$args['token']}'");
+             $device= \Scat\Device::forget($args['token']);
+             return $res;
+           });
+
+$app->post('/push/v1/log',
+           function (Request $req, Response $res, array $args) {
+             $data= $req->getParsedBody($req);
+             error_log("PUSH: " . json_encode($data));
+             return $res;
+           });
+
+$app->post('/~push-notification',
+           function (Request $req, Response $res, array $args) {
+              $devices= \Model::factory('Device')->find_many();
+
+              foreach ($devices as $device) {
+                $this->push->sendNotification(
+                  $device->token,
+                  $req->getParam('title'),
+                  $req->getParam('body'),
+                  $req->getParam('action'),
+                  'clicked' /* Not sure what to do about arguments yet. */
+                );
+              }
+
+              return $res->withRedirect("/push");
+           });
 
 /* SMS TODO just testing right now */
 $app->get('/sms',

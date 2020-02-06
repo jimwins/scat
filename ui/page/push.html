@@ -1,0 +1,69 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Push Notifications
+{% endblock %}
+
+{% block content %}
+  <button class="btn btn-primary" id="register">Register</button>
+  <script>
+  var p= document.getElementById("register");
+  p.onclick= function() {
+    // Ensure that the user can receive Safari Push Notifications.
+    if ('safari' in window && 'pushNotification' in window.safari) {
+      var permissionData= window.safari.pushNotification.permission('web.us.rawm.scat');
+      checkRemotePermission(permissionData);
+    }
+  };
+
+  var checkRemotePermission= function (permissionData) {
+    if (permissionData.permission === 'default') {
+      // This is a new web service URL and its validity is unknown.
+      window.safari.pushNotification.requestPermission(
+        'https://scat.muck.rawm.us/push', // The web service URL.
+        'web.us.rawm.scat',     // The Website Push ID.
+        {}, // Data to help you identify the user.
+        checkRemotePermission         // The callback function.
+      );
+    }
+    else if (permissionData.permission === 'denied') {
+      // The user said no.
+      alert("Denied.");
+    }
+    else if (permissionData.permission === 'granted') {
+      // The web service URL is a valid push provider, and the user said yes.
+      // permissionData.deviceToken is now available to use.
+      alert("Granted. Token = " + permissionData.deviceToken);
+    }
+  }
+  </script>
+
+  <form method="POST" action="/~push-notification">
+    <div class="form-group">
+      <label>
+        Title
+        <input type="text" class="form-control"
+               name="title" value="{{ title }}"
+               placeholder="Title">
+      </label>
+    </div>
+    <div class="form-group">
+      <label>
+        Body
+        <input type="text" class="form-control"
+               name="body" value="{{ body }}"u
+               placeholder="This is the message.">
+      </label>
+    </div>
+    <div class="form-group">
+      <label>
+        Action
+        <input type="text" class="form-control"
+               name="action" value="{{ action }}"
+               placeholder="Action">
+      </label>
+    </div>
+    <input type="submit" class="btn btn-primary" value="Send">
+  </form>
+{% endblock %}
