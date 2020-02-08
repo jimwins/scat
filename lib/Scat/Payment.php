@@ -33,4 +33,8 @@ class Payment extends \Model {
       return 'Paid by ' . self::$methods[$this->method];
     }
   }
+
+  public function txn() {
+    return $this->belongs_to('Txn', 'txn')->find_one();
+  }
 }

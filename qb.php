@@ -12,25 +12,25 @@ $config= [
 
 head("QuickBooks Connection");
 
-if ($_GET['disconnect']) {
+if ($_REQUEST['disconnect']) {
   \Scat\Config::forgetValue('qb.accessToken');
   \Scat\Config::forgetValue('qb.refreshToken');
   \Scat\Config::forgetValue('qb.realmId');
 }
 
 // Logging in
-if ($_GET['code']) {
+if ($_REQUEST['code']) {
   $qb= \QuickBooksOnline\API\DataService\DataService::Configure($config);
   $helper= $qb->getOAuth2LoginHelper();
 
   $token= $helper->exchangeAuthorizationCodeForToken(
-    $_GET['code'], $_GET['realmId']
+    $_REQUEST['code'], $_REQUEST['realmId']
   );
   $qb->updateOAuth2Token($token);
 
   \Scat\Config::setValue('qb.accessToken', $token->getAccessToken());
   \Scat\Config::setValue('qb.refreshToken', $token->getRefreshToken());
-  \Scat\Config::setValue('qb.realmId', $_GET['realmId']);
+  \Scat\Config::setValue('qb.realmId', $_REQUEST['realmId']);
 
   echo '<p>Obtained and saved token.</p>';
 } else {
@@ -75,48 +75,63 @@ if (!$token) {
 $info= $qb->getCompanyInfo();
 ?>
 <h1 class="page-title"><?=$info->CompanyName?></h1>
-<a href="qb.php?lookup=1" class="btn btn-default">
-  Look up Accounts
-</a>
-<a href="qb.php?payments=1" class="btn btn-default">
-  Load Payments
-</a>
-<a href="qb.php?sales=1" class="btn btn-default">
-  Load Sales
-</a>
+<div class="row">
+  <div class="col-sm-4">
+    <a href="qb.php?lookup=1" class="btn btn-default">
+      Look up Accounts
+    </a>
+  </div>
+  <div class="col-sm-4">
+    <form method="POST" action="qb.php">
+      <input type="hidden" name="payments" value="1">
+      <input type="date" class="form-control" name="date" value="2020-01-03">
+      <button type="submit" class="btn btn-default">
+        Load Payments
+      </button>
+    </form>
+  </div>
+  <div class="col-sm-4">
+    <form method="POST" action="qb.php">
+      <input type="hidden" name="sales" value="1">
+      <input type="date" class="form-control" name="date" value="2020-01-03">
+      <button type="submit" class="btn btn-default">
+        Load Sales
+      </button>
+    </form>
+  </div>
 <br>
 <?
-if ($_GET['lookup']) {
-echo '<pre>';
-  $i = 1;
-while (1) {
-    $allAccounts = $qb->FindAll('Account', $i, 500);
-    $error = $qb->getLastError();
-    if ($error) {
-        echo "The Status code is: " . $error->getHttpStatusCode() . "\n";
-        echo "The Helper message is: " . $error->getOAuthHelperError() . "\n";
-        echo "The Response message is: " . $error->getResponseBody() . "\n";
-        goto end;
-    }
+if ($_REQUEST['lookup']) {
+  echo '<pre>';
+  $i= 1;
+  while (1) {
+      $allAccounts= $qb->FindAll('Account', $i, 500);
+      $error= $qb->getLastError();
+      if ($error) {
+          echo "The Status code is: " . $error->getHttpStatusCode() . "\n";
+          echo "The Helper message is: " . $error->getOAuthHelperError() . "\n";
+          echo "The Response message is: " . $error->getResponseBody() . "\n";
+          goto end;
+      }
 
-    if (!$allAccounts || (0==count($allAccounts))) {
-        break;
-    }
+      if (!$allAccounts || (0==count($allAccounts))) {
+          break;
+      }
 
-    foreach ($allAccounts as $oneAccount) {
-        echo "Account[".($i++)."]: {$oneAccount->Name}\n";
-        echo "\t * Id: [{$oneAccount->Id}]\n";
-        echo "\t * AccountType: [{$oneAccount->AccountType}]\n";
-        echo "\t * AccountSubType: [{$oneAccount->AccountSubType}]\n";
-        echo "\t * Active: [{$oneAccount->Active}]\n";
-        echo "\n";
-    }
+      foreach ($allAccounts as $oneAccount) {
+          echo "Account[".($i++)."]: {$oneAccount->Name}\n";
+          echo "\t * Id: [{$oneAccount->Id}]\n";
+          echo "\t * AccountType: [{$oneAccount->AccountType}]\n";
+          echo "\t * AccountSubType: [{$oneAccount->AccountSubType}]\n";
+          echo "\t * Active: [{$oneAccount->Active}]\n";
+          echo "\n";
+      }
+  }
+
+  echo '</pre>';
 }
 
-echo '</pre>';
-}
-
-if ($_GET['payments']) {
+if ($_REQUEST['payments']) {
   $accts= [
     'drawer' => [
       'cash' =>       ['Cash Drawer', 'Cash Over/Short'],
@@ -140,53 +155,51 @@ if ($_GET['payments']) {
     ]
   ];
 
-  $date= '2020-01-02'; // sample date
-  $q= "SELECT payment.id, method,
-              DATE_FORMAT(processed, '%Y-%m-%d') processed,
-              amount, txn, txn.type,
-              CONCAT(YEAR(filled), '-', number) num
-         FROM payment
-         JOIN txn ON payment.txn = txn.id
-        WHERE processed BETWEEN '$date' AND '$date' + INTERVAL 1 DAY
-        ORDER BY 1";
+  $date= (new DateTime($_REQUEST['date']))->format('Y-m-d');
 
-  $r= $db->query($q)
-    or die_query($db, $q);
+  echo "<h2>Loading payments for '$date'</h2>";
 
-  while ($pay= $r->fetch_assoc()) {
-    if ($pay['amount'] == 0)
-      continue;
+  $payments= \Model::factory('Payment')
+              ->where_raw("processed BETWEEN ? and ? + INTERVAL 1 DAY",
+                          [ $date, $date ])
+              ->where_not_equal('amount', '0.00')
+              ->where_equal('qb_je_id', '')
+              ->find_many();
 
-    list($debit, $credit)= $accts[$pay['type']][$pay['method']];
+  foreach($payments as $pay) {
+    $txn= $pay->txn();
+    $method= $pay->method;
+
+    list($debit, $credit)= $accts[$txn->type][$method];
 
     if (!$debit) {
-      die("ERROR: Don't know how to handle $pay[method] for $pay[type] payment");
+      die("ERROR: Can't handle '$method' for '{$txn->type}' payment");
     }
 
-    switch ($pay['type']) {
+    switch ($txn->type) {
     case 'drawer':
-      $memo= "Till Count $pay[num]";
+      $memo= "Till Count " . $txn->formatted_number();
       break;
 
     case 'customer':
-      $memo= "Payment for invoice $pay[num]";
+      $memo= "Payment for invoice " . $txn->formatted_number();
       break;
 
     default:
-      die("ERROR: Don't know how to handle $pay[type] payment");
+      die("ERROR: Don't know how to handle '{$txn->type}' payment");
     }
 
     // create blank entry
     $data= [
-      "DocNumber" => 'P' . $pay['id'],
-      "TxnDate" => $pay['processed'],
+      "DocNumber" => 'P' . $pay->id,
+      "TxnDate" => (new \DateTime($pay->processed))->format('Y-m-d'),
       'Line' => [
         [
           "Description" => $memo,
-          "Amount" => $pay['amount'] < 0 ? substr($pay['amount'], 1) : $pay['amount'],
+          "Amount" => $pay->amount < 0 ? substr($pay->amount, 1) : $pay->amount,
           "DetailType" => "JournalEntryLineDetail",
           "JournalEntryLineDetail" => [
-            "PostingType" => $pay['amount'] < 0 ? "Credit" : "Debit",
+            "PostingType" => $pay->amount < 0 ? "Credit" : "Debit",
             "AccountRef" => getAccountByName($qb, $debit),
             "Entity" => [
               "EntityRef" => getCustomerByName($qb, "Retail Customer"),
@@ -196,10 +209,10 @@ if ($_GET['payments']) {
         ],
         [
           "Description" => $memo,
-          "Amount" => $pay['amount'] < 0 ? substr($pay['amount'], 1) : $pay['amount'],
+          "Amount" => $pay->amount < 0 ? substr($pay->amount, 1) : $pay->amount,
           "DetailType" => "JournalEntryLineDetail",
           "JournalEntryLineDetail" => [
-            "PostingType" => $pay['amount'] < 0 ? "Debit" : "Credit",
+            "PostingType" => $pay->amount < 0 ? "Debit" : "Credit",
             "AccountRef" => getAccountByName($qb, $credit),
             "Entity" => [
               "EntityRef" => getCustomerByName($qb, "Retail Customer"),
@@ -221,11 +234,13 @@ if ($_GET['payments']) {
     }
     else {
       echo "Created Id={$res->Id}";
+      $pay->qb_je_id= $res->Id;
+      $pay->save();
     }
   }
 }
 
-if ($_GET['sales']) {
+if ($_REQUEST['sales']) {
   $accts= [
     'drawer' => [
       'cash' =>       ['Cash Drawer', 'Cash Over/Short'],
@@ -249,7 +264,8 @@ if ($_GET['sales']) {
     ]
   ];
 
-  $range= "'2020-01-02' AND '2020-01-02' + INTERVAL 1 DAY";
+  $date= $_REQUEST['date'];
+  $range= "'$date' AND '$date' + INTERVAL 1 DAY";
   $q= "SELECT id, type, created,
               DATE_FORMAT(IF(type = 'customer', paid, created), '%Y-%m-%d') date,
               CONCAT(YEAR(IF(type = 'customer', paid, created)), '-', number) num,
