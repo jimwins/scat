@@ -77,6 +77,9 @@ $info= $qb->getCompanyInfo();
 <h1 class="page-title"><?=$info->CompanyName?></h1>
 <div class="row">
   <div class="col-sm-4">
+    <a href="qb.php?verify=1" class="btn btn-default">
+      Verify Accounts
+    </a>
     <a href="qb.php?lookup=1" class="btn btn-default">
       Look up Accounts
     </a>
@@ -84,7 +87,7 @@ $info= $qb->getCompanyInfo();
   <div class="col-sm-4">
     <form method="POST" action="qb.php">
       <input type="hidden" name="payments" value="1">
-      <input type="date" class="form-control" name="date" value="2020-01-03">
+      <input type="date" class="form-control" name="date" value="2020-01-02">
       <button type="submit" class="btn btn-default">
         Load Payments
       </button>
@@ -93,7 +96,7 @@ $info= $qb->getCompanyInfo();
   <div class="col-sm-4">
     <form method="POST" action="qb.php">
       <input type="hidden" name="sales" value="1">
-      <input type="date" class="form-control" name="date" value="2020-01-03">
+      <input type="date" class="form-control" name="date" value="2020-01-02">
       <button type="submit" class="btn btn-default">
         Load Sales
       </button>
@@ -101,6 +104,32 @@ $info= $qb->getCompanyInfo();
   </div>
 <br>
 <?
+$qb_accounts= [
+  [ 'Cash Over/Short', 'Other Expense', 'OtherMiscellaneousExpense' ],
+  [ 'Undeposited Funds', 'Other Current Asset', 'UndepositedFunds' ],
+  [ 'Accounts Receivable', 'Accounts Receivable', 'AccountsReceivable' ],
+  [ 'Cash Drawer', 'Other Current Asset', 'OtherCurrentAssets' ],
+  [ 'CardConnect Clearing Account', 'Other Current Asset', 'OtherCurrentAssets' ],
+  [ 'Square Clearing Account', 'Other Current Asset', 'OtherCurrentAssets' ],
+  [ 'Stripe Clearing Account', 'Other Current Asset', 'OtherCurrentAssets' ],
+  [ 'Amazon Clearing Account', 'Other Current Asset', 'OtherCurrentAssets' ],
+  [ 'EventBrite Clearing Account', 'Other Current Asset', 'OtherCurrentAssets' ],
+  [ 'Unclaimed Gift Certificates', 'Other Current Liability', 'OtherCurrentLiabilities' ],
+  [ 'Undeposited Funds', 'Other Current Asset', 'UndepositedFunds' ],
+  [ 'PayPal', 'Bank', 'Checking' ],
+  [ 'Discounts Given', 'Income', 'DiscountsRefundsGiven' ],
+  [ 'Shrinkage', 'Expense', 'SuppliesMaterials' ],
+  [ 'Donation', 'Expense', 'CharitableContributions' ],
+  [ 'Store Supplies', 'Expense', 'SuppliesMaterials' ],
+  [ 'Art Supplies', 'Other Current Asset', 'Inventory' ],
+  [ 'Sales Tax Payable', 'Other Current Liability', 'SalesTaxPayable' ],
+  [ 'Sales of Art Supplies', 'Income', 'SalesOfProductIncome' ],
+  [ 'Sales of Art', 'Income', 'SalesOfProductIncome' ],
+  [ 'Class Fees', 'Income', 'ServiceFeeIncome' ],
+  [ 'Delivery/Shipping & Handling', 'Income', 'ServiceFeeIncome' ],
+  [ 'Cost of Goods Sold', 'Cost of Goods Sold', 'SuppliesMaterialsCogs' ],
+];
+
 if ($_REQUEST['lookup']) {
   echo '<pre>';
   $i= 1;
@@ -129,6 +158,38 @@ if ($_REQUEST['lookup']) {
   }
 
   echo '</pre>';
+}
+
+if ($_REQUEST['verify']) {
+  foreach ($qb_accounts as $i => $account) {
+    try {
+      getAccountByName($qb, $account[0]);
+    } catch (\Exception $e) {
+      echo '<a href="qb.php?createAccount=',  $i, '">',
+           'Create "', ashtml($account[0]), '"',
+           '</a><br>';
+    }
+  }
+}
+
+if (array_key_exists('createAccount', $_REQUEST)) {
+  $num= $_REQUEST['createAccount'];
+  $obj= \QuickBooksOnline\API\Facades\Account::create([
+    'Name' => $qb_accounts[$num][0],
+    'AccountType' => $qb_accounts[$num][1],
+    'AccountSubType' => $qb_accounts[$num][2]
+  ]);
+
+  $res= $qb->Add($obj);
+  $error= $qb->getLastError();
+  if ($error) {
+    echo "The Status code is: " . $error->getHttpStatusCode() . "\n";
+    echo "The Helper message is: " . $error->getOAuthHelperError() . "\n";
+    echo "The Response message is: " . $error->getResponseBody() . "\n";
+  }
+  else {
+    echo "Created Id={$res->Id}<br>";
+  }
 }
 
 if ($_REQUEST['payments']) {
@@ -241,189 +302,108 @@ if ($_REQUEST['payments']) {
 }
 
 if ($_REQUEST['sales']) {
-  $accts= [
-    'drawer' => [
-      'cash' =>       ['Cash Drawer', 'Cash Over/Short'],
-      'withdrawal' => ['Cash Drawer', 'Undeposited Funds'],
-    ],
-    'customer' => [
-      'cash' =>       ['Cash Drawer', 'Accounts Receivable'],
-      'change' =>     ['Cash Drawer', 'Accounts Receivable'],
-      'credit' =>     ['CardConnect Clearing Account', 'Accounts Receivable'],
-      'square' =>     ['Square Clearing Account', 'Accounts Receivable'],
-      'stripe' =>     ['Stripe Clearing Account', 'Accounts Receivable'],
-      'amazon' =>     ['Amazon Clearing Account', 'Accounts Receivable'],
-      'eventbrite' => ['EventBrite Clearing Account', 'Accounts Receivable'],
-      'gift' =>       ['Unclaimed Gift Certificates', 'Accounts Receivable'],
-      'check' =>      ['Undeposited Funds', 'Accounts Receivable'],
-      'paypal'=>      ['PayPal', 'Accounts Receivable'],
-      'discount'=>    ['Discounts Given', 'Accounts Receivable'],
-      'bad'=>         ['Shrinkage', 'Accounts Receivable'],
-      'donation'=>    ['Donation', 'Accounts Receivable'],
-      'internal'=>    ['Store Supplies', 'Accounts Receivable'],
-    ]
+  $account= [
+    // assets
+    'receivable' => 'Accounts Receivable',
+    'inventory'  => 'Art Supplies',
+    // liabilities
+    'gift'       => 'Unclaimed Gift Certificates',
+    'salestax'   => 'Sales Tax Payable',
+    // sales
+    'art'        => 'Sales of Art',
+    'supplies'   => 'Sales of Art Supplies',
+    'class'      => 'Class Fees',
+    'freight'    => 'Delivery/Shipping & Handling',
+    // cost of sales
+    'costofgoods'=> 'Cost of Goods Sold',
+    'loyalty'    => 'Discounts Given',
+    // shrink
+    'shrink'     => 'Shrinkage',
   ];
 
-  $date= $_REQUEST['date'];
-  $range= "'$date' AND '$date' + INTERVAL 1 DAY";
-  $q= "SELECT id, type, created,
-              DATE_FORMAT(IF(type = 'customer', paid, created), '%Y-%m-%d') date,
-              CONCAT(YEAR(IF(type = 'customer', paid, created)), '-', number) num,
-              taxed, untaxed,
-              CAST(tax_rate AS DECIMAL(9,2)) tax_rate,
-              taxed + untaxed subtotal,
-              IF(uuid, tax,
-                 CAST(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)
-                      AS DECIMAL(9,2))) tax,
-              IF(uuid, untaxed + taxed + tax,
-                 CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
-                      AS DECIMAL(9,2))) total
-        FROM (SELECT
-              txn.id, txn.uuid, txn.type, txn.number,
-              txn.created, txn.filled, txn.paid,
-              SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS ordered,
-              SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS allocated,
-              CAST(ROUND_TO_EVEN(
-                SUM(IF(txn_line.taxfree, 1, 0) *
-                  IF(type = 'customer', -1, 1) * allocated *
-                  sale_price(retail_price, discount_type, discount)),
-                2) AS DECIMAL(9,2))
-              untaxed,
-              CAST(ROUND_TO_EVEN(
-                SUM(IF(txn_line.taxfree, 0, 1) *
-                  IF(type = 'customer', -1, 1) * allocated *
-                  sale_price(retail_price, discount_type, discount)),
-                2) AS DECIMAL(9,2))
-              taxed,
-              tax_rate,
-              SUM(tax) AS tax
-         FROM txn
-         LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-        WHERE (type = 'correction' AND created BETWEEN $range)
-           OR (type = 'customer'   AND paid    BETWEEN $range)
-        GROUP BY txn.id
-        ORDER BY id) t";
+  $date= (new DateTime($_REQUEST['date']))->format('Y-m-d');
 
-  $r= $db->query($q)
-    or die_query($db, $q);
+  $txns= \Model::factory('Txn')
+          ->where_raw("qb_je_id = '' AND
+                       ((type = 'correction' AND
+                         created BETWEEN ? AND ? + INTERVAL 1 DAY) OR
+                        (type = 'customer' AND
+                         paid BETWEEN ? AND ? + INTERVAL 1 DAY))",
+                        [ $date, $date, $date, $date ])
+          ->find_many();
 
-  $account= array(
-                  // assets
-                  'receivable' => 'Accounts Receivable',
-                  'inventory'  => 'Art Supplies',
-                  // liabilities
-                  'gift'       => 'Unclaimed Gift Certificates',
-                  'salestax'   => 'Sales Tax Payable',
-                  // sales
-                  'art'        => 'Art Supplies',
-                  'supplies'   => 'Art Supplies',
-                  'class'      => 'Class Fees',
-                  'freight'    => 'Delivery/Shipping & Handling',
-                  // cost of sales
-                  'costofgoods'=> 'Cost of Goods Sold',
-                  'loyalty'    => 'Discounts Given',
-                  // shrink
-                  'shrink'     => 'Shrinkage',
-                 );
-
-  while ($sale= $r->fetch_assoc()) {
-
-    switch ($sale['type']) {
+  foreach ($txns as $txn) {
+    switch ($txn->type) {
     case 'correction':
-      if ($sale['total'] == 0)
+      if ($txn->total() == 0)
         continue 2;
 
-      $memo= "$sale[id]: Correction $sale[num]";
+      $memo= "{$txn->id}: Correction {$txn->formatted_number()}";
 
-
-      // create blank entry
       $data= [
-        "DocNumber" => 'S' . $sale['id'],
-        "TxnDate" => $sale['date'],
+        "DocNumber" => 'S' . $txn->id,
+        "TxnDate" => (new \DateTime($txn->created))->format('Y-m-d'),
         'Line' => [
-          generateLine($qb, $memo, 'Shrinkage',    bcmul($sale['total'],-1)),
-          generateLine($qb, $memo, 'Art Supplies', $sale['total']),
+          generateLine($qb, $memo, 'Shrinkage',    bcmul($txn->total(),-1)),
+          generateLine($qb, $memo, 'Art Supplies', $txn->total()),
         ]
       ];
 
       break;
 
     case 'customer':
-      $memo= "$sale[id]: Invoice $sale[num]";
+      $memo= "{$txn->id}: Invoice {$txn->formatted_number()}";
 
       $data= [
-        "DocNumber" => 'S' . $sale['id'],
-        "TxnDate" => $sale['date'],
+        "DocNumber" => 'S' . $txn->id,
+        "TxnDate" => (new \DateTime($txn->created))->format('Y-m-d'),
         'Line' => [
           // receivable
-          generateLine($qb, $memo, 'Accounts Receivable', $sale['total']),
+          generateLine($qb, $memo, 'Accounts Receivable', $txn->total()),
         ]
       ];
 
-      if ($sale['tax_rate']) {
+      if ($txn->tax() != 0) {
         $data['Line'][]= generateLine($qb, $memo, 'Sales Tax Payable',
-                               bcmul($sale['tax'], -1));
+                               bcmul($txn->tax(), -1));
       }
 
-      $q= "SELECT code,
-                  CAST(IFNULL(ROUND_TO_EVEN(
-                      allocated *
-                      (SELECT ROUND_TO_EVEN(AVG(tl.retail_price), 2)
-                         FROM txn JOIN txn_line tl ON txn.id = tl.txn
-                        WHERE type = 'vendor'
-                          AND item = txn_line.item
-                          AND filled < '$sale[created]'
-                       ),
-                      2), 0.00) AS DECIMAL(9,2)) AS cost,
-                  CAST(ROUND_TO_EVEN(
-                    allocated *
-                    CASE txn_line.discount_type
-                      WHEN 'percentage' THEN txn_line.retail_price *
-                                           ((100 - txn_line.discount) / 100)
-                      WHEN 'relative' THEN (txn_line.retail_price -
-                                            txn_line.discount)
-                      WHEN 'fixed' THEN (txn_line.discount)
-                      ELSE txn_line.retail_price
-                    END, 2) AS DECIMAL(9,2)) AS price
-             FROM txn_line
-             JOIN item ON txn_line.item = item.id
-            WHERE txn = $sale[id]";
-
-      $in= $db->query($q)
-        or die_query($db, $q);
-
-      $sales= array();
+      $sales= [];
       $costs= $total= "0.00";
 
-      while ($line= $in->fetch_assoc()) {
+      foreach ($txn->items() as $line) {
+        $item= $line->item();
+
         $category= 'supplies';
-        if (preg_match('/^ZZ-frame/i', $line['code'])) {
+        if (preg_match('/^ZZ-frame/i', $item->code)) {
           $category= 'framing';
-        } elseif (preg_match('/^ZZ-(print|scan)/i', $line['code'])) {
+        } elseif (preg_match('/^ZZ-(print|scan)/i', $item->code)) {
           $category= 'printing';
-        } elseif (preg_match('/^ZZ-art/i', $line['code'])) {
+        } elseif (preg_match('/^ZZ-art/i', $item->code)) {
           $category= 'art';
-        } elseif (preg_match('/^ZZ-online/i', $line['code'])) {
+        } elseif (preg_match('/^ZZ-online/i', $item->code)) {
           $category= 'online';
-        } elseif (preg_match('/^ZZ-class/i', $line['code'])) {
+        } elseif (preg_match('/^ZZ-class/i', $item->code)) {
           $category= 'class';
-        } elseif (preg_match('/^ZZ-gift/i', $line['code'])) {
+        } elseif (preg_match('/^ZZ-gift/i', $item->code)) {
           $category= 'gift';
-        } elseif (preg_match('/^ZZ-loyalty/i', $line['code'])) {
+        } elseif (preg_match('/^ZZ-loyalty/i', $item->code)) {
           $category= 'loyalty';
-        } elseif (preg_match('/^ZZ-shipping/i', $line['code'])) {
+        } elseif (preg_match('/^ZZ-shipping/i', $item->code)) {
           $category= 'freight';
         }
 
-        $sales[$category]= bcadd($sales[$category], $line['price']);
-        $total= bcadd($total, $line['price']);
-        $costs= bcadd($costs, $line['cost']);
+        $sales[$category]= bcadd($sales[$category], $line->ext_price());
+        $total= bcadd($total, $line->ext_price());
+        $costs= bcadd($costs, $line->cost_of_goods());
       }
 
-      // $sale[subtotal] is has polarity opposite what we've done for total
-      if ($total != bcmul($sale['subtotal'], -1)) {
+#echo '<pre>' . json_encode($sales, JSON_PRETTY_PRINT), '</pre>';
+#echo "costs: $costs, total: $total, subtotal: {$txn->subtotal()}<br>";
+      // $txn->subtotal has polarity opposite what we've done for total
+      if ($total != bcmul($txn->subtotal(), -1)) {
         $sales['supplies']= bcsub($sales['supplies'],
-                                  bcadd($sale['subtotal'], $total));
+                                  bcadd($txn->subtotal(), $total));
       }
 
       foreach ($sales as $category => $amount) {
@@ -444,6 +424,9 @@ if ($_REQUEST['sales']) {
 
     $data['Line']= array_values(array_filter($data['Line']));
 
+#echo '<pre>' . json_encode($data, JSON_PRETTY_PRINT), '</pre>';
+#goto end;
+
     $je= \QuickBooksOnline\API\Facades\JournalEntry::create($data);
 
     $res= $qb->Add($je);
@@ -452,9 +435,12 @@ if ($_REQUEST['sales']) {
       echo "The Status code is: " . $error->getHttpStatusCode() . "<br>";
       echo "The Helper message is: " . $error->getOAuthHelperError() . "<br>";
       echo "The Response message is: " . $error->getResponseBody() . "<br>";
+      echo "Got this for {$txn->id}";
     }
     else {
-      echo "Created Id={$res->Id}";
+      $txn->qb_je_id= $res->Id;
+      $txn->save();
+      echo "Created Id={$res->Id}<br>";
     }
   }
 }
@@ -476,10 +462,11 @@ function getAccountByName($qb, $name) {
 
   return ($cache[$name] = [
     'value' => $res[0]->Id,
+    'name' => $res[0]->Name,
   ]);
 }
 
-function getCustomerByName($qb, $name) {
+function getCustomerByName($qb, $name, $create= true) {
   static $cache= [];
 
   $name= addslashes($name);
@@ -490,7 +477,18 @@ function getCustomerByName($qb, $name) {
 
   $res= $qb->Query("SELECT * FROM Customer WHERE DisplayName = '$name'");
   if (!$res) {
-    throw new \Exception("Not able to find account '$name'");
+    if ($create) {
+      $customer= \QuickBooksOnline\API\Facades\Customer::create([
+        'DisplayName' => $name
+      ]);
+      $res= $qb->Add($customer);
+      if (!$res) {
+        throw new \Exception("Not able to create customer '$name'");
+      }
+      $res= [ $res ]; // ugly, just to fix our reference below
+    } else {
+      throw new \Exception("Not able to find customer '$name'");
+    }
   }
 
   return ($cache[$name] = [

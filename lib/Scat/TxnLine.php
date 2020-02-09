@@ -56,6 +56,10 @@ class TxnLine extends \Model {
     }
   }
 
+  public function ext_price() {
+    return bcmul($this->sale_price(), $this->allocated);
+  }
+
   public function vendor_sku() {
     $vendor_id= $this->txn()->find_one()->person;
     if (!$vendor_id) return '';
@@ -71,5 +75,22 @@ class TxnLine extends \Model {
       }
     }
     return $sku;
+  }
+
+  public function cost_of_goods() {
+    /* To calculate the cost of goods, we take the average of our vendor costs
+     * before this transaction. Not great, but okay. */
+    $txn= $this->txn()->find_one();
+    $q= "SELECT CAST(IFNULL(ROUND_TO_EVEN(
+                    {$this->allocated} * ROUND_TO_EVEN(AVG(tl.retail_price), 2),
+                    2), 0.00) AS DECIMAL(9,2)) AS cost
+           FROM txn
+           JOIN txn_line tl ON txn.id = tl.txn
+          WHERE type = 'vendor'
+            AND item = {$this->item}
+            AND filled < '{$txn->created}'";
+
+    $cost= \ORM::for_table('txn')->raw_query($q)->find_one();
+    return $cost->cost;
   }
 }
