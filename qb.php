@@ -87,7 +87,7 @@ $info= $qb->getCompanyInfo();
   <div class="col-sm-4">
     <form method="POST" action="qb.php">
       <input type="hidden" name="payments" value="1">
-      <input type="date" class="form-control" name="date" value="2020-01-02">
+      <input type="date" class="form-control" name="date" value="<?=$db->get_one("SELECT MIN(DATE(processed)) FROM payment WHERE qb_je_id = '' AND processed > '2020-01-01'")?>">
       <button type="submit" class="btn btn-default">
         Load Payments
       </button>
@@ -96,7 +96,7 @@ $info= $qb->getCompanyInfo();
   <div class="col-sm-4">
     <form method="POST" action="qb.php">
       <input type="hidden" name="sales" value="1">
-      <input type="date" class="form-control" name="date" value="2020-01-02">
+      <input type="date" class="form-control" name="date" value="<?=$db->get_one("SELECT MIN(DATE(paid)) FROM txn WHERE type='customer' AND qb_je_id = '' AND paid > '2020-01-01'")?>">
       <button type="submit" class="btn btn-default">
         Load Sales
       </button>
