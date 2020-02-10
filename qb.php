@@ -294,7 +294,7 @@ if ($_REQUEST['payments']) {
       echo "The Response message is: " . $error->getResponseBody() . "<br>";
     }
     else {
-      echo "Created Id={$res->Id}";
+      echo "Created Id={$res->Id}<br>";
       $pay->qb_je_id= $res->Id;
       $pay->save();
     }
@@ -322,6 +322,8 @@ if ($_REQUEST['sales']) {
   ];
 
   $date= (new DateTime($_REQUEST['date']))->format('Y-m-d');
+
+  echo "<h2>Loading sales for '$date'</h2>";
 
   $txns= \Model::factory('Txn')
           ->where_raw("qb_je_id = '' AND
