@@ -426,6 +426,13 @@ if ($_REQUEST['sales']) {
 
     $data['Line']= array_values(array_filter($data['Line']));
 
+    if (count($data['Line']) == 0) {
+      echo "Transaction {$txn->id} was a wash, skipping";
+      $txn->qb_je_id= 'skipped';
+      $txn->save();
+      continue;
+    }
+
 #echo '<pre>' . json_encode($data, JSON_PRETTY_PRINT), '</pre>';
 #goto end;
 
