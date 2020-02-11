@@ -87,7 +87,7 @@ $info= $qb->getCompanyInfo();
   <div class="col-sm-4">
     <form method="POST" action="qb.php">
       <input type="hidden" name="payments" value="1">
-      <input type="date" class="form-control" name="date" value="<?=$db->get_one("SELECT MIN(DATE(processed)) FROM payment WHERE qb_je_id = '' AND processed > '2020-01-01'")?>">
+      <input type="date" class="form-control" name="date" value="<?=$db->get_one("SELECT MIN(DATE(processed)) FROM payment WHERE amount > 0 AND qb_je_id = '' AND processed > '2020-01-01'")?>">
       <button type="submit" class="btn btn-default">
         Load Payments
       </button>
