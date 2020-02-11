@@ -426,13 +426,6 @@ if ($_REQUEST['sales']) {
 
     $data['Line']= array_values(array_filter($data['Line']));
 
-    if (!count($data['Line'])) {
-      echo "Skipping {$txn->id} because there's no lines<br>";
-      $txn->qb_je_id= 'skipped';
-      $txn->save();
-      continue;
-    }
-
 #echo '<pre>' . json_encode($data, JSON_PRETTY_PRINT), '</pre>';
 #goto end;
 
@@ -445,6 +438,7 @@ if ($_REQUEST['sales']) {
       echo "The Helper message is: " . $error->getOAuthHelperError() . "<br>";
       echo "The Response message is: " . $error->getResponseBody() . "<br>";
       echo "Got this for {$txn->id}";
+      echo '<pre>', json_encode($data, JSON_PRETTY_PRINT), '</pre>';
     }
     else {
       $txn->qb_je_id= $res->Id;
