@@ -99,6 +99,9 @@ $container['phone']= function($c) {
 $container['push']= function($c) {
   return new \Scat\PushService($c['settings']['push']);
 };
+$container['tax']= function($c) {
+  return new \Scat\Service\Tax($c['settings']['tax']);
+};
 $container['txn']= function($c) {
   return new \Scat\TxnService();
 };
@@ -996,6 +999,12 @@ $app->post('/~push-notification',
               }
 
               return $res->withRedirect("/push");
+           });
+
+/* Tax stuff */
+$app->get('/~tax/ping',
+           function (Request $req, Response $res, array $args) {
+              return $res->withJson($this->tax->ping());
            });
 
 /* SMS TODO just testing right now */
