@@ -170,6 +170,18 @@ $app->group('/sale', function (Slim\App $app) {
               $email= $req->getParam('email');
               $subject= trim($req->getParam('subject'));
               error_log("Sending {$txn->id} to $email");
+
+              $attachments= [];
+              if ($req->getParam('include_details')) {
+                $pdf= $txn->getInvoicePDF();
+                $attachments[]= [
+                  'name' => (($txn->type == 'vendor') ? 'PO' : 'I') . $txn->formatted_number() . '.pdf',
+                  'type' => 'application/pdf',
+                  'data' => base64_encode($pdf->Output('', 'S')),
+                ];
+              }
+
+              // TODO push email sending into a service
               $httpClient= new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client());
               $sparky= new \SparkPost\SparkPost($httpClient,
                                                 [ 'key' => SPARKPOST_KEY ]);
@@ -185,6 +197,7 @@ $app->group('/sale', function (Slim\App $app) {
                   'subject' => $subject,
                   'from' => array('name' => "Raw Materials Art Supplies",
                                   'email' => OUTGOING_EMAIL_ADDRESS),
+                  'attachments' => $attachments,
                   'inline_images' => [
                     [
                       'name' => 'logo.png',
