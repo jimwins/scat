@@ -229,7 +229,7 @@ foreach ($payments as $payment) {
 </div>
 <div id="store_footer">
 Items purchased from stock may be returned in original condition and packaging
-within 30 days with receipt. Assembled easels are subject to a 20% restocking fee. No returns without original receipt.
+within 30 days with receipt. All easels are subject to a 50% restocking fee. No returns without original receipt.
 <br><br>
 http://RawMaterialsLA.com/
 </div>
