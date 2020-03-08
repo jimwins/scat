@@ -87,4 +87,10 @@ class Person extends \Model implements \JsonSerializable {
     return $this->has_many('VendorItem', 'vendor')
                 ->where_gte('active', (int)$only_active);
   }
+
+  public function open_orders() {
+    return $this->has_many('Txn', 'person')
+                ->where_null('filled')
+                ->find_many();
+  }
 }

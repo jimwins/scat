@@ -369,11 +369,19 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
 
                \ORM::get_db()->beginTransaction();
 
-               $purchase= $this->txn->create([
-                 'type' => 'vendor',
-                 'person' => $vendor_id,
-                 'tax_rate' => 0,
-               ]);
+               $txn_id= $req->getParam('txn_id');
+               if ($txn_id) {
+                 $purchase= $this->txn->fetchById($txn_id);
+                 if (!$txn_id) {
+                   throw new \Exception("Unable to find transaction.");
+                 }
+               } else {
+                 $purchase= $this->txn->create([
+                   'type' => 'vendor',
+                   'person' => $vendor_id,
+                   'tax_rate' => 0,
+                 ]);
+               }
 
                $items= $req->getParam('item');
                foreach ($items as $item_id => $quantity) {

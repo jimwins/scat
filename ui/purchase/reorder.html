@@ -79,6 +79,14 @@
         <tr>
           <td colspan="9">
             <input type="hidden" name="vendor" value="{{ vendor }}">
+            <select name="txn_id">
+              <option value="0">New Purchase Order</option>
+              {% for order in person.open_orders %}
+                <option value="{{ order.id }}">
+                  {{ order.formatted_number }}
+                </option>
+              {% endfor %}
+            </select>
             <button role="submit" class="btn btn-primary">
               Create Order
             </button>
