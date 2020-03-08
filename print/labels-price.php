@@ -17,6 +17,12 @@ if ($q= $_REQUEST['q']) {
   $items= item_find($db, $q, 0);
 
   if (!$items) die_json("No items found.");
+} elseif ($item_list= $_REQUEST['items']) {
+  $items= [];
+  $item_ids= explode(',', $item_list);
+  foreach ($item_ids as $id) {
+    $items[]= item_load($db, $id);
+  }
 } else {
   $id= (int)$_REQUEST['id'];
   $items= array(item_load($db, $id));
