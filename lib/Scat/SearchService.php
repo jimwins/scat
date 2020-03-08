@@ -73,7 +73,7 @@ class SearchService
                                                $v->force_all ? 0 : 1)
                                    ->where_not_equal('item.deleted', 1)
                                    ->group_by('item.id')
-                                   ->order_by_expr('!(stock > 0), item.code')
+                                   ->order_by_expr('!(minimum_quantity > 0 OR stock != 0), item.code')
                                    ->find_many();
 
     return $items;
