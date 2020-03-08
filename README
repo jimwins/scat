@@ -59,9 +59,6 @@ Scat uses the Idiorm & Paris minimalist database toolkit:
 Scat includes the Marked markdown parser and compiler for Javascript:
   https://github.com/chjj/marked
 
-Scat includes JQuery lightSlider:
-  http://sachinchoolur.github.io/lightslider/
-
 Scat includes X-editable:
  https://vitalets.github.io/x-editable/index.html
 
