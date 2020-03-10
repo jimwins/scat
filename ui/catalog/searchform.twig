@@ -1,45 +1,47 @@
 <form method="GET" action="/catalog/search">
-  <div class="pull-right" style="padding-left: 1em">
-    <button class="btn btn-default toggle-select" type="button">
-      Select
-    </button>
-    <button class="btn btn-default bulk-edit" type="button">
-      Bulk Edit
-    </button>
-    <div class="btn-group hidden-print">
-      <button type="button" class="btn btn-default print-labels">
-        <i class="fa fa-print"></i> Print Labels
+  {% if items %}
+    <div class="pull-right" style="padding-left: 1em">
+      <button class="btn btn-default toggle-select" type="button">
+        Select
       </button>
-      <button type="button" class="btn btn-default dropdown-toggle"
-              data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">
-        <span class="caret"></span>
-        <span class="sr-only">Toggle Dropdown</span>
+      <button class="btn btn-default bulk-edit" type="button">
+        Bulk Edit
       </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a class="print-labels" data-size="half" data-trim="ask">
-            Half-size price labels
-          </a>
-        </li>
-        <li>
-          <a class="print-labels" data-noprice="1">
-            No price
-          </a>
-        </li>
-        <li>
-          <a class="print-labels" data-trim="ask">
-            Trim name
-          </a>
-        </li>
-        <li>
-          <a class="print-labels" data-trim="yes" data-noprice="1">
-            Trim name, no price
-          </a>
-        </li>
-      </ul>
+      <div class="btn-group hidden-print">
+        <button type="button" class="btn btn-default print-labels">
+          <i class="fa fa-print"></i> Print Labels
+        </button>
+        <button type="button" class="btn btn-default dropdown-toggle"
+                data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <a class="print-labels" data-size="half" data-trim="ask">
+              Half-size price labels
+            </a>
+          </li>
+          <li>
+            <a class="print-labels" data-noprice="1">
+              No price
+            </a>
+          </li>
+          <li>
+            <a class="print-labels" data-trim="ask">
+              Trim name
+            </a>
+          </li>
+          <li>
+            <a class="print-labels" data-trim="yes" data-noprice="1">
+              Trim name, no price
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
+  {% endif %}
   <div class="input-group">
     <input class="form-control" type="text" name="q" value="{{ q }}" autofocus
            autocomplete="off" autocorrect="off" autocapitalize="off"
