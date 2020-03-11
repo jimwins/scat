@@ -113,6 +113,27 @@ class ScatUtils {
       return '$' + val.toFixed(2)
     }
   }
+
+  api (func, args, opts) {
+    let url= '/api/' + func + '.php';
+    const formData= new FormData()
+    for (let prop in args) {
+      formData.append(prop, args[prop])
+    }
+
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: formData
+    })
+    .then((response) => {
+      if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response)
+      }
+      return Promise.reject(new Error(response.statusText))
+    })
+    // XXX catch data.error and alert()?
+  }
 }
 
 let scat= new ScatUtils()

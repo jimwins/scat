@@ -40,6 +40,23 @@
           </li>
         </ul>
       </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Inventory <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <a class="inventory-print" href="#">
+              <i class="fa fa-print"></i> Print
+            </a>
+          </li>
+          <li>
+            <a class="inventory-done" href="#">
+              <i class="fa fa-check-circle"></i> Done
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   {% endif %}
   <div class="input-group">
@@ -56,6 +73,17 @@
   {# critical that <script> be inside div so currentScript.parentNode works #}
   <script>
     let form= document.currentScript.parentNode
+
+    let collectItems= (list) => {
+      let items= list.querySelectorAll('.item-list tr[data-id]')
+      return Array.from(items)
+                  .filter((el) => {
+                    return !!el.querySelector(':checked')
+                  })
+                  .map((el) => { return el.attributes['data-id'].value })
+                  .join(',')
+    }
+
     form.querySelector('.toggle-select').addEventListener('click', (ev) => {
       document.querySelectorAll('.item-list .item-select').forEach((item) => {
         item.classList.toggle('visible')
@@ -71,22 +99,31 @@
         // Get selected items and other options
         let doc= (ev.target.getAttribute('data-size') == 'half' ?
                   'labels-price-brush' : 'labels-price')
-        let items= list.querySelectorAll('.item-list tr[data-id]')
-        let item_param= Array.from(items)
-                         .filter((el) => {
-                           return !!el.querySelector(':checked')
-                         })
-                         .map((el) => { return el.attributes['data-id'].value })
-                         .join(',')
+        let items= collectItems(list)
         let noprice= ev.target.getAttribute('data-noprice')
         let trim= ev.target.getAttribute('data-trim')
         if (trim == 'ask') {
           trim= window.prompt("Please enter the part of the name to trim from the labels", "");
         }
         // trim, noprice, size
-        scat.printDocument(doc, { items: item_param, noprice: noprice,
-                                  trim: trim })
+        scat.printDocument(doc, { items: items, noprice: noprice, trim: trim })
       })
+    })
+
+    form.querySelector('.inventory-print').addEventListener('click', (ev) => {
+      let items= collectItems(list)
+      scat.printDocument('inventory', { items: items })
+    })
+    form.querySelector('.inventory-done').addEventListener('click', (ev) => {
+      let items= collectItems(list)
+
+      scat.api('item-mark-inventoried', { items: items })
+          .then((res) => {
+            return res.json()
+          })
+          .then((data) => {
+            alert("Marked " + data.count + " item(s) inventoried.")
+          })
     })
   </script>
 </form>

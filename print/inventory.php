@@ -3,13 +3,20 @@ require '../scat.php';
 require '../lib/item.php';
 
 $q= $_REQUEST['q'];
-if (!$q) die_json("Nothing to report.");
+if ($q) {
+  if (!preg_match('/stocked:/i', $q)) {
+    $q= $q . " stocked:1";
+  }
 
-if (!preg_match('/stocked:/i', $q)) {
-  $q= $q . " stocked:1";
+  $items= item_find($db, $q, 0);
+} elseif ($item_list= $_REQUEST['items']) {
+  $items= [];
+  $item_ids= explode(',', $item_list);
+  foreach ($item_ids as $id) {
+    $items[]= item_load($db, $id);
+  }
 }
 
-$items= item_find($db, $q, 0);
 if (!$items) die_json("No items found.");
 
 $product_id= $items[0]['product_id'];
@@ -28,6 +35,10 @@ foreach ($items as $item) {
 $product= ($use_short_name ?
            \Model::factory('Product')->where('id', $product_id)->find_one() :
            null);
+
+if ($product && !$q) {
+  $q= "product:{$product->id} stocked:1";
+}
 
 $loader= new \Twig\Loader\FilesystemLoader('../ui/');
 $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
