@@ -10,12 +10,16 @@ $client= new \GuzzleHttp\Client();
 \EasyPost\EasyPost::setApiKey(EASYPOST_KEY);
 
 $url= ORDURE . '/sale/list';
-$res= $client->request('GET', $url,
-                       [
-                         'debug' => $DEBUG,
-                         'query' => [ 'key' => ORDURE_KEY,
-                                      'json' => 1 ]
-                       ]);
+try {
+  $res= $client->request('GET', $url,
+                         [
+                           'debug' => $DEBUG,
+                           'query' => [ 'key' => ORDURE_KEY,
+                                        'json' => 1 ]
+                         ]);
+} catch (\GuzzleHttp\Exception\ConnectException $ex) {
+  exit;
+}
 
 $sales= json_decode($res->getBody());
 

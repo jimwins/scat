@@ -7,12 +7,16 @@ $exit= 0;
 
 $client= new \GuzzleHttp\Client();
 
-$url= ORDURE . '/get-pending-rewards';
-$res= $client->request('GET', $url,
-                       [
-                         'debug' => $DEBUG,
-                         'query' => [ 'key' => ORDURE_KEY ]
-                       ]);
+try {
+  $url= ORDURE . '/get-pending-rewards';
+  $res= $client->request('GET', $url,
+                         [
+                           'debug' => $DEBUG,
+                           'query' => [ 'key' => ORDURE_KEY ]
+                         ]);
+} catch (\GuzzleHttp\Exception\ConnectException $ex) {
+  exit;
+}
 
 $updates= json_decode($res->getBody());
 
