@@ -37,4 +37,10 @@ class Tax
   public function ping() {
     return $this->callApi('Ping');
   }
+
+  public function addTransactions($transactions) {
+    return $this->callApi('AddTransactions', [
+      'transactions' => $transactions
+    ]);
+  }
 }
