@@ -102,6 +102,9 @@ $container['push']= function($c) {
 $container['tax']= function($c) {
   return new \Scat\Service\Tax($c['settings']['tax']);
 };
+$container['giftcard']= function($c) {
+  return new \Scat\Service\Giftcard($c['settings']['giftcard']);
+};
 $container['txn']= function($c) {
   return new \Scat\TxnService();
 };
@@ -1056,5 +1059,18 @@ $app->post('/~ready-for-publish',
              touch('/tmp/ready-for-publish');
              return $res;
            });
+
+$app->get('/~gift-card/check-balance',
+          function (Request $req, Response $res, array $args) {
+            $card= $req->getParam('card');
+            return $res->withJson($this->giftcard->check_balance($card));
+          });
+
+$app->get('/~gift-card/add-txn',
+          function (Request $req, Response $res, array $args) {
+            $card= $req->getParam('card');
+            $amount= $req->getParam('amount');
+            return $res->withJson($this->giftcard->add_txn($card, $amount));
+          });
 
 $app->run();
