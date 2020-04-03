@@ -1073,4 +1073,23 @@ $app->get('/~gift-card/add-txn',
             return $res->withJson($this->giftcard->add_txn($card, $amount));
           });
 
+$app->get('/~rewards/check-balance',
+          function (Request $req, Response $res, array $args) {
+            $loyalty= $req->getParam('loyalty');
+            $loyalty_number= preg_replace('/[^\d]/', '', $loyalty);
+            $person= \Model::factory('Person')
+                      ->where_any_is([
+                        [ 'loyalty_number' => $loyalty_number ?: 'no' ],
+                        [ 'email' => $loyalty ]
+                      ])
+                      ->find_one();
+            if (!$person)
+              throw new \Slim\Exception\NotFoundException($req, $res);
+            return $res->withJson([
+              'loyalty_suppressed' => $person->loyalty_suppressed,
+              'points_available' => $person->points_available(),
+              'points_pending' => $person->points_pending(),
+            ]);
+          });
+
 $app->run();

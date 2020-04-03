@@ -35,6 +35,20 @@ class Person extends \Model implements \JsonSerializable {
     return $this->has_many('Loyalty');
   }
 
+  public function points_available() {
+    if ($this->suppress_loyalty) return 0;
+    return $this->loyalty()
+                ->where_raw("(points < 0 OR DATE(processed) < DATE(NOW()))")
+                ->sum('points');
+  }
+
+  public function points_pending() {
+    if ($this->suppress_loyalty) return 0;
+    return $this->loyalty()
+                ->where_raw("(points > 0 AND DATE(processed) > DATE(NOW()))")
+                ->sum('points');
+  }
+
   public function jsonSerialize() {
     return $this->asArray();
   }
