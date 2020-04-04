@@ -1,7 +1,7 @@
 <?php
-namespace Scat;
+namespace Scat\Service;
 
-class PhoneService
+class Phone
 {
   private $token;
   private $from;

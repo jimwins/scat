@@ -94,7 +94,7 @@ $container['report']= function($c) {
   return new \Scat\ReportService($c['settings']['report']);
 };
 $container['phone']= function($c) {
-  return new \Scat\PhoneService($c['settings']['phone']);
+  return new \Scat\Service\Phone($c['settings']['phone']);
 };
 $container['push']= function($c) {
   return new \Scat\PushService($c['settings']['push']);
@@ -1032,7 +1032,7 @@ $app->get('/~tax/ping',
            });
 
 /* SMS TODO just testing right now */
-$app->get('/sms',
+$app->get('/~sms/send',
             function (Request $req, Response $res, array $args) {
               $data= $this->phone->sendSMS($req->getParam('to'),
                                            $req->getParam('text'));
