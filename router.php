@@ -85,19 +85,19 @@ $container['view']= function ($container) {
 
 /* Hook up our services */
 $container['catalog']= function($c) {
-  return new \Scat\CatalogService();
+  return new \Scat\Service\Catalog();
 };
 $container['search']= function($c) {
-  return new \Scat\SearchService($c['settings']['search']);
+  return new \Scat\Service\Search($c['settings']['search']);
 };
 $container['report']= function($c) {
-  return new \Scat\ReportService($c['settings']['report']);
+  return new \Scat\Service\Report($c['settings']['report']);
 };
 $container['phone']= function($c) {
   return new \Scat\Service\Phone($c['settings']['phone']);
 };
 $container['push']= function($c) {
-  return new \Scat\PushService($c['settings']['push']);
+  return new \Scat\Service\Push($c['settings']['push']);
 };
 $container['tax']= function($c) {
   return new \Scat\Service\Tax($c['settings']['tax']);
@@ -106,7 +106,7 @@ $container['giftcard']= function($c) {
   return new \Scat\Service\Giftcard($c['settings']['giftcard']);
 };
 $container['txn']= function($c) {
-  return new \Scat\TxnService();
+  return new \Scat\Service\Txn();
 };
 
 /* Trim trailing slashes */

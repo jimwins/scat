@@ -1,7 +1,7 @@
 <?php
-namespace Scat;
+namespace Scat\Service;
 
-class PushService
+class Push
 {
   protected $config;
 

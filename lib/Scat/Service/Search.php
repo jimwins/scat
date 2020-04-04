@@ -1,9 +1,9 @@
 <?php
-namespace Scat;
+namespace Scat\Service;
 
 use PDO;
 
-class SearchService
+class Search
 {
   private $pdo;
   private $insert;

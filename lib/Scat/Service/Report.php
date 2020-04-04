@@ -1,7 +1,7 @@
 <?php
-namespace Scat;
+namespace Scat\Service;
 
-class ReportService
+class Report
 {
   public function sales($span= '', $begin= null, $end= null) {
     $items= "1=1";

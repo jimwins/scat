@@ -1,7 +1,7 @@
 <?php
-namespace Scat;
+namespace Scat\Service;
 
-class TxnService
+class Txn
 {
   public function __construct() {
   }

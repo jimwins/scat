@@ -1,7 +1,7 @@
 <?php
-namespace Scat;
+namespace Scat\Service;
 
-class CatalogService
+class Catalog
 {
   public function __construct() {
   }
