@@ -750,6 +750,7 @@ $app->group('/catalog', function (Slim\App $app) {
 $app->group('/person', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
+              // TODO most recent customers? vendors?
               return $this->view->render($res, 'page/people.html');
             });
   $app->get('/search',

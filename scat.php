@@ -123,7 +123,7 @@ $(document).ready(function() {
         <!-- Hide Gift Cards and Custom menu on tablet for size reasons -->
         <li class="hidden-sm"><a href="./gift-card.php">Gift Cards</a></li>
         <li class="hidden-sm"><a href="./custom.php">Custom</a></li>
-        <li><a href="./people.php">People</a></li>
+        <li><a href="/person">People</a></li>
         <li><a href="./txns.php">Transactions</a></li>
         <li><a href="./clock.php">Clock</a></li>
         <li><a href="catalog">Catalog</a></li>
