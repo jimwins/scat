@@ -15,6 +15,8 @@
   {# TODO import this into our repo #}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" integrity="sha256-gsmEoJAws/Kd3CjuOQzLie5Q3yshhvmo7YNtBG7aaEY=" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="/extern/x-editable-1.5.1/bootstrap3-editable/css/bootstrap-editable.css" />
+  <link rel="stylesheet" type="text/css" href="/vendor/select2/select2/dist/css/select2.min.css">
+  <link rel="stylesheet" type="text/css" href="/extern/select2-bootstrap-theme-0.1.0-beta.10/dist/select2-bootstrap.min.css">
 
   <link rel="stylesheet" type="text/css" href="/css/scat.css">
   <style type="text/css">
@@ -28,6 +30,10 @@
   <script src="/extern/x-editable-1.5.1/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
   <script>
     $.fn.editableform.buttons= '<button type="submit" class="btn btn-primary btn-submiteditable-submit"><i class="fa fa-check"></i></button><button type="button" class="btn btn-default bnt-sm editable-cancel"><i class="fa fa-ban"></i></button>'
+  </script>
+  <script src="/vendor/select2/select2/dist/js/select2.min.js"></script>
+  <script>
+    $.fn.select2.defaults.set("theme", "bootstrap");
   </script>
   <script src="/js/scat.main.js"></script>
 

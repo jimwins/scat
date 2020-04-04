@@ -136,6 +136,20 @@
 {% endblock %}
 
 {% block script %}
+  $('#brand_id', form).select2({
+    ajax: {
+      url: '/api/brand-find.php',
+      datatype: 'json'
+    }
+  })
+
+  $('#product_id', form).select2({
+    ajax: {
+      url: '/api/product-find.php',
+      datatype: 'json'
+    }
+  })
+
   form.onsubmit= (event) => {
     event.preventDefault()
 
