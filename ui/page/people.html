@@ -35,18 +35,17 @@
             <a href="/person/{{ person.id }}">{{ loop.index }}</a>
           </td>
           <td>
-            <a href="/person/{{ person.id }}">{{ person.name }}</a>
+            <a href="/person/{{ person.id }}">{{ person.name ?: '&#8203;' }}</a>
           </td>
           <td>
-            <a href="/person/{{ person.id }}">{{ person.company }}</a>
+            <a href="/person/{{ person.id }}">{{ person.company ?: '&#8203;' }}</a>
           </td>
           <td>
-            <a href="/person/{{ person.id }}">{{ person.pretty_phone }}</a>
+            <a href="/person/{{ person.id }}">{{ person.pretty_phone ?: '&#8203;' }}</a>
           </td>
           <td>
-            <a href="/person/{{ person.id }}">{{ person.email }}</a>
+            <a href="/person/{{ person.id }}">{{ person.email ?: '&#8203;' }}</a>
           </td>
-        </a>
         </tr>
       {% endfor %}
       </tbody>
