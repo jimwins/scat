@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 class Person extends \Model implements \JsonSerializable {
   public function friendly_name() {

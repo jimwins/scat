@@ -1,5 +1,5 @@
 <?
-namespace Scat;
+namespace Scat\Model;
 
 class Item extends \Model implements \JsonSerializable {
   /* XXX Legacy, should get from parent product */
@@ -143,7 +143,7 @@ class Item extends \Model implements \JsonSerializable {
         ->where_raw("type = 'correction' AND DATE(NOW()) = DATE(created)")
         ->find_one();
       if (!$cxn) {
-        $cxn= \Scat\Txn::create([ 'type' => 'correction', 'tax_rate' => 0 ]);
+        $cxn= \Scat\Model\Txn::create([ 'type' => 'correction', 'tax_rate' => 0 ]);
       }
 
       $diff= $stock - $current;

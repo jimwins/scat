@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 class Image extends \Model implements \JsonSerializable {
   public function original() {

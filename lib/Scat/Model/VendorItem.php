@@ -1,5 +1,5 @@
 <?
-namespace Scat;
+namespace Scat\Model;
 
 use OE\Lukas\QueryTree\Item;
 use OE\Lukas\QueryTree\Word;

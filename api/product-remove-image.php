@@ -11,6 +11,6 @@ $q= "DELETE FROM product_to_image
 $db->query($q)
   or die_query($db, $q);
 
-$product= \Scat\Product::getById($product_id);
+$product= \Scat\Model\Product::getById($product_id);
 
 echo jsonp($product);

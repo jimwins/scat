@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 class Product extends \Model implements \JsonSerializable {
   private $old_slug;

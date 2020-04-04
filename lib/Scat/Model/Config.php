@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 class Config extends \Model {
   static protected $cache= [];

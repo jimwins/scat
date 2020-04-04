@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 class Loyalty extends \Model {
   public function person() {

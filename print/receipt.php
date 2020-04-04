@@ -132,7 +132,7 @@ if (count($payments)) {
     if ($payment['method'] == 'discount' && $payment['discount']) {
       $method= sprintf("Discount (%d%%)", $payment['discount']);
     } else {
-      $method= \Scat\Payment::$methods[$payment['method']];
+      $method= \Scat\Model\Payment::$methods[$payment['method']];
     }
     echo '<tr>',
          '<td class="right" colspan="2">',

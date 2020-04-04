@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 class Device extends \Model implements \JsonSerializable {
   public function register($token) {

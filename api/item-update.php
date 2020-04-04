@@ -189,7 +189,7 @@ $item= item_load($db, $item_id);
 
 $product= array('id' => 0, 'name' => ''); /* Bare necessities for KO */
 if ($item['product_id']) {
-  $prod= \Scat\Product::getById($item['product_id']);
+  $prod= \Scat\Model\Product::getById($item['product_id']);
   $product= $prod->as_array();
   $product['full_slug']= $prod->full_slug();
 }

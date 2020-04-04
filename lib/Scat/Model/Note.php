@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 class Note extends \Model implements \JsonSerializable {
   public function txn() {

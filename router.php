@@ -13,7 +13,7 @@ $DEBUG= $ORM_DEBUG= false;
 $config= require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
 
 /* Configure Idiorm & Paris */
-Model::$auto_prefix_models= '\\Scat\\';
+Model::$auto_prefix_models= '\\Scat\\Model\\';
 
 ORM::configure('mysql:host=' . DB_SERVER . ';dbname=' . DB_SCHEMA . ';charset=utf8');
 ORM::configure('username', DB_USER);
@@ -393,7 +393,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                  }
 
                  $vendor_items=
-                   \Scat\VendorItem::findByItemIdForVendor($item_id,
+                   \Scat\Model\VendorItem::findByItemIdForVendor($item_id,
                                                            $vendor_id);
 
                  // Get the lowest available price for our quantity
@@ -549,11 +549,11 @@ $app->group('/catalog', function (Slim\App $app) {
 
                $url= $req->getParam('url');
                if ($url) {
-                 $image= \Scat\Image::createFromUrl($url);
+                 $image= \Scat\Model\Image::createFromUrl($url);
                  $product->addImage($image);
                } else {
                  foreach ($req->getUploadedFiles() as $file) {
-                   $image= \Scat\Image::createFromStream($file->getStream(),
+                   $image= \Scat\Model\Image::createFromStream($file->getStream(),
                                                          $file->getClientFilename());
                    $product->addImage($image);
                  }
@@ -756,7 +756,7 @@ $app->group('/person', function (Slim\App $app) {
             function (Request $req, Response $res, array $args) {
               $q= trim($req->getParam('q'));
 
-              $people= \Scat\Person::find($q);
+              $people= \Scat\Model\Person::find($q);
 
               return $this->view->render($res, 'page/people.html',
                                          [ 'people' => $people, 'q' => $q ]);
@@ -774,7 +774,7 @@ $app->group('/person', function (Slim\App $app) {
               }
               $limit= 25;
               $q= $req->getParam('q');
-              $items= \Scat\VendorItem::search($person->id, $q);
+              $items= \Scat\Model\VendorItem::search($person->id, $q);
               $items= $items->select_expr('COUNT(*) OVER()', 'total')
                             ->limit($limit)->offset($page * $limit);
               $items= $items->find_many();
@@ -839,10 +839,10 @@ $app->post('/media/add',
            function (Request $req, Response $res, array $args) {
              $url= $req->getParam('url');
              if ($url) {
-               $image= \Scat\Image::createFromUrl($url);
+               $image= \Scat\Model\Image::createFromUrl($url);
              } else {
                foreach ($req->getUploadedFiles() as $file) {
-                 $image= \Scat\Image::createFromStream($file->getStream(),
+                 $image= \Scat\Model\Image::createFromStream($file->getStream(),
                                                        $file->getClientFilename());
                }
              }
@@ -991,13 +991,13 @@ $app->post('/push/v2/pushPackages/{id}',
 $app->post('/push/v1/devices/{token}/registrations/{id}',
            function (Request $req, Response $res, array $args) {
              error_log("PUSH: Registered device: '{$args['token']}'");
-             $device= \Scat\Device::register($args['token']);
+             $device= \Scat\Model\Device::register($args['token']);
              return $res;
            });
 $app->delete('/push/v1/devices/{token}/registrations/{id}',
            function (Request $req, Response $res, array $args) {
              error_log("PUSH: Forget device: '{$args['token']}'");
-             $device= \Scat\Device::forget($args['token']);
+             $device= \Scat\Model\Device::forget($args['token']);
              return $res;
            });
 

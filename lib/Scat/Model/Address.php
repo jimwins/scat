@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 class Address extends \Model implements \JsonSerializable {
   public function jsonSerialize() {

@@ -7,7 +7,7 @@ class Txn
   }
 
   public function create($options) {
-    return \Scat\Txn::create($options);
+    return \Scat\Model\Txn::create($options);
   }
 
   public function fetchById($id) {

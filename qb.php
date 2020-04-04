@@ -13,9 +13,9 @@ $config= [
 head("QuickBooks Connection");
 
 if ($_REQUEST['disconnect']) {
-  \Scat\Config::forgetValue('qb.accessToken');
-  \Scat\Config::forgetValue('qb.refreshToken');
-  \Scat\Config::forgetValue('qb.realmId');
+  \Scat\Model\Config::forgetValue('qb.accessToken');
+  \Scat\Model\Config::forgetValue('qb.refreshToken');
+  \Scat\Model\Config::forgetValue('qb.realmId');
 }
 
 // Logging in
@@ -28,16 +28,16 @@ if ($_REQUEST['code']) {
   );
   $qb->updateOAuth2Token($token);
 
-  \Scat\Config::setValue('qb.accessToken', $token->getAccessToken());
-  \Scat\Config::setValue('qb.refreshToken', $token->getRefreshToken());
-  \Scat\Config::setValue('qb.realmId', $_REQUEST['realmId']);
+  \Scat\Model\Config::setValue('qb.accessToken', $token->getAccessToken());
+  \Scat\Model\Config::setValue('qb.refreshToken', $token->getRefreshToken());
+  \Scat\Model\Config::setValue('qb.realmId', $_REQUEST['realmId']);
 
   echo '<p>Obtained and saved token.</p>';
 } else {
 
-  $accessToken= \Scat\Config::getValue('qb.accessToken');
-  $refreshToken= \Scat\Config::getValue('qb.refreshToken');
-  $realmId= \Scat\Config::getValue('qb.realmId');
+  $accessToken= \Scat\Model\Config::getValue('qb.accessToken');
+  $refreshToken= \Scat\Model\Config::getValue('qb.refreshToken');
+  $realmId= \Scat\Model\Config::getValue('qb.realmId');
 
   if ($accessToken && $refreshToken && $realmId) {
     $config['accessTokenKey']= $accessToken;
@@ -50,8 +50,8 @@ if ($_REQUEST['code']) {
 
   if ($refreshToken) {
     $token= $helper->refreshToken();
-    \Scat\Config::setValue('qb.accessToken', $token->getAccessToken());
-    \Scat\Config::setValue('qb.refreshToken', $token->getRefreshToken());
+    \Scat\Model\Config::setValue('qb.accessToken', $token->getAccessToken());
+    \Scat\Model\Config::setValue('qb.refreshToken', $token->getRefreshToken());
     $qb->updateOAuth2Token($token);
   }
 }

@@ -294,7 +294,7 @@ $(document).on('dblclick', '.editable', function() {
   fld.focus().select();
 });
 
-var paymentMethods= <?=json_encode(\Scat\Payment::$methods)?>;
+var paymentMethods= <?=json_encode(\Scat\Model\Payment::$methods)?>;
 
 function formatMethod(payment) {
   if (payment.method() == 'discount' && payment.discount()) {

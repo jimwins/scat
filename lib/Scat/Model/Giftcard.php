@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 include dirname(__FILE__).'/../php-barcode.php';
 

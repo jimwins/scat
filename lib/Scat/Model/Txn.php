@@ -1,5 +1,5 @@
 <?php
-namespace Scat;
+namespace Scat\Model;
 
 class Txn extends \Model implements \JsonSerializable {
   private $_totals;
