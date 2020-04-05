@@ -1080,6 +1080,7 @@ $('#tax_rate .val').editable(function(value, settings) {
         <!-- ko if: $data.code() == 'ZZ-GIFTCARD' && $parent.txn.paid() -->
           <a data-bind="if: !$data.data.card, click: $parent.createGiftCard"><i class="fa fa-barcode"></i></a>
           <a data-bind="if: $data.data.card, click: $parent.printGiftCard"><i class="fa fa-print"></i></a>
+          <a data-bind="if: $data.data.card, click: $parent.emailGiftCard"><i class="fa fa-envelope"></i></a>
         <!-- /ko -->
         <span class="name" data-bind="text: $data.name"></span>
         <div class="discount" data-bind="text: $data.discount"></div>
@@ -1425,6 +1426,39 @@ viewModel.printGiftCard= function(item) {
                                         balance: data.balance,
                                         issued: data.latest });
             });
+}
+
+viewModel.emailGiftCard= function(item) {
+  var card= item.data.card();
+  Scat.dialog('giftcard-message').done(function (html) {
+    var panel= $(html);
+
+    var message= { card: card,
+                   from_name: '', from_email: '',
+                   to_name: '', to_email: '',
+                   message: '' };
+    message.error= '';
+
+    panel.on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+
+    messageModel= ko.mapping.fromJS(message);
+
+    messageModel.sendMessage= function(place, ev) {
+      var message= ko.mapping.toJS(messageModel);
+      delete message.error;
+
+      Scat.api('giftcard-email', message)
+          .done(function (data) {
+            $(place).closest('.modal').modal('hide');
+            Scat.alert({ title: "Success!", error: "Email sent." });
+          });
+    }
+
+    ko.applyBindings(messageModel, panel[0]);
+    panel.appendTo($('body')).modal();
+  });
 }
 
 viewModel.payTransaction= function() {
