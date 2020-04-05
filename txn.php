@@ -52,7 +52,7 @@ head("Transaction @ Scat", true);
     <div class="col-sm-8">
       <p class="form-control-static" id="person">
         <a data-bind="text: txn.person_name, 
-                      attr: { href: 'person.php?id=' + txn.person() }">
+                      attr: { href: '/person/' + txn.person() }">
         </a>
       </p>
     </div>

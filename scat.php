@@ -477,7 +477,7 @@ function expand_field($data, $class, $meta = null) {
     list($id, $company, $name, $loyalty)= preg_split('/\|/', $data, 4);
     if (!$id) return '';
     if (!$company && !$name) $name= format_phone($loyalty);
-    return '<a href="person.php?id='.ashtml($id).'">'.ashtml($company).($name&&$company?" (":"").ashtml($name).($name&&$company?")":"").'</a>';
+    return '<a href="/person/'.ashtml($id).'">'.ashtml($company).($name&&$company?" (":"").ashtml($name).($name&&$company?")":"").'</a>';
   case '$item':
     if ($meta) {
       return '<a href="item.php?id='.ashtml($meta).'">'.ashtml($data).'</a>';

@@ -764,7 +764,14 @@ $app->group('/person', function (Slim\App $app) {
             })->setName('person-search');
   $app->get('/{id:[0-9]+}',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect("/person.php?id={$args['id']}");
+              $person= \Model::factory('Person')->find_one($args['id']);
+              $page= (int)$req->getParam('page');
+              $limit= 25;
+              return $this->view->render($res, 'page/person.html', [
+                'person' => $person,
+                'page' => $page,
+                'limit' => $limit,
+              ]);
             })->setName('person');
   $app->get('/{id:[0-9]+}/items',
             function (Request $req, Response $res, array $args) {
@@ -788,6 +795,48 @@ $app->group('/person', function (Slim\App $app) {
                                            'page_size' => $page_size,
                                           ]);
             })->setName('vendor-items');
+  $app->post('/update',
+             function (Request $req, Response $res, array $args) {
+               $id= $req->getParam('pk');
+               $name= $req->getParam('name');
+               $value= $req->getParam('value');
+               $person= \Model::factory('Person')->find_one($id);
+               if (!$person)
+                 throw new \Slim\Exception\NotFoundException($req, $res);
+
+               $person->setProperty($name, $value);
+               $person->save();
+
+               return $res->withJson([
+                 'person' => $person,
+               ]);
+             });
+  $app->post('/{id:[0-9]+}/upload-items',
+             function (Request $req, Response $res, array $args) {
+               $person= \Model::factory('Person')->find_one($args['id']);
+               if (!$person)
+                 throw new \Slim\Exception\NotFoundException($req, $res);
+
+               $details= [];
+               foreach ($req->getUploadedFiles() as $file) {
+                 $details[]= $person->loadVendorData($file);
+               }
+
+               return $res->withJson([
+                 'details' => $details
+               ]);
+             });
+  $app->get('/{id:[0-9]+}/set-role',
+             function (Request $req, Response $res, array $args) {
+               $person= \Model::factory('Person')->find_one($args['id']);
+               if (!$person)
+                 throw new \Slim\Exception\NotFoundException($req, $res);
+               $role= $req->getParam('role');
+               $person->role= $role;
+               $person->save();
+               $path= $this->router->pathFor('person', [ 'id' => $person->id ]);
+               return $res->withRedirect($path);
+             });
 });
 
 /* Clock */

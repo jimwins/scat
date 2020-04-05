@@ -3,5 +3,302 @@
 
 {% block content %}
   {% include 'person-searchform.twig' %}
-  <h1>{{ person.friendly_name() }}</h1>
+  <h1 class="page-header {{ not person.active ? 'text-danger' }}">
+    {{ person.name ?: person.company ?: person.email ?: person.pretty_phone }}
+    <small>{% if person.name %}{{ person.company }}{% endif %}</small>
+    <div class="pull-right">
+      <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle"
+                type="button" id="settingsMenu" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="true">
+          <i class="fa fa-user"></i>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right"
+            aria-labelledby="settingsMenu">
+          <li><a href="{{ person.id }}/set-role?role=customer"><i class="fa {{ person.role == 'customer' ? 'fa-check' : '' }} fa-fw"></i> Customer</a>
+          <li><a href="{{ person.id }}/set-role?role=employee"><i class="fa {{ person.role == 'employee' ? 'fa-check' : '' }} fa-fw"></i> Employee</a>
+          <li><a href="{{ person.id }}/set-role?role=vendor"><i class="fa {{ person.role == 'vendor' ? 'fa-check' : '' }} fa-fw"></i> Vendor</a>
+        </ul>
+      </div>
+    </div>
+  </h1>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">Contact Info</h2>
+        </div>
+        <div class="panel-body form-horizontal">
+
+          <div class="form-group">
+            <label for="name" class="col-sm-2 control-label">
+              Name
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static editable"
+                 data-pk="{{ person.id }}"
+                 data-name="name" data-value="{{ person.name }}">
+                {{ person.name }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="company" class="col-sm-2 control-label">
+              Company
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static editable"
+                 data-pk="{{ person.id }}"
+                 data-name="company" data-value="{{ person.company }}">
+                {{ person.company }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="col-sm-2 control-label">
+              Email
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static editable"
+                 data-pk="{{ person.id }}"
+                 data-name="email" data-value="{{ person.email }}">
+                {{ person.email }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="phone" class="col-sm-2 control-label">
+              Phone
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static editable"
+                 data-pk="{{ person.id }}"
+                 data-name="phone" data-value="{{ person.phone }}">
+                {{ person.pretty_phone }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="instagram" class="col-sm-2 control-label">
+              Instagram
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static editable"
+                 data-pk="{{ person.id }}"
+                 data-name="instagram" data-value="{{ person.instagram }}">
+                {{ person.instagram }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="url" class="col-sm-2 control-label">
+              Website
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static editable"
+                 data-pk="{{ person.id }}"
+                 data-name="url" data-value="{{ person.url }}">
+                {{ person.url }}
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- .panel -->
+
+    </div><!-- .col-sm-6 -->
+
+    <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">Details</h2>
+        </div>
+        <div class="panel-body form-horizontal">
+
+          <div class="form-group">
+            <label for="tax_id" class="col-sm-2 control-label">
+              Tax ID
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static editable"
+                 data-pk="{{ person.id }}"
+                 data-name="tax_id" data-value="{{ person.tax_id }}">
+                {{ person.tax_id }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="vendor_rebate" class="col-sm-2 control-label">
+              Discount
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static editable"
+                 data-pk="{{ person.id }}"
+                 data-empty="0%"
+                 data-name="vendor_rebate"
+                 data-value="{{ person.vendor_rebate }}">
+                {{ "%.2f%%"|format(person.vendor_rebate) }}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="notes" class="col-sm-2 control-label">
+              Notes
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static editable"
+                 data-type="textarea"
+                 data-pk="{{ person.id }}"
+                 data-empty="0%"
+                 data-name="notes"
+                 data-value="{{ person.notes }}">
+                {{- person.notes -}}
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- .panel -->
+    </div><!-- .col-sm-6 -->
+
+    {% if person.role == 'vendor' %}
+      <div class="col-sm-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h2 class="panel-title">Vendor Details</h2>
+          </div>
+          <div class="panel-body form-horizontal">
+            <a class="btn btn-default"
+               href="/purchase/reorder?vendor={{ person.id }}">
+              Reorder
+            </a>
+            <a class="btn btn-default" href="{{ person.id }}/items">Items</a>
+          </div>
+        </div><!-- .panel -->
+      </div><!-- .col-sm-6 -->
+    {% else %}
+      <div class="col-sm-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h2 class="panel-title">Rewards</h2>
+          </div>
+          <div class="panel-body form-horizontal">
+            <div class="form-group">
+              <label for="tax_id" class="col-sm-2 control-label">
+                Available
+              </label>
+              <div class="col-sm-10">
+                <p class="form-control-static">
+                  {{ person.points_available }}
+                </p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tax_id" class="col-sm-2 control-label">
+                Pending
+              </label>
+              <div class="col-sm-10">
+                <p class="form-control-static">
+                  {{ person.points_pending }}
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div><!-- .panel -->
+      </div><!-- .col-sm-6 -->
+    {% endif %}
+
+  </div><!-- .row -->
+
+  {% set activity= person.txns(page, limit) %}
+  {% if activity %}
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h2 class="panel-title">Activity</h2>
+          </div>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Number</th>
+                <th>Created</th>
+                <th>Ordered</th>
+                <th>Allocated</th>
+                <th class="text-right">Total</th>
+                <th class="text-right">Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for txn in activity %}
+                <tr>
+                  <td>{{ (page * limit) + loop.index }}</td>
+                  <td>
+                    <a href="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
+                      {{ txn.formatted_number }}
+                    </a>
+                  </td>
+                  <td>{{ txn.created }}</td>
+                  <td>{{ txn.ordered }}</td>
+                  <td>{{ txn.allocated }}</td>
+                  <td class="text-right">{{ scat.amount(txn.total) }}</td>
+                  <td class="text-right">{{ scat.amount(txn.total_paid) }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class="panel-footer">
+            <nav aria-label="Controls for Activity List">
+              <ul class="pager">
+                <li class="previous {{ not page ? 'disabled' }}">
+                  <a href="?page={{ page - 1 }}">
+                    <span aria-hidden="true">&larr;</span> Previous
+                  </a>
+                </li>
+                <li>
+                 {{ page * limit + 1 }} -
+                 {{ min((page + 1) * limit + 1, activity[0].records) }}
+                 of {{ activity[0].records }}
+                </li>
+                <li class="next {{ ((page + 1) * limit) >= activity[0].records ? 'disabled' }}">
+                  <a href="?page={{ page + 1 }}">
+                    Next <span aria-hidden="true">&rarr;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div><!-- .panel -->
+      </div><!-- .col-sm-12 -->
+    </div><!-- .row -->
+  {% endif %}
+
+  <script>
+    $('.editable', document.currentScript.parentNode).editable({
+      url: '/person/update',
+      success: (response, newValue) => {
+        if (response.error) { return response.error }
+      }
+    }).on('shown', function (e, editable) {
+      // Can't just do this directly because $input isn't focused yet
+      setTimeout(function() {
+        editable.input.$input.select()
+      }, 1)
+    })
+  </script>
+
+  {# TODO better target? just update status, don't reload #}
+  {{ scat.file_upload('/person/' ~ person.id ~ '/upload-items') }}
 {% endblock %}

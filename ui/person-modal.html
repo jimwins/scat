@@ -75,12 +75,10 @@
 
       <div class="modal-footer">
         <div class="pull-left" data-bind="if: id">
-          <button type="button" class="btn btn-default"
-             data-bind="click: function () {
-               window.location.href= 'person.php?id=' + id()
-             }">
+          <a class="btn btn-default"
+             data-bind="attr: { href: '/person/' + id() }">
             View
-          </button>
+          </a>
         </div>
         <button type="button" class="btn btn-default" data-dismiss="modal">
           Close

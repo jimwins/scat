@@ -22,16 +22,13 @@
                                     $data.txn_name"></a>
               </div>
               <div data-bind="visible: $data.kind == 'person' || $data.kind == 'txn'">
-                <a data-bind="attr: { href: './person.php?id=' +
-                                            $data.about_id },
+                <a data-bind="attr: { href: '/person/' + $data.about_id },
                               text: $data.about_name"></a>
                 <a class="clearfix"
-                   data-bind="attr: { href: './person.php?id=' +
-                                            $data.about_id },
+                   data-bind="attr: { href: '/person/' + $data.about_id },
                               text: $data.about_company"></a>
                 <a class="clearfix"
-                   data-bind="attr: { href: './person.php?id=' +
-                                            $data.about_id },
+                   data-bind="attr: { href: '/person/' + $data.about_id },
                               text: $data.about_phone"></a>
               </div>
               <div data-bind="visible: $data.kind == 'item'">
