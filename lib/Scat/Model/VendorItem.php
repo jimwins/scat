@@ -10,7 +10,7 @@ use OE\Lukas\QueryTree\Negation;
 use OE\Lukas\QueryTree\DisjunctiveExpressionList;
 use OE\Lukas\QueryTree\ConjunctiveExpressionList;
 
-class VendorItem extends \Model {
+class VendorItem extends \Model implements \JsonSerializable {
   public static
   function findByItemIdForVendor($item_id, $vendor_id, $active= 1) {
     return \Model::factory('VendorItem')
@@ -55,6 +55,10 @@ class VendorItem extends \Model {
 
   public function vendor() {
     return $this->belongs_to('Person', 'vendor');
+  }
+
+  public function jsonSerialize() {
+    return $this->asArray();
   }
 }
 
