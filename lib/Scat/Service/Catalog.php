@@ -80,4 +80,16 @@ class Catalog
     }
     return $dst;
   }
+
+  public function createItem() {
+    return \Model::factory('Item')->create();
+  }
+
+  public function vendorItemLookup($code) {
+    return \Model::factory('VendorItem')
+             ->where('code', $code)
+             ->where_gte('vendor_item.active', 1)
+             ->order_by_asc('vendor_item.vendor_sku')
+             ->find_one();
+  }
 }

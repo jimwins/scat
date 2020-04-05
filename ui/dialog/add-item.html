@@ -1,0 +1,90 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Add New Item
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+
+    <div class="form-group">
+      <label for="code">Code</label>
+      <div class="input-group">
+        <input type="text" class="form-control" autofocus
+               name="code" placeholder="Code">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button"
+                  id="load" title="Load from Vendor">
+            <i class="fa fa-upload"></i>
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" class="form-control"
+             name="name" placeholder="Name">
+    </div>
+
+    <div class="form-group">
+      <label for="retail_price">Price</label>
+      <input type="text" class="form-control"
+             name="retail_price" placeholder="$0.00">
+    </div>
+
+    <input type="hidden" name="vendor_item" value="">
+
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">Add</button>
+{% endblock %}
+
+{% block script %}
+  form.querySelector('#load').addEventListener('click', (ev) => {
+    event.preventDefault()
+
+    let formData= new FormData(form)
+    fetch("/catalog/~vendor-lookup", {
+      method: 'POST',
+      body: formData
+    })
+    .then((res) => {
+      if (res.ok) {
+        return res.json()
+      } else {
+        alert(res.statusText)
+      }
+    })
+    .then((data) => {
+      form.code.value= data.code
+      form.name.value= data.name
+      form.retail_price.value= data.retail_price
+      form.vendor_item.value= data.id
+    })
+  })
+
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    fetch("/catalog/~add-item", {
+      method: 'POST',
+      body: formData
+    })
+    .then((res) => {
+      if (res.ok) {
+        return res.json()
+      } else {
+        alert(res.statusText)
+      }
+    })
+    .then((data) => {
+      window.location.href= "/catalog/item/" + data.id
+    })
+  }
+{% endblock %}

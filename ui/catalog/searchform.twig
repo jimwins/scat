@@ -1,6 +1,6 @@
 <form method="GET" action="/catalog/search">
-  {% if items %}
-    <div class="pull-right" style="padding-left: 1em">
+  <div class="pull-right" style="padding-left: 1em">
+    {% if items %}
       <button class="btn btn-default toggle-select" type="button">
         Select
       </button>
@@ -57,8 +57,12 @@
           </li>
         </ul>
       </div>
-    </div>
-  {% endif %}
+      <button class="btn btn-default add-item" type="button">
+        Add Item
+      </button>
+    {% endif %}
+
+  </div>
   <div class="input-group">
     <input class="form-control" type="text" name="q" value="{{ q }}" autofocus
            autocomplete="off" autocorrect="off" autocapitalize="off"
@@ -125,5 +129,10 @@
             alert("Marked " + data.count + " item(s) inventoried.")
           })
     })
+
+    form.querySelector('.add-item').addEventListener('click', (ev) => {
+      scat.dialog([], '/dialog/add-item.html')
+    })
+
   </script>
 </form>

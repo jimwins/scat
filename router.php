@@ -762,6 +762,26 @@ $app->group('/catalog', function (Slim\App $app) {
                throw $ex;
              }
             })->setName('catalog');
+  $app->post('/~add-item',
+             function (Request $req, Response $res, array $args) {
+               $item= $this->catalog->createItem();
+
+               $item->code= trim($req->getParam('code'));
+               $item->name= trim($req->getParam('name'));
+               $item->retail_price= $req->getParam('retail_price');
+
+               if (($vendor_item= $req->getParam('vendor_item'))) {
+               }
+
+               $item->save();
+
+               return $res->withJson($item);
+             });
+  $app->post('/~vendor-lookup',
+             function (Request $req, Response $res, array $args) {
+               $item= $this->catalog->vendorItemLookup($req->getParam('code'));
+               return $res->withJson($item);
+             });
 });
 
 /* People */
