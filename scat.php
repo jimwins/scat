@@ -124,7 +124,8 @@ $(document).ready(function() {
         <li class="hidden-sm"><a href="./gift-card.php">Gift Cards</a></li>
         <li class="hidden-sm"><a href="./custom.php">Custom</a></li>
         <li><a href="/person">People</a></li>
-        <li><a href="./txns.php">Transactions</a></li>
+        <li><a href="/sale">Sales</a></li>
+        <li><a href="/purchases">Purchases</a></li>
         <li><a href="./clock.php">Clock</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
