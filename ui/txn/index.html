@@ -1,0 +1,70 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block controls %}
+  <nav aria-label="Controls for Activity List">
+    <ul class="pager">
+      <li class="previous {{ not page ? 'disabled' }}">
+        <a href="?page={{ page - 1 }}">
+          <span aria-hidden="true">&larr;</span> Previous
+        </a>
+      </li>
+      <li>
+       {{ page * limit + 1 }} -
+       {{ min((page + 1) * limit + 1, txns[0].records) }}
+       of {{ txns[0].records }}
+      </li>
+      <li class="next {{ ((page + 1) * limit) >= txns[0].records ? 'disabled' }}">
+        <a href="?page={{ page + 1 }}">
+          Next <span aria-hidden="true">&rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  {{ block('controls') }}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Number</th>
+        <th>Created</th>
+        <th>Filled</th>
+        <th>Person</th>
+        <th>Ordered</th>
+        <th>Allocated</th>
+        <th class="text-right">Total</th>
+        <th class="text-right">Paid</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for txn in txns %}
+        <tr>
+          <td>{{ (page * limit) + loop.index }}</td>
+          <td>
+            <a href="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
+              {{ txn.formatted_number }}
+            </a>
+          </td>
+          <td>{{ txn.created }}</td>
+          <td>{{ txn.filled }}</td>
+          <td>
+            {% if txn.person %}
+              <a href="/person/{{ txn.person }}">
+                {{ txn.owner.friendly_name }}
+              </a>
+            {% endif %}
+          </td>
+          <td>{{ txn.ordered }}</td>
+          <td>{{ txn.allocated }}</td>
+          <td class="text-right">{{ scat.amount(txn.total) }}</td>
+          <td class="text-right">{{ scat.amount(txn.total_paid) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {{ block('controls') }}
+{% endblock %}

@@ -148,11 +148,21 @@ if ($DEBUG) {
             })->setName('info');
 }
 
+/* ROUTES */
+
 /* Sales */
 $app->group('/sale', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect('/txns.php?type=customer');
+              $page= (int)$req->getParam('page');
+              $limit= 25;
+              $txns= $this->txn->find('customer', $page, $limit);
+              return $this->view->render($res, 'txn/index.html', [
+                'type' => 'customer',
+                'txns' => $txns,
+                'page' => $page,
+                'limit' => $limit,
+              ]);
             });
   $app->get('/{id:[0-9]+}',
             function (Request $req, Response $res, array $args) {
@@ -249,7 +259,15 @@ $app->group('/sale', function (Slim\App $app) {
 $app->group('/purchase', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect('/txns.php?type=vendor');
+              $page= (int)$req->getParam('page');
+              $limit= 25;
+              $txns= $this->txn->find('vendor', $page, $limit);
+              return $this->view->render($res, 'txn/index.html', [
+                'type' => 'vendor',
+                'txns' => $txns,
+                'page' => $page,
+                'limit' => $limit,
+              ]);
             });
   $app->get('/reorder',
             function (Request $req, Response $res, array $args) {
