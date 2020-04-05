@@ -134,6 +134,16 @@ class Txn extends \Model implements \JsonSerializable {
     return $total['total'] - $total['total_paid'];
   }
 
+  public function ordered() {
+    $total= $this->_loadTotals();
+    return $total['ordered'];
+  }
+
+  public function allocated() {
+    $total= $this->_loadTotals();
+    return $total['ordered'];
+  }
+
   public function getInvoicePDF($variation= '') {
     $loader= new \Twig\Loader\FilesystemLoader('ui/');
     $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
