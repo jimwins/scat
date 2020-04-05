@@ -70,7 +70,7 @@ class Txn extends \Model implements \JsonSerializable {
   private function _loadTotals() {
     if ($this->_totals) return $this->_totals;
 
-    $q= "SELECT ordered, allocated
+    $q= "SELECT ordered, allocated,
                 taxed, untaxed,
                 CAST(tax_rate AS DECIMAL(9,2)) tax_rate,
                 taxed + untaxed subtotal,
