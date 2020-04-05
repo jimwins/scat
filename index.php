@@ -1434,7 +1434,8 @@ viewModel.emailGiftCard= function(item) {
     var panel= $(html);
 
     var message= { card: card,
-                   from_name: '', from_email: '',
+                   from_name: viewModel.person.name(),
+                   from_email: viewModel.person.email(),
                    to_name: '', to_email: '',
                    message: '' };
     message.error= '';
