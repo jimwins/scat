@@ -446,7 +446,7 @@ $app->group('/catalog', function (Slim\App $app) {
               $data['depts']= $this->catalog->getDepartments();
               $data['q']= $q;
 
-              return $this->view->render($res, 'catalog-searchresults.html',
+              return $this->view->render($res, 'catalog/searchresults.html',
                                          $data);
             })->setName('catalog-search');
 
@@ -579,7 +579,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
               $brands= $brand ? null : $this->catalog->getBrands();
 
-              return $this->view->render($res, 'catalog-brand.html',
+              return $this->view->render($res, 'catalog/brand.html',
                                          [ 'depts' => $depts,
                                            'brands' => $brands,
                                            'brand' => $brand,
@@ -646,7 +646,7 @@ $app->group('/catalog', function (Slim\App $app) {
               $products= $this->catalog->getNewProducts($limit);
               $depts= $this->catalog->getDepartments();
 
-              return $this->view->render($res, 'catalog-whatsnew.html',
+              return $this->view->render($res, 'catalog/whatsnew.html',
                                          [
                                            'products' => $products,
                                            'depts' => $depts,
@@ -719,7 +719,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
               $brands= $dept ? null : $this->catalog->getBrands();
 
-              return $this->view->render($res, 'catalog-layout.html',
+              return $this->view->render($res, 'catalog/layout.html',
                                          [ 'brands' => $brands,
                                            'dept' => $dept,
                                            'depts' => $depts,

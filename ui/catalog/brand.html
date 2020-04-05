@@ -1,4 +1,4 @@
-{% extends 'catalog-layout.html' %}
+{% extends 'catalog/layout.html' %}
 
 {% block title %}
   Catalog Brand
@@ -66,7 +66,7 @@
 {% endif %}
 
 {% if products %}
-  {% include 'catalog-products.twig' %}
+  {% include 'catalog/products.twig' %}
 {% endif %}
 
 {% endblock %}

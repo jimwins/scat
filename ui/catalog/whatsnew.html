@@ -1,4 +1,4 @@
-{% extends 'catalog-layout.html' %}
+{% extends 'catalog/layout.html' %}
 
 {% block title %}
   New Products
@@ -22,7 +22,7 @@
 <h1 class="title">What's New</h1>
 
 {% if products %}
-  {% include 'catalog-products.twig' %}
+  {% include 'catalog/products.twig' %}
 {% endif %}
 
 {% endblock %}

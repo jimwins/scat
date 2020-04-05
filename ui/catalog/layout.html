@@ -87,13 +87,13 @@
         </p>
       {% endif %}
       {% if products and not product %}
-        {% include 'catalog-products.twig' %}
+        {% include 'catalog/products.twig' %}
       {% endif %}
 
       {% if product %}
         <!-- don't show product link on items, we're already there -->
         <style>a.product-link { display: none; }</style>
-        {% include 'catalog-product.twig' %}
+        {% include 'catalog/product.twig' %}
       {% endif %}
 
       {# Item(s) #}
