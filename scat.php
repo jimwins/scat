@@ -119,14 +119,13 @@ $(document).ready(function() {
     <div class="collapse navbar-collapse">
       <ul id="navbar" class="nav navbar-nav">
         <li><a href="./">New Sale</a></li>
-        <li><a href="./items.php">Items</a></li>
+        <li><a href="catalog">Catalog</a></li>
         <!-- Hide Gift Cards and Custom menu on tablet for size reasons -->
         <li class="hidden-sm"><a href="./gift-card.php">Gift Cards</a></li>
         <li class="hidden-sm"><a href="./custom.php">Custom</a></li>
         <li><a href="/person">People</a></li>
         <li><a href="./txns.php">Transactions</a></li>
         <li><a href="./clock.php">Clock</a></li>
-        <li><a href="catalog">Catalog</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
           <ul class="dropdown-menu">

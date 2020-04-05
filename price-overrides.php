@@ -89,7 +89,7 @@ $(function() {
       break;
     }
 
-    return 'items.php?search=' + search;
+    return '/catalog/search?q=' + search;
   }
 
   viewModel.editOverride= function(place, ev) {

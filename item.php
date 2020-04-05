@@ -45,7 +45,7 @@ while (($row= $r->fetch_assoc())) {
   $price_overrides[]= $row;
 }
 
-$search= "";
+$q= "";
 
 head("Item: " . $item['name']. " @ Scat", true);
 
@@ -295,7 +295,7 @@ include 'item-searchform.php';
             </a>
 
             <a class="btn btn-default"
-               data-bind="attr: { href: 'items.php?search=product:' +
+               data-bind="attr: { href: '/catalog/search?q=product:' +
                                          item.product_id() }">
               <i class="far fa-clipboard"></i> Product List
             </a>
