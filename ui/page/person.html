@@ -2,7 +2,7 @@
 {% import 'macros.twig' as scat %}
 
 {% block content %}
-  {% include 'person-searchform.twig' %}
+  {% include 'person/searchform.twig' %}
   <h1 class="page-header {{ not person.active ? 'text-danger' }}">
     {{ person.name ?: person.company ?: person.email ?: person.pretty_phone }}
     <small>{% if person.name %}{{ person.company }}{% endif %}</small>
