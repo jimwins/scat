@@ -764,22 +764,54 @@ $app->group('/catalog', function (Slim\App $app) {
             })->setName('catalog');
   $app->post('/~add-item',
              function (Request $req, Response $res, array $args) {
+               \ORM::get_db()->beginTransaction();
+
                $item= $this->catalog->createItem();
 
                $item->code= trim($req->getParam('code'));
                $item->name= trim($req->getParam('name'));
                $item->retail_price= $req->getParam('retail_price');
 
-               if (($vendor_item= $req->getParam('vendor_item'))) {
+               if (($id= $req->getParam('vendor_item'))) {
+                 $vendor_item= $this->catalog->getVendorItemById($id);
+                 if ($vendor_item) {
+                   $item->purchase_quantity= $vendor_item->purchase_quantity;
+                   $item->length= $vendor_item->length;
+                   $item->width= $vendor_item->width;
+                   $item->height= $vendor_item->height;
+                   $item->weight= $vendor_item->weight;
+                   $item->prop65= $vendor_item->prop65;
+                   $item->hazmat= $vendor_item->hazmat;
+                   $item->oversized= $vendor_item->oversized;
+                 } else {
+                   // Not a hard error, but log it.
+                   error_log("Unable to find vendor_item $id");
+                 }
                }
 
                $item->save();
+
+               if ($vendor_item) {
+                 if ($vendor_item->barcode) {
+                   $barcode= $item->barcodes()->create();
+                   $barcode->code= $vendor_item->barcode;
+                   $barcode->item= $item->id();
+                   $barcode->save();
+                 }
+                 if (!$vendor_item->item) {
+                   $vendor_item->item= $item->id();
+                   $vendor_item->save();
+                 }
+               }
+
+               \ORM::get_db()->commit();
 
                return $res->withJson($item);
              });
   $app->post('/~vendor-lookup',
              function (Request $req, Response $res, array $args) {
-               $item= $this->catalog->vendorItemLookup($req->getParam('code'));
+               $item=
+                 $this->catalog->getVendorItemByCode($req->getParam('code'));
                return $res->withJson($item);
              });
 });

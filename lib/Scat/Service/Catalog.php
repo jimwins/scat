@@ -85,11 +85,18 @@ class Catalog
     return \Model::factory('Item')->create();
   }
 
-  public function vendorItemLookup($code) {
+  public function getVendorItemByCode($code) {
     return \Model::factory('VendorItem')
              ->where('code', $code)
              ->where_gte('vendor_item.active', 1)
              ->order_by_asc('vendor_item.vendor_sku')
              ->find_one();
+  }
+
+  public function getVendorItemById($id) {
+    return \Model::factory('VendorItem')
+             ->where_gte('vendor_item.active', 1)
+             ->order_by_asc('vendor_item.purchase_quantity')
+             ->find_one($id);
   }
 }
