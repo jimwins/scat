@@ -8,8 +8,8 @@ Scat uses the jQuery and jQueryUI Javascript libraries.
 Scat uses the Bootstrap front-end framework:
   http://getbootstrap.com/
 
-Scat uses Font Awesome, the iconic font designed for Bootstrap:
-  http://fontawesome.io/
+Scat uses Fork Awesome, a fork of the iconic font and CSS toolkit:
+  http://forkaweso.me/
 
 Scat includes the Tablesorter 2.0 plugin for jQuery:
   http://tablesorter.com/docs/

@@ -32,7 +32,7 @@ header("content-type: text/html;charset=utf-8");?>
  <title><?=ashtml($title)?></title>
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <link rel="stylesheet" type="text/css" href="extern/bootstrap/css/bootstrap.min.css">
- <link rel="stylesheet" type="text/css" href="components/font-awesome/css/all.min.css">
+ <link rel="stylesheet" type="text/css" href="/vendor/forkawesome/fork-awesome/css/fork-awesome.min.css">
  <link rel="stylesheet" type="text/css" href="extern/bootstrap-datepicker-1.7.1/css/bootstrap-datepicker3.min.css">
  <link rel="stylesheet" type="text/css" href="vendor/select2/select2/dist/css/select2.min.css">
  <link rel="stylesheet" type="text/css" href="extern/select2-bootstrap-theme-0.1.0-beta.10/dist/select2-bootstrap.min.css">
@@ -488,17 +488,17 @@ function expand_field($data, $class, $meta = null) {
     return \Scat\Model\Payment::$methods[$data];
   case '$bool':
     if ($data) {
-      return '<i data-truth="1" class="far fa-check-square"></i>';
+      return '<i data-truth="1" class="fa fa-check-square"></i>';
     } else {
-      return '<i data-truth="0" class="far fa-square"></i>';
+      return '<i data-truth="0" class="fa fa-square"></i>';
     }
   case '$trool':
     if ($data < 0 || $data === null) {
-      return '<i data-truth="1" class="far fa-check-square"></i>';
+      return '<i data-truth="1" class="fa fa-check-square"></i>';
     } elseif ($data == 0) {
-      return '<i data-truth="1" class="far fa-minus-square"></i>';
+      return '<i data-truth="1" class="fa fa-minus-square"></i>';
     } else {
-      return '<i data-truth="0" class="far fa-square"></i>';
+      return '<i data-truth="0" class="fa fa-square"></i>';
     }
   case '$html':
     return $data;

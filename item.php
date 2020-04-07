@@ -60,15 +60,15 @@ include 'item-searchform.php';
       <div class="panel-heading">
         <div class="pull-right">
           <button id="active" type="button" class="btn btn-default btn-xs">
-            <i class="far"
-               data-bind="css: { 'fa-check-square' : item.active(),
-                                'fa-square' : !item.active() }"></i>
+            <i class="fa"
+               data-bind="css: { 'fa-check-square-o' : item.active(),
+                                'fa-square-o' : !item.active() }"></i>
             Active
           </button>
           <button id="reviewed" type="button" class="btn btn-default btn-xs">
-            <i class="far"
-               data-bind="css: { 'fa-check-square' : item.reviewed(),
-                                'fa-square' : !item.reviewed() }"></i>
+            <i class="fa"
+               data-bind="css: { 'fa-check-square-o' : item.reviewed(),
+                                'fa-square-o' : !item.reviewed() }"></i>
             Reviewed
           </button>
         </div>
@@ -221,7 +221,7 @@ include 'item-searchform.php';
           <a class="btn btn-default btn-xs"
              data-bind="attr: { href: '<?=ORDURE?>/' + item.code() }"
              target="_blank">
-            <i class="fas fa-external-link-alt"></i>
+            <i class="fa fa-external-link"></i>
             Website
           </a>
         </div>
@@ -297,13 +297,13 @@ include 'item-searchform.php';
             <a class="btn btn-default"
                data-bind="attr: { href: '/catalog/search?q=product:' +
                                          item.product_id() }">
-              <i class="far fa-clipboard"></i> Product List
+              <i class="fa fa-clipboard"></i> Product List
             </a>
 
             <a class="btn btn-default"
                data-bind="attr: { href: 'report-performance.php?product=' +
                                          item.product_id() }">
-              <i class="far fa-chart-bar"></i> Performance
+              <i class="fa fa-bar-chart"></i> Performance
             </a>
           </div>
         </div>
@@ -324,7 +324,7 @@ include 'item-searchform.php';
           <tr>
             <td><span data-bind="text: $data.code"></span></td>
             <td><span data-bind="text: $data.quantity, jeditable: $data.quantity, jeditableOptions: { onupdate: editBarcodeQuantity, onblur: 'cancel' }"></span></td>
-            <td><button type="button" class="btn btn-default btn-xs" data-bind="click: $parent.removeBarcode"><i class="far fa-trash-alt"></i></button></td>
+            <td><button type="button" class="btn btn-default btn-xs" data-bind="click: $parent.removeBarcode"><i class="fa fa-trash"></i></button></td>
           </tr>
         </tbody>
       </table>
@@ -393,23 +393,23 @@ include 'item-searchform.php';
         </div>
         <button id="prop65" type="button" class="btn btn-default"
                 data-bind="click: toggleProperty">
-          <i class="far"
-             data-bind="css: { 'fa-check-square' : item.prop65(),
-                              'fa-square' : !item.prop65() }"></i>
+          <i class="fa"
+             data-bind="css: { 'fa-check-square-o' : item.prop65(),
+                              'fa-square-o' : !item.prop65() }"></i>
           Prop. 65
         </button>
         <button id="hazmat" type="button" class="btn btn-default"
                 data-bind="click: toggleProperty">
-          <i class="far"
-             data-bind="css: { 'fa-check-square' : item.hazmat(),
-                              'fa-square' : !item.hazmat() }"></i>
+          <i class="fa"
+             data-bind="css: { 'fa-check-square-o' : item.hazmat(),
+                              'fa-square-o' : !item.hazmat() }"></i>
           Hazardous Material
         </button>
         <button id="oversized" type="button" class="btn btn-default"
                 data-bind="click: toggleProperty">
-          <i class="far"
-             data-bind="css: { 'fa-check-square' : item.oversized(),
-                              'fa-square' : !item.oversized() }"></i>
+          <i class="fa"
+             data-bind="css: { 'fa-check-square-o' : item.oversized(),
+                              'fa-square-o' : !item.oversized() }"></i>
           Oversized
         </button>
       </div>
@@ -569,7 +569,7 @@ $vendor_items= item_load_vendor_items($db, $id);
       <td data-bind="text: amount($data.net_price())"></td>
       <td data-bind="text: amount($data.promo_price())"></td>
       <td data-bind="text: amount($data.net_price() / 0.6) + ' - ' + amount($data.net_price() / 0.5)"></td>
-      <td><i class="far" data-bind="css: { 'fa-check-square': $data.special_order() == '1', 'fa-square': $data.special_order() == '0' }"></i></td>
+      <td><i class="fa" data-bind="css: { 'fa-check-square-o': $data.special_order() == '1', 'fa-square-o': $data.special_order() == '0' }"></i></td>
       <td data-bind="text: $data.purchase_quantity"></td>
     </tr>
   </tbody>

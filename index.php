@@ -574,7 +574,7 @@ $("#txn-load").submit(function(ev) {
         <div class="pull-right">
           <button type="button" class="btn btn-default"
                   data-bind="enable: txn.id(), click: showNotes">
-           <i class="far fa-sticky-note"></i>
+           <i class="fa fa-sticky-note"></i>
            <span class="badge"
                  data-bind="text: notes().length, visible: notes().length">
            </span>
@@ -583,7 +583,7 @@ $("#txn-load").submit(function(ev) {
            <button type="button" class="btn btn-default dropdown-toggle"
                    data-bind="enable: txn.id()"
                    data-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-cog"></i>
+            <i class="fa fa-cog"></i>
             <span class="caret"></span>
            </button>
            <ul class="dropdown-menu" role="menu">
@@ -592,7 +592,7 @@ $("#txn-load").submit(function(ev) {
             </li>
             <li data-bind="visible: txn.type() == 'customer'">
                <a data-bind="click: toggleNoRewards">
-                 <i class="far"
+                 <i class="fa"
                     data-bind="css: { 'fa-square': txn.no_rewards(),
                                       'fa-check-square': !txn.no_rewards()
                                     }"></i>
@@ -904,12 +904,12 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
           </span>
           <span data-bind="css: { 'text-muted': !txn.paid() },
                            attr: { title: txn.paid() ? moment(txn.paid()).format('MMMM D YYYY h:mm:ss a') : '' }">
-            <i class="far fa-money-bill-alt"></i>
+            <i class="fa fa-money"></i>
           </span>
         </div>
         <div>
           <a data-bind="click: changePerson">
-            <i class="far fa-user"></i>
+            <i class="fa fa-user"></i>
             <span class="val"
                   data-bind="text: person.display_name()"></span>
           </a>
@@ -920,7 +920,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
               <span data-bind="text: person.points_available()"></span>
             </a>
             <span data-bind="if: person.points_pending() > 0">
-              + <i class="far fa-star"></i>
+              + <i class="fa fa-star"></i>
               <span data-bind="text: person.points_pending()"></span>
               = <span data-bind="text: person.points_available() + person.points_pending()"></span>
             </span>
@@ -930,14 +930,14 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
                 <span data-bind="text: loyaltyPointsUsed()"></span>
               </span>
               <span data-bind="if: !txn.no_rewards()">
-                + <i class="far fa-star"></i>
+                + <i class="fa fa-star"></i>
                 <span data-bind="text: <?=defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1?> * Math.max(1, Math.floor(txn.taxed()))"></span>
               </span>
               = <span data-bind="text: person.points_available() + person.points_pending() + (txn.no_rewards() ? 0 : <?=defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1?> * Math.max(1, Math.floor(txn.taxed()))) - loyaltyPointsUsed()"></span>
             </span>
           </span>
           <a data-bind="if: person.id(), click: removePerson">
-            <i class="far fa-trash-alt"></i>
+            <i class="fa fa-trash"></i>
           </a>
         </div>
       </div>
@@ -1003,7 +1003,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
       <th data-bind="attr: { colspan: $parent.showAllocated() ? 5 : 4 }"
           class="payment-buttons">
         <a data-bind="visible: $parent.showAdmin() || (method() == 'discount' && !$parent.txn.paid())" name="remove">
-          <i class="far fa-trash-alt"></i>
+          <i class="fa fa-trash"></i>
         </a>
         <a data-bind="visible: method() == 'credit',
                       click: function (data) { printChargeRecord(data.id()) }">
@@ -1061,7 +1061,7 @@ $('#tax_rate .val').editable(function(value, settings) {
       <td>
         <a class="remove"
            data-bind="click: $parent.removeItem">
-          <i class="far fa-trash-alt" title="Remove"></i>
+          <i class="fa fa-trash" title="Remove"></i>
         </a>
       </td>
       <td align="center" class="editable"

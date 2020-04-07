@@ -26,7 +26,6 @@
     "require": {
         "moment/moment": "^2.17",
         "components/jquery": "^3.1",
-        "components/font-awesome": "^5.0",
         "phpoffice/phpspreadsheet": "^1.6",
         "giggsey/libphonenumber-for-php": "^8.1",
         "guzzlehttp/guzzle": "^6.2",
