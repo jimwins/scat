@@ -54,7 +54,7 @@ $q= "SELECT name, timeclock.id,
             LEAST(8, TIMESTAMPDIFF(second, start, end) / 3600) regular,
             GREATEST(0, TIMESTAMPDIFF(second, start, end) / 3600 - 8) overtime
        FROM timeclock
-       JOIN person ON timeclock.person = person.id
+       JOIN person ON timeclock.person_id = person.id
       WHERE start BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
       ORDER BY name, day";
 

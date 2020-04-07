@@ -126,7 +126,7 @@ $(document).ready(function() {
         <li><a href="/person">People</a></li>
         <li><a href="/sale">Sales</a></li>
         <li><a href="/purchases">Purchases</a></li>
-        <li><a href="./clock.php">Clock</a></li>
+        <li><a href="/clock">Clock</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
           <ul class="dropdown-menu">

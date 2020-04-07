@@ -408,4 +408,27 @@ class Person extends \Model implements \JsonSerializable {
 
     return [ "result" => "Added or updated " . $added_or_updated . " items." ];
   }
+
+  public function punches() {
+    return $this->has_many('Timeclock');
+  }
+
+  public function punched() {
+    $punch= $this->punches()->where_null('end')->find_one();
+    return $punch->start;
+  }
+
+  public function punch() {
+    $punch= $this->punches()->where_null('end')->find_one();
+    if ($punch) {
+      $punch->set_expr('end', 'NOW()');
+      $punch->save();
+    } else {
+      $punch= $this->punches()->create();
+      $punch->person_id= $this->id();
+      $punch->set_expr('start', 'NOW()');
+      $punch->save();
+    }
+    return $punch;
+  }
 }

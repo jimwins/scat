@@ -1,0 +1,67 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Clock
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-sm-offset-3 col-sm-6">
+    <div class="alert alert-info">
+      <strong>Click</strong> on a name to clock in or out.
+    </div>
+    <div class="list-group">
+      {% for person in people %}
+        <a data-id="{{ person.id }}"
+           class="punch list-group-item
+                  {{ person.punched ? 'list-group-item-success' }}">
+          {{ person.name }}
+          <span class="badge">{{ person.punched }}</span>
+        </a>
+      {% endfor %}
+    </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    let reload= () => {
+      fetch('/clock?block=content')
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Network response was not ok')
+          }
+          return res.text()
+        })
+        .then((data) => {
+          document.querySelector('#scat-page').innerHTML= data
+          return data
+        })
+    }
+
+    window.addEventListener('focus', reload);
+
+    document.addEventListener('click', (ev) => {
+      if (!event.target.matches('.punch')) return;
+
+      let formData= new FormData()
+      formData.append('id', event.target.getAttribute('data-id'))
+      fetch('/clock/~punch', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: formData
+      })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok')
+        }
+        reload()
+      })
+    })
+  </script>
+{% endblock %}

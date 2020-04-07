@@ -881,7 +881,28 @@ $app->group('/person', function (Slim\App $app) {
 $app->group('/clock', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect('/clock.php');
+              $people= \Model::factory('Person')
+                ->select('*')
+                ->where('role', 'employee')
+                ->order_by_asc('name')
+                ->find_many();
+
+              if (($block= $req->getParam('block'))) {
+                $out= $this->view->fetchBlock('clock/index.html', $block, [
+                                               'people' => $people,
+                                             ]);
+                return $res->getBody()->write($out);
+              } else {
+                return $this->view->render($res, 'clock/index.html', [
+                                             'people' => $people,
+                                            ]);
+              }
+            });
+  $app->post('/~punch',
+            function (Request $req, Response $res, array $args) {
+              $id= $req->getParam('id');
+              $person= \Model::factory('Person')->find_one($id);
+              return $res->withJson($person->punch());
             });
 });
 
