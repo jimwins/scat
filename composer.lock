@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "22c3eeaf7eefa4e746e918f5d17cebfe",
+    "content-hash": "5767a714a68eedddab65983766190a44",
     "packages": [
         {
             "name": "aptoma/twig-markdown",
@@ -621,6 +621,53 @@
                 "scrolling"
             ],
             "time": "2015-09-24T17:48:10+00:00"
+        },
+        {
+            "name": "forkawesome/fork-awesome",
+            "version": "1.1.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ForkAwesome/Fork-Awesome.git",
+                "reference": "326af9c8bee0c80ff4c00cb2fadd4f1edd2a08c3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ForkAwesome/Fork-Awesome/zipball/326af9c8bee0c80ff4c00cb2fadd4f1edd2a08c3",
+                "reference": "326af9c8bee0c80ff4c00cb2fadd4f1edd2a08c3",
+                "shasum": ""
+            },
+            "require-dev": {
+                "jekyll": "1.0.2",
+                "lessc": "1.4.2"
+            },
+            "type": "component",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OFL-1.1",
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fork Awesome Community",
+                    "homepage": "https://forkawesome.github.io"
+                }
+            ],
+            "description": "A fork of the iconic font and CSS framework",
+            "homepage": "http://forkawesome.github.io/Fork-Awesome/",
+            "keywords": [
+                "FontAwesome",
+                "awesome",
+                "bootstrap",
+                "font",
+                "forkawesome",
+                "icon"
+            ],
+            "time": "2019-02-28T15:21:34+00:00"
         },
         {
             "name": "giggsey/libphonenumber-for-php",
