@@ -468,11 +468,7 @@ function expand_field($data, $class, $meta = null) {
                  'drawer' => 'Till Count',
                  'customer' => 'Invoice',
                  'vendor' => 'Purchase Order');
-    if ($type == 'customer' || $type == 'vendor' || $type == 'correction') {
-      return '<a href="./?id='.ashtml($id).'">'.$desc[$type].' '.ashtml($number).'</a>';
-    } else {
-      return '<a href="txn.php?id='.ashtml($id).'">'.$desc[$type].' '.ashtml($number).'</a>';
-    }
+    return '<a href="./?id='.ashtml($id).'">'.$desc[$type].' '.ashtml($number).'</a>';
   case '$person':
     list($id, $company, $name, $loyalty)= preg_split('/\|/', $data, 4);
     if (!$id) return '';

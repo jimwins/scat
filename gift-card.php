@@ -66,7 +66,7 @@ head('Gift Cards', true);
         <td data-bind="text: $data.entered"></td>
         <td>
           <a data-bind="text: $data.txn_name,
-                        attr: { href: 'txn.php?id=' + $data.txn_id() }"></a>
+                        attr: { href: '/sale/' + $data.txn_id() }"></a>
         </td>
         <td data-bind="text: Scat.amount($data.amount)"></td>
       </tr>
