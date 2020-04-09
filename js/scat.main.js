@@ -85,7 +85,7 @@ class ScatUtils {
     let text= '<iframe id="scat-print" src="' + url + '"></iframe>'
 
     let lpr= this.htmlToElement(text)
-    lpr.setAttribute('display', 'none');
+    lpr.style.display= 'none'
     lpr.addEventListener('load', (ev) => {
       /* If we got JSON, we printed directly */
       if (ev.target.contentDocument.contentType != 'application/json') {
@@ -133,6 +133,45 @@ class ScatUtils {
       return Promise.reject(new Error(response.statusText))
     })
     // XXX catch data.error and alert()?
+  }
+
+  print (url, args) {
+    const formData= args instanceof FormData ? args : new FormData()
+
+    if (!(args instanceof FormData)) {
+      for (let prop in args) {
+        formData.append(prop, args[prop])
+      }
+    }
+
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: formData
+    })
+    .then((response) => {
+      if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response)
+      }
+      return Promise.reject(new Error(response.statusText))
+    })
+    .then((res) => {
+      if (res.headers.get('Content-type').indexOf("application/json") == -1) {
+        res.text().then((html) => {
+          let lpr= document.createElement('iframe')
+          lpr.style.display= 'none'
+          lpr.addEventListener('load', (ev) => {
+            ev.target.contentWindow.print()
+          })
+          lpr.srcdoc= html
+          document.body.appendChild(lpr)
+        })
+      } else {
+        res.json().then((data) => {
+          window.alert(data.message)
+        })
+      }
+    })
   }
 }
 
