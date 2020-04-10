@@ -1,0 +1,148 @@
+{% import 'macros.twig' as scat %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    {% block title 'Scat' %}
+    {% if not (block('title') matches '/Scat/') %}
+      @ Scat
+    {% endif %}
+  </title>
+  {% block extra_head %}
+  {% endblock %}
+  <link rel="stylesheet" type="text/css" href="/css/print.css">
+  <style media="screen">
+    htmlpageheader, htmlpagefooter { display: none }
+  </style>
+  <style type="text/css">
+  body {
+    font:28px Monaco, monospace;
+    text-align:left;
+    color:#000;
+    margin:0;
+    padding:0;
+  }
+
+  header, footer {
+    display: none;
+  }
+
+  .right {
+    text-align: right;
+  }
+  .left {
+    text-align: left;
+  }
+
+  #doc_header {
+    margin-bottom: 2em;
+    padding-bottom:1em;
+    border-bottom:2px solid #000;
+    text-align:center;
+  }
+  #store_name {
+    font-size:1.5em;
+    font-weight:bold;
+    font-family: 'Directa Serif';
+  }
+  table {font-size:larger; width:100%; padding:2em 0;
+          border-bottom:2px solid #000; border-left:0; border-right:0;}
+  .qty {padding:0.2em 0.5em; text-align:right;} /* tr's and th's */
+  .price {padding:0.2em 0.1em; white-space:nowrap; text-align:right;}
+  .description { font-size: 0.75em; }
+  td {padding:0.2em 0.1em; vertical-align:top;}
+  tr.sub td {border-top:2px solid #000; border-bottom:2px solid #000;}
+  tr.total td, tr.total th {border-top:solid #000 6px; }
+
+  #doc_info {
+    text-align: center;
+    font-size: 1.5em;
+    padding-top: 1em;
+  }
+
+  #store_footer {margin:2em 0; padding:5px 0px; text-align:center;}
+
+  </style>
+</head>
+<body>
+<div id="doc_header">
+  <div id="store_name">Raw Materials Art Supplies</div>
+  645 South Los Angeles Street<br>
+  Los Angeles, CA 90014<br>
+  (800) 729-7060<br>
+  info@RawMaterialsLA.com<br>
+  http://RawMaterialsLA.com/
+</div>
+<div style="font-size: 1.5em; text-align: center">CHANGE ORDER</div>
+<table>
+  <thead>
+    <tr>
+      <th align="center">Qty</th>
+      <th>Type</th>
+      <th align="right">Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set total= 0 %}
+    {% if fives %}
+      <tr>
+        <td align="center">{{ fives }}</td>
+        <td>$5 bills</td>
+        <td align="right">{{ scat.amount(fives * 5) }}</td>
+      </tr>
+      {% set total= total + (fives * 5) %}
+    {% endif %}
+    {% if ones %}
+      <tr>
+        <td align="center">{{ ones }}</td>
+        <td>$1 bills</td>
+        <td align="right">{{ scat.amount(ones * 1) }}</td>
+      </tr>
+      {% set total= total + (ones * 1) %}
+    {% endif %}
+    {% if quarters %}
+      <tr>
+        <td align="center">{{ quarters }}</td>
+        <td>Rolls of Quarters</td>
+        <td align="right">{{ scat.amount(quarters * 10) }}</td>
+      </tr>
+      {% set total= total + (quarters * 10) %}
+    {% endif %}
+    {% if dimes %}
+      <tr>
+        <td align="center">{{ dimes }}</td>
+        <td>Rolls of Dimes</td>
+        <td align="right">{{ scat.amount(dimes * 5) }}</td>
+      </tr>
+      {% set total= total + (dimes * 5) %}
+    {% endif %}
+    {% if nickels %}
+      <tr>
+        <td align="center">{{ nickels }}</td>
+        <td>Rolls of Nickels</td>
+        <td align="right">{{ scat.amount(nickels * 2) }}</td>
+      </tr>
+      {% set total= total + (nickels * 2) %}
+    {% endif %}
+    {% if pennies %}
+      <tr>
+        <td align="center">{{ pennies }}</td>
+        <td>Rolls of Pennies</td>
+        <td align="right">{{ scat.amount(pennies * 0.5) }}</td>
+      </tr>
+      {% set total= total + (pennies * 0.5) %}
+    {% endif %}
+  </tbody>
+  <tfoot>
+    <tr class="total">
+      <th colspan="2" align="right">Total:</th>
+      <td align="right">{{ scat.amount(total) }}</td>
+    </tr>
+  </tfoot>
+</table>
+
+</body>
+</html>

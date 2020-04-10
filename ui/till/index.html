@@ -1,0 +1,296 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Till
+{% endblock %}
+
+{% block content %}
+  <div class="col-sm-6">
+    <form class="form-horizontal">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Till Count</h3>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label for="expected" class="col-sm-2 control-label">Expected</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" disabled
+                     name="expected" value="{{ scat.amount(expected) }}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="counted" class="col-sm-2 control-label">Counted</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control"
+                     name="counted" placeholder="$0.00">
+            </div>
+          </div>
+          <div class="form-group"
+               data-bind="css: { 'has-error' : overshort() < 0 }">
+            <label for="overshort" class="col-sm-2 control-label">
+              Over/(Short)
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" disabled
+                     name="overshort" placeholder="$0.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="withdraw" class="col-sm-2 control-label">
+              Withdrawal
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control"
+                     name="withdraw" placeholder="$0.00">
+            </div>
+          </div>
+          <div class="form-group"
+               data-bind="css: { 'has-error' : remaining() < 0 }">
+            <label for="remaining" class="col-sm-2 control-label">
+              Remaining
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" disabled
+                     name="remaining" value="{{ scat.amount(expected) }}">
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+      <script>
+      {
+        let form= document.currentScript.parentNode
+
+        let updateDeposit= (ev) => {
+          let expected= form.elements['expected'].value.replace(/[^0-9.-]+/g,"")
+          let counted= form.elements['counted'].value.replace(/[^0-9.-]+/g,"")
+          let withdraw= form.elements['withdraw'].value.replace(/[^0-9.-]+/g,"")
+
+          let overshort= counted - expected
+          let remaining= counted - withdraw
+
+          form.elements['overshort'].value= scat.amount(overshort)
+          form.elements['remaining'].value= scat.amount(remaining)
+
+          form.querySelectorAll('.has-error').forEach((el) => {
+            el.classList.remove('has-error')
+          })
+
+          if (overshort < 0) {
+            form.elements['overshort'].closest('.form-group')
+                 .classList.add('has-error')
+          }
+          if (remaining < 0) {
+            form.elements['remaining'].closest('.form-group')
+                .classList.add('has-error')
+          }
+        }
+
+        form.querySelectorAll('input[type="text"]').forEach((el) => {
+          el.addEventListener('change', updateDeposit)
+        })
+
+        form.addEventListener('submit', (ev) => {
+          ev.preventDefault()
+
+          scat.call('/till/~count', new FormData(ev.target))
+          .then((res) => {
+            return res.json()
+          })
+          .then((data) => {
+            if (data.error) {
+              alert(data.error)
+              return
+            }
+            form.reset()
+            form.elements['expected'].value= scat.amount(data.expected)
+            form.elements['remaining'].value= scat.amount(data.expected)
+            alert("Success!")
+          })
+        })
+      }
+      </script>
+    </form>
+
+    <form class="form-horizontal">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Petty Cash</h3>
+        </div>
+        <div class="panel-body form-horizontal">
+          <div class="form-group">
+            <label for="withdraw" class="col-sm-2 control-label">
+              Withdrawal
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control"
+                     name="amount" placeholder="$0.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reason" class="col-sm-2 control-label">
+              Reason
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control"
+                     name="reason"
+                     placeholder="Reason for withdrawing petty cash.">
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <button type="submit" class="btn btn-primary">
+            Process
+          </button>
+        </div>
+      </div>
+      <script>
+        let form= document.currentScript.parentNode
+        form.addEventListener('submit', (ev) => {
+          ev.preventDefault()
+          scat.call('/till/~withdraw-cash', new FormData(ev.target))
+          .then((res) => {
+            return res.json()
+          })
+          .then((data) => {
+            if (data.error) {
+              alert(data.error)
+              return
+            }
+            alert("Success! Withdrew " +
+                  scat.amount(form.elements['amount'].value) + " from till.")
+            form.reset()
+          })
+        })
+      </script>
+    </form>
+  </div>
+
+  <div class="col-sm-5">
+    <form class="form">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Change Order</h3>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="col-sm-3">Quantity</th>
+              <th class="col-sm-6">Type</th>
+              <th class="col-sm-3">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input type="number" class="form-control" size="4"
+                       name="fives" min="0" step="20" data-multiple="5"
+                       placeholder="0">
+              </td>
+              <td>$5 bills</td>
+              <td>
+                $0.00
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="number" class="form-control" size="4"
+                       name="ones" min="0" step="25" data-multiple="1"
+                       placeholder="0">
+              </td>
+              <td>$1 bills</td>
+              <td>
+                $0.00
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="number" class="form-control" size="4"
+                       name="quarters" min="0" step="1" data-multiple="10"
+                       placeholder="0">
+              </td>
+              <td>Rolls of Quarters</td>
+              <td>
+                $0.00
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="number" class="form-control" size="4"
+                       name="dimes" min="0" step="1" data-multiple="5"
+                       placeholder="0">
+              </td>
+              <td>Rolls of Dimes</td>
+              <td>
+                $0.00
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="number" class="form-control" size="4"
+                       name="nickels" min="0" step="1" data-multiple="2"
+                       placeholder="0">
+              </td>
+              <td>Rolls of Nickels</td>
+              <td>
+                $0.00
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="number" class="form-control" size="4"
+                       name="pennies" min="0" step="1" data-multiple="0.50"
+                       placeholder="0">
+              </td>
+              <td>Rolls of Pennies</td>
+              <td>
+                $0.00
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" align="right">Total:</td>
+              <td class="change-total">$0.00</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="panel-footer">
+          <button type="submit" class="btn btn-primary">
+            Print
+          </button>
+        </div>
+      </div>
+      <script>
+        let change= document.currentScript.parentNode
+
+        let updateTotals= (ev) => {
+          /* a little fragile, we depend on layout of table */
+          ev.target.parentElement.nextElementSibling.nextElementSibling.textContent=
+            scat.amount(ev.target.value *
+                        ev.target.getAttribute('data-multiple'))
+
+          let total= 0
+          change.querySelectorAll('input[type="number"]').forEach((el) => {
+            total+= el.value * el.getAttribute('data-multiple')
+          })
+
+          change.querySelector('.change-total').textContent= scat.amount(total)
+        }
+
+        change.querySelectorAll('input[type="number"]').forEach((el) => {
+          el.addEventListener('change', updateTotals)
+        })
+
+        change.addEventListener('submit', (ev) => {
+          ev.preventDefault()
+          scat.print('/till/~print-change-order', new FormData(ev.target))
+        })
+      </script>
+    </form>
+  </div>
+{% endblock content %}

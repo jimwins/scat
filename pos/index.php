@@ -3,6 +3,8 @@ require '../vendor/autoload.php';
 
 use \Psr\Http\Message\RequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use \Respect\Validation\Validator as v;
+use \DavidePastore\Slim\Validation\Validation as Validation;
 
 /* Some defaults */
 error_reporting(E_ALL & ~E_NOTICE);
@@ -107,6 +109,9 @@ $container['giftcard']= function($c) {
 };
 $container['txn']= function($c) {
   return new \Scat\Service\Txn();
+};
+$container['printer']= function($c) {
+  return new \Scat\Service\Printer($c->view);
 };
 
 /* Trim trailing slashes */
@@ -1112,8 +1117,117 @@ $app->post('/notes/{id}/update',
 $app->group('/till', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect("/till.php");
+              $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) AS expected
+                     FROM payment
+                    WHERE method IN ('cash','change','withdrawal')";
+              $data= \ORM::for_table('payment')->raw_query($q)->find_one();
+              return $this->view->render($res, "till/index.html", [
+                'expected' => $data->expected,
+              ]);
             });
+
+  $app->post('/~print-change-order',
+             function (Request $req, Response $res, array $args) {
+               $out= $this->printer->printFromTemplate(
+                 'print/change-order.html',
+                 $req->getParams()
+               );
+               return $res->getBody()->write($out);
+             });
+
+  $app->post('/~count',
+             function (Request $req, Response $res, array $args) {
+               if ($req->getAttribute('has_errors')) {
+                 return $res->withJson([
+                   'error' => "Validation failed.",
+                   'validation_errors' => $req->getAttribute('errors')
+                 ]);
+               }
+
+               $counted= $req->getParam('counted');
+               $withdraw= $req->getParam('withdraw');
+
+               $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) AS expected
+                      FROM payment
+                     WHERE method IN ('cash','change','withdrawal')";
+               $data= \ORM::for_table('payment')->raw_query($q)->find_one();
+               $expected= $data->expected;
+
+               \ORM::get_db()->beginTransaction();
+
+               $txn= $this->txn->create([ 'type' => 'drawer' ]);
+
+               if ($count != $expected) {
+                 $amount= $counted - $expected;
+
+                 $payment= Model::factory('Payment')->create();
+                 $payment->txn= $txn->id;
+                 $payment->method= 'cash';
+                 $payment->amount= $amount;
+                 $payment->set_expr('processed', 'NOW()');
+
+                 $payment->save();
+               }
+
+               if ($withdraw) {
+                 $payment= Model::factory('Payment')->create();
+                 $payment->txn= $txn->id;
+                 $payment->method= 'withdrawal';
+                 $payment->amount= -$withdraw;
+                 $payment->set_expr('processed', 'NOW()');
+
+                 $payment->save();
+               }
+
+               \ORM::get_db()->commit();
+
+               $data= \ORM::for_table('payment')->raw_query($q)->find_one();
+               return $res->withJson(['expected' => $data->expected ]);
+             })
+      ->add(new Validation([
+        'counted' => v::numeric()::positive(),
+        'withdraw' => v::numeric(),
+      ]));
+
+  $app->post('/~withdraw-cash',
+             function (Request $req, Response $res, array $args) {
+               if ($req->getAttribute('has_errors')) {
+                 return $res->withJson([
+                   'error' => "Validation failed.",
+                   'validation_errors' => $req->getAttribute('errors')
+                 ]);
+               }
+
+               $reason= $req->getParam('reason');
+               $amount= $req->getParam('amount');
+
+               \ORM::get_db()->beginTransaction();
+
+               $txn= $this->txn->create([ 'type' => 'drawer' ]);
+
+               $payment= Model::factory('Payment')->create();
+               $payment->txn= $txn->id;
+               $payment->method= 'withdrawal';
+               $payment->amount= -$amount;
+               $payment->set_expr('processed', 'NOW()');
+
+               $payment->save();
+
+               $note= Model::factory('Note')->create();
+               $note->kind= 'txn';
+               $note->attach_id= $txn->id;
+               $note->content= $reason;
+
+               $note->save();
+
+               \ORM::get_db()->commit();
+
+               return $res->withJson($txn);
+             })
+      ->add(new Validation([
+        'amount' => v::numeric()::positive(),
+        'reason' => v::stringType()::notOptional(),
+      ]));
 });
 
 /* Safari notifications */

@@ -146,7 +146,7 @@ $(document).ready(function() {
             <li><a href="price-overrides.php">Price Overrides</a></li>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header">Money</li>
-            <li><a href="./till.php">Till</a></li>
+            <li><a href="/till">Till</a></li>
             <li><a href="report-daily.php">Daily Flow</a></li>
           </ul>
         </li>
