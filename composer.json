@@ -52,7 +52,8 @@
         "easypost/easypost-php": "^3.4",
         "quickbooks/v3-php-sdk": "^5.3",
         "setasign/fpdf": "^1.8",
-        "forkawesome/fork-awesome": "^1.1"
+        "forkawesome/fork-awesome": "^1.1",
+        "davidepastore/slim-validation": "^0.5.1"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"
