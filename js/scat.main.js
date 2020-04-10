@@ -114,11 +114,13 @@ class ScatUtils {
     }
   }
 
-  api (func, args, opts) {
-    let url= '/api/' + func + '.php';
-    const formData= new FormData()
-    for (let prop in args) {
-      formData.append(prop, args[prop])
+  call (url, args, opts) {
+    const formData= args instanceof FormData ? args : new FormData()
+
+    if (!(args instanceof FormData)) {
+      for (let prop in args) {
+        formData.append(prop, args[prop])
+      }
     }
 
     return fetch(url, {
@@ -133,6 +135,11 @@ class ScatUtils {
       return Promise.reject(new Error(response.statusText))
     })
     // XXX catch data.error and alert()?
+  }
+
+  api (func, args, opts) {
+    let url= '/api/' + func + '.php';
+    return this.call(url, args, opts)
   }
 
   print (url, args) {
