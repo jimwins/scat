@@ -130,6 +130,13 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     case 'oversized':
       $this->current[]= "(item.$name = '$value')";
       break;
+    case 'margin':
+      $this->current[]= "((sale_price(item.retail_price, item.discount_type, item.discount) - (SELECT MIN(IF(promo_price, IF(promo_price < net_price,
+                                           promo_price, net_price),
+                           net_price))
+               FROM vendor_item
+              WHERE vendor_item.item = item.id AND vendor_item.active)) / sale_price(item.retail_price, item.discount_type, item.discount) < $value)";
+      break;
     default:
       throw new \Exception("Don't know how to handle '$name'");
     }
