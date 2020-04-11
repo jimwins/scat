@@ -46,10 +46,7 @@ class Search
 
     if (!$query) {
       $feedback= $parser->getFeedback();
-      foreach ($feedback as $msg) {
-        error_log($msg);
-      }
-      throw new \Exception($msg);
+      throw new \Exception($feedback[0]);
     }
 
     $v= new \Scat\SearchVisitor();

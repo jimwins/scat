@@ -70,7 +70,6 @@ class Item extends \Model implements \JsonSerializable {
 
     $res= \ORM::for_table('txn')->raw_query($q)->find_one();
 
-    error_log(json_encode($res));
     return $res->sold;
   }
 
