@@ -5,11 +5,23 @@ include dirname(__FILE__).'/../../php-barcode.php';
 
 class Giftcard extends \Model implements \JsonSerializable {
   public function card() {
-    return $self->id . $self->pin;
+    return $this->id . $this->pin;
   }
 
   public function txns() {
     return $this->has_many('Giftcard_Txn', 'card_id');
+  }
+
+  public function created() {
+    return $this->txns()->min('entered');
+  }
+
+  public function last_seen() {
+    return $this->txns()->max('entered');
+  }
+
+  public function balance() {
+    return $this->txns()->sum('amount');
   }
 
   public function jsonSerialize() {
@@ -118,6 +130,14 @@ class Giftcard extends \Model implements \JsonSerializable {
     error_reporting($error_reporting);
 
     return $content;
+  }
+
+  function add_txn($amount, $txn_id= 0) {
+    $txn= $this->txns()->create();
+    $txn->amount= $amount;
+    $txn->card_id= $this->id;
+    if ($txn_id) $txn->txn_id= $txn_id;
+    $txn->save();
   }
 }
 

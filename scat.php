@@ -121,11 +121,11 @@ $(document).ready(function() {
         <li><a href="./">New Sale</a></li>
         <li><a href="catalog">Catalog</a></li>
         <!-- Hide Gift Cards and Custom menu on tablet for size reasons -->
-        <li class="hidden-sm"><a href="./gift-card.php">Gift Cards</a></li>
         <li class="hidden-sm"><a href="./custom.php">Custom</a></li>
         <li><a href="/person">People</a></li>
         <li><a href="/sale">Sales</a></li>
         <li><a href="/purchase">Purchases</a></li>
+        <li class="hidden-sm"><a href="/gift-card">Gift Cards</a></li>
         <li><a href="/clock">Clock</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>

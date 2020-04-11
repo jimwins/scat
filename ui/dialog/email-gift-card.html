@@ -1,0 +1,79 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Email Gift Card
+{% endblock %}
+
+{% block body %}
+<div class="modal-body">
+
+  <div id="content" class="collapse in">
+
+    <div class="form-group">
+      <label for="to">To Name</label>
+      <input type="text" class="form-control"
+             name="to_name" placeholder="Vincent Van Gogh">
+    </div>
+
+    <div class="form-group">
+      <label for="to_email">To Email</label>
+      <input type="email" class="form-control"
+             name="to_email" placeholder="vincent.van.gogh@example.com">
+    </div>
+
+    <div class="form-group">
+      <label for="from">From Name</label>
+      <input type="text" class="form-control"
+             name="from_name" placeholder="Lorenzo de' Medici">
+    </div>
+
+    <div class="form-group">
+      <label for="email">From Email</label>
+      <input type="email" class="form-control"
+             name="from_email" placeholder="lorenzo.de.medici@example.com">
+    </div>
+
+    <div class="form-group">
+      <label for="message">Message</label>
+      <textarea class="form-control" id="message" rows="5"></textarea>
+    </div>
+
+    <input type="hidden" name="card" value="{{ card }}">
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    Send
+  </a>
+{% endblock %}
+
+{% block script %}
+  form.addEventListener('submit', (ev) => {
+    ev.preventDefault()
+
+    let formData= new FormData(ev.target)
+
+    fetch("/gift-card/" + formData.get('card') + "/email", {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: formData
+    })
+    .then(res => {
+      if (res.ok) {
+        return res.json()
+      } else {
+        alert(res.statusText)
+      }
+    })
+    .then(res => {
+      alert(res.message)
+      $(dialog).modal('hide')
+    })
+  })
+
+{% endblock script %}

@@ -1,0 +1,50 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Gift Cards
+{% endblock %}
+
+{% block content %}
+  {% include 'gift-card/form.twig' %}
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">Recent Cards</h2>
+    </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Created</th>
+          <th>Last Seen</th>
+          <th>Balance</th>
+          <th>Expires</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for card in cards %}
+          <tr>
+            <td>
+              <a href="/gift-card/{{ card.card }}">
+                {{- card.id -}}
+              </a>
+            </td>
+            <td>{{ card.created }}</td>
+            <td>{{ card.last_seen }}</td>
+            <td>{{ scat.amount(card.balance) }}</td>
+            <td>{{ card.expires }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+  {
+  }
+  </script>
+{% endblock %}

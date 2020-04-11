@@ -1,0 +1,122 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Gift Cards
+{% endblock %}
+
+{% block content %}
+  {% include 'gift-card/form.twig' %}
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Gift Card
+        {% if card.expires %}
+          <small>Expires {{ card.expires|date("F j, Y") }}</small>
+        {% endif %}
+      </h2>
+    </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Transaction</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td colspan="2" align="right">
+            <strong>Balance:</strong>
+          </td>
+          <td>{{ scat.amount(card.balance) }}</td>
+          </td>
+        </tr>
+      </tfoot>
+      <tbody>
+        {% for txn in card.txns.find_many %}
+          <tr>
+            <td>{{ txn.entered }}</td>
+            <td>
+              <a href="/sale/{{ txn.txn_id }}">
+                {{ txn.txn.find_one().formatted_number }}
+              </a>
+            </td>
+            <td>{{ scat.amount(txn.amount) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="panel-footer">
+      <form>
+        <div class="col-sm-4">
+          <button type="button"
+                  class="print-card btn btn-primary
+                         {{ card.balance <= 0 ? 'disabled' }}">
+            Print
+          </button>
+          <button type="button"
+                  class="email-card btn btn-primary
+                         {{ card.balance <= 0 ? 'disabled' }}">
+            Email
+          </button>
+        </div>
+        <div class="input-group col-sm-4">
+          <input type="text" class="form-control"
+                 name="amount"
+                 placeholder="$0.00">
+          <div class="input-group-btn">
+            <button class="btn btn-default"
+                    type="submit" name="action" value="add">
+              Add
+            </button>
+            <button class="btn btn-default"
+                    type="submit" name="action" value="spend">
+              Spend
+            </button>
+          </div>
+        </div>
+        <script>
+        {
+          let form= document.currentScript.parentNode
+
+          form.querySelector('.print-card').addEventListener('click', (ev) => {
+            let lpr= document.createElement('iframe')
+            lpr.style.display= 'none'
+            lpr.addEventListener('load', (ev) => {
+              ev.target.contentWindow.print()
+            })
+            lpr.src= '/gift-card/{{ card.card }}/print'
+            document.body.appendChild(lpr)
+          })
+
+          form.querySelector('.email-card').addEventListener('click', (ev) => {
+            scat.dialog(ev.target, '/gift-card/{{ card.card }}/email-form')
+          })
+
+          form.addEventListener('submit', (ev) => {
+            ev.preventDefault()
+
+            let formData= new FormData(ev.target)
+            amount= formData.get('amount') * (formData.get('action') == 'add' ? 1 : -1)
+
+            scat.call('/gift-card/{{ card.card }}/add-txn', { amount: amount })
+                .then((data) => {
+                  window.location.reload()
+                })
+          })
+        }
+        </script>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+  {
+  }
+  </script>
+{% endblock %}

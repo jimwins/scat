@@ -1,0 +1,71 @@
+<div class="row">
+  <div class="col-sm-6">
+    <form action="/gift-card/lookup">
+      <div class="input-group {{ error ? 'has-error' }}">
+        <input type="text" class="autofocus form-control"
+               name="card" value="{{ card ? card.card }}"
+               placeholder="Scan or enter card">
+        </input>
+        <span class="input-group-btn">
+          <button type="submit" class="btn btn-primary">
+            Check Card
+          </button>
+        </span>
+      </div>
+    </form>
+  </div>
+
+  <div class="col-sm-6">
+    <form>
+      <div class="input-group input-daterange" id="datepicker">
+        <input type="text" class="form-control"
+               name="expires"
+               placeholder="Expiration date (optional)">
+        <span class="input-group-btn">
+          <button type="submit" class="btn btn-success">
+            Create Card
+          </button>
+        </span>
+      </div>
+
+      <script>
+      {
+        let form= document.currentScript.parentNode
+
+        $('#datepicker', form).datepicker({
+          format: "yyyy-mm-dd",
+          todayHighlight: true
+        })
+
+        form.addEventListener('submit', (ev) => {
+          ev.preventDefault()
+
+          let formData= new FormData(ev.target)
+
+          fetch('/gift-card/create', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json' },
+            body: formData
+          })
+          .then((res) => {
+            if (res.status >= 200 && res.status < 300) {
+              return Promise.resolve(res)
+            }
+            return Promise.reject(new Error(res.statusText))
+          })
+          .then((res) => {
+            return res.json()
+          })
+          .then((data) => {
+            window.location.href= '/gift-card/' + data.id + data.pin
+          })
+        })
+      }
+      </script>
+    </form>
+  </div>
+
+</div>
+
+<br>
+

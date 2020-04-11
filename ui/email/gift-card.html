@@ -1,0 +1,29 @@
+{% extends 'layout/email.html' %}
+
+{% block title -%}
+  Gift Card for {{ to_name }}
+{%- endblock %}
+
+{% block preheader %}
+  You have a gift card for Raw Materials Art Supplies!
+{% endblock %}
+
+{% block content_top %}
+  <p>Hi,</p>
+
+  <p>
+    You've been sent a gift card for Raw Materials Art Supplies. The PDF is
+    attached, just print it out and bring it to the store (or show us the card
+    on your phone).
+  </p>
+
+  {% if message %}
+    <p>We were asked to pass along this message with the card:</p>
+
+    <blockquote>
+      {{ message }}
+    </blockquote>
+  {% endif %}
+
+  <p>Thanks!</p>
+{% endblock %}
