@@ -57,9 +57,9 @@
     {% for i in items %}
       <tr>
         <td>
-          {% if i.item %}
-            <a href="{{ path_for('catalog-item', { 'code' : i.real_item.code}) }}">
-              {{- i.real_item.code -}}
+          {% if i.item_id %}
+            <a href="{{ path_for('catalog-item', { 'code' : i.item.code}) }}">
+              {{- i.item.code -}}
             </a>
           {% else %}
             {{ i.code }}

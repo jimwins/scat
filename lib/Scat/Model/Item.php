@@ -21,7 +21,7 @@ class Item extends \Model implements \JsonSerializable {
   }
 
   public function vendor_items($active= 1) {
-    return $this->has_many('VendorItem', 'item')->where_gte('active', $active);
+    return $this->has_many('VendorItem')->where_gte('active', $active);
   }
 
   public function full_slug() {
@@ -238,15 +238,15 @@ class Item extends \Model implements \JsonSerializable {
 
   public function find_vendor_items() {
     $q= "UPDATE vendor_item, item
-            SET vendor_item.item = item.id
-          WHERE (vendor_item.item IS NULL OR vendor_item.item = 0)
+            SET vendor_item.item_id = item.id
+          WHERE (vendor_item.item_id IS NULL OR vendor_item.item_id = 0)
             AND vendor_item.code = item.code
             AND item.id = {$this->id}";
     \ORM::raw_execute($q);
 
     $q= "UPDATE vendor_item, barcode
-            SET vendor_item.item = barcode.item_id
-          WHERE (vendor_item.item IS NULL OR vendor_item.item = 0)
+            SET vendor_item.item_id = barcode.item_id
+          WHERE (vendor_item.item_id IS NULL OR vendor_item.item_id = 0)
             AND vendor_item.barcode = barcode.code
             AND barcode.item_id = {$this->id}";
     \ORM::raw_execute($q);

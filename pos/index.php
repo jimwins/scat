@@ -710,7 +710,7 @@ $app->group('/catalog', function (Slim\App $app) {
               if (!$vi)
                throw new \Slim\Exception\NotFoundException($req, $res);
 
-              $vi->item= 0; // XXX item_id
+              $vi->item_id= 0;
               $vi->save();
 
               return $res->withJson($item);

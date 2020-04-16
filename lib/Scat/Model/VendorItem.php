@@ -12,7 +12,7 @@ use OE\Lukas\QueryTree\ConjunctiveExpressionList;
 
 class VendorItem extends \Model implements \JsonSerializable {
   public function fields() {
-    return [ 'id', 'vendor', 'item', 'code', 'vendor_sku',
+    return [ 'id', 'vendor_id', 'item', 'code', 'vendor_sku',
              'name', 'retail_price', 'net_price', 'promo_price',
              'promo_quantity', 'barcode', 'purchase_quantity',
              'length', 'width', 'height', 'weight',
@@ -22,7 +22,7 @@ class VendorItem extends \Model implements \JsonSerializable {
   public static
   function findByItemIdForVendor($item_id, $vendor_id, $active= 1) {
     return \Model::factory('VendorItem')
-             ->where('vendor', $vendor_id)
+             ->where('vendor_id', $vendor_id)
              ->where('item', $item_id)
              ->where('active', $active)
              ->find_many();
@@ -47,7 +47,7 @@ class VendorItem extends \Model implements \JsonSerializable {
     $query->accept($v);
 
     $items= \Model::factory('VendorItem')->select('vendor_item.*')
-                                   ->where('vendor_item.vendor', $vendor_id)
+                                   ->where('vendor_item.vendor_id', $vendor_id)
                                    ->where_raw($v->where_clause())
                                    ->where_gte('vendor_item.active',
                                                $v->force_all ? 0 : 1)
@@ -57,26 +57,16 @@ class VendorItem extends \Model implements \JsonSerializable {
     return $items;
   }
 
-  /* TODO rename this column */
-  public function item_id() {
-    return $this->item;
-  }
-
-  public function real_item() {
-    return $this->belongs_to('Item', 'item')->find_one();
-  }
-
-  /* TODO rename this column */
-  public function vendor_id() {
-    return $this->vendor;
+  public function item() {
+    return $this->belongs_to('Item')->find_one();
   }
 
   public function vendor() {
-    return $this->belongs_to('Person', 'vendor')->find_one();
+    return $this->belongs_to('Person', 'vendor_id')->find_one();
   }
 
   public function checkVendorStock() {
-    switch ($this->vendor) {
+    switch ($this->vendor_id) {
     case 7: // Mac
       return check_mac_stock($this->vendor_sku);
     case 3757: // SLS
@@ -355,11 +345,11 @@ function check_sls_stock($code) {
 
   $body= $res->getBody();
 
-  $dom= new DOMDocument();
+  $dom= new \DOMDocument();
   libxml_use_internal_errors(true);
   $dom->loadHTML($body);
 
-  $xp= new DOMXpath($dom);
+  $xp= new \DOMXpath($dom);
   $no= $xp->query('//input[@name="qoh1"]')->item(0)->getAttribute('value');
   $vg= $xp->query('//input[@name="qoh2"]')->item(0)->getAttribute('value');
 

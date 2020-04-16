@@ -27,8 +27,8 @@
     <div class="form-group">
       <label for="vendor">Vendor</label>
       <select class="form-control initial-focus" name="vendor">
-        {% if vendor_item.vendor %}
-          <option value="{{ vendor_item.vendor }}">
+        {% if vendor_item.vendor_id %}
+          <option value="{{ vendor_item.vendor_id }}">
             {{- vendor_item.vendor().friendly_name -}}
           </option>
         {% endif %}
