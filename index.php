@@ -574,7 +574,7 @@ $("#txn-load").submit(function(ev) {
         <div class="pull-right">
           <button type="button" class="btn btn-default"
                   data-bind="enable: txn.id(), click: showNotes">
-           <i class="fa fa-sticky-note"></i>
+           <i class="fa fa-sticky-note-o"></i>
            <span class="badge"
                  data-bind="text: notes().length, visible: notes().length">
            </span>
@@ -1080,7 +1080,7 @@ $('#tax_rate .val').editable(function(value, settings) {
         <!-- ko if: $data.code() == 'ZZ-GIFTCARD' && $parent.txn.paid() -->
           <a data-bind="if: !$data.data.card, click: $parent.createGiftCard"><i class="fa fa-barcode"></i></a>
           <a data-bind="if: $data.data.card, click: $parent.printGiftCard"><i class="fa fa-print"></i></a>
-          <a data-bind="if: $data.data.card, click: $parent.emailGiftCard"><i class="fa fa-envelope"></i></a>
+          <a data-bind="if: $data.data.card, click: $parent.emailGiftCard"><i class="fa fa-envelope-o"></i></a>
         <!-- /ko -->
         <span class="name" data-bind="text: $data.name"></span>
         <div class="discount" data-bind="text: $data.discount"></div>
