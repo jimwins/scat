@@ -240,7 +240,7 @@ $q= "UPDATE vendor_order
         SET item = IF(barcode != '',
                       IFNULL((SELECT item.id
                                 FROM item
-                                JOIN barcode ON barcode.item = item.id
+                                JOIN barcode ON barcode.item_id = item.id
                                WHERE vendor_order.barcode = barcode.code
                                LIMIT 1),
                              0),
@@ -260,7 +260,7 @@ $db->query($q)
 
 # Identify items by barcode
 $q= "UPDATE vendor_order, barcode
-        SET vendor_order.item = barcode.item
+        SET vendor_order.item = barcode.item_id
       WHERE (NOT vendor_order.item OR vendor_order.item IS NULL)
         AND vendor_order.barcode != '' AND vendor_order.barcode IS NOT NULL
         AND vendor_order.barcode = barcode.code";

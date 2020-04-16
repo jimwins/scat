@@ -63,8 +63,8 @@ class Search
                                                      array('brand.id', '=',
                                                            'item.brand'))
                                    ->left_outer_join('barcode',
-                                                     array('barcode.item', '=',
-                                                           'item.id'))
+                                                     array('barcode.item_id',
+                                                           '=', 'item.id'))
                                    ->where_raw($v->where_clause())
                                    ->where_gte('item.active',
                                                $v->force_all ? 0 : 1)

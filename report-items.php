@@ -74,7 +74,7 @@ $q= "SELECT
        LEFT JOIN txn_line ON txn.id = txn_line.txn
        LEFT JOIN item ON txn_line.item = item.id
        LEFT JOIN brand ON item.brand = brand.id
-       LEFT JOIN barcode ON (item.id = barcode.item)
+       LEFT JOIN barcode ON (item.id = barcode.item_id)
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY

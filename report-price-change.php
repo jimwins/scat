@@ -84,7 +84,7 @@ $q= "SELECT
        FROM item
        LEFT JOIN vendor_item ON item.id = vendor_item.item
        LEFT JOIN brand ON item.brand = brand.id
-       LEFT JOIN barcode ON (item.id = barcode.item)
+       LEFT JOIN barcode ON (item.id = barcode.item_id)
       WHERE ABS(vendor_item.retail_price - item.retail_price) > 0.01
         AND item.active AND NOT item.deleted
         AND vendor_item.active

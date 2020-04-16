@@ -17,7 +17,7 @@ class Item extends \Model implements \JsonSerializable {
   }
 
   public function barcodes() {
-    return $this->has_many('Barcode', 'item');
+    return $this->has_many('Barcode');
   }
 
   public function vendor_items($active= 1) {
@@ -245,10 +245,10 @@ class Item extends \Model implements \JsonSerializable {
     \ORM::raw_execute($q);
 
     $q= "UPDATE vendor_item, barcode
-            SET vendor_item.item = barcode.item
+            SET vendor_item.item = barcode.item_id
           WHERE (vendor_item.item IS NULL OR vendor_item.item = 0)
             AND vendor_item.barcode = barcode.code
-            AND barcode.item = {$this->id}";
+            AND barcode.item_id = {$this->id}";
     \ORM::raw_execute($q);
   }
 
@@ -259,7 +259,7 @@ class Item extends \Model implements \JsonSerializable {
 
 class Barcode extends \Model {
   public function item() {
-    return $this->belongs_to('Item', 'item');
+    return $this->belongs_to('Item')->find_one();
   }
 }
 

@@ -637,7 +637,7 @@ $app->group('/catalog', function (Slim\App $app) {
                throw new \Slim\Exception\NotFoundException($req, $res);
 
               $barcode= $item->barcodes()->create();
-              $barcode->item= $item->id; // XXX should be item_id
+              $barcode->item_id= $item->id;
               $barcode->code= trim($req->getParam('barcode'));
               $barcode->quantity= 1;
               $barcode->save();
@@ -943,7 +943,7 @@ $app->group('/catalog', function (Slim\App $app) {
                  if ($vendor_item->barcode) {
                    $barcode= $item->barcodes()->create();
                    $barcode->code= $vendor_item->barcode;
-                   $barcode->item= $item->id();
+                   $barcode->item_id= $item->id();
                    $barcode->save();
                  }
                  if (!$vendor_item->item) {
