@@ -17,7 +17,7 @@
     <h2>
       {{ product.name }}
       <small>
-        {% set brand = product.brand.find_one %}
+        {% set brand = product.brand %}
         <a href="{{ path_for('catalog-brand', { 'brand' : brand.slug }) }}">
           {{ brand.name }}
         </a>

@@ -44,7 +44,7 @@
         <a href="{{ slug }}">
           {{- p.name -}}
         </a>
-        {% set brand = p.brand.find_one %}
+        {% set brand = p.brand %}
         <small>
           <a href="{{ path_for('catalog-brand', { 'brand': brand.slug }) }}">
             {{- brand.name -}}

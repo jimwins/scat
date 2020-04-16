@@ -6,12 +6,12 @@ class Department extends \Model implements \JsonSerializable {
 
   public function full_slug() {
     return
-      ($this->parent_id ? $this->parent()->find_one()->slug . '/' : '') .
+      ($this->parent_id ? $this->parent()->slug . '/' : '') .
       $this->slug;
   }
 
   public function parent() {
-    return $this->belongs_to('Department', 'parent_id');
+    return $this->belongs_to('Department', 'parent_id')->find_one();
   }
 
   public function departments($only_active= true) {

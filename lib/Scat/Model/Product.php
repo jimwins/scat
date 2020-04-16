@@ -11,15 +11,15 @@ class Product extends \Model implements \JsonSerializable {
   }
 
   public function brand() {
-    return $this->belongs_to('Brand');
+    return $this->belongs_to('Brand')->find_one();
   }
 
   public function brand_name() {
-    return $this->brand()->find_one()->name;
+    return $this->brand()->name;
   }
 
   public function dept() {
-    return $this->belongs_to('Department');
+    return $this->belongs_to('Department')->find_one();
   }
 
   public function items($only_active= true) {
@@ -30,8 +30,8 @@ class Product extends \Model implements \JsonSerializable {
 
   public function full_slug() {
     return
-      $this->dept()->find_one()->parent()->find_one()->slug . '/' .
-      $this->dept()->find_one()->slug . '/' . $this->slug;
+      $this->dept()->parent()->slug . '/' .
+      $this->dept()->slug . '/' . $this->slug;
   }
 
   public function stocked() {
