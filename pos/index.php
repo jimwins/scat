@@ -1069,6 +1069,8 @@ $app->group('/gift-card', function (Slim\App $app) {
               // XXX fix hardcoded name
               $from= $from_name ? "$from_name via Raw Materials Art Supplies"
                                 : "Raw Materials Art Supplies";
+              $to_name= $req->getParam('to_name');
+              $to_email= $req->getParam('to_email');
 
               $httpClient= new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client());
               $sparky= new \SparkPost\SparkPost($httpClient,
