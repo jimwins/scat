@@ -154,7 +154,7 @@ class VendorItemSearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
 /*
     case 'brand':
       if (is_numeric($value)) {
-        $this->current[]= "(item.brand = '$value')";
+        $this->current[]= "(item.brand_id = '$value')";
       } else {
         // XXX search name and slug?
         $this->current[]= "(brand.slug = '$value')";

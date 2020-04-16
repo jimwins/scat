@@ -520,7 +520,7 @@ $q= "SELECT
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
        LEFT JOIN item ON txn_line.item = item.id
-       LEFT JOIN brand ON item.brand = brand.id
+       LEFT JOIN brand ON item.brand_id = brand.id
       WHERE type = 'customer'
         AND filled BETWEEN '$date' AND '$date' + INTERVAL 1 DAY
       GROUP BY 1

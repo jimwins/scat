@@ -39,7 +39,7 @@ if ($GLOBALS['DEBUG'] || ($options & FIND_NEW_METHOD)) {
       $andor[]= "(barcode.code = '$code')";
     } elseif (preg_match('/^brand:(.+)/i', $term, $dbt)) {
       if ($dbt[1] === "0") {
-        $andor[]= "(item.brand = 0)";
+        $andor[]= "(item.brand_id = 0)";
       } else {
         $andor[]= "(brand.slug = '{$dbt[1]}')";
       }
@@ -167,7 +167,7 @@ function item_find($db, $q, $options) {
               item.prop65, item.oversized, item.hazmat,
               item.active, item.reviewed
          FROM item
-    LEFT JOIN brand ON (item.brand = brand.id)
+    LEFT JOIN brand ON (item.brand_id = brand.id)
     LEFT JOIN barcode ON (item.id = barcode.item_id)
         WHERE $sql_criteria
      GROUP BY item.id

@@ -67,7 +67,7 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
       break;
     case 'brand':
       if (is_numeric($value)) {
-        $this->current[]= "(item.brand = '$value')";
+        $this->current[]= "(item.brand_id = '$value')";
       } else {
         // XXX search name and slug?
         $this->current[]= "(brand.slug = '$value')";

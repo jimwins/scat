@@ -4,7 +4,7 @@ namespace Scat\Model;
 class Item extends \Model implements \JsonSerializable {
   /* XXX Legacy, should get from parent product */
   public function brand() {
-    return $this->belongs_to('Brand', 'brand');
+    return $this->belongs_to('Brand', 'brand')->find_one();
   }
 
   /* TODO change item.product to item.product_id */

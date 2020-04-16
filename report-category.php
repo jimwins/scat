@@ -77,7 +77,7 @@ $q= "CREATE TEMPORARY TABLE report_current
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
             JOIN item ON txn_line.item = item.id
-            JOIN brand ON item.brand = brand.id
+            JOIN brand ON item.brand_id = brand.id
        LEFT JOIN barcode ON item.id = barcode.item_id
        LEFT JOIN product ON product_id = product.id
       WHERE type = 'customer'
@@ -105,7 +105,7 @@ $q= "CREATE TEMPORARY TABLE report_previous
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
             JOIN item ON txn_line.item = item.id
-            JOIN brand ON item.brand = brand.id
+            JOIN brand ON item.brand_id = brand.id
        LEFT JOIN barcode ON item.id = barcode.item_id
        LEFT JOIN product ON product_id = product.id
       WHERE type = 'customer'

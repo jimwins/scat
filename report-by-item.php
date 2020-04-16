@@ -99,7 +99,7 @@ $q= "SELECT
                                AND '$end' - INTERVAL 1 YEAR + INTERVAL 1 DAY)
               AS LastTotal\$dollar
        FROM item
-       LEFT JOIN brand ON item.brand = brand.id
+       LEFT JOIN brand ON item.brand_id = brand.id
        WHERE ($sql_criteria)
        HAVING Sold OR LastSold
        ORDER BY item.code";

@@ -75,7 +75,7 @@ $q= "CREATE TEMPORARY TABLE current
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
             JOIN item ON txn_line.item = item.id
-            JOIN brand ON item.brand = brand.id
+            JOIN brand ON item.brand_id = brand.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
@@ -85,7 +85,7 @@ $q= "CREATE TEMPORARY TABLE current
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 $q= "UPDATE current
-        SET brand = IFNULL((SELECT brand FROM item
+        SET brand = IFNULL((SELECT brand_id FROM item
                              WHERE item.id = current.item),
                            0)";
 
@@ -107,7 +107,7 @@ $q= "CREATE TEMPORARY TABLE previous
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn
             JOIN item ON txn_line.item = item.id
-            JOIN brand ON item.brand = brand.id
+            JOIN brand ON item.brand_id = brand.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' - INTERVAL 1 YEAR
@@ -118,7 +118,7 @@ $q= "CREATE TEMPORARY TABLE previous
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 $q= "UPDATE previous
-        SET brand = IFNULL((SELECT brand FROM item
+        SET brand = IFNULL((SELECT brand_id FROM item
                              WHERE item.id = previous.item),
                            0)";
 
