@@ -57,7 +57,7 @@
       {{ i.minimum_quantity }}
     </span>
   </td>
-  <td class="text-center">{{ i.recent_sales }}</td>
+  <td class="text-center">{{ i.recent_sales.units }}</td>
   <td class="text-right" nowrap>
     {% if i.prop65 %}
       <span title="{{ i.prop65_warning.warning }}"><img src="{{ STATIC }}/msds/warning.svg" width="16" alt="WARNING"></span>

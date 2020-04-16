@@ -85,6 +85,21 @@ class Catalog
     return \Model::factory('Item')->create();
   }
 
+  public function getItemByCode($code) {
+    return \Model::factory('Item')
+             ->where('code', $code)
+             ->find_one();
+  }
+
+  public function getItemById($id) {
+    return \Model::factory('Item')->find_one($id);
+  }
+
+  public function createVendorItem() {
+    return \Model::factory('VendorItem')->create();
+  }
+
+  /* VendorItem isn't unique by code, just get one */
   public function getVendorItemByCode($code) {
     return \Model::factory('VendorItem')
              ->where('code', $code)
@@ -96,7 +111,6 @@ class Catalog
   public function getVendorItemById($id) {
     return \Model::factory('VendorItem')
              ->where_gte('vendor_item.active', 1)
-             ->order_by_asc('vendor_item.purchase_quantity')
              ->find_one($id);
   }
 }

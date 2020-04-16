@@ -68,7 +68,7 @@ while ($row= $r->fetch_assoc()) {
 <?}?>
         <tr>
           <td> &nbsp; </td>
-	  <td><a href="item.php?id=<?=$row['item']?>"><?=ashtml($row['code'])?></td>
+	  <td><a href="/catalog/item/<?=$row['code']?>"><?=ashtml($row['code'])?></td>
 	  <td><?=ashtml($row['item_name'])?></td>
 	  <td><?=ashtml($row['ordered'])?></td>
 	  <td><?=ashtml($row['allocated'])?></td>

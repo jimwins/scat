@@ -1,0 +1,132 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Vendor Item
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    {% if vendor_item.id %}
+      <input type="hidden" name="id" value="{{ vendor_item.id }}">
+    {% endif %}
+    {% if item.id %}
+      <input type="hidden" name="item" value="{{ item.id }}">
+    {% endif %}
+
+    <div class="form-group">
+      <label for="active">
+        Active
+        <select name="active" class="form-control">
+          <option value="1" {{ vendor_item.active ? 'selected' }}>Yes</option>
+          <option value="0" {{ vendor_item.id and not vendor_item.active ? 'selected' }}>No</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="vendor">Vendor</label>
+      <select class="form-control initial-focus" name="vendor">
+        {% if vendor_item.vendor %}
+          <option value="{{ vendor_item.vendor }}">
+            {{- vendor_item.vendor().friendly_name -}}
+          </option>
+        {% endif %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="name">Code</label>
+      <input type="text" class="form-control"
+             name="code" value="{{ vendor_item.code }}">
+    </div>
+
+    <div class="form-group">
+      <label for="name">SKU</label>
+      <input type="text" class="form-control"
+             name="vendor_sku" value="{{ vendor_item.vendor_sku }}">
+    </div>
+
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" class="form-control"
+             name="name" value="{{ vendor_item.name }}">
+    </div>
+
+    <div class="form-group">
+      <label for="retail_price">Retail Price</label>
+      <input type="text" class="form-control"
+             name="retail_price" value="{{ vendor_item.retail_price }}">
+    </div>
+
+    <div class="form-group">
+      <label for="net_price">Net Price</label>
+      <input type="text" class="form-control"
+             name="net_price" value="{{ vendor_item.net_price }}">
+    </div>
+
+    <div class="form-group">
+      <label for="promo_price">Promo Price</label>
+      <input type="text" class="form-control"
+             name="promo_price" value="{{ vendor_item.promo_price }}">
+    </div>
+
+    <div class="form-group">
+      <label for="purchase_quantity">Purchase Quantity</label>
+      <input type="text" class="form-control"
+             name="purchase_quantity"
+             value="{{ vendor_item.purchase_quantity }}">
+    </div>
+
+    <div class="form-group">
+      <label for="barcode">Barcode</label>
+      <input type="text" class="form-control"
+             name="barcode" value="{{ vendor_item.barcode }}">
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    {{- vendor_item.id ? 'Update' : 'Add' -}}
+  </a>
+{% endblock %}
+
+{% block script %}
+
+  $('[name="vendor"]', form).select2({
+    ajax: {
+      url: '/person/search',
+      datatype: 'json',
+      processResults: function (data) {
+        return {
+          results: data.map((d) => {
+            return { id: d.id, text: d.friendly_name }
+          })
+        }
+      }
+    }
+  })
+
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    fetch("/catalog/~update-vendor-item", {
+      method: 'POST',
+      body: formData
+    })
+    .then((res) => {
+      if (res.ok) {
+        return res.json()
+      } else {
+        alert(res.statusText)
+      }
+    })
+    .then((res) => {
+      window.location.reload()
+    })
+  }
+{% endblock %}

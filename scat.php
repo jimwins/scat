@@ -429,7 +429,7 @@ function dump_table($r, $calc = false) {
   echo '<tbody>';
   while ($row= $r->fetch_row()) {
     if ($r->fetch_field_direct(0)->name == 'code')
-      $row[0]= '<a href="item.php?code='.$row[0].'">'.$row[0].'</a>';
+      $row[0]= '<a href="/catalog/item/'.$row[0].'">'.$row[0].'</a>';
     if ($meta) {
       echo '<tr class="', ashtml($row[0]), '" data-id="', ashtml($row[0]), '">';
     } else {
@@ -475,9 +475,9 @@ function expand_field($data, $class, $meta = null) {
     return '<a href="/person/'.ashtml($id).'">'.ashtml($company).($name&&$company?" (":"").ashtml($name).($name&&$company?")":"").'</a>';
   case '$item':
     if ($meta) {
-      return '<a href="item.php?id='.ashtml($meta).'">'.ashtml($data).'</a>';
+      return '<a href="/catalog/item/'.ashtml($meta).'">'.ashtml($data).'</a>';
     } else {
-      return '<a href="item.php?code='.ashtml($data).'">'.ashtml($data).'</a>';
+      return '<a href="/catalog/item/'.ashtml($data).'">'.ashtml($data).'</a>';
     }
   case '$dollar':
     if ($data == null)

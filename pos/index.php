@@ -609,10 +609,152 @@ $app->group('/catalog', function (Slim\App $app) {
                                            'products' => $products ]);
             })->setName('catalog-brand');
 
-  $app->get('/item[/{code:.*}]',
+  $app->get('/item/{code:.*}',
             function (Request $req, Response $res, array $args) {
-              return $res->withRedirect("/item.php?code={$args['code']}");
+              $item= $this->catalog->getItemByCode($args['code']);
+              if (!$item)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+              return $this->view->render($res, 'catalog/item.html', [
+                                          'item' => $item,
+                                         ]);
             })->setName('catalog-item');
+
+  $app->post('/item/{code:.*}/~print-label',
+            function (Request $req, Response $res, array $args) {
+              $item= $this->catalog->getItemByCode($args['code']);
+              if (!$item)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+
+              $body= $res->getBody();
+              $body->write($item->getPDF($req->getParams()));
+              return $res->withHeader("Content-type", "application/pdf");
+            });
+
+  $app->post('/item/{code:.*}/~add-barcode',
+            function (Request $req, Response $res, array $args) {
+              $item= $this->catalog->getItemByCode($args['code']);
+              if (!$item)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+
+              $barcode= $item->barcodes()->create();
+              $barcode->item= $item->id; // XXX should be item_id
+              $barcode->code= trim($req->getParam('barcode'));
+              $barcode->quantity= 1;
+              $barcode->save();
+
+              return $res->withJson($item);
+            });
+
+  $app->post('/item/{code:.*}/~edit-barcode',
+            function (Request $req, Response $res, array $args) {
+              $item= $this->catalog->getItemByCode($args['code']);
+              if (!$item)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+
+              $barcode= $item->barcodes()
+                          ->where('code', $req->getParam('pk'))
+                          ->find_one();
+
+              if (!$barcode)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+
+              if ($req->getParam('name') == 'quantity') {
+                $barcode->quantity= trim($req->getParam('value'));
+              }
+
+              if ($req->getParam('name') == 'code') {
+                $barcode->code= trim($req->getParam('value'));
+              }
+
+              $barcode->save();
+
+              return $res->withJson($item);
+            });
+
+  $app->post('/item/{code:.*}/~remove-barcode',
+            function (Request $req, Response $res, array $args) {
+              $item= $this->catalog->getItemByCode($args['code']);
+              if (!$item)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+
+              $barcode= $item->barcodes()
+                          ->where('code', $req->getParam('pk'))
+                          ->find_one();
+
+              if (!$barcode)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+
+              $barcode->delete();
+
+              return $res->withJson($item);
+            });
+
+  $app->post('/item/{code:.*}/~find-vendor-items',
+            function (Request $req, Response $res, array $args) {
+              $item= $this->catalog->getItemByCode($args['code']);
+              if (!$item)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+
+              $item->findVendorItems();
+
+              return $res->withJson($item);
+            });
+  $app->post('/item/{code:.*}/~unlink-vendor-item',
+            function (Request $req, Response $res, array $args) {
+              $item= $this->catalog->getItemByCode($args['code']);
+              if (!$item)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+              $vi= $item->vendor_items()
+                        ->where('id', $req->getParam('id'))
+                        ->find_one();
+              if (!$vi)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+
+              $vi->item= 0; // XXX item_id
+              $vi->save();
+
+              return $res->withJson($item);
+            });
+  $app->post('/item/{code:.*}/~check-vendor-stock',
+            function (Request $req, Response $res, array $args) {
+              $item= $this->catalog->getItemByCode($args['code']);
+              if (!$item)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+              $vi= $item->vendor_items()
+                        ->where('id', $req->getParam('id'))
+                        ->find_one();
+              if (!$vi)
+               throw new \Slim\Exception\NotFoundException($req, $res);
+
+              return $res->withJson($vi->checkVendorStock());
+            });
+
+  $app->get('/vendor-item-form',
+            function (Request $req, Response $res, array $args) {
+              $item= $this->catalog->getItemById($req->getParam('item'));
+              $vendor_item= $this->catalog->getVendorItemById($req->getParam('id'));
+              return $this->view->render($res, 'dialog/vendor-item-edit.html',
+                                         [
+                                           'item' => $item,
+                                           'vendor_item' => $vendor_item,
+                                         ]);
+            });
+  $app->post('/~update-vendor-item',
+             function (Request $req, Response $res, array $args) {
+               $vi= $this->catalog->getVendorItemById($req->getParam('id'));
+               if (!$vi) {
+                 $vi= $this->catalog->createVendorItem();
+               }
+               foreach ($vi->fields() as $field) {
+                 $value= $req->getParam($field);
+                 if (isset($value)) {
+                   $vi->set($field, $value);
+                 }
+               }
+               $vi->save();
+               return $res->withJson($vi);
+             });
+
 
   $app->post('/item-update',
              function (Request $req, Response $res, array $args) {
@@ -628,6 +770,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
                return $res->withJson([
                  'item' => $item,
+                 'newValue' => $item->$name,
                  'replaceRow' => $this->view->fetch('catalog/item-row.twig', [
                                   'i' => $item,
                                   'variations' => $req->getParam('variations'),
@@ -830,9 +973,14 @@ $app->group('/person', function (Slim\App $app) {
             });
   $app->get('/search',
             function (Request $req, Response $res, array $args) {
+              $select2= $req->getParam('_type') == 'query';
               $q= trim($req->getParam('q'));
 
               $people= \Scat\Model\Person::find($q);
+
+              if ($select2) {
+                return $res->withJson($people);
+              }
 
               return $this->view->render($res, 'page/people.html',
                                          [ 'people' => $people, 'q' => $q ]);

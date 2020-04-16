@@ -47,6 +47,7 @@
             </ol>
           </div>
           <div class="col-xs-1">
+            {% block catalog_crumb_button %}
             <div class="dropdown">
               <button class="btn btn-default dropdown-toggle"
                       type="button" id="settingsMenu" data-toggle="dropdown"
@@ -75,6 +76,7 @@
                 {% endif %}
               </ul>
             </div>
+            {% endblock %}
           </div>
         </div>
       {% endif %}

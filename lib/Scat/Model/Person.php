@@ -50,7 +50,9 @@ class Person extends \Model implements \JsonSerializable {
   }
 
   public function jsonSerialize() {
-    return $this->asArray();
+    $data= $this->asArray();
+    $data['friendly_name']= $this->friendly_name();
+    return $data;
   }
 
   static function find($q, $all= false) {

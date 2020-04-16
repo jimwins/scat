@@ -7,12 +7,21 @@ class Item extends \Model implements \JsonSerializable {
     return $this->belongs_to('Brand', 'brand');
   }
 
+  /* TODO change item.product to item.product_id */
+  public function product_id() {
+    return $this->product;
+  }
+
   public function product() {
     return $this->belongs_to('Product');
   }
 
   public function barcodes() {
     return $this->has_many('Barcode', 'item');
+  }
+
+  public function vendor_items($active= 1) {
+    return $this->has_many('VendorItem', 'item')->where_gte('active', $active);
   }
 
   public function full_slug() {
@@ -61,7 +70,9 @@ class Item extends \Model implements \JsonSerializable {
 
   public function recent_sales($days= 90) {
     $days= (int)$days; // Make sure we have an integer
-    $q= "SELECT SUM(-1 * allocated) AS sold
+    $q= "SELECT SUM(-1 * allocated) AS units,
+                SUM(-1 * allocated *
+                    sale_price(retail_price, discount_type, discount)) AS gross
            FROM txn
            JOIN txn_line ON txn.id = txn_line.txn
           WHERE type = 'customer'
@@ -70,7 +81,7 @@ class Item extends \Model implements \JsonSerializable {
 
     $res= \ORM::for_table('txn')->raw_query($q)->find_one();
 
-    return $res->sold;
+    return $res;
   }
 
   public function setProperty($name, $value) {
@@ -78,6 +89,7 @@ class Item extends \Model implements \JsonSerializable {
       case 'retail_price':
         $value= preg_replace('/^\\$/', '', $value);
         // passthrough
+      case 'active':
       case 'code':
       case 'name':
       case 'short_name':
@@ -107,7 +119,7 @@ class Item extends \Model implements \JsonSerializable {
         $this->setDimensions($value);
         break;
       default:
-        throw \Exception("No way to set '$name' on an item.");
+        throw new \Exception("No way to set '$name' on an item.");
     }
   }
 
@@ -147,7 +159,7 @@ class Item extends \Model implements \JsonSerializable {
 
       $diff= $stock - $current;
 
-      // TODO should have a \Scat\Item method for this
+      // TODO should have a \Scat\Model\Item method for this
       $q= "SELECT retail_price AS cost
              FROM txn_line
              JOIN txn ON (txn_line.txn = txn.id)
@@ -183,6 +195,61 @@ class Item extends \Model implements \JsonSerializable {
     $this->length= $l;
     $this->width= $w;
     $this->height= $h;
+  }
+
+  public function dimensions() {
+    if ($this->length && $this->width && $this->height)
+      return $this->length . 'x' .
+             $this->width . 'x' .
+             $this->height;
+  }
+
+  public function price_overrides() {
+    return \Model::factory('PriceOverride')
+            ->where_raw("(pattern_type = 'product' AND pattern = ?) OR
+                         (pattern_type = 'like'  AND ? LIKE pattern) OR
+                         (pattern_type = 'rlike' AND ? RLIKE pattern)",
+                         [ $this->product_id, $this->code, $this->code ])
+            ->order_by_asc('minimum_quantity');
+  }
+
+  public function txns() {
+    return \Model::factory('Txn')
+            ->join('txn_line', [ 'txn.id', '=', 'txn_line.txn' ])
+            ->select('txn.*')
+            ->select_expr('AVG(sale_price(retail_price, discount_type, discount))',
+                          'sale_price')
+            ->select_expr('SUM(allocated)', 'quantity')
+            ->group_by('txn.id')
+            ->order_by_asc('txn.created')
+            ->where('txn_line.item', $this->id);
+
+    $q= "SELECT txn.id, txn.created, txn.type, txn.number,
+                AVG(sale_price(retail_price, discount_type, discount))
+                  AS sale_price,
+                SUM(allocated) AS quantity
+           FROM txn
+           JOIN txn_line ON (txn_line.txn = txn.id)
+          WHERE txn_line.item = {$this->id}
+          GROUP BY txn.id
+          ORDER BY txn.created";
+    return \ORM::for_table('txn')->raw_query($q);
+  }
+
+  public function find_vendor_items() {
+    $q= "UPDATE vendor_item, item
+            SET vendor_item.item = item.id
+          WHERE (vendor_item.item IS NULL OR vendor_item.item = 0)
+            AND vendor_item.code = item.code
+            AND item.id = {$this->id}";
+    \ORM::raw_execute($q);
+
+    $q= "UPDATE vendor_item, barcode
+            SET vendor_item.item = barcode.item
+          WHERE (vendor_item.item IS NULL OR vendor_item.item = 0)
+            AND vendor_item.barcode = barcode.code
+            AND barcode.item = {$this->id}";
+    \ORM::raw_execute($q);
   }
 
   public function jsonSerialize() {

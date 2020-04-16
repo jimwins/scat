@@ -30,6 +30,19 @@ class Txn extends \Model implements \JsonSerializable {
       ($created->format("Y") . "-" . $this->number);
   }
 
+  public function friendly_type() {
+    switch ($this->type) {
+      case 'vendor':
+        return 'Purchase Order';
+      case 'correction':
+        return 'Correction';
+      case 'drawer':
+        return 'Till Count';
+      case 'customer':
+        return $this->returned_from ? 'Return' : 'Sale';
+    }
+  }
+
   public function items_source() {
     return $this->has_many('TxnLine', 'txn');
   }
