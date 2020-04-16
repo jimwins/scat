@@ -35,6 +35,6 @@ class Payment extends \Model {
   }
 
   public function txn() {
-    return $this->belongs_to('Txn', 'txn')->find_one();
+    return $this->belongs_to('Txn')->find_one();
   }
 }

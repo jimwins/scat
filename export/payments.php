@@ -9,7 +9,7 @@ $q= "SELECT payment.id, method,
             cc_type, amount, txn, txn.type,
             CONCAT(YEAR(filled), '-', number) num
        FROM payment
-       JOIN txn ON payment.txn = txn.id
+       JOIN txn ON payment.txn_id = txn.id
       WHERE processed BETWEEN '$month-01' AND '$month-01' + INTERVAL 1 MONTH
       ORDER BY 1";
 

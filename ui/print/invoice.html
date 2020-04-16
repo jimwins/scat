@@ -127,7 +127,8 @@
       <td class="right" colspan="{{ span }}">Total:</td>
       <td class="price">{{ scat.amount(txn.total) }}</td>
     </tr>
-    {% for p in txn.payments %}
+    {% set payments= txn.payments.find_many() %}
+    {% for p in payments %}
       <tr>
         <td class="right" colspan="{{ span }}">
           {{ p.pretty_method }} ({{ p.processed}}):
@@ -135,7 +136,7 @@
         <td class="price">{{ scat.amount(p.amount) }}</td>
       </tr>
     {% endfor %}
-    {% if txn.payments %}
+    {% if payments %}
       <tr class="total">
         <td class="right" colspan="{{ span }}">Total Due:</td>
         <td class="price">{{ scat.amount(txn.total - txn.total_paid) }}</td>

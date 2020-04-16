@@ -14,7 +14,7 @@ $fn= (($txn->type == 'vendor') ? 'PO' : 'I') .
      $txn->formatted_number;
 
 $loader= new \Twig\Loader\FilesystemLoader('../ui/');
-$twig= new \Twig\Environment($loader, [ 'cache' => false ]);
+$twig= new \Twig\Environment($loader, [ 'debug' => $DEBUG, 'cache' => false ]);
 
 $template= $twig->load('print/invoice.html');
 $html= $template->render([ 'txn' => $txn, 'variation' => $variation ]);

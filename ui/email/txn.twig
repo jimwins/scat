@@ -71,7 +71,7 @@
           {{ scat.amount(txn.total) }}
         </td>
       </tr>
-      {% for data in txn.payments %}
+      {% for data in txn.payments.find_many %}
         <tr>
           <th colspan="{{ span }}" class="text-right">
             {{ data.pretty_method }}

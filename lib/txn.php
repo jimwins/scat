@@ -62,7 +62,7 @@ function txn_load($db, $id) {
               taxed,
               tax_rate,
               SUM(tax) AS tax,
-              CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
+              CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn_id)
                    AS DECIMAL(9,2)) AS total_paid
          FROM txn
          LEFT JOIN txn_line ON (txn.id = txn_line.txn)
@@ -150,7 +150,7 @@ function txn_load_payments($db, $id) {
   $q= "SELECT id, processed, method, amount, discount,
               cc_txn, cc_approval, cc_lastfour, cc_expire, cc_type
          FROM payment
-        WHERE txn = $id
+        WHERE txn_id = $id
         ORDER BY processed ASC";
 
   $r= $db->query($q)
@@ -393,7 +393,7 @@ class Transaction {
 
     // add payment record
     $q= "INSERT INTO payment
-            SET txn = {$this->id}, method = '$method', amount = $amount,
+            SET txn_id = {$this->id}, method = '$method', amount = $amount,
             $extra_fields
             processed = NOW()";
     $r= $this->db->query($q)
@@ -408,7 +408,7 @@ class Transaction {
       $change_paid= bcsub($this->total, bcadd($amount, $this->total_paid));
 
       $q= "INSERT INTO payment
-              SET txn = {$this->id}, method = 'change', amount = $change_paid,
+              SET txn_id = {$this->id}, method = 'change', amount = $change_paid,
               processed = NOW()";
       $r= $this->db->query($q)
         or die_query($this->db, $q);
@@ -444,7 +444,7 @@ class Transaction {
       or die_query($this->db, "START TRANSACTION");
 
     // remove payment record
-    $q= "DELETE FROM payment WHERE id = $payment AND txn = {$this->id}";
+    $q= "DELETE FROM payment WHERE id = $payment AND txn_id = {$this->id}";
     $r= $this->db->query($q)
       or die_query($this->db, $q);
 
@@ -478,7 +478,7 @@ class Transaction {
            FROM loyalty_reward
            JOIN txn_line ON loyalty_reward.item_id = txn_line.item
            JOIN item ON txn_line.item = item.id
-          WHERE txn = {$this->id}";
+          WHERE txn_line.txn = {$this->id}";
     // XXX throw an exception on failure
     $r= $this->db->query($q)
         or die_query($this->db, $q);

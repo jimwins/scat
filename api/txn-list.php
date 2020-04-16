@@ -69,7 +69,7 @@ $q= "SELECT id, type,
               2) AS DECIMAL(9,2))
             taxed,
             tax_rate,
-            CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
+            CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn_id)
                  AS DECIMAL(9,2)) AS total_paid
        FROM txn
        LEFT JOIN txn_line ON (txn.id = txn_line.txn)

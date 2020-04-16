@@ -56,7 +56,7 @@ class Txn extends \Model implements \JsonSerializable {
   }
 
   public function payments() {
-    return $this->has_many('Payment', 'txn')->find_many();
+    return $this->has_many('Payment');
   }
 
   public function person_id() {
@@ -116,7 +116,7 @@ class Txn extends \Model implements \JsonSerializable {
                 SUM(tax) AS tax,
                 CAST((SELECT SUM(amount)
                         FROM payment
-                       WHERE txn.id = payment.txn)
+                       WHERE txn.id = payment.txn_id)
                      AS DECIMAL(9,2)) AS total_paid
            FROM txn
            LEFT JOIN txn_line ON (txn.id = txn_line.txn)
@@ -158,7 +158,7 @@ class Txn extends \Model implements \JsonSerializable {
   }
 
   public function getInvoicePDF($variation= '') {
-    $loader= new \Twig\Loader\FilesystemLoader('ui/');
+    $loader= new \Twig\Loader\FilesystemLoader('../ui/');
     $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
 
     $template= $twig->load('print/invoice.html');

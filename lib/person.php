@@ -131,7 +131,7 @@ function person_load_activity($db, $id, $page= 0, $page_size= 50) {
                       FROM txn_line WHERE txn_line.txn = txn.id) *
                 (1 + IFNULL(tax_rate,0)/100) AS DECIMAL(9,2))
               total,
-              CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn)
+              CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn_id)
                    AS DECIMAL(9,2)) AS paid
          FROM txn
         WHERE person = $id
