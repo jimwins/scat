@@ -7,13 +7,8 @@ class Item extends \Model implements \JsonSerializable {
     return $this->belongs_to('Brand', 'brand')->find_one();
   }
 
-  /* TODO change item.product to item.product_id */
-  public function product_id() {
-    return $this->product;
-  }
-
   public function product() {
-    return $this->belongs_to('Product');
+    return $this->belongs_to('Product')->find_one();
   }
 
   public function barcodes() {
@@ -25,7 +20,7 @@ class Item extends \Model implements \JsonSerializable {
   }
 
   public function full_slug() {
-    $product= $this->product()->find_one();
+    $product= $this->product();
     if ($product)
       $subdept= $product->dept()->find_one();
     if ($subdept)

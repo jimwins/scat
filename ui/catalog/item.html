@@ -18,7 +18,7 @@
 
 {% block catalog_crumb %}
   {% if item.product_id %}
-    {% set product= item.product().find_one %}
+    {% set product= item.product %}
     {% set subdept= product.dept().find_one %}
     {% set dept= subdept.parent().find_one %}
     {{ parent() }}
