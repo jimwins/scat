@@ -22,19 +22,18 @@
 </style>
 <nav class="menu sidebar">
   <div class="btn-group btn-block">
-    <button class="btn btn-default col-sm-10 publish">
-      Publish
-    </button>
-    <button type="button" class="btn btn-default col-sm-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Add
       <span class="caret"></span>
       <span class="sr-only">Toggle Dropdown</span>
     </button>
     <ul class="dropdown-menu btn-block">
-      <li><a class="add-department" href="#">Add Department</a></li>
-      <li><a class="add-product" href="#">Add Product</a></li>
-{# not yet
-      <li><a class="add-item" href="#">Add Item</a></li>
-#}
+      <li><a class="add-brand" href="#">Brand</a></li>
+      <li><a class="add-department" href="#">Department</a></li>
+      <li><a class="add-product" href="#">Product</a></li>
+      <li><a class="add-item" href="#">Item</a></li>
+      <li class="divider"></li>
+      <li><a class="publish" href="#">Publish</a></li>
     </ul>
   </div>
   <hr style="border-color: rgba(0,0,0,0.1)">
@@ -73,6 +72,11 @@
       })
     })
 
+    nav.querySelector('.add-brand').addEventListener('click', (ev) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      scat.dialog(ev.target, '/catalog/brand-form')
+    })
     nav.querySelector('.add-department').addEventListener('click', (ev) => {
       ev.preventDefault()
       ev.stopPropagation()
@@ -85,12 +89,12 @@
       scat.dialog(ev.target, '/catalog/product-form',
                   { department_id: department })
     })
-{# not yet
     nav.querySelector('.add-item').addEventListener('click', (ev) => {
       ev.preventDefault()
       ev.stopPropagation()
-      scat.dialog(ev.target, '/catalog/item-form')
+      let product= {{ product ? product.id : 0 }}
+      scat.dialog(ev.target, '/catalog/item-add-form',
+                  { product_id: product })
     })
-#}
   </script>
 </nav>

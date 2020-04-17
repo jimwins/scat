@@ -58,11 +58,6 @@
         </ul>
       </div>
     {% endif %}
-
-    <button class="btn btn-default add-item" type="button">
-      Add Item
-    </button>
-
   </div>
   <div class="input-group">
     <input class="form-control" type="text" name="q" value="{{ q }}" autofocus
@@ -132,10 +127,6 @@
             })
       })
     {% endif %}
-
-    form.querySelector('.add-item').addEventListener('click', (ev) => {
-      scat.dialog([], '/dialog/add-item.html')
-    })
 
   </script>
 </form>

@@ -729,6 +729,15 @@ $app->group('/catalog', function (Slim\App $app) {
               return $res->withJson($vi->checkVendorStock());
             });
 
+  $app->get('/item-add-form',
+            function (Request $req, Response $res, array $args) {
+              return $this->view->render($res, 'dialog/item-add.html',
+                                         [
+                                           'product_id' =>
+                                             $req->getParam('product_id'),
+                                         ]);
+            });
+
   $app->get('/vendor-item-form',
             function (Request $req, Response $res, array $args) {
               $item= $this->catalog->getItemById($req->getParam('item'));
@@ -910,6 +919,7 @@ $app->group('/catalog', function (Slim\App $app) {
                throw $ex;
              }
             })->setName('catalog');
+
   $app->post('/~add-item',
              function (Request $req, Response $res, array $args) {
                \ORM::get_db()->beginTransaction();
@@ -919,6 +929,10 @@ $app->group('/catalog', function (Slim\App $app) {
                $item->code= trim($req->getParam('code'));
                $item->name= trim($req->getParam('name'));
                $item->retail_price= $req->getParam('retail_price');
+
+               if ($req->getParam('product_id')) {
+                 $item->product_id= $req->getParam('product_id');
+               }
 
                if (($id= $req->getParam('vendor_item'))) {
                  $vendor_item= $this->catalog->getVendorItemById($id);

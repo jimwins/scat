@@ -8,6 +8,10 @@
 {% block body %}
   <div class="modal-body">
 
+    {% if product_id %}
+      <input type="hidden" name="product_id" value="{{ product_id }}">
+    {% endif %}
+
     <div class="form-group">
       <label for="code">Code</label>
       <div class="input-group">
