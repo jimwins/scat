@@ -23,7 +23,7 @@ class VendorItem extends \Model implements \JsonSerializable {
   function findByItemIdForVendor($item_id, $vendor_id, $active= 1) {
     return \Model::factory('VendorItem')
              ->where('vendor_id', $vendor_id)
-             ->where('item', $item_id)
+             ->where('item_id', $item_id)
              ->where('active', $active)
              ->find_many();
   }

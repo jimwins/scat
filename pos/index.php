@@ -404,7 +404,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                } else {
                  $purchase= $this->txn->create([
                    'type' => 'vendor',
-                   'person' => $vendor_id,
+                   'person_id' => $vendor_id,
                    'tax_rate' => 0,
                  ]);
                }
@@ -438,8 +438,8 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                  }
 
                  $item= $purchase->items()->create();
-                 $item->txn= $purchase->id;
-                 $item->item= $item_id;
+                 $item->txn_id= $purchase->id;
+                 $item->item_id= $item_id;
                  $item->ordered= $quantity;
                  $item->retail_price= $price;
                  $item->save();
@@ -1506,7 +1506,7 @@ $app->group('/till', function (Slim\App $app) {
                  $amount= $counted - $expected;
 
                  $payment= Model::factory('Payment')->create();
-                 $payment->txn= $txn->id;
+                 $payment->txn_id= $txn->id;
                  $payment->method= 'cash';
                  $payment->amount= $amount;
                  $payment->set_expr('processed', 'NOW()');
@@ -1516,7 +1516,7 @@ $app->group('/till', function (Slim\App $app) {
 
                if ($withdraw) {
                  $payment= Model::factory('Payment')->create();
-                 $payment->txn= $txn->id;
+                 $payment->txn_id= $txn->id;
                  $payment->method= 'withdrawal';
                  $payment->amount= -$withdraw;
                  $payment->set_expr('processed', 'NOW()');
@@ -1551,7 +1551,7 @@ $app->group('/till', function (Slim\App $app) {
                $txn= $this->txn->create([ 'type' => 'drawer' ]);
 
                $payment= Model::factory('Payment')->create();
-               $payment->txn= $txn->id;
+               $payment->txn_id= $txn->id;
                $payment->method= 'withdrawal';
                $payment->amount= -$amount;
                $payment->set_expr('processed', 'NOW()');
