@@ -1,0 +1,113 @@
+{% extends 'catalog/layout.html' %}
+{% import 'macros.twig' as scat %}
+{% import _self as self %}
+
+{% macro pattern_link (override) %}
+  {%- if override.pattern_type == 'product' -%}
+    {{- '/catalog/' ~ override.product.full_slug -}}
+  {%- endif -%}
+  {%- if override.pattern_type == 'like' -%}
+    {{- '/catalog/search?q=code:' ~ override.pattern -}}
+  {%- endif -%}
+  {%- if override.pattern_type == 'rlike' -%}
+    {{- '/catalog/search?q=re:' ~ override.pattern -}}
+  {%- endif -%}
+{% endmacro %}
+
+{% block title %}
+  Price Overrides
+{% endblock %}
+
+{% block catalog_crumb %}
+{% endblock %}
+
+{% block catalog_width "12" %}
+
+{% block catalog_content %}
+
+<h1 class="title">Price Overrides</h1>
+
+<table class="table table-striped table-hover sortable">
+  <thead>
+    <tr>
+      <th>Pattern</th>
+      <th>Minimum</th>
+      <th>Discount</th>
+      <th>Expires</th>
+      <th>In Stock Only</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tfoot>
+    <tr>
+      <td colspan="5">
+        <button role="button" class="btn btn-primary edit-override">
+          Add Override
+        </button>
+      </td>
+    </tr>
+  </tfoot>
+  <tbody data-bind="foreach: overrides">
+    {% for override in price_overrides %}
+      <tr data-id="{{ override.id }}">
+        <td>
+          <a href="{{ self.pattern_link(override) }}">
+            {% if override.pattern_type == 'product' %}
+              <i class="fa fa-cubes"></i>
+              {{ override.product.name }}
+            {% else %}
+              {{ override.pattern }}
+            {% endif %}
+          </a>
+        </td>
+        <td>
+          {{ override.minimum_quantity }}
+        </td>
+        <td>
+          {{ scat.format_discount(override) }}
+        </td>
+        <td>
+          {{ override.expires ?: 'Never' }}
+        </td>
+        <td>
+          {{ override.in_stock ? 'Yes' : 'No' }}
+        </td>
+        <td>
+          <button role="button" class="btn btn-xs btn-default edit-override">
+            <i class="fa fa-pencil"></i>
+          </button>
+          <button role="button" class="btn btn-xs btn-default delete-override">
+            <i class="fa fa-trash-o"></i>
+          </button>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block script %}
+<script>
+  document.documentElement.addEventListener('click', (ev) => {
+    if (!ev.target.closest('.delete-override')) return;
+
+    let id= ev.target.closest('[data-id]').getAttribute('data-id')
+
+    if (confirm("Are you sure you want to delete this override?")) {
+      scat.call('/catalog/price-overrides/~delete', { id: id })
+      .then((res) => {
+        ev.target.closest('[data-id]').remove()
+      })
+    }
+  })
+
+  document.documentElement.addEventListener('click', (ev) => {
+    if (!ev.target.closest('.edit-override')) return;
+
+    let row= ev.target.closest('[data-id]')
+    let id= row ? row.getAttribute('data-id') : 0;
+
+    scat.dialog([], '/catalog/price-override-form', { id: id })
+  })
+</script>
+{% endblock %}

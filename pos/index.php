@@ -843,6 +843,52 @@ $app->group('/catalog', function (Slim\App $app) {
                                          ]);
             })->setName('catalog-whats-new');
 
+  $app->get('/price-overrides',
+             function (Request $req, Response $res, array $args) {
+               $price_overrides= \Model::factory('PriceOverride')
+                                  ->order_by_asc('pattern')
+                                  ->order_by_asc('minimum_quantity')
+                                  ->find_many();
+
+               return $this->view->render($res, 'catalog/price-overrides.html',[
+                'price_overrides' => $price_overrides,
+               ]);
+             })->setName('catalog-price-overrides');
+  $app->post('/price-overrides/~delete',
+             function (Request $req, Response $res, array $args) {
+               $override= \Model::factory('PriceOverride')
+                            ->find_one($req->getParam('id'));
+               if (!$override) {
+                 throw new \Slim\Exception\NotFoundException($req, $res);
+               }
+               $override->delete();
+               return $res->withJson([ 'message' => 'Success!' ]);
+             });
+  $app->post('/price-overrides/~edit',
+             function (Request $req, Response $res, array $args) {
+               $override= \Model::factory('PriceOverride')
+                            ->find_one($req->getParam('id'));
+               if (!$override) {
+                 $override= \Model::factory('PriceOverride')->create();
+               }
+               $override->pattern_type= $req->getParam('pattern_type');
+               $override->pattern= $req->getParam('pattern');
+               $override->minimum_quantity= $req->getParam('minimum_quantity');
+               $override->setDiscount($req->getParam('discount'));
+               $override->expires= $req->getParam('expires') ?: null;
+               $override->in_stock= $req->getParam('in_stock');
+               $override->save();
+               return $res->withJson($override);
+             });
+  $app->get('/price-override-form',
+            function (Request $req, Response $res, array $args) {
+              $override= \Model::factory('PriceOverride')
+                           ->find_one($req->getParam('id'));
+              return $this->view->render($res,
+                                         'dialog/price-override-edit.html',
+                                         [ 'override' => $override ]);
+            });
+
   $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]',
             function (Request $req, Response $res, array $args) {
             try {
