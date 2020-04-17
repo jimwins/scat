@@ -978,6 +978,12 @@ $app->group('/catalog', function (Slim\App $app) {
              });
 });
 
+/* Custom */
+$app->get('/custom',
+          function (Request $req, Response $res, array $args) {
+            return $this->view->render($res, 'custom/index.html');
+          });
+
 /* People */
 $app->group('/person', function (Slim\App $app) {
   $app->get('',

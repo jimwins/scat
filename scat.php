@@ -121,7 +121,7 @@ $(document).ready(function() {
         <li><a href="./">New Sale</a></li>
         <li><a href="catalog">Catalog</a></li>
         <!-- Hide Gift Cards and Custom menu on tablet for size reasons -->
-        <li class="hidden-sm"><a href="./custom.php">Custom</a></li>
+        <li class="hidden-sm"><a href="/custom">Custom</a></li>
         <li><a href="/person">People</a></li>
         <li><a href="/sale">Sales</a></li>
         <li><a href="/purchase">Purchases</a></li>

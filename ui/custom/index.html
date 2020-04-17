@@ -1,0 +1,225 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Custom
+{% endblock %}
+
+{% block content %}
+  <form id="dims" class="form-horizontal" role="form">
+    <div class="form-group">
+      <label for="w" class="col-sm-2 control-label">Width</label>
+      <div class="col-sm-4">
+        <input type="text" class="form-control" name="width">
+      </div>
+      <div class="col-sm-2">
+        <p class="form-control-static" id="w_in"></p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="h" class="col-sm-2 control-label">Height</label>
+      <div class="col-sm-4">
+        <input type="text" class="form-control" name="height">
+      </div>
+      <div class="col-sm-2">
+        <p class="form-control-static" id="h_in"></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-4">
+        <div class="panel panel-default">
+          <div class="panel-heading"><h3 class="panel-title">Canvas</h3></div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="slim" class="col-sm-6 control-label">
+                Slim (&frac34;")
+              </label>
+              <div class="col-sm-6">
+                <p class="form-control-static"
+                   data-calc="scat.amount(ui * 0.70)"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="thick" class="col-sm-6 control-label">
+                Thick (1&frac12;")
+              </label>
+              <div class="col-sm-6">
+                <p class="form-control-static"
+                   data-calc="(Math.max(w, h) > 40)
+                               ? 'Too big!'
+                               : scat.amount(ui * 1.00)"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="chunky" class="col-sm-6 control-label">
+                Chunky (1&frac12;")
+              </label>
+              <div class="col-sm-6">
+                <p class="form-control-static"
+                   data-calc="scat.amount(ui * 2.00)"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="epic" class="col-sm-6 control-label">
+                Epic (2&frac12;")
+              </label>
+              <div class="col-sm-6">
+                <p class="form-control-static"
+                   data-calc="scat.amount(ui * 3.00)"></p>
+              </div>
+            </div>
+          </div>
+        </div><!-- /.panel -->
+      </div><!-- /.col-sm-4 -->
+      <div class="col-sm-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Floater Frame</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="slim" class="col-sm-7 control-label">
+                Natural Slim (&frac34;")
+              </label>
+              <div class="col-sm-5">
+                <p class="form-control-static"
+                   data-calc="(Math.max(w, h) > 72)
+                               ? 'Too big!'
+                               : scat.amount(ui * 1.00)"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="slim-finished" class="col-sm-7 control-label">
+                Finished Slim (&frac34;")
+              </label>
+              <div class="col-sm-5">
+                <p class="form-control-static"
+                   data-calc="(Math.max(w, h) > 72)
+                               ? 'Too big!'
+                               : scat.amount(ui * 1.50)"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="thick" class="col-sm-7 control-label">
+                Natural Thick (1&frac12;")
+              </label>
+              <div class="col-sm-5">
+                <p class="form-control-static"
+                   data-calc="(Math.max(w, h) > 72)
+                               ? 'Too big!'
+                               : scat.amount(ui * 1.50)"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="thick-finished" class="col-sm-7 control-label">
+                Finished Thick (1&frac12;")
+              </label>
+              <div class="col-sm-5">
+                <p class="form-control-static"
+                   data-calc="(Math.max(w, h) > 72)
+                               ? 'Too big!'
+                               : scat.amount(ui * 2.50)"></p>
+              </div>
+            </div>
+          </div>
+        </div><!-- /.panel -->
+      </div><!-- /.col-sm-4 -->
+      <div class="col-sm-4">
+        <div class="panel panel-default">
+          <div class="panel-heading"><h3 class="panel-title">Birch Panel</h3></div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="uncradled" class="col-sm-6 control-label">
+                Uncradled (&frac14;")
+              </label>
+              <div class="col-sm-6">
+                <p class="form-control-static"
+                   data-calc="(Math.min(w, h) > 60)
+                               ? 'Too big!'
+                               : scat.amount(ui * 0.59)"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="thick" class="col-sm-6 control-label">
+                Thick (1&frac34;")
+              </label>
+              <div class="col-sm-6">
+                <p class="form-control-static"
+                   data-calc="(Math.min(w, h) > 60)
+                               ? 'Too big!'
+                               : (Math.min(w, h) > 48)
+                                  ? scat.amount(ui * 2)
+                                  : scat.amount(ui * 1.5)"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="epic" class="col-sm-6 control-label">
+                Epic (2&frac34;")
+              </label>
+              <div class="col-sm-6">
+                <p class="form-control-static"
+                   data-calc="(Math.min(w, h) > 60)
+                               ? 'Too big!'
+                               : (Math.min(w, h) > 48)
+                                  ? scat.amount(ui * 3)
+                                  : scat.amount(ui * 2)"></p>
+              </div>
+            </div>
+          </div>
+        </div><!-- /.panel -->
+      </div><!-- /.col-sm-4 -->
+    </div><!-- /.row -->
+  </form>
+{% endblock %}
+
+{% block script %}
+  <script>
+    let form= document.querySelector('#dims')
+
+    let recalculate= () => {
+      let w= form.elements['width'].value
+      let h= form.elements['height'].value
+
+      // We work in imperial, so calculate that
+      if (w.match(/cm/)) {
+        w= (parseFloat(w) / 2.54).toFixed(3)
+      }
+      if (h.match(/cm/)) {
+        h= (parseFloat(h) / 2.54).toFixed(3)
+      }
+
+      // Highlight fields if they aren't a number
+      form.elements['width'].closest('.form-group').classList.remove('has-error')
+      form.elements['height'].closest('.form-group').classList.remove('has-error')
+      if (isNaN(Number(w))) {
+        form.elements['width'].closest('.form-group').classList.add('has-error')
+      }
+      if (isNaN(Number(h))) {
+        form.elements['height'].closest('.form-group').classList.add('has-error')
+      }
+
+      form.querySelector('#w_in').innerText= Number(w) + '"'
+      form.querySelector('#h_in').innerText= Number(h) + '"'
+
+      let ui= Number(w) + Number(h)
+
+      // Not a number? Clear the outputs and give up
+      if (w == 0 || h == 0 || isNaN(ui)) {
+        form.querySelectorAll('[data-calc]').forEach((el) => {
+          el.innerText= ''
+        })
+        return
+      }
+
+      form.querySelectorAll('[data-calc]').forEach((el) => {
+        let calc= el.getAttribute('data-calc')
+        el.innerText= eval(calc)
+      })
+    }
+
+    form.querySelectorAll('input').forEach((input) => {
+      input.addEventListener('change', recalculate)
+      input.addEventListener('keyup', recalculate)
+    })
+  </script>
+{% endblock %}
