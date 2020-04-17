@@ -15,7 +15,7 @@ if (!empty($items)) {
 $q= "UPDATE item, vendor_item
         SET item.retail_price = vendor_item.retail_price
      WHERE item.id = vendor_item.item
-       AND vendor = $vendor
+       AND vendor_id = $vendor
        AND $sql_criteria
        AND item.active AND vendor_item.active";
 

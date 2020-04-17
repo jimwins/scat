@@ -34,7 +34,7 @@
   </div>
   <div id="client_info">
   {% if txn.person_id %}
-    {% set person= txn.owner %}
+    {% set person= txn.person %}
     <small>To:</small><br>
     {% if txn.shipping_address_id %}
       {% set addr= txn.shipping_address %}
@@ -87,7 +87,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for line in txn.items %}
+  {% for line in txn.items.find_many() %}
     {% set item= line.item() %}
     {% if variation != 'packing-slip' or not (item.code starts with 'ZZ-SHIP') %}
       <tr valign="top">

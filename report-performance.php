@@ -78,8 +78,8 @@ $q= "SELECT SUM(ordered *
                 sale_price(txn_line.retail_price, txn_line.discount_type,
                            txn_line.discount)) total
        FROM txn 
-       JOIN txn_line ON (txn.id = txn_line.txn)
-       JOIN item ON (txn_line.item = item.id)
+       JOIN txn_line ON (txn.id = txn_line.txn_id)
+       JOIN item ON (txn_line.item_id = item.id)
        LEFT JOIN brand ON item.brand_id = brand.id
       WHERE type = 'vendor'
         AND ($sql_criteria)
@@ -91,8 +91,8 @@ $q= "SELECT SUM(ordered * -1 *
                 sale_price(txn_line.retail_price, txn_line.discount_type,
                            txn_line.discount)) total
        FROM txn 
-       JOIN txn_line ON (txn.id = txn_line.txn)
-       JOIN item ON (txn_line.item = item.id)
+       JOIN txn_line ON (txn.id = txn_line.txn_id)
+       JOIN item ON (txn_line.item_id = item.id)
        LEFT JOIN brand ON item.brand_id = brand.id
       WHERE type = 'customer'
         AND ($sql_criteria)
@@ -211,8 +211,8 @@ $q= "SELECT DATE_FORMAT(created, '$format') AS span,
                 sale_price(txn_line.retail_price, txn_line.discount_type,
                            txn_line.discount)) total
        FROM txn 
-       JOIN txn_line ON (txn.id = txn_line.txn)
-       JOIN item ON (txn_line.item = item.id)
+       JOIN txn_line ON (txn.id = txn_line.txn_id)
+       JOIN item ON (txn_line.item_id = item.id)
        LEFT JOIN brand ON item.brand_id = brand.id
       WHERE type = 'customer'
         AND ($sql_criteria)

@@ -112,29 +112,29 @@ function person_load_activity($db, $id, $page= 0, $page_size= 50) {
               CONCAT(txn.id, '|', type, '|', txn.number) AS number,
               txn.created,
               (SELECT SUM(ordered) * IF(txn.type = 'customer', -1, 1)
-                 FROM txn_line WHERE txn_line.txn = txn.id) ordered,
+                 FROM txn_line WHERE txn_line.txn_id = txn.id) ordered,
               (SELECT SUM(allocated) * IF(txn.type = 'customer', -1, 1)
-                 FROM txn_line WHERE txn_line.txn = txn.id) allocated,
+                 FROM txn_line WHERE txn_line.txn_id = txn.id) allocated,
               (SELECT CAST(ROUND_TO_EVEN(
                             SUM(IF(txn_line.taxfree, 1, 0) *
                                 IF(type = 'customer', -1, 1) * allocated *
                                 sale_price(retail_price, discount_type,
                                            discount)),
                             2) AS DECIMAL(9,2))
-                 FROM txn_line WHERE txn_line.txn = txn.id) +
+                 FROM txn_line WHERE txn_line.txn_id = txn.id) +
               CAST((SELECT CAST(ROUND_TO_EVEN(
                                   SUM(IF(txn_line.taxfree, 0, 1) *
                                       IF(type = 'customer', -1, 1) * allocated *
                                       sale_price(retail_price, discount_type,
                                                  discount)),
                                   2) AS DECIMAL(9,2))
-                      FROM txn_line WHERE txn_line.txn = txn.id) *
+                      FROM txn_line WHERE txn_line.txn_id = txn.id) *
                 (1 + IFNULL(tax_rate,0)/100) AS DECIMAL(9,2))
               total,
               CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn_id)
                    AS DECIMAL(9,2)) AS paid
          FROM txn
-        WHERE person = $id
+        WHERE person_id = $id
         GROUP BY txn.id
         ORDER BY created DESC
         $limit";

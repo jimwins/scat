@@ -72,7 +72,7 @@ foreach ($updates as $update) {
         throw new \Exception("No such transaction found for '{$update->code}'");
       }
 
-      if ($txn->person && $txn->person != $person->id) {
+      if ($txn->person_id && $txn->person_id != $person->id) {
         throw new \Exception("Transaction {$id} already assigned to someone else.");
       }
 
@@ -80,7 +80,7 @@ foreach ($updates as $update) {
         throw new \Exception("Timestamps for transaction {$id} don't match. '{$created}' != '{$txn->created}'");
       }
 
-      $txn->person= $person->id;
+      $txn->person_id= $person->id;
       $txn->save();
 
       echo "Attached transaction {$id} to person.\n";

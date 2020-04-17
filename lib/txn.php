@@ -6,7 +6,7 @@ function txn_load_full($db, $id) {
   $items= txn_load_items($db, $id);
   $payments= txn_load_payments($db, $id);
   $notes= txn_load_notes($db, $id);
-  $person= person_load($db, $txn['person'], PERSON_FIND_EMPTY);
+  $person= person_load($db, $txn['person_id'], PERSON_FIND_EMPTY);
 
   return array('txn' => $txn,
                'items' => $items,
@@ -17,13 +17,13 @@ function txn_load_full($db, $id) {
 
 function txn_load($db, $id) {
   $q= "SELECT id, uuid, type,
-              number, created, filled, paid, returned_from,
+              number, created, filled, paid, returned_from_id,
               no_rewards,
               IF(type = 'vendor' && YEAR(created) > 2013,
                  CONCAT(SUBSTRING(YEAR(created), 3, 2), number),
                  CONCAT(DATE_FORMAT(created, '%Y-'), number))
                 AS formatted_number,
-              person, person_name,
+              person_id, person_name,
               IFNULL(ordered, 0) ordered, allocated,
               taxed, untaxed,
               CAST(tax_rate AS DECIMAL(9,2)) tax_rate, 
@@ -40,8 +40,8 @@ function txn_load($db, $id) {
         FROM (SELECT
               txn.id, txn.uuid, txn.type, txn.number,
               txn.created, txn.filled, txn.paid,
-              txn.returned_from, txn.no_rewards,
-              txn.person,
+              txn.returned_from_id, txn.no_rewards,
+              txn.person_id,
               CONCAT(IFNULL(person.name, ''),
                      IF(person.name != '' AND person.company != '', ' / ', ''),
                      IFNULL(person.company, ''))
@@ -65,8 +65,8 @@ function txn_load($db, $id) {
               CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn_id)
                    AS DECIMAL(9,2)) AS total_paid
          FROM txn
-         LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-         LEFT JOIN person ON (txn.person = person.id)
+         LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+         LEFT JOIN person ON (txn.person_id = person.id)
         WHERE txn.id = $id) t";
 
   $r= $db->query($q)
@@ -86,11 +86,11 @@ function txn_load($db, $id) {
 function txn_load_items($db, $id) {
   $q= "SELECT
               txn_line.id AS line_id, item.code, item.id AS item_id,
-              IF(type = 'vendor' && txn.person,
+              IF(type = 'vendor' && txn.person_id,
                  (SELECT vendor_sku
                     FROM vendor_item
-                   WHERE vendor = txn.person
-                     AND vendor_item.item = txn_line.item
+                   WHERE vendor_id = txn.person_id
+                     AND vendor_item.item_id = txn_line.item_id
                      AND vendor_item.active
                    ORDER BY vendor_item.purchase_quantity <= txn_line.ordered
                    LIMIT 1),
@@ -115,11 +115,11 @@ function txn_load_items($db, $id) {
                             END), '') discount,
               ordered * IF(txn.type = 'customer', -1, 1) AS quantity,
               allocated * IF(txn.type = 'customer', -1, 1) AS allocated,
-              (SELECT SUM(allocated) FROM txn_line WHERE item = item.id) AS stock,
+              (SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id) AS stock,
               purchase_quantity
          FROM txn
-         LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-         JOIN item ON (txn_line.item = item.id)
+         LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+         JOIN item ON (txn_line.item_id = item.id)
         WHERE txn.id = $id
         ORDER BY txn_line.id ASC";
 
@@ -219,8 +219,8 @@ function txn_apply_discounts($db, $id) {
     }
     $count= $db->get_one("SELECT ABS(SUM(ordered))
                             FROM txn_line
-                            JOIN item ON txn_line.item = item.id
-                           WHERE txn = $id
+                            JOIN item ON txn_line.item_id = item.id
+                           WHERE txn_id = $id
                              AND $condition
                              AND NOT discount_manual");
 
@@ -247,7 +247,7 @@ function txn_apply_discounts($db, $id) {
         $q= "UPDATE txn_line, item
                 SET txn_line.discount = $new_discount,
                     txn_line.discount_type = '$new_discount_type'
-              WHERE txn = $id AND txn_line.item = item.id
+              WHERE txn_id = $id AND txn_line.item_id = item.id
                 AND $condition
                 AND NOT discount_manual";
       } else {
@@ -259,7 +259,7 @@ function txn_apply_discounts($db, $id) {
                                  'percentage',
                                  $new_discount),
                     txn_line.discount_type = 'fixed'
-              WHERE txn = $id AND txn_line.item = item.id
+              WHERE txn_id = $id AND txn_line.item_id = item.id
                 AND $condition
                 AND NOT discount_manual";
       }
@@ -267,7 +267,7 @@ function txn_apply_discounts($db, $id) {
       $q= "UPDATE txn_line, item
               SET txn_line.discount = item.discount,
                   txn_line.discount_type = item.discount_type 
-            WHERE txn = $id AND txn_line.item = item.id
+            WHERE txn_id = $id AND txn_line.item_id = item.id
               AND $condition
               AND NOT discount_manual";
     }
@@ -298,7 +298,7 @@ function txn_update_filled($db, $txn_id) {
   /* If everything is allocated, flag txn as filled. */
   $q= "SELECT COUNT(*)
          FROM txn_line
-        WHERE txn = $txn_id AND ordered != allocated";
+        WHERE txn_id = $txn_id AND ordered != allocated";
 
   $unfilled= $db->get_one($q);
 
@@ -465,20 +465,20 @@ class Transaction {
 
   public function rewardLoyalty() {
     // No person? No loyalty.
-    if (!$this->person)
+    if (!$this->person_id)
       return;
 
     // Use rewards
     $q= "INSERT INTO loyalty (txn_id, person_id, processed, note, points)
          SELECT {$this->id} txn_id,
-                {$this->person} person_id,
+                {$this->person_id} person_id,
                 NOW() processed,
                 name note,
                 cost * allocated points
            FROM loyalty_reward
-           JOIN txn_line ON loyalty_reward.item_id = txn_line.item
-           JOIN item ON txn_line.item = item.id
-          WHERE txn_line.txn = {$this->id}";
+           JOIN txn_line ON loyalty_reward.item_id = txn_line.item_id
+           JOIN item ON txn_line.item_id = item.id
+          WHERE txn_line.txn_id = {$this->id}";
     // XXX throw an exception on failure
     $r= $this->db->query($q)
         or die_query($this->db, $q);
@@ -494,7 +494,7 @@ class Transaction {
 
     $q= "INSERT INTO loyalty
             SET txn_id= {$this->id},
-                person_id = {$this->person},
+                person_id = {$this->person_id},
                 processed = NOW(),
                 note = 'Pt Earned',
                 points = $points";

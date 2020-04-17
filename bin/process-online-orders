@@ -73,7 +73,7 @@ foreach ($sales as $summary) {
     $txn->filled= $data->sale->modified;
     $txn->paid= $data->sale->modified;
     $txn->type= 'customer';
-    $txn->person= $person->id;
+    $txn->person_id= $person->id;
     $txn->tax_rate= 0.0;
 
     $txn->save();

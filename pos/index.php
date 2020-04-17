@@ -285,40 +285,40 @@ $all= (int)$req->getParam('all');
 $vendor_code= "NULL";
 $vendor= (int)$req->getParam('vendor');
 if ($vendor > 0) {
-  $vendor_code= "(SELECT code FROM vendor_item WHERE vendor = $vendor AND item = item.id AND vendor_item.active LIMIT 1)";
+  $vendor_code= "(SELECT code FROM vendor_item WHERE vendor_id = $vendor AND item_id = item.id AND vendor_item.active LIMIT 1)";
   $extra= "AND EXISTS (SELECT id
                          FROM vendor_item
-                        WHERE vendor = $vendor
-                          AND item = item.id
+                        WHERE vendor_id = $vendor
+                          AND item_id = item.id
                           AND vendor_item.active)";
   $extra_field= "(SELECT MIN(IF(promo_quantity, promo_quantity,
                                 purchase_quantity))
                     FROM vendor_item
-                   WHERE item = item.id
-                     AND vendor = $vendor
+                   WHERE item_id = item.id
+                     AND vendor_id = $vendor
                      AND vendor_item.active)
                   AS minimum_order_quantity,
                  (SELECT MIN(IF(promo_price, promo_price, net_price))
                     FROM vendor_item
-                    JOIN person ON vendor_item.vendor = person.id
-                  WHERE item = item.id
-                    AND vendor = $vendor
+                    JOIN person ON vendor_item.vendor_id = person.id
+                  WHERE item_id = item.id
+                    AND vendor_id = $vendor
                     AND vendor_item.active)
                   AS cost,
                  (SELECT MIN(IF(promo_price, promo_price, net_price)
                              * ((100 - vendor_rebate) / 100))
                     FROM vendor_item
-                    JOIN person ON vendor_item.vendor = person.id
-                  WHERE item = item.id
-                    AND vendor = $vendor
+                    JOIN person ON vendor_item.vendor_id = person.id
+                  WHERE item_id = item.id
+                    AND vendor_id = $vendor
                     AND vendor_item.active) -
                  (SELECT MIN(IF(promo_price, promo_price, net_price)
                              * ((100 - vendor_rebate) / 100))
                     FROM vendor_item
-                    JOIN person ON vendor_item.vendor = person.id
-                   WHERE item = item.id
+                    JOIN person ON vendor_item.vendor_id = person.id
+                   WHERE item_id = item.id
                      AND NOT special_order
-                     AND vendor != $vendor
+                     AND vendor_id != $vendor
                      AND vendor_item.active)
                  cheapest, ";
   $extra_field_name= "minimum_order_quantity, cheapest, cost,";
@@ -326,7 +326,7 @@ if ($vendor > 0) {
   // No vendor
   $extra= "AND NOT EXISTS (SELECT id
                              FROM vendor_item
-                            WHERE item = item.id
+                            WHERE item_id = item.id
                               AND vendor_item.active)";
 }
 
@@ -348,15 +348,15 @@ $q= "SELECT id, code, vendor_code, name, stock,
                     SUM(allocated) stock,
                     minimum_quantity,
                     (SELECT -1 * SUM(allocated)
-                       FROM txn_line JOIN txn ON (txn = txn.id)
+                       FROM txn_line JOIN txn ON (txn_id = txn.id)
                       WHERE type = 'customer'
-                        AND txn_line.item = item.id
+                        AND txn_line.item_id = item.id
                         AND filled > NOW() - INTERVAL 3 MONTH)
                     AS last3months,
                     (SELECT SUM(ordered - allocated)
-                       FROM txn_line JOIN txn ON (txn = txn.id)
+                       FROM txn_line JOIN txn ON (txn_id = txn.id)
                       WHERE type = 'vendor'
-                        AND txn_line.item = item.id
+                        AND txn_line.item_id = item.id
                         AND created > NOW() - INTERVAL 12 MONTH)
                     AS ordered,
                     $extra_field
@@ -365,7 +365,7 @@ $q= "SELECT id, code, vendor_code, name, stock,
                        minimum_quantity - IFNULL(SUM(allocated), 0))
                       AS order_quantity
                FROM item
-               LEFT JOIN txn_line ON (item = item.id)
+               LEFT JOIN txn_line ON (item_id = item.id)
               WHERE purchase_quantity
                 AND item.active AND NOT item.deleted
                 $extra
@@ -437,7 +437,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                    error_log("Failed to get price for $item_id");
                  }
 
-                 $item= $purchase->items_source()->create();
+                 $item= $purchase->items()->create();
                  $item->txn= $purchase->id;
                  $item->item= $item_id;
                  $item->ordered= $quantity;

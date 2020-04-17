@@ -66,25 +66,25 @@ $q= "SELECT
             item.name Name\$name,
             (SELECT SUM(-1 * allocated)
                FROM txn
-               JOIN txn_line ON txn_line.txn = txn.id
+               JOIN txn_line ON txn_line.txn_id = txn.id
               WHERE type = 'customer'
-                AND txn_line.item = item.id
+                AND txn_line.item_id = item.id
                 AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY)
               AS Sold,
             (SELECT SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                                     txn_line.discount_type,
                                                     txn_line.discount))
                FROM txn
-               JOIN txn_line ON txn_line.txn = txn.id
+               JOIN txn_line ON txn_line.txn_id = txn.id
               WHERE type = 'customer'
-                AND txn_line.item = item.id
+                AND txn_line.item_id = item.id
                 AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY)
               AS Total\$dollar,
             (SELECT SUM(-1 * allocated)
                FROM txn
-               JOIN txn_line ON txn_line.txn = txn.id
+               JOIN txn_line ON txn_line.txn_id = txn.id
               WHERE type = 'customer'
-                AND txn_line.item = item.id
+                AND txn_line.item_id = item.id
                 AND filled BETWEEN '$begin' - INTERVAL 1 YEAR 
                                AND '$end' - INTERVAL 1 YEAR + INTERVAL 1 DAY)
               AS LastSold,
@@ -92,9 +92,9 @@ $q= "SELECT
                                                     txn_line.discount_type,
                                                     txn_line.discount))
                FROM txn
-               JOIN txn_line ON txn_line.txn = txn.id
+               JOIN txn_line ON txn_line.txn_id = txn.id
               WHERE type = 'customer'
-                AND txn_line.item = item.id
+                AND txn_line.item_id = item.id
                 AND filled BETWEEN '$begin' - INTERVAL 1 YEAR 
                                AND '$end' - INTERVAL 1 YEAR + INTERVAL 1 DAY)
               AS LastTotal\$dollar

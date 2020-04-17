@@ -14,7 +14,7 @@ if ($txn['paid']) {
   die_jsonp("This order is already paid!");
 }
 
-$q= "DELETE FROM txn_line WHERE txn = $txn_id AND id = $id";
+$q= "DELETE FROM txn_line WHERE txn_id = $txn_id AND id = $id";
 
 $r= $db->query($q);
 if (!$r) die_query($db, $q);

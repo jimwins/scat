@@ -39,16 +39,12 @@ class Txn extends \Model implements \JsonSerializable {
       case 'drawer':
         return 'Till Count';
       case 'customer':
-        return $this->returned_from ? 'Return' : 'Sale';
+        return $this->returned_from_id ? 'Return' : 'Sale';
     }
   }
 
-  public function items_source() {
-    return $this->has_many('TxnLine', 'txn');
-  }
-
   public function items() {
-    return $this->has_many('TxnLine', 'txn')->find_many();
+    return $this->has_many('TxnLine');
   }
 
   public function notes() {
@@ -59,12 +55,8 @@ class Txn extends \Model implements \JsonSerializable {
     return $this->has_many('Payment');
   }
 
-  public function person_id() {
-    return $this->person;
-  }
-
-  public function owner() {
-    return $this->belongs_to('Person', 'person')->find_one();
+  public function person() {
+    return $this->belongs_to('Person')->find_one();
   }
 
   public function shipping_address() {
@@ -73,7 +65,7 @@ class Txn extends \Model implements \JsonSerializable {
 
   function clearItems() {
     $this->orm->get_db()->beginTransaction();
-    $this->items_source()->delete_many();
+    $this->items()->delete_many();
     $this->filled= null;
     $this->save();
     $this->orm->get_db()->commit();
@@ -119,7 +111,7 @@ class Txn extends \Model implements \JsonSerializable {
                        WHERE txn.id = payment.txn_id)
                      AS DECIMAL(9,2)) AS total_paid
            FROM txn
-           LEFT JOIN txn_line ON (txn.id = txn_line.txn)
+           LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
           WHERE txn.id = {$this->id}) t";
     $this->orm->raw_execute($q);
     $st= $this->orm->get_last_statement();

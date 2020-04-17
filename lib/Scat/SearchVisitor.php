@@ -114,12 +114,12 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
       $vendor= (int)$value;
       $this->current[]= $vendor ? "(EXISTS (SELECT id
                                               FROM vendor_item
-                                             WHERE item = item.id
-                                               AND vendor = $vendor
+                                             WHERE item_id = item.id
+                                               AND vendor_id = $vendor
                                                AND vendor_item.active))"
                                 : "(NOT EXISTS (SELECT id
                                                   FROM vendor_item
-                                                 WHERE item = item.id
+                                                 WHERE item_id = item.id
                                                    AND vendor_item.active))";
       break;
     case 'variation':
@@ -135,7 +135,7 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
                                            promo_price, net_price),
                            net_price))
                FROM vendor_item
-              WHERE vendor_item.item = item.id AND vendor_item.active)) / sale_price(item.retail_price, item.discount_type, item.discount) < $value)";
+              WHERE vendor_item.item_id = item.id AND vendor_item.active)) / sale_price(item.retail_price, item.discount_type, item.discount) < $value)";
       break;
     default:
       throw new \Exception("Don't know how to handle '$name'");

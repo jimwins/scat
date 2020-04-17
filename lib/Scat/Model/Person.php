@@ -105,13 +105,13 @@ class Person extends \Model implements \JsonSerializable {
   }
 
   public function open_orders() {
-    return $this->has_many('Txn', 'person')
+    return $this->has_many('Txn')
                 ->where_null('filled')
                 ->find_many();
   }
 
   public function txns($page= 0, $limit= 25) {
-    return $this->has_many('Txn', 'person')
+    return $this->has_many('Txn')
                 ->select('*')
                 ->select_expr('COUNT(*) OVER()', 'records')
                 ->order_by_desc('created')
@@ -311,14 +311,14 @@ class Person extends \Model implements \JsonSerializable {
 
     /* If we are replacing vendor data, mark the old stuff inactive */
     if ($action == 'replace') {
-      $q= "UPDATE vendor_item SET active = 0 WHERE vendor = {$this->id}";
+      $q= "UPDATE vendor_item SET active = 0 WHERE vendor_id = {$this->id}";
       if (!\ORM::raw_execute($q))
         throw new \Exception("Unable to deactive old items");
     }
     /* If this is a promo, unset existing promos for this vendor */
     if ($action == 'promo') {
       $q= "UPDATE vendor_item SET promo_price = NULL, promo_quantity = NULL
-            WHERE vendor = {$this->id}";
+            WHERE vendor_id = {$this->id}";
       if (!\ORM::raw_execute($q))
         throw new \Exception("Unable to clear old promos");
     }
@@ -387,22 +387,22 @@ class Person extends \Model implements \JsonSerializable {
 
     // Find by code/item_no
     $q= "UPDATE vendor_item
-            SET item = IFNULL((SELECT id FROM item
+            SET item_id = IFNULL((SELECT id FROM item
                                 WHERE vendor_item.code = item.code),
                               0)
-         WHERE vendor = {$this->id}
-           AND (item IS NULL OR item = 0)";
+         WHERE vendor_id = {$this->id}
+           AND (item_id IS NULL OR item_id = 0)";
     if (!\ORM::raw_execute($q))
       throw new \Exception("Unable to match items by code");
 
     // Find by barcode
     $q= "UPDATE vendor_item
-            SET item = IFNULL((SELECT item FROM barcode
+            SET item_id = IFNULL((SELECT item_id FROM barcode
                                 WHERE barcode.code = barcode
                                 LIMIT 1),
                               0)
-         WHERE vendor = {$this->id}
-           AND (item IS NULL OR item = 0)
+         WHERE vendor_id = {$this->id}
+           AND (item_id IS NULL OR item_id = 0)
            AND barcode IS NOT NULL
            AND barcode != ''";
     if (!\ORM::raw_execute($q))

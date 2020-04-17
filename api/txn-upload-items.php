@@ -216,21 +216,21 @@ $db->query($q)
 
 # Identify vendor items by SKU
 $q= "UPDATE vendor_order, vendor_item
-        SET vendor_order.item = vendor_item.item
+        SET vendor_order.item_id = vendor_item.item_id
       WHERE vendor_order.sku != '' AND vendor_order.sku IS NOT NULL
         AND vendor_order.sku = vendor_item.vendor_sku
-        AND vendor = $txn[person]
+        AND vendor_id = $txn[person]
         AND vendor_item.active";
 $db->query($q)
   or die_query($db, $q);
 
 # Identify vendor items by code
 $q= "UPDATE vendor_order, vendor_item
-        SET vendor_order.item = vendor_item.item
+        SET vendor_order.item_id = vendor_item.item_id
       WHERE (NOT vendor_order.item OR vendor_order.item IS NULL)
         AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
         AND vendor_order.item_no = vendor_item.code
-        AND vendor = $txn[person]
+        AND vendor_id = $txn[person]
         AND vendor_item.active";
 $db->query($q)
   or die_query($db, $q);
@@ -320,8 +320,8 @@ echo "- Loaded ", $db->affected_rows, " new barcodes from order.\n";
 
 # Link items to vendor items if they aren't already
 $q= "UPDATE vendor_item, vendor_order
-        SET vendor_item.item = vendor_order.item
-      WHERE NOT vendor_item.item
+        SET vendor_item.item_id = vendor_order.item
+      WHERE NOT vendor_item.item_id
         AND vendor_item.code = vendor_order.item_no
         AND vendor_item.active";
 $db->query($q)
@@ -333,8 +333,8 @@ $q= "UPDATE vendor_order, vendor_item
         SET msrp = vendor_item.retail_price,
             net = vendor_item.net_price
       WHERE msrp IS NULL
-        AND vendor_order.item = vendor_item.item
-        AND vendor = $txn[person]
+        AND vendor_order.item = vendor_item.item_id
+        AND vendor_id = $txn[person]
         AND vendor_item.active";
 $db->query($q)
   or die_query($db, $q);
@@ -342,8 +342,8 @@ $db->query($q)
 echo "- Updated ", $db->affected_rows, " rows from vendor info.\n";
 
 # Add items to order
-$q= "INSERT INTO txn_line (txn, item, ordered, allocated, retail_price)
-     SELECT $txn_id txn, item,
+$q= "INSERT INTO txn_line (txn_id, item_id, ordered, allocated, retail_price)
+     SELECT $txn_id txn_id, item,
             ordered, shipped, net
        FROM vendor_order
       WHERE (shipped OR backordered) AND (item != 0 AND item IS NOT NULL)";

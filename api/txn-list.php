@@ -39,7 +39,7 @@ $start= $page * $per_page;
 $q= "SELECT id, type,
             number, created, filled, paid,
             CONCAT(DATE_FORMAT(created, '%Y-'), number) AS formatted_number,
-            person, person_name, loyalty_number,
+            person_id, person_name, loyalty_number,
             IFNULL(ordered, 0) ordered, allocated,
             taxed, untaxed, tax_rate,
             CAST(ROUND_TO_EVEN(taxed * (1 + tax_rate / 100), 2) + untaxed
@@ -48,7 +48,7 @@ $q= "SELECT id, type,
       FROM (SELECT
             txn.id, txn.type, txn.number,
             txn.created, txn.filled, txn.paid,
-            txn.person,
+            txn.person_id,
             CONCAT(IFNULL(person.name, ''),
                    IF(person.name != '' AND person.company != '', ' / ', ''),
                    IFNULL(person.company, ''))
@@ -72,8 +72,8 @@ $q= "SELECT id, type,
             CAST((SELECT SUM(amount) FROM payment WHERE txn.id = payment.txn_id)
                  AS DECIMAL(9,2)) AS total_paid
        FROM txn
-       LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-       LEFT JOIN person ON (txn.person = person.id)
+       LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+       LEFT JOIN person ON (txn.person_id = person.id)
       WHERE $criteria
       GROUP BY txn.id
       ORDER BY id DESC

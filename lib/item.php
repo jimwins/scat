@@ -87,12 +87,12 @@ if ($GLOBALS['DEBUG'] || ($options & FIND_NEW_METHOD)) {
       $vendor= (int)$dbt[1];
       $andor[]= $vendor ? "EXISTS (SELECT id
                                      FROM vendor_item
-                                    WHERE item = item.id
-                                      AND vendor = $vendor
+                                    WHERE item_id = item.id
+                                      AND vendor_id = $vendor
                                       AND vendor_item.active)"
                         : "NOT EXISTS (SELECT id
                                          FROM vendor_item
-                                        WHERE item = item.id
+                                        WHERE item_id = item.id
                                           AND vendor_item.active)";
     } elseif (preg_match('/^re:(.+)/i', $term, $dbt)) {
       $andor[]= ("item.code RLIKE '{$dbt[1]}'");
@@ -149,10 +149,10 @@ function item_find($db, $q, $options) {
                 ELSE ''
               END discount_label,
               (SELECT IFNULL(SUM(allocated),0) FROM txn_line
-                WHERE item = item.id) stock,
+                WHERE item_id = item.id) stock,
               (SELECT retail_price
-                 FROM txn_line JOIN txn ON (txn_line.txn = txn.id)
-                WHERE txn_line.item = item.id AND txn.type = 'vendor'
+                 FROM txn_line JOIN txn ON (txn_line.txn_id = txn.id)
+                WHERE txn_line.item_id = item.id AND txn.type = 'vendor'
                   AND filled IS NOT NULL
                 ORDER BY filled DESC
                 LIMIT 1) last_net,
@@ -220,8 +220,8 @@ function item_load_vendor_items($db, $id) {
               special_order,
               purchase_quantity, barcode
          FROM vendor_item
-         JOIN person ON vendor_item.vendor = person.id
-        WHERE item = $id AND vendor_item.active";
+         JOIN person ON vendor_item.vendor_id = person.id
+        WHERE item_id = $id AND vendor_item.active";
 
   $r= $db->query($q)
     or die_query($db, $q);

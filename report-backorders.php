@@ -9,14 +9,14 @@ $q= "SELECT txn.id AS txn, txn.created,
                CONCAT(SUBSTRING(YEAR(txn.created), 3, 2), number),
                CONCAT(DATE_FORMAT(txn.created, '%Y-'), number))
               AS formatted_number,
-            person.id AS person, person.company AS person_name,
+            person.id AS person_id, person.company AS person_name,
             item.id AS item, item.code,
             IFNULL(override_name, item.name) AS item_name, data,
             ordered, allocated
        FROM txn
-       JOIN txn_line ON txn.id = txn_line.txn
-       JOIN person ON txn.person = person.id
-       JOIN item ON txn_line.item = item.id
+       JOIN txn_line ON txn.id = txn_line.txn_id
+       JOIN person ON txn.person_id = person.id
+       JOIN item ON txn_line.item_id = item.id
       WHERE type = 'vendor'
         AND ordered != allocated
       ORDER BY txn.id DESC, code";

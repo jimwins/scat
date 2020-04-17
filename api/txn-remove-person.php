@@ -10,7 +10,7 @@ $db->start_transaction();
 
 $txn= new Transaction($db, $txn_id);
 
-$q= "UPDATE txn SET person = NULL WHERE id = $txn_id";
+$q= "UPDATE txn SET person_id = NULL WHERE id = $txn_id";
 $r= $db->query($q)
   or die_query($db, $q);
 

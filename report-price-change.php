@@ -9,7 +9,7 @@ if (($items= $_REQUEST['items'])) {
 
 $vendor= (int)$_REQUEST['vendor'];
 if ($vendor) {
-  $sql_criteria= "($sql_criteria) AND vendor_item.vendor = $vendor";
+  $sql_criteria= "($sql_criteria) AND vendor_item.vendor_id = $vendor";
 }
 
 head("Price Increases @ Scat", true);
@@ -79,10 +79,10 @@ $q= "SELECT
                    ' - ',
                    '$', CAST(MAX(vendor_item.net_price) / 0.5 AS DECIMAL(9,2)))
               AS NewSale,
-            (SELECT SUM(allocated) FROM txn_line WHERE item = item.id)
+            (SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id)
               AS Stock
        FROM item
-       LEFT JOIN vendor_item ON item.id = vendor_item.item
+       LEFT JOIN vendor_item ON item.id = vendor_item.item_id
        LEFT JOIN brand ON item.brand_id = brand.id
        LEFT JOIN barcode ON (item.id = barcode.item_id)
       WHERE ABS(vendor_item.retail_price - item.retail_price) > 0.01
@@ -93,7 +93,7 @@ $q= "SELECT
       ORDER BY 2";
 
 function Change($row) {
-  echo '<a class="price-change" data-id="' . $row[0] . '" data-msrp="' . $row[4] . '"><i class="fa fa-money></a>';
+  echo '<a class="price-change" data-id="' . $row[0] . '" data-msrp="' . $row[4] . '"><i class="fa fa-money"></i></a>';
 }
 
 dump_table($db->query($q), 'Change$right');

@@ -64,7 +64,7 @@ if (count($items) == 1) {
   $unique= preg_match('/^ZZ-(frame|print|univ|canvas|stretch|float|panel|giftcard)/i', $items[0]['code']);
 
   $q= "SELECT id, ordered FROM txn_line
-        WHERE txn = $txn_id AND item = {$items[0]['id']}";
+        WHERE txn_id = $txn_id AND item_id = {$items[0]['id']}";
   $r= $db->query($q);
   if (!$r) die_query($db, $q);
 
@@ -89,16 +89,16 @@ if (count($items) == 1) {
                "IFNULL((SELECT IF(promo_price AND promo_price < net_price,
                                   promo_price, net_price)
                           FROM vendor_item
-                         WHERE vendor = {$txn['person']}
-                           AND item = item.id
+                         WHERE vendor_id = {$txn['person']}
+                           AND item_id = item.id
                            AND vendor_item.active
                          ORDER BY 1
                          LIMIT 1), 0.00), NULL, NULL";
 
-    $q= "INSERT INTO txn_line (txn, item, ordered,
+    $q= "INSERT INTO txn_line (txn_id, item_id, ordered,
                                retail_price, discount, discount_type,
                                taxfree, tic)
-         SELECT $txn_id AS txn, {$items[0]['id']} AS item,
+         SELECT $txn_id AS txn_id, {$items[0]['id']} AS item_id,
                 $quantity AS ordered, $prices, taxfree, tic
            FROM item WHERE id = {$items[0]['id']}";
     $r= $db->query($q);

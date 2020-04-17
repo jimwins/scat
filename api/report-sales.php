@@ -81,8 +81,8 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
                     tax_rate,
                     SUM(tax) AS tax
                FROM txn
-               LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-                    JOIN item ON (txn_line.item = item.id)
+               LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                    JOIN item ON (txn_line.item_id = item.id)
                     JOIN brand ON (item.brand_id = brand.id)
               WHERE filled IS NOT NULL
                 AND filled BETWEEN $begin AND $end

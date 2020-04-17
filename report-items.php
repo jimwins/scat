@@ -71,8 +71,8 @@ $q= "SELECT
                                             txn_line.discount_type,
                                             txn_line.discount)) Total\$dollar
        FROM txn
-       LEFT JOIN txn_line ON txn.id = txn_line.txn
-       LEFT JOIN item ON txn_line.item = item.id
+       LEFT JOIN txn_line ON txn.id = txn_line.txn_id
+       LEFT JOIN item ON txn_line.item_id = item.id
        LEFT JOIN brand ON item.brand_id = brand.id
        LEFT JOIN barcode ON (item.id = barcode.item_id)
       WHERE type = 'customer'

@@ -51,9 +51,9 @@
           <td>{{ txn.created }}</td>
           <td>{{ txn.filled }}</td>
           <td>
-            {% if txn.person %}
-              <a href="/person/{{ txn.person }}">
-                {{ txn.owner.friendly_name }}
+            {% if txn.person_id %}
+              <a href="/person/{{ txn.person_id }}">
+                {{ txn.person.friendly_name }}
               </a>
             {% endif %}
           </td>

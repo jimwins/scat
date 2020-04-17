@@ -35,7 +35,7 @@ if (isset($_REQUEST['price'])) {
   } elseif (preg_match('/^(cost)$/', $price)) {
     $discount = "(SELECT MIN(net_price)
                     FROM vendor_item
-                   WHERE vendor_item.item = item.id
+                   WHERE vendor_item.item_id = item.id
                      AND vendor_item.active)";
     $discount_type = "'fixed'";
     $price= 'item.retail_price';
@@ -59,7 +59,7 @@ if (isset($_REQUEST['price'])) {
               txn_line.discount_type = $discount_type,
               txn_line.discount = $discount,
               txn_line.discount_manual = $discount_manual
-        WHERE txn = $txn_id AND txn_line.id = $id AND txn_line.item = item.id";
+        WHERE txn_id = $txn_id AND txn_line.id = $id AND txn_line.item_id = item.id";
 
   $r= $db->query($q)
     or die_query($db, $q);
@@ -70,12 +70,12 @@ if (!empty($_REQUEST['quantity'])) {
   if (preg_match('!^(\d+)/(\d+)$!', $_REQUEST['quantity'], $m)) {
     $quantity= (int)$m[2] * ($txn['type'] == 'customer' ? -1 : 1);
 
-    $q= "INSERT INTO txn_line (txn, item, ordered, override_name,
+    $q= "INSERT INTO txn_line (txn_id, item_id, ordered, override_name,
                                retail_price, discount_type, discount,
                                discount_manual, taxfree)
-         SELECT txn, item, $quantity, override_name,
+         SELECT txn_id, item_id, $quantity, override_name,
                 retail_price, discount_type, discount, discount_manual, taxfree
-           FROM txn_line WHERE txn = $txn_id AND txn_line.id = $id";
+           FROM txn_line WHERE txn_id = $txn_id AND txn_line.id = $id";
     $r= $db->query($q)
       or die_query($db, $q);
 
@@ -87,7 +87,7 @@ if (!empty($_REQUEST['quantity'])) {
   $mul= ($txn['type'] == 'customer' ? -1 : 1);
   $q= "UPDATE txn_line
           SET ordered = $mul * $quantity
-        WHERE txn = $txn_id AND txn_line.id = $id";
+        WHERE txn_id = $txn_id AND txn_line.id = $id";
 
   $r= $db->query($q)
     or die_query($db, $q);
@@ -99,7 +99,7 @@ if (isset($_REQUEST['allocated'])) {
   $mul= ($txn['type'] == 'customer' ? -1 : 1);
   $q= "UPDATE txn_line
           SET allocated = $mul * $allocated
-        WHERE txn = $txn_id AND txn_line.id = $id";
+        WHERE txn_id = $txn_id AND txn_line.id = $id";
 
   $r= $db->query($q)
     or die_query($db, $q);
@@ -109,7 +109,7 @@ if (isset($_REQUEST['name'])) {
   $name= $db->real_escape_string($_REQUEST['name']);
   $q= "UPDATE txn_line
           SET override_name = IF('$name' = '', NULL, '$name')
-        WHERE txn = $txn_id AND txn_line.id = $id";
+        WHERE txn_id = $txn_id AND txn_line.id = $id";
 
   $r= $db->query($q)
     or die_query($db, $q);
@@ -120,7 +120,7 @@ if (isset($_REQUEST['data'])) {
 
   $q= "UPDATE txn_line
           SET data = IF('$data' = '', NULL, '$data')
-        WHERE txn = $txn_id AND txn_line.id = $id";
+        WHERE txn_id = $txn_id AND txn_line.id = $id";
 
   $r= $db->query($q)
     or die_query($db, $q);

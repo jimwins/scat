@@ -413,7 +413,7 @@ $(function() {
   <h3 class="panel-title">
    <span data-bind="text: description">New Sale</span>
    <button class="btn btn-xs btn-link"
-           data-bind="visible: txn.returned_from(), click: loadReturnedFrom">
+           data-bind="visible: txn.returned_from_id(), click: loadReturnedFrom">
      <i class="fa fa-reply"></i>
    </button>
   </h3>
@@ -891,7 +891,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             New Sale
           </span>
           <button class="btn btn-xs btn-link"
-                  data-bind="visible: txn.returned_from(),
+                  data-bind="visible: txn.returned_from_id(),
                              click: loadReturnedFrom">
             <i class="fa fa-reply"></i>
           </button>
@@ -1107,7 +1107,7 @@ var model= {
     tax: 0.00,
     total: 0.00,
     total_paid: 0.00,
-    returned_from: 0,
+    returned_from_id: 0,
     created: null,
     filled: null,
     paid: null,
@@ -1147,7 +1147,7 @@ viewModel.description= ko.computed(function() {
   if (!viewModel.txn.created()) { return "New Sale"; }
   var type= (viewModel.txn.type() == 'vendor' ? 'PO' :
               (viewModel.txn.total_paid() ? 'Invoice' :
-               (viewModel.txn.returned_from() ? 'Return' : 'Sale')));
+               (viewModel.txn.returned_from_id() ? 'Return' : 'Sale')));
   return type + ' ' + viewModel.txn.formatted_number();
 }, viewModel);
 
@@ -1189,7 +1189,7 @@ viewModel.load= function(txn) {
 }
 
 viewModel.loadReturnedFrom= function() {
-  Txn.loadId(viewModel.txn.returned_from());
+  Txn.loadId(viewModel.txn.returned_from_id());
 }
 
 viewModel.deleteTransaction= function() {

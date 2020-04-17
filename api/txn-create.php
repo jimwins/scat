@@ -25,7 +25,7 @@ $q= "INSERT INTO txn
         SET created= NOW(),
             type = '$type',
             number = $number,
-            person = $person,
+            person_id = $person,
             tax_rate = $tax_rate";
 $r= $db->query($q);
 if (!$r) die_query($db, $q);

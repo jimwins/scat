@@ -22,9 +22,9 @@ $q= "INSERT INTO txn
         SET created= NOW(),
             type = 'customer',
             number = $row[number],
-            person = $person,
+            person_id = $person,
             uuid = $uuid,
-            returned_from = $txn_id,
+            returned_from_id = $txn_id,
             tax_rate = {$txn['tax_rate']}";
 $r= $db->query($q);
 if (!$r)
@@ -32,23 +32,23 @@ if (!$r)
 
 $new_txn_id= $db->insert_id;
 
-$q= "INSERT INTO txn_line (txn, item, ordered, allocated, override_name,
+$q= "INSERT INTO txn_line (txn_id, item_id, ordered, allocated, override_name,
                            retail_price, discount_type, discount, taxfree,
                            tic, tax)
-     SELECT $new_txn_id AS txn,
-            item,
+     SELECT $new_txn_id AS txn_id,
+            item_id,
             -ordered AS ordered,
             -allocated AS allocated,
             override_name,
             retail_price, discount_type, discount,
             taxfree, tic, -tax
-       FROM txn_line WHERE txn = $txn_id";
+       FROM txn_line WHERE txn_id = $txn_id";
 $r= $db->query($q);
 if (!$r)
   die_query($db, $q);
 
 // Check for discounts, and adjust prices as necessary
-$q= "SELECT SUM(discount) FROM payment WHERE txn = $txn_id";
+$q= "SELECT SUM(discount) FROM payment WHERE txn_id = $txn_id";
 
 $discount= $db->get_one($q);
 
@@ -57,7 +57,7 @@ if ($discount) {
           SET discount = sale_price(retail_price, discount_type, discount) *
                          (1 - $discount / 100),
               discount_type = 'fixed'
-        WHERE txn = $new_txn_id";
+        WHERE txn_id = $new_txn_id";
 
   $r= $db->query($q)
     or die_query($db, $q);

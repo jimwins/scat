@@ -155,14 +155,14 @@ if (isset($_REQUEST['stock'])) {
     $cost= 0.00;
 
     $q= "SELECT retail_price
-           FROM txn_line JOIN txn ON (txn_line.txn = txn.id)
-          WHERE item = $item_id AND type = 'vendor'
+           FROM txn_line JOIN txn ON (txn_line.txn_id = txn.id)
+          WHERE item_id = $item_id AND type = 'vendor'
           ORDER BY created DESC
           LIMIT 1";
     $cost= $db->get_one($q);
     if (!$cost) $cost= 0.00;
 
-    $q= "SELECT id FROM txn_line WHERE txn = $txn_id AND item = $item_id";
+    $q= "SELECT id FROM txn_line WHERE txn_id = $txn_id AND item_id = $item_id";
     $txn_line= $db->get_one($q);
 
     if ($txn_line) {
@@ -173,8 +173,8 @@ if (isset($_REQUEST['stock'])) {
             WHERE id = $txn_line";
     } else {
       $q= "INSERT INTO txn_line
-              SET txn = $txn_id,
-                  item = $item_id,
+              SET txn_id = $txn_id,
+                  item_id = $item_id,
                   retail_price = $cost,
                   ordered = $diff,
                   allocated = $diff";

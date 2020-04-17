@@ -55,7 +55,7 @@ class Item extends \Model implements \JsonSerializable {
   }
 
   public function stock() {
-    return $this->has_many('TxnLine', 'item')
+    return $this->has_many('TxnLine')
                 ->sum('allocated') ?: 0;
   }
 
@@ -69,9 +69,9 @@ class Item extends \Model implements \JsonSerializable {
                 SUM(-1 * allocated *
                     sale_price(retail_price, discount_type, discount)) AS gross
            FROM txn
-           JOIN txn_line ON txn.id = txn_line.txn
+           JOIN txn_line ON txn.id = txn_line.txn_id
           WHERE type = 'customer'
-            AND item = {$this->id}
+            AND item_id = {$this->id}
             AND created BETWEEN NOW() - INTERVAL $days DAY AND NOW()";
 
     $res= \ORM::for_table('txn')->raw_query($q)->find_one();
@@ -157,16 +157,16 @@ class Item extends \Model implements \JsonSerializable {
       // TODO should have a \Scat\Model\Item method for this
       $q= "SELECT retail_price AS cost
              FROM txn_line
-             JOIN txn ON (txn_line.txn = txn.id)
-            WHERE item = {$this->id} AND type = 'vendor'
+             JOIN txn ON (txn_line.txn_id = txn.id)
+            WHERE item_id = {$this->id} AND type = 'vendor'
             ORDER BY created DESC
             LIMIT 1";
       $res= \ORM::for_table('txn_line')->raw_query($q)->find_one();
       $cost= $res ? $res->cost : 0.00;
 
       $txn_line= \Model::factory('TxnLine')
-        ->where_equal('txn', $cxn->id)
-        ->where_equal('item', $this->id)
+        ->where_equal('txn_id', $cxn->id)
+        ->where_equal('item_id', $this->id)
         ->find_one();
 
       if ($txn_line) {
@@ -175,8 +175,8 @@ class Item extends \Model implements \JsonSerializable {
         $txn_line->retail_price= $txn_line->ordered < 0 ? $cost : 0.00;
       } else {
         $txn_line= \Model::factory('TxnLine')->create();
-        $txn_line->txn= $cxn->id;
-        $txn_line->item= $this->id;
+        $txn_line->txn_id= $cxn->id;
+        $txn_line->item_id= $this->id;
         $txn_line->ordered= $diff;
         $txn_line->allocated= $diff;
         $txn_line->retail_price= $cost;
@@ -210,22 +210,22 @@ class Item extends \Model implements \JsonSerializable {
 
   public function txns() {
     return \Model::factory('Txn')
-            ->join('txn_line', [ 'txn.id', '=', 'txn_line.txn' ])
+            ->join('txn_line', [ 'txn.id', '=', 'txn_line.txn_id' ])
             ->select('txn.*')
             ->select_expr('AVG(sale_price(retail_price, discount_type, discount))',
                           'sale_price')
             ->select_expr('SUM(allocated)', 'quantity')
             ->group_by('txn.id')
             ->order_by_asc('txn.created')
-            ->where('txn_line.item', $this->id);
+            ->where('txn_line.item_id', $this->id);
 
     $q= "SELECT txn.id, txn.created, txn.type, txn.number,
                 AVG(sale_price(retail_price, discount_type, discount))
                   AS sale_price,
                 SUM(allocated) AS quantity
            FROM txn
-           JOIN txn_line ON (txn_line.txn = txn.id)
-          WHERE txn_line.item = {$this->id}
+           JOIN txn_line ON (txn_line.txn_id = txn.id)
+          WHERE txn_line.item_id = {$this->id}
           GROUP BY txn.id
           ORDER BY txn.created";
     return \ORM::for_table('txn')->raw_query($q);

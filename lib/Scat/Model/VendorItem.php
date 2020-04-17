@@ -104,7 +104,7 @@ class VendorItemSearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
 
       /* Special case: generated UPC codes */
       if (preg_match('/^400400(\d+)\d$/i', $term, $dbt)) {
-        $this->current[]= "(vendor_item.item = '{$dbt[1]}')";
+        $this->current[]= "(vendor_item.item_id = '{$dbt[1]}')";
         return;
       }
 
@@ -139,7 +139,7 @@ class VendorItemSearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
       $this->current[]= "(vendor_item.vendor_sku LIKE '$value%')";
       break;
     case 'item':
-      $this->current[]= "(vendor_item.item = '$value')";
+      $this->current[]= "(vendor_item.item_id = '$value')";
       break;
 /*
     case 'brand':

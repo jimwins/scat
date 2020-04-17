@@ -40,7 +40,7 @@ $q= "SELECT id, type, created,
             tax_rate,
             SUM(tax) AS tax
        FROM txn
-       LEFT JOIN txn_line ON (txn.id = txn_line.txn)
+       LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
       WHERE (type = 'correction' AND created BETWEEN $range)
          OR (type = 'customer'   AND paid    BETWEEN $range)
       GROUP BY txn.id
@@ -118,7 +118,7 @@ while ($sale= $r->fetch_assoc()) {
                     (SELECT ROUND_TO_EVEN(AVG(tl.retail_price), 2)
                        FROM txn JOIN txn_line tl ON txn.id = tl.txn
                       WHERE type = 'vendor'
-                        AND item = txn_line.item
+                        AND item = txn_line.item_id
                         AND filled < '$sale[created]'
                      ),
                     2), 0.00) AS DECIMAL(9,2)) AS cost,
@@ -133,8 +133,8 @@ while ($sale= $r->fetch_assoc()) {
                     ELSE txn_line.retail_price
                   END, 2) AS DECIMAL(9,2)) AS price
            FROM txn_line
-           JOIN item ON txn_line.item = item.id
-          WHERE txn = $sale[id]";
+           JOIN item ON txn_line.item_id = item.id
+          WHERE txn_id = $sale[id]";
 
     $in= $db->query($q)
       or die_query($db, $q);

@@ -55,7 +55,7 @@ class Search
     $items= \Model::factory('Item')->select('item.*')
                                    ->select_expr('IFNULL((SELECT SUM(allocated)
                                                      FROM txn_line
-                                                    WHERE txn_line.item =
+                                                    WHERE txn_line.item_id =
                                                            item.id),
                                                          0)',
                                                     'stock')

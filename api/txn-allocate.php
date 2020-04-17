@@ -16,7 +16,7 @@ if ($txn['paid']) {
 $line= (int)$_REQUEST['line'];
 
 if ($line) {
-  $q= "UPDATE txn_line SET allocated = ordered WHERE txn = $id AND id = $line";
+  $q= "UPDATE txn_line SET allocated = ordered WHERE txn_id = $id AND id = $line";
 
   $r= $db->query($q)
     or die_jsonp($db->error);
@@ -25,7 +25,7 @@ if ($line) {
 
 } else {
 
-  $q= "UPDATE txn_line SET allocated = ordered WHERE txn = $id";
+  $q= "UPDATE txn_line SET allocated = ordered WHERE txn_id = $id";
   $r= $db->query($q)
     or die_jsonp($db->error);
   $lines= $db->affected_rows;

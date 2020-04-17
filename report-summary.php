@@ -38,8 +38,8 @@ $q= "SELECT SUM(taxed + untaxed) AS sales,
                     SUM(tax) AS tax,
                     tax_rate
                FROM txn
-               LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-                    JOIN item ON (txn_line.item = item.id)
+               LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                    JOIN item ON (txn_line.item_id = item.id)
               WHERE filled IS NOT NULL
                 AND filled BETWEEN '$date' AND '$date' + INTERVAL 1 DAY
                 AND type = 'customer'
@@ -115,7 +115,7 @@ $(function() {
 $q= "SELECT COUNT(*) total,
             SUM(IF(DATE(filled) != DATE(person.created), 1, 0)) returned,
             SUM(IF(DATE(filled) = DATE(person.created), 1, 0)) new
-       FROM txn LEFT JOIN person ON (txn.person = person.id)
+       FROM txn LEFT JOIN person ON (txn.person_id = person.id)
       WHERE DATE(filled) = '$date'";
 $people= $db->get_one_assoc($q);
 ?>
@@ -214,8 +214,8 @@ function get_sales_data($db, $format, $begin, $end= null) {
                       AS taxed,
                       tax_rate
                  FROM txn
-                 LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-                      JOIN item ON (txn_line.item = item.id)
+                 LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                      JOIN item ON (txn_line.item_id = item.id)
                 WHERE filled IS NOT NULL
                   AND filled BETWEEN $begin AND $end
                   AND type = 'customer'
@@ -408,8 +408,8 @@ $q= "SELECT AVG(sales) FROM (SELECT DATE(filled),
                     AS taxed,
                     tax_rate
                FROM txn
-               LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-                    JOIN item ON (txn_line.item = item.id)
+               LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                    JOIN item ON (txn_line.item_id = item.id)
               WHERE filled IS NOT NULL
                 AND filled BETWEEN '$date' - INTERVAL 3 MONTH AND '$date' + INTERVAL 1 DAY
                 AND DAYOFWEEK(filled) = DAYOFWEEK('$date')
@@ -442,8 +442,8 @@ $q= "SELECT AVG(sales) FROM (SELECT DATE(filled),
                     AS taxed,
                     tax_rate
                FROM txn
-               LEFT JOIN txn_line ON (txn.id = txn_line.txn)
-                    JOIN item ON (txn_line.item = item.id)
+               LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                    JOIN item ON (txn_line.item_id = item.id)
               WHERE filled IS NOT NULL
                 AND filled BETWEEN '$date' - INTERVAL 7 DAY AND '$date' + INTERVAL 1 DAY
                 AND type = 'customer'
@@ -518,8 +518,8 @@ $q= "SELECT
                                             txn_line.discount_type,
                                             txn_line.discount)) Total\$dollar
        FROM txn
-       LEFT JOIN txn_line ON txn.id = txn_line.txn
-       LEFT JOIN item ON txn_line.item = item.id
+       LEFT JOIN txn_line ON txn.id = txn_line.txn_id
+       LEFT JOIN item ON txn_line.item_id = item.id
        LEFT JOIN brand ON item.brand_id = brand.id
       WHERE type = 'customer'
         AND filled BETWEEN '$date' AND '$date' + INTERVAL 1 DAY

@@ -8,12 +8,12 @@
     </p>
     <p>
       <i class="fa fa-user-o fa-border"></i>
-      {{ txn.owner.name }}
-      {% if txn.owner.email %}
-        &lt;{{ txn.owner.email }}&gt;
+      {{ txn.person.name }}
+      {% if txn.person.email %}
+        &lt;{{ txn.person.email }}&gt;
       {% endif %}
-      {% if txn.owner.company %}
-        <br>{{ txn.owner.company }}
+      {% if txn.person.company %}
+        <br>{{ txn.person.company }}
       {% endif %}
     </p>
   </div>
@@ -32,7 +32,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for data in txn.items %}
+      {% for data in txn.items.find_many() %}
         <tr valign="top">
           <td></td>
           <td>{{ txn.type == 'vendor' ? data.ordered : -data.ordered }}</td>

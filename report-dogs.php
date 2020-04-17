@@ -5,16 +5,16 @@ require 'lib/item.php';
 $q= "SELECT id, code, name,
             (SELECT MIN(created)
                FROM txn
-               JOIN txn_line ON txn.id = txn_line.txn
-              WHERE txn_line.item = item.id 
+               JOIN txn_line ON txn.id = txn_line.txn_id
+              WHERE txn_line.item_id = item.id 
                 AND type = 'vendor') first_seen,
             (SELECT SUM(ordered)
                FROM txn_line
-              WHERE txn_line.item = item.id) stocked,
+              WHERE txn_line.item_id = item.id) stocked,
             (SELECT MAX(paid)
                FROM txn
-               JOIN txn_line ON txn.id = txn_line.txn
-              WHERE txn_line.item = item.id 
+               JOIN txn_line ON txn.id = txn_line.txn_id
+              WHERE txn_line.item_id = item.id 
                 AND type = 'customer') last_sale
        FROM item
       WHERE item.active AND NOT item.deleted

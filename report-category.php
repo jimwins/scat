@@ -62,49 +62,49 @@ head("Category Sales @ Scat", true);
 
 /* Current */
 $q= "CREATE TEMPORARY TABLE report_current
-       (item INT UNSIGNED PRIMARY KEY,
+       (item_id INT UNSIGNED PRIMARY KEY,
         product_id INT UNSIGNED,
         department_id INT UNSIGNED,
         units INT NOT NULL,
         amount DECIMAL(9,2) NOT NULL,
         KEY (department_id))
      SELECT
-            txn_line.item, product_id, department_id,
+            txn_line.item_id, product_id, department_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
                                             txn_line.discount)) amount
        FROM txn
-       LEFT JOIN txn_line ON txn.id = txn_line.txn
-            JOIN item ON txn_line.item = item.id
+       LEFT JOIN txn_line ON txn.id = txn_line.txn_id
+            JOIN item ON txn_line.item_id = item.id
             JOIN brand ON item.brand_id = brand.id
        LEFT JOIN barcode ON item.id = barcode.item_id
        LEFT JOIN product ON product_id = product.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
-        AND txn_line.item IS NOT NULL
+        AND txn_line.item_id IS NOT NULL
       GROUP BY 1";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 /* Previous */
 $q= "CREATE TEMPORARY TABLE report_previous
-       (item INT UNSIGNED PRIMARY KEY,
+       (item_id INT UNSIGNED PRIMARY KEY,
         product_id INT UNSIGNED,
         department_id INT UNSIGNED,
         units INT NOT NULL,
         amount DECIMAL(9,2) NOT NULL,
         KEY (department_id))
      SELECT
-            txn_line.item, product_id, department_id,
+            txn_line.item_id, product_id, department_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
                                             txn_line.discount)) amount
        FROM txn
-       LEFT JOIN txn_line ON txn.id = txn_line.txn
-            JOIN item ON txn_line.item = item.id
+       LEFT JOIN txn_line ON txn.id = txn_line.txn_id
+            JOIN item ON txn_line.item_id = item.id
             JOIN brand ON item.brand_id = brand.id
        LEFT JOIN barcode ON item.id = barcode.item_id
        LEFT JOIN product ON product_id = product.id
@@ -112,7 +112,7 @@ $q= "CREATE TEMPORARY TABLE report_previous
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' - INTERVAL 1 YEAR
                        AND '$end' + INTERVAL 1 DAY - INTERVAL 1 YEAR
-        AND txn_line.item IS NOT NULL
+        AND txn_line.item_id IS NOT NULL
       GROUP BY 1";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);

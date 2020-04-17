@@ -3,11 +3,7 @@ namespace Scat\Model;
 
 class TxnLine extends \Model {
   public function txn() {
-    return $this->belongs_to('Txn', 'txn');
-  }
-
-  public function item_id() {
-    return $this->item;
+    return $this->belongs_to('Txn')->find_one();
   }
 
   public function item() {
@@ -61,7 +57,7 @@ class TxnLine extends \Model {
   }
 
   public function vendor_sku() {
-    $vendor_id= $this->txn()->find_one()->person;
+    $vendor_id= $this->txn()->person_id;
     if (!$vendor_id) return '';
     $vendor_items= $this->has_many('VendorItem', 'item', 'item')
                         ->where('vendor', $vendor_id)
@@ -80,14 +76,14 @@ class TxnLine extends \Model {
   public function cost_of_goods() {
     /* To calculate the cost of goods, we take the average of our vendor costs
      * before this transaction. Not great, but okay. */
-    $txn= $this->txn()->find_one();
+    $txn= $this->txn();
     $q= "SELECT CAST(IFNULL(ROUND_TO_EVEN(
                     {$this->allocated} * ROUND_TO_EVEN(AVG(tl.retail_price), 2),
                     2), 0.00) AS DECIMAL(9,2)) AS cost
            FROM txn
-           JOIN txn_line tl ON txn.id = tl.txn
+           JOIN txn_line tl ON txn.id = tl.txn_id
           WHERE type = 'vendor'
-            AND item = {$this->item}
+            AND item_id = {$this->item}
             AND filled < '{$txn->created}'";
 
     $cost= \ORM::for_table('txn')->raw_query($q)->find_one();

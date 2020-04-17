@@ -23,11 +23,11 @@ if (!$r->num_rows)
 if ($txn->paid)
   $txn->clearLoyalty();
 
-$q= "UPDATE txn SET person = $person WHERE id = $txn_id";
+$q= "UPDATE txn SET person_id = $person WHERE id = $txn_id";
 $r= $db->query($q)
   or die_query($db, $q);
 
-$txn->person= $person;
+$txn->person_id= $person;
 
 if ($txn->paid)
   $txn->rewardLoyalty();
