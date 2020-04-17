@@ -593,8 +593,8 @@ $("#txn-load").submit(function(ev) {
             <li data-bind="visible: txn.type() == 'customer'">
                <a data-bind="click: toggleNoRewards">
                  <i class="fa"
-                    data-bind="css: { 'fa-square': txn.no_rewards(),
-                                      'fa-check-square': !txn.no_rewards()
+                    data-bind="css: { 'fa-square-o': txn.no_rewards(),
+                                      'fa-check-square-o': !txn.no_rewards()
                                     }"></i>
                    Earns Points
                </a>
@@ -909,7 +909,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
         </div>
         <div>
           <a data-bind="click: changePerson">
-            <i class="fa fa-user"></i>
+            <i class="fa fa-user-o"></i>
             <span class="val"
                   data-bind="text: person.display_name()"></span>
           </a>
@@ -937,7 +937,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
             </span>
           </span>
           <a data-bind="if: person.id(), click: removePerson">
-            <i class="fa fa-trash"></i>
+            <i class="fa fa-trash-o"></i>
           </a>
         </div>
       </div>
@@ -1003,7 +1003,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
       <th data-bind="attr: { colspan: $parent.showAllocated() ? 5 : 4 }"
           class="payment-buttons">
         <a data-bind="visible: $parent.showAdmin() || (method() == 'discount' && !$parent.txn.paid())" name="remove">
-          <i class="fa fa-trash"></i>
+          <i class="fa fa-trash-o"></i>
         </a>
         <a data-bind="visible: method() == 'credit',
                       click: function (data) { printChargeRecord(data.id()) }">
@@ -1061,7 +1061,7 @@ $('#tax_rate .val').editable(function(value, settings) {
       <td>
         <a class="remove"
            data-bind="click: $parent.removeItem">
-          <i class="fa fa-trash" title="Remove"></i>
+          <i class="fa fa-trash-o" title="Remove"></i>
         </a>
       </td>
       <td align="center" class="editable"
