@@ -1,5 +1,5 @@
 <?
-include 'scat.php';
+include '../scat.php';
 
 head("Clock Report @ Scat", true);
 
@@ -18,7 +18,9 @@ if (!$end) {
   $end= $db->escape($end);
 }
 ?>
-<form id="report-params" class="form-horizontal" role="form">
+<form id="report-params" class="form-horizontal" role="form"
+      action="<?=str_replace('?'.$_SERVER['QUERY_STRING'], '',
+                             $_SERVER['REQUEST_URI'])?>">
   <div class="form-group">
     <label for="datepicker" class="col-sm-2 control-label">
       Dates

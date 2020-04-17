@@ -5,7 +5,7 @@ var Scat= {};
  */
 
 Scat.api= function (func, args, opts) {
-  var url= 'api/' + func + '.php?callback=?';
+  var url= '/api/' + func + '.php?callback=?';
 
   // http://stackoverflow.com/a/5175170
   var validated= function(jqXHR, validationFunction) {
@@ -37,7 +37,7 @@ Scat.api= function (func, args, opts) {
 }
 
 Scat.dialog= function (name) {
-  var url= 'ui/' + name + '.html';
+  var url= '/ui/' + name + '.html';
 
   // XXX handle error
   return $.ajax({ url: url, cache: false });
@@ -75,7 +75,7 @@ Scat.dialog= function (name) {
 Scat.print= function(name, options) {
   $('#scat-print').remove();
 
-  var url= 'print/' + name + '.php?' + $.param(options);
+  var url= '/print/' + name + '.php?' + $.param(options);
   var lpr= $('<iframe id="scat-print" src="' + url + '"></iframe>').hide();
 
   lpr.on("load", function() {
@@ -91,7 +91,7 @@ Scat.print= function(name, options) {
 }
 
 Scat.printDirect= function(name, options) {
-  $.getJSON("print/" + name + ".php?callback=?",
+  $.getJSON("/print/" + name + ".php?callback=?",
             options,
             function (data) {
               if (data.error) {

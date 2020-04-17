@@ -1324,6 +1324,13 @@ $app->group('/report', function (Slim\App $app) {
             });
   $app->get('/{name}',
             function (Request $req, Response $res, array $args) {
+              ob_start();
+              include "../old-report/report-{$args['name']}.php";
+              $content= ob_get_clean();
+              return $this->view->render($res, 'report/old.html', [
+                'title' => $GLOBALS['title'],
+                'content' => $content,
+              ]);
               return $res->withRedirect("/report-{$args['name']}.php");
             });
 });

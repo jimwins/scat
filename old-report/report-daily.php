@@ -1,6 +1,6 @@
 <?
-require 'scat.php';
-require 'lib/txn.php';
+require '../scat.php';
+require '../lib/txn.php';
 
 head("Daily Flow @ Scat", true);
 
@@ -21,7 +21,8 @@ if (!$end) {
 
 ?>
 <form id="report-params" class="form-horizontal" role="form"
-      action="<?=$_SERVER['PHP_SELF']?>">
+      action="<?=str_replace('?'.$_SERVER['QUERY_STRING'], '',
+                             $_SERVER['REQUEST_URI'])?>">
   <div class="form-group">
     <label for="datepicker" class="col-sm-1 control-label">
       Dates

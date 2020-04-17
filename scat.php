@@ -1,4 +1,7 @@
 <?
+require dirname(__FILE__).'/lib/db.php';
+
+if (!$GLOBALS['app']) {
 error_reporting(E_ALL & ~E_NOTICE);
 
 date_default_timezone_set($_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ']);
@@ -13,8 +16,6 @@ $DEBUG= false;
 require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
 
 require dirname(__FILE__).'/vendor/autoload.php';
-
-require dirname(__FILE__).'/lib/db.php';
 
 Model::$auto_prefix_models= '\\Scat\\Model\\';
 Model::$short_table_names= true;
@@ -354,6 +355,29 @@ $(function() {
 FOOTER;
 }
 
+/* Configuration for Paris */
+ORM::configure('mysql:host=' . DB_SERVER . ';dbname=' . DB_SCHEMA . ';charset=utf8');
+ORM::configure('username', DB_USER);
+ORM::configure('password', DB_PASSWORD);
+ORM::configure('logging', true);
+ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
+Model::$short_table_names= true;
+
+if ($DEBUG) {
+  ORM::configure('logger', function ($log_string, $query_time) {
+    error_log('ORM: "' . $log_string . '" in ' . $query_time);
+  });
+}
+
+
+} else { // $app is present
+  function head($title, $x) {
+    $GLOBALS['title']= $title;
+  }
+  function foot() {
+  }
+}
+
 if (!defined('DB_SERVER') ||
     !defined('DB_USER') ||
     !defined('DB_PASSWORD') ||
@@ -380,20 +404,6 @@ if (!$db) die("mysqli_init failed");
 
 if (!$db->real_connect(DB_SERVER,DB_USER,DB_PASSWORD,DB_SCHEMA))
   die('connect failed: ' . mysqli_connect_error());
-
-/* Configuration for Paris */
-ORM::configure('mysql:host=' . DB_SERVER . ';dbname=' . DB_SCHEMA . ';charset=utf8');
-ORM::configure('username', DB_USER);
-ORM::configure('password', DB_PASSWORD);
-ORM::configure('logging', true);
-ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
-Model::$short_table_names= true;
-
-if ($DEBUG) {
-  ORM::configure('logger', function ($log_string, $query_time) {
-    error_log('ORM: "' . $log_string . '" in ' . $query_time);
-  });
-}
 
 function dump_table($r, $calc = false) {
   $c= $meta= $line= 0;

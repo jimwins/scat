@@ -1,6 +1,6 @@
 <?
-require 'scat.php';
-require 'lib/item.php';
+require '../scat.php';
+require '../lib/item.php';
 
 $items= $_REQUEST['items'];
 if (!$items && ($product= (int)$_REQUEST['product'])) {
@@ -36,7 +36,8 @@ head("Performance @ Scat", true);
 
 ?>
 <form id="report-params" class="form-horizontal" role="form"
-      action="<?=$_SERVER['PHP_SELF']?>">
+      action="<?=str_replace('?'.$_SERVER['QUERY_STRING'], '',
+                             $_SERVER['REQUEST_URI'])?>">
   <div class="form-group">
     <label for="datepicker" class="col-sm-2 control-label">
       Dates

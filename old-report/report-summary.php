@@ -1,5 +1,5 @@
 <?
-require 'scat.php';
+require '../scat.php';
 
 head("Daily Summary @ Scat", true);
 
@@ -49,7 +49,9 @@ $q= "SELECT SUM(taxed + untaxed) AS sales,
 
 $sales= $db->get_one_assoc($q);
 ?>
-<form id="report-params" role="form">
+<form id="report-params" role="form"
+      action="<?=str_replace('?'.$_SERVER['QUERY_STRING'], '',
+                             $_SERVER['REQUEST_URI'])?>">
   <div class="input-group col-sm-6">
     <span class="input-group-addon">Date</span>
     <div class="input-daterange" id="datepicker">
@@ -530,7 +532,7 @@ $q= "SELECT
 dump_table($db->query($q));
 ?>
       <div class="panel-footer text-center">
-        <a class="btn btn-default" href="report-items.php?begin=<?=$date?>&end=<?=$date?>">See All</a>
+        <a class="btn btn-default" href="/report/items?begin=<?=$date?>&end=<?=$date?>">See All</a>
       </div>
     </div>
   </div>

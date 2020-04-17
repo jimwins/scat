@@ -1,6 +1,6 @@
 <?
-require 'scat.php';
-require 'lib/item.php';
+require '../scat.php';
+require '../lib/item.php';
 
 head("Backorders @ Scat", true);
 

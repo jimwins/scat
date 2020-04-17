@@ -1,6 +1,6 @@
 <?
-require 'scat.php';
-require 'lib/item.php';
+require '../scat.php';
+require '../lib/item.php';
 
 $q= "SELECT id, code, name,
             (SELECT MIN(created)
@@ -44,7 +44,7 @@ head("Dogs @ Scat", true);
       <tr>
         <td class="num"><?=++$id?></td>
         <td>
-          <a href="item.php?id=<?=$row['id']?>"><?=ashtml($row['code'])?></a>
+          <a href="/catalog/item/<?=$row['code']?>"><?=ashtml($row['code'])?></a>
         </td>
         <td>
           <?=ashtml($row['name'])?>

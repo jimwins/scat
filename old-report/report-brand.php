@@ -1,6 +1,6 @@
 <?
-require 'scat.php';
-require 'lib/item.php';
+require '../scat.php';
+require '../lib/item.php';
 
 $sql_criteria= "1=1";
 if (($items= $_REQUEST['items'])) {
@@ -26,7 +26,8 @@ if (!$end) {
 head("Brand Sales @ Scat", true);
 ?>
 <form id="report-params" class="form-horizontal" role="form"
-      action="<?=$_SERVER['PHP_SELF']?>">
+      action="<?=str_replace('?'.$_SERVER['QUERY_STRING'], '',
+                             $_SERVER['REQUEST_URI'])?>">
   <div class="form-group">
     <label for="datepicker" class="col-sm-2 control-label">
       Dates
@@ -162,7 +163,7 @@ while ($row= $r->fetch_assoc()) {
   }
 ?>
   <tr class="XXX<?=($change < 0) ? 'danger' : ($change > 100) ? 'success' : ''?>">
-   <td><a href="report-category.php?begin=<?=ashtml($begin)?>&end=<?=ashtml($end)?>&items=<?=ashtml($items)?>+brand:<?=$row['slug']?>"><?=ashtml($row['name'])?></a></td>
+   <td><a href="/report/categor?begin=<?=ashtml($begin)?>&end=<?=ashtml($end)?>&items=<?=ashtml($items)?>+brand:<?=$row['slug']?>"><?=ashtml($row['name'])?></a></td>
    <td align="right"><?=amount($row['current_amount'])?></td>
    <td align="right"><?=amount($row['previous_amount'])?></td>
    <td align="right"><?=sprintf("%.1f%%", $change)?></td>
