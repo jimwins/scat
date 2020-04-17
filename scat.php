@@ -371,7 +371,7 @@ if ($DEBUG) {
 
 
 } else { // $app is present
-  function head($title, $x) {
+  function head($title, $x= null) {
     $GLOBALS['title']= $title;
   }
   function foot() {

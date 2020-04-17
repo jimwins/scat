@@ -1,0 +1,38 @@
+{% extends 'catalog/layout.html' %}
+
+{% block title %}
+  {{ title }}
+{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css">
+  <script src="/extern/knockout/knockout-3.4.2.js"></script>
+  <script src="/extern/knockout/knockout.mapping-2.4.1.js"></script>
+  <script src="/js/jquery.html5uploader.js"></script>
+  <script src="/extern/jquery_jeditable-2.0.3/dist/jquery.jeditable.min.js"></script>
+  <script src="/extern/cleave.js-1.4.4/dist/cleave.min.js"></script>
+  <script src="/extern/cleave.js-1.4.4/dist/addons/cleave-phone.us.js"></script>
+  <script src="/extern/mousetrap-1.6.2/mousetrap.min.js"></script>
+  <script src="/extern/mousetrap-1.6.2/plugins/global-bind/mousetrap-global-bind.min.js"></script>
+  <script src="/js/jquery-ui.min.js"></script>
+  <script src="/js/jquery.simplemodal.1.4.4.min.js"></script>
+  <script src="/components/moment/min/moment.min.js"></script>
+  <script src="/js/scat.js"></script>
+  <script>
+    $(document).ready(function() { 
+      // SimpleModal defaults
+      $.smodal.defaults.position= [ '25%', '25%' ];
+      $.smodal.defaults.overlayClose= true;
+      // Focus the #focus item
+      $("#focus").focus();
+    }); 
+  </script>
+{% endblock %}
+
+{% block content %}
+  {{ content | raw }}
+{% endblock %}
+
+{% block script %}
+{% endblock %}
+

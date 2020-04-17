@@ -155,6 +155,11 @@ if ($DEBUG) {
 
 /* ROUTES */
 
+$app->get('/',
+          function (Request $req, Response $res, array $args) {
+            return $res->withRedirect("/sale/new");
+          })->setName('home');
+
 /* Sales */
 $app->group('/sale', function (Slim\App $app) {
   $app->get('',
@@ -167,6 +172,16 @@ $app->group('/sale', function (Slim\App $app) {
                 'txns' => $txns,
                 'page' => $page,
                 'limit' => $limit,
+              ]);
+            });
+  $app->get('/new',
+            function (Request $req, Response $res, array $args) {
+              ob_start();
+              include "../old-index.php";
+              $content= ob_get_clean();
+              return $this->view->render($res, 'sale/old-new.html', [
+                'title' => $GLOBALS['title'],
+                'content' => $content,
               ]);
             });
   $app->get('/{id:[0-9]+}',
@@ -1331,7 +1346,6 @@ $app->group('/report', function (Slim\App $app) {
                 'title' => $GLOBALS['title'],
                 'content' => $content,
               ]);
-              return $res->withRedirect("/report-{$args['name']}.php");
             });
 });
 

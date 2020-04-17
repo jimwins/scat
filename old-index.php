@@ -57,7 +57,7 @@ Txn.due= function() {
 Txn.delete= function (id) {
   Scat.api('txn-delete', { txn: id })
       .done(function(data) {
-        window.location.href= './';
+        window.location.href= '/';
       });
 }
 
@@ -1214,7 +1214,7 @@ viewModel.clearItems= function() {
 
 viewModel.exportTransaction= function() {
   var txn= Txn.id();
-  window.location.href= 'export/txn.php?dl=1&id=' + txn;
+  window.location.href= '/export/txn.php?dl=1&id=' + txn;
 }
 
 viewModel.allocateTransaction= function() {
@@ -1495,7 +1495,7 @@ ko.applyBindings(viewModel);
 ?>
 $("body").html5Uploader({
   name: 'src',
-  postUrl: function() { return 'api/txn-upload-items.php?txn=' + Txn.id() },
+  postUrl: function() { return '/api/txn-upload-items.php?txn=' + Txn.id() },
   onSuccess: function(e, file, response) {
     data= $.parseJSON(response);
     if (data.error) {
