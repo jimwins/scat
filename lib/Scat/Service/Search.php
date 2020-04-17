@@ -15,10 +15,16 @@ class Search
   }
 
   public function search($q) {
-    $items= $products= $errors= [];
+    $items= $brands= $products= $errors= [];
 
     try {
       $items= $this->searchItems($q);
+    } catch (\Exception $e) {
+      $errors[]= $e->getMessage();
+    }
+
+    try {
+      $brands= $this->searchBrands($q);
     } catch (\Exception $e) {
       $errors[]= $e->getMessage();
     }
@@ -32,6 +38,7 @@ class Search
     }
 
     return [
+      'brands' => $brands,
       'items' => $items,
       'products' => $products,
       'errors' => $errors,
@@ -74,6 +81,13 @@ class Search
                                    ->find_many();
 
     return $items;
+  }
+
+  public function searchBrands($q) {
+    return \Model::factory('Brand')
+            ->where_raw('MATCH (name, slug) AGAINST (? IN NATURAL LANGUAGE MODE)', [ $q ])
+            ->where('active', 1)
+            ->find_many();
   }
 
   public function searchProducts($terms) {

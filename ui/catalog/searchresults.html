@@ -42,6 +42,18 @@
     {% endfor %}
   {% endif %}
 
+  {# Brand(s) #}
+  {% if brands|length %}
+    <div style="column-count: 3" class="list-group">
+      {% for b in brands %}
+        <a class="list-group-item" style="break-inside: avoid-column"
+           href="{{ path_for('catalog-brand', { 'brand' : b.slug }) }}">
+          {{ b.name }}
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   {# Item(s) #}
   {% if items|length %}
     {% include 'catalog/item-list.twig' %}
