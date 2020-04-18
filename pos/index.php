@@ -157,7 +157,10 @@ if ($DEBUG) {
 
 $app->get('/',
           function (Request $req, Response $res, array $args) {
-            return $res->withRedirect("/sale/new");
+            $q= ($req->getQueryParams() ?
+                  '?' . http_build_query($req->getQueryPArams()) :
+                  '');
+            return $res->withRedirect("/sale/new" . $q);
           })->setName('home');
 
 /* Sales */
