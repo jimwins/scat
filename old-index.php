@@ -1046,13 +1046,21 @@ $("#items").on("click", ".payment-row a[name='remove']", function() {
                   { txn: txn, id: row.data("id"),
                     admin: (viewModel.showAdmin() ? 1 : 0) });
 });
-$('#tax_rate .val').editable(function(value, settings) {
-  var txn= Txn.id();
-
-  Txn.callAndLoad('txn-update-tax-rate', { txn: txn, tax_rate: value });
-
-  return "...";
-}, { event: 'dblclick', style: 'display: inline', width: '4em' });
+$('#tax_rate .val').editable({
+  display: false, // let ko do it
+  pk: function() { return Txn.id() },
+  url: '/api/txn-update-tax-rate.php',
+  success: (response, newValue) => {
+    if (response && response.error) { return response.error }
+    Txn.loadData(response)
+  }
+})
+.on('shown', function (e, editable) {
+  // Can't just do this directly because $input isn't focused yet
+  setTimeout(function() {
+    editable.input.$input.select()
+  }, 1)
+});
 </script>
   <tbody data-bind="foreach: items">
     <tr class="item" valign="top"

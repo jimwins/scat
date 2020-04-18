@@ -3,6 +3,7 @@ include '../scat.php';
 include '../lib/txn.php';
 
 $txn_id= (int)$_REQUEST['txn'];
+if (!$txn_id) $txn_id= (int)$_REQUEST['pk'];
 if (!$txn_id)
   die_jsonp("no transaction specified.");
 
@@ -12,7 +13,8 @@ if ($txn['paid']) {
 }
 
 $tax_rate= (float)$_REQUEST['tax_rate'];
-if (!strcmp($_REQUEST['tax_rate'], 'def')) {
+if (!$tax_rate) $tax_rate= (float)$_REQUEST['value'];
+if (!strcmp($tax_rate, 'def')) {
   $tax_rate= DEFAULT_TAX_RATE;
 }
 
