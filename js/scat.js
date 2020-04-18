@@ -178,48 +178,6 @@ $(function() {
   });
 });
 
-// http://blog.fawnanddoug.com/2012/05/inline-editor-custom-binding-for.html
-ko.bindingHandlers.jeditable= {
-  init: function(element, valueAccessor, allBindingsAccessor) {
-    // get the options that were passed in
-    var options= allBindingsAccessor().jeditableOptions || {};
-          
-    // "submit" should be the default onblur action like regular ko controls
-    if (!options.onblur) {
-      options.onblur= 'submit';
-    }
-
-    // allow the editable function to be set as an option
-    if (!options.onupdate) {
-      options.onupdate= function(value, params) {
-        valueAccessor()(value);
-        return value;
-      }
-    }
-
-    // set the value on submit and pass the editable the options
-    $(element).editable(options.onupdate, options);
- 
-    //handle disposal (if KO removes by the template binding)
-    ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-      //$(element).editable("destroy");
-    });
- 
-  },
-      
-  //update the control when the view model changes
-  update: function(element, valueAccessor, allBindingsAccessor) {
-    // get the options that were passed in
-    var options= allBindingsAccessor().jeditableOptions || {};
-
-    var value= ko.utils.unwrapObservable(valueAccessor());
-    if (options.ondisplay) {
-      value= options.ondisplay(value);
-    }
-    $(element).html(value);
-  }
-};
-
 ko.bindingHandlers.cleave= {
   init: function(element, valueAccessor, allBindingsAccessor) {
     var options= allBindingsAccessor().cleaveOptions || {};

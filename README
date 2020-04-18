@@ -11,26 +11,11 @@ Scat uses the Bootstrap front-end framework:
 Scat uses Fork Awesome, a fork of the iconic font and CSS toolkit:
   http://forkaweso.me/
 
-Scat includes the Tablesorter 2.0 plugin for jQuery:
-  http://tablesorter.com/docs/
-
 Scat includes bootstrap-datepicker.js:
   https://github.com/eternicode/bootstrap-datepicker/
 
 Scat includes the SimpleModal plugin for jQuery:
   http://www.ericmmartin.com/projects/simplemodal/
-
-Scat includes the Jeditable jQuery plugin:
-  http://www.appelsiini.net/projects/jeditable
-
-Scat includes the jquery.dragbetter plugin:
-  https://github.com/lolmaus/jquery.dragbetter
-
-Scat includes the jquery.event.ue unified event plugin:
-  https://github.com/mmikowski/jquery.event.ue
-
-Scat includes the jQuery udraggable plugin:
-  https://github.com/grantm/jquery-udraggable
 
 Scat includes Mousetrap for handling keyboard shortcuts:
   https://craig.is/killing/mice
@@ -41,7 +26,7 @@ Scat includes Chart.js for charting:
 Scat includes FPDF for PDF generation:
   http://www.fpdf.org/
 
-Scat inclues BarCode Coder Library for barcode generation:
+Scat includes BarCode Coder Library for barcode generation:
   http://barcode-coder.com/
 
 Scat includes the Knockout JavaScript MVVM library:
@@ -52,9 +37,6 @@ Scat uses PhpSpreadSheet for writing Excel spreadsheets:
 
 Scat uses the Idiorm & Paris minimalist database toolkit:
   http://j4mie.github.io/idiormandparis/
-
-Scat includes the Marked markdown parser and compiler for Javascript:
-  https://github.com/chjj/marked
 
 Scat includes X-editable:
  https://vitalets.github.io/x-editable/index.html
