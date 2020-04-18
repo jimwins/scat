@@ -71,17 +71,6 @@ if (strlen($_REQUEST['dimensions'])) {
 }
 
 
-// Workaround for jEditable sorting: id may be prefixed with _
-$brand_id= isset($_REQUEST['brand_id']) ? ltrim($_REQUEST['brand_id'], '_') : 0;
-if ((int)$brand_id) {
-  $q= "UPDATE item
-          SET brand = $brand_id
-        WHERE id = $item_id";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-}
-
 if (isset($_REQUEST['retail_price'])) {
   $retail_price= preg_replace('/^\\$/', '', $_REQUEST['retail_price']);
   $retail_price= $db->real_escape_string($retail_price);

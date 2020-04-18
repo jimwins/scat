@@ -198,35 +198,4 @@ ko.bindingHandlers.cleave= {
   }
 };
 
-$.editable.addInputType('select2', {
-    element : function(settings, original) {
-        var input= $.editable.types.select.element.apply(this, [settings, original]);
-        return(input);
-    },
-    plugin : function(settings, original) {
-        var select= $("select", this);
-        select.select2(settings.select2);
-        select.on('select2:close', function(e) {
-          select.removeClass('select2-container-active');
-          select.blur();
-        });
-        return (select);
-    },
-    content : function(data, settings, original) {
-      if (!settings.submit) {
-        // XXX add our initial option
-        var form= this;
-        $(this).find('select').change(function() {
-          form.submit();
-        });
-      }
-    },
-});
-
-$.fn.editable.defaults.inputcssclass= 'form-control';
-$.fn.editable.defaults.cancelcssclass= 'btn btn-default';
-$.fn.editable.defaults.submitcssclass= 'btn btn-primary';
-$.fn.editable.defaults.width=  'none';
-$.fn.editable.defaults.height= 'none';
-
 $.fn.select2.defaults.set( "theme", "bootstrap" );
