@@ -1430,36 +1430,7 @@ viewModel.printGiftCard= function(item) {
 
 viewModel.emailGiftCard= function(item) {
   var card= item.data.card();
-  Scat.dialog('giftcard-message').done(function (html) {
-    var panel= $(html);
-
-    var message= { card: card,
-                   from_name: viewModel.person.name(),
-                   from_email: viewModel.person.email(),
-                   to_name: '', to_email: '',
-                   message: '' };
-    message.error= '';
-
-    panel.on('hidden.bs.modal', function() {
-      $(this).remove();
-    });
-
-    messageModel= ko.mapping.fromJS(message);
-
-    messageModel.sendMessage= function(place, ev) {
-      var message= ko.mapping.toJS(messageModel);
-      delete message.error;
-
-      Scat.api('giftcard-email', message)
-          .done(function (data) {
-            $(place).closest('.modal').modal('hide');
-            Scat.alert({ title: "Success!", error: "Email sent." });
-          });
-    }
-
-    ko.applyBindings(messageModel, panel[0]);
-    panel.appendTo($('body')).modal();
-  });
+  scat.dialog([], '/gift-card/' + card + '/email-form')
 }
 
 viewModel.payTransaction= function() {
