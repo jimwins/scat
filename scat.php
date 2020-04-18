@@ -3,6 +3,11 @@ require dirname(__FILE__).'/lib/db.php';
 
 if (!$GLOBALS['app']) {
   require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
+
+  require dirname(__FILE__).'/vendor/autoload.php';
+
+  Model::$auto_prefix_models= '\\Scat\\Model\\';
+  Model::$short_table_names= true;
 }
 
 function head($title, $x= null) {
