@@ -1,6 +1,10 @@
 <?
 require dirname(__FILE__).'/lib/db.php';
 
+if (!$GLOBALS['app']) {
+  require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
+}
+
 function head($title, $x= null) {
   $GLOBALS['title']= $title;
 }
