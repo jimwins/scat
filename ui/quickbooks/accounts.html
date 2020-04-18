@@ -1,0 +1,63 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Quickbooks Account Creation
+{% endblock %}
+
+{% block content %}
+
+
+  <div class="col-sm-4">
+
+    <a class="btn btn-danger btn-block" href="/quickbooks/~disconnect">
+      Disconnect
+    </a>
+
+    <br>
+
+    {% for i, account in accounts %}
+      <a class="btn btn-default btn-block create-account" href="#"
+         data-id="{{ i }}">
+        {{ account }}
+      </a>
+    {% else %}
+      <div class="alert alert-success">
+        No accounts need to be created.
+      </div>
+    {% endfor %}
+
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    document.documentElement.addEventListener('click', (ev) => {
+      if (!ev.target.matches('.create-account')) return;
+      ev.preventDefault();
+
+      let btn= ev.target
+
+      if (btn.disabled) return;
+      btn.disabled= true
+
+      let id= ev.target.getAttribute('data-id')
+      scat.call('/quickbooks/~create-account', { id: id })
+      .then((res) => {
+        if (!res.ok) Promise.reject(new Error(response.statusText));
+        return res.json()
+      })
+      .then((data) => {
+        if (data.message) alert(data.message)
+        btn.classList.remove('btn-default')
+        btn.classList.add('btn-success')
+        btn.setAttribute('disabled', true)
+      })
+      .catch((err) => {
+        alert(err.message)
+        btn.disabled= false;
+      })
+    })
+
+  </script>
+{% endblock %}

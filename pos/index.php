@@ -1779,4 +1779,20 @@ $app->get('/~rewards/check-balance',
             ]);
           });
 
+$app->group('/quickbooks', function (Slim\App $app) {
+  $app->get('',
+            \Scat\Controller\Quickbooks::class . ':home');
+  $app->get('/verify-accounts',
+            \Scat\Controller\Quickbooks::class . ':verifyAccounts');
+  $app->post('/~create-account',
+            \Scat\Controller\Quickbooks::class . ':createAccount');
+  $app->get('/~disconnect',
+            \Scat\Controller\Quickbooks::class . ':disconnect');
+  $app->post('/~sync', \Scat\Controller\Quickbooks::class . ':sync')
+      ->add(new Validation([
+          'from' => v::in(['sales', 'payments']),
+          'date' => v::date(),
+        ]));
+});
+
 $app->run();

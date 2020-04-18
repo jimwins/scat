@@ -35,7 +35,9 @@ class Config extends \Model {
 
   static public function forgetValue($name) {
     $row= \Model::factory('Config')->where('name', $name)->find_one();
-    $row->delete();
+    if ($row) {
+      $row->delete();
+    }
     unset($cache[$name]);
 
 

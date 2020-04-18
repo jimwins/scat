@@ -1,0 +1,119 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Quickbooks Integration
+{% endblock %}
+
+{% block content %}
+  {% for error in errors %}
+    <div class="alert alert-warning">
+      {{ error }}
+    </div>
+  {% endfor %}
+
+  <div class="col-sm-4">
+
+    {% if not connected %}
+      <a class="btn btn-primary btn-block"
+         href="{{ qb.getOAuth2LoginHelper.getAuthorizationCodeURL }}">
+        Connect to QuickBooks
+      </a>
+
+    {% else %}
+      <a class="btn btn-danger btn-block" href="/quickbooks/~disconnect">
+        Disconnect
+      </a>
+
+      <br>
+
+      <a class="btn btn-default btn-block" href="/quickbooks/verify-accounts">
+        Verify Accounts
+      </a>
+
+      <br>
+
+      <form class="sync">
+        <input type="hidden" name="from" value="sales">
+        <div class="input-group">
+          <span class="input-group-addon" style="width: 30%">
+            Sales:
+          </span>
+          <input type="date" class="form-control"
+            name="date" value="{{ last_synced_sale|date("Y-m-d") }}">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">Sync</button>
+          </span>
+        </div>
+      </form>
+
+      <br>
+
+      <form class="sync">
+        <input type="hidden" name="from" value="payments">
+        <div class="input-group">
+          <span class="input-group-addon" style="width: 30%">
+            Payment:
+          </span>
+          <input type="date" class="form-control"
+                 name="date" value="{{ last_synced_payment|date("Y-m-d") }}">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">Sync</button>
+          </span>
+        </div>
+      </form>
+    {% endif %}
+
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    let sync= (form) => {
+      if (form.disabled) return;
+      form.disabled= true
+
+      let formData= new FormData(form)
+
+      fetch('/quickbooks/~sync', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: formData
+      })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok')
+        }
+        return res.json()
+      })
+      .then((data) => {
+        if (data.error) {
+          form.classList.add('has-error')
+          setTimeout(() => {
+            form.classList.remove('has-error')
+          }, 2000);
+          throw new Error(data.error)
+        }
+        form.date.value= data.latest
+        form.classList.add('has-success')
+        setTimeout(() => {
+          form.classList.remove('has-success')
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("There was a problem syncing.", err)
+      })
+      .finally(() => {
+        form.disabled= false
+      })
+    }
+
+    document.querySelectorAll('form.sync').forEach((form) => {
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault()
+        sync(ev.target)
+      })
+    })
+
+  </script>
+{% endblock %}
