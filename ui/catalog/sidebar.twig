@@ -64,7 +64,7 @@
 
     let publish= nav.querySelector('.publish')
     publish.addEventListener('click', (ev) => {
-      ev.stopPropagation()
+      ev.preventDefault()
       fetch('/~ready-for-publish', {
         method: 'POST',
         headers: { 'Accept': 'application/json' }
