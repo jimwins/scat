@@ -778,7 +778,7 @@ $app->group('/catalog', function (Slim\App $app) {
                $id= $req->getParam('pk');
                $name= $req->getParam('name');
                $value= $req->getParam('value');
-               $item= \Model::factory('Item')->find_one($id);
+               $item= $this->catalog->getItemById($id);
                if (!$item)
                  throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -795,6 +795,23 @@ $app->group('/catalog', function (Slim\App $app) {
                                 ])
                ]);
              });
+  // XXX used by old-report/report-price-change
+  $app->post('/item-reprice',
+             function (Request $req, Response $res, array $args) {
+               $id= $req->getParam('id');
+               $retail_price= $req->getParam('retail_price');
+               $discount= $req->getParam('discount');
+               $item= $this->catalog->getItemById($id);
+               if (!$item)
+                 throw new \Slim\Exception\NotFoundException($req, $res);
+
+               $item->setProperty('retail_price', $retail_price);
+               $item->setProperty('discount', $discount);
+               $item->save();
+
+               return $res->withJson([ 'item' => $item ]);
+             });
+
 
   $app->post('/bulk-update',
              function (Request $req, Response $res, array $args) {

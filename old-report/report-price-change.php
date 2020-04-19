@@ -54,7 +54,7 @@ while ($row= $r->fetch_assoc()) {
     </div>
   </div>
 </form>
-<?if (!isset($_REQUEST['vendor'])) { foot(); exit; }?>
+<?if (!isset($_REQUEST['vendor'])) { foot(); return ; }?>
 <div id="results">
 <?
 $q= "SELECT
@@ -155,8 +155,9 @@ $('.price-change').popover({
 $('body').on('submit', '.price-change-form', function(ev) {
   ev.preventDefault();
   var form= $(this);
-  Scat.api('item-update', form.serializeArray())
-      .done(function (data) {
+  scat.call('/catalog/item-reprice', new FormData(ev.target))
+      .then((res) => res.json())
+      .then(function (data) {
         if ($('input[name="print"]:checked', form).length) {
           Scat.printDirect('labels-price',
                            { id: $('input[name="id"]', form).val() });
