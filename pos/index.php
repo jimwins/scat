@@ -1787,6 +1787,8 @@ $app->group('/ordure', function (Slim\App $app) {
   $app->get('/~push-prices', \Scat\Controller\Ordure::class . ':pushPrices');
   $app->get('/~pull-orders', \Scat\Controller\Ordure::class . ':pullOrders');
   $app->get('/~pull-signups', \Scat\Controller\Ordure::class . ':pullSignups');
+  $app->get('/~process-abandoned-carts',
+            \Scat\Controller\Ordure::class . ':processAbandonedCarts');
 });
 
 /* QuickBooks */
