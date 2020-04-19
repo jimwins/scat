@@ -117,6 +117,8 @@ class ScatUtils {
   call (url, args, opts) {
     const formData= args instanceof FormData ? args : new FormData()
 
+    // XXX should verify that url is not remove since we trust content
+
     if (!(args instanceof FormData)) {
       for (let prop in args) {
         formData.append(prop, args[prop])
@@ -134,7 +136,39 @@ class ScatUtils {
       }
       return Promise.reject(new Error(response.statusText))
     })
-    // XXX catch data.error and alert()?
+    .then((response) => {
+      /* Look for some headers to change title, reload page sections */
+      let title= response.headers.get('X-Scat-Title')
+      if (title) {
+        window.document.title= title
+      }
+
+      if (response.headers.has('X-Scat-Reload')) {
+        let tokens= response.headers.get('X-Scat-Reload')
+        tokens.split(',').forEach((token) => {
+          console.log("Requested reload of " + token.trim())
+          let el= document.getElementById(token.trim())
+          if (el && el.hasAttribute('data-reload')) {
+            let reload= el.getAttribute('data-reload')
+            fetch(reload)
+            .then((res) => {
+              if (res.status >= 200 && res.status < 300) {
+                return Promise.resolve(res)
+              }
+              return Promise.reject(new Error(res.statusText))
+            })
+            .then((res) => res.text())
+            .then((text) => {
+              // Yes, we trust this HTML
+              el.innerHTML= text
+            })
+          } else {
+            console.error(`Could not find "${token}" to be replaced`)
+          }
+        })
+      }
+      return response
+    })
   }
 
   api (func, args, opts) {

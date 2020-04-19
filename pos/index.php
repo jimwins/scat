@@ -143,16 +143,6 @@ $container['notFoundHandler']= function ($c) {
   };
 };
 
-/* Info (DEBUG only) */
-if ($DEBUG) {
-  $app->get('/info',
-            function (Request $req, Response $res, array $args) {
-              ob_start();
-              phpinfo();
-              return $res->getBody()->write(ob_get_clean());
-            })->setName('info');
-}
-
 /* ROUTES */
 
 $app->get('/',
@@ -1807,5 +1797,38 @@ $app->group('/quickbooks', function (Slim\App $app) {
           'date' => v::date(),
         ]));
 });
+
+/* Info (DEBUG only) */
+if ($DEBUG) {
+  $app->get('/info',
+            function (Request $req, Response $res, array $args) {
+              ob_start();
+              phpinfo();
+              return $res->getBody()->write(ob_get_clean());
+            })->setName('info');
+
+  $app->get('/test',
+            function (Request $req, Response $res, array $args) {
+              return $this->view->render($res, "test.html");
+            });
+  $app->get('/test/~one',
+            function (Request $req, Response $res, array $args) {
+              $res->getBody()->write('<div class="alert alert-warning">Reloaded one!</div>');
+              return $res;
+            });
+  $app->get('/test/~two',
+            function (Request $req, Response $res, array $args) {
+              $res->getBody()->write('<div class="alert alert-warning">Reloaded two!</div>');
+              return $res;
+            });
+  $app->post('/test',
+            function (Request $req, Response $res, array $args) {
+              $data= $req->getParams();
+              $res= $res->withHeader('X-Scat-Title', 'New Page Title');
+              $res= $res->withAddedHeader('X-Scat-Reload', 'one');
+              $res= $res->withAddedHeader('X-Scat-Reload', 'two');
+              return $res->withJson($data);
+            });
+}
 
 $app->run();

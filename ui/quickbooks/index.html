@@ -75,11 +75,7 @@
 
       let formData= new FormData(form)
 
-      fetch('/quickbooks/~sync', {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: formData
-      })
+      scat.call('/quickbooks/~sync', formData)
       .then((res) => {
         if (!res.ok) {
           throw new Error('Network response was not ok')
@@ -87,13 +83,6 @@
         return res.json()
       })
       .then((data) => {
-        if (data.error) {
-          form.classList.add('has-error')
-          setTimeout(() => {
-            form.classList.remove('has-error')
-          }, 2000);
-          throw new Error(data.error)
-        }
         form.date.value= data.latest
         form.classList.add('has-success')
         setTimeout(() => {
@@ -101,6 +90,10 @@
         }, 2000);
       })
       .catch((err) => {
+        form.classList.add('has-error')
+        setTimeout(() => {
+          form.classList.remove('has-error')
+        }, 2000);
         console.error("There was a problem syncing.", err)
       })
       .finally(() => {
