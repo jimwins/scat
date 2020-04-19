@@ -1785,6 +1785,7 @@ $app->get('/~rewards/check-balance',
 /* Ordure */
 $app->group('/ordure', function (Slim\App $app) {
   $app->get('/~push-prices', \Scat\Controller\Ordure::class . ':pushPrices');
+  $app->get('/~pull-orders', \Scat\Controller\Ordure::class . ':pullOrders');
   $app->get('/~pull-signups', \Scat\Controller\Ordure::class . ':pullSignups');
 });
 
