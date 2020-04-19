@@ -1782,6 +1782,12 @@ $app->get('/~rewards/check-balance',
             ]);
           });
 
+/* Ordure */
+$app->group('/ordure', function (Slim\App $app) {
+  $app->get('/~push-prices', \Scat\Controller\Ordure::class . ':pushPrices');
+});
+
+/* QuickBooks */
 $app->group('/quickbooks', function (Slim\App $app) {
   $app->get('',
             \Scat\Controller\Quickbooks::class . ':home');

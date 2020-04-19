@@ -95,6 +95,12 @@ class Catalog
     return \Model::factory('Item')->find_one($id);
   }
 
+  public function getItems($only_active= true, $include_deleted= false) {
+    return \Model::factory('Item')
+            ->where_gte('item.active', (int)$only_active)
+            ->where_lte('item.deleted', (int)$include_deleted);
+  }
+
   public function createVendorItem() {
     return \Model::factory('VendorItem')->create();
   }
