@@ -59,8 +59,8 @@ class TxnLine extends \Model {
   public function vendor_sku() {
     $vendor_id= $this->txn()->person_id;
     if (!$vendor_id) return '';
-    $vendor_items= $this->has_many('VendorItem', 'item', 'item')
-                        ->where('vendor', $vendor_id)
+    $vendor_items= $this->has_many('VendorItem')
+                        ->where('vendor_id', $vendor_id)
                         ->order_by_asc('purchase_quantity')
                         ->find_many();
     if (!$vendor_items) return '';
