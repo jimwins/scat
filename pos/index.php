@@ -1078,7 +1078,7 @@ $app->group('/person', function (Slim\App $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
               // TODO most recent customers? vendors?
-              return $this->view->render($res, 'page/people.html');
+              return $this->view->render($res, 'person/index.html');
             });
   $app->get('/search',
             function (Request $req, Response $res, array $args) {
@@ -1091,7 +1091,7 @@ $app->group('/person', function (Slim\App $app) {
                 return $res->withJson($people);
               }
 
-              return $this->view->render($res, 'page/people.html',
+              return $this->view->render($res, 'people/people.html',
                                          [ 'people' => $people, 'q' => $q ]);
             })->setName('person-search');
   $app->get('/{id:[0-9]+}',
@@ -1099,7 +1099,7 @@ $app->group('/person', function (Slim\App $app) {
               $person= \Model::factory('Person')->find_one($args['id']);
               $page= (int)$req->getParam('page');
               $limit= 25;
-              return $this->view->render($res, 'page/person.html', [
+              return $this->view->render($res, 'person/index.html', [
                 'person' => $person,
                 'page' => $page,
                 'limit' => $limit,
@@ -1693,7 +1693,7 @@ $app->group('/till', function (Slim\App $app) {
 /* Safari notifications */
 $app->get('/push',
             function (Request $req, Response $res, array $args) {
-              return $this->view->render($res, "page/push.html");
+              return $this->view->render($res, "push/index.html");
             });
 
 $app->post('/push/v2/pushPackages/{id}',
