@@ -8,6 +8,12 @@ if (!$GLOBALS['app']) {
 
   Model::$auto_prefix_models= '\\Scat\\Model\\';
   Model::$short_table_names= true;
+
+  ORM::configure('mysql:host=' . DB_SERVER . ';dbname=' . DB_SCHEMA . ';charset=utf8');
+  ORM::configure('username', DB_USER);
+  ORM::configure('password', DB_PASSWORD);
+  ORM::configure('logging', true);
+  ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
 }
 
 function head($title, $x= null) {
