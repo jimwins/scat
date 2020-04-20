@@ -209,10 +209,51 @@ class ScatUtils {
         })
       } else {
         res.json().then((data) => {
-          window.alert(data.message)
+          scat.alert('success', data.message)
         })
       }
     })
+  }
+
+  alert (level, title, message= undefined, timeOut= undefined) {
+    let holder= document.getElementById('notification-holder')
+
+    if (!holder) {
+      window.alert(message)
+      return
+    }
+
+    // given only one of message or title, use it as message
+    if (message === undefined) {
+      message= title
+      title= ""
+    }
+
+    if (timeOut === undefined) {
+      timeOut= ['success','info','warning'].includes(level) ? 3000 : 0;
+    }
+
+    let text= `<div class="alert alert-${level}" role="alert">
+                 <button type="button" class="close"
+                         data-dismiss="alert" aria-label="Close">
+                   <span aria-hidden="true">&times;</span>
+                 </button>
+                 <strong>${title}</strong>
+                 ${message}
+               </div>`
+
+    let alert= this.htmlToElement(text)
+    alert.addEventListener('transitionend', (ev) => {
+      ev.target.remove()
+    })
+
+    if (timeOut) {
+      setTimeout(() => {
+        alert.classList.add('fade-out')
+      }, timeOut)
+    }
+
+    holder.appendChild(alert)
   }
 }
 

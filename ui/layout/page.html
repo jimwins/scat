@@ -24,6 +24,23 @@
     body.page {
       padding-top: 70px;
     }
+    div#notification-holder {
+      position: absolute;
+      top: 4em;
+      right: 2em;
+      width:25%;
+    }
+    @keyframes fadeIn {
+      from {opacity:0;}
+      to {opacity:1;}
+    }
+    div#notification-holder div.alert {
+      animation: fadeIn 0.5s;
+    }
+    div#notification-holder .fade-out {
+      opacity: 0;
+      transition: 1s ease;
+    }
   </style>
 
   <script src="/components/jquery/jquery.min.js"></script>
@@ -190,6 +207,8 @@
  <span id="status">{% block status "" %}</span>
  <span class="pull-right">Scat &copy; 2010-2019 Jim Winstead Jr.</span>
 </footer>
+
+<div id="notification-holder"></div>
 
 {% block script %}{% endblock %}
 

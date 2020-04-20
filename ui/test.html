@@ -6,8 +6,12 @@
 {% endblock %}
 
 {% block content %}
-  <button class="btn btn-primary btn-block" id="test">
-    Do it
+  <button class="btn btn-primary btn-block" id="test-reloads">
+    Reloads
+  </button>
+
+  <button class="btn btn-primary btn-block" id="test-notify">
+    Notifications
   </button>
 
   <div id="one" class="well" data-reload="/test/~one">
@@ -21,8 +25,14 @@
 
 {% block script %}
   <script>
-    document.querySelector('#test').addEventListener('click', (ev) => {
+    document.querySelector('#test-reloads').addEventListener('click', (ev) => {
       scat.call('/test', { one: 1, two: 2 })
     })
+
+    document.querySelector('#test-notify').addEventListener('click', (ev) => {
+      scat.alert('warning', 'Warning', "This is a warning.")
+      scat.alert('danger', 'Danger', 'This is some danger.')
+    })
+
   </script>
 {% endblock %}
