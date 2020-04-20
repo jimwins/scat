@@ -393,6 +393,24 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                 'person' => \Model::factory('Person')->find_one($vendor)
               ]);
             })->setName('sale');
+  $app->get('/create',
+             function (Request $req, Response $res, array $args) {
+               $vendor_id= $req->getParam('vendor');
+
+               if (!$vendor_id) {
+                 throw new \Exception("No vendor specified.");
+               }
+
+               $purchase= $this->txn->create([
+                 'type' => 'vendor',
+                 'person_id' => $vendor_id,
+                 'tax_rate' => 0,
+               ]);
+               $path= $this->router->pathFor('purchase', [
+                 'id' => $purchase->id
+               ]);
+               return $res->withRedirect($path);
+             });
   $app->post('/reorder',
              function (Request $req, Response $res, array $args) {
                $vendor_id= $req->getParam('vendor');
