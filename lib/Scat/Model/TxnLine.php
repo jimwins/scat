@@ -7,7 +7,7 @@ class TxnLine extends \Model {
   }
 
   public function item() {
-    return $this->belongs_to('Item', 'item')->find_one();
+    return $this->belongs_to('Item')->find_one();
   }
 
   // We don't show codes starting with ZZ-, they're special
@@ -86,7 +86,7 @@ class TxnLine extends \Model {
             AND item_id = {$this->item}
             AND filled < '{$txn->created}'";
 
-    $cost= \ORM::for_table('txn')->raw_query($q)->find_one();
+    $cost= $this->orm->for_table('txn')->raw_query($q)->find_one();
     return $cost->cost;
   }
 }
