@@ -24,7 +24,7 @@ class Ordure {
                                WHERE item_id = item.id)',
                             'stock')
               ->select_many('code', 'minimum_quantity', 'purchase_quantity')
-              ->select_expr('(SELECT COUNT(*)
+              ->select_expr('(SELECT MIN(purchase_quantity)
                                 FROM vendor_item
                                WHERE item_id = item.id
                                  AND vendor_id = 7
