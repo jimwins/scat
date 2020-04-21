@@ -24,11 +24,17 @@ class Ordure {
                                WHERE item_id = item.id)',
                             'stock')
               ->select_many('code', 'minimum_quantity', 'purchase_quantity')
+              ->select_expr('(SELECT COUNT(*)
+                                FROM vendor_item
+                               WHERE item_id = item.id
+                                 AND vendor_id = 7
+                                 AND NOT special_order)',
+                            'is_dropshippable')
               ->find_many();
 
     /* Just in-memory, could be clever and build a stream interface. */
     $data= "retail_price\tdiscount_type\tdiscount\tstock\tcode\t".
-           "minimum_quantity\tpurchase_quantity\r\n";
+           "minimum_quantity\tpurchase_quantity\tis_dropshippable\r\n";
 
     foreach ($items as $item) {
       $data.= $item->retail_price . "\t" .
@@ -37,7 +43,8 @@ class Ordure {
               ($item->stock ?: 'NULL') . "\t" .
               $item->code . "\t" .
               $item->minimum_quantity . "\t" .
-              $item->purchase_quantity . "\r\n";
+              $item->purchase_quantity . "\t";
+              $item->is_dropshippable . "\r\n";
     }
 
     $client= new \GuzzleHttp\Client();
