@@ -1091,7 +1091,7 @@ $app->group('/person', function (Slim\App $app) {
                 return $res->withJson($people);
               }
 
-              return $this->view->render($res, 'people/people.html',
+              return $this->view->render($res, 'person/people.html',
                                          [ 'people' => $people, 'q' => $q ]);
             })->setName('person-search');
   $app->get('/{id:[0-9]+}',
