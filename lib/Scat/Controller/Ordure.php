@@ -43,8 +43,8 @@ class Ordure {
               ($item->stock ?: 'NULL') . "\t" .
               $item->code . "\t" .
               $item->minimum_quantity . "\t" .
-              $item->purchase_quantity . "\t";
-              $item->is_dropshippable . "\r\n";
+              $item->purchase_quantity . "\t" .
+              ($item->is_dropshippable ?: '0') . "\r\n";
     }
 
     $client= new \GuzzleHttp\Client();
