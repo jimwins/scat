@@ -113,6 +113,69 @@
 
         </div>
       </div>
+
+      <!-- Barcodes -->
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Barcodes</h3>
+        </div>
+        <table id="barcodes" class="table table-striped">
+          <tbody>
+            {% for barcode in item.barcodes.find_many %}
+              <tr>
+                <td>{{ barcode.code }}</td>
+                <td class="edit-barcode-quantity"
+                    data-pk="{{ barcode.code }}"
+                    data-name="quantity">
+                  {{- barcode.quantity -}}
+                </td>
+                <td>
+                  <button type="button"
+                          class="btn btn-default btn-xs remove-barcode"
+                          data-barcode="{{ barcode.code }}">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="panel-footer">
+          <button id="new-barcode" class="btn btn-default">
+            <i class="fa fa-barcode"></i> New
+          </button>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default print-barcode">
+              <i class="fa fa-print"></i> Print
+            </button>
+            <button type="button" class="btn btn-default dropdown-toggle"
+                    data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="print-barcode" data-multiple="1">
+                  Multiple
+                </a>
+              </li>
+              <li>
+                <a class="print-barcode" data-noprice="1">
+                  No price
+                </a>
+              </li>
+              <li>
+                <a class="print-barcode" data-multiple="1" data-noprice="1">
+                  Multiple, no price
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Catalog -->
@@ -320,70 +383,6 @@
             </div>
           </div>
 
-        </div>
-      </div>
-    </div>
-
-    <!-- Barcodes -->
-    <div class="col-sm-3">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">Barcodes</h3>
-        </div>
-        <table id="barcodes" class="table table-striped">
-          <tbody>
-            {% for barcode in item.barcodes.find_many %}
-              <tr>
-                <td>{{ barcode.code }}</td>
-                <td class="edit-barcode-quantity"
-                    data-pk="{{ barcode.code }}"
-                    data-name="quantity">
-                  {{- barcode.quantity -}}
-                </td>
-                <td>
-                  <button type="button"
-                          class="btn btn-default btn-xs remove-barcode"
-                          data-barcode="{{ barcode.code }}">
-                    <i class="fa fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-
-        <div class="panel-footer">
-          <button id="new-barcode" class="btn btn-default">
-            <i class="fa fa-barcode"></i> New
-          </button>
-          <div class="btn-group">
-            <button type="button" class="btn btn-default print-barcode">
-              <i class="fa fa-print"></i> Print
-            </button>
-            <button type="button" class="btn btn-default dropdown-toggle"
-                    data-toggle="dropdown" aria-haspopup="true"
-                    aria-expanded="false">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li>
-                <a class="print-barcode" data-multiple="1">
-                  Multiple
-                </a>
-              </li>
-              <li>
-                <a class="print-barcode" data-noprice="1">
-                  No price
-                </a>
-              </li>
-              <li>
-                <a class="print-barcode" data-multiple="1" data-noprice="1">
-                  Multiple, no price
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
     </div>
