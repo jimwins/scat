@@ -1099,7 +1099,7 @@ $app->group('/person', function (Slim\App $app) {
               $person= \Model::factory('Person')->find_one($args['id']);
               $page= (int)$req->getParam('page');
               $limit= 25;
-              return $this->view->render($res, 'person/index.html', [
+              return $this->view->render($res, 'person/person.html', [
                 'person' => $person,
                 'page' => $page,
                 'limit' => $limit,
