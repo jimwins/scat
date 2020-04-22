@@ -532,6 +532,7 @@
       url: '/catalog/item-update',
       success: (response, newValue) => {
         if (response.error) { return response.error }
+        if (response.newValue) { return response }
       }
     })
     .on('shown', function (e, editable) {

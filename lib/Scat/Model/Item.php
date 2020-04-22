@@ -86,8 +86,6 @@ class Item extends \Model implements \JsonSerializable {
         // passthrough
       case 'active':
       case 'code':
-      case 'name':
-      case 'short_name':
       case 'variation':
       case 'tic':
       case 'color':
@@ -102,6 +100,21 @@ class Item extends \Model implements \JsonSerializable {
       case 'width':
       case 'height':
       case 'weight':
+        $this->$name= $value;
+        break;
+      case 'name':
+      case 'short_name':
+        $value= preg_replace_callback('/{{(.+?)}}/',
+          function ($m) {
+            if ($m[1] == 'size') {
+              $size= strstr($this->name, ' ', true);
+              return
+                str_replace('ft"', ' ft.',
+                            str_replace('yd"', ' yds.',
+                                        str_replace('x', '" × ', $size) . '"'));
+            }
+            return $this->{$m[1]};
+          }, $value);
         $this->$name= $value;
         break;
       case 'discount':
