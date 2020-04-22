@@ -69,6 +69,7 @@ head("Sales Report @ Scat", true);
       <th class="text-right">Transactions</th>
       <th class="text-right">Average</th>
       <th class="text-right">Resale</th>
+      <th class="text-right">Online</th>
       <th class="text-right">Tax</th>
       <th class="text-right">Total</th>
     </tr>
@@ -103,6 +104,7 @@ $("#report-params").on('submit', function(ev) {
                      '<td align="right">' + sales.transactions +
                      '<td align="right">' + amount(sales.total / sales.transactions) +
                      '<td align="right">' + amount(sales.resale) +
+                     '<td align="right">' + amount(sales.online) +
                      '<td align="right">' + amount(sales.tax) +
                      '<td align="right">' + amount(sales.total_taxed) +
                      '</tr>'));

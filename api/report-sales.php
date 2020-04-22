@@ -57,6 +57,8 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
             SUM(IF(uuid, untaxed + taxed + tax,
                    ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed))
               AS total_taxed,
+            SUM(IF(uuid, untaxed + taxed + tax, 0))
+              AS online,
             MIN(DATE(filled)) AS raw_date,
             COUNT(*) AS transactions
        FROM (SELECT 
@@ -103,6 +105,7 @@ while ($row= $r->fetch_assoc()) {
   $row['resale']= (float)$row['resale'];
   $row['tax']= (float)$row['tax'];
   $row['total_taxed']= (float)$row['total_taxed'];
+  $row['online']= (float)$row['online'];
   $sales[]= $row;
 }
 
