@@ -89,7 +89,7 @@ if (count($items) == 1) {
                "IFNULL((SELECT IF(promo_price AND promo_price < net_price,
                                   promo_price, net_price)
                           FROM vendor_item
-                         WHERE vendor_id = {$txn['person']}
+                         WHERE vendor_id = {$txn['person_id']}
                            AND item_id = item.id
                            AND vendor_item.active
                          ORDER BY 1
