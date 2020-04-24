@@ -1747,7 +1747,7 @@ $app->get('/~tax/ping',
            });
 
 /* SMS TODO just testing right now */
-$app->get('/~sms/send',
+$app->map(['GET','POST'], '/~sms/send',
             function (Request $req, Response $res, array $args) {
               $data= $this->phone->sendSMS($req->getParam('to'),
                                            $req->getParam('text'));
@@ -1814,6 +1814,7 @@ $app->group('/ordure', function (Slim\App $app) {
   $app->get('/~pull-signups', \Scat\Controller\Ordure::class . ':pullSignups');
   $app->get('/~process-abandoned-carts',
             \Scat\Controller\Ordure::class . ':processAbandonedCarts');
+  $app->post('/~load-person', \Scat\Controller\Ordure::class . ':loadPerson');
 });
 
 /* QuickBooks */

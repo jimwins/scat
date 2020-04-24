@@ -451,4 +451,26 @@ class Ordure {
     return $response;
   }
 
+  public function loadPerson(Request $req, Response $res, array $a) {
+    $loyalty= $req->getParam('loyalty');
+    $id= $req->getParam('id');
+
+    if ($id) {
+      $person= \Model::factory('Person')->find_one($id);
+    }
+    elseif ($loyalty) {
+      $loyalty_number= preg_replace('/[^\d]/', '', $loyalty);
+      $person= \Model::factory('Person')
+                ->where_any_is([
+                  [ 'loyalty_number' => $loyalty_number ?: 'no' ],
+                  [ 'email' => $loyalty ?: NULL ]
+                ])
+                ->find_one();
+    }
+
+    if (!$person)
+      throw new \Slim\Exception\NotFoundException($req, $res);
+
+    return $res->withJson($person);
+  }
 }
