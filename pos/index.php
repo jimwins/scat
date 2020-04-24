@@ -1815,6 +1815,8 @@ $app->group('/ordure', function (Slim\App $app) {
   $app->get('/~process-abandoned-carts',
             \Scat\Controller\Ordure::class . ':processAbandonedCarts');
   $app->post('/~load-person', \Scat\Controller\Ordure::class . ':loadPerson');
+  $app->post('/~update-person',
+             \Scat\Controller\Ordure::class . ':updatePerson');
 });
 
 /* QuickBooks */

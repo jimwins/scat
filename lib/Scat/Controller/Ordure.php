@@ -473,4 +473,40 @@ class Ordure {
 
     return $res->withJson($person);
   }
+
+  public function updatePerson(Request $req, Response $res, array $args) {
+    $id= $req->getParam('id');
+    v::positive()->assert($id);
+
+    $person= \Model::factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\NotFoundException($req, $res);
+
+    $name= $req->getParam('name');
+    $email= $req->getParam('email');
+    $phone= $req->getParam('phone');
+
+    $errors= [];
+
+    foreach (['name', 'email', 'phone'] as $name) {
+      try {
+        $person->setProperty($name, $req->getParam($name));
+      } catch (\Exception $e) {
+        $errors[]= $name;
+      }
+    }
+
+    if ($errors) {
+      return $res->withJson([ 'errors' => $errors ]);
+    }
+
+    try {
+      $person->save();
+    } catch (\Exception $e) {
+      // XXX just assuming a conflict, could be something else
+      return $res->withJson([ 'errors' => [ 'conflict' ] ]);
+    }
+
+    return $res->withJson($person);
+ }
 }
