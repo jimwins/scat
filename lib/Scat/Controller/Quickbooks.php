@@ -82,7 +82,7 @@ class Quickbooks {
     return false;
   }
 
-  public function connect(Response $res, $code, $realmId) {
+  public function connect(Response $response, $code, $realmId) {
     $qb=
       \QuickBooksOnline\API\DataService\DataService::Configure($this->config);
     $helper= $qb->getOAuth2LoginHelper();
@@ -94,14 +94,14 @@ class Quickbooks {
     \Scat\Model\Config::setValue('qb.refreshToken', $token->getRefreshToken());
     \Scat\Model\Config::setValue('qb.realmId', $realmId);
 
-    return $res->withRedirect('/quickbooks');
+    return $response->withRedirect('/quickbooks');
   }
 
-  public function home(Request $req, Response $res, array $args) {
-    if ($req->getParam('code')) {
-      return $this->connect($res,
-                            $req->getParam('code'),
-                            $req->getParam('realmId'));
+  public function home(Request $request, Response $response) {
+    if ($request->getParam('code')) {
+      return $this->connect($response,
+                            $request->getParam('code'),
+                            $request->getParam('realmId'));
     }
 
     try {
@@ -110,7 +110,7 @@ class Quickbooks {
       $errors[]= $e->getMessage();
     }
 
-    return $this->container->get('view')->render($res, "quickbooks/index.html", [
+    return $this->container->get('view')->render($response, "quickbooks/index.html", [
       'qb' => $this->qb,
       'connected' => $this->connected,
       'last_synced_payment' => $this->getLastSyncedPayment(),
@@ -135,14 +135,14 @@ class Quickbooks {
             ->min('paid');
   }
 
-  public function disconnect(Request $req, Response $res, array $args) {
+  public function disconnect(Request $request, Response $response) {
     \Scat\Model\Config::forgetValue('qb.accessToken');
     \Scat\Model\Config::forgetValue('qb.refreshToken');
     \Scat\Model\Config::forgetValue('qb.realmId');
-    return $res->withRedirect('/quickbooks');
+    return $response->withRedirect('/quickbooks');
   }
 
-  public function verifyAccounts(Request $req, Response $res, array $args) {
+  public function verifyAccounts(Request $request, Response $response) {
     if (!$this->refreshToken()) {
       throw new \Exception("Unable to refresh OAuth2 token");
     }
@@ -156,15 +156,15 @@ class Quickbooks {
       }
     }
 
-    return $this->container->get('view')->render($res, "quickbooks/accounts.html", [
+    return $this->container->get('view')->render($response, "quickbooks/accounts.html", [
       'accounts' => $accounts
     ]);
   }
 
-  public function createAccount(Request $req, Response $res, array $args) {
-    $id= $req->getParam('id');
+  public function createAccount(Request $request, Response $response) {
+    $id= $request->getParam('id');
     if (!$id)
-      throw new \Slim\Exception\NotFoundException($req, $res);
+      throw new \Slim\Exception\NotFoundException($request, $response);
 
     if (!$this->refreshToken()) {
       throw new \Exception("Unable to refresh OAuth2 token");
@@ -176,20 +176,20 @@ class Quickbooks {
       'AccountSubType' => $this->account_list[$id][2]
     ]);
 
-    $response= $this->qb->Add($obj);
+    $res= $this->qb->Add($obj);
     $error= $this->qb->getLastError();
     if ($error) {
       throw new \Exception($error->getResponseBody());
     }
 
-    return $res->withJson([ 'message' => 'Success!' ]);
+    return $response->withJson([ 'message' => 'Success!' ]);
   }
 
-  public function sync(Request $req, Response $res, array $args) {
-    if ($req->getAttribute('has_errors')) {
-      return $res->withJson([
+  public function sync(Request $request, Response $response) {
+    if ($request->getAttribute('has_errors')) {
+      return $response->withJson([
         'error' => "Validation failed.",
-        'validation_errors' => $req->getAttribute('errors')
+        'validation_errors' => $request->getAttribute('errors')
       ]);
     }
 
@@ -197,8 +197,8 @@ class Quickbooks {
       throw new \Exception("Unable to refresh OAuth2 token");
     }
 
-    $from= $req->getParam('from');
-    $date= $req->getParam('date');
+    $from= $request->getParam('from');
+    $date= $request->getParam('date');
 
     switch ($from) {
     case 'payments':
@@ -213,7 +213,7 @@ class Quickbooks {
 
     $latest= (new \DateTime($latest))->format('Y-m-d');
 
-    return $res->withJson([ 'latest' => $latest ]);
+    return $response->withJson([ 'latest' => $latest ]);
   }
 
   function syncSales($date) {

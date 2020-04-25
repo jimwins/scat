@@ -13,7 +13,7 @@ class Ordure {
     $this->container= $container;
   }
 
-  public function pushPrices(Request $req, Response $res, array $args) {
+  public function pushPrices(Request $request, Response $response) {
     $url= ORDURE . '/update-pricing';
     $key= ORDURE_KEY;
 
@@ -65,9 +65,11 @@ class Ordure {
                            ]);
 
     $body= $res->getBody();
+
+    return $response;
   }
 
-  public function pullSignups(Request $req, Response $response, array $args) {
+  public function pullSignups(Request $request, Response $response) {
     $exit= 0;
     $messages= [];
 
@@ -170,7 +172,7 @@ class Ordure {
     return $response;
   }
 
-  public function pullOrders(Request $req, Response $response, array $args) {
+  public function pullOrders(Request $request, Response $response) {
     $messages= [];
 
     $client= new \GuzzleHttp\Client();
@@ -356,7 +358,7 @@ class Ordure {
     return $response;
   }
 
-  public function processAbandonedCarts(Request $req, Response $res, array $a) {
+  public function processAbandonedCarts(Request $request, Response $response) {
     $loader= new \Twig\Loader\FilesystemLoader('../ui');
     $twig= new \Twig\Environment($loader, [
       'cache' => false
@@ -440,7 +442,7 @@ class Ordure {
       ]);
 
       try {
-        $response= $promise->wait();
+        $res= $promise->wait();
 
       } catch (\Exception $e) {
         error_log(sprintf("SparkPost failure: %s (%s)",
@@ -448,12 +450,12 @@ class Ordure {
       }
     }
 
-    return $res;
+    return $response;
   }
 
-  public function loadPerson(Request $req, Response $res, array $a) {
-    $loyalty= $req->getParam('loyalty');
-    $id= $req->getParam('id');
+  public function loadPerson(Request $request, Response $response) {
+    $loyalty= $request->getParam('loyalty');
+    $id= $request->getParam('id');
 
     if ($id) {
       $person= \Model::factory('Person')->find_one($id);
@@ -469,44 +471,44 @@ class Ordure {
     }
 
     if (!$person)
-      throw new \Slim\Exception\NotFoundException($req, $res);
+      throw new \Slim\Exception\NotFoundException($request, $response);
 
-    return $res->withJson($person);
+    return $response->withJson($person);
   }
 
-  public function updatePerson(Request $req, Response $res, array $args) {
-    $id= $req->getParam('id');
+  public function updatePerson(Request $request, Response $response) {
+    $id= $request->getParam('id');
     v::positive()->assert($id);
 
     $person= \Model::factory('Person')->find_one($id);
     if (!$person)
-      throw new \Slim\Exception\NotFoundException($req, $res);
+      throw new \Slim\Exception\NotFoundException($request, $response);
 
-    $name= $req->getParam('name');
-    $email= $req->getParam('email');
-    $phone= $req->getParam('phone');
+    $name= $request->getParam('name');
+    $email= $request->getParam('email');
+    $phone= $request->getParam('phone');
 
     $errors= [];
 
     foreach (['name', 'email', 'phone'] as $name) {
       try {
-        $person->setProperty($name, $req->getParam($name));
+        $person->setProperty($name, $request->getParam($name));
       } catch (\Exception $e) {
         $errors[]= $name;
       }
     }
 
     if ($errors) {
-      return $res->withJson([ 'errors' => $errors ]);
+      return $response->withJson([ 'errors' => $errors ]);
     }
 
     try {
       $person->save();
     } catch (\Exception $e) {
       // XXX just assuming a conflict, could be something else
-      return $res->withJson([ 'errors' => [ 'conflict' ] ]);
+      return $response->withJson([ 'errors' => [ 'conflict' ] ]);
     }
 
-    return $res->withJson($person);
+    return $response->withJson($person);
  }
 }

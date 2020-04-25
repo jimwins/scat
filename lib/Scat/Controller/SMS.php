@@ -13,17 +13,17 @@ class SMS {
     $this->container= $container;
   }
 
-  function send(Request $req, Response $res, array $args) {
-    $data= $this->container->get('phone')->sendSMS($req->getParam('to'),
-                                            $req->getParam('text'));
-    return $res->withJson($data);
+  function send(Request $request, Response $response) {
+    $data= $this->container->get('phone')->sendSMS($request->getParam('to'),
+                                            $request->getParam('text'));
+    return $response->withJson($data);
   }
 
-  function register(Request $req, Response $res, array $args) {
+  function register(Request $request, Response $response) {
     $data= $this->container->get('phone')->registerWebhook();
-    return $res->withJson($data);
+    return $response->withJson($data);
   }
 
-  function receive(Request $req, Response $res, array $args) {
+  function receive(Request $request, Response $response) {
   }
 }
