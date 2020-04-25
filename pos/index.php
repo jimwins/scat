@@ -98,8 +98,8 @@ $errorMiddleware->setErrorHandler(
   function (Request $request, Throwable $exception,
             bool $displayErrorDetails) use ($container)
   {
-    $res= new \Slim\Psr7\Response();
-    return $container->get('view')->render($res, '404.html')
+    $response= new \Slim\Psr7\Response();
+    return $container->get('view')->render($response, '404.html')
       ->withStatus(404)
       ->withHeader('Content-Type', 'text/html');
   });
@@ -107,21 +107,21 @@ $errorMiddleware->setErrorHandler(
 /* ROUTES */
 
 $app->get('/',
-          function (Request $req, Response $res, array $args) {
-            $q= ($req->getQueryParams() ?
-                  '?' . http_build_query($req->getQueryPArams()) :
+          function (Request $request, Response $response) {
+            $q= ($request->getQueryParams() ?
+                  '?' . http_build_query($request->getQueryParams()) :
                   '');
-            return $res->withRedirect("/sale/new" . $q);
+            return $response->withRedirect("/sale/new" . $q);
           })->setName('home');
 
 /* Sales */
 $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $req, Response $res, array $args) {
-              $page= (int)$req->getParam('page');
+            function (Request $request, Response $response) {
+              $page= (int)$request->getParam('page');
               $limit= 25;
               $txns= $this->get('txn')->find('customer', $page, $limit);
-              return $this->get('view')->render($res, 'txn/index.html', [
+              return $this->get('view')->render($response, 'txn/index.html', [
                 'type' => 'customer',
                 'txns' => $txns,
                 'page' => $page,
@@ -129,37 +129,38 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
               ]);
             });
   $app->get('/new',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               ob_start();
               include "../old-index.php";
               $content= ob_get_clean();
-              return $this->get('view')->render($res, 'sale/old-new.html', [
+              return $this->get('view')->render($response, 'sale/old-new.html', [
                 'title' => $GLOBALS['title'],
                 'content' => $content,
               ]);
             });
   $app->get('/{id:[0-9]+}',
-            function (Request $req, Response $res, array $args) {
-              return $res->withRedirect("/?id={$args['id']}");
+            // TODO use DI to set $id
+            function (Request $request, Response $response, array $args) {
+              return $response->withRedirect("/?id={$args['id']}");
             })->setName('sale');
   $app->get('/email-invoice-form',
-            function (Request $req, Response $res, array $args) {
-              $txn= $this->get('txn')->fetchById($req->getParam('id'));
-              return $this->get('view')->render($res, 'dialog/email-invoice.html',
+            function (Request $request, Response $response) {
+              $txn= $this->get('txn')->fetchById($request->getParam('id'));
+              return $this->get('view')->render($response, 'dialog/email-invoice.html',
                                          [
                                            'txn' => $txn
                                          ]);
             });
   $app->post('/email-invoice',
-            function (Request $req, Response $res, array $args) {
-              $txn= $this->get('txn')->fetchById($req->getParam('id'));
-              $name= $req->getParam('name');
-              $email= $req->getParam('email');
-              $subject= trim($req->getParam('subject'));
+            function (Request $request, Response $response) {
+              $txn= $this->get('txn')->fetchById($request->getParam('id'));
+              $name= $request->getParam('name');
+              $email= $request->getParam('email');
+              $subject= trim($request->getParam('subject'));
               error_log("Sending {$txn->id} to $email");
 
               $attachments= [];
-              if ($req->getParam('include_details')) {
+              if ($request->getParam('include_details')) {
                 $pdf= $txn->getInvoicePDF();
                 $attachments[]= [
                   'name' => (($txn->type == 'vendor') ? 'PO' : 'I') . $txn->formatted_number() . '.pdf',
@@ -179,7 +180,7 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
                                                  'txn' => $txn,
                                                  'subject' => $subject,
                                                  'content' =>
-                                                   $req->getParam('content'),
+                                                   $request->getParam('content'),
                                                ]),
                   'subject' => $subject,
                   'from' => array('name' => "Raw Materials Art Supplies",
@@ -216,11 +217,11 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
 
 	      try {
 		$response= $promise->wait();
-                return $res->withJson([ "message" => "Email sent." ]);
+                return $response->withJson([ "message" => "Email sent." ]);
 	      } catch (\Exception $e) {
 		error_log(sprintf("SparkPost failure: %s (%s)",
 				  $e->getMessage(), $e->getCode()));
-                return $res->withJson([
+                return $response->withJson([
                   "error" =>
                     sprintf("SparkPost failure: %s (%s)",
                             $e->getMessage(), $e->getCode())
@@ -232,11 +233,11 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
 /* Sales */
 $app->group('/purchase', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $req, Response $res, array $args) {
-              $page= (int)$req->getParam('page');
+            function (Request $request, Response $response) {
+              $page= (int)$request->getParam('page');
               $limit= 25;
               $txns= $this->get('txn')->find('vendor', $page, $limit);
-              return $this->get('view')->render($res, 'txn/index.html', [
+              return $this->get('view')->render($response, 'txn/index.html', [
                 'type' => 'vendor',
                 'txns' => $txns,
                 'page' => $page,
@@ -244,15 +245,15 @@ $app->group('/purchase', function (RouteCollectorProxy $app) {
               ]);
             });
   $app->get('/reorder',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
 
 /* XXX This needs to move into a service or something. */
 $extra= $extra_field= $extra_field_name= '';
 
-$all= (int)$req->getParam('all');
+$all= (int)$request->getParam('all');
 
 $vendor_code= "NULL";
-$vendor= (int)$req->getParam('vendor');
+$vendor= (int)$request->getParam('vendor');
 if ($vendor > 0) {
   $vendor_code= "(SELECT code FROM vendor_item WHERE vendor_id = $vendor AND item_id = item.id AND vendor_item.active LIMIT 1)";
   $extra= "AND EXISTS (SELECT id
@@ -299,7 +300,7 @@ if ($vendor > 0) {
                               AND vendor_item.active)";
 }
 
-$code= trim($req->getParam('code'));
+$code= trim($request->getParam('code'));
 if ($code) {
   $extra.= " AND code LIKE " . ORM::get_db()->quote($code.'%');
 }
@@ -346,7 +347,7 @@ $q= "SELECT id, code, vendor_code, name, stock,
 
 $items= ORM::for_table('item')->raw_query($q)->find_many();
 
-              return $this->get('view')->render($res, 'purchase/reorder.html', [
+              return $this->get('view')->render($response, 'purchase/reorder.html', [
                 'items' => $items,
                 'all' => $all,
                 'code' => $code,
@@ -355,8 +356,8 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
               ]);
             })->setName('sale');
   $app->get('/create',
-             function (Request $req, Response $res, array $args) {
-               $vendor_id= $req->getParam('vendor');
+             function (Request $request, Response $response) {
+               $vendor_id= $request->getParam('vendor');
 
                if (!$vendor_id) {
                  throw new \Exception("No vendor specified.");
@@ -370,11 +371,11 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                $path= $this->router->pathFor('purchase', [
                  'id' => $purchase->id
                ]);
-               return $res->withRedirect($path);
+               return $response->withRedirect($path);
              });
   $app->post('/reorder',
-             function (Request $req, Response $res, array $args) {
-               $vendor_id= $req->getParam('vendor');
+             function (Request $request, Response $response) {
+               $vendor_id= $request->getParam('vendor');
 
                if (!$vendor_id) {
                  throw new \Exception("No vendor specified.");
@@ -382,7 +383,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
 
                \ORM::get_db()->beginTransaction();
 
-               $txn_id= $req->getParam('txn_id');
+               $txn_id= $request->getParam('txn_id');
                if ($txn_id) {
                  $purchase= $this->get('txn')->fetchById($txn_id);
                  if (!$txn_id) {
@@ -396,7 +397,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                  ]);
                }
 
-               $items= $req->getParam('item');
+               $items= $request->getParam('item');
                foreach ($items as $item_id => $quantity) {
                  if (!$quantity) {
                    continue;
@@ -437,30 +438,31 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                $path= $this->router->pathFor('purchase', [
                  'id' => $purchase->id
                ]);
-               return $res->withRedirect($path);
+               return $response->withRedirect($path);
              });
   $app->get('/{id}',
-            function (Request $req, Response $res, array $args) {
-              return $res->withRedirect("/?id={$args['id']}");
+            // TODO use DI for $id
+            function (Request $request, Response $response, array $args) {
+              return $response->withRedirect("/?id={$args['id']}");
             })->setName('purchase');
 });
 
 /* Catalog */
 $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->get('/search',
-            function (Request $req, Response $res, array $args) {
-              $q= trim($req->getParam('q'));
+            function (Request $request, Response $response) {
+              $q= trim($request->getParam('q'));
 
               $data= $this->get('search')->search($q);
 
               $data['depts']= $this->get('catalog')->getDepartments();
               $data['q']= $q;
 
-              return $this->get('view')->render($res, 'catalog/searchresults.html',
+              return $this->get('view')->render($response, 'catalog/searchresults.html',
                                          $data);
             })->setName('catalog-search');
 
-  $app->get('/~reindex', function (Request $req, Response $res, array $args) {
+  $app->get('/~reindex', function (Request $request, Response $response) {
     $this->get('search')->flush();
 
     $rows= 0;
@@ -468,37 +470,37 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
       $rows+= $this->get('search')->indexProduct($product);
     }
 
-    $res->getBody()->write("Indexed $rows rows.");
-    return $res;
+    $response->getBody()->write("Indexed $rows rows.");
+    return $response;
   });
 
   $app->get('/brand-form',
-            function (Request $req, Response $res, array $args) {
-              $brand= $this->get('catalog')->getBrandById($req->getParam('id'));
-              return $this->get('view')->render($res, 'dialog/brand-edit.html',
+            function (Request $request, Response $response) {
+              $brand= $this->get('catalog')->getBrandById($request->getParam('id'));
+              return $this->get('view')->render($response, 'dialog/brand-edit.html',
                                          [
                                            'brand' => $brand
                                          ]);
             });
 
   $app->post('/brand-form',
-             function (Request $req, Response $res, array $args) {
-               $brand= $this->get('catalog')->getBrandById($req->getParam('id'));
+             function (Request $request, Response $response) {
+               $brand= $this->get('catalog')->getBrandById($request->getParam('id'));
                if (!$brand)
                  $brand= $this->get('catalog')->createBrand();
-               $brand->name= $req->getParam('name');
-               $brand->slug= $req->getParam('slug');
-               $brand->description= $req->getParam('description');
-               $brand->active= (int)$req->getParam('active');
+               $brand->name= $request->getParam('name');
+               $brand->slug= $request->getParam('slug');
+               $brand->description= $request->getParam('description');
+               $brand->active= (int)$request->getParam('active');
                $brand->save();
-               return $res->withJson($brand);
+               return $response->withJson($brand);
              });
 
   $app->get('/department-form',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               $depts= $this->get('catalog')->getDepartments();
-              $dept= $this->get('catalog')->getDepartmentById($req->getParam('id'));
-              return $this->get('view')->render($res, 'dialog/department-edit.html',
+              $dept= $this->get('catalog')->getDepartmentById($request->getParam('id'));
+              return $this->get('view')->render($response, 'dialog/department-edit.html',
                                          [
                                            'depts' => $depts,
                                            'dept' => $dept
@@ -506,81 +508,82 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             });
 
   $app->post('/department-form',
-             function (Request $req, Response $res, array $args) {
-               $dept= $this->get('catalog')->getDepartmentById($req->getParam('id'));
+             function (Request $request, Response $response) {
+               $dept= $this->get('catalog')->getDepartmentById($request->getParam('id'));
                if (!$dept)
                  $dept= $this->get('catalog')->createDepartment();
-               $dept->name= $req->getParam('name');
-               $dept->slug= $req->getParam('slug');
-               $dept->parent_id= $req->getParam('parent_id');
-               $dept->description= $req->getParam('description');
-               $dept->active= (int)$req->getParam('active');
+               $dept->name= $request->getParam('name');
+               $dept->slug= $request->getParam('slug');
+               $dept->parent_id= $request->getParam('parent_id');
+               $dept->description= $request->getParam('description');
+               $dept->active= (int)$request->getParam('active');
                $dept->save();
-               return $res->withJson($dept);
+               return $response->withJson($dept);
              });
 
   $app->get('/product-form',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               $depts= $this->get('catalog')->getDepartments();
-              $product= $this->get('catalog')->getProductById($req->getParam('id'));
+              $product= $this->get('catalog')->getProductById($request->getParam('id'));
               $brands= $this->get('catalog')->getBrands();
-              return $this->get('view')->render($res, 'dialog/product-edit.html',
+              return $this->get('view')->render($response, 'dialog/product-edit.html',
                                          [
                                            'depts' => $depts,
                                            'brands' => $brands,
                                            'product' => $product,
                                            'department_id' =>
-                                             $req->getParam('department_id'),
+                                             $request->getParam('department_id'),
                                          ]);
             });
 
   $app->post('/product-form',
-             function (Request $req, Response $res, array $args) {
-               $product= $this->get('catalog')->getProductById($req->getParam('id'));
+             function (Request $request, Response $response) {
+               $product= $this->get('catalog')->getProductById($request->getParam('id'));
                if (!$product) {
-                 if (!$req->getParam('slug')) {
+                 if (!$request->getParam('slug')) {
                    throw \Exception("Must specify a slug.");
                  }
                  $product= $this->get('catalog')->createProduct();
                }
                foreach ($product->fields() as $field) {
-                 $value= $req->getParam($field);
+                 $value= $request->getParam($field);
                  if (isset($value)) {
                    $product->set($field, $value);
                  }
                }
                $product->save();
                $this->get('search')->indexProduct($product);
-               return $res->withJson($product);
+               return $response->withJson($product);
              });
 
   $app->post('/product/add-image',
-             function (Request $req, Response $res, array $args) {
-               $product= $this->get('catalog')->getProductById($req->getParam('id'));
+             function (Request $request, Response $response) {
+               $product= $this->get('catalog')->getProductById($request->getParam('id'));
 
-               $url= $req->getParam('url');
+               $url= $request->getParam('url');
                if ($url) {
                  $image= \Scat\Model\Image::createFromUrl($url);
                  $product->addImage($image);
                } else {
-                 foreach ($req->getUploadedFiles() as $file) {
+                 foreach ($request->getUploadedFiles() as $file) {
                    $image= \Scat\Model\Image::createFromStream($file->getStream(),
                                                          $file->getClientFilename());
                    $product->addImage($image);
                  }
                }
 
-               return $res->withJson($product);
+               return $response->withJson($product);
              });
 
   $app->get('/brand[/{brand}]',
-            function (Request $req, Response $res, array $args) {
+            // TODO use DI for $brand
+            function (Request $request, Response $response, array $args) {
               $depts= $this->get('catalog')->getDepartments();
 
               $brand= $args['brand'] ?
                 $this->get('catalog')->getBrandBySlug($args['brand']) : null;
               if ($args['brand'] && !$brand)
-                throw new \Slim\Exception\NotFoundException($req, $res);
+                throw new \Slim\Exception\HttpNotFoundException($request);
 
               if ($brand)
                 $products= $brand->products()
@@ -590,212 +593,212 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
 
               $brands= $brand ? null : $this->get('catalog')->getBrands();
 
-              return $this->get('view')->render($res, 'catalog/brand.html',
+              return $this->get('view')->render($response, 'catalog/brand.html',
                                          [ 'depts' => $depts,
                                            'brands' => $brands,
                                            'brand' => $brand,
                                            'products' => $products ]);
             })->setName('catalog-brand');
 
-  $app->get('/item/{code:.*}',
-            function (Request $req, Response $res, array $args) {
+  $app->get('/item/{code:.*}', // TODO use DI for $code
+            function (Request $request, Response $response, array $args) {
               $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
-               throw new \Slim\Exception\NotFoundException($req, $res);
-              return $this->get('view')->render($res, 'catalog/item.html', [
+               throw new \Slim\Exception\HttpNotFoundException($request);
+              return $this->get('view')->render($response, 'catalog/item.html', [
                                           'item' => $item,
                                          ]);
             })->setName('catalog-item');
 
-  $app->post('/item/{code:.*}/~print-label',
-            function (Request $req, Response $res, array $args) {
+  $app->post('/item/{code:.*}/~print-label', // TODO use DI For $code
+            function (Request $request, Response $response, array $args) {
               $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
 
-              $body= $res->getBody();
-              $body->write($item->getPDF($req->getParams()));
-              return $res->withHeader("Content-type", "application/pdf");
+              $body= $response->getBody();
+              $body->write($item->getPDF($request->getParams()));
+              return $response->withHeader("Content-type", "application/pdf");
             });
 
-  $app->post('/item/{code:.*}/~add-barcode',
-            function (Request $req, Response $res, array $args) {
+  $app->post('/item/{code:.*}/~add-barcode', // TODO use DI for $code
+            function (Request $request, Response $response, array $args) {
               $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
 
               $barcode= $item->barcodes()->create();
               $barcode->item_id= $item->id;
-              $barcode->code= trim($req->getParam('barcode'));
+              $barcode->code= trim($request->getParam('barcode'));
               $barcode->quantity= 1;
               $barcode->save();
 
-              return $res->withJson($item);
+              return $response->withJson($item);
             });
 
-  $app->post('/item/{code:.*}/~edit-barcode',
-            function (Request $req, Response $res, array $args) {
+  $app->post('/item/{code:.*}/~edit-barcode', // TODO use DI for $code
+            function (Request $request, Response $response, array $args) {
               $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
 
               $barcode= $item->barcodes()
-                          ->where('code', $req->getParam('pk'))
+                          ->where('code', $request->getParam('pk'))
                           ->find_one();
 
               if (!$barcode)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
 
-              if ($req->getParam('name') == 'quantity') {
-                $barcode->quantity= trim($req->getParam('value'));
+              if ($request->getParam('name') == 'quantity') {
+                $barcode->quantity= trim($request->getParam('value'));
               }
 
-              if ($req->getParam('name') == 'code') {
-                $barcode->code= trim($req->getParam('value'));
+              if ($request->getParam('name') == 'code') {
+                $barcode->code= trim($request->getParam('value'));
               }
 
               $barcode->save();
 
-              return $res->withJson($item);
+              return $response->withJson($item);
             });
 
-  $app->post('/item/{code:.*}/~remove-barcode',
-            function (Request $req, Response $res, array $args) {
+  $app->post('/item/{code:.*}/~remove-barcode', // TODO use DI for $code
+            function (Request $request, Response $response, array $args) {
               $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
 
               $barcode= $item->barcodes()
-                          ->where('code', $req->getParam('pk'))
+                          ->where('code', $request->getParam('pk'))
                           ->find_one();
 
               if (!$barcode)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
 
               $barcode->delete();
 
-              return $res->withJson($item);
+              return $response->withJson($item);
             });
 
-  $app->post('/item/{code:.*}/~find-vendor-items',
-            function (Request $req, Response $res, array $args) {
+  $app->post('/item/{code:.*}/~find-vendor-items', // TODO use DI for $code
+            function (Request $request, Response $response, array $args) {
               $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
 
               $item->findVendorItems();
 
-              return $res->withJson($item);
+              return $response->withJson($item);
             });
-  $app->post('/item/{code:.*}/~unlink-vendor-item',
-            function (Request $req, Response $res, array $args) {
+  $app->post('/item/{code:.*}/~unlink-vendor-item', // TODO use DI for $code
+            function (Request $request, Response $response, array $args) {
               $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
               $vi= $item->vendor_items()
-                        ->where('id', $req->getParam('id'))
+                        ->where('id', $request->getParam('id'))
                         ->find_one();
               if (!$vi)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
 
               $vi->item_id= 0;
               $vi->save();
 
-              return $res->withJson($item);
+              return $response->withJson($item);
             });
-  $app->post('/item/{code:.*}/~check-vendor-stock',
-            function (Request $req, Response $res, array $args) {
+  $app->post('/item/{code:.*}/~check-vendor-stock', // TODO use DI for $code
+            function (Request $request, Response $response, array $args) {
               $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
               $vi= $item->vendor_items()
-                        ->where('id', $req->getParam('id'))
+                        ->where('id', $request->getParam('id'))
                         ->find_one();
               if (!$vi)
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
 
-              return $res->withJson($vi->checkVendorStock());
+              return $response->withJson($vi->checkVendorStock());
             });
 
   $app->get('/item-add-form',
-            function (Request $req, Response $res, array $args) {
-              return $this->get('view')->render($res, 'dialog/item-add.html',
+            function (Request $request, Response $response) {
+              return $this->get('view')->render($response, 'dialog/item-add.html',
                                          [
                                            'product_id' =>
-                                             $req->getParam('product_id'),
+                                             $request->getParam('product_id'),
                                          ]);
             });
 
   $app->get('/vendor-item-form',
-            function (Request $req, Response $res, array $args) {
-              $item= $this->get('catalog')->getItemById($req->getParam('item'));
-              $vendor_item= $this->get('catalog')->getVendorItemById($req->getParam('id'));
-              return $this->get('view')->render($res, 'dialog/vendor-item-edit.html',
+            function (Request $request, Response $response) {
+              $item= $this->get('catalog')->getItemById($request->getParam('item'));
+              $vendor_item= $this->get('catalog')->getVendorItemById($request->getParam('id'));
+              return $this->get('view')->render($response, 'dialog/vendor-item-edit.html',
                                          [
                                            'item' => $item,
                                            'vendor_item' => $vendor_item,
                                          ]);
             });
   $app->post('/~update-vendor-item',
-             function (Request $req, Response $res, array $args) {
-               $vi= $this->get('catalog')->getVendorItemById($req->getParam('id'));
+             function (Request $request, Response $response) {
+               $vi= $this->get('catalog')->getVendorItemById($request->getParam('id'));
                if (!$vi) {
                  $vi= $this->get('catalog')->createVendorItem();
                }
                foreach ($vi->fields() as $field) {
-                 $value= $req->getParam($field);
+                 $value= $request->getParam($field);
                  if (isset($value)) {
                    $vi->set($field, $value);
                  }
                }
                $vi->save();
-               return $res->withJson($vi);
+               return $response->withJson($vi);
              });
 
 
   $app->post('/item-update',
-             function (Request $req, Response $res, array $args) {
-               $id= $req->getParam('pk');
-               $name= $req->getParam('name');
-               $value= $req->getParam('value');
+             function (Request $request, Response $response) {
+               $id= $request->getParam('pk');
+               $name= $request->getParam('name');
+               $value= $request->getParam('value');
                $item= $this->get('catalog')->getItemById($id);
                if (!$item)
-                 throw new \Slim\Exception\NotFoundException($req, $res);
+                 throw new \Slim\Exception\HttpNotFoundException($request);
 
                $item->setProperty($name, $value);
                $item->save();
 
-               return $res->withJson([
+               return $response->withJson([
                  'item' => $item,
                  'newValue' => $item->$name,
                  'replaceRow' => $this->get('view')->fetch('catalog/item-row.twig', [
                                   'i' => $item,
-                                  'variations' => $req->getParam('variations'),
-                                  'product' => $req->getParam('product')
+                                  'variations' => $request->getParam('variations'),
+                                  'product' => $request->getParam('product')
                                 ])
                ]);
              });
   // XXX used by old-report/report-price-change
   $app->post('/item-reprice',
-             function (Request $req, Response $res, array $args) {
-               $id= $req->getParam('id');
-               $retail_price= $req->getParam('retail_price');
-               $discount= $req->getParam('discount');
+             function (Request $request, Response $response) {
+               $id= $request->getParam('id');
+               $retail_price= $request->getParam('retail_price');
+               $discount= $request->getParam('discount');
                $item= $this->get('catalog')->getItemById($id);
                if (!$item)
-                 throw new \Slim\Exception\NotFoundException($req, $res);
+                 throw new \Slim\Exception\HttpNotFoundException($request);
 
                $item->setProperty('retail_price', $retail_price);
                $item->setProperty('discount', $discount);
                $item->save();
 
-               return $res->withJson([ 'item' => $item ]);
+               return $response->withJson([ 'item' => $item ]);
              });
 
 
   $app->post('/bulk-update',
-             function (Request $req, Response $res, array $args) {
-               $items= $req->getParam('items');
+             function (Request $request, Response $response) {
+               $items= $request->getParam('items');
 
                if (!preg_match('/^(?:\d+)(?:,\d+)*$/', $items)) {
                  throw new \Exception("Invalid items specified.");
@@ -804,10 +807,10 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                foreach (explode(',', $items) as $id) {
                  $item= \Model::factory('Item')->find_one($id);
                  if (!$item)
-                   throw new \Slim\Exception\NotFoundException($req, $res);
+                   throw new \Slim\Exception\HttpNotFoundException($request);
 
                  foreach ([ 'brand_id','product_id','name','short_name','variation','retail_price','discount','minimum_quantity','purchase_quantity','dimensions','weight','prop65','hazmat','oversized','active' ] as $key) {
-                   $value= $req->getParam($key);
+                   $value= $request->getParam($key);
                    if (strlen($value)) {
                      $item->setProperty($key, $value);
                    }
@@ -816,17 +819,17 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                  $item->save();
                }
 
-               return $res->withJson([ 'message' => 'Okay.' ]);
+               return $response->withJson([ 'message' => 'Okay.' ]);
              });
 
   $app->get('/whats-new',
-            function (Request $req, Response $res, array $args) {
-              $limit= (int)$req->getParam('limit');
+            function (Request $request, Response $response) {
+              $limit= (int)$request->getParam('limit');
               if (!$limit) $limit= 12;
               $products= $this->get('catalog')->getNewProducts($limit);
               $depts= $this->get('catalog')->getDepartments();
 
-              return $this->get('view')->render($res, 'catalog/whatsnew.html',
+              return $this->get('view')->render($response, 'catalog/whatsnew.html',
                                          [
                                            'products' => $products,
                                            'depts' => $depts,
@@ -834,60 +837,60 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             })->setName('catalog-whats-new');
 
   $app->get('/price-overrides',
-             function (Request $req, Response $res, array $args) {
+             function (Request $request, Response $response) {
                $price_overrides= \Model::factory('PriceOverride')
                                   ->order_by_asc('pattern')
                                   ->order_by_asc('minimum_quantity')
                                   ->find_many();
 
-               return $this->get('view')->render($res, 'catalog/price-overrides.html',[
+               return $this->get('view')->render($response, 'catalog/price-overrides.html',[
                 'price_overrides' => $price_overrides,
                ]);
              })->setName('catalog-price-overrides');
   $app->post('/price-overrides/~delete',
-             function (Request $req, Response $res, array $args) {
+             function (Request $request, Response $response) {
                $override= \Model::factory('PriceOverride')
-                            ->find_one($req->getParam('id'));
+                            ->find_one($request->getParam('id'));
                if (!$override) {
-                 throw new \Slim\Exception\NotFoundException($req, $res);
+                 throw new \Slim\Exception\HttpNotFoundException($request);
                }
                $override->delete();
-               return $res->withJson([ 'message' => 'Success!' ]);
+               return $response->withJson([ 'message' => 'Success!' ]);
              });
   $app->post('/price-overrides/~edit',
-             function (Request $req, Response $res, array $args) {
+             function (Request $request, Response $response) {
                $override= \Model::factory('PriceOverride')
-                            ->find_one($req->getParam('id'));
+                            ->find_one($request->getParam('id'));
                if (!$override) {
                  $override= \Model::factory('PriceOverride')->create();
                }
-               $override->pattern_type= $req->getParam('pattern_type');
-               $override->pattern= $req->getParam('pattern');
-               $override->minimum_quantity= $req->getParam('minimum_quantity');
-               $override->setDiscount($req->getParam('discount'));
-               $override->expires= $req->getParam('expires') ?: null;
-               $override->in_stock= $req->getParam('in_stock');
+               $override->pattern_type= $request->getParam('pattern_type');
+               $override->pattern= $request->getParam('pattern');
+               $override->minimum_quantity= $request->getParam('minimum_quantity');
+               $override->setDiscount($request->getParam('discount'));
+               $override->expires= $request->getParam('expires') ?: null;
+               $override->in_stock= $request->getParam('in_stock');
                $override->save();
-               return $res->withJson($override);
+               return $response->withJson($override);
              });
   $app->get('/price-override-form',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               $override= \Model::factory('PriceOverride')
-                           ->find_one($req->getParam('id'));
-              return $this->get('view')->render($res,
+                           ->find_one($request->getParam('id'));
+              return $this->get('view')->render($response,
                                          'dialog/price-override-edit.html',
                                          [ 'override' => $override ]);
             });
 
-  $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]',
-            function (Request $req, Response $res, array $args) {
+  $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]', // TODO use DI
+            function (Request $request, Response $response, array $args) {
             try {
               $depts= $this->get('catalog')->getDepartments();
               $dept= $args['dept'] ?
                 $this->get('catalog')->getDepartmentBySlug($args['dept']):null;
 
               if ($args['dept'] && !$dept)
-                throw new \Slim\Exception\NotFoundException($req, $res);
+                throw new \Slim\Exception\HttpNotFoundException($request);
 
               $subdepts= $dept ?
                 $dept->departments()->order_by_asc('name')->find_many():null;
@@ -897,7 +900,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                      ->where('slug', $args['subdept'])
                      ->find_one():null;
               if ($args['subdept'] && !$subdept)
-                throw new \Slim\Exception\NotFoundException($req, $res);
+                throw new \Slim\Exception\HttpNotFoundException($request);
 
               $products= $subdept ?
                 $subdept->products()
@@ -914,7 +917,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                         ->where('slug', $args['product'])
                         ->find_one():null;
               if ($args['product'] && !$product)
-                throw new \Slim\Exception\NotFoundException($req, $res);
+                throw new \Slim\Exception\HttpNotFoundException($request);
 
               $items= $product ?
                 $product->items()
@@ -941,11 +944,11 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                         ->where('code', $args['item'])
                         ->find_one():null;
               if ($args['item'] && !$item)
-                throw new \Slim\Exception\NotFoundException($req, $res);
+                throw new \Slim\Exception\HttpNotFoundException($request);
 
               $brands= $dept ? null : $this->get('catalog')->getBrands();
 
-              return $this->get('view')->render($res, 'catalog/layout.html',
+              return $this->get('view')->render($response, 'catalog/layout.html',
                                          [ 'brands' => $brands,
                                            'dept' => $dept,
                                            'depts' => $depts,
@@ -957,14 +960,14 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                                            'item' => $item,
                                            'items' => $items ]);
              }
-             catch (\Slim\Exception\NotFoundException $ex) {
+             catch (\Slim\Exception\HttpNotFoundException $ex) {
                /* TODO figure out a way to not have to add/remove /catalog/ */
                $path= preg_replace('!/catalog/!', '',
-                                   $req->getUri()->getPath());
+                                   $request->getUri()->getPath());
                $re= $this->get('catalog')->getRedirectFrom($path);
 
                if ($re) {
-                 return $res->withRedirect('/catalog/' . $re->dest, 301);
+                 return $response->withRedirect('/catalog/' . $re->dest, 301);
                }
 
                throw $ex;
@@ -972,20 +975,20 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             })->setName('catalog');
 
   $app->post('/~add-item',
-             function (Request $req, Response $res, array $args) {
+             function (Request $request, Response $response) {
                \ORM::get_db()->beginTransaction();
 
                $item= $this->get('catalog')->createItem();
 
-               $item->code= trim($req->getParam('code'));
-               $item->name= trim($req->getParam('name'));
-               $item->retail_price= $req->getParam('retail_price');
+               $item->code= trim($request->getParam('code'));
+               $item->name= trim($request->getParam('name'));
+               $item->retail_price= $request->getParam('retail_price');
 
-               if ($req->getParam('product_id')) {
-                 $item->product_id= $req->getParam('product_id');
+               if ($request->getParam('product_id')) {
+                 $item->product_id= $request->getParam('product_id');
                }
 
-               if (($id= $req->getParam('vendor_item'))) {
+               if (($id= $request->getParam('vendor_item'))) {
                  $vendor_item= $this->get('catalog')->getVendorItemById($id);
                  if ($vendor_item) {
                    $item->purchase_quantity= $vendor_item->purchase_quantity;
@@ -1019,68 +1022,68 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
 
                \ORM::get_db()->commit();
 
-               return $res->withJson($item);
+               return $response->withJson($item);
              });
   $app->post('/~vendor-lookup',
-             function (Request $req, Response $res, array $args) {
+             function (Request $request, Response $response) {
                $item=
-                 $this->get('catalog')->getVendorItemByCode($req->getParam('code'));
-               return $res->withJson($item);
+                 $this->get('catalog')->getVendorItemByCode($request->getParam('code'));
+               return $response->withJson($item);
              });
 });
 
 /* Custom */
 $app->get('/custom',
-          function (Request $req, Response $res, array $args) {
-            return $this->get('view')->render($res, 'custom/index.html');
+          function (Request $request, Response $response) {
+            return $this->get('view')->render($response, 'custom/index.html');
           });
 
 /* People */
 $app->group('/person', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               // TODO most recent customers? vendors?
-              return $this->get('view')->render($res, 'person/index.html');
+              return $this->get('view')->render($response, 'person/index.html');
             });
   $app->get('/search',
-            function (Request $req, Response $res, array $args) {
-              $select2= $req->getParam('_type') == 'query';
-              $q= trim($req->getParam('q'));
+            function (Request $request, Response $response) {
+              $select2= $request->getParam('_type') == 'query';
+              $q= trim($request->getParam('q'));
 
               $people= \Scat\Model\Person::find($q);
 
               if ($select2) {
-                return $res->withJson($people);
+                return $response->withJson($people);
               }
 
-              return $this->get('view')->render($res, 'person/index.html',
+              return $this->get('view')->render($response, 'person/index.html',
                                          [ 'people' => $people, 'q' => $q ]);
             })->setName('person-search');
-  $app->get('/{id:[0-9]+}',
-            function (Request $req, Response $res, array $args) {
+  $app->get('/{id:[0-9]+}', // TODO use DI for $id
+            function (Request $request, Response $response, array $args) {
               $person= \Model::factory('Person')->find_one($args['id']);
-              $page= (int)$req->getParam('page');
+              $page= (int)$request->getParam('page');
               $limit= 25;
-              return $this->get('view')->render($res, 'person/person.html', [
+              return $this->get('view')->render($response, 'person/person.html', [
                 'person' => $person,
                 'page' => $page,
                 'limit' => $limit,
               ]);
             })->setName('person');
-  $app->get('/{id:[0-9]+}/items',
-            function (Request $req, Response $res, array $args) {
+  $app->get('/{id:[0-9]+}/items', // TODO use DI for $id
+            function (Request $request, Response $response) {
               $person= \Model::factory('Person')->find_one($args['id']);
-              $page= (int)$req->getParam('page');
+              $page= (int)$request->getParam('page');
               if ($person->role != 'vendor') {
                 throw new \Exception("That person is not a vendor.");
               }
               $limit= 25;
-              $q= $req->getParam('q');
+              $q= $request->getParam('q');
               $items= \Scat\Model\VendorItem::search($person->id, $q);
               $items= $items->select_expr('COUNT(*) OVER()', 'total')
                             ->limit($limit)->offset($page * $limit);
               $items= $items->find_many();
-              return $this->get('view')->render($res, 'person/items.html', [
+              return $this->get('view')->render($response, 'person/items.html', [
                                            'person' => $person,
                                            'items' => $items,
                                            'q' => $q,
@@ -1090,83 +1093,83 @@ $app->group('/person', function (RouteCollectorProxy $app) {
                                           ]);
             })->setName('vendor-items');
   $app->post('/update',
-             function (Request $req, Response $res, array $args) {
-               $id= $req->getParam('pk');
-               $name= $req->getParam('name');
-               $value= $req->getParam('value');
+             function (Request $request, Response $response) {
+               $id= $request->getParam('pk');
+               $name= $request->getParam('name');
+               $value= $request->getParam('value');
                $person= \Model::factory('Person')->find_one($id);
                if (!$person)
-                 throw new \Slim\Exception\NotFoundException($req, $res);
+                 throw new \Slim\Exception\HttpNotFoundException($request);
 
                $person->setProperty($name, $value);
                $person->save();
 
-               return $res->withJson([
+               return $response->withJson([
                  'person' => $person,
                ]);
              });
-  $app->post('/{id:[0-9]+}/upload-items',
-             function (Request $req, Response $res, array $args) {
+  $app->post('/{id:[0-9]+}/upload-items', // TODO use DI for $id
+             function (Request $request, Response $response, array $args) {
                $person= \Model::factory('Person')->find_one($args['id']);
                if (!$person)
-                 throw new \Slim\Exception\NotFoundException($req, $res);
+                 throw new \Slim\Exception\HttpNotFoundException($request);
 
                $details= [];
-               foreach ($req->getUploadedFiles() as $file) {
+               foreach ($request->getUploadedFiles() as $file) {
                  $details[]= $person->loadVendorData($file);
                }
 
-               return $res->withJson([
+               return $response->withJson([
                  'details' => $details
                ]);
              });
-  $app->get('/{id:[0-9]+}/set-role',
-             function (Request $req, Response $res, array $args) {
+  $app->get('/{id:[0-9]+}/set-role', // TODO use DI for $id
+             function (Request $request, Response $response, array $args) {
                $person= \Model::factory('Person')->find_one($args['id']);
                if (!$person)
-                 throw new \Slim\Exception\NotFoundException($req, $res);
-               $role= $req->getParam('role');
+                 throw new \Slim\Exception\HttpNotFoundException($request);
+               $role= $request->getParam('role');
                $person->role= $role;
                $person->save();
                $path= $this->router->pathFor('person', [ 'id' => $person->id ]);
-               return $res->withRedirect($path);
+               return $response->withRedirect($path);
              });
 });
 
 /* Clock */
 $app->group('/clock', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               $people= \Model::factory('Person')
                 ->select('*')
                 ->where('role', 'employee')
                 ->order_by_asc('name')
                 ->find_many();
 
-              if (($block= $req->getParam('block'))) {
+              if (($block= $request->getParam('block'))) {
                 $out= $this->get('view')->fetchBlock('clock/index.html', $block, [
                                                'people' => $people,
                                              ]);
-                $res->getBody()->write($out);
-                return $res;
+                $response->getBody()->write($out);
+                return $response;
               } else {
-                return $this->get('view')->render($res, 'clock/index.html', [
+                return $this->get('view')->render($response, 'clock/index.html', [
                                              'people' => $people,
                                             ]);
               }
             });
   $app->post('/~punch',
-            function (Request $req, Response $res, array $args) {
-              $id= $req->getParam('id');
+            function (Request $request, Response $response) {
+              $id= $request->getParam('id');
               $person= \Model::factory('Person')->find_one($id);
-              return $res->withJson($person->punch());
+              return $response->withJson($person->punch());
             });
 });
 
 /* Gift Cards */
 $app->group('/gift-card', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               $page_size= 25;
 
               $cards= \Model::factory('Giftcard')
@@ -1177,15 +1180,15 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
                         ->where('active', 1)
                         ->find_many();
 
-              return $this->get('view')->render($res, 'gift-card/index.html', [
+              return $this->get('view')->render($response, 'gift-card/index.html', [
                                            'cards' => $cards,
-                                           'error' => $req->getParam('error'),
+                                           'error' => $request->getParam('error'),
                                           ]);
             });
 
   $app->get('/lookup',
-            function (Request $req, Response $res, array $args) {
-              $card= $req->getParam('card');
+            function (Request $request, Response $response) {
+              $card= $request->getParam('card');
               $card= preg_replace('/^RAW-/', '', $card);
               $id= substr($card, 0, 7);
               $pin= substr($card, -4);
@@ -1195,17 +1198,17 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
                       ->find_one();
 
               if ($card) {
-                return $res->withRedirect("/gift-card/" . $card->card());
+                return $response->withRedirect("/gift-card/" . $card->card());
               } else {
-                return $res->withRedirect("/gift-card?error=not-found");
+                return $response->withRedirect("/gift-card?error=not-found");
               }
             });
 
   $app->post('/create',
-            function (Request $req, Response $res, array $args) {
-              $expires= $req->getParam('expires');
-              $txn_id= $req->getParam('txn_id');
-              $balance= $req->getParam('balance');
+            function (Request $request, Response $response) {
+              $expires= $request->getParam('expires');
+              $txn_id= $request->getParam('txn_id');
+              $balance= $request->getParam('balance');
 
               \ORM::get_db()->beginTransaction();
 
@@ -1232,11 +1235,11 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
 
               \ORM::get_db()->commit();
 
-              return $res->withJson($card);
+              return $response->withJson($card);
             });
 
-  $app->get('/{card:[0-9]+}',
-            function (Request $req, Response $res, array $args) {
+  $app->get('/{card:[0-9]+}', // TODO use DI for $card
+            function (Request $request, Response $response, array $args) {
               $id= substr($args['card'], 0, 7);
               $pin= substr($args['card'], -4);
               $card= \Model::factory('Giftcard')
@@ -1244,13 +1247,13 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
                       ->where('pin', $pin)
                       ->find_one();
 
-              return $this->get('view')->render($res, 'gift-card/card.html', [
+              return $this->get('view')->render($response, 'gift-card/card.html', [
                                            'card' => $card,
                                           ]);
             });
 
-  $app->get('/{card:[0-9]+}/print',
-            function (Request $req, Response $res, array $args) {
+  $app->get('/{card:[0-9]+}/print', // TODO use DI for $card
+            function (Request $request, Response $response, array $args) {
               $id= substr($args['card'], 0, 7);
               $pin= substr($args['card'], -4);
               $card= \Model::factory('Giftcard')
@@ -1258,19 +1261,19 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
                       ->where('pin', $pin)
                       ->find_one();
 
-              $body= $res->getBody();
+              $body= $response->getBody();
               $body->write($card->getPDF());
-              return $res->withHeader("Content-type", "application/pdf");
+              return $response->withHeader("Content-type", "application/pdf");
             });
 
-  $app->get('/{card:[0-9]+}/email-form',
-            function (Request $req, Response $res, array $args) {
-              $txn= $this->get('txn')->fetchById($req->getParam('id'));
-              return $this->get('view')->render($res, 'dialog/email-gift-card.html',
+  $app->get('/{card:[0-9]+}/email-form', // TODO use DI for $card
+            function (Request $request, Response $response, array $args) {
+              $txn= $this->get('txn')->fetchById($request->getParam('id'));
+              return $this->get('view')->render($response, 'dialog/email-gift-card.html',
                                          $args);
             });
-  $app->post('/{card:[0-9]+}/email',
-            function (Request $req, Response $res, array $args) {
+  $app->post('/{card:[0-9]+}/email', // TODO use DI for $card
+            function (Request $request, Response $response, array $args) {
               $id= substr($args['card'], 0, 7);
               $pin= substr($args['card'], -4);
               $card= \Model::factory('Giftcard')
@@ -1279,18 +1282,18 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
                       ->find_one();
 
               $email_body= $this->get('view')->fetch('email/gift-card.html',
-                                              $req->getParams());
+                                              $request->getParams());
               $subject= $this->get('view')->fetchBlock('email/gift-card.html',
                                                 'title',
-                                                $req->getParams());
+                                                $request->getParams());
 
               $giftcard_pdf= $card->getPDF();
 
               // XXX fix hardcoded name
               $from= $from_name ? "$from_name via Raw Materials Art Supplies"
                                 : "Raw Materials Art Supplies";
-              $to_name= $req->getParam('to_name');
-              $to_email= $req->getParam('to_email');
+              $to_name= $request->getParam('to_name');
+              $to_email= $request->getParam('to_email');
 
               $httpClient= new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client());
               $sparky= new \SparkPost\SparkPost($httpClient,
@@ -1343,43 +1346,43 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
 
               $response= $promise->wait();
 
-              return $res->withJson([ 'message' => 'Success!' ]);
+              return $response->withJson([ 'message' => 'Success!' ]);
             });
 
-  $app->post('/{card:[0-9]+}/add-txn',
-            function (Request $req, Response $res, array $args) {
+  $app->post('/{card:[0-9]+}/add-txn', // TODO use DI for $card
+            function (Request $request, Response $response, array $args) {
               $id= substr($args['card'], 0, 7);
               $pin= substr($args['card'], -4);
               $card= \Model::factory('Giftcard')
                       ->where('id', $id)
                       ->where('pin', $pin)
                       ->find_one();
-              $card->add_txn($req->getParam('amount'),
-                             $req->getParam('txn_id'));
-              return $res->withJson($card);
+              $card->add_txn($request->getParam('amount'),
+                             $request->getParam('txn_id'));
+              return $response->withJson($card);
             });
 });
 
 /* Reports */
 $app->group('/report', function (RouteCollectorProxy $app) {
   $app->get('/quick',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               $data= $this->get('report')->sales();
-              return $this->get('view')->render($res, 'dialog/report-quick.html',
+              return $this->get('view')->render($response, 'dialog/report-quick.html',
                                          $data);
             });
   $app->get('/empty-products',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               $data= $this->get('report')->emptyProducts();
-              return $this->get('view')->render($res, 'report/empty-products.html',
+              return $this->get('view')->render($response, 'report/empty-products.html',
                                          $data);
             });
-  $app->get('/{name}',
-            function (Request $req, Response $res, array $args) {
+  $app->get('/{name}', // TODO use DI for $name
+            function (Request $request, Response $response, array $args) {
               ob_start();
               include "../old-report/report-{$args['name']}.php";
               $content= ob_get_clean();
-              return $this->get('view')->render($res, 'report/old.html', [
+              return $this->get('view')->render($response, 'report/old.html', [
                 'title' => $GLOBALS['title'],
                 'content' => $content,
               ]);
@@ -1388,8 +1391,8 @@ $app->group('/report', function (RouteCollectorProxy $app) {
 
 /* Media */
 $app->get('/media',
-          function (Request $req, Response $res, array $args) {
-            $page= (int)$req->getParam('page');
+          function (Request $request, Response $response, array $args) {
+            $page= (int)$request->getParam('page');
             $page_size= 20;
             $media= \Model::factory('Image')
               ->order_by_desc('created_at')
@@ -1397,7 +1400,7 @@ $app->get('/media',
               ->find_many();
             $total= \Model::factory('Image')->count();
 
-            return $this->get('view')->render($res, 'media/index.html', [
+            return $this->get('view')->render($response, 'media/index.html', [
                                          'media' => $media,
                                          'page' => $page,
                                          'page_size' => $page_size,
@@ -1405,39 +1408,39 @@ $app->get('/media',
                                         ]);
           });
 $app->post('/media/add',
-           function (Request $req, Response $res, array $args) {
-             $url= $req->getParam('url');
+           function (Request $request, Response $response) {
+             $url= $request->getParam('url');
              if ($url) {
                $image= \Scat\Model\Image::createFromUrl($url);
              } else {
-               foreach ($req->getUploadedFiles() as $file) {
+               foreach ($request->getUploadedFiles() as $file) {
                  $image= \Scat\Model\Image::createFromStream($file->getStream(),
                                                        $file->getClientFilename());
                }
              }
 
-             return $res->withJson($image);
+             return $response->withJson($image);
            });
-$app->post('/media/{id}/update',
-           function (Request $req, Response $res, array $args) {
+$app->post('/media/{id}/update', // TODO use DI for $id
+           function (Request $request, Response $response, array $args) {
              \ORM::get_db()->beginTransaction();
 
              $image= \Model::factory('Image')->find_one($args['id']);
              if (!$image) {
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
              }
-             $image->alt_text= $req->getParam('caption');
+             $image->alt_text= $request->getParam('caption');
              $image->save();
 
              \ORM::get_db()->commit();
 
-             return $res->withJson($image);
+             return $response->withJson($image);
            });
 
 /* Notes */
 $app->get('/notes',
-          function (Request $req, Response $res, array $args) {
-            $parent_id= (int)$req->getParam('parent_id');
+          function (Request $request, Response $response) {
+            $parent_id= (int)$request->getParam('parent_id');
             $staff= \Model::factory('Person')
                       ->where('role', 'employee')
                       ->where('person.active', 1)
@@ -1465,32 +1468,32 @@ $app->get('/notes',
                         ->order_by_desc('id')
                         ->find_many();
             }
-            return $this->get('view')->render($res, 'dialog/notes.html',
+            return $this->get('view')->render($response, 'dialog/notes.html',
                                        [
                                          'body_only' =>
-                                           (int)$req->getParam('body_only'),
+                                           (int)$request->getParam('body_only'),
                                          'parent_id' => $parent_id,
                                          'staff' => $staff,
                                          'notes' => $notes
                                        ]);
           });
 $app->post('/notes/add',
-           function (Request $req, Response $res, array $args) {
+           function (Request $request, Response $response) {
              $note= \Model::factory('Note')->create();
-             $note->parent_id= (int)$req->getParam('parent_id');
-             $note->person_id= (int)$req->getParam('person_id');
-             $note->content= $req->getParam('content');
-             $note->todo= (int)$req->getParam('todo');
-             $note->public= (int)$req->getParam('public');
+             $note->parent_id= (int)$request->getParam('parent_id');
+             $note->person_id= (int)$request->getParam('person_id');
+             $note->content= $request->getParam('content');
+             $note->todo= (int)$request->getParam('todo');
+             $note->public= (int)$request->getParam('public');
              $note->save();
 
-             if ((int)$req->getParam('sms')) {
+             if ((int)$request->getParam('sms')) {
                try {
                  $txn= $note->parent()->find_one()->txn();
                  $person= $txn->owner();
                  error_log("Sending message to {$person->phone}");
                  $data= $this->get('phone')->sendSMS($person->phone,
-                                              $req->getParam('content'));
+                                              $request->getParam('content'));
                  $note->public= true;
                  $note->save();
                 } catch (\Exception $e) {
@@ -1498,20 +1501,20 @@ $app->post('/notes/add',
                 }
              }
 
-             return $res->withJson($note);
+             return $response->withJson($note);
            });
-$app->post('/notes/{id}/update',
-           function (Request $req, Response $res, array $args) {
+$app->post('/notes/{id}/update', // TODO use DI for $id
+           function (Request $request, Response $response, array $args) {
              \ORM::get_db()->beginTransaction();
 
              $note= \Model::factory('Note')->find_one($args['id']);
              if (!$note) {
-               throw new \Slim\Exception\NotFoundException($req, $res);
+               throw new \Slim\Exception\HttpNotFoundException($request);
              }
 
-             $todo= $req->getParam('todo');
+             $todo= $request->getParam('todo');
              if ($todo !== null && $todo != $note->todo) {
-               $note->todo= (int)$req->getParam('todo');
+               $note->todo= (int)$request->getParam('todo');
                $update= \Model::factory('Note')->create();
                // TODO who did this?
                $update->parent_id= $note->parent_id ?: $note->id;
@@ -1519,9 +1522,9 @@ $app->post('/notes/{id}/update',
                $update->save();
              }
 
-             $public= $req->getParam('public');
+             $public= $request->getParam('public');
              if ($public !== null && $public != $note->public) {
-               $note->public= (int)$req->getParam('public');
+               $note->public= (int)$request->getParam('public');
                $update= \Model::factory('Note')->create();
                // TODO who did this?
                $update->parent_id= $note->parent_id ?: $note->id;
@@ -1533,43 +1536,43 @@ $app->post('/notes/{id}/update',
 
              \ORM::get_db()->commit();
 
-             return $res->withJson($note);
+             return $response->withJson($note);
            });
 
 /* Till */
 $app->group('/till', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) AS expected
                      FROM payment
                     WHERE method IN ('cash','change','withdrawal')";
               $data= \ORM::for_table('payment')->raw_query($q)->find_one();
-              return $this->get('view')->render($res, "till/index.html", [
+              return $this->get('view')->render($response, "till/index.html", [
                 'expected' => $data->expected,
               ]);
             });
 
   $app->post('/~print-change-order',
-             function (Request $req, Response $res, array $args) {
+             function (Request $request, Response $response) {
                $out= $this->get('printer')->printFromTemplate(
                  'print/change-order.html',
-                 $req->getParams()
+                 $request->getParams()
                );
-               $res->getBody()->write($out);
-               return $res;
+               $response->getBody()->write($out);
+               return $response;
              });
 
   $app->post('/~count',
-             function (Request $req, Response $res, array $args) {
-               if ($req->getAttribute('has_errors')) {
-                 return $res->withJson([
+             function (Request $request, Response $response) {
+               if ($request->getAttribute('has_errors')) {
+                 return $response->withJson([
                    'error' => "Validation failed.",
-                   'validation_errors' => $req->getAttribute('errors')
+                   'validation_errors' => $request->getAttribute('errors')
                  ]);
                }
 
-               $counted= $req->getParam('counted');
-               $withdraw= $req->getParam('withdraw');
+               $counted= $request->getParam('counted');
+               $withdraw= $request->getParam('withdraw');
 
                $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) AS expected
                       FROM payment
@@ -1606,7 +1609,7 @@ $app->group('/till', function (RouteCollectorProxy $app) {
                \ORM::get_db()->commit();
 
                $data= \ORM::for_table('payment')->raw_query($q)->find_one();
-               return $res->withJson(['expected' => $data->expected ]);
+               return $response->withJson(['expected' => $data->expected ]);
              })
       ->add(new Validation([
         'counted' => v::numeric()::positive(),
@@ -1614,16 +1617,16 @@ $app->group('/till', function (RouteCollectorProxy $app) {
       ]));
 
   $app->post('/~withdraw-cash',
-             function (Request $req, Response $res, array $args) {
-               if ($req->getAttribute('has_errors')) {
-                 return $res->withJson([
+             function (Request $request, Response $response) {
+               if ($request->getAttribute('has_errors')) {
+                 return $response->withJson([
                    'error' => "Validation failed.",
-                   'validation_errors' => $req->getAttribute('errors')
+                   'validation_errors' => $request->getAttribute('errors')
                  ]);
                }
 
-               $reason= $req->getParam('reason');
-               $amount= $req->getParam('amount');
+               $reason= $request->getParam('reason');
+               $amount= $request->getParam('amount');
 
                \ORM::get_db()->beginTransaction();
 
@@ -1646,7 +1649,7 @@ $app->group('/till', function (RouteCollectorProxy $app) {
 
                \ORM::get_db()->commit();
 
-               return $res->withJson($txn);
+               return $response->withJson($txn);
              })
       ->add(new Validation([
         'amount' => v::numeric()::positive(),
@@ -1656,58 +1659,58 @@ $app->group('/till', function (RouteCollectorProxy $app) {
 
 /* Safari notifications */
 $app->get('/push',
-            function (Request $req, Response $res, array $args) {
-              return $this->get('view')->render($res, "push/index.html");
+            function (Request $request, Response $response) {
+              return $this->get('view')->render($response, "push/index.html");
             });
 
-$app->post('/push/v2/pushPackages/{id}',
-           function (Request $req, Response $res, array $args) {
+$app->post('/push/v2/pushPackages/{id}', // TODO use DI for $id
+           function (Request $request, Response $response, array $args) {
              $zip= $this->get('push')->getPushPackage();
-             return $res->withHeader("Content-type", "application/zip")
+             return $response->withHeader("Content-type", "application/zip")
                          ->withBody($zip);
            });
 
-$app->post('/push/v1/devices/{token}/registrations/{id}',
-           function (Request $req, Response $res, array $args) {
+$app->post('/push/v1/devices/{token}/registrations/{id}', // TODO use DI for $id
+           function (Request $request, Response $response, array $args) {
              error_log("PUSH: Registered device: '{$args['token']}'");
              $device= \Scat\Model\Device::register($args['token']);
-             return $res;
+             return $response;
            });
-$app->delete('/push/v1/devices/{token}/registrations/{id}',
-           function (Request $req, Response $res, array $args) {
+$app->delete('/push/v1/devices/{token}/registrations/{id}', // TODO use DI
+           function (Request $request, Response $response, array $args) {
              error_log("PUSH: Forget device: '{$args['token']}'");
              $device= \Scat\Model\Device::forget($args['token']);
-             return $res;
+             return $response;
            });
 
 $app->post('/push/v1/log',
-           function (Request $req, Response $res, array $args) {
-             $data= $req->getParsedBody($req);
+           function (Request $request, Response $response) {
+             $data= $request->getParsedBody();
              error_log("PUSH: " . json_encode($data));
-             return $res;
+             return $response;
            });
 
 $app->post('/~push-notification',
-           function (Request $req, Response $res, array $args) {
+           function (Request $request, Response $response) {
               $devices= \Model::factory('Device')->find_many();
 
               foreach ($devices as $device) {
                 $this->get('push')->sendNotification(
                   $device->token,
-                  $req->getParam('title'),
-                  $req->getParam('body'),
-                  $req->getParam('action'),
+                  $request->getParam('title'),
+                  $request->getParam('body'),
+                  $request->getParam('action'),
                   'clicked' /* Not sure what to do about arguments yet. */
                 );
               }
 
-              return $res->withRedirect("/push");
+              return $response->withRedirect("/push");
            });
 
 /* Tax stuff */
 $app->get('/~tax/ping',
-           function (Request $req, Response $res, array $args) {
-              return $res->withJson($this->get('tax')->ping());
+           function (Request $request, Response $response) {
+              return $response->withJson($this->get('tax')->ping());
            });
 
 /* SMS */
@@ -1715,43 +1718,43 @@ $app->map(['GET','POST'], '/sms/~send', \Scat\Controller\SMS::class . ':send');
 $app->post('/sms/~receive', \Scat\Controller\SMS::class . ':receive');
 $app->get('/sms/~register', \Scat\Controller\SMS::class . ':register');
 
-$app->get('/dialog/{dialog}',
-          function (Request $req, Response $res, array $args) {
-            return $this->get('view')->render($res, "dialog/{$args['dialog']}");
+$app->get('/dialog/{dialog}', // TODO use DI for $dialog
+          function (Request $request, Response $response, array $args) {
+            return $this->get('view')->render($response, "dialog/{$args['dialog']}");
           });
 
 $app->get('/~ready-for-publish',
-          function (Request $req, Response $res, array $args) {
+          function (Request $request, Response $response) {
             if (file_exists('/tmp/ready-for-publish')) {
-              $res->getBody()->write('OK');
+              $response->getBody()->write('OK');
               unlink('/tmp/ready-for-publish');
             } else {
-              $res->getBody()->write('NO');
+              $response->getBody()->write('NO');
             }
-            return $res;
+            return $response;
           });
 $app->post('/~ready-for-publish',
-           function (Request $req, Response $res, array $args) {
+           function (Request $request, Response $response) {
              touch('/tmp/ready-for-publish');
-             return $res;
+             return $response;
            });
 
 $app->get('/~gift-card/check-balance',
-          function (Request $req, Response $res, array $args) {
-            $card= $req->getParam('card');
-            return $res->withJson($this->get('giftcard')->check_balance($card));
+          function (Request $request, Response $response) {
+            $card= $request->getParam('card');
+            return $response->withJson($this->get('giftcard')->check_balance($card));
           });
 
 $app->get('/~gift-card/add-txn',
-          function (Request $req, Response $res, array $args) {
-            $card= $req->getParam('card');
-            $amount= $req->getParam('amount');
-            return $res->withJson($this->get('giftcard')->add_txn($card, $amount));
+          function (Request $request, Response $response) {
+            $card= $request->getParam('card');
+            $amount= $request->getParam('amount');
+            return $response->withJson($this->get('giftcard')->add_txn($card, $amount));
           });
 
 $app->get('/~rewards/check-balance',
-          function (Request $req, Response $res, array $args) {
-            $loyalty= $req->getParam('loyalty');
+          function (Request $request, Response $response) {
+            $loyalty= $request->getParam('loyalty');
             $loyalty_number= preg_replace('/[^\d]/', '', $loyalty);
             $person= \Model::factory('Person')
                       ->where_any_is([
@@ -1760,8 +1763,8 @@ $app->get('/~rewards/check-balance',
                       ])
                       ->find_one();
             if (!$person)
-              throw new \Slim\Exception\NotFoundException($req, $res);
-            return $res->withJson([
+              throw new \Slim\Exception\HttpNotFoundException($request);
+            return $response->withJson([
               'loyalty_suppressed' => $person->loyalty_suppressed,
               'points_available' => $person->points_available(),
               'points_pending' => $person->points_pending(),
@@ -1800,34 +1803,34 @@ $app->group('/quickbooks', function (RouteCollectorProxy $app) {
 /* Info (DEBUG only) */
 if ($DEBUG) {
   $app->get('/info',
-            function (Request $req, Response $res, array $args) {
+            function (Request $request, Response $response) {
               ob_start();
               phpinfo();
-              $res->getBody()->write(ob_get_clean());
-              return $res;
+              $response->getBody()->write(ob_get_clean());
+              return $response;
             })->setName('info');
 
   $app->get('/test',
-            function (Request $req, Response $res, array $args) {
-              return $this->get('view')->render($res, "test.html");
+            function (Request $request, Response $response) {
+              return $this->get('view')->render($response, "test.html");
             });
   $app->get('/test/~one',
-            function (Request $req, Response $res, array $args) {
-              $res->getBody()->write('<div class="alert alert-warning">Reloaded one!</div>');
-              return $res;
+            function (Request $request, Response $response) {
+              $response->getBody()->write('<div class="alert alert-warning">Reloaded one!</div>');
+              return $response;
             });
   $app->get('/test/~two',
-            function (Request $req, Response $res, array $args) {
-              $res->getBody()->write('<div class="alert alert-warning">Reloaded two!</div>');
-              return $res;
+            function (Request $request, Response $response) {
+              $response->getBody()->write('<div class="alert alert-warning">Reloaded two!</div>');
+              return $response;
             });
   $app->post('/test',
-            function (Request $req, Response $res, array $args) {
-              $data= $req->getParams();
-              $res= $res->withHeader('X-Scat-Title', 'New Page Title');
-              $res= $res->withAddedHeader('X-Scat-Reload', 'one');
-              $res= $res->withAddedHeader('X-Scat-Reload', 'two');
-              return $res->withJson($data);
+            function (Request $request, Response $response) {
+              $data= $request->getParams();
+              $response= $response->withHeader('X-Scat-Title', 'New Page Title');
+              $response= $response->withAddedHeader('X-Scat-Reload', 'one');
+              $response= $response->withAddedHeader('X-Scat-Reload', 'two');
+              return $response->withJson($data);
             });
 }
 
