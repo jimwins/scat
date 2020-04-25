@@ -25,7 +25,7 @@
   }
 </style>
 {% for p in products %}
-  {% set slug = path_for('catalog') ~ '/' ~ p.full_slug %}
+  {% set slug = url_for('catalog') ~ '/' ~ p.full_slug %}
   <div class="row">
     <div class="col-sm-2">
       <div class="thumbnail">
@@ -46,7 +46,7 @@
         </a>
         {% set brand = p.brand %}
         <small>
-          <a href="{{ path_for('catalog-brand', { 'brand': brand.slug }) }}">
+          <a href="{{ url_for('catalog-brand', { 'brand': brand.slug }) }}">
             {{- brand.name -}}
           </a>
         </small>

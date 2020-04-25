@@ -2,8 +2,8 @@
 namespace Scat\Controller;
 
 use \Psr\Container\ContainerInterface;
-use \Psr\Http\Message\RequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+use \Slim\Http\ServerRequest as Request;
+use \Slim\Http\Response as Response;
 use \Respect\Validation\Validator as v;
 
 class SMS {
@@ -14,13 +14,13 @@ class SMS {
   }
 
   function send(Request $req, Response $res, array $args) {
-    $data= $this->container->phone->sendSMS($req->getParam('to'),
+    $data= $this->container->get('phone')->sendSMS($req->getParam('to'),
                                             $req->getParam('text'));
     return $res->withJson($data);
   }
 
   function register(Request $req, Response $res, array $args) {
-    $data= $this->container->phone->registerWebhook();
+    $data= $this->container->get('phone')->registerWebhook();
     return $res->withJson($data);
   }
 

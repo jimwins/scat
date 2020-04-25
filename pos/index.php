@@ -1,9 +1,10 @@
 <?php
 require '../vendor/autoload.php';
 
-use \Psr\Http\Message\RequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+use \Slim\Http\ServerRequest as Request;
+use \Slim\Http\Response as Response;
 use \Respect\Validation\Validator as v;
+use \Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
 use \DavidePastore\Slim\Validation\Validation as Validation;
 
 /* Some defaults */
@@ -30,103 +31,78 @@ if ($DEBUG || $ORM_DEBUG) {
   });
 }
 
-$app= new \Slim\App([ 'settings' => $config ]);
+$container= new \DI\Container();
+\Slim\Factory\AppFactory::setContainer($container);
 
-$container= $app->getContainer();
-
-/* We use monolog for logging (but still just through PHP's log for now) */
-$container['logger']= function($c) {
-  $logger= new \Monolog\Logger('scat');
-  $handler= new \Monolog\Handler\ErrorLogHandler();
-  $logger->pushHandler($handler);
-  return $logger;
-};
+$app= \Slim\Factory\AppFactory::create();
+$app->addRoutingMiddleware();
 
 /* Twig for templating */
-$container['view']= function ($container) {
-  $view= new \Slim\Views\Twig('../ui', [
-    'cache' => false /* No cache for now */
-  ]);
+$container->set('view', function() use ($config) {
+  /* No cache for now */
+  $view= \Slim\Views\Twig::create('../ui', [ 'cache' => false ]);
 
-  if (($tz= $container['settings']['Twig']['timezone'])) {
+  if (($tz= $config['Twig']['timezone'])) {
     $view->getEnvironment()
       ->getExtension('Twig_Extension_Core')
       ->setTimezone($tz);
   }
 
-  // Instantiate and add Slim specific extension
-  $router= $container->get('router');
-  $uri= \Slim\Http\Uri::createFromEnvironment(
-          new \Slim\Http\Environment($_SERVER));
-  $view->addExtension(new \Slim\Views\TwigExtension($router, $uri));
-
   // Add the Markdown extension
-  $engine= new Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine();
-  $view->addExtension(new Aptoma\Twig\Extension\MarkdownExtension($engine));
+  $engine= new \Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine();
+  $view->addExtension(new \Aptoma\Twig\Extension\MarkdownExtension($engine));
 
   // Add our Twig extensions
   $view->addExtension(new \Scat\TwigExtension());
 
   return $view;
-};
+});
+$app->add(\Slim\Views\TwigMiddleware::createFromContainer($app));
 
 /* Hook up our services */
-$container['catalog']= function($c) {
+$container->set('catalog', function() use ($config) {
   return new \Scat\Service\Catalog();
-};
-$container['search']= function($c) {
-  return new \Scat\Service\Search($c['settings']['search']);
-};
-$container['report']= function($c) {
-  return new \Scat\Service\Report($c['settings']['report']);
-};
-$container['phone']= function($c) {
-  return new \Scat\Service\Phone($c['settings']['phone']);
-};
-$container['push']= function($c) {
-  return new \Scat\Service\Push($c['settings']['push']);
-};
-$container['tax']= function($c) {
-  return new \Scat\Service\Tax($c['settings']['tax']);
-};
-$container['giftcard']= function($c) {
-  return new \Scat\Service\Giftcard($c['settings']['giftcard']);
-};
-$container['txn']= function($c) {
+});
+$container->set('search', function() use ($config) {
+  return new \Scat\Service\Search($config['search']);
+});
+$container->set('report', function() use ($config) {
+  return new \Scat\Service\Report($config['report']);
+});
+$container->set('phone', function() use ($config) {
+  return new \Scat\Service\Phone($config['phone']);
+});
+$container->set('push', function() use ($config) {
+  return new \Scat\Service\Push($config['push']);
+});
+$container->set('tax', function() use ($config) {
+  return new \Scat\Service\Tax($config['tax']);
+});
+$container->set('giftcard', function() use ($config) {
+  return new \Scat\Service\Giftcard($config['giftcard']);
+});
+$container->set('txn', function() use ($config) {
   return new \Scat\Service\Txn();
-};
-$container['printer']= function($c) {
-  return new \Scat\Service\Printer($c->view);
-};
-
-/* Trim trailing slashes */
-$app->add(function (Request $request, Response $response, callable $next) {
-    $uri = $request->getUri();
-    $path = $uri->getPath();
-    if ($path != '/' && substr($path, -1) == '/') {
-        // permanently redirect paths with a trailing slash
-        // to their non-trailing counterpart
-        $uri = $uri->withPath(substr($path, 0, -1));
-        
-        if($request->getMethod() == 'GET') {
-            return $response->withRedirect((string)$uri, 301);
-        }
-        else {
-            return $next($request->withUri($uri), $response);
-        }
-    }
-
-    return $next($request, $response);
+});
+$container->set('printer', function() {
+  return new \Scat\Service\Printer($container->get('view'));
 });
 
+$app->add(new \Middlewares\TrailingSlash());
+
+$errorMiddleware= $app->addErrorMiddleware($DEBUG, true, true);
+
 /* 404 */
-$container['notFoundHandler']= function ($c) {
-  return function ($req, $res) use ($c) {
-    return $c->get('view')->render($res, '404.html')
+$errorMiddleware->setErrorHandler(
+  \Slim\Exception\HttpNotFoundException::class,
+  function (Request $request, Throwable $exception,
+            bool $displayErrorDetails) use ($container)
+  {
+    $res= new \Slim\Psr7\Response();
+    return $container->get('view')->render($res, '404.html')
       ->withStatus(404)
       ->withHeader('Content-Type', 'text/html');
-  };
-};
+  });
 
 /* ROUTES */
 
@@ -139,13 +115,13 @@ $app->get('/',
           })->setName('home');
 
 /* Sales */
-$app->group('/sale', function (Slim\App $app) {
+$app->group('/sale', function (RouteCollectorProxy $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
               $page= (int)$req->getParam('page');
               $limit= 25;
-              $txns= $this->txn->find('customer', $page, $limit);
-              return $this->view->render($res, 'txn/index.html', [
+              $txns= $this->get('txn')->find('customer', $page, $limit);
+              return $this->get('view')->render($res, 'txn/index.html', [
                 'type' => 'customer',
                 'txns' => $txns,
                 'page' => $page,
@@ -157,7 +133,7 @@ $app->group('/sale', function (Slim\App $app) {
               ob_start();
               include "../old-index.php";
               $content= ob_get_clean();
-              return $this->view->render($res, 'sale/old-new.html', [
+              return $this->get('view')->render($res, 'sale/old-new.html', [
                 'title' => $GLOBALS['title'],
                 'content' => $content,
               ]);
@@ -168,15 +144,15 @@ $app->group('/sale', function (Slim\App $app) {
             })->setName('sale');
   $app->get('/email-invoice-form',
             function (Request $req, Response $res, array $args) {
-              $txn= $this->txn->fetchById($req->getParam('id'));
-              return $this->view->render($res, 'dialog/email-invoice.html',
+              $txn= $this->get('txn')->fetchById($req->getParam('id'));
+              return $this->get('view')->render($res, 'dialog/email-invoice.html',
                                          [
                                            'txn' => $txn
                                          ]);
             });
   $app->post('/email-invoice',
             function (Request $req, Response $res, array $args) {
-              $txn= $this->txn->fetchById($req->getParam('id'));
+              $txn= $this->get('txn')->fetchById($req->getParam('id'));
               $name= $req->getParam('name');
               $email= $req->getParam('email');
               $subject= trim($req->getParam('subject'));
@@ -198,7 +174,7 @@ $app->group('/sale', function (Slim\App $app) {
                                                 [ 'key' => SPARKPOST_KEY ]);
 	      $promise= $sparky->transmissions->post([
 		'content' => [
-                  'html' => $this->view->fetch('email/invoice.html',
+                  'html' => $this->get('view')->fetch('email/invoice.html',
                                                [
                                                  'txn' => $txn,
                                                  'subject' => $subject,
@@ -254,13 +230,13 @@ $app->group('/sale', function (Slim\App $app) {
 });
 
 /* Sales */
-$app->group('/purchase', function (Slim\App $app) {
+$app->group('/purchase', function (RouteCollectorProxy $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
               $page= (int)$req->getParam('page');
               $limit= 25;
-              $txns= $this->txn->find('vendor', $page, $limit);
-              return $this->view->render($res, 'txn/index.html', [
+              $txns= $this->get('txn')->find('vendor', $page, $limit);
+              return $this->get('view')->render($res, 'txn/index.html', [
                 'type' => 'vendor',
                 'txns' => $txns,
                 'page' => $page,
@@ -370,7 +346,7 @@ $q= "SELECT id, code, vendor_code, name, stock,
 
 $items= ORM::for_table('item')->raw_query($q)->find_many();
 
-              return $this->view->render($res, 'purchase/reorder.html', [
+              return $this->get('view')->render($res, 'purchase/reorder.html', [
                 'items' => $items,
                 'all' => $all,
                 'code' => $code,
@@ -386,7 +362,7 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                  throw new \Exception("No vendor specified.");
                }
 
-               $purchase= $this->txn->create([
+               $purchase= $this->get('txn')->create([
                  'type' => 'vendor',
                  'person_id' => $vendor_id,
                  'tax_rate' => 0,
@@ -408,12 +384,12 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
 
                $txn_id= $req->getParam('txn_id');
                if ($txn_id) {
-                 $purchase= $this->txn->fetchById($txn_id);
+                 $purchase= $this->get('txn')->fetchById($txn_id);
                  if (!$txn_id) {
                    throw new \Exception("Unable to find transaction.");
                  }
                } else {
-                 $purchase= $this->txn->create([
+                 $purchase= $this->get('txn')->create([
                    'type' => 'vendor',
                    'person_id' => $vendor_id,
                    'tax_rate' => 0,
@@ -470,35 +446,36 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
 });
 
 /* Catalog */
-$app->group('/catalog', function (Slim\App $app) {
+$app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->get('/search',
             function (Request $req, Response $res, array $args) {
               $q= trim($req->getParam('q'));
 
-              $data= $this->search->search($q);
+              $data= $this->get('search')->search($q);
 
-              $data['depts']= $this->catalog->getDepartments();
+              $data['depts']= $this->get('catalog')->getDepartments();
               $data['q']= $q;
 
-              return $this->view->render($res, 'catalog/searchresults.html',
+              return $this->get('view')->render($res, 'catalog/searchresults.html',
                                          $data);
             })->setName('catalog-search');
 
   $app->get('/~reindex', function (Request $req, Response $res, array $args) {
-    $this->search->flush();
+    $this->get('search')->flush();
 
     $rows= 0;
-    foreach ($this->catalog->getProducts() as $product) {
-      $rows+= $this->search->indexProduct($product);
+    foreach ($this->get('catalog')->getProducts() as $product) {
+      $rows+= $this->get('search')->indexProduct($product);
     }
 
-    return $res->getBody()->write("Indexed $rows rows.");
+    $res->getBody()->write("Indexed $rows rows.");
+    return $res;
   });
 
   $app->get('/brand-form',
             function (Request $req, Response $res, array $args) {
-              $brand= $this->catalog->getBrandById($req->getParam('id'));
-              return $this->view->render($res, 'dialog/brand-edit.html',
+              $brand= $this->get('catalog')->getBrandById($req->getParam('id'));
+              return $this->get('view')->render($res, 'dialog/brand-edit.html',
                                          [
                                            'brand' => $brand
                                          ]);
@@ -506,9 +483,9 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->post('/brand-form',
              function (Request $req, Response $res, array $args) {
-               $brand= $this->catalog->getBrandById($req->getParam('id'));
+               $brand= $this->get('catalog')->getBrandById($req->getParam('id'));
                if (!$brand)
-                 $brand= $this->catalog->createBrand();
+                 $brand= $this->get('catalog')->createBrand();
                $brand->name= $req->getParam('name');
                $brand->slug= $req->getParam('slug');
                $brand->description= $req->getParam('description');
@@ -519,9 +496,9 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->get('/department-form',
             function (Request $req, Response $res, array $args) {
-              $depts= $this->catalog->getDepartments();
-              $dept= $this->catalog->getDepartmentById($req->getParam('id'));
-              return $this->view->render($res, 'dialog/department-edit.html',
+              $depts= $this->get('catalog')->getDepartments();
+              $dept= $this->get('catalog')->getDepartmentById($req->getParam('id'));
+              return $this->get('view')->render($res, 'dialog/department-edit.html',
                                          [
                                            'depts' => $depts,
                                            'dept' => $dept
@@ -530,9 +507,9 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->post('/department-form',
              function (Request $req, Response $res, array $args) {
-               $dept= $this->catalog->getDepartmentById($req->getParam('id'));
+               $dept= $this->get('catalog')->getDepartmentById($req->getParam('id'));
                if (!$dept)
-                 $dept= $this->catalog->createDepartment();
+                 $dept= $this->get('catalog')->createDepartment();
                $dept->name= $req->getParam('name');
                $dept->slug= $req->getParam('slug');
                $dept->parent_id= $req->getParam('parent_id');
@@ -544,10 +521,10 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->get('/product-form',
             function (Request $req, Response $res, array $args) {
-              $depts= $this->catalog->getDepartments();
-              $product= $this->catalog->getProductById($req->getParam('id'));
-              $brands= $this->catalog->getBrands();
-              return $this->view->render($res, 'dialog/product-edit.html',
+              $depts= $this->get('catalog')->getDepartments();
+              $product= $this->get('catalog')->getProductById($req->getParam('id'));
+              $brands= $this->get('catalog')->getBrands();
+              return $this->get('view')->render($res, 'dialog/product-edit.html',
                                          [
                                            'depts' => $depts,
                                            'brands' => $brands,
@@ -559,12 +536,12 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->post('/product-form',
              function (Request $req, Response $res, array $args) {
-               $product= $this->catalog->getProductById($req->getParam('id'));
+               $product= $this->get('catalog')->getProductById($req->getParam('id'));
                if (!$product) {
                  if (!$req->getParam('slug')) {
                    throw \Exception("Must specify a slug.");
                  }
-                 $product= $this->catalog->createProduct();
+                 $product= $this->get('catalog')->createProduct();
                }
                foreach ($product->fields() as $field) {
                  $value= $req->getParam($field);
@@ -573,13 +550,13 @@ $app->group('/catalog', function (Slim\App $app) {
                  }
                }
                $product->save();
-               $this->search->indexProduct($product);
+               $this->get('search')->indexProduct($product);
                return $res->withJson($product);
              });
 
   $app->post('/product/add-image',
              function (Request $req, Response $res, array $args) {
-               $product= $this->catalog->getProductById($req->getParam('id'));
+               $product= $this->get('catalog')->getProductById($req->getParam('id'));
 
                $url= $req->getParam('url');
                if ($url) {
@@ -598,10 +575,10 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->get('/brand[/{brand}]',
             function (Request $req, Response $res, array $args) {
-              $depts= $this->catalog->getDepartments();
+              $depts= $this->get('catalog')->getDepartments();
 
               $brand= $args['brand'] ?
-                $this->catalog->getBrandBySlug($args['brand']) : null;
+                $this->get('catalog')->getBrandBySlug($args['brand']) : null;
               if ($args['brand'] && !$brand)
                 throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -611,9 +588,9 @@ $app->group('/catalog', function (Slim\App $app) {
                                  ->where('product.active', 1)
                                  ->find_many();
 
-              $brands= $brand ? null : $this->catalog->getBrands();
+              $brands= $brand ? null : $this->get('catalog')->getBrands();
 
-              return $this->view->render($res, 'catalog/brand.html',
+              return $this->get('view')->render($res, 'catalog/brand.html',
                                          [ 'depts' => $depts,
                                            'brands' => $brands,
                                            'brand' => $brand,
@@ -622,17 +599,17 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->get('/item/{code:.*}',
             function (Request $req, Response $res, array $args) {
-              $item= $this->catalog->getItemByCode($args['code']);
+              $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
                throw new \Slim\Exception\NotFoundException($req, $res);
-              return $this->view->render($res, 'catalog/item.html', [
+              return $this->get('view')->render($res, 'catalog/item.html', [
                                           'item' => $item,
                                          ]);
             })->setName('catalog-item');
 
   $app->post('/item/{code:.*}/~print-label',
             function (Request $req, Response $res, array $args) {
-              $item= $this->catalog->getItemByCode($args['code']);
+              $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
                throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -643,7 +620,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->post('/item/{code:.*}/~add-barcode',
             function (Request $req, Response $res, array $args) {
-              $item= $this->catalog->getItemByCode($args['code']);
+              $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
                throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -658,7 +635,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->post('/item/{code:.*}/~edit-barcode',
             function (Request $req, Response $res, array $args) {
-              $item= $this->catalog->getItemByCode($args['code']);
+              $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
                throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -684,7 +661,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->post('/item/{code:.*}/~remove-barcode',
             function (Request $req, Response $res, array $args) {
-              $item= $this->catalog->getItemByCode($args['code']);
+              $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
                throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -702,7 +679,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->post('/item/{code:.*}/~find-vendor-items',
             function (Request $req, Response $res, array $args) {
-              $item= $this->catalog->getItemByCode($args['code']);
+              $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
                throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -712,7 +689,7 @@ $app->group('/catalog', function (Slim\App $app) {
             });
   $app->post('/item/{code:.*}/~unlink-vendor-item',
             function (Request $req, Response $res, array $args) {
-              $item= $this->catalog->getItemByCode($args['code']);
+              $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
                throw new \Slim\Exception\NotFoundException($req, $res);
               $vi= $item->vendor_items()
@@ -728,7 +705,7 @@ $app->group('/catalog', function (Slim\App $app) {
             });
   $app->post('/item/{code:.*}/~check-vendor-stock',
             function (Request $req, Response $res, array $args) {
-              $item= $this->catalog->getItemByCode($args['code']);
+              $item= $this->get('catalog')->getItemByCode($args['code']);
               if (!$item)
                throw new \Slim\Exception\NotFoundException($req, $res);
               $vi= $item->vendor_items()
@@ -742,7 +719,7 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->get('/item-add-form',
             function (Request $req, Response $res, array $args) {
-              return $this->view->render($res, 'dialog/item-add.html',
+              return $this->get('view')->render($res, 'dialog/item-add.html',
                                          [
                                            'product_id' =>
                                              $req->getParam('product_id'),
@@ -751,9 +728,9 @@ $app->group('/catalog', function (Slim\App $app) {
 
   $app->get('/vendor-item-form',
             function (Request $req, Response $res, array $args) {
-              $item= $this->catalog->getItemById($req->getParam('item'));
-              $vendor_item= $this->catalog->getVendorItemById($req->getParam('id'));
-              return $this->view->render($res, 'dialog/vendor-item-edit.html',
+              $item= $this->get('catalog')->getItemById($req->getParam('item'));
+              $vendor_item= $this->get('catalog')->getVendorItemById($req->getParam('id'));
+              return $this->get('view')->render($res, 'dialog/vendor-item-edit.html',
                                          [
                                            'item' => $item,
                                            'vendor_item' => $vendor_item,
@@ -761,9 +738,9 @@ $app->group('/catalog', function (Slim\App $app) {
             });
   $app->post('/~update-vendor-item',
              function (Request $req, Response $res, array $args) {
-               $vi= $this->catalog->getVendorItemById($req->getParam('id'));
+               $vi= $this->get('catalog')->getVendorItemById($req->getParam('id'));
                if (!$vi) {
-                 $vi= $this->catalog->createVendorItem();
+                 $vi= $this->get('catalog')->createVendorItem();
                }
                foreach ($vi->fields() as $field) {
                  $value= $req->getParam($field);
@@ -781,7 +758,7 @@ $app->group('/catalog', function (Slim\App $app) {
                $id= $req->getParam('pk');
                $name= $req->getParam('name');
                $value= $req->getParam('value');
-               $item= $this->catalog->getItemById($id);
+               $item= $this->get('catalog')->getItemById($id);
                if (!$item)
                  throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -791,7 +768,7 @@ $app->group('/catalog', function (Slim\App $app) {
                return $res->withJson([
                  'item' => $item,
                  'newValue' => $item->$name,
-                 'replaceRow' => $this->view->fetch('catalog/item-row.twig', [
+                 'replaceRow' => $this->get('view')->fetch('catalog/item-row.twig', [
                                   'i' => $item,
                                   'variations' => $req->getParam('variations'),
                                   'product' => $req->getParam('product')
@@ -804,7 +781,7 @@ $app->group('/catalog', function (Slim\App $app) {
                $id= $req->getParam('id');
                $retail_price= $req->getParam('retail_price');
                $discount= $req->getParam('discount');
-               $item= $this->catalog->getItemById($id);
+               $item= $this->get('catalog')->getItemById($id);
                if (!$item)
                  throw new \Slim\Exception\NotFoundException($req, $res);
 
@@ -846,10 +823,10 @@ $app->group('/catalog', function (Slim\App $app) {
             function (Request $req, Response $res, array $args) {
               $limit= (int)$req->getParam('limit');
               if (!$limit) $limit= 12;
-              $products= $this->catalog->getNewProducts($limit);
-              $depts= $this->catalog->getDepartments();
+              $products= $this->get('catalog')->getNewProducts($limit);
+              $depts= $this->get('catalog')->getDepartments();
 
-              return $this->view->render($res, 'catalog/whatsnew.html',
+              return $this->get('view')->render($res, 'catalog/whatsnew.html',
                                          [
                                            'products' => $products,
                                            'depts' => $depts,
@@ -863,7 +840,7 @@ $app->group('/catalog', function (Slim\App $app) {
                                   ->order_by_asc('minimum_quantity')
                                   ->find_many();
 
-               return $this->view->render($res, 'catalog/price-overrides.html',[
+               return $this->get('view')->render($res, 'catalog/price-overrides.html',[
                 'price_overrides' => $price_overrides,
                ]);
              })->setName('catalog-price-overrides');
@@ -897,7 +874,7 @@ $app->group('/catalog', function (Slim\App $app) {
             function (Request $req, Response $res, array $args) {
               $override= \Model::factory('PriceOverride')
                            ->find_one($req->getParam('id'));
-              return $this->view->render($res,
+              return $this->get('view')->render($res,
                                          'dialog/price-override-edit.html',
                                          [ 'override' => $override ]);
             });
@@ -905,9 +882,9 @@ $app->group('/catalog', function (Slim\App $app) {
   $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]',
             function (Request $req, Response $res, array $args) {
             try {
-              $depts= $this->catalog->getDepartments();
+              $depts= $this->get('catalog')->getDepartments();
               $dept= $args['dept'] ?
-                $this->catalog->getDepartmentBySlug($args['dept']):null;
+                $this->get('catalog')->getDepartmentBySlug($args['dept']):null;
 
               if ($args['dept'] && !$dept)
                 throw new \Slim\Exception\NotFoundException($req, $res);
@@ -966,9 +943,9 @@ $app->group('/catalog', function (Slim\App $app) {
               if ($args['item'] && !$item)
                 throw new \Slim\Exception\NotFoundException($req, $res);
 
-              $brands= $dept ? null : $this->catalog->getBrands();
+              $brands= $dept ? null : $this->get('catalog')->getBrands();
 
-              return $this->view->render($res, 'catalog/layout.html',
+              return $this->get('view')->render($res, 'catalog/layout.html',
                                          [ 'brands' => $brands,
                                            'dept' => $dept,
                                            'depts' => $depts,
@@ -984,7 +961,7 @@ $app->group('/catalog', function (Slim\App $app) {
                /* TODO figure out a way to not have to add/remove /catalog/ */
                $path= preg_replace('!/catalog/!', '',
                                    $req->getUri()->getPath());
-               $re= $this->catalog->getRedirectFrom($path);
+               $re= $this->get('catalog')->getRedirectFrom($path);
 
                if ($re) {
                  return $res->withRedirect('/catalog/' . $re->dest, 301);
@@ -998,7 +975,7 @@ $app->group('/catalog', function (Slim\App $app) {
              function (Request $req, Response $res, array $args) {
                \ORM::get_db()->beginTransaction();
 
-               $item= $this->catalog->createItem();
+               $item= $this->get('catalog')->createItem();
 
                $item->code= trim($req->getParam('code'));
                $item->name= trim($req->getParam('name'));
@@ -1009,7 +986,7 @@ $app->group('/catalog', function (Slim\App $app) {
                }
 
                if (($id= $req->getParam('vendor_item'))) {
-                 $vendor_item= $this->catalog->getVendorItemById($id);
+                 $vendor_item= $this->get('catalog')->getVendorItemById($id);
                  if ($vendor_item) {
                    $item->purchase_quantity= $vendor_item->purchase_quantity;
                    $item->length= $vendor_item->length;
@@ -1047,7 +1024,7 @@ $app->group('/catalog', function (Slim\App $app) {
   $app->post('/~vendor-lookup',
              function (Request $req, Response $res, array $args) {
                $item=
-                 $this->catalog->getVendorItemByCode($req->getParam('code'));
+                 $this->get('catalog')->getVendorItemByCode($req->getParam('code'));
                return $res->withJson($item);
              });
 });
@@ -1055,15 +1032,15 @@ $app->group('/catalog', function (Slim\App $app) {
 /* Custom */
 $app->get('/custom',
           function (Request $req, Response $res, array $args) {
-            return $this->view->render($res, 'custom/index.html');
+            return $this->get('view')->render($res, 'custom/index.html');
           });
 
 /* People */
-$app->group('/person', function (Slim\App $app) {
+$app->group('/person', function (RouteCollectorProxy $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
               // TODO most recent customers? vendors?
-              return $this->view->render($res, 'person/index.html');
+              return $this->get('view')->render($res, 'person/index.html');
             });
   $app->get('/search',
             function (Request $req, Response $res, array $args) {
@@ -1076,7 +1053,7 @@ $app->group('/person', function (Slim\App $app) {
                 return $res->withJson($people);
               }
 
-              return $this->view->render($res, 'person/index.html',
+              return $this->get('view')->render($res, 'person/index.html',
                                          [ 'people' => $people, 'q' => $q ]);
             })->setName('person-search');
   $app->get('/{id:[0-9]+}',
@@ -1084,7 +1061,7 @@ $app->group('/person', function (Slim\App $app) {
               $person= \Model::factory('Person')->find_one($args['id']);
               $page= (int)$req->getParam('page');
               $limit= 25;
-              return $this->view->render($res, 'person/person.html', [
+              return $this->get('view')->render($res, 'person/person.html', [
                 'person' => $person,
                 'page' => $page,
                 'limit' => $limit,
@@ -1103,7 +1080,7 @@ $app->group('/person', function (Slim\App $app) {
               $items= $items->select_expr('COUNT(*) OVER()', 'total')
                             ->limit($limit)->offset($page * $limit);
               $items= $items->find_many();
-              return $this->view->render($res, 'person/items.html', [
+              return $this->get('view')->render($res, 'person/items.html', [
                                            'person' => $person,
                                            'items' => $items,
                                            'q' => $q,
@@ -1157,7 +1134,7 @@ $app->group('/person', function (Slim\App $app) {
 });
 
 /* Clock */
-$app->group('/clock', function (Slim\App $app) {
+$app->group('/clock', function (RouteCollectorProxy $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
               $people= \Model::factory('Person')
@@ -1167,12 +1144,13 @@ $app->group('/clock', function (Slim\App $app) {
                 ->find_many();
 
               if (($block= $req->getParam('block'))) {
-                $out= $this->view->fetchBlock('clock/index.html', $block, [
+                $out= $this->get('view')->fetchBlock('clock/index.html', $block, [
                                                'people' => $people,
                                              ]);
-                return $res->getBody()->write($out);
+                $res->getBody()->write($out);
+                return $res;
               } else {
-                return $this->view->render($res, 'clock/index.html', [
+                return $this->get('view')->render($res, 'clock/index.html', [
                                              'people' => $people,
                                             ]);
               }
@@ -1186,7 +1164,7 @@ $app->group('/clock', function (Slim\App $app) {
 });
 
 /* Gift Cards */
-$app->group('/gift-card', function (Slim\App $app) {
+$app->group('/gift-card', function (RouteCollectorProxy $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
               $page_size= 25;
@@ -1199,7 +1177,7 @@ $app->group('/gift-card', function (Slim\App $app) {
                         ->where('active', 1)
                         ->find_many();
 
-              return $this->view->render($res, 'gift-card/index.html', [
+              return $this->get('view')->render($res, 'gift-card/index.html', [
                                            'cards' => $cards,
                                            'error' => $req->getParam('error'),
                                           ]);
@@ -1266,7 +1244,7 @@ $app->group('/gift-card', function (Slim\App $app) {
                       ->where('pin', $pin)
                       ->find_one();
 
-              return $this->view->render($res, 'gift-card/card.html', [
+              return $this->get('view')->render($res, 'gift-card/card.html', [
                                            'card' => $card,
                                           ]);
             });
@@ -1287,8 +1265,8 @@ $app->group('/gift-card', function (Slim\App $app) {
 
   $app->get('/{card:[0-9]+}/email-form',
             function (Request $req, Response $res, array $args) {
-              $txn= $this->txn->fetchById($req->getParam('id'));
-              return $this->view->render($res, 'dialog/email-gift-card.html',
+              $txn= $this->get('txn')->fetchById($req->getParam('id'));
+              return $this->get('view')->render($res, 'dialog/email-gift-card.html',
                                          $args);
             });
   $app->post('/{card:[0-9]+}/email',
@@ -1300,9 +1278,9 @@ $app->group('/gift-card', function (Slim\App $app) {
                       ->where('pin', $pin)
                       ->find_one();
 
-              $email_body= $this->view->fetch('email/gift-card.html',
+              $email_body= $this->get('view')->fetch('email/gift-card.html',
                                               $req->getParams());
-              $subject= $this->view->fetchBlock('email/gift-card.html',
+              $subject= $this->get('view')->fetchBlock('email/gift-card.html',
                                                 'title',
                                                 $req->getParams());
 
@@ -1383,17 +1361,17 @@ $app->group('/gift-card', function (Slim\App $app) {
 });
 
 /* Reports */
-$app->group('/report', function (Slim\App $app) {
+$app->group('/report', function (RouteCollectorProxy $app) {
   $app->get('/quick',
             function (Request $req, Response $res, array $args) {
-              $data= $this->report->sales();
-              return $this->view->render($res, 'dialog/report-quick.html',
+              $data= $this->get('report')->sales();
+              return $this->get('view')->render($res, 'dialog/report-quick.html',
                                          $data);
             });
   $app->get('/empty-products',
             function (Request $req, Response $res, array $args) {
-              $data= $this->report->emptyProducts();
-              return $this->view->render($res, 'report/empty-products.html',
+              $data= $this->get('report')->emptyProducts();
+              return $this->get('view')->render($res, 'report/empty-products.html',
                                          $data);
             });
   $app->get('/{name}',
@@ -1401,7 +1379,7 @@ $app->group('/report', function (Slim\App $app) {
               ob_start();
               include "../old-report/report-{$args['name']}.php";
               $content= ob_get_clean();
-              return $this->view->render($res, 'report/old.html', [
+              return $this->get('view')->render($res, 'report/old.html', [
                 'title' => $GLOBALS['title'],
                 'content' => $content,
               ]);
@@ -1419,7 +1397,7 @@ $app->get('/media',
               ->find_many();
             $total= \Model::factory('Image')->count();
 
-            return $this->view->render($res, 'media/index.html', [
+            return $this->get('view')->render($res, 'media/index.html', [
                                          'media' => $media,
                                          'page' => $page,
                                          'page_size' => $page_size,
@@ -1487,7 +1465,7 @@ $app->get('/notes',
                         ->order_by_desc('id')
                         ->find_many();
             }
-            return $this->view->render($res, 'dialog/notes.html',
+            return $this->get('view')->render($res, 'dialog/notes.html',
                                        [
                                          'body_only' =>
                                            (int)$req->getParam('body_only'),
@@ -1511,7 +1489,7 @@ $app->post('/notes/add',
                  $txn= $note->parent()->find_one()->txn();
                  $person= $txn->owner();
                  error_log("Sending message to {$person->phone}");
-                 $data= $this->phone->sendSMS($person->phone,
+                 $data= $this->get('phone')->sendSMS($person->phone,
                                               $req->getParam('content'));
                  $note->public= true;
                  $note->save();
@@ -1559,25 +1537,26 @@ $app->post('/notes/{id}/update',
            });
 
 /* Till */
-$app->group('/till', function (Slim\App $app) {
+$app->group('/till', function (RouteCollectorProxy $app) {
   $app->get('',
             function (Request $req, Response $res, array $args) {
               $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) AS expected
                      FROM payment
                     WHERE method IN ('cash','change','withdrawal')";
               $data= \ORM::for_table('payment')->raw_query($q)->find_one();
-              return $this->view->render($res, "till/index.html", [
+              return $this->get('view')->render($res, "till/index.html", [
                 'expected' => $data->expected,
               ]);
             });
 
   $app->post('/~print-change-order',
              function (Request $req, Response $res, array $args) {
-               $out= $this->printer->printFromTemplate(
+               $out= $this->get('printer')->printFromTemplate(
                  'print/change-order.html',
                  $req->getParams()
                );
-               return $res->getBody()->write($out);
+               $res->getBody()->write($out);
+               return $res;
              });
 
   $app->post('/~count',
@@ -1600,7 +1579,7 @@ $app->group('/till', function (Slim\App $app) {
 
                \ORM::get_db()->beginTransaction();
 
-               $txn= $this->txn->create([ 'type' => 'drawer' ]);
+               $txn= $this->get('txn')->create([ 'type' => 'drawer' ]);
 
                if ($count != $expected) {
                  $amount= $counted - $expected;
@@ -1648,7 +1627,7 @@ $app->group('/till', function (Slim\App $app) {
 
                \ORM::get_db()->beginTransaction();
 
-               $txn= $this->txn->create([ 'type' => 'drawer' ]);
+               $txn= $this->get('txn')->create([ 'type' => 'drawer' ]);
 
                $payment= Model::factory('Payment')->create();
                $payment->txn_id= $txn->id;
@@ -1678,12 +1657,12 @@ $app->group('/till', function (Slim\App $app) {
 /* Safari notifications */
 $app->get('/push',
             function (Request $req, Response $res, array $args) {
-              return $this->view->render($res, "push/index.html");
+              return $this->get('view')->render($res, "push/index.html");
             });
 
 $app->post('/push/v2/pushPackages/{id}',
            function (Request $req, Response $res, array $args) {
-             $zip= $this->push->getPushPackage();
+             $zip= $this->get('push')->getPushPackage();
              return $res->withHeader("Content-type", "application/zip")
                          ->withBody($zip);
            });
@@ -1713,7 +1692,7 @@ $app->post('/~push-notification',
               $devices= \Model::factory('Device')->find_many();
 
               foreach ($devices as $device) {
-                $this->push->sendNotification(
+                $this->get('push')->sendNotification(
                   $device->token,
                   $req->getParam('title'),
                   $req->getParam('body'),
@@ -1728,7 +1707,7 @@ $app->post('/~push-notification',
 /* Tax stuff */
 $app->get('/~tax/ping',
            function (Request $req, Response $res, array $args) {
-              return $res->withJson($this->tax->ping());
+              return $res->withJson($this->get('tax')->ping());
            });
 
 /* SMS */
@@ -1738,7 +1717,7 @@ $app->get('/sms/~register', \Scat\Controller\SMS::class . ':register');
 
 $app->get('/dialog/{dialog}',
           function (Request $req, Response $res, array $args) {
-            return $this->view->render($res, "dialog/{$args['dialog']}");
+            return $this->get('view')->render($res, "dialog/{$args['dialog']}");
           });
 
 $app->get('/~ready-for-publish',
@@ -1760,14 +1739,14 @@ $app->post('/~ready-for-publish',
 $app->get('/~gift-card/check-balance',
           function (Request $req, Response $res, array $args) {
             $card= $req->getParam('card');
-            return $res->withJson($this->giftcard->check_balance($card));
+            return $res->withJson($this->get('giftcard')->check_balance($card));
           });
 
 $app->get('/~gift-card/add-txn',
           function (Request $req, Response $res, array $args) {
             $card= $req->getParam('card');
             $amount= $req->getParam('amount');
-            return $res->withJson($this->giftcard->add_txn($card, $amount));
+            return $res->withJson($this->get('giftcard')->add_txn($card, $amount));
           });
 
 $app->get('/~rewards/check-balance',
@@ -1790,7 +1769,7 @@ $app->get('/~rewards/check-balance',
           });
 
 /* Ordure */
-$app->group('/ordure', function (Slim\App $app) {
+$app->group('/ordure', function (RouteCollectorProxy $app) {
   $app->get('/~push-prices', \Scat\Controller\Ordure::class . ':pushPrices');
   $app->get('/~pull-orders', \Scat\Controller\Ordure::class . ':pullOrders');
   $app->get('/~pull-signups', \Scat\Controller\Ordure::class . ':pullSignups');
@@ -1802,7 +1781,7 @@ $app->group('/ordure', function (Slim\App $app) {
 });
 
 /* QuickBooks */
-$app->group('/quickbooks', function (Slim\App $app) {
+$app->group('/quickbooks', function (RouteCollectorProxy $app) {
   $app->get('',
             \Scat\Controller\Quickbooks::class . ':home');
   $app->get('/verify-accounts',
@@ -1824,12 +1803,13 @@ if ($DEBUG) {
             function (Request $req, Response $res, array $args) {
               ob_start();
               phpinfo();
-              return $res->getBody()->write(ob_get_clean());
+              $res->getBody()->write(ob_get_clean());
+              return $res;
             })->setName('info');
 
   $app->get('/test',
             function (Request $req, Response $res, array $args) {
-              return $this->view->render($res, "test.html");
+              return $this->get('view')->render($res, "test.html");
             });
   $app->get('/test/~one',
             function (Request $req, Response $res, array $args) {

@@ -18,7 +18,7 @@
       {{ product.name }}
       <small>
         {% set brand = product.brand %}
-        <a href="{{ path_for('catalog-brand', { 'brand' : brand.slug }) }}">
+        <a href="{{ url_for('catalog-brand', { 'brand' : brand.slug }) }}">
           {{ brand.name }}
         </a>
       </small>

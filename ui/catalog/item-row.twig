@@ -18,7 +18,7 @@
     <input type="checkbox" checked>
   </td>
   <td>
-    <a href="{{ path_for('catalog-item', { 'code' : i.code }) }}">
+    <a href="{{ url_for('catalog-item', { 'code' : i.code }) }}">
       {{- i.code -}}
     </a>
   </td>

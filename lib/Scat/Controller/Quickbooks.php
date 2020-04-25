@@ -2,8 +2,8 @@
 namespace Scat\Controller;
 
 use \Psr\Container\ContainerInterface;
-use \Psr\Http\Message\RequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+use \Slim\Http\ServerRequest as Request;
+use \Slim\Http\Response as Response;
 use \Respect\Validation\Validator as v;
 use \DavidePastore\Slim\Validation\Validation as Validation;
 
@@ -110,7 +110,7 @@ class Quickbooks {
       $errors[]= $e->getMessage();
     }
 
-    return $this->container->view->render($res, "quickbooks/index.html", [
+    return $this->container->get('view')->render($res, "quickbooks/index.html", [
       'qb' => $this->qb,
       'connected' => $this->connected,
       'last_synced_payment' => $this->getLastSyncedPayment(),
@@ -156,7 +156,7 @@ class Quickbooks {
       }
     }
 
-    return $this->container->view->render($res, "quickbooks/accounts.html", [
+    return $this->container->get('view')->render($res, "quickbooks/accounts.html", [
       'accounts' => $accounts
     ]);
   }

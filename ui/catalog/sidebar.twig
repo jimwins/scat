@@ -42,14 +42,14 @@
   <ul class="nav nav-pills nav-stacked">
   {% for d in depts %}
     <li class="{{ (dept and dept.id == d.id) ? 'active' }}">
-      <a href="{{ path_for('catalog', { 'dept' : d.slug }) }}">
+      <a href="{{ url_for('catalog', { 'dept' : d.slug }) }}">
         {{ d.name }}
       </a>  
       {% if dept and dept.id == d.id %}
         <ul class="nav nav-pills nav-stacked">
           {% for s in subdepts %}
             <li class="{{ (subdept and subdept.id == s.id) ? 'active' }}">
-              <a href="{{ path_for('catalog', { 'dept' : d.slug,
+              <a href="{{ url_for('catalog', { 'dept' : d.slug,
                                                 'subdept' : s.slug }) }}">
                 {{ s.name }}
               </a>

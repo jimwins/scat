@@ -12,7 +12,7 @@
       <strong>No results found.</strong>
       Nothing was found for those search parameters.
       {% if not (q matches '/active:0/') %}
-        <a href="{{ current_path(true) ~ ' active:0' }}">Try again with inactive people.</a>
+        <a href="{{ current_url(true) ~ ' active:0' }}">Try again with inactive people.</a>
       {% endif %}
     </p>
   {% endif %}

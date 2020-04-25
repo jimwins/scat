@@ -9,7 +9,7 @@
   {% if products|length %}
     <div class="col-md-3 col-md-pull-9">
       {% for p in products %}
-        {% set slug = path_for('catalog') ~ '/' ~ p.full_slug %}
+        {% set slug = url_for('catalog') ~ '/' ~ p.full_slug %}
         <figure class="thumbnail is-square">
           <a href="{{ slug }}">
             {% if p.media|length %}
@@ -47,7 +47,7 @@
     <div style="column-count: 3" class="list-group">
       {% for b in brands %}
         <a class="list-group-item" style="break-inside: avoid-column"
-           href="{{ path_for('catalog-brand', { 'brand' : b.slug }) }}">
+           href="{{ url_for('catalog-brand', { 'brand' : b.slug }) }}">
           {{ b.name }}
         </a>
       {% endfor %}
@@ -64,7 +64,7 @@
       <strong>No results found.</strong>
       Nothing was found for those search parameters.
       {% if not (q matches '/active:0/') %}
-        <a href="{{ current_path(true) ~ ' active:0' }}">Try again with inactive items.</a>
+        <a href="{{ current_url(true) ~ ' active:0' }}">Try again with inactive items.</a>
       {% endif %}
     </p>
   {% endif %}

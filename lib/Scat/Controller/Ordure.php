@@ -2,8 +2,8 @@
 namespace Scat\Controller;
 
 use \Psr\Container\ContainerInterface;
-use \Psr\Http\Message\RequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+use \Slim\Http\ServerRequest as Request;
+use \Slim\Http\Response as Response;
 use \Respect\Validation\Validator as v;
 
 class Ordure {
@@ -17,7 +17,7 @@ class Ordure {
     $url= ORDURE . '/update-pricing';
     $key= ORDURE_KEY;
 
-    $items= $this->container->catalog->getItems()
+    $items= $this->container->get('catalog')->getItems()
               ->select_many('retail_price','discount_type','discount')
               ->select_expr('(SELECT SUM(allocated)
                                 FROM txn_line

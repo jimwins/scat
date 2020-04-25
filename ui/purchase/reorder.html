@@ -38,7 +38,7 @@
           <tr>
             <td class="num">{{ loop.index }}</td>
             <td>
-              <a href="{{ path_for('catalog-item', { 'code' : item.code }) }}">
+              <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
                 {{- item.vendor_code ?: item.code -}}
               </a>
             </td>

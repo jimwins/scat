@@ -19,24 +19,24 @@
         <td class="text-right" width="20%">
           {% if note.kind == 'txn' %}
             {% set txn= note.txn %}
-            <a href="{{ path_for('sale', { 'id' : txn.id }) }}">
+            <a href="{{ url_for('sale', { 'id' : txn.id }) }}">
               Invoice {{ txn.formatted_number }}
             </a>
           {% endif %}
           {% set about= note.about %}
           {% if about %}
-            <a class="clearfix" href="{{ path_for('person', { 'id' : about.id() }) }}">
+            <a class="clearfix" href="{{ url_for('person', { 'id' : about.id() }) }}">
               {{ about.friendly_name }}
             </a>
             {% if about.phone %}
-              <a class="clearfix" href="{{ path_for('person', { 'id' : about.id() }) }}">
+              <a class="clearfix" href="{{ url_for('person', { 'id' : about.id() }) }}">
                 {{ about.phone | phone_number_format }}
               </a>
             {% endif %}
           {% endif %}
           {% if note.kind == 'item' %}
             {% set item= note.item %}
-            <a href="{{ path_for('catalog-item', { 'code' : item.code }) }}">
+            <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
               {{ item.name }}
             </a>
           {% endif %}

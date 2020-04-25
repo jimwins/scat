@@ -20,16 +20,16 @@
         <div class="row">
           <div class="col-xs-11">
             <ol class="breadcrumb">
-              <li><a href="{{ path_for('catalog') }}">Catalog</a></li>
+              <li><a href="{{ url_for('catalog') }}">Catalog</a></li>
               <li class="{{ not subdept ? 'active' }}">
-                <a href="{{ path_for('catalog', { 'dept' : dept.slug }) }}">
+                <a href="{{ url_for('catalog', { 'dept' : dept.slug }) }}">
                   {{ dept.name }}
                 </a>
               </li>
               {% if subdept %}
                 <li class="{{ not product ? 'active' }}">
                   <a style="{{ not subdept.active ? 'text-decoration: line-through' }}"
-                     href="{{ path_for('catalog', {'dept': dept.slug,
+                     href="{{ url_for('catalog', {'dept': dept.slug,
                                                    'subdept': subdept.slug }) }}">
                     {{ subdept.name }}
                   </a>
@@ -37,7 +37,7 @@
               {% endif %}
               {% if product %}
                 <li class="{{ not item ? 'active' }}">
-                  <a href="{{ path_for('catalog', { 'dept': dept.slug,
+                  <a href="{{ url_for('catalog', { 'dept': dept.slug,
                                                     'subdept': subdept.slug,
                                                     'product': product.slug}) }}">
                     {{ product.name }}
@@ -110,12 +110,12 @@
       {% if brands|length %}
         <div style="column-count: 3" class="list-group">
           <a class="list-group-item active" style="break-inside: avoid-column"
-             href="{{ path_for('catalog-whats-new') }}">
+             href="{{ url_for('catalog-whats-new') }}">
             What's New
           </a>
           {% for b in brands %}
             <a class="list-group-item" style="break-inside: avoid-column"
-               href="{{ path_for('catalog-brand', { 'brand' : b.slug }) }}">
+               href="{{ url_for('catalog-brand', { 'brand' : b.slug }) }}">
               {{ b.name }}
             </a>
           {% endfor %}
