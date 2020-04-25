@@ -42,11 +42,6 @@ $container['logger']= function($c) {
   return $logger;
 };
 
-/* HTTP cache */
-$container['cache']= function () {
-  return new \Slim\HttpCache\CacheProvider();
-};
-
 /* Twig for templating */
 $container['view']= function ($container) {
   $view= new \Slim\Views\Twig('../ui', [
