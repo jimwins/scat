@@ -448,7 +448,7 @@ class Ordure {
       }
     }
 
-    return $response;
+    return $res;
   }
 
   public function loadPerson(Request $req, Response $res, array $a) {
