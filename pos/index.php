@@ -1746,13 +1746,10 @@ $app->get('/~tax/ping',
               return $res->withJson($this->tax->ping());
            });
 
-/* SMS TODO just testing right now */
-$app->map(['GET','POST'], '/~sms/send',
-            function (Request $req, Response $res, array $args) {
-              $data= $this->phone->sendSMS($req->getParam('to'),
-                                           $req->getParam('text'));
-              return $res->withJson($data);
-            });
+/* SMS */
+$app->map(['GET','POST'], '/sms/~send', \Scat\Controller\SMS::class . ':send');
+$app->post('/sms/~receive', \Scat\Controller\SMS::class . ':receive');
+$app->get('/sms/~register', \Scat\Controller\SMS::class . ':register');
 
 $app->get('/dialog/{dialog}',
           function (Request $req, Response $res, array $args) {

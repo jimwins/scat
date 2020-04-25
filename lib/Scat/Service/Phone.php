@@ -5,44 +5,63 @@ class Phone
 {
   private $token;
   private $from;
+  private $account_id;
+  private $webhook_url;
 
   public function __construct(array $config) {
     $this->token= $config['token'];
     $this->account_id= $config['account_id'];
     $this->from= $config['from'];
+    $this->webhook_url= $config['webhook_url'];
   }
 
   public function sendSMS($to, $text) {
-    $curl= curl_init();
+    $client= new \GuzzleHttp\Client();
 
+    $url= "https://api.phone.com/v4/accounts/{$this->account_id}/sms";
     $data= [ 'from' => $this->from, 'to' => $to, 'text' => $text ];
 
-    curl_setopt_array($curl, array(
-        CURLOPT_URL =>
-          "https://api.phone.com/v4/accounts/{$this->account_id}/sms",
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_POSTFIELDS => json_encode($data),
-        CURLOPT_HTTPHEADER => array(
-            "authorization: Bearer " . $this->token,
-            "cache-control: no-cache",
-            "content-type: application/json",
-      ),
-    ));
+    $res= $client->request('POST', $url, [
+                             //'debug' => true,
+                             'form_params' => $data,
+                             'headers' => [
+                               'authorization' => "Bearer {$this->token}",
+                               'cache-control' => "no-cache",
+                             ],
+                           ]);
 
-    $response= curl_exec($curl);
-    $err= curl_error($curl);
+    $body= $res->getBody();
 
-    curl_close($curl);
+    return json_decode($body);
+  }
 
-    if ($err) {
-      throw new \Exception("cURL Error #:" . $err);
-    } else {
-      return json_decode($response);
-    }
+  public function registerWebhook() {
+    $client= new \GuzzleHttp\Client();
+
+    $url= "https://api.phone.com/v4/accounts/{$this->account_id}/listeners";
+    $data= [
+      'type' => 'callback',
+      'event_type' => 'sms.in',
+      'callbacks' => [
+        [
+          'role' => 'main',
+          'url' => $this->webhook_url,
+          'verb' => 'POST',
+        ]
+      ]
+    ];
+
+    $res= $client->request('POST', $url, [
+                             //'debug' => true,
+                             'json' => $data,
+                             'headers' => [
+                               'authorization' => "Bearer {$this->token}",
+                               'cache-control' => "no-cache",
+                             ],
+                           ]);
+
+    $body= $res->getBody();
+
+    return json_decode($body);
   }
 }
