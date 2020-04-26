@@ -7,17 +7,14 @@ use \Slim\Http\Response as Response;
 use \Respect\Validation\Validator as v;
 
 class Ordure {
-  protected $container;
 
-  public function __construct(ContainerInterface $container) {
-    $this->container= $container;
-  }
-
-  public function pushPrices(Request $request, Response $response) {
+  public function pushPrices(Response $response,
+                              \Scat\Service\Catalog $catalog) {
     $url= ORDURE . '/update-pricing';
     $key= ORDURE_KEY;
 
-    $items= $this->container->get('catalog')->getItems()
+    $items= $catalog
+              ->getItems()
               ->select_many('retail_price','discount_type','discount')
               ->select_expr('(SELECT SUM(allocated)
                                 FROM txn_line
@@ -471,7 +468,7 @@ class Ordure {
     }
 
     if (!$person)
-      throw new \Slim\Exception\NotFoundException($request, $response);
+      throw new \Slim\Exception\HttpNotFoundException($request);
 
     return $response->withJson($person);
   }
@@ -482,7 +479,7 @@ class Ordure {
 
     $person= \Model::factory('Person')->find_one($id);
     if (!$person)
-      throw new \Slim\Exception\NotFoundException($request, $response);
+      throw new \Slim\Exception\HttpNotFoundException($request);
 
     $name= $request->getParam('name');
     $email= $request->getParam('email');

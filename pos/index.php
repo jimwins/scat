@@ -3,6 +3,7 @@ require '../vendor/autoload.php';
 
 use \Slim\Http\ServerRequest as Request;
 use \Slim\Http\Response as Response;
+use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 use \Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
 use \DavidePastore\Slim\Validation\Validation as Validation;
@@ -31,10 +32,13 @@ if ($DEBUG || $ORM_DEBUG) {
   });
 }
 
-$container= new \DI\Container();
-\Slim\Factory\AppFactory::setContainer($container);
+$builder= new \DI\ContainerBuilder();
+$builder->addDefinitions([
+  'Slim\Views\Twig' => \DI\get('view')
+]);
+$container= $builder->build();
 
-$app= \Slim\Factory\AppFactory::create();
+$app= \DI\Bridge\Slim\Bridge::create($container);
 $app->addRoutingMiddleware();
 
 /* Twig for templating */
@@ -117,11 +121,12 @@ $app->get('/',
 /* Sales */
 $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response,
+                      \Scat\Service\Txn $txn, View $view) {
               $page= (int)$request->getParam('page');
               $limit= 25;
-              $txns= $this->get('txn')->find('customer', $page, $limit);
-              return $this->get('view')->render($response, 'txn/index.html', [
+              $txns= $txn->find('customer', $page, $limit);
+              return $view->render($response, 'txn/index.html', [
                 'type' => 'customer',
                 'txns' => $txns,
                 'page' => $page,
@@ -129,31 +134,30 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
               ]);
             });
   $app->get('/new',
-            function (Request $request, Response $response) {
+            function (Response $response, View $view) {
               ob_start();
               include "../old-index.php";
               $content= ob_get_clean();
-              return $this->get('view')->render($response, 'sale/old-new.html', [
+              return $view->render($response, 'sale/old-new.html', [
                 'title' => $GLOBALS['title'],
                 'content' => $content,
               ]);
             });
   $app->get('/{id:[0-9]+}',
-            // TODO use DI to set $id
-            function (Request $request, Response $response, array $args) {
-              return $response->withRedirect("/?id={$args['id']}");
+            function (Response $response, $id) {
+              return $response->withRedirect("/?id=$id");
             })->setName('sale');
   $app->get('/email-invoice-form',
-            function (Request $request, Response $response) {
-              $txn= $this->get('txn')->fetchById($request->getParam('id'));
-              return $this->get('view')->render($response, 'dialog/email-invoice.html',
-                                         [
-                                           'txn' => $txn
-                                         ]);
+            function (Request $request, Response $response,
+                      \Scat\Service\Txn $txn, View $view) {
+              $txn= $txn->fetchById($request->getParam('id'));
+              return $view->render($response, 'dialog/email-invoice.html',
+                                   [ 'txn' => $txn ]);
             });
   $app->post('/email-invoice',
-            function (Request $request, Response $response) {
-              $txn= $this->get('txn')->fetchById($request->getParam('id'));
+            function (Request $request, Response $response,
+                      \Scat\Service\Txn $txn, View $view) {
+              $txn= $txn->fetchById($request->getParam('id'));
               $name= $request->getParam('name');
               $email= $request->getParam('email');
               $subject= trim($request->getParam('subject'));
@@ -175,13 +179,13 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
                                                 [ 'key' => SPARKPOST_KEY ]);
 	      $promise= $sparky->transmissions->post([
 		'content' => [
-                  'html' => $this->get('view')->fetch('email/invoice.html',
-                                               [
-                                                 'txn' => $txn,
-                                                 'subject' => $subject,
-                                                 'content' =>
-                                                   $request->getParam('content'),
-                                               ]),
+                  'html' => $view->fetch('email/invoice.html',
+                                         [
+                                           'txn' => $txn,
+                                           'subject' => $subject,
+                                           'content' =>
+                                             $request->getParam('content'),
+                                         ]),
                   'subject' => $subject,
                   'from' => array('name' => "Raw Materials Art Supplies",
                                   'email' => OUTGOING_EMAIL_ADDRESS),
@@ -233,11 +237,12 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
 /* Sales */
 $app->group('/purchase', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response,
+                      \Scat\Service\Txn $txn, View $view) {
               $page= (int)$request->getParam('page');
               $limit= 25;
-              $txns= $this->get('txn')->find('vendor', $page, $limit);
-              return $this->get('view')->render($response, 'txn/index.html', [
+              $txns= $txn->find('vendor', $page, $limit);
+              return $view->render($response, 'txn/index.html', [
                 'type' => 'vendor',
                 'txns' => $txns,
                 'page' => $page,
@@ -347,7 +352,7 @@ $q= "SELECT id, code, vendor_code, name, stock,
 
 $items= ORM::for_table('item')->raw_query($q)->find_many();
 
-              return $this->get('view')->render($response, 'purchase/reorder.html', [
+              return $view->render($response, 'purchase/reorder.html', [
                 'items' => $items,
                 'all' => $all,
                 'code' => $code,
@@ -356,14 +361,15 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
               ]);
             })->setName('sale');
   $app->get('/create',
-             function (Request $request, Response $response) {
+             function (Request $request, Response $response,
+                       \Scat\Service\Txn $txn, View $view) {
                $vendor_id= $request->getParam('vendor');
 
                if (!$vendor_id) {
                  throw new \Exception("No vendor specified.");
                }
 
-               $purchase= $this->get('txn')->create([
+               $purchase= $txn->create([
                  'type' => 'vendor',
                  'person_id' => $vendor_id,
                  'tax_rate' => 0,
@@ -374,7 +380,8 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                return $response->withRedirect($path);
              });
   $app->post('/reorder',
-             function (Request $request, Response $response) {
+             function (Request $request, Response $response,
+                       \Scat\Service\Txn $txn, View $view) {
                $vendor_id= $request->getParam('vendor');
 
                if (!$vendor_id) {
@@ -385,12 +392,12 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
 
                $txn_id= $request->getParam('txn_id');
                if ($txn_id) {
-                 $purchase= $this->get('txn')->fetchById($txn_id);
+                 $purchase= $txn->fetchById($txn_id);
                  if (!$txn_id) {
                    throw new \Exception("Unable to find transaction.");
                  }
                } else {
-                 $purchase= $this->get('txn')->create([
+                 $purchase= $txn->create([
                    'type' => 'vendor',
                    'person_id' => $vendor_id,
                    'tax_rate' => 0,
@@ -441,33 +448,38 @@ $items= ORM::for_table('item')->raw_query($q)->find_many();
                return $response->withRedirect($path);
              });
   $app->get('/{id}',
-            // TODO use DI for $id
-            function (Request $request, Response $response, array $args) {
-              return $response->withRedirect("/?id={$args['id']}");
+            function (Request $request, Response $response, $id) {
+              return $response->withRedirect("/?id=$id");
             })->setName('purchase');
 });
 
 /* Catalog */
 $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->get('/search',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response,
+                      \Scat\Service\Search $search,
+                      \Scat\Service\Catalog $catalog,
+                      View $view) {
               $q= trim($request->getParam('q'));
 
-              $data= $this->get('search')->search($q);
+              $data= $search->search($q);
 
-              $data['depts']= $this->get('catalog')->getDepartments();
+              $data['depts']= $catalog->getDepartments();
               $data['q']= $q;
 
-              return $this->get('view')->render($response, 'catalog/searchresults.html',
-                                         $data);
+              return $view->render($response, 'catalog/searchresults.html',
+                                   $data);
             })->setName('catalog-search');
 
-  $app->get('/~reindex', function (Request $request, Response $response) {
-    $this->get('search')->flush();
+  $app->get('/~reindex',
+            function (Request $request, Response $response,
+                      \Scat\Service\Search $search,
+                      \Scat\Service\Catalog $catalog) {
+    $search->flush();
 
     $rows= 0;
-    foreach ($this->get('catalog')->getProducts() as $product) {
-      $rows+= $this->get('search')->indexProduct($product);
+    foreach ($catalog->getProducts() as $product) {
+      $rows+= $search->indexProduct($product);
     }
 
     $response->getBody()->write("Indexed $rows rows.");
@@ -475,19 +487,21 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
   });
 
   $app->get('/brand-form',
-            function (Request $request, Response $response) {
-              $brand= $this->get('catalog')->getBrandById($request->getParam('id'));
-              return $this->get('view')->render($response, 'dialog/brand-edit.html',
+            function (Request $request, Response $response,
+                      \Scat\Service\Catalog $catalog, View $view) {
+              $brand= $catalog->getBrandById($request->getParam('id'));
+              return $view->render($response, 'dialog/brand-edit.html',
                                          [
                                            'brand' => $brand
                                          ]);
             });
 
   $app->post('/brand-form',
-             function (Request $request, Response $response) {
-               $brand= $this->get('catalog')->getBrandById($request->getParam('id'));
+             function (Request $request, Response $response,
+                      \Scat\Service\Catalog $catalog) {
+               $brand= $catalog->getBrandById($request->getParam('id'));
                if (!$brand)
-                 $brand= $this->get('catalog')->createBrand();
+                 $brand= $catalog->createBrand();
                $brand->name= $request->getParam('name');
                $brand->slug= $request->getParam('slug');
                $brand->description= $request->getParam('description');
@@ -497,10 +511,11 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              });
 
   $app->get('/department-form',
-            function (Request $request, Response $response) {
-              $depts= $this->get('catalog')->getDepartments();
-              $dept= $this->get('catalog')->getDepartmentById($request->getParam('id'));
-              return $this->get('view')->render($response, 'dialog/department-edit.html',
+            function (Request $request, Response $response,
+                      \Scat\Service\Catalog $catalog, View $view) {
+              $depts= $catalog->getDepartments();
+              $dept= $catalog->getDepartmentById($request->getParam('id'));
+              return $view->render($response, 'dialog/department-edit.html',
                                          [
                                            'depts' => $depts,
                                            'dept' => $dept
@@ -508,10 +523,11 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             });
 
   $app->post('/department-form',
-             function (Request $request, Response $response) {
-               $dept= $this->get('catalog')->getDepartmentById($request->getParam('id'));
+             function (Request $request, Response $response,
+                      \Scat\Service\Catalog $catalog) {
+               $dept= $catalog->getDepartmentById($request->getParam('id'));
                if (!$dept)
-                 $dept= $this->get('catalog')->createDepartment();
+                 $dept= $catalog->createDepartment();
                $dept->name= $request->getParam('name');
                $dept->slug= $request->getParam('slug');
                $dept->parent_id= $request->getParam('parent_id');
@@ -522,11 +538,12 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              });
 
   $app->get('/product-form',
-            function (Request $request, Response $response) {
-              $depts= $this->get('catalog')->getDepartments();
-              $product= $this->get('catalog')->getProductById($request->getParam('id'));
-              $brands= $this->get('catalog')->getBrands();
-              return $this->get('view')->render($response, 'dialog/product-edit.html',
+            function (Request $request, Response $response,
+                      \Scat\Service\Catalog $catalog, View $view) {
+              $depts= $catalog->getDepartments();
+              $product= $catalog->getProductById($request->getParam('id'));
+              $brands= $catalog->getBrands();
+              return $view->render($response, 'dialog/product-edit.html',
                                          [
                                            'depts' => $depts,
                                            'brands' => $brands,
@@ -537,13 +554,15 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             });
 
   $app->post('/product-form',
-             function (Request $request, Response $response) {
-               $product= $this->get('catalog')->getProductById($request->getParam('id'));
+             function (Request $request, Response $response,
+                       \Scat\Service\Catalog $catalog,
+                       \Scat\Service\Search $search) {
+               $product= $catalog->getProductById($request->getParam('id'));
                if (!$product) {
                  if (!$request->getParam('slug')) {
                    throw \Exception("Must specify a slug.");
                  }
-                 $product= $this->get('catalog')->createProduct();
+                 $product= $catalog->createProduct();
                }
                foreach ($product->fields() as $field) {
                  $value= $request->getParam($field);
@@ -552,13 +571,14 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                  }
                }
                $product->save();
-               $this->get('search')->indexProduct($product);
+               $search->indexProduct($product);
                return $response->withJson($product);
              });
 
   $app->post('/product/add-image',
-             function (Request $request, Response $response) {
-               $product= $this->get('catalog')->getProductById($request->getParam('id'));
+             function (Request $request, Response $response,
+                       \Scat\Service\Catalog $catalog) {
+               $product= $catalog->getProductById($request->getParam('id'));
 
                $url= $request->getParam('url');
                if ($url) {
@@ -575,14 +595,14 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                return $response->withJson($product);
              });
 
-  $app->get('/brand[/{brand}]',
-            // TODO use DI for $brand
-            function (Request $request, Response $response, array $args) {
-              $depts= $this->get('catalog')->getDepartments();
+  $app->get('/brand[/{slug}]',
+            function (Request $request, Response $response, $slug,
+                      View $view, \Scat\Service\Catalog $catalog) {
+              $depts= $catalog->getDepartments();
 
-              $brand= $args['brand'] ?
-                $this->get('catalog')->getBrandBySlug($args['brand']) : null;
-              if ($args['brand'] && !$brand)
+              $brand= $slug ?
+                $catalog->getBrandBySlug($slug) : null;
+              if ($slug && !$brand)
                 throw new \Slim\Exception\HttpNotFoundException($request);
 
               if ($brand)
@@ -591,28 +611,30 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                                  ->where('product.active', 1)
                                  ->find_many();
 
-              $brands= $brand ? null : $this->get('catalog')->getBrands();
+              $brands= $brand ? null : $catalog->getBrands();
 
-              return $this->get('view')->render($response, 'catalog/brand.html',
+              return $view->render($response, 'catalog/brand.html',
                                          [ 'depts' => $depts,
                                            'brands' => $brands,
                                            'brand' => $brand,
                                            'products' => $products ]);
             })->setName('catalog-brand');
 
-  $app->get('/item/{code:.*}', // TODO use DI for $code
-            function (Request $request, Response $response, array $args) {
-              $item= $this->get('catalog')->getItemByCode($args['code']);
+  $app->get('/item/{code:.*}',
+            function (Request $request, Response $response, $code,
+                      \Scat\Service\Catalog $catalog, View $view) {
+              $item= $catalog->getItemByCode($code);
               if (!$item)
                throw new \Slim\Exception\HttpNotFoundException($request);
-              return $this->get('view')->render($response, 'catalog/item.html', [
+              return $view->render($response, 'catalog/item.html', [
                                           'item' => $item,
                                          ]);
             })->setName('catalog-item');
 
-  $app->post('/item/{code:.*}/~print-label', // TODO use DI For $code
-            function (Request $request, Response $response, array $args) {
-              $item= $this->get('catalog')->getItemByCode($args['code']);
+  $app->post('/item/{code:.*}/~print-label',
+            function (Request $request, Response $response, $code,
+                      \Scat\Service\Catalog $catalog) {
+              $item= $catalog->getItemByCode($code);
               if (!$item)
                throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -621,9 +643,10 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
               return $response->withHeader("Content-type", "application/pdf");
             });
 
-  $app->post('/item/{code:.*}/~add-barcode', // TODO use DI for $code
-            function (Request $request, Response $response, array $args) {
-              $item= $this->get('catalog')->getItemByCode($args['code']);
+  $app->post('/item/{code:.*}/~add-barcode',
+            function (Request $request, Response $response, $code,
+                      \Scat\Service\Catalog $catalog) {
+              $item= $catalog->getItemByCode($code);
               if (!$item)
                throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -636,9 +659,10 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
               return $response->withJson($item);
             });
 
-  $app->post('/item/{code:.*}/~edit-barcode', // TODO use DI for $code
-            function (Request $request, Response $response, array $args) {
-              $item= $this->get('catalog')->getItemByCode($args['code']);
+  $app->post('/item/{code:.*}/~edit-barcode',
+            function (Request $request, Response $response, $code,
+                      \Scat\Service\Catalog $catalog) {
+              $item= $catalog->getItemByCode($code);
               if (!$item)
                throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -662,9 +686,10 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
               return $response->withJson($item);
             });
 
-  $app->post('/item/{code:.*}/~remove-barcode', // TODO use DI for $code
-            function (Request $request, Response $response, array $args) {
-              $item= $this->get('catalog')->getItemByCode($args['code']);
+  $app->post('/item/{code:.*}/~remove-barcode',
+            function (Request $request, Response $response, $code,
+                      \Scat\Service\Catalog $catalog) {
+              $item= $catalog->getItemByCode($code);
               if (!$item)
                throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -680,9 +705,10 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
               return $response->withJson($item);
             });
 
-  $app->post('/item/{code:.*}/~find-vendor-items', // TODO use DI for $code
-            function (Request $request, Response $response, array $args) {
-              $item= $this->get('catalog')->getItemByCode($args['code']);
+  $app->post('/item/{code:.*}/~find-vendor-items',
+            function (Request $request, Response $response, $code,
+                      \Scat\Service\Catalog $catalog) {
+              $item= $catalog->getItemByCode($code);
               if (!$item)
                throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -690,9 +716,10 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
 
               return $response->withJson($item);
             });
-  $app->post('/item/{code:.*}/~unlink-vendor-item', // TODO use DI for $code
-            function (Request $request, Response $response, array $args) {
-              $item= $this->get('catalog')->getItemByCode($args['code']);
+  $app->post('/item/{code:.*}/~unlink-vendor-item',
+            function (Request $request, Response $response, $code,
+                      \Scat\Service\Catalog $catalog) {
+              $item= $catalog->getItemByCode($code);
               if (!$item)
                throw new \Slim\Exception\HttpNotFoundException($request);
               $vi= $item->vendor_items()
@@ -706,9 +733,10 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
 
               return $response->withJson($item);
             });
-  $app->post('/item/{code:.*}/~check-vendor-stock', // TODO use DI for $code
-            function (Request $request, Response $response, array $args) {
-              $item= $this->get('catalog')->getItemByCode($args['code']);
+  $app->post('/item/{code:.*}/~check-vendor-stock',
+            function (Request $request, Response $response, $code,
+                      \Scat\Service\Catalog $catalog) {
+              $item= $catalog->getItemByCode($code);
               if (!$item)
                throw new \Slim\Exception\HttpNotFoundException($request);
               $vi= $item->vendor_items()
@@ -721,8 +749,8 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             });
 
   $app->get('/item-add-form',
-            function (Request $request, Response $response) {
-              return $this->get('view')->render($response, 'dialog/item-add.html',
+            function (Request $request, Response $response, View $view) {
+              return $view->render($response, 'dialog/item-add.html',
                                          [
                                            'product_id' =>
                                              $request->getParam('product_id'),
@@ -730,20 +758,22 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             });
 
   $app->get('/vendor-item-form',
-            function (Request $request, Response $response) {
-              $item= $this->get('catalog')->getItemById($request->getParam('item'));
-              $vendor_item= $this->get('catalog')->getVendorItemById($request->getParam('id'));
-              return $this->get('view')->render($response, 'dialog/vendor-item-edit.html',
+            function (Request $request, Response $response,
+                      \Scat\Service\Catalog $catalog, View $view) {
+              $item= $catalog->getItemById($request->getParam('item'));
+              $vendor_item= $catalog->getVendorItemById($request->getParam('id'));
+              return $view->render($response, 'dialog/vendor-item-edit.html',
                                          [
                                            'item' => $item,
                                            'vendor_item' => $vendor_item,
                                          ]);
             });
   $app->post('/~update-vendor-item',
-             function (Request $request, Response $response) {
-               $vi= $this->get('catalog')->getVendorItemById($request->getParam('id'));
+             function (Request $request, Response $response,
+                       \Scat\Service\Catalog $catalog) {
+               $vi= $catalog->getVendorItemById($request->getParam('id'));
                if (!$vi) {
-                 $vi= $this->get('catalog')->createVendorItem();
+                 $vi= $catalog->createVendorItem();
                }
                foreach ($vi->fields() as $field) {
                  $value= $request->getParam($field);
@@ -757,11 +787,12 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
 
 
   $app->post('/item-update',
-             function (Request $request, Response $response) {
+             function (Request $request, Response $response,
+                       \Scat\Service\Catalog $catalog, View $view) {
                $id= $request->getParam('pk');
                $name= $request->getParam('name');
                $value= $request->getParam('value');
-               $item= $this->get('catalog')->getItemById($id);
+               $item= $catalog->getItemById($id);
                if (!$item)
                  throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -771,7 +802,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                return $response->withJson([
                  'item' => $item,
                  'newValue' => $item->$name,
-                 'replaceRow' => $this->get('view')->fetch('catalog/item-row.twig', [
+                 'replaceRow' => $view->fetch('catalog/item-row.twig', [
                                   'i' => $item,
                                   'variations' => $request->getParam('variations'),
                                   'product' => $request->getParam('product')
@@ -780,11 +811,12 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              });
   // XXX used by old-report/report-price-change
   $app->post('/item-reprice',
-             function (Request $request, Response $response) {
+             function (Request $request, Response $response,
+                       \Scat\Service\Catalog $catalog) {
                $id= $request->getParam('id');
                $retail_price= $request->getParam('retail_price');
                $discount= $request->getParam('discount');
-               $item= $this->get('catalog')->getItemById($id);
+               $item= $catalog->getItemById($id);
                if (!$item)
                  throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -823,13 +855,14 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              });
 
   $app->get('/whats-new',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response,
+                      \Scat\Service\Catalog $catalog, View $view) {
               $limit= (int)$request->getParam('limit');
               if (!$limit) $limit= 12;
-              $products= $this->get('catalog')->getNewProducts($limit);
-              $depts= $this->get('catalog')->getDepartments();
+              $products= $catalog->getNewProducts($limit);
+              $depts= $catalog->getDepartments();
 
-              return $this->get('view')->render($response, 'catalog/whatsnew.html',
+              return $view->render($response, 'catalog/whatsnew.html',
                                          [
                                            'products' => $products,
                                            'depts' => $depts,
@@ -837,13 +870,13 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             })->setName('catalog-whats-new');
 
   $app->get('/price-overrides',
-             function (Request $request, Response $response) {
+             function (Request $request, Response $response, View $view) {
                $price_overrides= \Model::factory('PriceOverride')
                                   ->order_by_asc('pattern')
                                   ->order_by_asc('minimum_quantity')
                                   ->find_many();
 
-               return $this->get('view')->render($response, 'catalog/price-overrides.html',[
+               return $view->render($response, 'catalog/price-overrides.html',[
                 'price_overrides' => $price_overrides,
                ]);
              })->setName('catalog-price-overrides');
@@ -874,32 +907,34 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                return $response->withJson($override);
              });
   $app->get('/price-override-form',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response, View $view) {
               $override= \Model::factory('PriceOverride')
                            ->find_one($request->getParam('id'));
-              return $this->get('view')->render($response,
+              return $view->render($response,
                                          'dialog/price-override-edit.html',
                                          [ 'override' => $override ]);
             });
 
-  $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]', // TODO use DI
-            function (Request $request, Response $response, array $args) {
+  $app->get('[/{dept_slug}[/{subdept_slug}[/{product_slug}]]]',
+            function (Request $request, Response $response,
+                      $dept_slug, $subdept_slug, $product_slug,
+                      \Scat\Service\Catalog $catalog, View $view) {
             try {
-              $depts= $this->get('catalog')->getDepartments();
-              $dept= $args['dept'] ?
-                $this->get('catalog')->getDepartmentBySlug($args['dept']):null;
+              $depts= $catalog->getDepartments();
+              $dept= $dept_slug ?
+                $catalog->getDepartmentBySlug($dept_slug):null;
 
-              if ($args['dept'] && !$dept)
+              if ($dept_slug && !$dept)
                 throw new \Slim\Exception\HttpNotFoundException($request);
 
               $subdepts= $dept ?
                 $dept->departments()->order_by_asc('name')->find_many():null;
 
-              $subdept= $args['subdept'] ?
+              $subdept= $subdept_slug ?
                 $dept->departments(false)
-                     ->where('slug', $args['subdept'])
+                     ->where('slug', $subdept_slug)
                      ->find_one():null;
-              if ($args['subdept'] && !$subdept)
+              if ($subdept_slug && !$subdept)
                 throw new \Slim\Exception\HttpNotFoundException($request);
 
               $products= $subdept ?
@@ -912,11 +947,11 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                         ->order_by_asc('product.name')
                         ->find_many():null;
 
-              $product= $args['product'] ?
+              $product= $product_slug ?
                 $subdept->products(false)
-                        ->where('slug', $args['product'])
+                        ->where('slug', $product_slug)
                         ->find_one():null;
-              if ($args['product'] && !$product)
+              if ($product_slug && !$product)
                 throw new \Slim\Exception\HttpNotFoundException($request);
 
               $items= $product ?
@@ -939,16 +974,9 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                   }, $items));
               }
 
-              $item= $args['item'] ?
-                $product->items()
-                        ->where('code', $args['item'])
-                        ->find_one():null;
-              if ($args['item'] && !$item)
-                throw new \Slim\Exception\HttpNotFoundException($request);
+              $brands= $dept ? null : $catalog->getBrands();
 
-              $brands= $dept ? null : $this->get('catalog')->getBrands();
-
-              return $this->get('view')->render($response, 'catalog/layout.html',
+              return $view->render($response, 'catalog/layout.html',
                                          [ 'brands' => $brands,
                                            'dept' => $dept,
                                            'depts' => $depts,
@@ -964,7 +992,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                /* TODO figure out a way to not have to add/remove /catalog/ */
                $path= preg_replace('!/catalog/!', '',
                                    $request->getUri()->getPath());
-               $re= $this->get('catalog')->getRedirectFrom($path);
+               $re= $catalog->getRedirectFrom($path);
 
                if ($re) {
                  return $response->withRedirect('/catalog/' . $re->dest, 301);
@@ -975,10 +1003,11 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             })->setName('catalog');
 
   $app->post('/~add-item',
-             function (Request $request, Response $response) {
+             function (Request $request, Response $response,
+                       \Scat\Service\Catalog $catalog) {
                \ORM::get_db()->beginTransaction();
 
-               $item= $this->get('catalog')->createItem();
+               $item= $catalog->createItem();
 
                $item->code= trim($request->getParam('code'));
                $item->name= trim($request->getParam('name'));
@@ -989,7 +1018,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                }
 
                if (($id= $request->getParam('vendor_item'))) {
-                 $vendor_item= $this->get('catalog')->getVendorItemById($id);
+                 $vendor_item= $catalog->getVendorItemById($id);
                  if ($vendor_item) {
                    $item->purchase_quantity= $vendor_item->purchase_quantity;
                    $item->length= $vendor_item->length;
@@ -1025,28 +1054,29 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                return $response->withJson($item);
              });
   $app->post('/~vendor-lookup',
-             function (Request $request, Response $response) {
+             function (Request $request, Response $response,
+                       \Scat\Service\Catalog $catalog) {
                $item=
-                 $this->get('catalog')->getVendorItemByCode($request->getParam('code'));
+                 $catalog->getVendorItemByCode($request->getParam('code'));
                return $response->withJson($item);
              });
 });
 
 /* Custom */
 $app->get('/custom',
-          function (Request $request, Response $response) {
-            return $this->get('view')->render($response, 'custom/index.html');
+          function (Request $request, Response $response, View $view) {
+            return $view->render($response, 'custom/index.html');
           });
 
 /* People */
 $app->group('/person', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response, View $view) {
               // TODO most recent customers? vendors?
-              return $this->get('view')->render($response, 'person/index.html');
+              return $view->render($response, 'person/index.html');
             });
   $app->get('/search',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response, View $view) {
               $select2= $request->getParam('_type') == 'query';
               $q= trim($request->getParam('q'));
 
@@ -1056,23 +1086,23 @@ $app->group('/person', function (RouteCollectorProxy $app) {
                 return $response->withJson($people);
               }
 
-              return $this->get('view')->render($response, 'person/index.html',
+              return $view->render($response, 'person/index.html',
                                          [ 'people' => $people, 'q' => $q ]);
             })->setName('person-search');
-  $app->get('/{id:[0-9]+}', // TODO use DI for $id
-            function (Request $request, Response $response, array $args) {
-              $person= \Model::factory('Person')->find_one($args['id']);
+  $app->get('/{id:[0-9]+}',
+            function (Request $request, Response $response, $id, View $view) {
+              $person= \Model::factory('Person')->find_one($id);
               $page= (int)$request->getParam('page');
               $limit= 25;
-              return $this->get('view')->render($response, 'person/person.html', [
+              return $view->render($response, 'person/person.html', [
                 'person' => $person,
                 'page' => $page,
                 'limit' => $limit,
               ]);
             })->setName('person');
-  $app->get('/{id:[0-9]+}/items', // TODO use DI for $id
-            function (Request $request, Response $response) {
-              $person= \Model::factory('Person')->find_one($args['id']);
+  $app->get('/{id:[0-9]+}/items',
+            function (Request $request, Response $response, $id, View $view) {
+              $person= \Model::factory('Person')->find_one($id);
               $page= (int)$request->getParam('page');
               if ($person->role != 'vendor') {
                 throw new \Exception("That person is not a vendor.");
@@ -1083,7 +1113,7 @@ $app->group('/person', function (RouteCollectorProxy $app) {
               $items= $items->select_expr('COUNT(*) OVER()', 'total')
                             ->limit($limit)->offset($page * $limit);
               $items= $items->find_many();
-              return $this->get('view')->render($response, 'person/items.html', [
+              return $view->render($response, 'person/items.html', [
                                            'person' => $person,
                                            'items' => $items,
                                            'q' => $q,
@@ -1108,9 +1138,9 @@ $app->group('/person', function (RouteCollectorProxy $app) {
                  'person' => $person,
                ]);
              });
-  $app->post('/{id:[0-9]+}/upload-items', // TODO use DI for $id
-             function (Request $request, Response $response, array $args) {
-               $person= \Model::factory('Person')->find_one($args['id']);
+  $app->post('/{id:[0-9]+}/upload-items',
+             function (Request $request, Response $response, $id) {
+               $person= \Model::factory('Person')->find_one($id);
                if (!$person)
                  throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -1123,9 +1153,9 @@ $app->group('/person', function (RouteCollectorProxy $app) {
                  'details' => $details
                ]);
              });
-  $app->get('/{id:[0-9]+}/set-role', // TODO use DI for $id
-             function (Request $request, Response $response, array $args) {
-               $person= \Model::factory('Person')->find_one($args['id']);
+  $app->get('/{id:[0-9]+}/set-role',
+             function (Request $request, Response $response, $id) {
+               $person= \Model::factory('Person')->find_one($id);
                if (!$person)
                  throw new \Slim\Exception\HttpNotFoundException($request);
                $role= $request->getParam('role');
@@ -1139,7 +1169,7 @@ $app->group('/person', function (RouteCollectorProxy $app) {
 /* Clock */
 $app->group('/clock', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response, View $view) {
               $people= \Model::factory('Person')
                 ->select('*')
                 ->where('role', 'employee')
@@ -1147,13 +1177,13 @@ $app->group('/clock', function (RouteCollectorProxy $app) {
                 ->find_many();
 
               if (($block= $request->getParam('block'))) {
-                $out= $this->get('view')->fetchBlock('clock/index.html', $block, [
+                $out= $view->fetchBlock('clock/index.html', $block, [
                                                'people' => $people,
                                              ]);
                 $response->getBody()->write($out);
                 return $response;
               } else {
-                return $this->get('view')->render($response, 'clock/index.html', [
+                return $view->render($response, 'clock/index.html', [
                                              'people' => $people,
                                             ]);
               }
@@ -1169,7 +1199,7 @@ $app->group('/clock', function (RouteCollectorProxy $app) {
 /* Gift Cards */
 $app->group('/gift-card', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response, View $view) {
               $page_size= 25;
 
               $cards= \Model::factory('Giftcard')
@@ -1180,7 +1210,7 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
                         ->where('active', 1)
                         ->find_many();
 
-              return $this->get('view')->render($response, 'gift-card/index.html', [
+              return $view->render($response, 'gift-card/index.html', [
                                            'cards' => $cards,
                                            'error' => $request->getParam('error'),
                                           ]);
@@ -1238,24 +1268,24 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
               return $response->withJson($card);
             });
 
-  $app->get('/{card:[0-9]+}', // TODO use DI for $card
-            function (Request $request, Response $response, array $args) {
-              $id= substr($args['card'], 0, 7);
-              $pin= substr($args['card'], -4);
+  $app->get('/{card:[0-9]+}',
+            function (Request $request, Response $response, $card, View $view) {
+              $id= substr($card, 0, 7);
+              $pin= substr($card, -4);
               $card= \Model::factory('Giftcard')
                       ->where('id', $id)
                       ->where('pin', $pin)
                       ->find_one();
 
-              return $this->get('view')->render($response, 'gift-card/card.html', [
+              return $view->render($response, 'gift-card/card.html', [
                                            'card' => $card,
                                           ]);
             });
 
-  $app->get('/{card:[0-9]+}/print', // TODO use DI for $card
-            function (Request $request, Response $response, array $args) {
-              $id= substr($args['card'], 0, 7);
-              $pin= substr($args['card'], -4);
+  $app->get('/{card:[0-9]+}/print',
+            function (Request $request, Response $response, $card) {
+              $id= substr($card, 0, 7);
+              $pin= substr($card, -4);
               $card= \Model::factory('Giftcard')
                       ->where('id', $id)
                       ->where('pin', $pin)
@@ -1266,24 +1296,25 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
               return $response->withHeader("Content-type", "application/pdf");
             });
 
-  $app->get('/{card:[0-9]+}/email-form', // TODO use DI for $card
-            function (Request $request, Response $response, array $args) {
-              $txn= $this->get('txn')->fetchById($request->getParam('id'));
-              return $this->get('view')->render($response, 'dialog/email-gift-card.html',
-                                         $args);
+  $app->get('/{card:[0-9]+}/email-form',
+            function (Request $request, Response $response, $card,
+                      \Scat\Service\Txn $txn, View $view) {
+              $txn= $txn->fetchById($request->getParam('id'));
+              return $view->render($response, 'dialog/email-gift-card.html',
+                                         [ "card" => $card ]);
             });
-  $app->post('/{card:[0-9]+}/email', // TODO use DI for $card
-            function (Request $request, Response $response, array $args) {
-              $id= substr($args['card'], 0, 7);
-              $pin= substr($args['card'], -4);
+  $app->post('/{card:[0-9]+}/email',
+            function (Request $request, Response $response, $card, View $view) {
+              $id= substr($card, 0, 7);
+              $pin= substr($card, -4);
               $card= \Model::factory('Giftcard')
                       ->where('id', $id)
                       ->where('pin', $pin)
                       ->find_one();
 
-              $email_body= $this->get('view')->fetch('email/gift-card.html',
+              $email_body= $view->fetch('email/gift-card.html',
                                               $request->getParams());
-              $subject= $this->get('view')->fetchBlock('email/gift-card.html',
+              $subject= $view->fetchBlock('email/gift-card.html',
                                                 'title',
                                                 $request->getParams());
 
@@ -1349,10 +1380,10 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
               return $response->withJson([ 'message' => 'Success!' ]);
             });
 
-  $app->post('/{card:[0-9]+}/add-txn', // TODO use DI for $card
-            function (Request $request, Response $response, array $args) {
-              $id= substr($args['card'], 0, 7);
-              $pin= substr($args['card'], -4);
+  $app->post('/{card:[0-9]+}/add-txn',
+            function (Request $request, Response $response, $card) {
+              $id= substr($card, 0, 7);
+              $pin= substr($card, -4);
               $card= \Model::factory('Giftcard')
                       ->where('id', $id)
                       ->where('pin', $pin)
@@ -1366,23 +1397,25 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
 /* Reports */
 $app->group('/report', function (RouteCollectorProxy $app) {
   $app->get('/quick',
-            function (Request $request, Response $response) {
-              $data= $this->get('report')->sales();
-              return $this->get('view')->render($response, 'dialog/report-quick.html',
+            function (Request $request, Response $response,
+                      \Scat\Service\Report $report, View $view) {
+              $data= $report->sales();
+              return $view->render($response, 'dialog/report-quick.html',
                                          $data);
             });
   $app->get('/empty-products',
-            function (Request $request, Response $response) {
-              $data= $this->get('report')->emptyProducts();
-              return $this->get('view')->render($response, 'report/empty-products.html',
+            function (Request $request, Response $response,
+                      \Scat\Service\Report $report, View $view) {
+              $data= $report->emptyProducts();
+              return $view->render($response, 'report/empty-products.html',
                                          $data);
             });
-  $app->get('/{name}', // TODO use DI for $name
-            function (Request $request, Response $response, array $args) {
+  $app->get('/{name}',
+            function (Request $request, Response $response, $name, View $view) {
               ob_start();
-              include "../old-report/report-{$args['name']}.php";
+              include "../old-report/report-$name.php";
               $content= ob_get_clean();
-              return $this->get('view')->render($response, 'report/old.html', [
+              return $view->render($response, 'report/old.html', [
                 'title' => $GLOBALS['title'],
                 'content' => $content,
               ]);
@@ -1391,7 +1424,7 @@ $app->group('/report', function (RouteCollectorProxy $app) {
 
 /* Media */
 $app->get('/media',
-          function (Request $request, Response $response, array $args) {
+          function (Request $request, Response $response, View $view) {
             $page= (int)$request->getParam('page');
             $page_size= 20;
             $media= \Model::factory('Image')
@@ -1400,7 +1433,7 @@ $app->get('/media',
               ->find_many();
             $total= \Model::factory('Image')->count();
 
-            return $this->get('view')->render($response, 'media/index.html', [
+            return $view->render($response, 'media/index.html', [
                                          'media' => $media,
                                          'page' => $page,
                                          'page_size' => $page_size,
@@ -1421,11 +1454,11 @@ $app->post('/media/add',
 
              return $response->withJson($image);
            });
-$app->post('/media/{id}/update', // TODO use DI for $id
-           function (Request $request, Response $response, array $args) {
+$app->post('/media/{id}/update',
+           function (Request $request, Response $response, $id) {
              \ORM::get_db()->beginTransaction();
 
-             $image= \Model::factory('Image')->find_one($args['id']);
+             $image= \Model::factory('Image')->find_one($id);
              if (!$image) {
                throw new \Slim\Exception\HttpNotFoundException($request);
              }
@@ -1439,7 +1472,7 @@ $app->post('/media/{id}/update', // TODO use DI for $id
 
 /* Notes */
 $app->get('/notes',
-          function (Request $request, Response $response) {
+          function (Request $request, Response $response, View $view) {
             $parent_id= (int)$request->getParam('parent_id');
             $staff= \Model::factory('Person')
                       ->where('role', 'employee')
@@ -1468,7 +1501,7 @@ $app->get('/notes',
                         ->order_by_desc('id')
                         ->find_many();
             }
-            return $this->get('view')->render($response, 'dialog/notes.html',
+            return $view->render($response, 'dialog/notes.html',
                                        [
                                          'body_only' =>
                                            (int)$request->getParam('body_only'),
@@ -1478,7 +1511,8 @@ $app->get('/notes',
                                        ]);
           });
 $app->post('/notes/add',
-           function (Request $request, Response $response) {
+           function (Request $request, Response $response,
+                     \Scat\Service\Phone $phone) {
              $note= \Model::factory('Note')->create();
              $note->parent_id= (int)$request->getParam('parent_id');
              $note->person_id= (int)$request->getParam('person_id');
@@ -1492,7 +1526,7 @@ $app->post('/notes/add',
                  $txn= $note->parent()->find_one()->txn();
                  $person= $txn->owner();
                  error_log("Sending message to {$person->phone}");
-                 $data= $this->get('phone')->sendSMS($person->phone,
+                 $data= $phone->sendSMS($person->phone,
                                               $request->getParam('content'));
                  $note->public= true;
                  $note->save();
@@ -1503,11 +1537,11 @@ $app->post('/notes/add',
 
              return $response->withJson($note);
            });
-$app->post('/notes/{id}/update', // TODO use DI for $id
-           function (Request $request, Response $response, array $args) {
+$app->post('/notes/{id}/update',
+           function (Request $request, Response $response, $id) {
              \ORM::get_db()->beginTransaction();
 
-             $note= \Model::factory('Note')->find_one($args['id']);
+             $note= \Model::factory('Note')->find_one($id);
              if (!$note) {
                throw new \Slim\Exception\HttpNotFoundException($request);
              }
@@ -1542,19 +1576,20 @@ $app->post('/notes/{id}/update', // TODO use DI for $id
 /* Till */
 $app->group('/till', function (RouteCollectorProxy $app) {
   $app->get('',
-            function (Request $request, Response $response) {
+            function (Request $request, Response $response, View $view) {
               $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) AS expected
                      FROM payment
                     WHERE method IN ('cash','change','withdrawal')";
               $data= \ORM::for_table('payment')->raw_query($q)->find_one();
-              return $this->get('view')->render($response, "till/index.html", [
+              return $view->render($response, "till/index.html", [
                 'expected' => $data->expected,
               ]);
             });
 
   $app->post('/~print-change-order',
-             function (Request $request, Response $response) {
-               $out= $this->get('printer')->printFromTemplate(
+             function (Request $request, Response $response,
+                       \Scat\Service\Printer $printer) {
+               $out= $printer->printFromTemplate(
                  'print/change-order.html',
                  $request->getParams()
                );
@@ -1563,7 +1598,8 @@ $app->group('/till', function (RouteCollectorProxy $app) {
              });
 
   $app->post('/~count',
-             function (Request $request, Response $response) {
+             function (Request $request, Response $response,
+                       \Scat\Service\Txn $txn) {
                if ($request->getAttribute('has_errors')) {
                  return $response->withJson([
                    'error' => "Validation failed.",
@@ -1582,7 +1618,7 @@ $app->group('/till', function (RouteCollectorProxy $app) {
 
                \ORM::get_db()->beginTransaction();
 
-               $txn= $this->get('txn')->create([ 'type' => 'drawer' ]);
+               $txn= $txn->create([ 'type' => 'drawer' ]);
 
                if ($count != $expected) {
                  $amount= $counted - $expected;
@@ -1617,7 +1653,8 @@ $app->group('/till', function (RouteCollectorProxy $app) {
       ]));
 
   $app->post('/~withdraw-cash',
-             function (Request $request, Response $response) {
+             function (Request $request, Response $response,
+                       \Scat\Service\Txn $txn) {
                if ($request->getAttribute('has_errors')) {
                  return $response->withJson([
                    'error' => "Validation failed.",
@@ -1630,7 +1667,7 @@ $app->group('/till', function (RouteCollectorProxy $app) {
 
                \ORM::get_db()->beginTransaction();
 
-               $txn= $this->get('txn')->create([ 'type' => 'drawer' ]);
+               $txn= $txn->create([ 'type' => 'drawer' ]);
 
                $payment= Model::factory('Payment')->create();
                $payment->txn_id= $txn->id;
@@ -1659,27 +1696,28 @@ $app->group('/till', function (RouteCollectorProxy $app) {
 
 /* Safari notifications */
 $app->get('/push',
-            function (Request $request, Response $response) {
-              return $this->get('view')->render($response, "push/index.html");
+            function (Request $request, Response $response, View $view) {
+              return $view->render($response, "push/index.html");
             });
 
-$app->post('/push/v2/pushPackages/{id}', // TODO use DI for $id
-           function (Request $request, Response $response, array $args) {
-             $zip= $this->get('push')->getPushPackage();
+$app->post('/push/v2/pushPackages/{id}',
+           function (Request $request, Response $response, $id,
+                     \Scat\Service\Push $push) {
+             $zip= $push->getPushPackage();
              return $response->withHeader("Content-type", "application/zip")
                          ->withBody($zip);
            });
 
-$app->post('/push/v1/devices/{token}/registrations/{id}', // TODO use DI for $id
-           function (Request $request, Response $response, array $args) {
-             error_log("PUSH: Registered device: '{$args['token']}'");
-             $device= \Scat\Model\Device::register($args['token']);
+$app->post('/push/v1/devices/{token}/registrations/{id}',
+           function (Request $request, Response $response, $token, $id) {
+             error_log("PUSH: Registered device: '$token'");
+             $device= \Scat\Model\Device::register($token);
              return $response;
            });
-$app->delete('/push/v1/devices/{token}/registrations/{id}', // TODO use DI
-           function (Request $request, Response $response, array $args) {
-             error_log("PUSH: Forget device: '{$args['token']}'");
-             $device= \Scat\Model\Device::forget($args['token']);
+$app->delete('/push/v1/devices/{token}/registrations/{id}',
+           function (Request $request, Response $response, $token, $id) {
+             error_log("PUSH: Forget device: '$token'");
+             $device= \Scat\Model\Device::forget($token);
              return $response;
            });
 
@@ -1691,11 +1729,12 @@ $app->post('/push/v1/log',
            });
 
 $app->post('/~push-notification',
-           function (Request $request, Response $response) {
+           function (Request $request, Response $response,
+                     \Scat\Service\Push $push) {
               $devices= \Model::factory('Device')->find_many();
 
               foreach ($devices as $device) {
-                $this->get('push')->sendNotification(
+                $push->sendNotification(
                   $device->token,
                   $request->getParam('title'),
                   $request->getParam('body'),
@@ -1709,18 +1748,21 @@ $app->post('/~push-notification',
 
 /* Tax stuff */
 $app->get('/~tax/ping',
-           function (Request $request, Response $response) {
-              return $response->withJson($this->get('tax')->ping());
+           function (Request $request, Response $response,
+                     \Scat\Service\Tax $tax) {
+              return $response->withJson($tax->ping());
            });
 
 /* SMS */
-$app->map(['GET','POST'], '/sms/~send', \Scat\Controller\SMS::class . ':send');
-$app->post('/sms/~receive', \Scat\Controller\SMS::class . ':receive');
-$app->get('/sms/~register', \Scat\Controller\SMS::class . ':register');
+$app->map(['GET','POST'], '/sms/~send',
+          [ \Scat\Controller\SMS::class, 'send' ]);
+$app->post('/sms/~receive',
+           [ \Scat\Controller\SMS::class, 'receive' ]);
+$app->get('/sms/~register', [ \Scat\Controller\SMS::class, 'register' ]);
 
-$app->get('/dialog/{dialog}', // TODO use DI for $dialog
-          function (Request $request, Response $response, array $args) {
-            return $this->get('view')->render($response, "dialog/{$args['dialog']}");
+$app->get('/dialog/{dialog}',
+          function (Request $request, Response $response, $dialog, View $view) {
+            return $view->render($response, "dialog/$dialog");
           });
 
 $app->get('/~ready-for-publish',
@@ -1740,16 +1782,18 @@ $app->post('/~ready-for-publish',
            });
 
 $app->get('/~gift-card/check-balance',
-          function (Request $request, Response $response) {
+          function (Request $request, Response $response,
+                    \Scat\Service\Giftcard $giftcard) {
             $card= $request->getParam('card');
-            return $response->withJson($this->get('giftcard')->check_balance($card));
+            return $response->withJson($giftcard->check_balance($card));
           });
 
 $app->get('/~gift-card/add-txn',
-          function (Request $request, Response $response) {
+          function (Request $request, Response $response,
+                    \Scat\Service\Giftcard $giftcard) {
             $card= $request->getParam('card');
             $amount= $request->getParam('amount');
-            return $response->withJson($this->get('giftcard')->add_txn($card, $amount));
+            return $response->withJson($giftcard->add_txn($card, $amount));
           });
 
 $app->get('/~rewards/check-balance',
@@ -1773,31 +1817,27 @@ $app->get('/~rewards/check-balance',
 
 /* Ordure */
 $app->group('/ordure', function (RouteCollectorProxy $app) {
-  $app->get('/~push-prices', \Scat\Controller\Ordure::class . ':pushPrices');
-  $app->get('/~pull-orders', \Scat\Controller\Ordure::class . ':pullOrders');
-  $app->get('/~pull-signups', \Scat\Controller\Ordure::class . ':pullSignups');
+  $app->get('/~push-prices', [ \Scat\Controller\Ordure::class, 'pushPrices' ]);
+  $app->get('/~pull-orders', [ \Scat\Controller\Ordure::class, 'pullOrders' ]);
+  $app->get('/~pull-signups',
+            [ \Scat\Controller\Ordure::class, 'pullSignups' ]);
   $app->get('/~process-abandoned-carts',
-            \Scat\Controller\Ordure::class . ':processAbandonedCarts');
-  $app->post('/~load-person', \Scat\Controller\Ordure::class . ':loadPerson');
+            [ \Scat\Controller\Ordure::class, 'processAbandonedCarts' ]);
+  $app->post('/~load-person', [ \Scat\Controller\Ordure::class, 'loadPerson' ]);
   $app->post('/~update-person',
-             \Scat\Controller\Ordure::class . ':updatePerson');
+             [ \Scat\Controller\Ordure::class, 'updatePerson' ]);
 });
 
 /* QuickBooks */
 $app->group('/quickbooks', function (RouteCollectorProxy $app) {
-  $app->get('',
-            \Scat\Controller\Quickbooks::class . ':home');
+  $app->get('', [ \Scat\Controller\Quickbooks::class, 'home' ]);
   $app->get('/verify-accounts',
-            \Scat\Controller\Quickbooks::class . ':verifyAccounts');
+            [ \Scat\Controller\Quickbooks::class, 'verifyAccounts' ]);
   $app->post('/~create-account',
-            \Scat\Controller\Quickbooks::class . ':createAccount');
+            [ \Scat\Controller\Quickbooks::class, 'createAccount' ]);
   $app->get('/~disconnect',
-            \Scat\Controller\Quickbooks::class . ':disconnect');
-  $app->post('/~sync', \Scat\Controller\Quickbooks::class . ':sync')
-      ->add(new Validation([
-          'from' => v::in(['sales', 'payments']),
-          'date' => v::date(),
-        ]));
+            [ \Scat\Controller\Quickbooks::class, 'disconnect' ]);
+  $app->post('/~sync', [ \Scat\Controller\Quickbooks::class, 'sync' ]);
 });
 
 /* Info (DEBUG only) */
@@ -1809,29 +1849,6 @@ if ($DEBUG) {
               $response->getBody()->write(ob_get_clean());
               return $response;
             })->setName('info');
-
-  $app->get('/test',
-            function (Request $request, Response $response) {
-              return $this->get('view')->render($response, "test.html");
-            });
-  $app->get('/test/~one',
-            function (Request $request, Response $response) {
-              $response->getBody()->write('<div class="alert alert-warning">Reloaded one!</div>');
-              return $response;
-            });
-  $app->get('/test/~two',
-            function (Request $request, Response $response) {
-              $response->getBody()->write('<div class="alert alert-warning">Reloaded two!</div>');
-              return $response;
-            });
-  $app->post('/test',
-            function (Request $request, Response $response) {
-              $data= $request->getParams();
-              $response= $response->withHeader('X-Scat-Title', 'New Page Title');
-              $response= $response->withAddedHeader('X-Scat-Reload', 'one');
-              $response= $response->withAddedHeader('X-Scat-Reload', 'two');
-              return $response->withJson($data);
-            });
 }
 
 $app->run();

@@ -5,10 +5,9 @@ use \Psr\Container\ContainerInterface;
 use \Slim\Http\ServerRequest as Request;
 use \Slim\Http\Response as Response;
 use \Respect\Validation\Validator as v;
-use \DavidePastore\Slim\Validation\Validation as Validation;
+use \Slim\Views\Twig as View;
 
 class Quickbooks {
-  protected $container;
   protected $qb;
 
   protected $config= [
@@ -45,10 +44,6 @@ class Quickbooks {
     [ 'Delivery/Shipping & Handling', 'Income', 'ServiceFeeIncome' ],
     [ 'Cost of Goods Sold', 'Cost of Goods Sold', 'SuppliesMaterialsCogs' ],
   ];
-
-  public function __construct(ContainerInterface $container) {
-    $this->container= $container;
-  }
 
   protected function refreshToken() {
     // TODO base config should be elsewhere
@@ -97,7 +92,7 @@ class Quickbooks {
     return $response->withRedirect('/quickbooks');
   }
 
-  public function home(Request $request, Response $response) {
+  public function home(Request $request, Response $response, View $view) {
     if ($request->getParam('code')) {
       return $this->connect($response,
                             $request->getParam('code'),
@@ -110,7 +105,7 @@ class Quickbooks {
       $errors[]= $e->getMessage();
     }
 
-    return $this->container->get('view')->render($response, "quickbooks/index.html", [
+    return $view->render($response, "quickbooks/index.html", [
       'qb' => $this->qb,
       'connected' => $this->connected,
       'last_synced_payment' => $this->getLastSyncedPayment(),
@@ -142,7 +137,7 @@ class Quickbooks {
     return $response->withRedirect('/quickbooks');
   }
 
-  public function verifyAccounts(Request $request, Response $response) {
+  public function verifyAccounts(Response $response, View $view) {
     if (!$this->refreshToken()) {
       throw new \Exception("Unable to refresh OAuth2 token");
     }
@@ -156,7 +151,7 @@ class Quickbooks {
       }
     }
 
-    return $this->container->get('view')->render($response, "quickbooks/accounts.html", [
+    return $view->render($response, "quickbooks/accounts.html", [
       'accounts' => $accounts
     ]);
   }
@@ -164,7 +159,7 @@ class Quickbooks {
   public function createAccount(Request $request, Response $response) {
     $id= $request->getParam('id');
     if (!$id)
-      throw new \Slim\Exception\NotFoundException($request, $response);
+      throw new \Slim\Exception\HttpNotFoundException($request);
 
     if (!$this->refreshToken()) {
       throw new \Exception("Unable to refresh OAuth2 token");
@@ -186,10 +181,13 @@ class Quickbooks {
   }
 
   public function sync(Request $request, Response $response) {
-    if ($request->getAttribute('has_errors')) {
+    try {
+      v::in(['sales','payments'])->assert($request->getParam('from'));
+      v::date()->assert($request->getParam('date'));
+    } catch (\Respect\Validation\Exceptions\ValidationException $e) {
       return $response->withJson([
         'error' => "Validation failed.",
-        'validation_errors' => $request->getAttribute('errors')
+        'validation_errors' => $e->getMessages()
       ]);
     }
 
