@@ -33,8 +33,15 @@ if ($DEBUG || $ORM_DEBUG) {
 }
 
 $builder= new \DI\ContainerBuilder();
+/* Need to set up definitions for services that require manual setup */
 $builder->addDefinitions([
-  'Slim\Views\Twig' => \DI\get('view')
+  'Slim\Views\Twig' => \DI\get('view'),
+  'Scat\Service\Giftcard' => \DI\get('giftcard'),
+  'Scat\Service\Phone' => \DI\get('phone'),
+  'Scat\Service\Report' => \DI\get('report'),
+  'Scat\Service\Search' => \DI\get('search'),
+  'Scat\Service\Push' => \DI\get('push'),
+  'Scat\Service\Tax' => \DI\get('tax'),
 ]);
 $container= $builder->build();
 
@@ -65,9 +72,6 @@ $container->set('view', function() use ($config) {
 $app->add(\Slim\Views\TwigMiddleware::createFromContainer($app));
 
 /* Hook up our services */
-$container->set('catalog', function() use ($config) {
-  return new \Scat\Service\Catalog();
-});
 $container->set('search', function() use ($config) {
   return new \Scat\Service\Search($config['search']);
 });
@@ -85,12 +89,6 @@ $container->set('tax', function() use ($config) {
 });
 $container->set('giftcard', function() use ($config) {
   return new \Scat\Service\Giftcard($config['giftcard']);
-});
-$container->set('txn', function() use ($config) {
-  return new \Scat\Service\Txn();
-});
-$container->set('printer', function() {
-  return new \Scat\Service\Printer($container->get('view'));
 });
 
 $app->add(new \Middlewares\TrailingSlash());
@@ -916,47 +914,47 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                                          [ 'override' => $override ]);
             });
 
-  $app->get('[/{dept_slug}[/{subdept_slug}[/{product_slug}]]]',
+  $app->get('[/{dept}[/{subdept}[/{product}]]]',
             function (Request $request, Response $response,
-                      $dept_slug, $subdept_slug, $product_slug,
-                      \Scat\Service\Catalog $catalog, View $view) {
+                      \Scat\Service\Catalog $catalog, View $view,
+                      $dept= null, $subdept= null, $product= null) {
             try {
               $depts= $catalog->getDepartments();
-              $dept= $dept_slug ?
-                $catalog->getDepartmentBySlug($dept_slug):null;
+              $deptO= $dept ?
+                $catalog->getDepartmentBySlug($dept):null;
 
-              if ($dept_slug && !$dept)
+              if ($dept && !$deptO)
                 throw new \Slim\Exception\HttpNotFoundException($request);
 
-              $subdepts= $dept ?
-                $dept->departments()->order_by_asc('name')->find_many():null;
+              $subdepts= $deptO ?
+                $deptO->departments()->order_by_asc('name')->find_many():null;
 
-              $subdept= $subdept_slug ?
-                $dept->departments(false)
-                     ->where('slug', $subdept_slug)
-                     ->find_one():null;
-              if ($subdept_slug && !$subdept)
+              $subdeptO= $subdept ?
+                $deptO->departments(false)
+                      ->where('slug', $subdept)
+                      ->find_one():null;
+              if ($subdept && !$subdeptO)
                 throw new \Slim\Exception\HttpNotFoundException($request);
 
-              $products= $subdept ?
-                $subdept->products()
-                        ->select('product.*')
-                        ->left_outer_join('brand',
-                                          array('product.brand_id', '=',
-                                                 'brand.id'))
-                        ->order_by_asc('brand.name')
-                        ->order_by_asc('product.name')
-                        ->find_many():null;
+              $products= $subdeptO ?
+                $subdeptO->products()
+                         ->select('product.*')
+                         ->left_outer_join('brand',
+                                           array('product.brand_id', '=',
+                                                  'brand.id'))
+                         ->order_by_asc('brand.name')
+                         ->order_by_asc('product.name')
+                         ->find_many():null;
 
-              $product= $product_slug ?
-                $subdept->products(false)
-                        ->where('slug', $product_slug)
-                        ->find_one():null;
-              if ($product_slug && !$product)
+              $productO= $product ?
+                $subdeptO->products(false)
+                         ->where('slug', $product)
+                         ->find_one():null;
+              if ($product && !$productO)
                 throw new \Slim\Exception\HttpNotFoundException($request);
 
-              $items= $product ?
-                $product->items()
+              $items= $productO ?
+                $productO->items()
                         # A crude implementation of a numsort
                         ->order_by_expr('IF(CONVERT(variation, SIGNED),
                                             CONCAT(LPAD(CONVERT(variation,
@@ -975,18 +973,17 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                   }, $items));
               }
 
-              $brands= $dept ? null : $catalog->getBrands();
+              $brands= $deptO ? null : $catalog->getBrands();
 
               return $view->render($response, 'catalog/layout.html',
                                          [ 'brands' => $brands,
-                                           'dept' => $dept,
+                                           'dept' => $deptO,
                                            'depts' => $depts,
-                                           'subdept' => $subdept,
+                                           'subdept' => $subdeptO,
                                            'subdepts' => $subdepts,
-                                           'product' => $product,
+                                           'product' => $productO,
                                            'products' => $products,
                                            'variations' => $variations,
-                                           'item' => $item,
                                            'items' => $items ]);
              }
              catch (\Slim\Exception\HttpNotFoundException $ex) {

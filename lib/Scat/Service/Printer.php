@@ -5,7 +5,7 @@ class Printer
 {
   private $view;
 
-  public function __construct($view) {
+  public function __construct(\Slim\Views\Twig $view) {
     $this->view= $view;
   }
 
