@@ -1,7 +1,6 @@
 <?php
 namespace Scat\Controller;
 
-use \Psr\Container\ContainerInterface;
 use \Slim\Http\ServerRequest as Request;
 use \Slim\Http\Response as Response;
 use \Slim\Views\Twig as View;
@@ -109,7 +108,15 @@ class People {
     }
 
     if ($dirty) {
-      $person->save();
+      try {
+        $person->save();
+      } catch (\PDOException $e) {
+        if ($e->getCode() == '23000') {
+          throw new \Scat\Exception\HttpConflictException($request);
+        } else {
+          throw $e;
+        }
+      }
     } else {
       return $response->withStatus(304);
     }
