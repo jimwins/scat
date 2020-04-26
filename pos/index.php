@@ -39,6 +39,7 @@ $builder->addDefinitions([
 $container= $builder->build();
 
 $app= \DI\Bridge\Slim\Bridge::create($container);
+
 $app->addRoutingMiddleware();
 
 /* Twig for templating */
@@ -1070,100 +1071,21 @@ $app->get('/custom',
 
 /* People */
 $app->group('/person', function (RouteCollectorProxy $app) {
-  $app->get('',
-            function (Request $request, Response $response, View $view) {
-              // TODO most recent customers? vendors?
-              return $view->render($response, 'person/index.html');
-            });
-  $app->get('/search',
-            function (Request $request, Response $response, View $view) {
-              $select2= $request->getParam('_type') == 'query';
-              $q= trim($request->getParam('q'));
+  $app->get('', [ \Scat\Controller\People::class, 'home' ])
+      ->setName('people');
 
-              $people= \Scat\Model\Person::find($q);
+  $app->get('/search', [ \Scat\Controller\People::class, 'search' ])
+      ->setName('people-search');
 
-              if ($select2) {
-                return $response->withJson($people);
-              }
-
-              return $view->render($response, 'person/index.html',
-                                         [ 'people' => $people, 'q' => $q ]);
-            })->setName('person-search');
   $app->get('/{id:[0-9]+}',
-            function (Request $request, Response $response, $id, View $view) {
-              $person= \Model::factory('Person')->find_one($id);
-              $page= (int)$request->getParam('page');
-              $limit= 25;
-              return $view->render($response, 'person/person.html', [
-                'person' => $person,
-                'page' => $page,
-                'limit' => $limit,
-              ]);
-            })->setName('person');
+            [ \Scat\Controller\People::class, 'person' ])
+      ->setName('person');
+  $app->patch('/{id:[0-9]+}',
+            [ \Scat\Controller\People::class, 'updatePerson' ]);
   $app->get('/{id:[0-9]+}/items',
-            function (Request $request, Response $response, $id, View $view) {
-              $person= \Model::factory('Person')->find_one($id);
-              $page= (int)$request->getParam('page');
-              if ($person->role != 'vendor') {
-                throw new \Exception("That person is not a vendor.");
-              }
-              $limit= 25;
-              $q= $request->getParam('q');
-              $items= \Scat\Model\VendorItem::search($person->id, $q);
-              $items= $items->select_expr('COUNT(*) OVER()', 'total')
-                            ->limit($limit)->offset($page * $limit);
-              $items= $items->find_many();
-              return $view->render($response, 'person/items.html', [
-                                           'person' => $person,
-                                           'items' => $items,
-                                           'q' => $q,
-                                           'page' => $page,
-                                           'limit' => $limit,
-                                           'page_size' => $page_size,
-                                          ]);
-            })->setName('vendor-items');
-  $app->post('/update',
-             function (Request $request, Response $response) {
-               $id= $request->getParam('pk');
-               $name= $request->getParam('name');
-               $value= $request->getParam('value');
-               $person= \Model::factory('Person')->find_one($id);
-               if (!$person)
-                 throw new \Slim\Exception\HttpNotFoundException($request);
-
-               $person->setProperty($name, $value);
-               $person->save();
-
-               return $response->withJson([
-                 'person' => $person,
-               ]);
-             });
-  $app->post('/{id:[0-9]+}/upload-items',
-             function (Request $request, Response $response, $id) {
-               $person= \Model::factory('Person')->find_one($id);
-               if (!$person)
-                 throw new \Slim\Exception\HttpNotFoundException($request);
-
-               $details= [];
-               foreach ($request->getUploadedFiles() as $file) {
-                 $details[]= $person->loadVendorData($file);
-               }
-
-               return $response->withJson([
-                 'details' => $details
-               ]);
-             });
-  $app->get('/{id:[0-9]+}/set-role',
-             function (Request $request, Response $response, $id) {
-               $person= \Model::factory('Person')->find_one($id);
-               if (!$person)
-                 throw new \Slim\Exception\HttpNotFoundException($request);
-               $role= $request->getParam('role');
-               $person->role= $role;
-               $person->save();
-               $path= $this->router->pathFor('person', [ 'id' => $person->id ]);
-               return $response->withRedirect($path);
-             });
+            [ \Scat\Controller\People::class, 'items' ]);
+  $app->post('/{id:[0-9]+}/items',
+             [ \Scat\Controler\People::class, 'uploadItems' ]);
 });
 
 /* Clock */

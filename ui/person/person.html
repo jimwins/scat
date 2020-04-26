@@ -16,9 +16,18 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-right"
             aria-labelledby="settingsMenu">
-          <li><a href="{{ person.id }}/set-role?role=customer"><i class="fa {{ person.role == 'customer' ? 'fa-check' : '' }} fa-fw"></i> Customer</a>
-          <li><a href="{{ person.id }}/set-role?role=employee"><i class="fa {{ person.role == 'employee' ? 'fa-check' : '' }} fa-fw"></i> Employee</a>
-          <li><a href="{{ person.id }}/set-role?role=vendor"><i class="fa {{ person.role == 'vendor' ? 'fa-check' : '' }} fa-fw"></i> Vendor</a>
+          <li>
+            <a class="set-role" href="#" data-role="customer">
+              <i class="fa {{ person.role == 'customer' ? 'fa-check' }} fa-fw"></i> Customer
+            </a>
+          <li>
+            <a class="set-role" href="#" data-role="employee">
+              <i class="fa {{ person.role == 'employee' ? 'fa-check' }} fa-fw"></i> Employee
+            </a>
+          <li>
+            <a class="set-role" href="#" data-role="vendor">
+              <i class="fa {{ person.role == 'vendor' ? 'fa-check' }} fa-fw"></i> Vendor
+            </a>
         </ul>
       </div>
     </div>
@@ -291,7 +300,16 @@
 
   <script>
     $('.editable', document.currentScript.parentNode).editable({
-      url: '/person/update',
+      url: (params) => {
+        return fetch("/person/" + params.pk, {
+          method: 'PATCH',
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ [params.name] : params.value })
+        })
+      },
       success: (response, newValue) => {
         if (response.error) { return response.error }
       }
@@ -301,8 +319,28 @@
         editable.input.$input.select()
       }, 1)
     })
+
+    document.querySelectorAll('.set-role').forEach((el) => {
+      el.addEventListener('click', (ev) => {
+        ev.preventDefault()
+        let role= ev.target.getAttribute('data-role')
+        console.log('role: ' + role)
+        fetch("/person/{{ person.id }}", {
+          method: 'PATCH',
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ role: role, test: "testing" })
+        })
+        .then((res) => {
+          // TODO just reload contents
+          window.location.reload()
+        })
+      })
+    })
   </script>
 
   {# TODO better target? just update status, don't reload #}
-  {{ scat.file_upload('/person/' ~ person.id ~ '/upload-items') }}
+  {{ scat.file_upload('/person/' ~ person.id ~ '/items') }}
 {% endblock %}
