@@ -32,8 +32,15 @@ class People {
   public function person(Request $request, Response $response, $id, View $view)
   {
     $person= \Model::factory('Person')->find_one($id);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($person);
+    }
+
     $page= (int)$request->getParam('page');
     $limit= 25;
+
     return $view->render($response, 'person/person.html', [
       'person' => $person,
       'page' => $page,
