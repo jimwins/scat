@@ -633,9 +633,11 @@
         copies= window.prompt("How many?", copies)
         if (!copies) return
       }
-      scat.print('/catalog/item/{{ item.code }}/~print-label',
+      //scat.print('/catalog/item/{{ item.code }}/~print-label',
+      scat.print('/print/labels-price?id={{ item.id }}',
                  {
-                   copies: copies,
+                   //copies: copies,
+                   quantity: copies,
                    noprice: ev.target.getAttribute('data-noprice')
                  })
     }
