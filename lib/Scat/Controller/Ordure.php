@@ -414,7 +414,7 @@ class Ordure {
               'name' => 'logo.png',
               'type' => 'image/png',
               'data' => base64_encode(file_get_contents(basename(__DIR__).
-                                                        '/../ui/logo.png')),
+                                                        '/../../../ui/logo.png')),
             ],
           ],
         ],
