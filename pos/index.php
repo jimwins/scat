@@ -37,7 +37,6 @@ $builder= new \DI\ContainerBuilder();
 $builder->addDefinitions([
   'Slim\Views\Twig' => \DI\get('view'),
   'Scat\Service\Giftcard' => \DI\get('giftcard'),
-  'Scat\Service\Phone' => \DI\get('phone'),
   'Scat\Service\Report' => \DI\get('report'),
   'Scat\Service\Search' => \DI\get('search'),
   'Scat\Service\Push' => \DI\get('push'),
@@ -77,9 +76,6 @@ $container->set('search', function() use ($config) {
 });
 $container->set('report', function() use ($config) {
   return new \Scat\Service\Report($config['report']);
-});
-$container->set('phone', function() use ($config) {
-  return new \Scat\Service\Phone($config['phone']);
 });
 $container->set('push', function() use ($config) {
   return new \Scat\Service\Push($config['push']);

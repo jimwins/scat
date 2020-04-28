@@ -8,11 +8,11 @@ class Phone
   private $account_id;
   private $webhook_url;
 
-  public function __construct(array $config) {
-    $this->token= $config['token'];
-    $this->account_id= $config['account_id'];
-    $this->from= $config['from'];
-    $this->webhook_url= $config['webhook_url'];
+  public function __construct(Config $config) {
+    $this->token= $config->get('phone.token');
+    $this->account_id= $config->get('phone.account_id');
+    $this->from= $config->get('phone.from');
+    $this->webhook_url= $config->get('phone.webhook_url');
   }
 
   public function sendSMS($to, $text) {
