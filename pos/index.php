@@ -1766,6 +1766,15 @@ $app->group('/quickbooks', function (RouteCollectorProxy $app) {
   $app->post('/~sync', [ \Scat\Controller\Quickbooks::class, 'sync' ]);
 });
 
+/* Settings */
+$app->group('/settings', function (RouteCollectorProxy $app) {
+  $app->get('', [ \Scat\Controller\Settings::class, 'home' ])
+      ->setName('settings');
+  $app->post('', [ \Scat\Controller\Settings::class, 'create' ]);
+  $app->patch('/{id:[0-9]+}',
+            [ \Scat\Controller\Settings::class, 'update' ]);
+});
+
 /* Info (DEBUG only) */
 if ($DEBUG) {
   $app->get('/info',

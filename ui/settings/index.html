@@ -1,0 +1,82 @@
+{% extends 'layout/page.html' %}
+
+{% block title %}
+  Settings
+{% endblock %}
+
+{% block content %}
+
+  <h1 class="page-header">Settings</h1>
+
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for setting in settings %}
+        <tr data-id="{{ setting.id }}">
+          <td>
+            <span class="editable"
+                data-pk="{{ setting.id }}"
+                data-name="name">
+              {{- setting.name -}}
+            </span>
+          </td>
+          <td>
+            <span class="editable"
+                data-pk="{{ setting.id }}"
+                data-name="value">
+              {{- setting.value -}}
+            </span>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <td colspan="2">
+        <button id="create-new" class="btn btn-primary">
+          Create New Setting
+        </button>
+    </tfoot>
+  </table>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    $('.editable').editable({
+      url: (params) => {
+        return fetch("/settings/" + params.pk, {
+          method: 'PATCH',
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ [params.name] : params.value })
+        })
+      },
+      success: (response, newValue) => {
+        if (!response.ok) { return response.statusText }
+        if (response.error) { return response.error }
+      }
+    }).on('shown', function (e, editable) {
+      // Can't just do this directly because $input isn't focused yet
+      setTimeout(function() {
+        editable.input.$input.select()
+      }, 1)
+    })
+
+    document.getElementById('create-new').addEventListener('click', (ev) => {
+      let name= window.prompt("Setting name", '')
+      if (name) {
+        scat.call('/settings', { name: name })
+            .then((res) => {
+              window.location.reload()
+            })
+      }
+    })
+  </script>
+{% endblock %}
