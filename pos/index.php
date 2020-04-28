@@ -1747,6 +1747,13 @@ $app->group('/ordure', function (RouteCollectorProxy $app) {
              [ \Scat\Controller\Ordure::class, 'updatePerson' ]);
 });
 
+/* Newsletter */
+$app->get('/newsletter/~register-webhooks',
+          function (Request $request, Response $response,
+                    \Scat\Service\Newsletter $newsletter) {
+  return $response->withJson($newsletter->registerWebhooks());
+});
+
 /* QuickBooks */
 $app->group('/quickbooks', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Controller\Quickbooks::class, 'home' ]);
