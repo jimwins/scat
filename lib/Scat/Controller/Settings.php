@@ -27,7 +27,6 @@ class Settings {
   }
 
   public function update(Request $request, Response $response, $id) {
-    error_log("Loading config for $id");
     $config= \Model::factory('Config')->find_one($id);
     if (!$config)
       throw new \Slim\Exception\HttpNotFoundException($request);

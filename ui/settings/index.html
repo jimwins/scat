@@ -12,7 +12,9 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th>Type</th>
         <th>Value</th>
+        <th>Last Modified</th>
       </tr>
     </thead>
     <tbody>
@@ -26,11 +28,31 @@
             </span>
           </td>
           <td>
-            <span class="editable"
-                data-pk="{{ setting.id }}"
-                data-name="value">
-              {{- setting.value -}}
+            <span class="change-type"
+                  data-type="select"
+                  data-pk="{{ setting.id }}"
+                  data-name="type"
+                  data-value="{{ setting.type }}">
             </span>
+          </td>
+          <td>
+            {%- if setting.type == 'blob' -%}
+              <i class="fa fa-file-image-o"></i>
+            {%- else -%}
+              <span class="editable"
+                  data-type="{{ setting.type == 'text' ? 'textarea' : 'text' }}"
+                  data-pk="{{ setting.id }}"
+                  data-name="value">
+                {%- if setting.type == 'text' -%}
+                  {{- setting.value|markdown -}}
+                {%- else -%}
+                  {{- setting.value -}}
+                {%- endif -%}
+              </span>
+            {%- endif -%}
+          </td>
+          <td>
+            {{ setting.updated_at }}
           </td>
         </tr>
       {% endfor %}
@@ -47,21 +69,42 @@
 
 {% block script %}
   <script>
+    let update= (params) => {
+      return fetch("/settings/" + params.pk, {
+        method: 'PATCH',
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ [params.name] : params.value })
+      })
+    }
+
     $('.editable').editable({
-      url: (params) => {
-        return fetch("/settings/" + params.pk, {
-          method: 'PATCH',
-          headers: {
-            'Content-type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ [params.name] : params.value })
-        })
-      },
+      url: update,
       success: (response, newValue) => {
         if (!response.ok) { return response.statusText }
         if (response.error) { return response.error }
       }
+    }).on('shown', function (e, editable) {
+      // Can't just do this directly because $input isn't focused yet
+      setTimeout(function() {
+        editable.input.$input.select()
+      }, 1)
+    })
+
+    $('.change-type').editable({
+      url: update,
+      success: (response, newValue) => {
+        if (!response.ok) { return response.statusText }
+        if (response.error) { return response.error }
+      },
+      source:
+      [
+        { value: 'string', text: 'String' },
+        { value: 'text', text: 'Text' },
+        { value: 'blob', text: 'Blob' },
+      ]
     }).on('shown', function (e, editable) {
       // Can't just do this directly because $input isn't focused yet
       setTimeout(function() {
