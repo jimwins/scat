@@ -199,6 +199,12 @@ class ScatUtils {
     .then((res) => {
       if (res.headers.get('Content-type').indexOf("application/pdf") != 1) {
         res.blob().then((blob) => {
+          /* XXX
+           * This doesn't work with Firefox, because it uses PDF.js
+           * internally to do the rendering, which doesn't render when the
+           * iframe is not visible and isn't even ready to print when the load
+           * event fires when it is visible. ¯\_(ツ)_/¯
+           */
           let lpr= document.createElement('iframe')
           lpr.style.display= 'none'
           lpr.addEventListener('load', (ev) => {

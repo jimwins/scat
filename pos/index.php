@@ -1500,12 +1500,11 @@ $app->group('/till', function (RouteCollectorProxy $app) {
   $app->post('/~print-change-order',
              function (Request $request, Response $response,
                        \Scat\Service\Printer $printer) {
-               $out= $printer->printFromTemplate(
+               return $printer->printFromTemplate(
+                 $response, 'receipt',
                  'print/change-order.html',
                  $request->getParams()
                );
-               $response->getBody()->write($out);
-               return $response;
              });
 
   $app->post('/~count',
