@@ -38,6 +38,7 @@ class Printer
     $cups_host= $this->config->get('cups.host');
     $cups_user= $this->config->get('cups.user');
     $cups_pass= $this->config->get('cups.pass');
+    list ($pageType, $modifier)= explode(':', $pageType);
     $printer= $this->config->get('printer.' . $pageType);
 
     if (!$cups_host || !$printer) {
@@ -67,6 +68,9 @@ class Printer
     $job->setCopies(1);
     $job->setPageRanges('1-1000');
     $job->addText($pdf, '', 'application/pdf');
+    if ($modifier == 'open') {
+      $job->addAttribute('CashDrawerSetting', '1OpenDrawer1');
+    }
     $result= $jobManager->send($printer, $job);
 
     return $response->withJson([ 'result' => 'Printed.' ]);
