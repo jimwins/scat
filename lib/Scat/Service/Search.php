@@ -1,17 +1,27 @@
 <?php
 namespace Scat\Service;
 
-use PDO;
-
 class Search
 {
+  private $data;
   private $pdo;
   private $insert;
 
-  public function __construct(array $config) {
-    $this->pdo= new PDO($config['dsn'], $config['user'], $config['pass']);
-    $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+  public function __construct(Config $config, Data $data) {
+    $this->data= $data;
+
+    $dsn= $config->get('search.dsn');
+
+    if (!$dsn) {
+      throw new \Exception("Unable to find DSN for search");
+    }
+
+    $username= $config->get('search.username');
+    $password= $config->get('search.password');
+
+    $this->pdo= new \PDO($dsn, $username, $password);
+    $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+    $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
   }
 
   public function search($q) {
@@ -100,7 +110,7 @@ class Search
     $stmt= $this->pdo->prepare($q);
     $stmt->execute(array($terms));
 
-    $products= $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+    $products= $stmt->fetchAll(\PDO::FETCH_COLUMN, 0);
 
     return $products ?
            \Model::factory('Product')->where_in('product.id', $products)

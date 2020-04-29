@@ -21,7 +21,6 @@ $builder= new \DI\ContainerBuilder();
 $builder->addDefinitions([
   'Slim\Views\Twig' => \DI\get('view'),
   'Scat\Service\Data' => \DI\get('data'),
-  'Scat\Service\Search' => \DI\get('search'),
 ]);
 $container= $builder->build();
 
@@ -51,12 +50,8 @@ $container->set('view', function() {
 });
 $app->add(\Slim\Views\TwigMiddleware::createFromContainer($app));
 
-/* Hook up our services */
-$container->set('data',
-  new \Scat\Service\Data($config['data']));
-$container->set('search', function() use ($config) {
-  return new \Scat\Service\Search($config['search']);
-});
+/* Hook up the data service, but not lazily because we rely on side-effects */
+$container->set('data', new \Scat\Service\Data($config['data']));
 
 $app->add(new \Middlewares\TrailingSlash());
 
