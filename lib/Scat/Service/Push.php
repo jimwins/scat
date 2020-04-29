@@ -9,7 +9,7 @@ class Push
     $this->config= $config;
   }
 
-  public function getPushPackage($baseUrl) {
+  public function getPushPackage($baseUrl, $id) {
     $certificate= $this->config->get('push.certificate');
     $password= $this->config->get('push.password');
 
@@ -47,8 +47,7 @@ class Push
       "websitePushID" => $this->config->get('push.websitePushID'),
       "allowedDomains" => [ $baseUrl ],
       "urlFormatString" => $baseUrl . '/push/respond?q=%@',
-      /* XXX This should be some sort of person identifier. */
-      "authenticationToken" => "19f8d7a6e9fb8a7f6d9330dabe",
+      "authenticationToken" => $id,
       "webServiceURL" => $baseUrl . '/push',
     ];
 

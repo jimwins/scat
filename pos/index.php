@@ -1567,73 +1567,17 @@ $app->group('/till', function (RouteCollectorProxy $app) {
 });
 
 /* Safari notifications */
-$app->get('/push',
-            function (Request $request, Response $response,
-                      View $view, \Scat\Service\Config $config) {
-              $uri= $request->getUri();
-              // Not getting \Slim\Http\Uri for some reason, so more work
-              $scheme = $uri->getScheme();
-              $authority = $uri->getAuthority();
-              $baseUrl= ($scheme !== '' ? $scheme . ':' : '') .
-                        ($authority !== '' ? '//' . $authority : '');
-              $ident= $config->get('push.websitePushID');
-              return $view->render($response, "push/index.html", [
-                                    'url' => $baseUrl,
-                                    'ident' => $ident,
-                                  ]);
-            });
-
-$app->post('/push/v2/pushPackages/{id}',
-           function (Request $request, Response $response, $id,
-                     \Scat\Service\Push $push) {
-             $uri= $request->getUri();
-             // Not getting \Slim\Http\Uri for some reason, so more work
-             $scheme = $uri->getScheme();
-             $authority = $uri->getAuthority();
-             $baseUrl= ($scheme !== '' ? $scheme . ':' : '') .
-                       ($authority !== '' ? '//' . $authority : '');
-             $zip= $push->getPushPackage($baseUrl);
-             return $response->withHeader("Content-type", "application/zip")
-                         ->withBody($zip);
-           });
-
-$app->post('/push/v1/devices/{token}/registrations/{id}',
-           function (Request $request, Response $response, $token, $id) {
-             error_log("PUSH: Registered device: '$token'");
-             $device= \Scat\Model\Device::register($token);
-             return $response;
-           });
-$app->delete('/push/v1/devices/{token}/registrations/{id}',
-           function (Request $request, Response $response, $token, $id) {
-             error_log("PUSH: Forget device: '$token'");
-             $device= \Scat\Model\Device::forget($token);
-             return $response;
-           });
-
-$app->post('/push/v1/log',
-           function (Request $request, Response $response) {
-             $data= $request->getParsedBody();
-             error_log("PUSH: " . json_encode($data));
-             return $response;
-           });
-
-$app->post('/~push-notification',
-           function (Request $request, Response $response,
-                     \Scat\Service\Push $push) {
-              $devices= \Model::factory('Device')->find_many();
-
-              foreach ($devices as $device) {
-                $push->sendNotification(
-                  $device->token,
-                  $request->getParam('title'),
-                  $request->getParam('body'),
-                  $request->getParam('action'),
-                  'clicked' /* Not sure what to do about arguments yet. */
-                );
-              }
-
-              return $response->withRedirect("/push");
-           });
+$app->group('/push', function (RouteCollectorProxy $app) {
+  $app->get('', [ \Scat\Controller\Push::class, 'home' ]);
+  $app->post('/v2/pushPackages/{id}',
+              [ \Scat\Controller\Push::class, 'pushPackages' ]);
+  $app->post('/v1/devices/{token}/registrations/{id}',
+              [ \Scat\Controller\Push::class, 'registerDevice' ]);
+  $app->delete('/v1/devices/{token}/registrations/{id}',
+                [ \Scat\Controller\Push::class, 'forgetDevice' ]);
+  $app->post('/v1/log', [ \Scat\Controller\Push::class, 'log' ]);
+  $app->post('/~notify', [ \Scat\Controller\Push::class, 'pushNotification' ]);
+});
 
 /* Tax stuff */
 $app->get('/tax/~ping',
