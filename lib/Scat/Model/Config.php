@@ -18,7 +18,7 @@ class Config extends \Model {
     return null;
   }
 
-  static public function setValue($name, $value) {
+  static public function setValue($name, $value, $type= null) {
     $row= \Model::factory('Config')->where('name', $name)->find_one();
 
     if (!$row) {
@@ -27,6 +27,9 @@ class Config extends \Model {
     }
 
     $row->value= $value;
+    if ($type) {
+      $row->type= $type;
+    }
 
     $row->save();
 

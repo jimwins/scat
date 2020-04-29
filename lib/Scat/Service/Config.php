@@ -7,8 +7,8 @@ class Config
     return \Scat\Model\Config::getValue($name);
   }
 
-  public function set($name, $value) {
-    return \Scat\Model\Config::setValue($name, $value);
+  public function set($name, $value, $type= null) {
+    return \Scat\Model\Config::setValue($name, $value, $type);
   }
 
   public function forget($name) {
