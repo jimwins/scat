@@ -10,14 +10,30 @@ use \Slim\Views\Twig as View;
 class Quickbooks {
   protected $qb;
 
-  protected $config= [
-    'auth_mode' => 'oauth2',
-    'ClientID' => QB_CLIENT_ID,
-    'ClientSecret' => QB_CLIENT_SECRET,
-    'RedirectURI' => QB_REDIRECT_URI,
-    'baseUrl' => QB_BASE_URL,
-    'scope' => QB_SCOPE,
-  ];
+  protected $config;
+
+  public function __construct(\Scat\Service\Config $config) {
+    $this->config= $config;
+  }
+
+  public function getConfig(Request $request) {
+    $uri= $request->getUri();
+    // Not getting \Slim\Http\Uri for some reason, so more work
+    $scheme = $uri->getScheme();
+    $authority = $uri->getAuthority();
+    $baseUrl= ($scheme !== '' ? $scheme . ':' : '') .
+              ($authority !== '' ? '//' . $authority : '');
+
+    return [
+      'auth_mode' => 'oauth2',
+      'ClientID' => $this->config->get('qb.client_id'),
+      'ClientSecret' => $this->config->get('qb.client_secret'),
+      'RedirectURI' => $baseUrl . '/quickbooks',
+      'baseUrl' => $GLOBALS['DEBUG'] ? 'development' : 'production',
+      'scope' =>  'com.intuit.quickbooks.accounting openid ' .
+                  'profile email phone address',
+    ];
+  }
 
   private $account_list= [
     [ 'Cash Over/Short', 'Other Expense', 'OtherMiscellaneousExpense' ],
@@ -45,13 +61,12 @@ class Quickbooks {
     [ 'Cost of Goods Sold', 'Cost of Goods Sold', 'SuppliesMaterialsCogs' ],
   ];
 
-  protected function refreshToken() {
-    // TODO base config should be elsewhere
-    $config= $this->config;
+  protected function refreshToken(Request $request) {
+    $config= $this->getConfig($request);
 
-    $accessToken= \Scat\Model\Config::getValue('qb.accessToken');
-    $refreshToken= \Scat\Model\Config::getValue('qb.refreshToken');
-    $realmId= \Scat\Model\Config::getValue('qb.realmId');
+    $accessToken= $this->config->get('qb.accessToken');
+    $refreshToken= $this->config->get('qb.refreshToken');
+    $realmId= $this->config->get('qb.realmId');
 
     if ($accessToken && $refreshToken && $realmId) {
       $config['accessTokenKey']= $accessToken;
@@ -65,10 +80,8 @@ class Quickbooks {
 
     if ($refreshToken) {
       $token= $helper->refreshToken();
-      \Scat\Model\Config::setValue('qb.accessToken',
-                                   $token->getAccessToken());
-      \Scat\Model\Config::setValue('qb.refreshToken',
-                                   $token->getRefreshToken());
+      $this->config->set('qb.accessToken', $token->getAccessToken(), 'blob');
+      $this->config->set('qb.refreshToken', $token->getRefreshToken(), 'blob');
       $this->qb->updateOAuth2Token($token);
 
       return true;
@@ -77,30 +90,33 @@ class Quickbooks {
     return false;
   }
 
-  public function connect(Response $response, $code, $realmId) {
+  public function connect(Request $request, Response $response,
+                          $code, $realmId) {
+    $config= $this->getConfig($request);
+
     $qb=
-      \QuickBooksOnline\API\DataService\DataService::Configure($this->config);
+      \QuickBooksOnline\API\DataService\DataService::Configure($config);
     $helper= $qb->getOAuth2LoginHelper();
 
     $token= $helper->exchangeAuthorizationCodeForToken($code, $realmId);
     $qb->updateOAuth2Token($token);
 
-    \Scat\Model\Config::setValue('qb.accessToken', $token->getAccessToken());
-    \Scat\Model\Config::setValue('qb.refreshToken', $token->getRefreshToken());
-    \Scat\Model\Config::setValue('qb.realmId', $realmId);
+    $this->config->set('qb.accessToken', $token->getAccessToken(), 'blob');
+    $this->config->set('qb.refreshToken', $token->getRefreshToken(), 'blob');
+    $this->config->set('qb.realmId', $realmId, 'blob');
 
     return $response->withRedirect('/quickbooks');
   }
 
   public function home(Request $request, Response $response, View $view) {
     if ($request->getParam('code')) {
-      return $this->connect($response,
+      return $this->connect($request, $response,
                             $request->getParam('code'),
                             $request->getParam('realmId'));
     }
 
     try {
-      $this->connected= $this->refreshToken();
+      $this->connected= $this->refreshToken($request);
     } catch (\Exception $e) {
       $errors[]= $e->getMessage();
     }
@@ -130,15 +146,17 @@ class Quickbooks {
             ->min('paid');
   }
 
-  public function disconnect(Request $request, Response $response) {
-    \Scat\Model\Config::forgetValue('qb.accessToken');
-    \Scat\Model\Config::forgetValue('qb.refreshToken');
-    \Scat\Model\Config::forgetValue('qb.realmId');
+  public function disconnect(Request $request, Response $response,
+                              Config $config) {
+    $config->forget('qb.accessToken');
+    $config->forget('qb.refreshToken');
+    $config->forget('qb.realmId');
     return $response->withRedirect('/quickbooks');
   }
 
-  public function verifyAccounts(Response $response, View $view) {
-    if (!$this->refreshToken()) {
+  public function verifyAccounts(Request $request, Response $response,
+                                 View $view) {
+    if (!$this->refreshToken($request)) {
       throw new \Exception("Unable to refresh OAuth2 token");
     }
 
@@ -161,7 +179,7 @@ class Quickbooks {
     if (!$id)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    if (!$this->refreshToken()) {
+    if (!$this->refreshToken($request)) {
       throw new \Exception("Unable to refresh OAuth2 token");
     }
 
@@ -191,7 +209,7 @@ class Quickbooks {
       ]);
     }
 
-    if (!$this->refreshToken()) {
+    if (!$this->refreshToken($request)) {
       throw new \Exception("Unable to refresh OAuth2 token");
     }
 
