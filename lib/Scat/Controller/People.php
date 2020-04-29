@@ -12,13 +12,29 @@ class People {
     return $view->render($response, 'person/index.html');
   }
 
-  public function search(Request $request, Response $response, View $view) {
-    $select2= $request->getParam('_type') == 'query';
+  public function search(Request $request, Response $response, View $view,
+                          \Scat\Service\Data $data) {
     $q= trim($request->getParam('q'));
+    $loyalty= trim($request->getParam('loyalty'));
 
-    $people= \Scat\Model\Person::find($q);
+    if ($q) {
+      $people= \Scat\Model\Person::find($q);
+    } elseif ($loyalty) {
+      $loyalty_number= preg_replace('/[^\d]/', '', $loyalty);
+      $person= $data->factory('Person')
+                    ->where_any_is([
+                      [ 'loyalty_number' => $loyalty_number ?: 'no' ],
+                      [ 'email' => $loyalty ]
+                    ])
+                    ->find_one();
+      $people= $person ? [ $person ] : [];
+    } else {
+      $people= [];
+    }
 
-    if ($select2) {
+    $select2= $request->getParam('_type') == 'query';
+    $accept= $request->getHeaderLine('Accept');
+    if ($select2 || strpos($accept, 'application/json') !== false) {
       return $response->withJson($people);
     }
 
@@ -28,9 +44,10 @@ class People {
     ]);
   }
 
-  public function person(Request $request, Response $response, $id, View $view)
+  public function person(Request $request, Response $response, $id, View $view,
+                          \Scat\Service\Data $data)
   {
-    $person= \Model::factory('Person')->find_one($id);
+    $person= $data->factory('Person')->find_one($id);
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
@@ -47,8 +64,9 @@ class People {
     ]);
   }
 
-  public function items(Request $request, Response $response, $id, View $view) {
-    $person= \Model::factory('Person')->find_one($id);
+  public function items(Request $request, Response $response, $id, View $view,
+                        \Scat\Service\Data $data) {
+    $person= $data->factory('Person')->find_one($id);
     $page= (int)$request->getParam('page');
 
     if ($person->role != 'vendor') {
@@ -74,8 +92,9 @@ class People {
     ]);
   }
 
-  function uploadItems(Request $request, Response $response, $id) {
-    $person= \Model::factory('Person')->find_one($id);
+  function uploadItems(Request $request, Response $response, $id,
+                        \Scat\Service\Data $data) {
+    $person= $data->factory('Person')->find_one($id);
     if (!$person)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -89,8 +108,9 @@ class People {
     ]);
   }
 
-  public function updatePerson(Request $request, Response $response, $id) {
-    $person= \Model::factory('Person')->find_one($id);
+  public function updatePerson(Request $request, Response $response, $id,
+                                \Scat\Service\Data $data) {
+    $person= $data->factory('Person')->find_one($id);
     if (!$person)
       throw new \Slim\Exception\HttpNotFoundException($request);
 

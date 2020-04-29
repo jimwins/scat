@@ -54,6 +54,8 @@ class Person extends \Model implements \JsonSerializable {
   public function jsonSerialize() {
     $data= $this->asArray();
     $data['friendly_name']= $this->friendly_name();
+    $data['points_available']= $this->points_available();
+    $data['points_pending']= $this->points_pending();
     return $data;
   }
 

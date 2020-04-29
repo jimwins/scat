@@ -6,7 +6,6 @@ class Data
   private $dsn, $options;
 
   public function __construct($config) {
-    error_log("Configuring data\n");
     $this->dsn= $config['dsn'];
     $this->options= $config['options'];
 
@@ -41,5 +40,9 @@ class Data
 
   public function rollback() {
     return \ORM::get_db()->rollback();
+  }
+
+  public function factory($name) {
+    return \Model::factory($name);
   }
 }
