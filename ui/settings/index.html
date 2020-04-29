@@ -45,6 +45,8 @@
                   data-name="value">
                 {%- if setting.type == 'text' -%}
                   {{- setting.value|markdown -}}
+                {%- elseif setting.type == 'password' -%}
+                  {{- '********' -}} 
                 {%- else -%}
                   {{- setting.value -}}
                 {%- endif -%}
@@ -102,6 +104,7 @@
       source:
       [
         { value: 'string', text: 'String' },
+        { value: 'password', text: 'Password' },
         { value: 'text', text: 'Text' },
         { value: 'blob', text: 'Blob' },
       ]
