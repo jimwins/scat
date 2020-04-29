@@ -16,26 +16,11 @@ bcscale(2);
 $DEBUG= $ORM_DEBUG= false;
 $config= require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/../config.php';
 
-/* Configure Idiorm & Paris */
-Model::$auto_prefix_models= '\\Scat\\Model\\';
-
-ORM::configure('mysql:host=' . DB_SERVER . ';dbname=' . DB_SCHEMA . ';charset=utf8');
-ORM::configure('username', DB_USER);
-ORM::configure('password', DB_PASSWORD);
-ORM::configure('logging', true);
-ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
-Model::$short_table_names= true;
-
-if ($DEBUG || $ORM_DEBUG) {
-  ORM::configure('logger', function ($log_string, $query_time) {
-    error_log('ORM: "' . $log_string . '" in ' . $query_time);
-  });
-}
-
 $builder= new \DI\ContainerBuilder();
 /* Need to set up definitions for services that require manual setup */
 $builder->addDefinitions([
   'Slim\Views\Twig' => \DI\get('view'),
+  'Scat\Service\Data' => \DI\get('data'),
   'Scat\Service\Search' => \DI\get('search'),
 ]);
 $container= $builder->build();
@@ -67,6 +52,8 @@ $container->set('view', function() {
 $app->add(\Slim\Views\TwigMiddleware::createFromContainer($app));
 
 /* Hook up our services */
+$container->set('data',
+  new \Scat\Service\Data($config['data']));
 $container->set('search', function() use ($config) {
   return new \Scat\Service\Search($config['search']);
 });

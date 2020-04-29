@@ -2,17 +2,17 @@
 require dirname(__FILE__).'/lib/db.php';
 
 if (!$GLOBALS['app']) {
-  require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
+  $config= require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
 
   require dirname(__FILE__).'/vendor/autoload.php';
 
   Model::$auto_prefix_models= '\\Scat\\Model\\';
   Model::$short_table_names= true;
 
-  ORM::configure('mysql:host=' . DB_SERVER . ';dbname=' . DB_SCHEMA . ';charset=utf8');
-  ORM::configure('username', DB_USER);
-  ORM::configure('password', DB_PASSWORD);
-  ORM::configure('logging', true);
+  ORM::configure($config['data']['dsn']);
+  foreach ($config['data']['options'] as $option => $value) {
+    ORM::configure($option, $value);
+  }
   ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
 }
 
@@ -22,31 +22,15 @@ function head($title, $x= null) {
 function foot() {
 }
 
-if (!defined('DB_SERVER') ||
-    !defined('DB_USER') ||
-    !defined('DB_PASSWORD') ||
-    !defined('DB_SCHEMA')) {
-  head("Scat Configuration", true);
-  $msg= <<<CONFIG
-<p>You must configure Scat to connect to your database. Create
-<code>config.php</code> and add the following code, configured as appropriate
-for your setup:
-<pre>
-&lt;?
-/* Database configuration */
-define('DB_SERVER', 'localhost');
-define('DB_USER', 'scat');
-define('DB_PASSWORD', 'scat');
-define('DB_SCHEMA', 'scat');
-</pre>
-CONFIG;
-  die($msg);
-}
-
 $db= new ScatDB();
 if (!$db) die("mysqli_init failed");
 
-if (!$db->real_connect(DB_SERVER,DB_USER,DB_PASSWORD,DB_SCHEMA))
+preg_match('/mysql:host=(.+?);dbname=(.+?);charset=utf8/',
+           $GLOBALS['config']['data']['dsn'], $m);
+
+if (!$db->real_connect($m[1], $GLOBALS['config']['data']['options']['username'],
+                       $GLOBALS['config']['data']['options']['password'],
+                       $m[2]))
   die('connect failed: ' . mysqli_connect_error());
 
 function dump_table($r, $calc = false) {
