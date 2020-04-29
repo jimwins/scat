@@ -1619,25 +1619,6 @@ $app->post('/~ready-for-publish',
              return $response;
            });
 
-$app->get('/~rewards/check-balance',
-          function (Request $request, Response $response) {
-            $loyalty= $request->getParam('loyalty');
-            $loyalty_number= preg_replace('/[^\d]/', '', $loyalty);
-            $person= \Model::factory('Person')
-                      ->where_any_is([
-                        [ 'loyalty_number' => $loyalty_number ?: 'no' ],
-                        [ 'email' => $loyalty ]
-                      ])
-                      ->find_one();
-            if (!$person)
-              throw new \Slim\Exception\HttpNotFoundException($request);
-            return $response->withJson([
-              'loyalty_suppressed' => $person->loyalty_suppressed,
-              'points_available' => $person->points_available(),
-              'points_pending' => $person->points_pending(),
-            ]);
-          });
-
 /* Ordure */
 $app->group('/ordure', function (RouteCollectorProxy $app) {
   $app->get('/~push-prices', [ \Scat\Controller\Ordure::class, 'pushPrices' ]);
@@ -1646,9 +1627,6 @@ $app->group('/ordure', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Ordure::class, 'pullSignups' ]);
   $app->get('/~process-abandoned-carts',
             [ \Scat\Controller\Ordure::class, 'processAbandonedCarts' ]);
-  $app->post('/~load-person', [ \Scat\Controller\Ordure::class, 'loadPerson' ]);
-  $app->post('/~update-person',
-             [ \Scat\Controller\Ordure::class, 'updatePerson' ]);
 });
 
 /* Newsletter */
