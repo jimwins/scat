@@ -1049,32 +1049,8 @@ $app->group('/person', function (RouteCollectorProxy $app) {
 
 /* Clock */
 $app->group('/clock', function (RouteCollectorProxy $app) {
-  $app->get('',
-            function (Request $request, Response $response, View $view) {
-              $people= \Model::factory('Person')
-                ->select('*')
-                ->where('role', 'employee')
-                ->order_by_asc('name')
-                ->find_many();
-
-              if (($block= $request->getParam('block'))) {
-                $out= $view->fetchBlock('clock/index.html', $block, [
-                                               'people' => $people,
-                                             ]);
-                $response->getBody()->write($out);
-                return $response;
-              } else {
-                return $view->render($response, 'clock/index.html', [
-                                             'people' => $people,
-                                            ]);
-              }
-            });
-  $app->post('/~punch',
-            function (Request $request, Response $response) {
-              $id= $request->getParam('id');
-              $person= \Model::factory('Person')->find_one($id);
-              return $response->withJson($person->punch());
-            });
+  $app->get('', [ \Scat\Controller\Timeclock::class, 'home' ]);
+  $app->post('/~punch', [ \Scat\Controller\Timeclock::class, 'punch' ]);
 });
 
 /* Gift Cards */
