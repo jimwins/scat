@@ -195,7 +195,7 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
             });
 });
 
-/* Sales */
+/* Purchases */
 $app->group('/purchase', function (RouteCollectorProxy $app) {
   $app->get('',
             function (Request $request, Response $response,
@@ -1022,7 +1022,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              });
 });
 
-/* Custom */
+/* Custom (no controller, just one standalone page) */
 $app->get('/custom',
           function (Request $request, Response $response, View $view) {
             return $view->render($response, 'custom/index.html');
@@ -1250,6 +1250,22 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
               return $response->withJson($card);
             });
 });
+/* Two extras used by Ordure */
+$app->get('/~gift-card/check-balance',
+          function (Request $request, Response $response,
+                    \Scat\Service\Giftcard $giftcard) {
+            $card= $request->getParam('card');
+            return $response->withJson($giftcard->check_balance($card));
+          });
+
+$app->get('/~gift-card/add-txn',
+          function (Request $request, Response $response,
+                    \Scat\Service\Giftcard $giftcard) {
+            $card= $request->getParam('card');
+            $amount= $request->getParam('amount');
+            return $response->withJson($giftcard->add_txn($card, $amount));
+          });
+
 
 /* Reports */
 $app->group('/report', function (RouteCollectorProxy $app) {
@@ -1627,11 +1643,14 @@ $app->get('/tax/~ping',
            });
 
 /* SMS */
-$app->map(['GET','POST'], '/sms/~send',
-          [ \Scat\Controller\SMS::class, 'send' ]);
-$app->post('/sms/~receive',
-           [ \Scat\Controller\SMS::class, 'receive' ]);
-$app->get('/sms/~register', [ \Scat\Controller\SMS::class, 'register' ]);
+$app->group('/sms', function (RouteCollectorProxy $app) {
+  $app->map(['GET','POST'], '/~send',
+            [ \Scat\Controller\SMS::class, 'send' ]);
+  $app->post('/~receive',
+             [ \Scat\Controller\SMS::class, 'receive' ]);
+  $app->get('/~register', [ \Scat\Controller\SMS::class, 'register' ]);
+
+});
 
 $app->get('/dialog/{dialog}',
           function (Request $request, Response $response, $dialog, View $view) {
@@ -1653,21 +1672,6 @@ $app->post('/~ready-for-publish',
              touch('/tmp/ready-for-publish');
              return $response;
            });
-
-$app->get('/~gift-card/check-balance',
-          function (Request $request, Response $response,
-                    \Scat\Service\Giftcard $giftcard) {
-            $card= $request->getParam('card');
-            return $response->withJson($giftcard->check_balance($card));
-          });
-
-$app->get('/~gift-card/add-txn',
-          function (Request $request, Response $response,
-                    \Scat\Service\Giftcard $giftcard) {
-            $card= $request->getParam('card');
-            $amount= $request->getParam('amount');
-            return $response->withJson($giftcard->add_txn($card, $amount));
-          });
 
 $app->get('/~rewards/check-balance',
           function (Request $request, Response $response) {
