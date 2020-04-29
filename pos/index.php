@@ -1580,11 +1580,13 @@ $app->group('/push', function (RouteCollectorProxy $app) {
 });
 
 /* Tax stuff */
-$app->get('/tax/~ping',
-           function (Request $request, Response $response,
-                     \Scat\Service\Tax $tax) {
-              return $response->withJson($tax->ping());
-           });
+$app->group('/tax', function (RouteCollectorProxy $app) {
+  $app->get('/~ping',
+             function (Request $request, Response $response,
+                       \Scat\Service\Tax $tax) {
+                return $response->withJson($tax->ping());
+             });
+});
 
 /* SMS */
 $app->group('/sms', function (RouteCollectorProxy $app) {
