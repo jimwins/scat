@@ -3,9 +3,6 @@ namespace Scat\Service;
 
 class Giftcard
 {
-  public function __construct($config) {
-  }
-
   public function check_balance($card) {
     $card= preg_replace('/^RAW-/', '', $card);
 

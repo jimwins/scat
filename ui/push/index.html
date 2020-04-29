@@ -21,7 +21,7 @@
     if (permissionData.permission === 'default') {
       // This is a new web service URL and its validity is unknown.
       window.safari.pushNotification.requestPermission(
-        'https://scat.muck.rawm.us/push', // The web service URL.
+        '{{ url }}/push', // The web service URL.
         'web.us.rawm.scat',     // The Website Push ID.
         {}, // Data to help you identify the user.
         checkRemotePermission         // The callback function.

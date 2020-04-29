@@ -5,13 +5,13 @@ class Push
 {
   protected $config;
 
-  public function __construct($config) {
+  public function __construct(\Scat\Service\Config $config) {
     $this->config= $config;
   }
 
-  public function getPushPackage() {
-    $certificate= $this->config['certificate'];
-    $password= $this->config['password'];
+  public function getPushPackage($baseUrl) {
+    $certificate= $this->config->get('push.certificate');
+    $password= $this->config->get('push.password');
 
     $raw_files= [
       'icon.iconset/icon_16x16.png',
@@ -35,7 +35,7 @@ class Push
     $manifest= [];
 
     foreach ($raw_files as $file) {
-      copy("ui/$file", "$tmp/$file");
+      copy("../ui/$file", "$tmp/$file");
       $manifest[$file]= [
         'hashType' => 'sha512',
         'hashValue' => hash('sha512', file_get_contents("$tmp/$file"))
@@ -43,13 +43,13 @@ class Push
     }
 
     $website_json= [
-      "websiteName" => $this->config['websiteName'],
-      "websitePushID" => $this->config['websitePushID'],
-      "allowedDomains" => $this->config['allowedDomains'],
-      "urlFormatString" => $this->config['urlFormatString'],
+      "websiteName" => $this->config->get('push.websiteName'),
+      "websitePushID" => $this->config->get('push.websitePushID'),
+      "allowedDomains" => [ $baseUrl ],
+      "urlFormatString" => $baseUrl . '/push/respond?q=%@',
       /* XXX This should be some sort of person identifier. */
       "authenticationToken" => "19f8d7a6e9fb8a7f6d9330dabe",
-      "webServiceURL" => $this->config['webServiceURL'],
+      "webServiceURL" => $baseUrl . '/push',
     ];
 
     file_put_contents("$tmp/website.json",
@@ -65,9 +65,8 @@ class Push
                       /* Easier to debug if it is pretty. */
                       json_encode((object)$manifest, JSON_PRETTY_PRINT));
 
-    $cert= file_get_contents($certificate);
-    $cert_data= openssl_x509_read($cert);
-    $private_key= openssl_pkey_get_private($cert, $password);
+    $cert_data= openssl_x509_read($certificate);
+    $private_key= openssl_pkey_get_private($certificate, $password);
 
     openssl_pkcs7_sign("$tmp/manifest.json", "$tmp/signature",
                        $cert_data, $private_key, [],
@@ -118,10 +117,14 @@ class Push
     $payload= json_encode($payload);
     $apnsHost= 'gateway.push.apple.com';
     $apnsPort= 2195;
-    $apnsCert= $this->config['certificate'];
+    $apnsCert= $this->config->get('push.certificate');
+
+    /* local_cert is dumb, has to be in a file */
+    $tmp= tempnam('/tmp', 'cert');
+    file_put_contents($tmp, $apnsCert);
 
     $streamContext= stream_context_create();
-    stream_context_set_option($streamContext, 'ssl', 'local_cert', $apnsCert);
+    stream_context_set_option($streamContext, 'ssl', 'local_cert', $tmp);
     $apns= stream_socket_client('ssl://' . $apnsHost . ':' . $apnsPort,
                                 $error, $errorString,
                                 2/* timeout */,
@@ -131,5 +134,7 @@ class Push
                   chr(strlen($payload)) . $payload;
     fwrite($apns, $apnsMessage);
     fclose($apns);
+
+    unlink($tmp);
   }
 }

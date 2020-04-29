@@ -36,10 +36,7 @@ $builder= new \DI\ContainerBuilder();
 /* Need to set up definitions for services that require manual setup */
 $builder->addDefinitions([
   'Slim\Views\Twig' => \DI\get('view'),
-  'Scat\Service\Giftcard' => \DI\get('giftcard'),
-  'Scat\Service\Report' => \DI\get('report'),
   'Scat\Service\Search' => \DI\get('search'),
-  'Scat\Service\Push' => \DI\get('push'),
 ]);
 $container= $builder->build();
 
@@ -48,15 +45,15 @@ $app= \DI\Bridge\Slim\Bridge::create($container);
 $app->addRoutingMiddleware();
 
 /* Twig for templating */
-$container->set('view', function() use ($config) {
+$container->set('view', function() {
   /* No cache for now */
   $view= \Slim\Views\Twig::create('../ui', [ 'cache' => false ]);
 
-  if (($tz= $config['Twig']['timezone'])) {
-    $view->getEnvironment()
-      ->getExtension('Twig_Extension_Core')
-      ->setTimezone($tz);
-  }
+  /* Set timezone for date functions */
+  $tz= @$_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ'];
+  $view->getEnvironment()
+    ->getExtension('Twig_Extension_Core')
+    ->setTimezone($tz);
 
   // Add the Markdown extension
   $engine= new \Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine();
@@ -72,15 +69,6 @@ $app->add(\Slim\Views\TwigMiddleware::createFromContainer($app));
 /* Hook up our services */
 $container->set('search', function() use ($config) {
   return new \Scat\Service\Search($config['search']);
-});
-$container->set('report', function() use ($config) {
-  return new \Scat\Service\Report($config['report']);
-});
-$container->set('push', function() use ($config) {
-  return new \Scat\Service\Push($config['push']);
-});
-$container->set('giftcard', function() use ($config) {
-  return new \Scat\Service\Giftcard($config['giftcard']);
 });
 
 $app->add(new \Middlewares\TrailingSlash());
@@ -1607,13 +1595,25 @@ $app->group('/till', function (RouteCollectorProxy $app) {
 /* Safari notifications */
 $app->get('/push',
             function (Request $request, Response $response, View $view) {
-              return $view->render($response, "push/index.html");
+              $uri= $request->getUri();
+              // Not getting \Slim\Http\Uri for some reason, so more work
+              $scheme = $uri->getScheme();
+              $authority = $uri->getAuthority();
+              $baseUrl= ($scheme !== '' ? $scheme . ':' : '') .
+                        ($authority !== '' ? '//' . $authority : '');
+              return $view->render($response, "push/index.html", [ 'url' => $baseUrl ]);
             });
 
 $app->post('/push/v2/pushPackages/{id}',
            function (Request $request, Response $response, $id,
                      \Scat\Service\Push $push) {
-             $zip= $push->getPushPackage();
+             $uri= $request->getUri();
+             // Not getting \Slim\Http\Uri for some reason, so more work
+             $scheme = $uri->getScheme();
+             $authority = $uri->getAuthority();
+             $baseUrl= ($scheme !== '' ? $scheme . ':' : '') .
+                       ($authority !== '' ? '//' . $authority : '');
+             $zip= $push->getPushPackage($baseUrl);
              return $response->withHeader("Content-type", "application/zip")
                          ->withBody($zip);
            });
