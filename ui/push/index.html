@@ -12,7 +12,7 @@
   p.onclick= function() {
     // Ensure that the user can receive Safari Push Notifications.
     if ('safari' in window && 'pushNotification' in window.safari) {
-      var permissionData= window.safari.pushNotification.permission('web.us.rawm.scat');
+      var permissionData= window.safari.pushNotification.permission('{{ ident }}');
       checkRemotePermission(permissionData);
     }
   };
@@ -22,7 +22,7 @@
       // This is a new web service URL and its validity is unknown.
       window.safari.pushNotification.requestPermission(
         '{{ url }}/push', // The web service URL.
-        'web.us.rawm.scat',     // The Website Push ID.
+        '{{ ident }}',     // The Website Push ID.
         {}, // Data to help you identify the user.
         checkRemotePermission         // The callback function.
       );

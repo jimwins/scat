@@ -1594,14 +1594,19 @@ $app->group('/till', function (RouteCollectorProxy $app) {
 
 /* Safari notifications */
 $app->get('/push',
-            function (Request $request, Response $response, View $view) {
+            function (Request $request, Response $response,
+                      View $view, \Scat\Service\Config $config) {
               $uri= $request->getUri();
               // Not getting \Slim\Http\Uri for some reason, so more work
               $scheme = $uri->getScheme();
               $authority = $uri->getAuthority();
               $baseUrl= ($scheme !== '' ? $scheme . ':' : '') .
                         ($authority !== '' ? '//' . $authority : '');
-              return $view->render($response, "push/index.html", [ 'url' => $baseUrl ]);
+              $ident= $config->get('push.websitePushID');
+              return $view->render($response, "push/index.html", [
+                                    'url' => $baseUrl,
+                                    'ident' => $ident,
+                                  ]);
             });
 
 $app->post('/push/v2/pushPackages/{id}',
