@@ -40,7 +40,6 @@ $builder->addDefinitions([
   'Scat\Service\Report' => \DI\get('report'),
   'Scat\Service\Search' => \DI\get('search'),
   'Scat\Service\Push' => \DI\get('push'),
-  'Scat\Service\Tax' => \DI\get('tax'),
 ]);
 $container= $builder->build();
 
@@ -79,9 +78,6 @@ $container->set('report', function() use ($config) {
 });
 $container->set('push', function() use ($config) {
   return new \Scat\Service\Push($config['push']);
-});
-$container->set('tax', function() use ($config) {
-  return new \Scat\Service\Tax($config['tax']);
 });
 $container->set('giftcard', function() use ($config) {
   return new \Scat\Service\Giftcard($config['giftcard']);
@@ -1662,7 +1658,7 @@ $app->post('/~push-notification',
            });
 
 /* Tax stuff */
-$app->get('/~tax/ping',
+$app->get('/tax/~ping',
            function (Request $request, Response $response,
                      \Scat\Service\Tax $tax) {
               return $response->withJson($tax->ping());

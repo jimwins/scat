@@ -6,6 +6,11 @@ class Tax
   private $apiLoginID;
   private $apiKey;
 
+  public function __construct(Config $config) {
+    $this->apiLoginID= $config->get('taxcloud.id');
+    $this->apiKey= $config->get('taxcloud.key');
+  }
+
   /* Very simple wrapper that builds the URL, merges in the API credentials,
    * and turns errors into exceptions. */
   protected function callApi($method, $params= []) {
@@ -27,11 +32,6 @@ class Tax
     }
 
     return $data;
-  }
-
-  public function __construct(array $config) {
-    $this->apiLoginID= $config['taxcloud_id'];
-    $this->apiKey= $config['taxcloud_key'];
   }
 
   public function ping() {
