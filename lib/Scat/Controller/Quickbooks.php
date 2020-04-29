@@ -147,7 +147,7 @@ class Quickbooks {
   }
 
   public function disconnect(Request $request, Response $response,
-                              Config $config) {
+                              \Scat\Service\Config $config) {
     $config->forget('qb.accessToken');
     $config->forget('qb.refreshToken');
     $config->forget('qb.realmId');
