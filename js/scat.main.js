@@ -197,6 +197,18 @@ class ScatUtils {
       return Promise.reject(new Error(response.statusText))
     })
     .then((res) => {
+      if (res.headers.get('Content-type').indexOf("application/pdf") != 1) {
+        res.blob().then((blob) => {
+          let lpr= document.createElement('iframe')
+          lpr.style.display= 'none'
+          lpr.addEventListener('load', (ev) => {
+            ev.target.contentWindow.print()
+          })
+          // holy moly, this is magic!
+          lpr.src= URL.createObjectURL(blob)
+          document.body.appendChild(lpr)
+        })
+      } else
       if (res.headers.get('Content-type').indexOf("application/json") == -1) {
         res.text().then((html) => {
           let lpr= document.createElement('iframe')
