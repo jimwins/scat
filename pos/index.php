@@ -1237,7 +1237,7 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
                 ],
               ]);
 
-              $response= $promise->wait();
+              $res= $promise->wait();
 
               return $response->withJson([ 'message' => 'Success!' ]);
             });
