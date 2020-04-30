@@ -7,9 +7,26 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class People {
-  public function home(Response $response, View $view) {
-    // TODO most recent customers? vendors?
-    return $view->render($response, 'person/index.html');
+  public function home(Request $request, Response $response, View $view,
+                        \Scat\Service\Data $data) {
+    $limit= $request->getParam('limit') ?: 20;
+    $people= $data->factory('Person')
+                  ->select('*')
+                  ->select_expr('(SELECT MAX(IFNULL(txn.paid, txn.created))
+                                    FROM txn WHERE txn.person_id = person.id)',
+                                'latest')
+                  ->where('active', 1)
+                  ->order_by_desc('latest')
+                  ->limit($limit)
+                  ->find_many();
+
+    $accept= $request->getHeaderLine('Accept');
+    if ($select2 || strpos($accept, 'application/json') !== false) {
+      return $response->withJson($people);
+    }
+    return $view->render($response, 'person/index.html', [
+      'people' => $people
+    ]);
   }
 
   public function search(Request $request, Response $response, View $view,

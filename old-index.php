@@ -1286,9 +1286,6 @@ viewModel.changePerson= function(data, event) {
       }
 
       scat.call('/person/search', { q: search, limit: 20 })
-          .then((res) => {
-            return res.json()
-          })
           .then((data) => {
             personModel.people(data);
           });
@@ -1321,10 +1318,14 @@ viewModel.changePerson= function(data, event) {
 
     ko.applyBindings(personModel, panel[0]);
 
-    Scat.api('person-list-recent', { })
-        .done(function (data) {
-          personModel.people(data);
-        });
+    // TODO should be scat.get but not yet
+    fetch('/person?limit=10', {
+      headers: { 'Accept': 'application/json' }
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      personModel.people(data);
+    })
 
     panel.appendTo($('body')).modal();
   });
