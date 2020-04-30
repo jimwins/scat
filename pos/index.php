@@ -1033,7 +1033,8 @@ $app->group('/person', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Controller\People::class, 'home' ])
       ->setName('people');
 
-  $app->get('/search', [ \Scat\Controller\People::class, 'search' ])
+  $app->map(['GET', 'POST'], '/search',
+            [ \Scat\Controller\People::class, 'search' ])
       ->setName('people-search');
 
   $app->get('/{id:[0-9]+}',

@@ -1285,8 +1285,11 @@ viewModel.changePerson= function(data, event) {
         return;
       }
 
-      Scat.api('person-list', { term: search, limit: 20 })
-          .done(function (data) {
+      scat.call('/person/search', { q: search, limit: 20 })
+          .then((res) => {
+            return res.json()
+          })
+          .then((data) => {
             personModel.people(data);
           });
     }, personModel);
