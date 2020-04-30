@@ -54,6 +54,8 @@ class Person extends \Scat\Model {
 
   public function jsonSerialize() {
     $data= parent::jsonSerialize();
+    /* Need to decode our JSON field */
+    $data['subscriptions']= json_decode($this->subscriptions);
     $data['friendly_name']= $this->friendly_name();
     $data['points_available']= $this->points_available();
     $data['points_pending']= $this->points_pending();
@@ -133,6 +135,12 @@ class Person extends \Scat\Model {
     else if ($name == 'email') {
       v::optional(v::email())->assert($value);
       $this->email= $value ?: null;
+    }
+    else if ($name == 'mailerlite_id') {
+      $this->mailerlite_id= $value ?: null;
+      if ($value) {
+        $this->syncToMailerlite();
+      }
     }
     elseif (isset($this, $name)) {
       $this->$name= $value ?: null;
@@ -446,5 +454,40 @@ class Person extends \Scat\Model {
       $punch->save();
     }
     return $punch;
+  }
+
+  public function subscriptions($update= null) {
+    if ($update) {
+      $this->subscriptions= json_encode($update);
+    }
+
+    return json_decode($this->subscriptions);
+  }
+
+  public function syncToMailerlite() {
+    // XXX There must be a better way to get this.
+    $config= $GLOBALS['container']->get(\Scat\Service\Config::class);
+
+    $client= new \GuzzleHttp\Client();
+
+    $url= "https://api.mailerlite.com/api/v2" .
+          "/subscribers/{$this->mailerlite_id}/groups";
+
+    $res= $client->request('GET', $url, [
+                            //'debug' => true,
+                            'headers' => [
+                              'X-MailerLite-ApiKey' =>
+                                $config->get("newsletter.key")
+                            ],
+                          ]);
+
+    $data= json_decode($res->getBody());
+
+    $groups= array_map(function($group) {
+      return [ 'id' => $group->id, 'name' => $group->name ];
+    }, $data);
+
+    $this->subscriptions($groups);
+
   }
 }

@@ -39,9 +39,9 @@ function person_find($db, $q, $options= null, $limit= null) {
 
   $q= "SELECT id, name, role, company,
               address,
-              email, email_ok,
-              phone, loyalty_number, sms_ok,
-              tax_id, payment_account_id,
+              email,
+              phone, loyalty_number,
+              tax_id,
               vendor_rebate,
               birthday, notes,
               url, instagram,
