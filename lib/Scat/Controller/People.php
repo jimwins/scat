@@ -125,17 +125,25 @@ class People {
     ]);
   }
 
+  public function createPerson(Request $request, Response $response,
+                                \Scat\Service\Data $data) {
+    $person= $data->factory('Person')->create();
+    return $this->processPerson($request, $response, $data, $person);
+  }
+
   public function updatePerson(Request $request, Response $response, $id,
                                 \Scat\Service\Data $data) {
     $person= $data->factory('Person')->find_one($id);
     if (!$person)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    error_log("params:" . json_encode($request->getParams()));
-    error_log("body:" . json_encode($request->getParsedBody()));
+    return $this->processPerson($request, $response, $data, $person);
+  }
 
+  public function processPerson(Request $request, Response $response,
+                                \Scat\Service\Data $data, $person) {
     $dirty= false;
-    foreach (array_keys($person->as_array()) as $field) {
+    foreach ($person->getFields() as $field) {
       if ($field == 'id') continue; // don't allow changing id
       $value= $request->getParam($field);
       if ($value !== null) {
@@ -143,6 +151,8 @@ class People {
         $dirty= true;
       }
     }
+
+    $new= $person->is_new();
 
     if ($dirty) {
       try {
@@ -156,6 +166,11 @@ class People {
       }
     } else {
       return $response->withStatus(304);
+    }
+
+    if ($new) {
+      $response= $response->withStatus(201)
+                          ->withHeader('Location', '/person/' . $person->id);
     }
 
     return $response->withJson($person);

@@ -3,7 +3,8 @@ namespace Scat\Model;
 
 use \Respect\Validation\Validator as v;
 
-class Person extends \Model implements \JsonSerializable {
+class Person extends \Scat\Model {
+
   public function friendly_name() {
     if ($this->name || $this->company) {
       return $this->name .
@@ -52,7 +53,7 @@ class Person extends \Model implements \JsonSerializable {
   }
 
   public function jsonSerialize() {
-    $data= $this->asArray();
+    $data= parent::jsonSerialize();
     $data['friendly_name']= $this->friendly_name();
     $data['points_available']= $this->points_available();
     $data['points_pending']= $this->points_pending();
@@ -125,16 +126,16 @@ class Person extends \Model implements \JsonSerializable {
 
   public function setProperty($name, $value) {
     if ($name == 'phone') {
-      v::phone()->assert($value);
-      $this->phone= $value;
+      v::optional(v::phone())->assert($value);
+      $this->phone= $value ?: null;
       $this->loyalty_number= preg_replace('/[^\d]/', '', $value) ?: null;
     }
     else if ($name == 'email') {
-      v::email()->assert($value);
-      $this->email= $value;
+      v::optional(v::email())->assert($value);
+      $this->email= $value ?: null;
     }
     elseif (isset($this, $name)) {
-      $this->$name= $value;
+      $this->$name= $value ?: null;
     } else {
       throw new \Exception("No way to set '$name' on a person.");
     }

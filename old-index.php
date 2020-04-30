@@ -1286,6 +1286,7 @@ viewModel.changePerson= function(data, event) {
       }
 
       scat.call('/person/search', { q: search, limit: 20 })
+          .then((res) => res.json())
           .then((data) => {
             personModel.people(data);
           });
@@ -1374,15 +1375,28 @@ function displayPerson(person) {
 
     personModel.savePerson= function(place, ev) {
       var person= ko.mapping.toJS(personModel);
-      Scat.api(person.id ? 'person-update' : 'person-add', person)
-          .done(function (data) {
-            if (person.id) {
-              viewModel.load(data);
-            } else {
-              Txn.updatePerson(Txn.id(), data.person);
-            }
-            $(place).closest('.modal').modal('hide');
-          });
+      if (person.id) {
+        fetch("/person/" + person.id, {
+          method: 'PATCH',
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(person)
+        })
+        .then((res) => res.json())
+        .then((data) => {
+          viewModel.load({ person: data })
+          $(place).closest('.modal').modal('hide');
+        })
+      } else {
+        scat.call('/person', person)
+            .then((res) => res.json())
+            .then((data) => {
+              Txn.updatePerson(Txn.id(), data.id)
+              $(place).closest('.modal').modal('hide');
+            })
+      }
     }
 
     ko.applyBindings(personModel, panel[0]);
