@@ -24,6 +24,7 @@ class Data
 
     // TODO use a logger service and always log at debug level?
     if ($GLOBALS['DEBUG'] || $GLOBALS['ORM_DEBUG']) {
+      \ORM::configure('logging', true);
       \ORM::configure('logger', function ($log_string, $query_time) {
         error_log('ORM: "' . $log_string . '" in ' . $query_time . "\n");
       });
