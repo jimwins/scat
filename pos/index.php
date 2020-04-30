@@ -1662,12 +1662,15 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Settings::class, 'update' ]);
 });
 
+/* Webhooks */
+$app->post('/~webhook/sms', [ \Scat\Controller\SMS::class, 'receive' ]);
+
 $app->map(['GET', 'POST'], '/~webhook[/{hook:.*}]',
             function (Request $request, Response $response, $hook) {
               error_log("Received webhook $hook\n");
               error_log(json_encode($request->getParams())."\n");
               return $response->withJson([ 'message' => 'Received.' ]);
-            })->setName('info');
+            });
 
 /* Info (DEBUG only) */
 if ($DEBUG) {
