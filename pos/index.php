@@ -1662,6 +1662,13 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Settings::class, 'update' ]);
 });
 
+$app->map(['GET', 'POST'], '/~webhook[/{hook:.*}]',
+            function (Request $request, Response $response, $hook) {
+              error_log("Received webhook $hook\n");
+              error_log(json_encode($request->getParams())."\n");
+              return $response->withJson([ 'message' => 'Received.' ]);
+            })->setName('info');
+
 /* Info (DEBUG only) */
 if ($DEBUG) {
   $app->get('/info',
