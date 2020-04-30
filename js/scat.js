@@ -41,35 +41,6 @@ Scat.dialog= function (name) {
 
   // XXX handle error
   return $.ajax({ url: url, cache: false });
-  /*
-    var panel= $(html);
-
-    panel.on('hidden.bs.modal', function() {
-      $(this).remove();
-    });
-
-    person.error= '';
-
-    personModel= ko.mapping.fromJS(person);
-
-    personModel.savePerson= function(place, ev) {
-      var person= ko.mapping.toJS(personModel);
-      Scat.api(person.id ? 'person-update' : 'person-add', person)
-          .done(function (data) {
-            if (person.id) {
-              viewModel.load(data);
-            } else {
-              Txn.updatePerson(Txn.id(), data.person);
-            }
-            $(place).closest('.modal').modal('hide');
-          });
-    }
-
-    ko.applyBindings(personModel, panel[0]);
-
-    panel.appendTo($('body')).modal();
-  });
-  */
 }
 
 Scat.print= function(name, options) {
