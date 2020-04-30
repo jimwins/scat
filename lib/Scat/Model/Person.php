@@ -142,6 +142,21 @@ class Person extends \Scat\Model {
         $this->syncToMailerlite();
       }
     }
+    else if ($name == 'rewardsplus') {
+      /*
+       * If this is a new opt-in to Rewards+, need to send welcome
+       * and compliance message.
+       */
+      if ($value && !$this->rewardsplus) {
+        $config= $GLOBALS['container']->get(\Scat\Service\Config::class);
+        $phone= $GLOBALS['container']->get(\Scat\Service\Phone::class);
+        $message= $config->get('rewards.signup_message');
+        $compliance= 'Reply STOP to unsubscribe or HELP for help. 6 msgs per month, Msg&Data rates may apply.';
+        $phone->sendSMS($this->loyalty_number, $message);
+        $phone->sendSMS($this->loyalty_number, $compliance);
+      }
+      $this->$name= $value;
+    }
     elseif (isset($this, $name)) {
       $this->$name= $value ?: null;
     } else {
