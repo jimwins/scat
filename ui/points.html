@@ -1,0 +1,40 @@
+<div class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <form class="modal-content" role="form">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+          Points
+        </h4>
+      </div>
+
+      <div style="max-height: 30em; overflow: scroll">
+      <table class="table table-striped"
+             data-bind="if: activity().length">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Points</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: activity">
+          <tr>
+            <td data-bind="text: $data.processed"></td>
+            <td data-bind="text: $data.points"></td>
+            <td data-bind="text: $data.note"></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

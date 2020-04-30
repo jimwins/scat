@@ -1409,10 +1409,9 @@ viewModel.showPoints= function(data, event) {
     var personModel= ko.mapping.fromJS(model);
     personModel.activity= ko.observableArray();
 
-    Scat.api('person-load-loyalty', { person: data.person.id() })
-        .done(function (data) {
-          personModel.activity(data.activity);
-        });
+    fetch('/person/' + data.person.id() + '/loyalty')
+    .then((res) => res.json())
+    .then((data) => personModel.activity(data))
 
     ko.applyBindings(personModel, panel[0]);
 

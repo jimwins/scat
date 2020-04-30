@@ -154,26 +154,6 @@ function person_load_activity($db, $id, $page= 0, $page_size= 50) {
   return $activity;
 }
 
-function person_load_loyalty($db, $id) {
-  $id= (int)$id;
-
-  $loyalty= array();
-
-  $q= "SELECT processed, points, note
-         FROM loyalty
-        WHERE person_id = $id";
-
-  $r= $db->query($q);
-
-  if ($r->num_rows) {
-    while ($row= $r->fetch_assoc()) {
-      $loyalty[]= $row;
-    }
-  }
-
-  return $loyalty;
-}
-
 function available_loyalty_items($db, $points) {
   $q= "SELECT item_id AS id, cost, code, name, retail_price
         FROM loyalty_reward

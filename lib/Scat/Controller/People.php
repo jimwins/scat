@@ -160,4 +160,14 @@ class People {
 
     return $response->withJson($person);
   }
+
+  public function loyalty(Request $request, Response $response, $id, View $view,
+                          \Scat\Service\Data $data) {
+    $person= $data->factory('Person')->find_one($id);
+
+    $activity= $person->loyalty()->order_by_desc('id')->find_many();
+
+    return $response->withJson($activity);
+  }
+
 }
