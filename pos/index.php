@@ -523,8 +523,8 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              });
 
   $app->get('/brand[/{slug}]',
-            function (Request $request, Response $response, $slug,
-                      View $view, \Scat\Service\Catalog $catalog) {
+            function (Request $request, Response $response,
+                      View $view, \Scat\Service\Catalog $catalog, $slug= null) {
               $depts= $catalog->getDepartments();
 
               $brand= $slug ?
