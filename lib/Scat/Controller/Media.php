@@ -93,4 +93,26 @@ class Media {
 
     return $response->withJson($image);
   }
+
+  public function addFromInstagram(Request $request, Response $response) {
+    $type= $request->getParam('media_type');
+
+    /* XXX handle other media types */
+    if ($type != 'IMAGE') {
+      error_log("Unable to handle Instagram media!");
+      error_log($request->getBody()."\n");
+    }
+    $this->data->beginTransaction();
+
+    $url= $request->getParam('media_url');
+
+    $image= \Scat\Model\Image::createFromUrl($url);
+    $image->caption= $request->getParam('caption');
+    $image->data= $request->getBody();
+    $image->save();
+
+    $this->data->commit();
+
+    return $response->withJson($image);
+  }
 }

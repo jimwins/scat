@@ -1494,6 +1494,8 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
 
 /* Webhooks */
 $app->post('/~webhook/sms', [ \Scat\Controller\SMS::class, 'receive' ]);
+$app->post('/~webhook/instagram',
+            [ \Scat\Controller\Media::class, 'addFromInstagram' ]);
 
 $app->map(['GET', 'POST'], '/~webhook[/{hook:.*}]',
             function (Request $request, Response $response, $hook) {
