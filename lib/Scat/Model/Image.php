@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-class Image extends \Model implements \JsonSerializable {
+class Image extends \Scat\Model {
   public function original() {
     return PUBLITIO_BASE . '/' . $this->uuid . '.' . $this->ext;
   }

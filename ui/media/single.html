@@ -1,0 +1,65 @@
+{% extends 'layout/page.html' %}
+
+{% block title %}
+  {{ image.alt_text }} - {{ image.width }}&times;{{ image.height}}
+{% endblock %}
+
+{% block content %}
+  <h1 class="page-header">{{ block('title') }}</h1>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <form class="form form-horizontal">
+            <div class="form-group">
+              <label for="alt_text" class="col-sm-4 control-label">
+                Text description
+              </label>
+              <div class="col-sm-8">
+                <p class="form-control-static editable"
+                   data-name="alt_text">
+                  {{ image.alt_text }}
+                </p>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <figure>
+        <img class="img-responsive center-block"
+             src="{{ image.medium }}" alt="{{ image.alt_text }}">
+      </figure>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    $('.editable', document.currentScript.parentNode).editable({
+      url: (params) => {
+        return fetch("/media/{{ image.id }}", {
+          method: 'PATCH',
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ [params.name] : params.value })
+        })
+      },
+      success: (response, newValue) => {
+        if (response.error) { return response.error }
+      }
+    }).on('shown', function (e, editable) {
+      // Can't just do this directly because $input isn't focused yet
+      setTimeout(function() {
+        editable.input.$input.select()
+      }, 1)
+    })
+  </script>
+
+{% endblock %}

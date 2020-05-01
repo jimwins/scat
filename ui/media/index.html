@@ -53,7 +53,7 @@
 {% endblock %}
 
 {% block script %}
-{{ scat.file_upload('/media/add') }}
+{{ scat.file_upload('/media') }}
 <style>
 .controls {
   opacity: 0.3;
@@ -69,13 +69,13 @@
     let current= thumb.getElementsByClassName('caption')[0].textContent
     let caption= window.prompt("Please enter a caption:", current)
     if (caption) {
-      const formData= new FormData()
-      formData.append('caption', caption)
-
-      fetch('/media/' + id + '/update', {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: formData
+      fetch('/media/' + id, {
+        method: 'PATCH',
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ caption: caption })
       })
       .then((response) => {
         if (response.status >= 200 && response.status < 300) {

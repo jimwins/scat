@@ -1267,52 +1267,12 @@ $app->group('/report', function (RouteCollectorProxy $app) {
 });
 
 /* Media */
-$app->get('/media',
-          function (Request $request, Response $response, View $view) {
-            $page= (int)$request->getParam('page');
-            $page_size= 20;
-            $media= \Model::factory('Image')
-              ->order_by_desc('created_at')
-              ->limit($page_size)->offset($page * $page_size)
-              ->find_many();
-            $total= \Model::factory('Image')->count();
-
-            return $view->render($response, 'media/index.html', [
-                                         'media' => $media,
-                                         'page' => $page,
-                                         'page_size' => $page_size,
-                                         'total' => $total,
-                                        ]);
-          });
-$app->post('/media/add',
-           function (Request $request, Response $response) {
-             $url= $request->getParam('url');
-             if ($url) {
-               $image= \Scat\Model\Image::createFromUrl($url);
-             } else {
-               foreach ($request->getUploadedFiles() as $file) {
-                 $image= \Scat\Model\Image::createFromStream($file->getStream(),
-                                                       $file->getClientFilename());
-               }
-             }
-
-             return $response->withJson($image);
-           });
-$app->post('/media/{id}/update',
-           function (Request $request, Response $response, $id) {
-             \ORM::get_db()->beginTransaction();
-
-             $image= \Model::factory('Image')->find_one($id);
-             if (!$image) {
-               throw new \Slim\Exception\HttpNotFoundException($request);
-             }
-             $image->alt_text= $request->getParam('caption');
-             $image->save();
-
-             \ORM::get_db()->commit();
-
-             return $response->withJson($image);
-           });
+$app->group('/media', function (RouteCollectorProxy $app) {
+  $app->get('', [ \Scat\Controller\Media::class, 'home' ]);
+  $app->post('', [ \Scat\Controller\Media::class, 'create' ]);
+  $app->get('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'show' ]);
+  $app->patch('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'update' ]);
+});
 
 /* Notes */
 $app->group('/note', function (RouteCollectorProxy $app) {
