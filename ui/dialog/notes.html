@@ -1,4 +1,4 @@
-{% extends body_only ? 'layout/body.html' : 'layout/dialog.html' %}
+{% extends 'layout/dialog.html' %}
 {% import 'macros.twig' as scat %}
 
 {% block size 'modal-lg' %}
@@ -71,6 +71,12 @@
               {{ note.todo ? 'TODO' : 'DONE' }}
             </a>
           {% endif %}
+          {% if note.source == 'sms' %}
+            <i class="fa fa-lg fa-mobile"></i>
+          {% endif %}
+          {% if note.source == 'email' %}
+            <i class="fa fa-lg fa-envelope-o"></i>
+          {% endif %}
         </td>
       </tr>
     {% endfor %}
@@ -113,40 +119,39 @@
 {% endblock %}
 
 {% block script %}
-  const enableTodoLinks= (form) => {
-    let todoLink= form.querySelector('.todo-link')
-    todoLink.addEventListener('click', (ev) => {
-      ev.preventDefault()
-      ev.stopPropagation()
+  form.addEventListener('click', (ev) => {
+    let todoLink= ev.target.closest('.todo-link')
+    if (!todoLink) return
 
-      const id= ev.currentTarget.attributes['data-id'].value
-      const todo= ev.currentTarget.attributes['data-todo'].value
+    ev.preventDefault()
+    ev.stopPropagation()
 
-      let formData= new FormData();
-      formData.append('todo', todo == '1' ? 0 : 1);
-      fetch('/notes/' + id + '/update', {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: formData
-      })
-      .then((res) => {
-        return res.json()
-      })
-      .then((note) => {
-        todoLink.attributes['data-todo'].value= note.todo
-        todoLink.text= note.todo ? 'TODO' : 'DONE'
-        todoLink.classList.remove('label-primary','label-success')
-        todoLink.classList.add(note.todo ? 'label-primary' : 'label-success')
-      })
+    const id= todoLink.attributes['data-id'].value
+    const todo= todoLink.attributes['data-todo'].value
+
+    let formData= new FormData();
+    fetch('/note/' + id, {
+      method: 'PATCH',
+      headers: {
+        'Content-type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ todo: todo == '1' ? 0 : 1 })
     })
-  }
-
-  enableTodoLinks(form)
+    .then((res) => {
+      return res.json()
+    })
+    .then((note) => {
+      todoLink.attributes['data-todo'].value= note.todo
+      todoLink.text= note.todo ? 'TODO' : 'DONE'
+      todoLink.classList.remove('label-primary','label-success')
+      todoLink.classList.add(note.todo ? 'label-primary' : 'label-success')
+    })
+  })
 
   form.loadNotes= (id) => {
-    fetch('/notes/?body_only=1' + (id ? '&parent_id=' + id : ''), {
+    fetch('/note' + (id ? '/' + id : '') + '?body_only=1', {
       method: 'GET',
-      headers: { 'Accept': 'application/json' }
     })
     .then((res) => {
       return res.text()
@@ -156,7 +161,6 @@
       let old= form.getElementsByTagName('table')[0]
       old.replaceWith(body)
       form.parent_id.value= id
-      enableTodoLinks(form)
     })
   }
 
@@ -165,7 +169,7 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    fetch("/notes/add", {
+    fetch("/note", {
       method: 'POST',
       headers: { 'Accept': 'application/json' },
       body: formData

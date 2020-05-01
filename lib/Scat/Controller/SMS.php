@@ -71,9 +71,9 @@ class SMS {
 
     default:
       $note= $data->factory('Note')->create();
-      // TODO flag that source was SMS
       $note->kind= 'person';
       $note->attach_id= $person->id;
+      $note->source= 'sms';
       $note->person_id= $person->id;
       $note->content= $payload['message'];
       $note->todo= 1;

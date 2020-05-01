@@ -1315,107 +1315,11 @@ $app->post('/media/{id}/update',
            });
 
 /* Notes */
-$app->get('/notes',
-          function (Request $request, Response $response, View $view) {
-            $parent_id= (int)$request->getParam('parent_id');
-            $staff= \Model::factory('Person')
-                      ->where('role', 'employee')
-                      ->where('person.active', 1)
-                      ->order_by_asc('name')
-                      ->find_many();
-            if ($parent_id) {
-              $notes= \Model::factory('Note')
-                        ->select('*')
-                        ->select_expr('0', 'children')
-                        ->where_any_is([
-                          [ 'id' => $parent_id ],
-                          [ 'parent_id' => $parent_id ]
-                        ])
-                        ->order_by_asc('id')
-                        ->find_many();
-            } else {
-              $notes= \Model::factory('Note')
-                        ->select('*')
-                        ->select_expr('(SELECT COUNT(*)
-                                          FROM note children
-                                         WHERE children.parent_id = note.id)',
-                                      'children')
-                        ->where('parent_id', $parent_id)
-                        ->where('todo', 1)
-                        ->order_by_desc('id')
-                        ->find_many();
-            }
-            return $view->render($response, 'dialog/notes.html',
-                                       [
-                                         'body_only' =>
-                                           (int)$request->getParam('body_only'),
-                                         'parent_id' => $parent_id,
-                                         'staff' => $staff,
-                                         'notes' => $notes
-                                       ]);
-          });
-$app->post('/notes/add',
-           function (Request $request, Response $response,
-                     \Scat\Service\Phone $phone) {
-             $note= \Model::factory('Note')->create();
-             $note->parent_id= (int)$request->getParam('parent_id');
-             $note->person_id= (int)$request->getParam('person_id');
-             $note->content= $request->getParam('content');
-             $note->todo= (int)$request->getParam('todo');
-             $note->public= (int)$request->getParam('public');
-             $note->save();
-
-             if ((int)$request->getParam('sms')) {
-               try {
-                 $txn= $note->parent()->find_one()->txn();
-                 $person= $txn->owner();
-                 error_log("Sending message to {$person->phone}");
-                 $data= $phone->sendSMS($person->phone,
-                                              $request->getParam('content'));
-                 $note->public= true;
-                 $note->save();
-                } catch (\Exception $e) {
-                  error_log("Got exception: " . $e->getMessage());
-                }
-             }
-
-             return $response->withJson($note);
-           });
-$app->post('/notes/{id}/update',
-           function (Request $request, Response $response, $id) {
-             \ORM::get_db()->beginTransaction();
-
-             $note= \Model::factory('Note')->find_one($id);
-             if (!$note) {
-               throw new \Slim\Exception\HttpNotFoundException($request);
-             }
-
-             $todo= $request->getParam('todo');
-             if ($todo !== null && $todo != $note->todo) {
-               $note->todo= (int)$request->getParam('todo');
-               $update= \Model::factory('Note')->create();
-               // TODO who did this?
-               $update->parent_id= $note->parent_id ?: $note->id;
-               $update->content= $todo ? "Marked todo." : "Marked done.";
-               $update->save();
-             }
-
-             $public= $request->getParam('public');
-             if ($public !== null && $public != $note->public) {
-               $note->public= (int)$request->getParam('public');
-               $update= \Model::factory('Note')->create();
-               // TODO who did this?
-               $update->parent_id= $note->parent_id ?: $note->id;
-               $update->content= $public ? "Marked public." : "Marked private.";
-               $update->save();
-             }
-
-             $note->save();
-
-             \ORM::get_db()->commit();
-
-             return $response->withJson($note);
-           });
+$app->group('/note', function (RouteCollectorProxy $app) {
+  $app->get('[/{id:[0-9]+}]', [ \Scat\Controller\Notes::class, 'view' ]);
+  $app->post('', [ \Scat\Controller\Notes::class, 'create' ]);
+  $app->patch('/{id:[0-9]+}', [ \Scat\Controller\Notes::class, 'update' ]);
+});
 
 /* Till */
 $app->group('/till', function (RouteCollectorProxy $app) {

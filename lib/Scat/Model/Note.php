@@ -28,7 +28,7 @@ class Note extends \Model implements \JsonSerializable {
   }
 
   public function parent() {
-    return $this->belongs_to('Note', 'parent_id');
+    return $this->belongs_to('Note', 'parent_id')->find_one();
   }
 
   public function jsonSerialize() {
