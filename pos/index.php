@@ -117,81 +117,47 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
             });
   $app->post('/email-invoice',
             function (Request $request, Response $response,
-                      \Scat\Service\Txn $txn, View $view) {
+                      \Scat\Service\Txn $txn, View $view,
+                      \Scat\Service\Email $email) {
               $txn= $txn->fetchById($request->getParam('id'));
-              $name= $request->getParam('name');
-              $email= $request->getParam('email');
+              $to_name= $request->getParam('name');
+              $to_email= $request->getParam('email');
               $subject= trim($request->getParam('subject'));
-              error_log("Sending {$txn->id} to $email");
 
-              $attachments= [];
+              $body= $view->fetch('email/invoice.html',
+                                   [
+                                     'txn' => $txn,
+                                     'subject' => $subject,
+                                     'content' =>
+                                       $request->getParam('content'),
+                                   ]);
+
+              $attachments= [
+                [
+                  base64_encode(file_get_contents('../ui/logo.png')),
+                  'image/png',
+                  'logo.png',
+                  'inline',
+                  'logo.png'
+                ],
+              ];
+
               if ($request->getParam('include_details')) {
                 $pdf= $txn->getInvoicePDF();
                 $attachments[]= [
-                  'name' => (($txn->type == 'vendor') ? 'PO' : 'I') . $txn->formatted_number() . '.pdf',
-                  'type' => 'application/pdf',
-                  'data' => base64_encode($pdf->Output('', 'S')),
+                  base64_encode($pdf->Output('', 'S')),
+                  'application/pdf',
+                  (($txn->type == 'vendor') ? 'PO' : 'I') .
+                    $txn->formatted_number() . '.pdf',
+                  'attachment'
                 ];
               }
 
-              // TODO push email sending into a service
-              $httpClient= new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client());
-              $sparky= new \SparkPost\SparkPost($httpClient,
-                                                [ 'key' => SPARKPOST_KEY ]);
-	      $promise= $sparky->transmissions->post([
-		'content' => [
-                  'html' => $view->fetch('email/invoice.html',
-                                         [
-                                           'txn' => $txn,
-                                           'subject' => $subject,
-                                           'content' =>
-                                             $request->getParam('content'),
-                                         ]),
-                  'subject' => $subject,
-                  'from' => array('name' => "Raw Materials Art Supplies",
-                                  'email' => OUTGOING_EMAIL_ADDRESS),
-                  'attachments' => $attachments,
-                  'inline_images' => [
-                    [
-                      'name' => 'logo.png',
-                      'type' => 'image/png',
-                      'data' => base64_encode(
-                                 file_get_contents('../ui/logo.png')),
-                    ],
-                  ],
-                ],
-		'recipients' => [
-		  [
-		    'address' => [
-		      'name' => $name,
-		      'email' => $email,
-		    ],
-		  ],
-		  [
-		    // BCC ourselves
-		    'address' => [
-		      'header_to' => $name,
-		      'email' => OUTGOING_EMAIL_ADDRESS,
-		    ],
-		  ],
-		],
-		'options' => [
-		  'inlineCss' => true,
-		],
-	      ]);
+              $res= $email->send([ $to_email => $to_name ],
+                                 $subject, $body, $attachments);
 
-	      try {
-		$response= $promise->wait();
-                return $response->withJson([ "message" => "Email sent." ]);
-	      } catch (\Exception $e) {
-		error_log(sprintf("SparkPost failure: %s (%s)",
-				  $e->getMessage(), $e->getCode()));
-                return $response->withJson([
-                  "error" =>
-                    sprintf("SparkPost failure: %s (%s)",
-                            $e->getMessage(), $e->getCode())
-                ], 500);
-	      }
+              return $response->withJson($res->body() ?:
+                                          [ "message" => "Email sent." ]);
             });
 });
 
