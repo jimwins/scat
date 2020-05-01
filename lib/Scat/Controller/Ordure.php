@@ -102,9 +102,7 @@ class Ordure {
         $person= \Model::factory('Person')->create();
         $person->name= $update->name;
         $person->email= $update->email;
-        $person->phone= $update->phone;
-        if (!empty($update->loyalty_number))
-          $person->loyalty_number= $update->loyalty_number;
+        $person->setProperty('phone', $update->phone);
         $person->save();
 
         $messages[]=
@@ -114,10 +112,17 @@ class Ordure {
       else {
         if ($update->name) $person->name= $update->name;
         if ($update->email) $person->email= $update->email;
+        if ($update->phone)
+          $person->setProperty('phone', $update->phone);
         $person->save();
 
         $messages[]=
           "Updated details for person '".($person->name?:$person->email)."'";
+      }
+
+      /* This may trigger an SMS message if it's a new signup. */
+      if ($update->rewardsplus) {
+        $person->setProperty('rewardsplus', $update->rewardsplus);
       }
 
       /* Handle code */
