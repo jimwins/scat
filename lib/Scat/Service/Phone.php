@@ -18,6 +18,13 @@ class Phone
   public function sendSMS($to, $text) {
     $client= new \GuzzleHttp\Client();
 
+    /* Don't actually send SMS in $DEBUG to avoid accidental messages. */
+    if ($GLOBALS['DEBUG']) {
+      // TODO actually allow through messages to a specific number?
+      error_log("Would SMS: $to: $text\n");
+      return true;
+    }
+
     $url= "https://api.phone.com/v4/accounts/{$this->account_id}/sms";
     $data= [ 'from' => $this->from, 'to' => $to, 'text' => $text ];
 
