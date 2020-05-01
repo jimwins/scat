@@ -55,7 +55,8 @@
         "middlewares/trailing-slash": "^2.0",
         "php-di/php-di": "^6.1",
         "slim/http": "^1.0",
-        "php-di/slim-bridge": "^3.0"
+        "php-di/slim-bridge": "^3.0",
+        "sendgrid/sendgrid": "^7.5"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"
