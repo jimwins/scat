@@ -97,14 +97,10 @@ class Media {
   public function addFromInstagram(Request $request, Response $response) {
     $type= $request->getParam('media_type');
 
-    /* XXX handle other media types */
-    if ($type != 'IMAGE') {
-      error_log("Unable to handle Instagram media!");
-      error_log($request->getBody()."\n");
-    }
     $this->data->beginTransaction();
 
-    $url= $request->getParam('media_url');
+    $url= ($type == 'IMAGE') ? $request->getParam('media_url') :
+                               $request->getParam('thumbnail_url');
 
     $image= \Scat\Model\Image::createFromUrl($url);
     $image->caption= $request->getParam('caption');
