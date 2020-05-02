@@ -99,4 +99,8 @@ class Image extends \Scat\Model {
 
     return parent::delete();
   }
+
+  public function productsUsedBy() {
+    return $this->has_many_through('Product')->find_many();
+  }
 }

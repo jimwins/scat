@@ -41,6 +41,26 @@
           </form>
         </div>
       </div>
+
+      {% set products= image.productsUsedBy() %}
+      {% if products|length %}
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              Referenced by Products
+            </h3>
+          </div>
+          <ul class="list-group">
+            {% for product in products %}
+              <a class="list-group-item"
+                 href="/catalog/{{ product.full_slug }}">
+                {{- product.name -}}
+              </a>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
     </div>
     <div class="col-sm-6">
       <figure>
