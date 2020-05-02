@@ -842,6 +842,17 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                                          [ 'override' => $override ]);
             });
 
+  /* Custom (no controller, just one standalone page) */
+  $app->get('/custom',
+            function (Request $request, Response $response, View $view,
+                      \Scat\Service\Catalog $catalog) {
+              $depts= $catalog->getDepartments();
+              return $view->render($response, 'catalog/custom.html', [
+                'depts' => $depts,
+              ]);
+            });
+
+
   $app->get('[/{dept}[/{subdept}[/{product}]]]',
             function (Request $request, Response $response,
                       \Scat\Service\Catalog $catalog, View $view,
@@ -987,12 +998,6 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                return $response->withJson($item);
              });
 });
-
-/* Custom (no controller, just one standalone page) */
-$app->get('/custom',
-          function (Request $request, Response $response, View $view) {
-            return $view->render($response, 'custom/index.html');
-          });
 
 /* People */
 $app->group('/person', function (RouteCollectorProxy $app) {

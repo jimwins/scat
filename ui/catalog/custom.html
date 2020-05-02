@@ -1,11 +1,11 @@
-{% extends 'layout/page.html' %}
+{% extends 'catalog/layout.html' %}
 {% import 'macros.twig' as scat %}
 
 {% block title %}
   Custom
 {% endblock %}
 
-{% block content %}
+{% block catalog_content %}
   <form id="dims" class="form-horizontal" role="form">
     <div class="form-group">
       <label for="w" class="col-sm-2 control-label">Width</label>
@@ -174,11 +174,11 @@
 
 {% block script %}
   <script>
-    let form= document.querySelector('#dims')
+    let dims= document.querySelector('#dims')
 
     let recalculate= () => {
-      let w= form.elements['width'].value
-      let h= form.elements['height'].value
+      let w= dims.elements['width'].value
+      let h= dims.elements['height'].value
 
       // We work in imperial, so calculate that
       if (w.match(/cm/)) {
@@ -189,35 +189,35 @@
       }
 
       // Highlight fields if they aren't a number
-      form.elements['width'].closest('.form-group').classList.remove('has-error')
-      form.elements['height'].closest('.form-group').classList.remove('has-error')
+      dims.elements['width'].closest('.form-group').classList.remove('has-error')
+      dims.elements['height'].closest('.form-group').classList.remove('has-error')
       if (isNaN(Number(w))) {
-        form.elements['width'].closest('.form-group').classList.add('has-error')
+        dims.elements['width'].closest('.form-group').classList.add('has-error')
       }
       if (isNaN(Number(h))) {
-        form.elements['height'].closest('.form-group').classList.add('has-error')
+        dims.elements['height'].closest('.form-group').classList.add('has-error')
       }
 
-      form.querySelector('#w_in').innerText= Number(w) + '"'
-      form.querySelector('#h_in').innerText= Number(h) + '"'
+      dims.querySelector('#w_in').innerText= Number(w) + '"'
+      dims.querySelector('#h_in').innerText= Number(h) + '"'
 
       let ui= Number(w) + Number(h)
 
       // Not a number? Clear the outputs and give up
       if (w == 0 || h == 0 || isNaN(ui)) {
-        form.querySelectorAll('[data-calc]').forEach((el) => {
+        dims.querySelectorAll('[data-calc]').forEach((el) => {
           el.innerText= ''
         })
         return
       }
 
-      form.querySelectorAll('[data-calc]').forEach((el) => {
+      dims.querySelectorAll('[data-calc]').forEach((el) => {
         let calc= el.getAttribute('data-calc')
         el.innerText= eval(calc)
       })
     }
 
-    form.querySelectorAll('input').forEach((input) => {
+    dims.querySelectorAll('input').forEach((input) => {
       input.addEventListener('change', recalculate)
       input.addEventListener('keyup', recalculate)
     })
