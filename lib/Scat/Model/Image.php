@@ -75,6 +75,7 @@ class Image extends \Scat\Model {
     // Save the details
     $image= \Model::factory('Image')->create();
     $image->uuid= $res->public_id;
+    $image->publitio_id= $res->id;
     $image->width= $res->width;
     $image->height= $res->height;
     $image->ext= $res->extension;
@@ -84,7 +85,18 @@ class Image extends \Scat\Model {
     return $image;
   }
 
-  public function jsonSerialize() {
-    return $this->as_array();
+  public function delete() {
+    $publitio= new \Publitio\API(PUBLITIO_KEY, PUBLITIO_SECRET);
+
+    $res= $publitio->call("/files/delete/" . $this->publitio_id,
+                          'DELETE');
+
+    if (!$res->success) {
+      error_log(json_encode($res));
+      throw new \Exception($res->error->message ? $res->error->message :
+                           $res->message);
+    }
+
+    return parent::delete();
   }
 }

@@ -5,6 +5,11 @@
 {% endblock %}
 
 {% block content %}
+  <div class="pull-right">
+    <button id="delete-image" class="btn btn-danger">
+      Delete
+    </button>
+  </div>
   <h1 class="page-header">{{ block('title') }}</h1>
 
   <div class="row">
@@ -69,6 +74,22 @@
         editable.input.$input.select()
       }, 1)
     })
-  </script>
 
+    document.getElementById('delete-image').addEventListener('click', (ev) => {
+      if (window.confirm("Are you sure that you want to delete this?")) {
+        return fetch("/media/{{ image.id }}", {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+        .then((res) => {
+          if (!res.ok) {
+            return Promise.reject(new Error(res.statusText))
+          }
+          window.location.href= '/media'
+        })
+      }
+    })
+  </script>
 {% endblock %}

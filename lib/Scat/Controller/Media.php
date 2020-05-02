@@ -94,6 +94,15 @@ class Media {
     return $response->withJson($image);
   }
 
+  public function delete(Request $request, Response $response, $id) {
+    $image= $this->data->factory('Image')->find_one($id);
+    if (!$image) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+    $image->delete();
+    return $response->withJson([ 'message' => 'Deleted.' ]);
+  }
+
   public function addFromInstagram(Request $request, Response $response) {
     $type= $request->getParam('media_type');
 
