@@ -6,7 +6,7 @@
 
 {% block content %}
 
-  <form class="form-inline" action="reorder" method="POST">
+  <form class="form-inline">
     <div class="pull-right">
       <button type="button" class="btn btn-default" id="zero">
         Zero
@@ -240,6 +240,22 @@
           handleChange(input, false)
         }
         updateTotal(inputs[0].form)
+      })
+
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault()
+
+        let formData= new FormData(form)
+        let txn_id= formData.get('txn_id')
+
+        scat.call('/purchase' + (txn_id ? '/' + txn_id : ''), formData)
+        .then((res) => {
+          if (res.redirected) {
+            window.location.href= res.url
+            return
+          }
+          alert("Unexpected response.")
+        })
       })
     </script>
   </form>
