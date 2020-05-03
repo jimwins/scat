@@ -10,10 +10,11 @@ class Txn
   }
 
   public function create($type, $data= null) {
-    $txn= $this->data->factory('Txn')->create([ 'type' => $type ]);
+    $txn= $this->data->factory('Txn')->create();
     if ($data) {
-      $txn->hydrate($data)->force_all_dirty();
+      $txn->hydrate($data);
     }
+    $txn->type= $type;
 
     // Generate number based on transaction type
     $number= $this->data->factory('Txn')
