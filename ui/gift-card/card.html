@@ -101,7 +101,7 @@
             let formData= new FormData(ev.target)
             amount= formData.get('amount') * (formData.get('action') == 'add' ? 1 : -1)
 
-            scat.call('/gift-card/{{ card.card }}/add-txn', { amount: amount })
+            scat.call('/gift-card/{{ card.card }}', { amount: amount })
                 .then((data) => {
                   window.location.reload()
                 })
@@ -112,11 +112,4 @@
     </div>
   </div>
 
-{% endblock %}
-
-{% block script %}
-  <script>
-  {
-  }
-  </script>
 {% endblock %}

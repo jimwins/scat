@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-sm-6">
-    <form action="/gift-card/lookup">
+    <form method="POST" action="/gift-card/lookup">
       <div class="input-group {{ error ? 'has-error' }}">
         <input type="text" class="autofocus form-control"
                name="card" value="{{ card ? card.card }}"
@@ -42,7 +42,7 @@
 
           let formData= new FormData(ev.target)
 
-          fetch('/gift-card/create', {
+          fetch('/gift-card', {
             method: 'POST',
             headers: { 'Accept': 'application/json' },
             body: formData
@@ -68,4 +68,3 @@
 </div>
 
 <br>
-

@@ -131,16 +131,7 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
                                        $request->getParam('content'),
                                    ]);
 
-              $attachments= [
-                [
-                  base64_encode(file_get_contents('../ui/logo.png')),
-                  'image/png',
-                  'logo.png',
-                  'inline',
-                  'logo.png'
-                ],
-              ];
-
+              $attachments= [];
               if ($request->getParam('include_details')) {
                 $pdf= $txn->getInvoicePDF();
                 $attachments[]= [
@@ -1030,200 +1021,20 @@ $app->group('/clock', function (RouteCollectorProxy $app) {
 
 /* Gift Cards */
 $app->group('/gift-card', function (RouteCollectorProxy $app) {
-  $app->get('',
-            function (Request $request, Response $response, View $view) {
-              $page_size= 25;
+  $app->get('', [ \Scat\Controller\Giftcards::class, 'home' ]);
+  $app->get('/lookup', [ \Scat\Controller\Giftcards::class, 'lookup' ]);
 
-              $cards= \Model::factory('Giftcard')
-                        ->select('*')
-                        ->select_expr('COUNT(*) OVER()', 'total')
-                        ->order_by_desc('id')
-                        ->limit($page_size)->offset($page * $page_size)
-                        ->where('active', 1)
-                        ->find_many();
-
-              return $view->render($response, 'gift-card/index.html', [
-                                           'cards' => $cards,
-                                           'error' => $request->getParam('error'),
-                                          ]);
-            });
-
-  $app->get('/lookup',
-            function (Request $request, Response $response) {
-              $card= $request->getParam('card');
-              $card= preg_replace('/^RAW-/', '', $card);
-              $id= substr($card, 0, 7);
-              $pin= substr($card, -4);
-              $card= \Model::factory('Giftcard')
-                      ->where('id', $id)
-                      ->where('pin', $pin)
-                      ->find_one();
-
-              if ($card) {
-                return $response->withRedirect("/gift-card/" . $card->card());
-              } else {
-                return $response->withRedirect("/gift-card?error=not-found");
-              }
-            });
-
-  $app->post('/create',
-            function (Request $request, Response $response) {
-              $expires= $request->getParam('expires');
-              $txn_id= $request->getParam('txn_id');
-              $balance= $request->getParam('balance');
-
-              \ORM::get_db()->beginTransaction();
-
-              $card= Model::factory('Giftcard')->create();
-
-              $card->set_expr('pin', 'SUBSTR(RAND(), 5, 4)');
-              if ($expires) {
-                $card->expires= $expires . ' 23:59:59';
-              }
-              $card->active= 1;
-
-              $card->save();
-
-              /* Reload the card to make sure we have calculated values */
-              $card= \Model::factory('Giftcard')->find_one($card->id);
-
-              if ($balance) {
-                $txn= $card->txns()->create();
-                $txn->amount= $balance;
-                $txn->card_id= $card->id;
-                if ($txn_id) $txn->txn_id= $txn_id;
-                $txn->save();
-              }
-
-              \ORM::get_db()->commit();
-
-              return $response->withJson($card);
-            });
-
-  $app->get('/{card:[0-9]+}',
-            function (Request $request, Response $response, $card, View $view) {
-              $id= substr($card, 0, 7);
-              $pin= substr($card, -4);
-              $card= \Model::factory('Giftcard')
-                      ->where('id', $id)
-                      ->where('pin', $pin)
-                      ->find_one();
-
-              return $view->render($response, 'gift-card/card.html', [
-                                           'card' => $card,
-                                          ]);
-            });
-
+  $app->post('/', [ \Scat\Controller\Giftcards::class, 'create' ]);
+  $app->get('/{card:[0-9]+}', [ \Scat\Controller\Giftcards::class, 'card' ]);
   $app->get('/{card:[0-9]+}/print',
-            function (Request $request, Response $response, $card) {
-              $id= substr($card, 0, 7);
-              $pin= substr($card, -4);
-              $card= \Model::factory('Giftcard')
-                      ->where('id', $id)
-                      ->where('pin', $pin)
-                      ->find_one();
-
-              $body= $response->getBody();
-              $body->write($card->getPDF());
-              return $response->withHeader("Content-type", "application/pdf");
-            });
-
+            [ \Scat\Controller\Giftcards::class, 'printCard' ]);
   $app->get('/{card:[0-9]+}/email-form',
-            function (Request $request, Response $response, $card,
-                      \Scat\Service\Txn $txn, View $view) {
-              $txn= $txn->fetchById($request->getParam('id'));
-              return $view->render($response, 'dialog/email-gift-card.html',
-                                         [ "card" => $card ]);
-            });
+            [ \Scat\Controller\Giftcards::class, 'getEmailForm' ]);
   $app->post('/{card:[0-9]+}/email',
-            function (Request $request, Response $response, $card, View $view) {
-              $id= substr($card, 0, 7);
-              $pin= substr($card, -4);
-              $card= \Model::factory('Giftcard')
-                      ->where('id', $id)
-                      ->where('pin', $pin)
-                      ->find_one();
+              [ \Scat\Controller\Giftcards::class, 'emailCard' ]);
 
-              $email_body= $view->fetch('email/gift-card.html',
-                                              $request->getParams());
-              $subject= $view->fetchBlock('email/gift-card.html',
-                                                'title',
-                                                $request->getParams());
-
-              $giftcard_pdf= $card->getPDF();
-
-              // XXX fix hardcoded name
-              $from= $from_name ? "$from_name via Raw Materials Art Supplies"
-                                : "Raw Materials Art Supplies";
-              $to_name= $request->getParam('to_name');
-              $to_email= $request->getParam('to_email');
-
-              $httpClient= new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client());
-              $sparky= new \SparkPost\SparkPost($httpClient,
-                                                [ 'key' => SPARKPOST_KEY ]);
-
-              $promise= $sparky->transmissions->post([
-                'content' => [
-                  'html' => $email_body,
-                  'subject' => $subject,
-                  'from' => array('name' => $from,
-                                  'email' => OUTGOING_EMAIL_ADDRESS),
-                  'attachments' => [
-                    [
-                      'name' => 'Gift Card.pdf',
-                      'type' => 'application/pdf',
-                      'data' => base64_encode($giftcard_pdf),
-                    ]
-                  ],
-                  'inline_images' => [
-                    [
-                      'name' => 'logo.png',
-                      'type' => 'image/png',
-                      'data' => base64_encode(
-                                 file_get_contents('../ui/logo.png')),
-                    ],
-                  ],
-                ],
-                'substitution_data' => $data,
-                'recipients' => [
-                  [
-                    'address' => [
-                      'name' => $to_name,
-                      'email' => $to_email,
-                    ],
-                  ],
-                  [
-                    // BCC ourselves
-                    'address' => [
-                      'name' => $to_name,
-                      'header_to' => $to_email,
-                      'email' => OUTGOING_EMAIL_ADDRESS,
-                    ],
-                  ],
-                ],
-                'options' => [
-                  'inlineCss' => true,
-                  'transactional' => true,
-                ],
-              ]);
-
-              $res= $promise->wait();
-
-              return $response->withJson([ 'message' => 'Success!' ]);
-            });
-
-  $app->post('/{card:[0-9]+}/add-txn',
-            function (Request $request, Response $response, $card) {
-              $id= substr($card, 0, 7);
-              $pin= substr($card, -4);
-              $card= \Model::factory('Giftcard')
-                      ->where('id', $id)
-                      ->where('pin', $pin)
-                      ->find_one();
-              $card->add_txn($request->getParam('amount'),
-                             $request->getParam('txn_id'));
-              return $response->withJson($card);
-            });
+  $app->post('/{card:[0-9]+}',
+              [ \Scat\Controller\Giftcards::class, 'addTransaction' ]);
 });
 /* Two extras used by Ordure */
 $app->get('/~gift-card/check-balance',

@@ -58,20 +58,10 @@
 
     let formData= new FormData(ev.target)
 
-    fetch("/gift-card/" + formData.get('card') + "/email", {
-      method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      body: formData
-    })
-    .then(res => {
-      if (res.ok) {
-        return res.json()
-      } else {
-        alert(res.statusText)
-      }
-    })
-    .then(res => {
-      alert(res.message)
+    scat.call("/gift-card/" + formData.get('card') + "/email", formData)
+    .then((res) => res.json())
+    .then((data) => {
+      alert(data.message)
       $(dialog).modal('hide')
     })
   })

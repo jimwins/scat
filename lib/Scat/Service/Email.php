@@ -11,10 +11,16 @@ class Email {
     $this->from_name= $config->get('email.from_name');
   }
 
-  public function send($to, $subject, $body, $attachments= null) {
+  public function send($to, $subject, $body,
+                        $attachments= null, $options= null)
+  {
     $email= new \SendGrid\Mail\Mail();
 
-    $email->setFrom($this->from_email, $this->from_name);
+    if ($options['from']) {
+      $email->setFrom($options['from']['email'], $options['from']['name']);
+    } else {
+      $email->setFrom($this->from_email, $this->from_name);
+    }
     $email->setSubject($subject);
 
     /* We might have just gotten an email in $to */
@@ -38,6 +44,14 @@ class Email {
     }
 
     $email->addContent("text/html", $body);
+
+    $email->addAttachment(
+        base64_encode(file_get_contents('../ui/logo.png')),
+        'image/png',
+        'logo.png',
+        'inline',
+        'logo.png'
+    );
 
     if ($attachments) {
       $email->addAttachments($attachments);
