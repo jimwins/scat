@@ -1036,22 +1036,6 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
   $app->post('/{card:[0-9]+}',
               [ \Scat\Controller\Giftcards::class, 'addTransaction' ]);
 });
-/* Two extras used by Ordure */
-$app->get('/~gift-card/check-balance',
-          function (Request $request, Response $response,
-                    \Scat\Service\Giftcard $giftcard) {
-            $card= $request->getParam('card');
-            return $response->withJson($giftcard->check_balance($card));
-          });
-
-$app->get('/~gift-card/add-txn',
-          function (Request $request, Response $response,
-                    \Scat\Service\Giftcard $giftcard) {
-            $card= $request->getParam('card');
-            $amount= $request->getParam('amount');
-            return $response->withJson($giftcard->add_txn($card, $amount));
-          });
-
 
 /* Reports */
 $app->group('/report', function (RouteCollectorProxy $app) {

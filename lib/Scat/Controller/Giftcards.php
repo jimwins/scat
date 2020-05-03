@@ -88,6 +88,11 @@ class Giftcards {
   public function card(Request $request, Response $response, $card) {
     $card= $this->fetch($card);
 
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($card);
+    }
+
     return $this->view->render($response, 'gift-card/card.html', [
       'card' => $card,
     ]);
