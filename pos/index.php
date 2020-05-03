@@ -6,7 +6,6 @@ use \Slim\Http\Response as Response;
 use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 use \Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
-use \DavidePastore\Slim\Validation\Validation as Validation;
 
 /* Some defaults */
 error_reporting(E_ALL & ~E_NOTICE);

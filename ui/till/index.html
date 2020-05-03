@@ -153,9 +153,15 @@
             return res.json()
           })
           .then((data) => {
-            alert("Success! Withdrew " +
-                  scat.amount(form.elements['amount'].value) + " from till.")
-            form.reset()
+            if (data.error) {
+              alert(data.error)
+              // TODO handle validation errors
+            } else {
+              alert("Success! Withdrew " +
+                    scat.amount(form.elements['amount'].value) + " from till.")
+              // TODO update expected
+              form.reset()
+            }
           })
         })
       </script>

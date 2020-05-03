@@ -50,13 +50,13 @@
         "quickbooks/v3-php-sdk": "^5.3",
         "setasign/fpdf": "^1.8",
         "forkawesome/fork-awesome": "^1.1",
-        "davidepastore/slim-validation": "^0.5.1",
         "slim/psr7": "^1.0",
         "middlewares/trailing-slash": "^2.0",
         "php-di/php-di": "^6.1",
         "slim/http": "^1.0",
         "php-di/slim-bridge": "^3.0",
-        "sendgrid/sendgrid": "^7.5"
+        "sendgrid/sendgrid": "^7.5",
+        "respect/validation": "^2.0"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"

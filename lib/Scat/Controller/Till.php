@@ -38,8 +38,8 @@ class Till {
 
   public function count(Request $request, Response $response) {
     try {
-      v::numeric()::positive()->assert($request->getParam('counted'));
-      v::numeric()->assert($request->getParam('withdraw'));
+      v::numericVal()::positive()->assert($request->getParam('counted'));
+      v::numericVal()->assert($request->getParam('withdraw'));
     } catch (\Respect\Validation\Exceptions\ValidationException $e) {
       return $response->withJson([
         'error' => "Validation failed.",
@@ -85,8 +85,8 @@ class Till {
 
   public function withdrawCash(Request $request, Response $response) {
     try {
-      v::numeric()::positive()->assert($request->getParam('amount'));
-      v::stringType()::notOptional()->assert($request->getParam('reason'));
+      v::numericVal()->positive()->assert($request->getParam('amount'));
+      v::stringType()->notBlank()->assert($request->getParam('reason'));
     } catch (\Respect\Validation\Exceptions\ValidationException $e) {
       return $response->withJson([
         'error' => "Validation failed.",
