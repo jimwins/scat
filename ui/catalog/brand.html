@@ -49,7 +49,7 @@
   <ul style="column-count: 3" class="list-group">
     {% for b in brands %}
       <li class="list-group-item" style="break-inside: avoid-column">
-        <a href="{{ url_for('catalog-brand', { 'brand' : b.slug }) }}">
+        <a href="{{ url_for('catalog-brand', { 'slug' : b.slug }) }}">
           {{ b.name }}
         </a>
       </li>
