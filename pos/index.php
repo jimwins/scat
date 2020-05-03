@@ -1245,30 +1245,10 @@ $app->get('/~gift-card/add-txn',
 
 /* Reports */
 $app->group('/report', function (RouteCollectorProxy $app) {
-  $app->get('/quick',
-            function (Request $request, Response $response,
-                      \Scat\Service\Report $report, View $view) {
-              $data= $report->sales();
-              return $view->render($response, 'dialog/report-quick.html',
-                                         $data);
-            });
+  $app->get('/quick', [ \Scat\Controller\Reports::class, 'quick' ]);
   $app->get('/empty-products',
-            function (Request $request, Response $response,
-                      \Scat\Service\Report $report, View $view) {
-              $data= $report->emptyProducts();
-              return $view->render($response, 'report/empty-products.html',
-                                         $data);
-            });
-  $app->get('/{name}',
-            function (Request $request, Response $response, $name, View $view) {
-              ob_start();
-              include "../old-report/report-$name.php";
-              $content= ob_get_clean();
-              return $view->render($response, 'report/old.html', [
-                'title' => $GLOBALS['title'],
-                'content' => $content,
-              ]);
-            });
+            [ \Scat\Controller\Reports::class, 'emptyProducts' ]);
+  $app->get('/{name}', [ \Scat\Controller\Reports::class, 'oldReport' ]);
 });
 
 /* Media */
