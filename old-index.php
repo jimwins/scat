@@ -355,7 +355,7 @@ function emailInvoice() {
     Scat.alert("No sale to email.");
     return false;
   }
-  scat.dialog({}, '/sale/email-invoice-form', { id: txn })
+  scat.dialog({}, '/sale/' + txn + '/email-invoice-form')
   return false;
 }
 

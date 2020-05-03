@@ -80,75 +80,14 @@ $app->get('/',
 
 /* Sales */
 $app->group('/sale', function (RouteCollectorProxy $app) {
-  $app->get('',
-            function (Request $request, Response $response,
-                      \Scat\Service\Txn $txn, View $view) {
-              $page= (int)$request->getParam('page');
-              $limit= 25;
-              $txns= $txn->find('customer', $page, $limit);
-              return $view->render($response, 'txn/index.html', [
-                'type' => 'customer',
-                'txns' => $txns,
-                'page' => $page,
-                'limit' => $limit,
-              ]);
-            });
-  $app->get('/new',
-            function (Response $response, View $view) {
-              ob_start();
-              include "../old-index.php";
-              $content= ob_get_clean();
-              return $view->render($response, 'sale/old-new.html', [
-                'title' => $GLOBALS['title'],
-                'content' => $content,
-              ]);
-            });
-  $app->get('/{id:[0-9]+}',
-            function (Response $response, $id) {
-              return $response->withRedirect("/?id=$id");
-            })->setName('sale');
-  $app->get('/email-invoice-form',
-            function (Request $request, Response $response,
-                      \Scat\Service\Txn $txn, View $view) {
-              $txn= $txn->fetchById($request->getParam('id'));
-              return $view->render($response, 'dialog/email-invoice.html',
-                                   [ 'txn' => $txn ]);
-            });
-  $app->post('/email-invoice',
-            function (Request $request, Response $response,
-                      \Scat\Service\Txn $txn, View $view,
-                      \Scat\Service\Email $email) {
-              $txn= $txn->fetchById($request->getParam('id'));
-              $to_name= $request->getParam('name');
-              $to_email= $request->getParam('email');
-              $subject= trim($request->getParam('subject'));
-
-              $body= $view->fetch('email/invoice.html',
-                                   [
-                                     'txn' => $txn,
-                                     'subject' => $subject,
-                                     'content' =>
-                                       $request->getParam('content'),
-                                   ]);
-
-              $attachments= [];
-              if ($request->getParam('include_details')) {
-                $pdf= $txn->getInvoicePDF();
-                $attachments[]= [
-                  base64_encode($pdf->Output('', 'S')),
-                  'application/pdf',
-                  (($txn->type == 'vendor') ? 'PO' : 'I') .
-                    $txn->formatted_number() . '.pdf',
-                  'attachment'
-                ];
-              }
-
-              $res= $email->send([ $to_email => $to_name ],
-                                 $subject, $body, $attachments);
-
-              return $response->withJson($res->body() ?:
-                                          [ "message" => "Email sent." ]);
-            });
+  $app->get('', [ \Scat\Controller\Transactions::class, 'sales' ]);
+  $app->get('/new', [ \Scat\Controller\Transactions::class, 'newSale' ]);
+  $app->get('/{id:[0-9]+}', [ \Scat\Controller\Transactions::class, 'sale' ])
+      ->setName('sale');
+  $app->get('/{id:[0-9]+}/email-invoice-form',
+            [ \Scat\Controller\Transactions::class, 'emailForm' ]);
+  $app->post('/{id:[0-9]+}/email-invoice',
+              [ \Scat\Controller\Transactions::class, 'email' ]);
 });
 
 /* Purchases */

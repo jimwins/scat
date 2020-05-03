@@ -7,7 +7,6 @@
 
 {% block body %}
   <div class="modal-body">
-    <input type="hidden" name="id" value="{{ txn.id }}">
 
     <div class="form-group">
       <label for="name">Email</label>
@@ -57,20 +56,10 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    fetch("/sale/email-invoice", {
-      method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      body: formData
-    })
-    .then(res => {
-      if (res.ok) {
-        return res.json()
-      } else {
-        alert(res.statusText)
-      }
-    })
-    .then(res => {
-      alert(res.message)
+    scat.call("/sale/{{ txn.id }}/email-invoice", formData)
+    .then((res) => res.json())
+    .then((data) => {
+      alert(data.message)
       $(dialog).modal('hide')
     })
   }
