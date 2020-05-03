@@ -106,6 +106,8 @@ class Media {
   public function addFromInstagram(Request $request, Response $response) {
     $type= $request->getParam('media_type');
 
+    error_log($request->getBody() . "\n");
+
     $this->data->beginTransaction();
 
     $url= ($type == 'IMAGE') ? $request->getParam('media_url') :
