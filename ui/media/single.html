@@ -1,7 +1,7 @@
 {% extends 'layout/page.html' %}
 
 {% block title %}
-  {{ image.alt_text }} - {{ image.width }}&times;{{ image.height}}
+  {{ image.name }} - {{ image.width }}&times;{{ image.height}}
 {% endblock %}
 
 {% block content %}
@@ -10,7 +10,13 @@
       Delete
     </button>
   </div>
-  <h1 class="page-header">{{ block('title') }}</h1>
+  <h1 class="page-header">
+    <span class="editable" data-name="name">{{ image.name }}</span>
+    -
+    <span class="editable" data-name="width">{{ image.width }}</span>
+    &times;
+    <span class="editable" data-name="height">{{ image.height }}</span>
+  </h1>
 
   <div class="row">
     <div class="col-sm-6">
