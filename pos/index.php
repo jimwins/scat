@@ -1269,122 +1269,13 @@ $app->group('/note', function (RouteCollectorProxy $app) {
 
 /* Till */
 $app->group('/till', function (RouteCollectorProxy $app) {
-  $app->get('',
-            function (Request $request, Response $response, View $view) {
-              $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) AS expected
-                     FROM payment
-                    WHERE method IN ('cash','change','withdrawal')";
-              $data= \ORM::for_table('payment')->raw_query($q)->find_one();
-              return $view->render($response, "till/index.html", [
-                'expected' => $data->expected,
-              ]);
-            });
-
+  $app->get('', [ \Scat\Controller\Till::class, 'home' ]);
   $app->post('/~print-change-order',
-             function (Request $request, Response $response,
-                       \Scat\Service\Printer $printer) {
-               return $printer->printFromTemplate(
-                 $response, 'receipt',
-                 'print/change-order.html',
-                 $request->getParams()
-               );
-             });
-
+              [ \Scat\Controller\Till::class, 'printChangeOrder' ]);
   $app->post('/~count',
-             function (Request $request, Response $response,
-                       \Scat\Service\Txn $txn) {
-               if ($request->getAttribute('has_errors')) {
-                 return $response->withJson([
-                   'error' => "Validation failed.",
-                   'validation_errors' => $request->getAttribute('errors')
-                 ]);
-               }
-
-               $counted= $request->getParam('counted');
-               $withdraw= $request->getParam('withdraw');
-
-               $q= "SELECT CAST(SUM(amount) AS DECIMAL(9,2)) AS expected
-                      FROM payment
-                     WHERE method IN ('cash','change','withdrawal')";
-               $data= \ORM::for_table('payment')->raw_query($q)->find_one();
-               $expected= $data->expected;
-
-               \ORM::get_db()->beginTransaction();
-
-               $txn= $txn->create([ 'type' => 'drawer' ]);
-
-               if ($count != $expected) {
-                 $amount= $counted - $expected;
-
-                 $payment= Model::factory('Payment')->create();
-                 $payment->txn_id= $txn->id;
-                 $payment->method= 'cash';
-                 $payment->amount= $amount;
-                 $payment->set_expr('processed', 'NOW()');
-
-                 $payment->save();
-               }
-
-               if ($withdraw) {
-                 $payment= Model::factory('Payment')->create();
-                 $payment->txn_id= $txn->id;
-                 $payment->method= 'withdrawal';
-                 $payment->amount= -$withdraw;
-                 $payment->set_expr('processed', 'NOW()');
-
-                 $payment->save();
-               }
-
-               \ORM::get_db()->commit();
-
-               $data= \ORM::for_table('payment')->raw_query($q)->find_one();
-               return $response->withJson(['expected' => $data->expected ]);
-             })
-      ->add(new Validation([
-        'counted' => v::numeric()::positive(),
-        'withdraw' => v::numeric(),
-      ]));
-
+              [ \Scat\Controller\Till::class, 'count' ]);
   $app->post('/~withdraw-cash',
-             function (Request $request, Response $response,
-                       \Scat\Service\Txn $txn) {
-               if ($request->getAttribute('has_errors')) {
-                 return $response->withJson([
-                   'error' => "Validation failed.",
-                   'validation_errors' => $request->getAttribute('errors')
-                 ]);
-               }
-
-               $reason= $request->getParam('reason');
-               $amount= $request->getParam('amount');
-
-               \ORM::get_db()->beginTransaction();
-
-               $txn= $txn->create([ 'type' => 'drawer' ]);
-
-               $payment= Model::factory('Payment')->create();
-               $payment->txn_id= $txn->id;
-               $payment->method= 'withdrawal';
-               $payment->amount= -$amount;
-               $payment->set_expr('processed', 'NOW()');
-
-               $payment->save();
-
-               $note= Model::factory('Note')->create();
-               $note->kind= 'txn';
-               $note->attach_id= $txn->id;
-               $note->content= $reason;
-
-               $note->save();
-
-               \ORM::get_db()->commit();
-
-               return $response->withJson($txn);
-             })
-      ->add(new Validation([
-        'amount' => v::numeric()::positive(),
-        'reason' => v::stringType()::notOptional(),
-      ]));
+              [ \Scat\Controller\Till::class, 'withdrawCash' ]);
 });
 
 /* Safari notifications */

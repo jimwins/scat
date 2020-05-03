@@ -3,11 +3,26 @@ namespace Scat\Service;
 
 class Txn
 {
-  public function __construct() {
+  private $data;
+
+  public function __construct(\Scat\Service\Data $data) {
+    $this->data= $data;
   }
 
-  public function create($options) {
-    return \Scat\Model\Txn::create($options);
+  public function create($type, $data= null) {
+    $txn= $this->data->factory('Txn')->create([ 'type' => $type ]);
+    if ($data) {
+      $txn->hydrate($data)->force_all_dirty();
+    }
+
+    // Generate number based on transaction type
+    $number= $this->data->factory('Txn')
+                  ->where('type', $txn->type)
+                  ->max('number');
+    $txn->number= $number + 1;
+
+    $txn->save();
+    return $txn;
   }
 
   public function fetchById($id) {
@@ -22,5 +37,10 @@ class Txn
                 ->where('type', $type)
                 ->limit($limit)->offset($page * $limit)
                 ->find_many();
+  }
+
+  /* Till needs to get payments directly. */
+  public function getPayments() {
+    return $this->data->factory('Payment');
   }
 }
