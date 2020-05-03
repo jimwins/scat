@@ -101,6 +101,6 @@ class Image extends \Scat\Model {
   }
 
   public function productsUsedBy() {
-    return $this->has_many_through('Product')->find_many();
+    return $this->has_many_through('Product');
   }
 }

@@ -63,7 +63,7 @@
       {{ person.email }}<br>
     {% endif %}
   {% endif %}
-  {% for note in txn.notes %}
+  {% for note in txn.notes.find_many %}
     {% if note.content starts with 'PO ' %}
       {{ note.content }}
     {% endif %}
@@ -145,7 +145,7 @@
   {% endif %}
 </table>
 
-{% for note in txn.notes %}
+{% for note in txn.notes.find_many %}
   {% if note.public %}
     <p>
       {{ note.content }}

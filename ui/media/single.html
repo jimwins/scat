@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      {% set products= image.productsUsedBy() %}
+      {% set products= image.productsUsedBy.find_many %}
       {% if products|length %}
         <div class="panel panel-default">
           <div class="panel-heading">
