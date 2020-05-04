@@ -1236,7 +1236,7 @@ viewModel.reopenAllocated= function() {
 }
 
 viewModel.showNotes= function() {
-  Scat.showNotes({ kind: 'txn', attach_id: Txn.id() });
+  scat.dialog(this, '/note?kind=txn&attach_id=' + Txn.id())
 }
 
 viewModel.removeItem= function(item) {

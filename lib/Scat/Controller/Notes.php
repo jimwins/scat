@@ -16,6 +16,8 @@ class Notes {
 
   public function view(Request $request, Response $response,
                         View $view, $id= 0) {
+    $kind= $request->getParam('kind');
+    $attach_id= $request->getParam('attach_id');
     $staff= $this->data->factory('Person')
               ->where('role', 'employee')
               ->where('person.active', 1)
@@ -30,9 +32,14 @@ class Notes {
                                  WHERE children.parent_id = note.id)',
                               'children')
                 ->where('parent_id', 0)
-                ->where('todo', 1)
-                ->order_by_desc('id')
-                ->find_many();
+                ->order_by_desc('id');
+      if ($kind) {
+        $notes= $notes->where('kind', $kind)
+                      ->where('attach_id', $attach_id);
+      } else {
+        $notes= $notes->where('todo', 1);
+      }
+      $notes= $notes->find_many();
     } else {
       $notes= $this->data->factory('Note')
                 ->select('*')
@@ -74,6 +81,8 @@ class Notes {
 
     $note= $this->data->factory('Note')->create();
     $note->source= $sms ? 'sms' : 'internal';
+    $note->kind= $request->getParam('kind') ?: 'general';
+    $note->attach_id= $request->getParam('attach_id') ?: null;
     $note->parent_id= (int)$request->getParam('parent_id');
     $note->person_id= (int)$request->getParam('person_id');
     $note->content= $request->getParam('content');
