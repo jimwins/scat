@@ -209,6 +209,8 @@ class Transactions {
   public function createPurchase(Request $request, Response $response) {
     $vendor_id= $request->getParam('vendor');
 
+    error_log("Creating purchase for $vendor_id");
+
     if (!$vendor_id) {
       throw new \Exception("No vendor specified.");
     }
@@ -217,6 +219,8 @@ class Transactions {
       'person_id' => $vendor_id,
       'tax_rate' => 0,
     ]);
+
+    $purchase->save();
 
     /* Pass through to addToPurchase() to handle adding items */
     return $this->addToPurchase($request, $response, $purchase->id);
@@ -237,39 +241,41 @@ class Transactions {
     }
 
     $items= $request->getParam('item');
-    foreach ($items as $item_id => $quantity) {
-      if (!$quantity) {
-        continue;
+    if ($items) {
+      foreach ($items as $item_id => $quantity) {
+        if (!$quantity) {
+          continue;
+        }
+
+        $vendor_items=
+          \Scat\Model\VendorItem::findByItemIdForVendor($item_id,
+                                                  $vendor_id);
+
+        // Get the lowest available price for our quantity
+        $price= 0;
+        foreach ($vendor_items as $item) {
+          $contender= ($item->promo_price > 0.00 &&
+                       $quantity >= $item->promo_quantity) ?
+                      $item->promo_price :
+                      (($quantity >= $item->purchase_quantity) ?
+                       $item->net_price :
+                       0);
+          $price= ($price && $price < $contender) ?
+                  $price :
+                  $contender;
+        }
+
+        if (!$price) {
+          error_log("Failed to get price for $item_id");
+        }
+
+        $item= $purchase->items()->create();
+        $item->txn_id= $purchase->id;
+        $item->item_id= $item_id;
+        $item->ordered= $quantity;
+        $item->retail_price= $price;
+        $item->save();
       }
-
-      $vendor_items=
-        \Scat\Model\VendorItem::findByItemIdForVendor($item_id,
-                                                $vendor_id);
-
-      // Get the lowest available price for our quantity
-      $price= 0;
-      foreach ($vendor_items as $item) {
-        $contender= ($item->promo_price > 0.00 &&
-                     $quantity >= $item->promo_quantity) ?
-                    $item->promo_price :
-                    (($quantity >= $item->purchase_quantity) ?
-                     $item->net_price :
-                     0);
-        $price= ($price && $price < $contender) ?
-                $price :
-                $contender;
-      }
-
-      if (!$price) {
-        error_log("Failed to get price for $item_id");
-      }
-
-      $item= $purchase->items()->create();
-      $item->txn_id= $purchase->id;
-      $item->item_id= $item_id;
-      $item->ordered= $quantity;
-      $item->retail_price= $price;
-      $item->save();
     }
 
     \ORM::get_db()->commit();

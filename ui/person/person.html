@@ -220,7 +220,7 @@
           </div>
           <div class="panel-body form-horizontal">
             <a class="btn btn-default"
-               href="/purchase/create?vendor={{ person.id }}">
+               id="create-order">
               Create Order
             </a>
             <a class="btn btn-default"
@@ -401,6 +401,15 @@
           body: JSON.stringify({ [name]: value })
         })
       })
+    })
+
+    document.getElementById('create-order').addEventListener('click', (ev) => {
+      scat.call("/purchase?vendor={{ person.id }}")
+          .then((res) => {
+            if (res.redirected) {
+              window.location.href= res.url
+            }
+          })
     })
   </script>
 
