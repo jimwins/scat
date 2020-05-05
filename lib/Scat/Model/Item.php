@@ -131,6 +131,14 @@ class Item extends \Scat\Model {
     }
   }
 
+  /* Need to promote a couple of pseudo-fields */
+  public function getFields() {
+    $fields= parent::getFields();
+    $fields[]= 'dimensions';
+    $fields[]= 'stock';
+    return $fields;
+  }
+
   public function setDiscount($discount) {
     $discount= preg_replace('/^\\$/', '', $discount);
     if (preg_match('/^(\d*)(\/|%)( off)?$/', $discount, $m)) {
