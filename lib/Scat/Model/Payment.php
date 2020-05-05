@@ -14,6 +14,7 @@ class Payment extends \Model {
     'paypal' => "PayPal",
     'amazon' => "Amazon Pay",
     'eventbrite' => "Eventbrite",
+    'venmo' => "Venmo",
     'discount' => "Discount",
     'bad' => "Bad Debt",
     'donation' => "Donation",
