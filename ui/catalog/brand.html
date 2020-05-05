@@ -21,25 +21,26 @@
         {% endif %}
       </ol>
     </div>
-    <div class="col-xs-1">
-      <div class="dropdown">
-        <button class="btn btn-default dropdown-toggle"
-                type="button" id="settingsMenu" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="true">
-          <i class="fa fa-cog"></i>
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-right"
-            aria-labelledby="settingsMenu">
-          <li>
-            <a onclick="scat.dialog(this, '/catalog/brand-form',
-                                    { id : {{ brand.id }} })">
-              Edit Brand
-            </a>
-          </li>
-        </ul>
+    {% if brand %}
+      <div class="col-xs-1">
+        <div class="dropdown">
+          <button class="btn btn-default dropdown-toggle"
+                  type="button" id="settingsMenu" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="true">
+            <i class="fa fa-cog"></i>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right"
+              aria-labelledby="settingsMenu">
+            <li>
+              <a onclick="scat.dialog(this, '/catalog/brand/{{ brand.slug }}')">
+                Edit Brand
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
+    {% endif %}
   </div>
 {% endblock %}
 

@@ -63,6 +63,16 @@ $errorMiddleware->setErrorHandler(
             bool $displayErrorDetails) use ($container)
   {
     $response= new \Slim\Psr7\Response();
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      $response->getBody()->write(json_encode([ 'error' => 'Not found.' ]));
+      return $response
+              ->withStatus(404)
+              ->withHeader('Content-Type', 'application/json');
+    }
+    // TODO special handling for application/vnd.scat.dialog?
+
     return $container->get('view')->render($response, '404.html')
       ->withStatus(404)
       ->withHeader('Content-Type', 'text/html');
@@ -104,419 +114,73 @@ $app->group('/purchase', function (RouteCollectorProxy $app) {
 
 /* Catalog */
 $app->group('/catalog', function (RouteCollectorProxy $app) {
-  $app->get('/search',
-            function (Request $request, Response $response,
-                      \Scat\Service\Search $search,
-                      \Scat\Service\Catalog $catalog,
-                      View $view) {
-              $q= trim($request->getParam('q'));
+  $app->get('/search', [ \Scat\Controller\Catalog::class, 'search' ])
+      ->setName('catalog-search');
+  $app->get('/~reindex', [ \Scat\Controller\Catalog::class, 'reindex' ]);
 
-              $data= $search->search($q);
+  $app->get('/custom', [ \Scat\Controller\Catalog::class, 'custom' ]);
 
-              $data['depts']= $catalog->getDepartments();
-              $data['q']= $q;
+  $app->get('/whats-new', [ \Scat\Controller\Catalog::class, 'whatsNew' ])
+      ->setName('catalog-whats-new');
 
-              return $view->render($response, 'catalog/searchresults.html',
-                                   $data);
-            })->setName('catalog-search');
+  $app->get('/brand[/{slug}]', [ \Scat\Controller\Catalog::class, 'brand' ])
+      ->setName('catalog-brand');
+  $app->post('/brand[/{slug}]',
+              [ \Scat\Controller\Catalog::class, 'brandUpdate' ]);
 
-  $app->get('/~reindex',
-            function (Request $request, Response $response,
-                      \Scat\Service\Search $search,
-                      \Scat\Service\Catalog $catalog) {
-    $search->flush();
+  $app->get('/department[/{id:[0-9]+}]',
+            [ \Scat\Controller\Catalog::class, 'dept' ])
+      ->setName('catalog-department');
+  $app->post('/department[/{id:[0-9]+}]',
+            [ \Scat\Controller\Catalog::class, 'deptUpdate' ]);
 
-    $rows= 0;
-    foreach ($catalog->getProducts() as $product) {
-      $rows+= $search->indexProduct($product);
-    }
+  $app->get('/product[/{id:[0-9]+}]',
+            [ \Scat\Controller\Catalog::class, 'product' ])
+      ->setName('catalog-product');
+  $app->post('/product[/{id:[0-9]+}]',
+            [ \Scat\Controller\Catalog::class, 'productUpdate' ]);
 
-    $response->getBody()->write("Indexed $rows rows.");
-    return $response;
-  });
+  $app->post('/product/{id:[0-9]+}/media',
+            [ \Scat\Controller\Catalog::class, 'productAddMedia' ]);
 
-  $app->get('/brand-form',
-            function (Request $request, Response $response,
-                      \Scat\Service\Catalog $catalog, View $view) {
-              $brand= $catalog->getBrandById($request->getParam('id'));
-              return $view->render($response, 'dialog/brand-edit.html',
-                                         [
-                                           'brand' => $brand
-                                         ]);
-            });
-
-  $app->post('/brand-form',
-             function (Request $request, Response $response,
-                      \Scat\Service\Catalog $catalog) {
-               $brand= $catalog->getBrandById($request->getParam('id'));
-               if (!$brand)
-                 $brand= $catalog->createBrand();
-               $brand->name= $request->getParam('name');
-               $brand->slug= $request->getParam('slug');
-               $brand->description= $request->getParam('description');
-               $brand->active= (int)$request->getParam('active');
-               $brand->save();
-               return $response->withJson($brand);
-             });
-
-  $app->get('/department-form',
-            function (Request $request, Response $response,
-                      \Scat\Service\Catalog $catalog, View $view) {
-              $depts= $catalog->getDepartments();
-              $dept= $catalog->getDepartmentById($request->getParam('id'));
-              return $view->render($response, 'dialog/department-edit.html',
-                                         [
-                                           'depts' => $depts,
-                                           'dept' => $dept
-                                         ]);
-            });
-
-  $app->post('/department-form',
-             function (Request $request, Response $response,
-                      \Scat\Service\Catalog $catalog) {
-               $dept= $catalog->getDepartmentById($request->getParam('id'));
-               if (!$dept)
-                 $dept= $catalog->createDepartment();
-               $dept->name= $request->getParam('name');
-               $dept->slug= $request->getParam('slug');
-               $dept->parent_id= $request->getParam('parent_id');
-               $dept->description= $request->getParam('description');
-               $dept->active= (int)$request->getParam('active');
-               $dept->save();
-               return $response->withJson($dept);
-             });
-
-  $app->get('/product-form',
-            function (Request $request, Response $response,
-                      \Scat\Service\Catalog $catalog, View $view) {
-              $depts= $catalog->getDepartments();
-              $product= $catalog->getProductById($request->getParam('id'));
-              $brands= $catalog->getBrands();
-              return $view->render($response, 'dialog/product-edit.html',
-                                         [
-                                           'depts' => $depts,
-                                           'brands' => $brands,
-                                           'product' => $product,
-                                           'department_id' =>
-                                             $request->getParam('department_id'),
-                                         ]);
-            });
-
-  $app->post('/product-form',
-             function (Request $request, Response $response,
-                       \Scat\Service\Catalog $catalog,
-                       \Scat\Service\Search $search) {
-               $product= $catalog->getProductById($request->getParam('id'));
-               if (!$product) {
-                 if (!$request->getParam('slug')) {
-                   throw \Exception("Must specify a slug.");
-                 }
-                 $product= $catalog->createProduct();
-               }
-               foreach ($product->fields() as $field) {
-                 $value= $request->getParam($field);
-                 if (isset($value)) {
-                   $product->set($field, $value);
-                 }
-               }
-               $product->save();
-               $search->indexProduct($product);
-               return $response->withJson($product);
-             });
-
-  $app->post('/product/add-image',
-             function (Request $request, Response $response,
-                       \Scat\Service\Catalog $catalog) {
-               $product= $catalog->getProductById($request->getParam('id'));
-
-               $url= $request->getParam('url');
-               if ($url) {
-                 $image= \Scat\Model\Image::createFromUrl($url);
-                 $product->addImage($image);
-               } else {
-                 foreach ($request->getUploadedFiles() as $file) {
-                   $image= \Scat\Model\Image::createFromStream($file->getStream(),
-                                                         $file->getClientFilename());
-                   $product->addImage($image);
-                 }
-               }
-
-               return $response->withJson($product);
-             });
-
-  $app->get('/brand[/{slug}]',
-            function (Request $request, Response $response,
-                      View $view, \Scat\Service\Catalog $catalog, $slug= null) {
-              $depts= $catalog->getDepartments();
-
-              $brand= $slug ?
-                $catalog->getBrandBySlug($slug) : null;
-              if ($slug && !$brand)
-                throw new \Slim\Exception\HttpNotFoundException($request);
-
-              if ($brand)
-                $products= $brand->products()
-                                 ->order_by_asc('name')
-                                 ->where('product.active', 1)
-                                 ->find_many();
-
-              $brands= $brand ? null : $catalog->getBrands();
-
-              return $view->render($response, 'catalog/brand.html',
-                                         [ 'depts' => $depts,
-                                           'brands' => $brands,
-                                           'brand' => $brand,
-                                           'products' => $products ]);
-            })->setName('catalog-brand');
-
-  $app->get('/item/{code:.*}',
-            function (Request $request, Response $response, $code,
-                      \Scat\Service\Catalog $catalog, View $view) {
-              $item= $catalog->getItemByCode($code);
-              if (!$item)
-               throw new \Slim\Exception\HttpNotFoundException($request);
-              return $view->render($response, 'catalog/item.html', [
-                                          'item' => $item,
-                                         ]);
-            })->setName('catalog-item');
+  $app->get('/item[/{code:.*}]', [ \Scat\Controller\Catalog::class, 'item' ])
+      ->setName('catalog-item');
+  $app->post('/item',
+              [ \Scat\Controller\Catalog::class, 'updateItem' ]);
+  $app->patch('/item/{code:.*}',
+              [ \Scat\Controller\Catalog::class, 'updateItem' ]);
 
   $app->post('/item/{code:.*}/~print-label',
-            function (Request $request, Response $response, $code,
-                      \Scat\Service\Catalog $catalog) {
-              $item= $catalog->getItemByCode($code);
-              if (!$item)
-               throw new \Slim\Exception\HttpNotFoundException($request);
+            [ \Scat\Controller\Catalog::class, 'printItemLabel' ]);
 
-              $body= $response->getBody();
-              $body->write($item->getPDF($request->getParams()));
-              return $response->withHeader("Content-type", "application/pdf");
-            });
+  $app->post('/item/{code:.*}/barcode',
+            [ \Scat\Controller\Catalog::class, 'addItemBarcode' ]);
+  $app->patch('/item/{code:.*}/barcode/{barcode:.*}',
+            [ \Scat\Controller\Catalog::class, 'updateItemBarcode' ]);
+  $app->delete('/item/{code:.*}/barcode/{barcode:.*}',
+            [ \Scat\Controller\Catalog::class, 'deleteItemBarcode' ]);
 
-  $app->post('/item/{code:.*}/~add-barcode',
-            function (Request $request, Response $response, $code,
-                      \Scat\Service\Catalog $catalog) {
-              $item= $catalog->getItemByCode($code);
-              if (!$item)
-               throw new \Slim\Exception\HttpNotFoundException($request);
+  $app->get('/item/{code:.*}/vendor-item',
+            [ \Scat\Controller\Catalog::class, 'findVendorItems' ]);
+  $app->delete('/item/{code:.*}/vendor-item/{id:[0-9]+}',
+            [ \Scat\Controller\Catalog::class, 'unlinkVendorItem' ]);
 
-              $barcode= $item->barcodes()->create();
-              $barcode->item_id= $item->id;
-              $barcode->code= trim($request->getParam('barcode'));
-              $barcode->quantity= 1;
-              $barcode->save();
+  $app->post('/item/~bulk-update',
+            [ \Scat\Controller\Catalog::class, 'bulkItemUpdate' ]);
 
-              return $response->withJson($item);
-            });
+  $app->get('/vendor-item[/{id:[0-9]+}]',
+            [ \Scat\Controller\Catalog::class, 'vendorItem' ]);
 
-  $app->post('/item/{code:.*}/~edit-barcode',
-            function (Request $request, Response $response, $code,
-                      \Scat\Service\Catalog $catalog) {
-              $item= $catalog->getItemByCode($code);
-              if (!$item)
-               throw new \Slim\Exception\HttpNotFoundException($request);
+  $app->post('/vendor-item/search',
+            [ \Scat\Controller\Catalog::class, 'vendorItemSearch' ]);
 
-              $barcode= $item->barcodes()
-                          ->where('code', $request->getParam('pk'))
-                          ->find_one();
+  $app->post('/vendor-item',
+              [ \Scat\Controller\Catalog::class, 'updateVendorItem' ]);
+  $app->patch('/vendor-item/{id:[0-9]+}',
+              [ \Scat\Controller\Catalog::class, 'updateVendorItem' ]);
 
-              if (!$barcode)
-               throw new \Slim\Exception\HttpNotFoundException($request);
-
-              if ($request->getParam('name') == 'quantity') {
-                $barcode->quantity= trim($request->getParam('value'));
-              }
-
-              if ($request->getParam('name') == 'code') {
-                $barcode->code= trim($request->getParam('value'));
-              }
-
-              $barcode->save();
-
-              return $response->withJson($item);
-            });
-
-  $app->post('/item/{code:.*}/~remove-barcode',
-            function (Request $request, Response $response, $code,
-                      \Scat\Service\Catalog $catalog) {
-              $item= $catalog->getItemByCode($code);
-              if (!$item)
-               throw new \Slim\Exception\HttpNotFoundException($request);
-
-              $barcode= $item->barcodes()
-                          ->where('code', $request->getParam('pk'))
-                          ->find_one();
-
-              if (!$barcode)
-               throw new \Slim\Exception\HttpNotFoundException($request);
-
-              $barcode->delete();
-
-              return $response->withJson($item);
-            });
-
-  $app->post('/item/{code:.*}/~find-vendor-items',
-            function (Request $request, Response $response, $code,
-                      \Scat\Service\Catalog $catalog) {
-              $item= $catalog->getItemByCode($code);
-              if (!$item)
-               throw new \Slim\Exception\HttpNotFoundException($request);
-
-              $item->findVendorItems();
-
-              return $response->withJson($item);
-            });
-  $app->post('/item/{code:.*}/~unlink-vendor-item',
-            function (Request $request, Response $response, $code,
-                      \Scat\Service\Catalog $catalog) {
-              $item= $catalog->getItemByCode($code);
-              if (!$item)
-               throw new \Slim\Exception\HttpNotFoundException($request);
-              $vi= $item->vendor_items()
-                        ->where('id', $request->getParam('id'))
-                        ->find_one();
-              if (!$vi)
-               throw new \Slim\Exception\HttpNotFoundException($request);
-
-              $vi->item_id= 0;
-              $vi->save();
-
-              return $response->withJson($item);
-            });
-  $app->post('/item/{code:.*}/~check-vendor-stock',
-            function (Request $request, Response $response, $code,
-                      \Scat\Service\Catalog $catalog) {
-              $item= $catalog->getItemByCode($code);
-              if (!$item)
-               throw new \Slim\Exception\HttpNotFoundException($request);
-              $vi= $item->vendor_items()
-                        ->where('id', $request->getParam('id'))
-                        ->find_one();
-              if (!$vi)
-               throw new \Slim\Exception\HttpNotFoundException($request);
-
-              return $response->withJson($vi->checkVendorStock());
-            });
-
-  $app->get('/item-add-form',
-            function (Request $request, Response $response, View $view) {
-              return $view->render($response, 'dialog/item-add.html',
-                                         [
-                                           'product_id' =>
-                                             $request->getParam('product_id'),
-                                         ]);
-            });
-
-  $app->get('/vendor-item-form',
-            function (Request $request, Response $response,
-                      \Scat\Service\Catalog $catalog, View $view) {
-              $item= $catalog->getItemById($request->getParam('item'));
-              $vendor_item= $catalog->getVendorItemById($request->getParam('id'));
-              return $view->render($response, 'dialog/vendor-item-edit.html',
-                                         [
-                                           'item' => $item,
-                                           'vendor_item' => $vendor_item,
-                                         ]);
-            });
-  $app->post('/~update-vendor-item',
-             function (Request $request, Response $response,
-                       \Scat\Service\Catalog $catalog) {
-               $vi= $catalog->getVendorItemById($request->getParam('id'));
-               if (!$vi) {
-                 $vi= $catalog->createVendorItem();
-               }
-               foreach ($vi->fields() as $field) {
-                 $value= $request->getParam($field);
-                 if (isset($value)) {
-                   $vi->set($field, $value);
-                 }
-               }
-               $vi->save();
-               return $response->withJson($vi);
-             });
-
-
-  $app->post('/item-update',
-             function (Request $request, Response $response,
-                       \Scat\Service\Catalog $catalog, View $view) {
-               $id= $request->getParam('pk');
-               $name= $request->getParam('name');
-               $value= $request->getParam('value');
-               $item= $catalog->getItemById($id);
-               if (!$item)
-                 throw new \Slim\Exception\HttpNotFoundException($request);
-
-               $item->setProperty($name, $value);
-               $item->save();
-
-               return $response->withJson([
-                 'item' => $item,
-                 'newValue' => $item->$name,
-                 'replaceRow' => $view->fetch('catalog/item-row.twig', [
-                                  'i' => $item,
-                                  'variations' => $request->getParam('variations'),
-                                  'product' => $request->getParam('product')
-                                ])
-               ]);
-             });
-  // XXX used by old-report/report-price-change
-  $app->post('/item-reprice',
-             function (Request $request, Response $response,
-                       \Scat\Service\Catalog $catalog) {
-               $id= $request->getParam('id');
-               $retail_price= $request->getParam('retail_price');
-               $discount= $request->getParam('discount');
-               $item= $catalog->getItemById($id);
-               if (!$item)
-                 throw new \Slim\Exception\HttpNotFoundException($request);
-
-               $item->setProperty('retail_price', $retail_price);
-               $item->setProperty('discount', $discount);
-               $item->save();
-
-               return $response->withJson([ 'item' => $item ]);
-             });
-
-
-  $app->post('/bulk-update',
-             function (Request $request, Response $response) {
-               $items= $request->getParam('items');
-
-               if (!preg_match('/^(?:\d+)(?:,\d+)*$/', $items)) {
-                 throw new \Exception("Invalid items specified.");
-               }
-
-               foreach (explode(',', $items) as $id) {
-                 $item= \Model::factory('Item')->find_one($id);
-                 if (!$item)
-                   throw new \Slim\Exception\HttpNotFoundException($request);
-
-                 foreach ([ 'brand_id','product_id','name','short_name','variation','retail_price','discount','minimum_quantity','purchase_quantity','dimensions','weight','prop65','hazmat','oversized','active' ] as $key) {
-                   $value= $request->getParam($key);
-                   if (strlen($value)) {
-                     $item->setProperty($key, $value);
-                   }
-                 }
-
-                 $item->save();
-               }
-
-               return $response->withJson([ 'message' => 'Okay.' ]);
-             });
-
-  $app->get('/whats-new',
-            function (Request $request, Response $response,
-                      \Scat\Service\Catalog $catalog, View $view) {
-              $limit= (int)$request->getParam('limit');
-              if (!$limit) $limit= 12;
-              $products= $catalog->getNewProducts($limit);
-              $depts= $catalog->getDepartments();
-
-              return $view->render($response, 'catalog/whatsnew.html',
-                                         [
-                                           'products' => $products,
-                                           'depts' => $depts,
-                                         ]);
-            })->setName('catalog-whats-new');
+  $app->get('/vendor-item/{id:[0-9]+}/stock',
+              [ \Scat\Controller\Catalog::class, 'vendorItemStock' ]);
 
   $app->get('/price-overrides',
              function (Request $request, Response $response, View $view) {
@@ -564,161 +228,9 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                                          [ 'override' => $override ]);
             });
 
-  /* Custom (no controller, just one standalone page) */
-  $app->get('/custom',
-            function (Request $request, Response $response, View $view,
-                      \Scat\Service\Catalog $catalog) {
-              $depts= $catalog->getDepartments();
-              return $view->render($response, 'catalog/custom.html', [
-                'depts' => $depts,
-              ]);
-            });
-
-
   $app->get('[/{dept}[/{subdept}[/{product}]]]',
-            function (Request $request, Response $response,
-                      \Scat\Service\Catalog $catalog, View $view,
-                      $dept= null, $subdept= null, $product= null) {
-            try {
-              $depts= $catalog->getDepartments();
-              $deptO= $dept ?
-                $catalog->getDepartmentBySlug($dept):null;
-
-              if ($dept && !$deptO)
-                throw new \Slim\Exception\HttpNotFoundException($request);
-
-              $subdepts= $deptO ?
-                $deptO->departments()->order_by_asc('name')->find_many():null;
-
-              $subdeptO= $subdept ?
-                $deptO->departments(false)
-                      ->where('slug', $subdept)
-                      ->find_one():null;
-              if ($subdept && !$subdeptO)
-                throw new \Slim\Exception\HttpNotFoundException($request);
-
-              $products= $subdeptO ?
-                $subdeptO->products()
-                         ->select('product.*')
-                         ->left_outer_join('brand',
-                                           array('product.brand_id', '=',
-                                                  'brand.id'))
-                         ->order_by_asc('brand.name')
-                         ->order_by_asc('product.name')
-                         ->find_many():null;
-
-              $productO= $product ?
-                $subdeptO->products(false)
-                         ->where('slug', $product)
-                         ->find_one():null;
-              if ($product && !$productO)
-                throw new \Slim\Exception\HttpNotFoundException($request);
-
-              $items= $productO ?
-                $productO->items()
-                        # A crude implementation of a numsort
-                        ->order_by_expr('IF(CONVERT(variation, SIGNED),
-                                            CONCAT(LPAD(CONVERT(variation,
-                                                                SIGNED),
-                                                        10, "0"),
-                                                   variation),
-                                            variation) ASC')
-                        ->order_by_expr('minimum_quantity > 0 DESC')
-                        ->order_by_asc('code')
-                        ->find_many():null;
-
-              if ($items) {
-                $variations= array_unique(
-                  array_map(function ($i) {
-                    return $i->variation;
-                  }, $items));
-              }
-
-              $brands= $deptO ? null : $catalog->getBrands();
-
-              return $view->render($response, 'catalog/layout.html',
-                                         [ 'brands' => $brands,
-                                           'dept' => $deptO,
-                                           'depts' => $depts,
-                                           'subdept' => $subdeptO,
-                                           'subdepts' => $subdepts,
-                                           'product' => $productO,
-                                           'products' => $products,
-                                           'variations' => $variations,
-                                           'items' => $items ]);
-             }
-             catch (\Slim\Exception\HttpNotFoundException $ex) {
-               /* TODO figure out a way to not have to add/remove /catalog/ */
-               $path= preg_replace('!/catalog/!', '',
-                                   $request->getUri()->getPath());
-               $re= $catalog->getRedirectFrom($path);
-
-               if ($re) {
-                 return $response->withRedirect('/catalog/' . $re->dest, 301);
-               }
-
-               throw $ex;
-             }
-            })->setName('catalog');
-
-  $app->post('/~add-item',
-             function (Request $request, Response $response,
-                       \Scat\Service\Catalog $catalog) {
-               \ORM::get_db()->beginTransaction();
-
-               $item= $catalog->createItem();
-
-               $item->code= trim($request->getParam('code'));
-               $item->name= trim($request->getParam('name'));
-               $item->retail_price= $request->getParam('retail_price');
-
-               if ($request->getParam('product_id')) {
-                 $item->product_id= $request->getParam('product_id');
-               }
-
-               if (($id= $request->getParam('vendor_item'))) {
-                 $vendor_item= $catalog->getVendorItemById($id);
-                 if ($vendor_item) {
-                   $item->purchase_quantity= $vendor_item->purchase_quantity;
-                   $item->length= $vendor_item->length;
-                   $item->width= $vendor_item->width;
-                   $item->height= $vendor_item->height;
-                   $item->weight= $vendor_item->weight;
-                   $item->prop65= $vendor_item->prop65;
-                   $item->hazmat= $vendor_item->hazmat;
-                   $item->oversized= $vendor_item->oversized;
-                 } else {
-                   // Not a hard error, but log it.
-                   error_log("Unable to find vendor_item $id");
-                 }
-               }
-
-               $item->save();
-
-               if ($vendor_item) {
-                 if ($vendor_item->barcode) {
-                   $barcode= $item->barcodes()->create();
-                   $barcode->code= $vendor_item->barcode;
-                   $barcode->item_id= $item->id();
-                   $barcode->save();
-                 }
-                 if (!$vendor_item->item) {
-                   $vendor_item->item= $item->id();
-                   $vendor_item->save();
-                 }
-               }
-
-               \ORM::get_db()->commit();
-
-               return $response->withJson($item);
-             });
-  $app->post('/~vendor-lookup',
-             function (Request $request, Response $response,
-                       \Scat\Service\Catalog $catalog) {
-               $item=
-                 $catalog->getVendorItemByCode($request->getParam('code'));
-               return $response->withJson($item);
-             });
+            [ \Scat\Controller\Catalog::class, 'catalogPage' ])
+      ->setName('catalog');
 });
 
 /* People */

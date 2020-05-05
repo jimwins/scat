@@ -591,10 +591,16 @@
     })
 
     $('.edit-barcode-quantity').editable({
-      url: '/catalog/item/{{ item.code }}/~edit-barcode',
-      success: (response, newValue) => {
-        if (response.error) { return response.error }
-      }
+      url: (params) => {
+        return fetch("/catalog/item/{{ item.code }}/barcode/" + params.pk, {
+          method: 'PATCH',
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ [params.name] : params.value })
+        })
+      },
     })
     .on('shown', function (e, editable) {
       // Can't just do this directly because $input isn't focused yet
@@ -605,9 +611,16 @@
 
     let removeBarcode= (ev) => {
       let barcode= ev.target.closest('[data-barcode]').getAttribute('data-barcode')
-      scat.call('/catalog/item/{{ item.code }}/~remove-barcode',
-                { pk: barcode })
+      return fetch("/catalog/item/{{ item.code }}/barcode/" + barcode, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
       .then((res) => {
+        if (!res.ok) {
+          return Promise.reject(new Error(res.statusText))
+        }
         window.location.reload()
       })
     }
@@ -620,8 +633,7 @@
       let barcode= window.prompt("What's the new barcode?", "")
       if (!barcode) { return }
 
-      scat.call('/catalog/item/{{ item.code }}/~add-barcode',
-                { barcode: barcode })
+      scat.call('/catalog/item/{{ item.code }}/barcode', { barcode: barcode })
       .then((res) => {
         window.location.reload()
       })
@@ -649,7 +661,7 @@
     document.querySelector('#vendors').addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'find-vendor-items') {
-        scat.call('/catalog/item/{{ item.code }}/~find-vendor-items', {})
+        scat.call('/catalog/item/{{ item.code }}/vendor-item', {})
         .then((res) => {
           window.location.reload()
         })
@@ -660,9 +672,9 @@
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'edit-vendor-item') {
         let vi= ev.target.closest('[data-id]')
-        scat.dialog(ev.target, '/catalog/vendor-item-form', {
-          id: vi ? vi.getAttribute('data-id') : 0,
-          item: {{ item.id }}
+        let id= vi ? vi.getAttribute('data-id') : 0
+        scat.dialog(ev.target, '/catalog/vendor-item' + (id ? '/' + id : ''), {
+          item_id: {{ item.id }}
         })
       }
     })
@@ -670,10 +682,17 @@
     document.querySelector('#vendors').addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'unlink-vendor-item') {
-        scat.call('/catalog/item/{{ item.code }}/~unlink-vendor-item', {
-          id: ev.target.closest('[data-id]').getAttribute('data-id')
+        let id= ev.target.closest('[data-id]').getAttribute('data-id')
+        return fetch("/catalog/item/{{ item.code }}/vendor-item/" + id, {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json'
+          }
         })
         .then((res) => {
+          if (!res.ok) {
+            return Promise.reject(new Error(res.statusText))
+          }
           window.location.reload()
         })
       }
@@ -682,10 +701,12 @@
     document.querySelector('#vendors').addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'check-vendor-stock') {
-        scat.call('/catalog/item/{{ item.code }}/~check-vendor-stock', {
-          id: ev.target.closest('[data-id]').getAttribute('data-id')
-        })
+        let id= ev.target.closest('[data-id]').getAttribute('data-id')
+        fetch('/catalog/vendor-item/' + id + '/stock')
         .then((res) => {
+          if (!res.ok) {
+            return Promise.reject(new Error(res.statusText))
+          }
           return res.json()
         })
         .then((data) => {

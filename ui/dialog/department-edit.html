@@ -7,10 +7,6 @@
 
 {% block body %}
   <div class="modal-body">
-    {% if dept.id %}
-      <input type="hidden" name="id" value="{{ dept.id }}">
-    {% endif %}
-
     <div class="form-group">
       <label for="active">
         Active
@@ -37,7 +33,8 @@
       <select class="form-control" name="parent_id">
         <option value="0">Top</option>
         {% for d in depts %}
-          <option value="{{ d.id }}" {{ d.id == dept.parent_id ? 'selected' }}>
+          <option value="{{ d.id }}"
+                  {{ d.id == (dept.parent_id ?: parent_id) ? 'selected' }}>
             {{ d.name }}
           </option>
         {% endfor %}
@@ -65,16 +62,13 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    fetch("/catalog/department-form", {
-      method: 'POST',
-      body: formData
-    })
-      .then(res => {
-        if (res.ok) {
-          window.location.reload()
-        } else {
-          alert(res.statusText)
-        }
-      })
+    scat.call("/catalog/department{{ dept.id ? '/' ~ dept.id }}", formData)
+        .then((res) => {
+          if (res.redirected) {
+            window.location.href= res.url
+          } else {
+            window.location.reload()
+          }
+        })
   }
 {% endblock %}

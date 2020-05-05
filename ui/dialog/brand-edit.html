@@ -36,7 +36,7 @@
     <div class="form-group">
       <label for="description">Description</label>
       <textarea class="form-control" rows="10" name="description">
-        {{- brand.description }}
+        {{- brand.description -}}
       </textarea>
     </div>
 
@@ -55,16 +55,13 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    fetch("/catalog/brand-form", {
-      method: 'POST',
-      body: formData
-    })
-      .then(res => {
-        if (res.ok) {
-          window.location.reload()
-        } else {
-          alert(res.statusText)
-        }
-      })
+    scat.call("/catalog/brand{{ brand.id ? '/' ~ brand.slug }}", formData)
+        .then((res) => {
+          if (res.redirected) {
+            window.location.href= res.url
+          } else {
+            window.location.reload()
+          }
+        })
   }
 {% endblock %}

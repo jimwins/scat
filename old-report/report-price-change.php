@@ -155,17 +155,29 @@ $('.price-change').popover({
 $('body').on('submit', '.price-change-form', function(ev) {
   ev.preventDefault();
   var form= $(this);
-  scat.call('/catalog/item-reprice', new FormData(ev.target))
-      .then((res) => res.json())
-      .then(function (data) {
-        if ($('input[name="print"]:checked', form).length) {
-          Scat.printDirect('labels-price',
-                           { id: $('input[name="id"]', form).val() });
-        }
-        $(form).parent().parent()
-               .siblings('.price-change')
-               .popover('hide');
-      });
+  let formData= new FormData(ev.target)
+  fetch('/catalog/item/' + formData.get('id'), {
+    method: 'PATCH',
+    headers: {
+      'Content-type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(Object.fromEntries(formData))
+  })
+  .then((res) => {
+    if (!res.ok) {
+      return Promise.reject(new Error(res.statusText))
+    }
+    return res.json()
+  })
+  .then((data) => {
+    if ($('input[name="print"]:checked', form).length) {
+      Scat.printDirect('labels-price', { id: formData.get('id') });
+    }
+    $(form).parent().parent()
+           .siblings('.price-change')
+           .popover('hide');
+  });
 });
 
 $('#download').on('click', function(ev) {

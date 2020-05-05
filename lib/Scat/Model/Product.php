@@ -1,14 +1,8 @@
 <?php
 namespace Scat\Model;
 
-class Product extends \Model implements \JsonSerializable {
+class Product extends \Scat\Model {
   private $old_slug;
-
-  public function fields() {
-    return [ 'id', 'department_id', 'brand_id', 'name',
-             'description', 'slug', 'variation_style',
-             'active' ];
-  }
 
   public function brand() {
     return $this->belongs_to('Brand')->find_one();

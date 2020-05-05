@@ -162,17 +162,8 @@
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
     formData.append('items', item_param)
-    fetch("/catalog/bulk-update", {
-      method: 'POST',
-      body: formData
-    })
-      .then(res => {
-        if (res.ok) {
-          window.location.reload()
-        } else {
-          alert(res.statusText)
-        }
-      })
+    scat.call("/catalog/item/~bulk-update", formData)
+        .then((res) => { window.location.reload() })
   }
 {% endblock %}
 

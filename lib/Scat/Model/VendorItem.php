@@ -10,15 +10,7 @@ use OE\Lukas\QueryTree\Negation;
 use OE\Lukas\QueryTree\DisjunctiveExpressionList;
 use OE\Lukas\QueryTree\ConjunctiveExpressionList;
 
-class VendorItem extends \Model implements \JsonSerializable {
-  public function fields() {
-    return [ 'id', 'vendor_id', 'item', 'code', 'vendor_sku',
-             'name', 'retail_price', 'net_price', 'promo_price',
-             'promo_quantity', 'barcode', 'purchase_quantity',
-             'length', 'width', 'height', 'weight',
-             'special_order', 'prop65', 'hazmat', 'oversized', 'active' ];
-  }
-
+class VendorItem extends \Scat\Model {
   public static
   function findByItemIdForVendor($item_id, $vendor_id, $active= 1) {
     return \Model::factory('VendorItem')

@@ -11,7 +11,7 @@
       <input type="hidden" name="id" value="{{ vendor_item.id }}">
     {% endif %}
     {% if item.id %}
-      <input type="hidden" name="item" value="{{ item.id }}">
+      <input type="hidden" name="item_id" value="{{ item.id }}">
     {% endif %}
 
     <div class="form-group">
@@ -25,8 +25,8 @@
     </div>
 
     <div class="form-group">
-      <label for="vendor">Vendor</label>
-      <select class="form-control initial-focus" name="vendor">
+      <label for="vendor_id">Vendor</label>
+      <select class="form-control initial-focus" name="vendor_id">
         {% if vendor_item.vendor_id %}
           <option value="{{ vendor_item.vendor_id }}">
             {{- vendor_item.vendor().friendly_name -}}
@@ -38,25 +38,25 @@
     <div class="form-group">
       <label for="name">Code</label>
       <input type="text" class="form-control"
-             name="code" value="{{ vendor_item.code }}">
+             name="code" value="{{ vendor_item.code ?: item.code }}">
     </div>
 
     <div class="form-group">
       <label for="name">SKU</label>
       <input type="text" class="form-control"
-             name="vendor_sku" value="{{ vendor_item.vendor_sku }}">
+             name="vendor_sku" value="{{ vendor_item.vendor_sku ?: item.code }}">
     </div>
 
     <div class="form-group">
       <label for="name">Name</label>
       <input type="text" class="form-control"
-             name="name" value="{{ vendor_item.name }}">
+             name="name" value="{{ vendor_item.name ?: item.name }}">
     </div>
 
     <div class="form-group">
       <label for="retail_price">Retail Price</label>
       <input type="text" class="form-control"
-             name="retail_price" value="{{ vendor_item.retail_price }}">
+             name="retail_price" value="{{ vendor_item.retail_price ?: item.retail_price }}">
     </div>
 
     <div class="form-group">
@@ -75,7 +75,7 @@
       <label for="purchase_quantity">Purchase Quantity</label>
       <input type="text" class="form-control"
              name="purchase_quantity"
-             value="{{ vendor_item.purchase_quantity }}">
+             value="{{ vendor_item.purchase_quantity ?: 1 }}">
     </div>
 
     <div class="form-group">
@@ -95,7 +95,7 @@
 
 {% block script %}
 
-  $('[name="vendor"]', form).select2({
+  $('[name="vendor_id"]', form).select2({
     ajax: {
       url: '/person/search',
       datatype: 'json',
@@ -114,17 +114,7 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    fetch("/catalog/~update-vendor-item", {
-      method: 'POST',
-      body: formData
-    })
-    .then((res) => {
-      if (res.ok) {
-        return res.json()
-      } else {
-        alert(res.statusText)
-      }
-    })
+    scat.call("/catalog/vendor-item", formData)
     .then((res) => {
       window.location.reload()
     })

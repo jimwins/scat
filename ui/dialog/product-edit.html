@@ -100,20 +100,14 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    fetch("/catalog/product-form", {
-      method: 'POST',
-      body: formData
-    })
-    .then(res => {
-      if (res.ok) {
-        return res.json()
-      } else {
-        alert(res.statusText)
-      }
-    })
-    .then(res => {
-      window.location.href= '/catalog/' + res.full_slug
-    })
+    scat.call("/catalog/product{{ product.id ? '/' ~ product.id }}", formData)
+        .then((res) => {
+          if (res.redirected) {
+            window.location.href= res.url
+          } else {
+            window.location.reload()
+          }
+        })
   }
 
   form.generateSlug= (event) => {

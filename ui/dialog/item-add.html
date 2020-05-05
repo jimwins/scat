@@ -52,22 +52,16 @@
     event.preventDefault()
 
     let formData= new FormData(form)
-    fetch("/catalog/~vendor-lookup", {
-      method: 'POST',
-      body: formData
-    })
-    .then((res) => {
-      if (res.ok) {
-        return res.json()
-      } else {
-        alert(res.statusText)
-      }
-    })
+    scat.call("/catalog/vendor-item/search", formData)
+    .then((res) => res.json())
     .then((data) => {
-      form.code.value= data.code
-      form.name.value= data.name
-      form.retail_price.value= data.retail_price
-      form.vendor_item.value= data.id
+      // TODO feedback when nothing found
+      if (data.id) {
+        form.code.value= data.code
+        form.name.value= data.name
+        form.retail_price.value= data.retail_price
+        form.vendor_item.value= data.id
+      }
     })
   })
 
@@ -76,7 +70,7 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    fetch("/catalog/~add-item", {
+    fetch("/catalog/item", {
       method: 'POST',
       body: formData
     })
