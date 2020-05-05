@@ -25,6 +25,7 @@ class Ordure {
                                 FROM vendor_item
                                WHERE item_id = item.id
                                  AND vendor_id = 7
+                                 AND vendor_item.active
                                  AND NOT special_order)',
                             'is_dropshippable')
               ->find_many();
