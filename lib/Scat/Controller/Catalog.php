@@ -343,8 +343,8 @@ class Catalog {
       'newValue' => $item->$name,
       'replaceRow' => $this->view->fetch('catalog/item-row.twig', [
                        'i' => $item,
-                       'variations' => $request->getParam('variations'),
-                       'product' => $request->getParam('product')
+                       'variations' => $item->variation,
+                       'product' => $item->product_id,
                      ])
     ]);
   }

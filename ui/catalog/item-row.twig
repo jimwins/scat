@@ -79,10 +79,16 @@
 {
   let row= document.currentScript.parentNode
   $('.editable', document.currentScript.parentNode).editable({
-    url: '/catalog/item-update',
-    params: {
-      variations: {{ variations|length ? "'XXX'" : "''" }},
-      product: {{ product ? 'true' : 'false' }}
+    url: (params) => {
+      return fetch("/catalog/item/" + params.pk, {
+        method: 'PATCH',
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ [params.name] : params.value })
+      })
+      .then((res) => res.json())
     },
     success: (response, newValue) => {
       if (response.error) { return response.error }

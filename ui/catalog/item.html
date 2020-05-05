@@ -529,7 +529,17 @@
   <script>
     $('.editable').editable({
       pk: {{ item.id }},
-      url: '/catalog/item-update',
+      url: (params) => {
+        return fetch("/catalog/item/" + params.pk, {
+          method: 'PATCH',
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ [params.name] : params.value })
+        })
+        .then((res) => res.json())
+      },
       success: (response, newValue) => {
         if (response.error) { return response.error }
         if (response.newValue) { return response }
@@ -544,7 +554,17 @@
 
     $('.editable-select2').editable({
       pk: {{ item.id }},
-      url: '/catalog/item-update',
+      url: (params) => {
+        return fetch("/catalog/item/" + params.pk, {
+          method: 'PATCH',
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ [params.name] : params.value })
+        })
+        .then((res) => res.json())
+      },
       tpl: '<select></select>',
       select2: {
         width: '30em',
