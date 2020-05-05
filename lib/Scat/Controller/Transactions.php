@@ -41,6 +41,48 @@ class Transactions {
     return $response->withRedirect("/?id=$id");
   }
 
+  public function createSale(Request $request, Response $response) {
+    \ORM::get_db()->beginTransaction();
+
+    $copy_from_id= $request->getParam('copy_from_id');
+    $copy= $copy_from_id ? $this->txn->fetchById($copy_from_id) : null;
+
+    $sale= $this->txn->create('customer', [
+      'tax_rate' => 0,
+    ]);
+
+    if ($copy) {
+      // Just copy a limited number of fields
+      foreach ([
+        'person_id', 'shipping_address_id', 'tax_rate',
+        'returned_from_id', 'no_rewards'
+      ] as $field) {
+        $sale->set($field, $copy->$field);
+      }
+    }
+
+    $sale->save();
+
+    if ($copy) {
+      foreach ($copy->items()->find_many() as $line) {
+        $new= $sale->items()->create();
+        $data= $line->as_array();
+        unset($data['id']); // don't copy id!
+        $new->set($data);
+        $new->txn_id= $sale->id;
+        $new->save();
+      }
+    }
+
+    /* We don't copy notes. */
+
+    \ORM::get_db()->commit();
+
+    $path= '/sale/' . $sale->id;
+
+    return $response->withRedirect($path);
+  }
+
   public function emailForm(Request $request, Response $response, $id) {
     $txn= $this->txn->fetchById($id);
 

@@ -606,6 +606,9 @@ $("#txn-load").submit(function(ev) {
             <li data-bind="css: { disabled: !txn.id() || !items().length || txn.paid() }">
                <a data-bind="click: reopenAllocated">Deallocate</a>
             </li>
+            <li data-bind="css: { disabled: !txn.id() || !items().length }">
+               <a data-bind="click: copyTransaction">Clone</a>
+            </li>
             <li data-bind="css: { disabled: !txn.id() || !items().length ||
                                             txn.type() != 'vendor' }">
                <a data-bind="click: exportTransaction">Export</a>
@@ -1219,6 +1222,18 @@ viewModel.clearItems= function() {
     return false;
   }
   Txn.callAndLoad('txn-clear', { txn: Txn.id() });
+}
+
+viewModel.copyTransaction= function() {
+  var txn= Txn.id();
+  scat.call('/sale', { copy_from_id: txn })
+      .then((res) => {
+        if (res.redirected) {
+          window.location.href= res.url
+        } else {
+          alert("Got unexpected result.")
+        }
+      })
 }
 
 viewModel.exportTransaction= function() {

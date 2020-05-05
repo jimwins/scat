@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-class Txn extends \Model implements \JsonSerializable {
+class Txn extends \Scat\Model {
   private $_totals;
 
   public function formatted_number() {
