@@ -1,7 +1,7 @@
 <?
 namespace Scat\Model;
 
-class Item extends \Model implements \JsonSerializable {
+class Item extends \Scat\Model {
   /* XXX Legacy, should get from parent product */
   public function brand() {
     return $this->belongs_to('Brand', 'brand')->find_one();
@@ -265,11 +265,11 @@ class Item extends \Model implements \JsonSerializable {
   }
 }
 
-class Barcode extends \Model {
+class Barcode extends \Scat\Model {
   public function item() {
     return $this->belongs_to('Item')->find_one();
   }
 }
 
-class Prop65_Warning extends \Model {
+class Prop65_Warning extends \Scat\Model {
 }
