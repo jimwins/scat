@@ -589,14 +589,18 @@
       let toggle= ev.target
       let current= ev.target.getAttribute('data-value')
 
-      scat.call('/catalog/item-update', {
-        pk: {{ item.id }},
-        name: ev.target.getAttribute('data-name'),
-        value: current === '1' ? 0 : 1
+      let name= ev.target.getAttribute('data-name')
+      let value= current === '1' ? 0 : 1
+
+      fetch("/catalog/item/{{ item.id }}", {
+        method: 'PATCH',
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ [name] : value })
       })
-      .then((res) => {
-        return res.json()
-      })
+      .then((res) => res.json())
       .then((data) => {
         let icon= toggle.querySelector('i')
         icon.classList.remove('fa-square-o','fa-check-square-o')
