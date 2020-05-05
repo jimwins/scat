@@ -432,9 +432,9 @@ class Catalog {
 
       foreach ($item->getFields() as $field) {
         if ($field == 'id') continue;
-        $value= $request->getParam($key);
+        $value= $request->getParam($field);
         if (strlen($value)) {
-          $item->setProperty($key, $value);
+          $item->setProperty($field, $value);
         }
       }
 
