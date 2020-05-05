@@ -106,7 +106,8 @@ class Media {
   public function addFromInstagram(Request $request, Response $response) {
     $type= $request->getParam('media_type');
 
-    error_log($request->getBody() . "\n");
+    error_log("Media type is $type\n");
+    file_put_contents('/tmp/insta.json', $request->getBody());
 
     $this->data->beginTransaction();
 
