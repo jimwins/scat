@@ -424,10 +424,10 @@ $app->post('/~webhook/sms', [ \Scat\Controller\SMS::class, 'receive' ]);
 $app->post('/~webhook/instagram',
             [ \Scat\Controller\Media::class, 'addFromInstagram' ]);
 
-$app->map(['GET', 'POST'], '/~webhook[/{hook:.*}]',
+$app->map(['GET', 'POST'], '/~webhook[/{hook:[a-z]*}]',
             function (Request $request, Response $response, $hook) {
               error_log("Received webhook $hook\n");
-              error_log(json_encode($request->getParams())."\n");
+              file_put_contents("/tmp/$hook.json", $request->getBody());
               return $response->withJson([ 'message' => 'Received.' ]);
             });
 
