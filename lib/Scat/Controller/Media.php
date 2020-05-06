@@ -111,13 +111,23 @@ class Media {
 
     $this->data->beginTransaction();
 
-    $url= ($type == 'IMAGE') ? $request->getParam('media_url') :
-                               $request->getParam('thumbnail_url');
+    if ($type == 'CAROUSEL_ALBUM') {
+      $children= str_replace("'", '"', $request->getParam('children'));
+      $media= json_decode($children, true);
+    } else {
+      $media= [ $request->getParams() ];
+    }
 
-    $image= \Scat\Model\Image::createFromUrl($url);
-    $image->caption= $request->getParam('caption');
-    $image->data= $request->getBody();
-    $image->save();
+    foreach ($media as $i) {
+      $url= ($i['media_type']== 'IMAGE')
+          ? $i['media_url']
+          : $i['thumbnail_url'];
+
+      $image= \Scat\Model\Image::createFromUrl($url);
+      $image->caption= $i['caption'];
+      $image->data= json_encode($i);
+      $image->save();
+    }
 
     $this->data->commit();
 
