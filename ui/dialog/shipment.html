@@ -38,8 +38,6 @@
   form.onsubmit= (event) => {
     event.preventDefault()
 
-    debugger
-
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
     fetch("/sale/{{ txn.id }}/shipment{{ shipment.id ? '/' ~ shipment.id }}", {
