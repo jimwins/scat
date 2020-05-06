@@ -359,6 +359,8 @@ $app->group('/sms', function (RouteCollectorProxy $app) {
 $app->group('/shipping', function (RouteCollectorProxy $app) {
   $app->get('/~register', [ \Scat\Controller\Shipping::class, 'register' ]);
 });
+$app->post('/~webhook/shipping',
+            [ \Scat\Controller\Shipping::class, 'handleUpdate' ]);
 
 $app->get('/dialog/{dialog}',
           function (Request $request, Response $response, $dialog, View $view) {

@@ -33,22 +33,25 @@
     </thead>
     <tbody>
       {% for data in txn.items.find_many() %}
-        <tr valign="top">
-          <td></td>
-          <td>{{ txn.type == 'vendor' ? data.ordered : -data.ordered }}</td>
-          {% if txn.type == 'vendor' %}
-            <td>{{ data.vendor_sku }}</td>
-          {% endif %}
-          <td><small>{{ data.code }}</small></td>
-          <td>
-            <span>{{ data.name }}</span>
-            <div class="small">{{ data.pricing_detail }}</div>
-          </td>
-          <td class="text-right">{{ scat.amount(data.sale_price) }}</td>
-          <td class="text-right">
-            {{ scat.amount(data.sale_price * (txn.type == 'vendor' ? data.ordered : -data.ordered)) }}
-          </td>
-        </tr>
+        {# hide lines with no code or price to avoid confusion #}
+        {% if data.code != '' or data.sale_price > 0 %}
+          <tr valign="top">
+            <td></td>
+            <td>{{ txn.type == 'vendor' ? data.ordered : -data.ordered }}</td>
+            {% if txn.type == 'vendor' %}
+              <td>{{ data.vendor_sku }}</td>
+            {% endif %}
+            <td><small>{{ data.code }}</small></td>
+            <td>
+              <span>{{ data.name }}</span>
+              <div class="small">{{ data.pricing_detail }}</div>
+            </td>
+            <td class="text-right">{{ scat.amount(data.sale_price) }}</td>
+            <td class="text-right">
+              {{ scat.amount(data.sale_price * (txn.type == 'vendor' ? data.ordered : -data.ordered)) }}
+            </td>
+          </tr>
+        {% endif %}
       {% endfor %}
     </tbody>
     <tfoot>

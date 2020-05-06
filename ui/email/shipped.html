@@ -1,0 +1,34 @@
+{% extends 'layout/email.html' %}
+
+{% block title -%}
+  Your order has been shipped!
+{%- endblock %}
+
+{% block content_top %}
+  <p>
+    {% if txn.person.name %}
+      Dear {{ txn.person.name }},
+    {% else %}
+      Dear,
+    {% endif %}
+  </p>
+
+  <p>
+    Thank you for your order from Raw Materials Art Supplies!
+  </p>
+  <p>
+    We wanted to let you know that your order ({{ txn.formatted_number }}) was
+    shipped via {{ tracker.carrier }} on {{ tracker.created_at | date("l, F j") }}.
+  </p>
+
+{% endblock %}
+
+{% set call_to_action_url= tracker.public_url %}
+{% block call_to_action "Track Your Shipment" %}
+
+{% block content_bottom %}
+  <p>
+    Thank you for your business and we look forward to serving you in the
+    future!
+  </p>
+{% endblock %}

@@ -178,7 +178,8 @@ class Transactions {
         'carrier' => $request->getParam('carrier'),
       ]);
       $shipment->tracker_id= $tracker->id;
-      $shipment->status= $tracker->status;
+      /* Wait for webhook to update status. */
+      $shipment->status= 'unknown';
     }
 
     $shipment->save();
