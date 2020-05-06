@@ -349,6 +349,11 @@ $app->group('/sms', function (RouteCollectorProxy $app) {
 
 });
 
+/* Shipping */
+$app->group('/shipping', function (RouteCollectorProxy $app) {
+  $app->get('/~register', [ \Scat\Controller\Shipping::class, 'register' ]);
+});
+
 $app->get('/dialog/{dialog}',
           function (Request $request, Response $response, $dialog, View $view) {
             return $view->render($response, "dialog/$dialog");

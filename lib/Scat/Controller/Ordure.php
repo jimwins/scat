@@ -175,12 +175,12 @@ class Ordure {
     return $response;
   }
 
-  public function pullOrders(Request $request, Response $response) {
+  public function pullOrders(Request $request, Response $response,
+                              \Scat\Service\Shipping $shipping)
+  {
     $messages= [];
 
     $client= new \GuzzleHttp\Client();
-
-    \EasyPost\EasyPost::setApiKey(EASYPOST_KEY);
 
     $url= ORDURE . '/sale/list';
     $res= $client->request('GET', $url,
@@ -304,7 +304,7 @@ class Ordure {
 
         /* Add shipping address */
         if ($data->sale->shipping_address_id != 1) {
-          $easypost_address= \EasyPost\Address::create([
+          $easypost_address= $shipping->createAddress([
             'name' => $data->shipping_address->name,
             'company' => $data->shipping_address->company,
             'street1' => $data->shipping_address->address1,
