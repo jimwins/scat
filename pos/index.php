@@ -99,6 +99,12 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Transactions::class, 'emailForm' ]);
   $app->post('/{id:[0-9]+}/email-invoice',
               [ \Scat\Controller\Transactions::class, 'email' ]);
+  $app->get('/{id:[0-9]+}/shipment[/{shipment_id:[0-9]+}]',
+            [ \Scat\Controller\Transactions::class, 'saleShipments' ]);
+  $app->post('/{id:[0-9]+}/shipment',
+              [ \Scat\Controller\Transactions::class, 'updateShipment' ]);
+  $app->patch('/{id:[0-9]+}/shipment/{shipment_id:[0-9]+}',
+              [ \Scat\Controller\Transactions::class, 'updateShipment' ]);
 });
 
 /* Purchases */

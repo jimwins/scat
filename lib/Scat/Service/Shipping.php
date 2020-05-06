@@ -18,5 +18,9 @@ class Shipping
   public function createAddress($details) {
     return \EasyPost\Address::create($details);
   }
+
+  public function createTracker($details) {
+    return \EasyPost\Tracker::create($details);
+  }
 }
 

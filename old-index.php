@@ -583,6 +583,19 @@ $("#txn-load").submit(function(ev) {
            <button type="button" class="btn btn-default dropdown-toggle"
                    data-bind="enable: txn.id()"
                    data-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-truck"></i>
+            <span class="caret"></span>
+           </button>
+           <ul class="dropdown-menu" role="menu">
+            <li>
+               <a data-bind="click: addShippingTracker">Add Tracker</a>
+            </li>
+           </ul>
+          </div>
+          <div class="btn-group">
+           <button type="button" class="btn btn-default dropdown-toggle"
+                   data-bind="enable: txn.id()"
+                   data-toggle="dropdown" aria-expanded="false">
             <i class="fa fa-cog"></i>
             <span class="caret"></span>
            </button>
@@ -1202,6 +1215,12 @@ viewModel.load= function(txn) {
 
 viewModel.loadReturnedFrom= function() {
   Txn.loadId(viewModel.txn.returned_from_id());
+}
+
+viewModel.addShippingTracker= () => {
+  var id= Txn.id()
+
+  scat.dialog([], '/sale/' + id + '/shipment')
 }
 
 viewModel.deleteTransaction= function() {

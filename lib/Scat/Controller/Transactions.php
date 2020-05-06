@@ -126,6 +126,66 @@ class Transactions {
                                 [ "message" => "Email sent." ]);
   }
 
+  public function saleShipments(Request $request, Response $response,
+                                $id, $shipment_id= null) {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $shipment= $shipment_id ? $txn->shipments()->find_one($shipment_id) : null;
+    if ($shipment_id && !$shipment)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/shipment.html', [
+        'txn' => $txn,
+        'shipment' => $shipment
+      ]);
+    }
+
+    return $response->withJson($shipment);
+  }
+
+  public function updateShipment(Request $request, Response $response,
+                                  \Scat\Service\Shipping $shipping,
+                                  $id, $shipment_id= null) {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $shipment= $shipment_id ? $txn->shipments()->find_one($shipment_id) : null;
+    if ($shipment_id && !$shipment)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if (!$shipment) {
+      $shipment= $txn->shipments()->create();
+      $shipment->txn_id= $txn->id;
+    }
+
+    foreach ($shipment->getFields() as $field) {
+      if ($field == 'id') continue;
+      $value= $request->getParam($field);
+      if (strlen($value)) {
+        $shipment->setProperty($field, $value);
+      }
+    }
+
+    /* New tracking code? */
+    if (($tracking_code= $request->getParam('tracking_code'))) {
+      $tracker= $shipping->createTracker([
+        'tracking_code' => $tracking_code,
+        'carrier' => $request->getParam('carrier'),
+      ]);
+      $shipment->tracker_id= $tracker->id;
+      $shipment->status= $tracker->status;
+    }
+
+    $shipment->save();
+
+    return $response->withJson($shipment);
+  }
+
   public function purchases(Request $request, Response $response) {
     $page= (int)$request->getParam('page');
     $limit= 25;

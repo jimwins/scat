@@ -152,7 +152,7 @@ class Txn extends \Scat\Model {
     return $mpdf;
   }
 
-  public function jsonSerialize() {
-    return $this->as_array();
+  public function shipments() {
+    return $this->has_many('Shipment');
   }
 }
