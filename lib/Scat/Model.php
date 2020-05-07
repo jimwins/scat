@@ -28,4 +28,25 @@ class Model extends \Model implements \JsonSerializable {
   public function jsonSerialize() {
     return $this->asArray();
   }
+
+  public function reload() {
+    $this->orm->where_id_is($this->id);
+    $this->orm->limit(1);
+    $rows= $this->orm->_run();
+
+    if (empty($rows)) {
+      return false;
+    }
+
+    $this->orm->hydrate($rows[0]);
+    return $this;
+  }
+
+  /* Reload new things so we get all the fields with defaults. */
+  public function save() {
+    $new= $this->is_new();
+    error_log("Saving, new? " . ($new ? 'yes' : 'no') . "\n");
+    parent::save();
+    return $new ? $this->reload() : $this;
+  }
 }
