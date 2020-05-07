@@ -45,7 +45,6 @@ class Model extends \Model implements \JsonSerializable {
   /* Reload new things so we get all the fields with defaults. */
   public function save() {
     $new= $this->is_new();
-    error_log("Saving, new? " . ($new ? 'yes' : 'no') . "\n");
     parent::save();
     return $new ? $this->reload() : $this;
   }
