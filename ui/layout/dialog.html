@@ -1,35 +1,37 @@
 <div class="modal fade" {% block modal_options '' %} role="dialog">
   <div class="modal-dialog {% block size '' %}">
-    <form class="modal-content {% block form_class '' %}">
+    {% block form %}
+      <form class="modal-content {% block form_class '' %}">
 
-      <div class="modal-header">
-        {% block closebutton %}
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        {% endblock %}
-        <h4 class="modal-title">
-          {% block title %}Title{% endblock %}
-        </h4>
-      </div>
-
-      {% block body %}
-        <div class="modal-body">
-          <p>Body goes here.</p>
-        </div>
-      {% endblock %}
-
-      {% block footer %}
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            Close
-          </button>
-          {% block submit %}
-            <button type="submit" class="btn btn-primary">
-              Submit
-            </button>
+        <div class="modal-header">
+          {% block closebutton %}
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           {% endblock %}
+          <h4 class="modal-title">
+            {% block title %}Title{% endblock %}
+          </h4>
         </div>
-      {% endblock %}
-    </form>
+
+        {% block body %}
+          <div class="modal-body">
+            <p>Body goes here.</p>
+          </div>
+        {% endblock %}
+
+        {% block footer %}
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+            {% block submit %}
+              <button type="submit" class="btn btn-primary">
+                Submit
+              </button>
+            {% endblock %}
+          </div>
+        {% endblock %}
+      </form>
+    {% endblock %}
   </div>
   <script>
     {

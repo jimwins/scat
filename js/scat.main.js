@@ -11,15 +11,12 @@ class ScatUtils {
   }
 
   // Pop up a dialog
-  dialog (from, name, data= {}) {
+  dialog (from, name, data= null) {
     let url= name
 
-    if (Object.keys(data)) {
-      let query= Object.keys(data)
-                   .map(k => encodeURIComponent(k) + '=' +
-                             encodeURIComponent(data[k]))
-                   .join('&')
-      url+= '?' + query
+    let params= new URLSearchParams(data)
+    if (params.keys().length) {
+      url+= (url.match(/\?/) ? '&' : '?') + params
     }
 
     if (from.disabled) return false

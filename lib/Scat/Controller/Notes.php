@@ -58,8 +58,10 @@ class Notes {
     }
 
     if ($request->getParam('body_only')) {
-      $block= $view->fetchBlock('dialog/notes.html', 'body', [
-        'parent_id' => 0,
+      $block= $view->fetchBlock('dialog/notes.html', 'form', [
+        'parent_id' => $id,
+        'kind' => $kind,
+        'attach_id' => $attach_id,
         'staff' => $staff,
         'notes' => $notes
       ]);
@@ -68,7 +70,9 @@ class Notes {
       return $response;
     } else {
       return $view->render($response, 'dialog/notes.html', [
-        'parent_id' => 0,
+        'parent_id' => $id,
+        'kind' => $kind,
+        'attach_id' => $attach_id,
         'staff' => $staff,
         'notes' => $notes
       ]);

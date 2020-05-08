@@ -4,9 +4,16 @@
 {% block size 'modal-lg' %}
 
 {% block title %}
-  <a onclick="event.currentTarget.closest('form').loadNotes(0)">
+  {% if parent_id %}
+    <a class="load-note">
+      <i class="fa fa-fw fa-chevron-left"></i>
+    </a>
+  {% endif %}
+  {% if attach_id %}
+    Notes on something
+  {% else %}
     Notes
-  </a>
+  {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -17,28 +24,30 @@
     {% for note in notes %}
       <tr>
         <td class="text-right" width="20%">
-          {% if note.kind == 'txn' %}
-            {% set txn= note.txn %}
-            <a href="{{ url_for('sale', { 'id' : txn.id }) }}">
-              Invoice {{ txn.formatted_number }}
-            </a>
-          {% endif %}
-          {% set about= note.about %}
-          {% if about %}
-            <a class="clearfix" href="{{ url_for('person', { 'id' : about.id() }) }}">
-              {{ about.friendly_name }}
-            </a>
-            {% if about.phone %}
-              <a class="clearfix" href="{{ url_for('person', { 'id' : about.id() }) }}">
-                {{ about.phone | phone_number_format }}
+          {% if not note.parent_id %}
+            {% if note.kind == 'txn' %}
+              {% set txn= note.txn %}
+              <a href="{{ url_for('sale', { 'id' : txn.id }) }}">
+                Invoice {{ txn.formatted_number }}
               </a>
             {% endif %}
-          {% endif %}
-          {% if note.kind == 'item' %}
-            {% set item= note.item %}
-            <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
-              {{ item.name }}
-            </a>
+            {% set about= note.about %}
+            {% if about %}
+              <a class="clearfix" href="{{ url_for('person', { 'id' : about.id() }) }}">
+                {{ about.friendly_name }}
+              </a>
+              {% if about.phone %}
+                <a class="clearfix" href="{{ url_for('person', { 'id' : about.id() }) }}">
+                  {{ about.phone | phone_number_format }}
+                </a>
+              {% endif %}
+            {% endif %}
+            {% if note.kind == 'item' %}
+              {% set item= note.item %}
+              <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
+                {{ item.name }}
+              </a>
+            {% endif %}
           {% endif %}
         </td>
         <td width="100%">
@@ -52,13 +61,13 @@
           <p style="padding-left: 1em">{{ note.content }}</p>
           {% if not note.parent_id %}
             <div class="small">
-              <a onclick="event.currentTarget.closest('form').loadNotes({{ note.id }})">
-              {% if note.children %}
-                View {{ note.children }}
-                repl{{ note.children != '1' ? 'ies' : 'y' }}
-              {% else %}
-                Reply
-              {% endif %}
+              <a class="load-note" data-id="{{ note.id }}">
+                {% if note.children %}
+                  View {{ note.children }}
+                  repl{{ note.children != '1' ? 'ies' : 'y' }}
+                {% else %}
+                  Reply
+                {% endif %}
               </a>
             </div>
           {% endif %}
@@ -153,33 +162,47 @@
   })
 
   form.loadNotes= (id) => {
-    fetch('/note' + (id ? '/' + id : '') + '?body_only=1', {
+    let args= { body_only: 1 }
+    {% if attach_id %}
+      args.attach_id= '{{ attach_id }}'
+    {% endif %}
+    {% if attach_id %}
+      args.kind= '{{ kind }}'
+    {% endif %}
+    let params= new URLSearchParams(args)
+    fetch('/note' + (id ? '/' + id : '') + '?' + params, {
       method: 'GET',
     })
     .then((res) => {
+      if (!res.ok) {
+        return Promise.reject(new Error(res.statusText))
+      }
       return res.text()
     })
     .then((text) => {
       let body= scat.htmlToElement(text)
-      let old= form.getElementsByTagName('table')[0]
-      old.replaceWith(body)
-      form.parent_id.value= id
+      // replace the contents so we don't lose the event handlers
+      form.innerHTML= ''
+      form.append(...body.childNodes)
     })
   }
+
+  form.addEventListener('click', (ev) => {
+    let link= ev.target.closest('.load-note')
+    if (link) {
+      let id= link.getAttribute('data-id')
+      form.loadNotes(id)
+      ev.preventDefault()
+    }
+  })
 
   form.onsubmit= (event) => {
     event.preventDefault()
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    fetch("/note", {
-      method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      body: formData
-    })
-    .then((res) => {
-      return res.json()
-    })
+    scat.call("/note", formData)
+    .then((res) => res.json())
     .then((note) => {
       form.reset()
       form.loadNotes(note.parent_id)
