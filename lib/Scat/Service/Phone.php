@@ -25,6 +25,8 @@ class Phone
       return true;
     }
 
+    error_log("Sending '$text' to '$to'\n");
+
     $url= "https://api.phone.com/v4/accounts/{$this->account_id}/sms";
     $data= [ 'from' => $this->from, 'to' => $to, 'text' => $text ];
 
