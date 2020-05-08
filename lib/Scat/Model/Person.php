@@ -147,7 +147,7 @@ class Person extends \Scat\Model {
        * If this is a new opt-in to Rewards+, need to send welcome
        * and compliance message.
        */
-      if ($value && !$this->rewardsplus) {
+      if ($value && !$this->rewardsplus && $this->loyalty_number) {
         $config= $GLOBALS['container']->get(\Scat\Service\Config::class);
         $phone= $GLOBALS['container']->get(\Scat\Service\Phone::class);
         $message= $config->get('rewards.signup_message');
