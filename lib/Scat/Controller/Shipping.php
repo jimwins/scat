@@ -42,6 +42,7 @@ class Shipping {
 
           if (!$txn->person()->email) {
             error_log("Don't know the email for txn {$txn->id}, can't update");
+            break;
           }
 
           $subject= $view->fetchBlock('email/shipped.html', 'title', [
