@@ -18,6 +18,26 @@
   {%- endif -%}
 {% endmacro %}
 
+{% macro format_txn_status(status) %}
+  {%- if status == 'new' -%}
+    <span class="text-default">New</span>
+  {%- elseif status == 'filled' -%}
+    <span class="text-default">Filled</span>
+  {%- elseif status == 'paid' -%}
+    <span class="text-danger">Paid</span>
+  {%- elseif status == 'processing' -%}
+    <span class="text-danger">Processing</span>
+  {%- elseif status == 'shipped' -%}
+    <span class="text-success">Shipped</span>
+  {%- elseif status == 'complete' -%}
+    <span class="text-success">Complete</span>
+  {%- elseif status == 'template' -%}
+    Template
+  {%- else -%}
+    <span class="text-danger">Unknown</span>
+  {%- endif -%}
+{% endmacro %}
+
 {% macro file_upload(dest) %}
 <style>
 #droptarget {

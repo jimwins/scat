@@ -29,6 +29,7 @@
     <thead>
       <tr>
         <th>#</th>
+        <th>Status</th>
         <th>Number</th>
         <th>Created</th>
         <th>Filled</th>
@@ -43,6 +44,7 @@
       {% for txn in txns %}
         <tr>
           <td>{{ (page * limit) + loop.index }}</td>
+          <td>{{ scat.format_txn_status(txn.status) }}</td>
           <td>
             <a href="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
               {{ txn.formatted_number }}
