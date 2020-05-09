@@ -40,6 +40,11 @@ class Shipping {
           // send order shipped email
           $txn= $shipment->txn();
 
+          if (in_array($txn->status, [ 'paid', 'processing' ])) {
+            $txn->status= 'shipped';
+            $txn->save();
+          }
+
           if (!$txn->person()->email) {
             error_log("Don't know the email for txn {$txn->id}, can't update");
             break;
@@ -57,18 +62,20 @@ class Shipping {
           $res= $email->send([ $txn->person()->email => $txn->person()->name ],
                              $subject, $body);
 
-          if (in_array($txn->status, [ 'paid', 'processing' ])) {
-            $txn->status= 'shipped';
-            $txn->save();
-          }
           break;
 
         case 'delivered':
           // send order delivered email
           $txn= $shipment->txn();
 
+          if (in_array($txn->status, [ 'paid', 'processing', 'shipped' ])) {
+            $txn->status= 'complete';
+            $txn->save();
+          }
+
           if (!$txn->person()->email) {
             error_log("Don't know the email for txn {$txn->id}, can't update");
+            break;
           }
 
           $subject= $view->fetchBlock('email/delivered.html', 'title', [
@@ -83,10 +90,6 @@ class Shipping {
           $res= $email->send([ $txn->person()->email => $txn->person()->name ],
                              $subject, $body);
 
-          if (in_array($txn->status, [ 'paid', 'processing', 'shipped' ])) {
-            $txn->status= 'complete';
-            $txn->save();
-          }
           break;
 
         case 'available_for_pickup':
