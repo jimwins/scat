@@ -99,7 +99,6 @@ class Item extends \Scat\Model {
       case 'length':
       case 'width':
       case 'height':
-      case 'weight':
         $this->$name= $value;
         break;
       case 'name':
@@ -125,6 +124,9 @@ class Item extends \Scat\Model {
         break;
       case 'dimensions':
         $this->setDimensions($value);
+        break;
+      case 'weight':
+        $this->setWeight($value);
         break;
       default:
         throw new \Exception("No way to set '$name' on an item.");
@@ -211,6 +213,14 @@ class Item extends \Scat\Model {
     $this->length= $l;
     $this->width= $w;
     $this->height= $h;
+  }
+
+  public function setWeight($weight) {
+    if (preg_match('/([0-9.]+\s+)?([0-9.]+) *oz/', $weight, $m)) {
+      error_log(json_encode($m));
+      $weight= (int)$m[1] + ($m[2] / 16);
+    }
+    $this->weight= $weight;
   }
 
   public function dimensions() {
