@@ -478,7 +478,7 @@ $(function() {
 
 <!-- SHIPPING -->
 <div class="panel panel-default"
-     data-bind="visible: txn.uuid()">
+     data-bind="visible: txn.shipping_address_id() > 0 || shipments().length">
   <div class="panel-heading">
     <div class="panel-title">Shipping</div>
   </div>
