@@ -11,17 +11,19 @@ $search= $_REQUEST['q'];
 
 if (!$search && !$item) die_jsonp('no query specified');
 
-if ($txn_id) {
-  $txn= txn_load($db, $txn_id);
-  if ($txn['paid']) {
-    die_jsonp("This order is already paid!");
-  }
+if (!$txn_id) {
+  die_jsonp("No transaction specified.");
+}
+
+$txn= txn_load($db, $txn_id);
+if ($txn['paid']) {
+  die_jsonp("This order is already paid!");
 }
 
 if (!$search)
   $search= "item:$item";
 
-$items= item_find($db, $search, ($_REQUEST['all'] ? FIND_ALL : 0) | FIND_STOCKED_FIRST);
+$items= item_find($db, $search, (($item || $_REQUEST['all']) ? FIND_ALL : 0) | FIND_STOCKED_FIRST);
 
 /*
   Fallback: if we found nothing, try searching for an exact match on the
@@ -32,34 +34,9 @@ if (count($items) == 0) {
 }
 
 /* if it is just one item, go ahead and add it to the invoice */
-if (count($items) == 1) {
-  if (!$txn_id) {
-    $q= "START TRANSACTION;";
-    $r= $db->query($q);
-    if (!$r) die_query($db, $q);
-
-    $q= "SELECT 1 + IFNULL(MAX(number),0) AS number
-           FROM txn WHERE type = 'customer'";
-    $r= $db->query($q);
-    if (!$r) die_query($db, $q);
-    $row= $r->fetch_assoc();
-
-    $q= "INSERT INTO txn
-            SET created= NOW(),
-                type = 'customer',
-                number = $row[number],
-                tax_rate = " . DEFAULT_TAX_RATE;
-    $r= $db->query($q);
-    if (!$r) die_query($db, $q);
-
-    $txn_id= $db->insert_id;
-
-    $r= $db->commit();
-    if (!$r) die_query($db, "COMMIT");
-
-    $txn= txn_load($db, $txn_id);
-  }
-
+if (count($items) != 1) {
+  die_jsonp(count($items) ? "More than one item found." : 'No items found.');
+} else {
   // XXX some items should always be added on their own
   $unique= preg_match('/^ZZ-(frame|print|univ|canvas|stretch|float|panel|giftcard)/i', $items[0]['code']);
 
@@ -124,15 +101,4 @@ if (count($items) == 1) {
   }
 
   echo jsonp($ret);
-} else {
-
-  $total= count($items);
-
-  // limit ourselves to 250 items
-  $page= (int)$_REQUEST['page'];
-  $items= array_slice($items, $page * 250, 250);
-
-  echo jsonp(array('total' => $total, 'page' => $page, 'matches' => $items));
 }
-
-

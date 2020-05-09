@@ -19,8 +19,24 @@ class Catalog {
                           \Scat\Service\Search $search)
   {
     $q= trim($request->getParam('q'));
+    $scope= $request->getParam('scope');
 
-    $data= $search->search($q);
+    if ($scope == 'items') {
+      $items= $search->searchItems($q);
+
+      /*
+        Fallback: if we found nothing and it looks like a barcode, try
+        searching for an exact match on the barcode to catch items
+        inadvertantly set inactive.
+      */
+      if (count($items) == 0 && preg_match('/^[-0-9x]+$/i', $q)) {
+        $items= $search->searchItems("barcode:\"$q\" active:0");
+      }
+
+      $data= [ 'items' => $items ];
+    } else {
+      $data= $search->search($q);
+    }
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {

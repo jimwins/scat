@@ -80,9 +80,14 @@ class Transactions {
 
     \ORM::get_db()->commit();
 
-    $path= '/sale/' . $sale->id;
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      $response= $response->withStatus(201)
+                          ->withHeader('Location', '/sale/' . $sale->id);
+      return $response->withJson($sale);
+    }
 
-    return $response->withRedirect($path);
+    return $response->withRedirect('/sale/' . $sale->id);
   }
 
   public function emailForm(Request $request, Response $response, $id) {

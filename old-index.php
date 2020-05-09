@@ -112,14 +112,18 @@ Txn.voidPayment= function (payment_id) {
 }
 
 Txn.addItem= function (txn, item) {
-  Scat.api('txn-add-item', { txn: txn, item: item.id })
-      .done(function (data) {
-        if (data.matches) {
-          // this shouldn't happen!
-        } else {
-          Txn.loadData(data);
-        }
-      });
+  if (!txn) {
+    scat.call('/sale')
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.id) {
+            return Promise.reject(new Error("Unable to create new sale."))
+          }
+          Txn.addItem(data.id, item)
+        })
+    return;
+  }
+  Txn.callAndLoad('txn-add-item', { txn: txn, item: item.id });
 }
 
 Txn.removeItem= function (id, item) {
@@ -128,40 +132,48 @@ Txn.removeItem= function (id, item) {
 
 Txn.findAndAddItem= function(q) {
   // go find!
-  Scat.api('txn-add-item', { txn: Txn.id(), q: q },
-           { type: 'GET', async: false })
-      .done(function (data) {
-        if (data.matches) {
-          if (data.matches.length == 0) {
-            $("#lookup").addClass("error");
-            var errors= $('<div class="alert alert-danger"/>');
-            errors.text(" Didn't find anything for '" + q + "'.");
-            errors.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
-            $("#items").before(errors);
-          } else {
-            var choices= $('<div class="choices alert alert-warning"/>');
-            choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
-            var list= $('<table class="table table-condensed" style="width: 95%;">');
-            $.each(data.matches, function(i,item) {
-              var n= $("<tr" + (item.stock > 0 ? " class='stocked'" : "") + ">" +
-                       "<td>" + item.name + "</td>" +
-                       "<td>" + item.brand + "</td>" +
-                       "<td align='right'>" + (item.sale_price ? ("<s>" + amount(item.retail_price) + "</s>") : "") + "</td>" +
-                       "<td align='right'>" + amount(item.sale_price ? item.sale_price : item.retail_price) + "</td>" +
-                       "</tr>");
-              n.click(item, function(ev) {
-                Txn.addItem(Txn.id(), ev.data);
-                $(this).closest(".choices").remove();
-              });
-              list.append(n);
-            });
-            choices.append(list);
-            $("#items").before(choices);
-          }
-        } else {
-          Txn.loadData(data);
-        }
+  fetch('/catalog/search?scope=items&q=' + encodeURI(q), {
+    headers: { 'Accept': 'application/json' }
+  })
+  .then((res) => {
+    if (!res.ok) {
+      return Promise.reject(new Error(res.statusText))
+    }
+    return res.json()
+  })
+  .then((data) => {
+    if (data.items.length == 0) {
+      // No items? Add an error message
+      $("#lookup").addClass("error");
+      var errors= $('<div class="alert alert-danger"/>');
+      errors.text(" Didn't find anything for '" + q + "'.");
+      errors.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
+      $("#items").before(errors);
+    } else if (data.items.length > 1) {
+      // Multiple items? Show the choices
+      var choices= $('<div class="choices alert alert-warning"/>');
+      choices.prepend('<button type="button" class="close" onclick="$(this).parent().remove(); return false">&times;</button>');
+      var list= $('<table class="table table-condensed" style="width: 95%;">');
+      $.each(data.items, function(i,item) {
+        var n= $("<tr" + (item.stock > 0 ? " class='stocked'" : "") + ">" +
+                 "<td>" + item.name + "</td>" +
+                 // XXX "<td>" + item.brand + "</td>" +
+                 "<td align='right'>" + (item.sale_price ? ("<s>" + amount(item.retail_price) + "</s>") : "") + "</td>" +
+                 "<td align='right'>" + amount(item.sale_price ? item.sale_price : item.retail_price) + "</td>" +
+                 "</tr>");
+        n.click(item, function(ev) {
+          Txn.addItem(Txn.id(), ev.data);
+          $(this).closest(".choices").remove();
+        });
+        list.append(n);
       });
+      choices.append(list);
+      $("#items").before(choices);
+    } else {
+      // Just one item? Add it
+      Txn.addItem(Txn.id(), data.items[0]);
+    }
+  })
 };
 
 Txn.removePerson= function (txn) {
@@ -171,10 +183,14 @@ Txn.removePerson= function (txn) {
 
 Txn.updatePerson= function (txn, person) {
   if (!txn) {
-    Scat.api("txn-create", { type: 'customer' })
-        .done(function (data) {
-          Txn.updatePerson(data.txn.id, person);
-        });
+    scat.call('/sale')
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.id) {
+            return Promise.reject(new Error("Unable to create new sale."))
+          }
+          Txn.updatePerson(data.id, person)
+        })
     return;
   }
   Txn.callAndLoad('txn-update-person', { txn: txn, person: person });
