@@ -510,7 +510,7 @@ $(function() {
     </div>
     <ul>
     <!-- ko foreach: shipments -->
-      <li data-bind="text: $data.tracker_id()"></li>
+      <li><a data-bind="text: $data.status, attr: { href: '/sale/' + $parent.txn.id() + '/shipment/' + $data.id() + '/track' }">Track</a></li>
     <!-- /ko -->
     </ul>
   </div>

@@ -22,5 +22,9 @@ class Shipping
   public function createTracker($details) {
     return \EasyPost\Tracker::create($details);
   }
+
+  public function getTracker($tracker_id) {
+    return \EasyPost\Tracker::retrieve($tracker_id);
+  }
 }
 
