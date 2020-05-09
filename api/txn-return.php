@@ -15,7 +15,7 @@ if (!$r)
   die_query($db, $q);
 $row= $r->fetch_assoc();
 
-$person= $txn['person'] ? $txn['person'] : 'NULL';
+$person= $txn['person_id'] ? $txn['person_id'] : 'NULL';
 $uuid= $txn['uuid'] ? "REVERSE('{$txn['uuid']}')" : 'NULL';
 
 $q= "INSERT INTO txn
