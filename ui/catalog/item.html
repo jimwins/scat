@@ -539,6 +539,9 @@
           body: JSON.stringify({ [params.name] : params.value })
         })
         .then((res) => res.json())
+        .then((data) => {
+          return { newValue: data.item[params.name] }
+        })
       },
       success: (response, newValue) => {
         if (response.error) { return response.error }
