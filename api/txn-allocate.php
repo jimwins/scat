@@ -31,7 +31,7 @@ if ($line) {
   $lines= $db->affected_rows;
 
   if ($lines || !$txn['filled']) {
-    $q= "UPDATE txn SET filled = NOW() WHERE id = $id";
+    $q= "UPDATE txn SET filled = NOW(), status = 'filled' WHERE id = $id";
     $r= $db->query($q)
       or die_jsonp($db->error);
   }

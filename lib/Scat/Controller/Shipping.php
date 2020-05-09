@@ -56,7 +56,13 @@ class Shipping {
 
           $res= $email->send([ $txn->person()->email => $txn->person()->name ],
                              $subject, $body);
+
+          if (in_array($txn->status, [ 'paid', 'processing' ])) {
+            $txn->status= 'shipped';
+            $txn->save();
+          }
           break;
+
         case 'delivered':
           // send order delivered email
           $txn= $shipment->txn();
@@ -76,10 +82,17 @@ class Shipping {
 
           $res= $email->send([ $txn->person()->email => $txn->person()->name ],
                              $subject, $body);
+
+          if (in_array($txn->status, [ 'paid', 'processing', 'shipped' ])) {
+            $txn->status= 'complete';
+            $txn->save();
+          }
           break;
+
         case 'available_for_pickup':
           // send order available for pickup
           break;
+
         case 'pre_transit':
         case 'out_for_delivery':
         case 'return_to_sender':
@@ -87,6 +100,7 @@ class Shipping {
         case 'cancelled':
         case 'error':
           break;
+
         default:
           throw new \Exception("Did not understand new shipping status {$tracker->status}");
         }

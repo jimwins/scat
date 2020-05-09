@@ -7,6 +7,11 @@ use \Slim\Http\Response as Response;
 use \Respect\Validation\Validator as v;
 
 class Ordure {
+  protected $txn;
+
+  public function __construct(\Scat\Service\Txn $txn) {
+    $this->txn= $txn;
+  }
 
   public function pushPrices(Response $response,
                               \Scat\Service\Catalog $catalog) {
@@ -135,7 +140,7 @@ class Ordure {
           $created= date("Y-m-d H:i:s", hexdec($created));
           $id= hexdec($id);
 
-          $txn= Model::factory('Txn')->find_one($id);
+          $txn= $this->txn->fetchById($id);
           if (!$txn) {
             throw new \Exception("No such transaction found for '{$update->code}'");
           }
@@ -232,17 +237,13 @@ class Ordure {
           $messages[]= "Updated details for person '{$person->name}'.";
         }
 
-        $number= \ORM::for_table('txn')
-                  ->where('type', 'customer')->max('number');
-
         /* Create the base transaction */
-        $txn= \Model::factory('Txn')->create();
+        $txn= $this->txn->create('customer');
         $txn->uuid= $data->sale->uuid;
-        $txn->number= $number + 1;
+        $txn->status= 'paid';
         $txn->created= $data->sale->created;
         $txn->filled= $data->sale->modified;
         $txn->paid= $data->sale->modified;
-        $txn->type= 'customer';
         $txn->person_id= $person->id;
         $txn->tax_rate= 0.0;
 
@@ -250,7 +251,7 @@ class Ordure {
 
         /* Add items */
         foreach ($data->items as $item) {
-          $txn_line= \Model::factory('TxnLine')->create();
+          $txn_line= $txn->items()->create();
           $txn_line->txn_id= $txn->id;
           $txn_line->item_id= $item->item_id;
           $txn_line->ordered= $txn_line->allocated= -1 * ($item->quantity);
@@ -270,7 +271,7 @@ class Ordure {
                    ->where('code','ZZ-SHIPPING-CUSTOM')
                    ->find_one();
 
-          $txn_line= \Model::factory('TxnLine')->create();
+          $txn_line= $txn->items()->create();
           $txn_line->txn_id= $txn->id;
           $txn_line->item_id= $item->id;
           $txn_line->ordered= $txn_line->allocated= -1;
@@ -282,7 +283,7 @@ class Ordure {
 
         /* Add payments */
         foreach ($data->payments as $pay) {
-          $payment= \Model::factory('Payment')->create();
+          $payment= $txn->payments()->create();
           $payment->txn_id= $txn->id;
           $payment->method= ($pay->method == 'credit') ? 'stripe' : $pay->method;
           $payment->amount= $pay->amount;
@@ -291,7 +292,7 @@ class Ordure {
         }
 
         /* Add a note */
-        $note= \Model::factory('Note')->create();
+        $note= $txn->notes()->create();
         $note->kind= 'txn';
         $note->attach_id= $txn->id;
         if ($data->sale->shipping_address_id == 1) {

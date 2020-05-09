@@ -17,7 +17,7 @@ function txn_load_full($db, $id) {
 
 function txn_load($db, $id) {
   $q= "SELECT id, uuid, type,
-              number, created, filled, paid, returned_from_id,
+              number, status, created, filled, paid, returned_from_id,
               no_rewards,
               IF(type = 'vendor' && YEAR(created) > 2013,
                  CONCAT(SUBSTRING(YEAR(created), 3, 2), number),
@@ -38,7 +38,7 @@ function txn_load($db, $id) {
                       AS DECIMAL(9,2))) total,
               IFNULL(total_paid, 0.00) total_paid
         FROM (SELECT
-              txn.id, txn.uuid, txn.type, txn.number,
+              txn.id, txn.uuid, txn.type, txn.number, txn.status,
               txn.created, txn.filled, txn.paid,
               txn.returned_from_id, txn.no_rewards,
               txn.person_id,
@@ -302,7 +302,14 @@ function txn_update_filled($db, $txn_id) {
 
   $unfilled= $db->get_one($q);
 
-  $q= "UPDATE txn SET filled = IF($unfilled, NULL, NOW()) WHERE id = $txn_id";
+  $q= "UPDATE txn
+          SET filled = IF($unfilled, NULL, NOW()),
+              status = IF($unfilled && status = 'filled',
+                          'new',
+                          IF(status = 'new',
+                             'filled',
+                             status))
+        WHERE id = $txn_id";
   $r= $db->query($q)
     or die_query($db, $q);
 
@@ -417,8 +424,12 @@ class Transaction {
     $this->total_paid= bcadd($this->total_paid, bcadd($amount, $change_paid));
 
     // if we're all paid up, record that the txn is paid
+    // XXX goes straight to complete because this is only used by old API
     if (!bccomp($this->total_paid, $this->total)) {
-      $q= "UPDATE txn SET paid = NOW() WHERE id = {$this->id}";
+      $q= "UPDATE txn
+              SET paid = NOW(),
+                  status = IF(status IN ('new', 'filled'), 'complete', status)
+            WHERE id = {$this->id}";
       $r= $this->db->query($q)
         or die_query($this->db, $q);
 
@@ -426,7 +437,7 @@ class Transaction {
 
     } elseif ($this->paid) {
       // we thought we were paid, but now we must not be
-      $q= "UPDATE txn SET paid = NULL WHERE id = {$this->id}";
+      $q= "UPDATE txn SET paid = NULL, status = IF(filled, 'filled', 'new') WHERE id = {$this->id}";
       $r= $this->db->query($q)
         or die_query($this->db, $q);
     }
@@ -449,7 +460,7 @@ class Transaction {
       or die_query($this->db, $q);
 
     if ($this->paid) {
-      $q= "UPDATE txn SET paid = NULL WHERE id = {$this->id}";
+      $q= "UPDATE txn SET paid = NULL, status = IF(filled, 'filled', 'new') WHERE id = {$this->id}";
       $r= $this->db->query($q)
         or die_query($this->db, $q);
     }
