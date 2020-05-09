@@ -28,9 +28,9 @@
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>#</th>
-        <th>Status</th>
+        <th class="num">#</th>
         <th>Number</th>
+        <th>Status</th>
         <th>Created</th>
         <th>Filled</th>
         <th>Person</th>
@@ -43,13 +43,13 @@
     <tbody>
       {% for txn in txns %}
         <tr>
-          <td>{{ (page * limit) + loop.index }}</td>
-          <td>{{ scat.format_txn_status(txn.status) }}</td>
+          <td class="num">{{ (page * limit) + loop.index }}</td>
           <td>
             <a href="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
               {{ txn.formatted_number }}
             </a>
           </td>
+          <td>{{ scat.format_txn_status(txn.status) }}</td>
           <td>{{ txn.created }}</td>
           <td>{{ txn.filled }}</td>
           <td>
