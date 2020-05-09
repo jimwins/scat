@@ -346,7 +346,7 @@ $app->group('/tax', function (RouteCollectorProxy $app) {
                 return $response->withJson($tax->ping());
              });
 });
-$app->post('/~webhook/tax',
+$app->get('/~webhook/tax',
              function (Request $request, Response $response,
                        \Scat\Service\Tax $tax) {
                 return $response->withJson($tax->ping());
