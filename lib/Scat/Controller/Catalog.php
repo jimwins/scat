@@ -22,6 +22,11 @@ class Catalog {
 
     $data= $search->search($q);
 
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($data);
+    }
+
     $data['depts']= $this->catalog->getDepartments();
     $data['q']= $q;
 
