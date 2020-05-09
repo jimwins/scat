@@ -475,6 +475,47 @@ $(function() {
   </button>
  </div>
 </div>
+
+<!-- SHIPPING -->
+<div class="panel panel-default"
+     data-bind="visible: txn.uuid()">
+  <div class="panel-heading">
+    <div class="panel-title">Shipping</div>
+  </div>
+  <div class="panel-body">
+    <div class="btn-group pull-right">
+     <button type="button" class="btn btn-default dropdown-toggle"
+             data-bind="enable: txn.id()"
+             data-toggle="dropdown" aria-expanded="false">
+      <i class="fa fa-truck"></i>
+      <span class="caret"></span>
+     </button>
+     <ul class="dropdown-menu" role="menu">
+      <li>
+         <a data-bind="click: addShippingTracker">Add Tracker</a>
+      </li>
+     </ul>
+    </div>
+    <div data-bind="if: txn.shipping_address_id() > 0 && shipping_address">
+      <div data-bind="text: shipping_address.name()"></div>
+      <div data-bind="text: shipping_address.company()"></div>
+      <div data-bind="text: shipping_address.street1()"></div>
+      <div data-bind="text: shipping_address.street2()"></div>
+      <div>
+        <span data-bind="text: shipping_address.city()"></span>,
+        <span data-bind="text: shipping_address.state()"></span>
+        <span data-bind="text: shipping_address.zip()"></span>
+      </div>
+      <div data-bind="text: shipping_address.phone()"></div>
+    </div>
+    <ul>
+    <!-- ko foreach: shipments -->
+      <li data-bind="text: $data.tracker_id()"></li>
+    <!-- /ko -->
+    </ul>
+  </div>
+</div>
+
 <div class="panel panel-default">
   <div class="panel-heading">
   <ul class="nav nav-pills nav-justified">
@@ -579,19 +620,6 @@ $("#txn-load").submit(function(ev) {
                  data-bind="text: notes().length, visible: notes().length">
            </span>
           </button>
-          <div class="btn-group">
-           <button type="button" class="btn btn-default dropdown-toggle"
-                   data-bind="enable: txn.id()"
-                   data-toggle="dropdown" aria-expanded="false">
-            <i class="fa fa-truck"></i>
-            <span class="caret"></span>
-           </button>
-           <ul class="dropdown-menu" role="menu">
-            <li>
-               <a data-bind="click: addShippingTracker">Add Tracker</a>
-            </li>
-           </ul>
-          </div>
           <div class="btn-group">
            <button type="button" class="btn btn-default dropdown-toggle"
                    data-bind="enable: txn.id()"
@@ -1126,6 +1154,7 @@ $('#tax_rate .val').editable({
 var model= {
   txn: {
     id: 0,
+    status: 'new',
     uuid: null,
     subtotal: 0.00,
     tax_rate: 0.00,
@@ -1133,6 +1162,7 @@ var model= {
     total: 0.00,
     total_paid: 0.00,
     returned_from_id: 0,
+    shipping_address_id: 0,
     created: null,
     filled: null,
     paid: null,
@@ -1144,6 +1174,7 @@ var model= {
   items: [],
   payments: [],
   notes: [],
+  shipments: [],
   person: {
     id: 0,
     name: '',
@@ -1161,6 +1192,16 @@ var model= {
     points_pending: 0,
     suppress_loyalty: 0,
     rewards: [],
+  },
+  shipping_address: {
+    name: '',
+    company: '',
+    street1: '',
+    street2: '',
+    city: '',
+    state: '',
+    zip: '',
+    phone: ''
   },
   orders: [],
   showAdmin: false,

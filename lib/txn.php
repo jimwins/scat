@@ -6,13 +6,19 @@ function txn_load_full($db, $id) {
   $items= txn_load_items($db, $id);
   $payments= txn_load_payments($db, $id);
   $notes= txn_load_notes($db, $id);
+  $shipments= txn_load_shipments($db, $id);
   $person= person_load($db, $txn['person_id'], PERSON_FIND_EMPTY);
+  if ($txn['shipping_address_id']) {
+    $shipping_address= txn_load_address($db, $txn['shipping_address_id']);
+  }
 
   return array('txn' => $txn,
                'items' => $items,
                'payments' => $payments,
                'person' => $person,
-               'notes' => $notes);
+               'notes' => $notes,
+               'shipments' => $shipments,
+               'shipping_address' => $shipping_address);
 }
 
 function txn_load($db, $id) {
@@ -24,6 +30,7 @@ function txn_load($db, $id) {
                  CONCAT(DATE_FORMAT(created, '%Y-'), number))
                 AS formatted_number,
               person_id, person_name,
+              shipping_address_id,
               IFNULL(ordered, 0) ordered, allocated,
               taxed, untaxed,
               CAST(tax_rate AS DECIMAL(9,2)) tax_rate, 
@@ -46,6 +53,7 @@ function txn_load($db, $id) {
                      IF(person.name != '' AND person.company != '', ' / ', ''),
                      IFNULL(person.company, ''))
                   AS person_name,
+              txn.shipping_address_id,
               SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS ordered,
               SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS allocated,
               CAST(ROUND_TO_EVEN(
@@ -183,6 +191,34 @@ function txn_load_notes($db, $id) {
   }
 
   return $notes;
+}
+
+function txn_load_address($db, $id) {
+  $q= "SELECT *
+         FROM address
+        WHERE id = $id";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  return $r ? $r->fetch_assoc() : null;
+}
+
+function txn_load_shipments($db, $id) {
+  $q= "SELECT *
+         FROM shipment
+        WHERE txn_id = $id
+        ORDER BY created ASC";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  $shipments= array();
+  while ($row= $r->fetch_assoc()) {
+    $shipments[]= $row;
+  }
+
+  return $shipments;
 }
 
 function txn_apply_discounts($db, $id) {
