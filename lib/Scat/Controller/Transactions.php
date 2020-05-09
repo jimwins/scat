@@ -41,14 +41,16 @@ class Transactions {
     return $response->withRedirect("/?id=$id");
   }
 
-  public function createSale(Request $request, Response $response) {
+  public function createSale(Request $request, Response $response,
+                              \Scat\Service\Config $config)
+  {
     \ORM::get_db()->beginTransaction();
 
     $copy_from_id= $request->getParam('copy_from_id');
     $copy= $copy_from_id ? $this->txn->fetchById($copy_from_id) : null;
 
     $sale= $this->txn->create('customer', [
-      'tax_rate' => 0,
+      'tax_rate' => $config->get("tax.default_rate"),
     ]);
 
     if ($copy) {
