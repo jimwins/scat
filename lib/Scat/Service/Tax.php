@@ -43,4 +43,9 @@ class Tax
       'transactions' => $transactions
     ]);
   }
+
+  public function getTICs() {
+    return $this->callApi('GetTICs');
+  }
+
 }
