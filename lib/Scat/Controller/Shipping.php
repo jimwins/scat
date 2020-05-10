@@ -78,12 +78,20 @@ class Shipping {
             break;
           }
 
+          foreach ($tracker->tracking_details as $details) {
+            if ($details->status == 'delivered') {
+              $delivered= $details->datetime;
+            }
+          }
+
           $subject= $view->fetchBlock('email/delivered.html', 'title', [
             'tracker' => $tracker,
+            'delivered' => $delivered,
             'txn' => $txn,
           ]);
           $body= $view->fetch('email/delivered.html', [
             'tracker' => $tracker,
+            'delivered' => $delivered,
             'txn' => $txn,
           ]);
 
