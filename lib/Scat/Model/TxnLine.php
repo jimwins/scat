@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-class TxnLine extends \Model {
+class TxnLine extends \Scat\Model {
   public function txn() {
     return $this->belongs_to('Txn')->find_one();
   }
