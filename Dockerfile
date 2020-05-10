@@ -1,8 +1,8 @@
-FROM php:7.3.0-fpm-alpine
+FROM php:7.4.5-fpm-alpine
 
 LABEL maintainer="Jim Winstead <jimw@trainedmonkey.com>"
 
-RUN apk add --no-cache \
+RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
       freetype-dev \
       gifsicle \
       jpegoptim \
@@ -10,6 +10,7 @@ RUN apk add --no-cache \
       libpng-dev \
       libzip-dev \
       optipng \
+      php7-pecl-decimal \
       pngquant \
       mysql-client \
       tzdata \
