@@ -240,6 +240,7 @@ class Ordure {
         /* Create the base transaction */
         $txn= $this->txn->create('customer');
         $txn->uuid= $data->sale->uuid;
+        $txn->online_sale_id= $data->sale->id;
         $txn->status= 'paid';
         $txn->created= $data->sale->created;
         $txn->filled= $data->sale->modified;
