@@ -22,7 +22,7 @@ function txn_load_full($db, $id) {
 }
 
 function txn_load($db, $id) {
-  $q= "SELECT id, uuid, type,
+  $q= "SELECT id, uuid, online_sale_id, type,
               number, status, created, filled, paid, returned_from_id,
               no_rewards,
               IF(type = 'vendor' && YEAR(created) > 2013,
@@ -45,7 +45,8 @@ function txn_load($db, $id) {
                       AS DECIMAL(9,2))) total,
               IFNULL(total_paid, 0.00) total_paid
         FROM (SELECT
-              txn.id, txn.uuid, txn.type, txn.number, txn.status,
+              txn.id, txn.uuid, txn.online_sale_id,
+              txn.type, txn.number, txn.status,
               txn.created, txn.filled, txn.paid,
               txn.returned_from_id, txn.no_rewards,
               txn.person_id,

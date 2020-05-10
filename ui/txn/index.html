@@ -47,6 +47,9 @@
           <td>
             <a href="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
               {{ txn.formatted_number }}
+              {% if txn.online_sale_id %}
+                <br><small>({{ "%07d"|format(txn.online_sale_id) }})</small>
+              {% endif %}
             </a>
           </td>
           <td>{{ scat.format_txn_status(txn.status) }}</td>

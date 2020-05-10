@@ -1172,6 +1172,7 @@ var model= {
     id: 0,
     status: 'new',
     uuid: null,
+    online_sale_id: 0,
     subtotal: 0.00,
     tax_rate: 0.00,
     tax: 0.00,
@@ -1230,7 +1231,9 @@ viewModel.description= ko.computed(function() {
   var type= (viewModel.txn.type() == 'vendor' ? 'PO' :
               (viewModel.txn.total_paid() ? 'Invoice' :
                (viewModel.txn.returned_from_id() ? 'Return' : 'Sale')));
-  return type + ' ' + viewModel.txn.formatted_number();
+  return type + ' ' + viewModel.txn.formatted_number() +
+         (viewModel.txn.online_sale_id() ?
+           ' (' + viewModel.txn.online_sale_id().padStart(7, '0') + ')' : '')
 }, viewModel);
 
 viewModel.txn.due= ko.computed(function() {
