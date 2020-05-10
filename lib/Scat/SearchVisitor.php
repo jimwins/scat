@@ -122,6 +122,7 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
                                                  WHERE item_id = item.id
                                                    AND vendor_item.active))";
       break;
+    case 'tic':
     case 'variation':
     case 'purchase_quantity':
     case 'reviewed':
