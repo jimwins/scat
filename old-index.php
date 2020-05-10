@@ -496,11 +496,8 @@ $(function() {
 <div class="panel panel-default"
      data-bind="visible: txn.shipping_address_id() > 0 || shipments().length">
   <div class="panel-heading">
-    <div class="panel-title">Shipping</div>
-  </div>
-  <div class="panel-body">
     <div class="btn-group pull-right">
-     <button type="button" class="btn btn-default dropdown-toggle"
+     <button type="button" class="btn btn-default btn-xs dropdown-toggle"
              data-bind="enable: txn.id()"
              data-toggle="dropdown" aria-expanded="false">
       <i class="fa fa-truck"></i>
@@ -512,6 +509,9 @@ $(function() {
       </li>
      </ul>
     </div>
+    <div class="panel-title">Shipping</div>
+  </div>
+  <div class="panel-body">
     <div data-bind="if: txn.shipping_address_id() > 0 && shipping_address">
       <div data-bind="text: shipping_address.name()"></div>
       <div data-bind="text: shipping_address.company()"></div>
