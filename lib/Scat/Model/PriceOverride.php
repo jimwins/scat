@@ -13,6 +13,10 @@ class PriceOverride extends \Model {
     if (preg_match('/^(\d*)(\/|%)( off)?$/', $discount, $m)) {
       $discount = (float)$m[1];
       $discount_type = "percentage";
+    }
+    elseif (preg_match('/^\+(\d*)(\/|%)( off)?$/', $discount, $m)) {
+      $discount = (float)$m[1];
+      $discount_type = "additional_percentage";
     } elseif (preg_match('/^(\d*\.?\d*)$/', $discount, $m)) {
       $discount = (float)$m[1];
       $discount_type = "fixed";
@@ -26,7 +30,7 @@ class PriceOverride extends \Model {
       $discount= null;
       $discount_type= null;
     } else {
-      throw \Exception("Did not understand discount.");
+      throw new \Exception("Did not understand discount.");
     }
     $this->discount= $discount;
     $this->discount_type= $discount_type;
