@@ -119,4 +119,21 @@ class Catalog
              ->where_gte('vendor_item.active', 1)
              ->find_one($id);
   }
+
+  public function getPriceOverrides() {
+    return \Model::factory('PriceOverride')
+      ->select('pattern')
+      ->select_expr('ANY_VALUE(`pattern_type`)', 'pattern_type')
+      ->select_expr('GROUP_CONCAT(`minimum_quantity` ORDER BY `minimum_quantity`
+                                  SEPARATOR ",")',
+                    'breaks')
+      ->select_expr('GROUP_CONCAT(`discount_type` ORDER BY `minimum_quantity`
+                                  SEPARATOR ",")',
+                    'discount_types')
+      ->select_expr('GROUP_CONCAT(`discount` ORDER BY `minimum_quantity`
+                                  SEPARATOR ",")',
+                    'discounts')
+      ->group_by('pattern')
+      ->find_many();
+  }
 }

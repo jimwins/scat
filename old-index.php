@@ -123,7 +123,12 @@ Txn.addItem= function (txn, item) {
         })
     return;
   }
-  Txn.callAndLoad('txn-add-item', { txn: txn, item: item.id });
+
+  scat.call('/sale/' + txn + '/item', { item_id: item.id })
+      .then((res) => res.json())
+      .then((data) => {
+        Txn.loadId(txn)
+      })
 }
 
 Txn.removeItem= function (id, item) {
@@ -241,17 +246,28 @@ Txn.reopenAllocated= function(txn) {
 
 var lastItem;
 
-function updateValue(row, key, value) {
+function updateValue(row, key, value, force= 0) {
   var txn= Txn.id();
   var line= $(row).data('line_id');
   
-  var data= { txn: txn, id: line };
-  data[key] = value;
-
-  Txn.callAndLoad('txn-update-item', data)
-      .done(function (data) {
-        setActiveRow($('#items tbody tr[data-line_id=' + line + ']'));
-      });
+  fetch("/sale/" + txn + '/item/' + line, {
+    method: 'PATCH',
+    headers: {
+      'Content-type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({ [key] : value, force: force })
+  })
+  .then((res) => {
+    if (!res.ok) {
+      return Promise.reject(new Error(res.statusText))
+    }
+    return res.json()
+  })
+  .then((data) => {
+    Txn.loadId(txn)
+    setActiveRow($('#items tbody tr[data-line_id=' + line + ']'))
+  })
 }
 
 function setActiveRow(row) {
@@ -1151,11 +1167,12 @@ $('#tax_rate .val').editable({
           <a data-bind="if: $data.data.card, click: $parent.printGiftCard"><i class="fa fa-print"></i></a>
           <a data-bind="if: $data.data.card, click: $parent.emailGiftCard"><i class="fa fa-envelope-o"></i></a>
         <!-- /ko -->
-        <span class="name" data-bind="text: $data.name"></span>
+        <span class="override_name" data-bind="text: $data.name"></span>
         <div class="discount" data-bind="text: $data.discount"></div>
       </td>
       <td class="editable" class="right">
-        <span class="price" data-bind="text: Scat.amount($data.price())"></span>
+        <span class="sale_price"
+              data-bind="text: Scat.amount($data.price())"></span>
       </td>
       <td class="right">
         <span data-bind="text: Scat.amount($data.ext_price())"></span>
@@ -1532,10 +1549,7 @@ viewModel.createGiftCard= function(item) {
   Scat.api('giftcard-create', { balance: item.msrp(), txn: Txn.id() })
       .done(function (data) {
               // save to txn
-              Txn.callAndLoad('txn-update-item',
-                              { force: 1, txn: Txn.id(),
-                                id: item.line_id(),
-                                data: { card: data.card } });
+              updateValue(item.line_id(), 'data', { card: data.card }, 1);
             });
 }
 

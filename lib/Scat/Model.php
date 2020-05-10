@@ -48,4 +48,26 @@ class Model extends \Model implements \JsonSerializable {
     parent::save();
     return $new ? $this->reload() : $this;
   }
+
+  /*
+   * Maybe not the right place to have this, but convenient.
+   */
+  public function calcSalePrice($retail_price, $discount_type, $discount) {
+    switch ($discount_type) {
+    case 'percentage':
+      // TODO fix rounding
+      return bcmul($retail_price,
+                   bcdiv(bcsub(100, $discount),
+                         100));
+    case 'relative':
+      return bcsub($retail_price, $this->discount);
+    case 'fixed':
+      return $discount;
+    case '':
+    case null:
+      return $retail_price;
+    default:
+      throw new Exception('Did not understand discount for item.');
+    }
+  }
 }

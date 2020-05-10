@@ -155,4 +155,113 @@ class Txn extends \Scat\Model {
   public function shipments() {
     return $this->has_many('Shipment');
   }
+
+  public function applyPriceOverrides(\Scat\Service\Catalog $catalog) {
+    // Not an error, but we don't do anything
+    if ($this->type != 'customer') {
+      return;
+    }
+
+    $discounts= $catalog->getPriceOverrides();
+
+    foreach ($discounts as $d) {
+      if ($d->pattern_type == 'product') {
+        $condition= "`product_id` = '{$d->pattern}'";
+      } else {
+        $condition= "`code` {$d->pattern_type} '{$d->pattern}'";
+      }
+
+      $items= $this->items()
+        ->select('txn_line.*')
+        ->select('item.retail_price', 'original_retail_price')
+        ->select('item.discount', 'original_discount')
+        ->select('item.discount_type', 'original_discount_type')
+        ->join('item', [ 'item_id', '=', 'item.id' ])
+        ->where('txn_id', $this->id)
+        ->where_raw($condition)
+        ->where_raw('NOT `discount_manual`');
+
+      /* turn off logging here, it's just too much */
+      \ORM::configure('logging', false);
+      $count= abs($items->sum('ordered'));
+      $items->limit(null); // reset limit that sum() injects into $items
+      \ORM::configure('logging', true);
+
+      if (!$count) {
+        continue;
+      }
+
+      $new_discount= 0;
+      $new_discount_type= '';
+
+      $breaks= explode(',', $d->breaks);
+      $discount_types= explode(',', $d->discount_types);
+      $discounts= explode(',', $d->discounts);
+
+      foreach ($breaks as $i => $qty) {
+        if ($count >= $qty) {
+          $new_discount_type= $discount_types[$i];
+          $new_discount= $discounts[$i];
+        }
+      }
+
+      foreach ($items->find_many() as $item) {
+        if ($new_discount) {
+          if ($new_discount_type != 'additional_percentage') {
+            $item->discount= $new_discount;
+            $item->discount_type= $new_discount_type;
+          } else {
+            $item->discount= $this->calcSalePrice(
+              $this->calcSalePrice($item->original_retail_price,
+                                   $item->original_discount_type,
+                                   $item->original_discount),
+              'percentage',
+              $new_discount
+            );
+            $item->discount_type= 'fixed';
+          }
+        } else {
+          $item->discount= $item->original_discount;
+          $item->discount_type= $item->original_discount_type;
+        }
+        $item->save();
+      }
+    }
+
+    foreach ($this->payments() as $payment) {
+      if ($payment->method == 'discount' && $payment->discount) {
+        // Force total() to be calculated
+        unset($txn->_totals);
+        $payment->amount= $payment->discount / 100 * $txn->total();
+        $payment->save();
+      }
+    }
+  }
+
+  public function recalculateTax(\Scat\Service\Tax $tax) {
+    if ($this->type != 'customer') {
+      return;
+    }
+
+    if ($this->shipping_address_id > 1) {
+      throw new Exception("Don't know how to calculate tax on shipped orders.");
+    }
+
+    /* Really need to nail down how TaxCloud does rounding. */
+    $scale= bcscale(5);
+    $tax_rate= bcdiv($this->tax_rate, 100);
+
+    foreach ($this->items()->find_many() as $line) {
+      if (!in_array($line->tic, [ '91082', '10005', '11000' ])) {
+        $tax= bcmul(bcmul($line->ordered * -1, $line->sale_price()),
+                    $tax_rate);
+        if ($tax != $line->tax) {
+          $line->tax= $tax;
+          $line->save();
+        }
+      }
+    }
+
+    bcscale($scale);
+  }
 }

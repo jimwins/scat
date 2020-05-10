@@ -22,6 +22,10 @@ class Txn
                   ->max('number');
     $txn->number= $number + 1;
 
+    // Could use real UUID() but this is shorter. Hardcoded '0' could be
+    // replaced with a server-id to further avoid collisions
+    $txn->uuid= sprintf("%08x%02x%s", time(), 0, bin2hex(random_bytes(8)));
+
     $txn->save();
     return $txn;
   }

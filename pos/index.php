@@ -95,10 +95,19 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->get('/new', [ \Scat\Controller\Transactions::class, 'newSale' ]);
   $app->get('/{id:[0-9]+}', [ \Scat\Controller\Transactions::class, 'sale' ])
       ->setName('sale');
+
+  /* Items (aka line) */
+  $app->post('/{id:[0-9]+}/item',
+              [ \Scat\Controller\Transactions::class, 'addItem' ]);
+  $app->patch('/{id:[0-9]+}/item/{line_id:[0-9]+}',
+              [ \Scat\Controller\Transactions::class, 'updateItem' ]);
+
   $app->get('/{id:[0-9]+}/email-invoice-form',
             [ \Scat\Controller\Transactions::class, 'emailForm' ]);
   $app->post('/{id:[0-9]+}/email-invoice',
               [ \Scat\Controller\Transactions::class, 'email' ]);
+
+  /* Shipments */
   $app->get('/{id:[0-9]+}/shipment[/{shipment_id:[0-9]+}]',
             [ \Scat\Controller\Transactions::class, 'saleShipments' ]);
   $app->get('/{id:[0-9]+}/shipment/{shipment_id:[0-9]+}/track',

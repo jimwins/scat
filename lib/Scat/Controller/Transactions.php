@@ -90,6 +90,147 @@ class Transactions {
     return $response->withRedirect('/sale/' . $sale->id);
   }
 
+  /* Items (aka lines) */
+  public function addItem(Request $request, Response $response,
+                          \Scat\Service\Catalog $catalog,
+                          \Scat\Service\Tax $tax, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if (!in_array($txn->status, [ 'new', 'filled' ])) {
+      throw new \Scat\Exception\HttpConflictException($request,
+        "Unable to add items to transactions because it is {$txn->status}."
+      );
+    }
+
+    $item_id= $request->getParam('item_id');
+    $item= $catalog->getItemById($item_id);
+    if (!$item) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    \ORM::get_db()->beginTransaction();
+
+    $unique= preg_match('/^ZZ-(frame|print|univ|canvas|stretch|float|panel|giftcard)/i', $item->code);
+
+    if (!$unique) {
+      $line= $txn->items()->where('item_id', $item->id)->find_one();
+    }
+
+    if ($unique || !$line) {
+      $line= $txn->items()->create();
+      $line->txn_id= $txn->id;
+      $line->item_id= $item->id;
+
+      /* TODO figure out pricing for vendor items */
+      $line->retail_price= $item->retail_price;
+      $line->discount= $item->discount;
+      $line->discount_type= $item->discount_type;
+
+      $line->taxfree= $item->taxfree;
+      $line->tic= $item->tic;
+    }
+
+    $quantity= $request->getParam('quantity') ?: 1;
+    $line->ordered+= $quantity * ($txn->type == 'customer') ? -1 : 1;
+
+    $line->save();
+
+    // txn no longer filled?
+    if ($txn->status == 'filled') {
+      $txn->status= 'new';
+      $txn->filled= NULL;
+      $txn->save();
+    }
+
+    $txn->applyPriceOverrides($catalog);
+    $txn->recalculateTax($tax);
+
+    // TODO push new price to pole
+
+    \ORM::get_db()->commit();
+
+    $line->reload();
+
+    return $response->withJson($line);
+  }
+
+  public function updateItem(Request $request, Response $response,
+                              \Scat\Service\Catalog $catalog,
+                              \Scat\Service\Tax $tax, $id, $line_id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if (!$request->getParam('force') &&
+        !in_array($txn->status, [ 'new', 'filled' ])) {
+      throw new \Scat\Exception\HttpConflictException($request,
+        "Unable to modify item because transaction is {$txn->status}."
+      );
+    }
+
+    $line= $txn->items()->find_one($line_id);
+    if (!$line)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    \ORM::get_db()->beginTransaction();
+
+    foreach ($line->getFields() as $field) {
+      if ($field == 'id') continue;
+      $value= $request->getParam($field);
+      if (strlen($value)) {
+        $line->set($field, $value);
+      }
+    }
+
+    // Have to handle this here because it depends on $txn
+    $quantity= $request->getParam('quantity');
+    if (strlen($quantity)) {
+      /* special case: #/# lets us split line with two quantities */
+      if (preg_match('!^(\d+)/(\d+)$!', $quantity, $m)) {
+        $quantity= (int)$m[2] * ($txn->type == 'customer' ? -1 : 1);
+
+        $new= $txn->lines()->create();
+        $new->txn_id= $txn->id;
+        $new->item_id= $line->item_id;
+        $new->ordered= $quantity;
+        $new->retail_price= $line->retail_price;
+        $new->discount_type= $line->discount_type;
+        $new->discount= $line->discount;
+        $new->discount_manual= $line->discount_manual;
+        $new->taxfree= $line->taxfree;
+        $new->save();
+
+        $quantity= (int)$m[1];
+      } else {
+        $quantity= (int)$quantity;
+      }
+
+      $mul= ($txn->type == 'customer' ? -1 : 1);
+      $line->ordered= $mul * $quantity;
+    }
+
+    $line->save();
+
+    // txn no longer filled?
+    if ($txn->status == 'filled') {
+      $txn->status= 'new';
+      $txn->filled= NULL;
+      $txn->save();
+    }
+
+    $txn->applyPriceOverrides($catalog);
+    $txn->recalculateTax($tax);
+
+    \ORM::get_db()->commit();
+
+    return $response->withJson($line);
+  }
+
+
   public function emailForm(Request $request, Response $response, $id) {
     $txn= $this->txn->fetchById($id);
 
@@ -132,6 +273,8 @@ class Transactions {
     return $response->withJson($res->body() ?:
                                 [ "message" => "Email sent." ]);
   }
+
+  /* Shipments */
 
   public function saleShipments(Request $request, Response $response,
                                 $id, $shipment_id= null) {

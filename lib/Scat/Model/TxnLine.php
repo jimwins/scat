@@ -34,22 +34,11 @@ class TxnLine extends \Scat\Model {
   }
 
   public function sale_price() {
-    switch ($this->discount_type) {
-    case 'percentage':
-      // TODO fix rounding
-      return bcmul($this->retail_price,
-                   bcdiv(bcsub(100, $this->discount),
-                         100));
-    case 'relative':
-      return bcsub($this->retail_price, $this->discount);
-    case 'fixed':
-      return $this->discount;
-    case '':
-    case null:
-      return $this->retail_price;
-    default:
-      throw new Exception('Did not understand discount for item.');
-    }
+    return $this->calcSalePrice(
+      $this->retail_price,
+      $this->discount_type,
+      $this->discount
+    );
   }
 
   public function ext_price() {
@@ -88,5 +77,71 @@ class TxnLine extends \Scat\Model {
 
     $cost= $this->orm->for_table('txn')->raw_query($q)->find_one();
     return $cost->cost;
+  }
+
+  public function as_array() {
+    $data= parent::as_array();
+    $data['sale_price']= $this->sale_price();
+    return $data;
+  }
+
+  public function getFields() {
+    $data= parent::getFields();
+    $data[]= 'sale_price';
+    return $data;
+  }
+
+  public function set($name, $value= null) {
+    if ($name == 'sale_price') {
+      $item= $this->item();
+
+      if (preg_match('/^[\d.]*(\/|%)$/', $value)) {
+        $discount = (float)$value;
+        $discount_type = 'percentage';
+        $retail_price= $item->retail_price ?: $this->retail_price;
+        $discount_manual= 1;
+      } elseif (preg_match('/^(-)?\$?(-?\d*\.?\d*)$/', $value, $m)) {
+        $value= (float)"$m[1]$m[2]";
+        if ($this->txn()->type == 'vendor') {
+          $discount_type= null;
+          $discount= null;
+          $retail_price= $value;
+        } else {
+          $discount= $item->retail_price ? $value : null;
+          $discount_type= $item->retail_price ? 'fixed' : null;
+          $retail_price= $item->retail_price ?: $value;
+        }
+        $discount_manual= 1;
+      } elseif (preg_match('/^(cost)$/', $value)) {
+        $discount= $this->item()->vendor_items()->min('net_price');
+        $discount_type= 'fixed';
+        $retail_price= $item->retail_price;
+        $discount_manual= 1;
+      } elseif (preg_match('/^(msrp)$/', $value)) {
+        $discount= null;
+        $discount_type= null;
+        $retail_price= $item->retail_price;
+        $discount_manual= 1;
+      } elseif (preg_match('/^(def|\.\.\.)$/', $value)) {
+        $discount= $item->discount;
+        $discount_type= $item->discount_type;
+        $retail_price= $item->retail_price;
+        $discount_manual= 0;
+      } else {
+        throw new \Exception("Did not understand price.");
+      }
+
+      parent::set('retail_price', $retail_price);
+      parent::set('discount', $discount);
+      parent::set('discount_type', $discount_type);
+      parent::set('discount_manual', $discount_manual);
+    } elseif ($name == 'data') {
+      return parent::set('data', json_encode($value));
+    } elseif ($name == 'override_name') {
+      /* Reset override_name when given '...' */
+      return parent::set('override_name', $value == '...' ? null : $value);
+    } else {
+      return parent::set($name, $value);
+    }
   }
 }
