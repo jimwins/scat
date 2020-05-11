@@ -90,6 +90,25 @@ class Transactions {
     return $response->withRedirect('/sale/' . $sale->id);
   }
 
+  public function updateSale(Request $request, Response $response, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    foreach ($txn->getFields() as $field) {
+      if ($field == 'id') continue;
+      $value= $request->getParam($field);
+      if (strlen($value)) {
+        $txn->set($field, $value);
+      }
+    }
+
+    $txn->save();
+
+    return $response->withJson($txn);
+  }
+
   /* Items (aka lines) */
   public function addItem(Request $request, Response $response,
                           \Scat\Service\Catalog $catalog,
@@ -229,7 +248,6 @@ class Transactions {
 
     return $response->withJson($line);
   }
-
 
   public function emailForm(Request $request, Response $response, $id) {
     $txn= $this->txn->fetchById($id);

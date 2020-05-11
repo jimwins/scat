@@ -984,6 +984,21 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
                            attr: { title: txn.paid() ? moment(txn.paid()).format('MMMM D YYYY h:mm:ss a') : '' }">
             <i class="fa fa-money"></i>
           </span>
+          <div class="btn-group">
+           <button type="button" class="btn btn-default btn-xs dropdown-toggle"
+                   data-bind="enable: txn.id()"
+                   data-toggle="dropdown" aria-expanded="false">
+            <span data-bind="text: txn.status"></span>
+            <span class="caret"></span>
+           </button>
+           <ul class="dropdown-menu" role="menu">
+            <li>
+               <?foreach (['new','filled','paid','processing','shipped','complete','template'] as $status) {?>
+                 <a data-bind="click: setStatus"><?=$status?></a>
+               <?}?>
+            </li>
+           </ul>
+          </div>
         </div>
         <div>
           <a data-bind="click: changePerson">
@@ -1293,6 +1308,29 @@ viewModel.load= function(txn) {
 
 viewModel.loadReturnedFrom= function() {
   Txn.loadId(viewModel.txn.returned_from_id());
+}
+
+viewModel.setStatus= (x,ev) => {
+  var txn= Txn.id()
+  var newStatus= ev.currentTarget.text
+
+  fetch("/sale/" + txn, {
+    method: 'PATCH',
+    headers: {
+      'Content-type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({ status: newStatus })
+  })
+  .then((res) => {
+    if (!res.ok) {
+      return Promise.reject(new Error(res.statusText))
+    }
+    return res.json()
+  })
+  .then((data) => {
+    Txn.loadId(txn)
+  })
 }
 
 viewModel.createDropShip= () => {

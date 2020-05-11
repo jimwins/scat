@@ -95,6 +95,8 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->get('/new', [ \Scat\Controller\Transactions::class, 'newSale' ]);
   $app->get('/{id:[0-9]+}', [ \Scat\Controller\Transactions::class, 'sale' ])
       ->setName('sale');
+  $app->patch('/{id:[0-9]+}',
+              [ \Scat\Controller\Transactions::class, 'updateSale' ]);
 
   /* Items (aka line) */
   $app->post('/{id:[0-9]+}/item',
