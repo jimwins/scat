@@ -1,0 +1,61 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Create Drop Shipment
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+
+    {% if dropship %}
+      {# TODO implement editing of dropship info #}
+    {% else %}
+      <div class="form-group">
+        <label for="person_id">Vendor</label>
+        <select class="form-control" autofocus name="person_id">
+          <option value="">-- Select --</option>
+          {% for vendor in vendors %}
+            <option value="{{ vendor.id }}">
+              {{ vendor.company ?: vendor.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+    {% endif %}
+
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    {{ dropship ? 'Update' : 'Add' }}
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    fetch("/sale/{{ txn.id }}/dropship{{ dropship.id ? '/' ~ dropship.id }}", {
+      method: '{{ dropship ? 'PATCH' : 'POST' }}',
+      headers: {
+        'Accept' : 'application/json',
+        'Content-type' : 'application/json',
+      },
+      body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then((res) => {
+      if (!res.ok) {
+        return Promise.reject(new Error(response.statusText))
+      }
+      return res.json()
+    })
+    .then((data) => {
+      window.location.href= '/purchase/' + data.id
+    })
+  }
+{% endblock %}
