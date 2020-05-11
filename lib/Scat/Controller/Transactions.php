@@ -401,7 +401,7 @@ class Transactions {
     $dropship->save();
 
     if ($txn->status == 'paid') {
-      $txn->status= 'processed';
+      $txn->status= 'processing';
       $txn->save();
     }
 
