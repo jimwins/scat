@@ -348,7 +348,9 @@
       </div><!-- .col-sm-12 -->
     </div><!-- .row -->
   {% endif %}
+{% endblock %}
 
+{% block script %}
   <script>
     $('.editable', document.currentScript.parentNode).editable({
       url: (params) => {

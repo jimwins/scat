@@ -165,13 +165,13 @@ class Person extends \Scat\Model {
   }
 
   public function loadVendorData($file) {
-    $tmpfn= $file->file;
     $fn= $file->getClientFilename();
+    $stream= $file->getStream();
+    $tmpfn= ($stream->getMetaData())['uri'];
 
     /* Grab the first line for detecting file type */
-    $stream= $file->getStream();
     $line= fgets($stream);
-    fclose($file);
+    fclose($stream);
 
     ob_start();
 
