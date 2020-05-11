@@ -2,20 +2,32 @@
 {% import 'macros.twig' as scat %}
 
 {% block controls %}
+<nav>
+    <ul class="nav nav-pills nav-justified">
+      <li {{ '' == status ? 'class="active"' }}>
+        <a href="?">All</a>
+      </li>
+      {% for s in [ 'new', 'filled', 'paid', 'processing', 'shipped', 'complete', 'template' ] %}
+        <li {{ s == status ? 'class="active"' }}>
+          <a href="?status={{ s }}">{{ s|title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+    </nav>
   <nav aria-label="Controls for Activity List">
     <ul class="pager">
       <li class="previous {{ not page ? 'disabled' }}">
-        <a href="?page={{ page - 1 }}">
+        <a href="?page={{ page - 1 }}&status={{ status }}">
           <span aria-hidden="true">&larr;</span> Previous
         </a>
       </li>
       <li>
-       {{ page * limit + 1 }} -
-       {{ min((page + 1) * limit + 1, txns[0].records) }}
-       of {{ txns[0].records }}
+        {{ page * limit + 1 }} -
+        {{ min((page + 1) * limit + 1, txns[0].records) }}
+        of {{ txns[0].records }}
       </li>
       <li class="next {{ ((page + 1) * limit) >= txns[0].records ? 'disabled' }}">
-        <a href="?page={{ page + 1 }}">
+        <a href="?page={{ page + 1 }}&status={{ status }}">
           Next <span aria-hidden="true">&rarr;</span>
         </a>
       </li>

@@ -40,8 +40,7 @@ class Txn
                 ->select_expr('COUNT(*) OVER()', 'records')
                 ->order_by_desc('created')
                 ->where('type', $type)
-                ->limit($limit)->offset($page * $limit)
-                ->find_many();
+                ->limit($limit)->offset($page * $limit);
   }
 
   /* Till needs to get payments directly. */
