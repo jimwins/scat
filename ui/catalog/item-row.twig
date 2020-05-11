@@ -23,7 +23,10 @@
     </a>
   </td>
   <td style="{{ s.style_item_color(i.color) }}">
-    {{ variations|length ? (i.short_name ?: i.name) : i.name }}
+    <span class="editable"
+          data-pk="{{ i.id }}"
+          data-name="{{ variations|length ? 'short_name' : 'name' }}">
+    {{- variations|length ? (i.short_name ?: i.name) : i.name -}}
   </td>
   <td class="text-right" nowrap>
     <span class="editable"
