@@ -389,7 +389,7 @@ $app->group('/shipping', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Shipping::class, 'checkStalledTrackers' ]);
 });
 $app->post('/~webhook/shipping',
-            [ \Scat\Controller\Shipping::class, 'handleUpdate' ]);
+            [ \Scat\Controller\Shipping::class, 'handleWebhook' ]);
 
 $app->get('/dialog/{dialog}',
           function (Request $request, Response $response, $dialog, View $view) {
