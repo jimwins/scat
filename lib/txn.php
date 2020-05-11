@@ -7,6 +7,7 @@ function txn_load_full($db, $id) {
   $payments= txn_load_payments($db, $id);
   $notes= txn_load_notes($db, $id);
   $shipments= txn_load_shipments($db, $id);
+  $dropships= txn_load_dropships($db, $id);
   $person= person_load($db, $txn['person_id'], PERSON_FIND_EMPTY);
   if ($txn['shipping_address_id']) {
     $shipping_address= txn_load_address($db, $txn['shipping_address_id']);
@@ -18,6 +19,7 @@ function txn_load_full($db, $id) {
                'person' => $person,
                'notes' => $notes,
                'shipments' => $shipments,
+               'dropships' => $dropships,
                'shipping_address' => $shipping_address);
 }
 
@@ -220,6 +222,23 @@ function txn_load_shipments($db, $id) {
   }
 
   return $shipments;
+}
+
+function txn_load_dropships($db, $id) {
+  $q= "SELECT *
+         FROM txn
+        WHERE type = 'vendor' AND returned_from_id = $id
+        ORDER BY created ASC";
+
+  $r= $db->query($q)
+    or die_query($db, $q);
+
+  $dropships= array();
+  while ($row= $r->fetch_assoc()) {
+    $dropships[]= $row;
+  }
+
+  return $dropships;
 }
 
 function txn_apply_discounts($db, $id) {

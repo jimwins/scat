@@ -546,6 +546,11 @@ $(function() {
       <li><a data-bind="text: $data.status, attr: { href: '/sale/' + $parent.txn.id() + '/shipment/' + $data.id() + '/track' }">Track</a></li>
     <!-- /ko -->
     </ul>
+    <ul>
+    <!-- ko foreach: dropships -->
+      <li><a data-bind="text: $data.id, attr: { href: '/purchase/' + $data.id() }">Drop Ship</a></li>
+    <!-- /ko -->
+    </ul>
   </div>
 </div>
 
@@ -1225,6 +1230,7 @@ var model= {
   payments: [],
   notes: [],
   shipments: [],
+  dropships: [],
   person: {
     id: 0,
     name: '',
