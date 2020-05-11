@@ -385,6 +385,8 @@ $app->group('/sms', function (RouteCollectorProxy $app) {
 /* Shipping */
 $app->group('/shipping', function (RouteCollectorProxy $app) {
   $app->get('/~register', [ \Scat\Controller\Shipping::class, 'register' ]);
+  $app->get('/~check-stalled',
+            [ \Scat\Controller\Shipping::class, 'checkStalledTrackers' ]);
 });
 $app->post('/~webhook/shipping',
             [ \Scat\Controller\Shipping::class, 'handleUpdate' ]);

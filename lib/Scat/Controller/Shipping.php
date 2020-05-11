@@ -21,6 +21,22 @@ class Shipping {
     return $response->withJson($this->shipping->registerWebhook());
   }
 
+  function checkStalledTrackers(Request $request, Response $response) {
+    $shipments= $this->txn->getShipments()
+      ->where('status', 'unknown')
+      ->find_many();
+
+    $updating= [];
+    foreach ($shipments as $shipment) {
+      $tracker= $this->shipping->getTracker($shipment->tracker_id);
+      if ($tracker->status != 'unknown') {
+        $updating[]= $tracker->id;
+      }
+    }
+
+    return $response->withJson([ 'updating' => $updating ]);
+  }
+
   function handleUpdate(Request $request, Response $response, View $view,
                         \Scat\Service\Email $email) {
     $data= json_decode($request->getBody());

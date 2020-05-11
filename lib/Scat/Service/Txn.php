@@ -49,8 +49,12 @@ class Txn
     return $this->data->factory('Payment');
   }
 
+  public function getShipments() {
+    return $this->data->factory('Shipment');
+  }
+
   public function fetchShipmentByTracker($tracker_id) {
-    return $this->data->factory('Shipment')
+    return $this->getShipments()
       ->where('tracker_id', $tracker_id)
       ->find_one();
   }
