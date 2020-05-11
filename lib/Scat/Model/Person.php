@@ -107,7 +107,7 @@ class Person extends \Scat\Model {
     if ($this->role != 'vendor') {
       throw new \Exception("People who are not vendors don't have items.");
     }
-    return $this->has_many('VendorItem', 'vendor')
+    return $this->has_many('VendorItem', 'vendor_id')
                 ->where_gte('active', (int)$only_active);
   }
 

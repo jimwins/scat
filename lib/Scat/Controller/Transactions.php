@@ -318,6 +318,98 @@ class Transactions {
     return $response->withRedirect($tracker->public_url);
   }
 
+  /* Drop-ships */
+  public function saleDropShips(Request $request, Response $response,
+                                \Scat\Service\Data $data,
+                                $id, $dropship_id= null)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $dropship= $dropship_id ? $txn->dropships()->find_one($dropship_id) : null;
+    if ($dropship_id && !$dropship)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      $vendors= $data->factory('Person')
+                      ->where('active', 1)
+                      ->where('role', 'vendor')
+                      ->order_by_asc(['company', 'name'])
+                      ->find_many();
+
+      return $this->view->render($response, 'dialog/dropship.html', [
+        'vendors' => $vendors,
+        'txn' => $txn,
+        'dropship' => $dropship
+      ]);
+    }
+
+    return $response->withJson($dropship);
+  }
+
+  public function createDropShip(Request $request, Response $response,
+                                  $id, $dropship_id= null)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $dropship= $dropship_id ? $txn->dropships()->find_one($dropship_id) : null;
+    if ($dropship_id && !$dropship)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    \ORM::get_db()->beginTransaction();
+
+    if (!$dropship) {
+      $dropship= $this->txn->create('vendor');
+      $dropship->shipping_address_id= $txn->shipping_address_id;
+      $dropship->returned_from_id= $txn->id;
+    }
+
+    foreach ($dropship->getFields() as $field) {
+      if ($field == 'id') continue;
+      $value= $request->getParam($field);
+      if (strlen($value)) {
+        $dropship->set($field, $value);
+      }
+    }
+
+    $vendor= $dropship->person();
+    if (!$vendor->role == 'vendor') {
+      throw new \Slim\Exception\HttpBadRequestException($request,
+        "No vendor supplied for dropship!"
+      );
+    }
+
+    /* New dropship? Add items that this vendor has available. */
+    if (!$dropship_id) {
+      foreach ($txn->items()->find_many() as $item) {
+        $vi= $vendor->items()->where('item_id', $item->item_id)->find_one();
+        if ($vi) {
+          $new= $dropship->items()->create();
+          $new->txn_id= $dropship->id;
+          $new->item_id= $item->item_id;
+          $new->ordered= -1 * $item->ordered;
+          $new->retail_price= ($vi->promo_price > 0 && $new->ordered > $vi->promo_quantity) ? $vi->promo_price : $vi->net_price;
+          $new->save();
+        }
+      }
+    }
+
+    $dropship->save();
+
+    if ($txn->status == 'paid') {
+      $txn->status= 'processed';
+      $txn->save();
+    }
+
+    \ORM::get_db()->commit();
+
+    return $response->withJson($dropship);
+  }
+
   public function updateShipment(Request $request, Response $response,
                                   \Scat\Service\Shipping $shipping,
                                   $id, $shipment_id= null) {

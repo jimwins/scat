@@ -46,10 +46,16 @@ class Txn extends \Scat\Model {
     return $this->belongs_to('Address', 'shipping_address_id')->find_one();
   }
 
+  public function dropships() {
+    return $this->has_many('Txn', 'returned_from_id')
+                ->where('type', 'vendor');
+  }
+
   function clearItems() {
     $this->orm->get_db()->beginTransaction();
     $this->items()->delete_many();
     $this->filled= null;
+    if ($this->status == 'filled') $this->status= 'new';
     $this->save();
     $this->orm->get_db()->commit();
     return true;

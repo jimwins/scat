@@ -521,6 +521,7 @@ $(function() {
      </button>
      <ul class="dropdown-menu" role="menu">
       <li>
+         <a data-bind="click: createDropShip">Create Drop Shipment</a>
          <a data-bind="click: addShippingTracker">Add Tracker</a>
       </li>
      </ul>
@@ -1292,6 +1293,12 @@ viewModel.load= function(txn) {
 
 viewModel.loadReturnedFrom= function() {
   Txn.loadId(viewModel.txn.returned_from_id());
+}
+
+viewModel.createDropShip= () => {
+  var id= Txn.id()
+
+  scat.dialog([], '/sale/' + id + '/dropship')
 }
 
 viewModel.addShippingTracker= () => {
