@@ -40,6 +40,10 @@ class Shipping {
           // send order shipped email
           $txn= $shipment->txn();
 
+          if ($txn->status == 'shipped') {
+            break;
+          }
+
           if (in_array($txn->status, [ 'paid', 'processing' ])) {
             $txn->status= 'shipped';
             $txn->save();
