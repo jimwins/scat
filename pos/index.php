@@ -449,6 +449,9 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
 });
 
 /* Webhooks */
+$app->map(['GET', 'POST'], '/~webhook/ping', function (Response $response) {
+  return $response->withJson([ 'message' => 'Received' ]);
+});
 $app->post('/~webhook/sms', [ \Scat\Controller\SMS::class, 'receive' ]);
 $app->post('/~webhook/instagram',
             [ \Scat\Controller\Media::class, 'addFromInstagram' ]);
