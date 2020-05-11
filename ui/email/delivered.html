@@ -19,7 +19,7 @@
   <p>
     We wanted to let you know that your order ({{ txn.formatted_number }}) was
     reported to be delivered by {{ tracker.carrier }} on
-    {{ (delivered ?: tracker.updated_at) | date("l, F j \\a\\t g:i:a") }}.
+    {{ (delivered ?: tracker.updated_at) | date("l, F j \\a\\t g:i:a", "UTC") }}.
     {% if delivered and delivered|date("Y-m-d") != tracker.updated_at|date("Y-m-d") %}
       (Sorry for the slow update, we just got the news!)
     {% endif %}

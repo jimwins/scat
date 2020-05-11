@@ -18,9 +18,9 @@
   </p>
   <p>
     We wanted to let you know that your order ({{ txn.formatted_number }}) was
-    shipped via {{ tracker.carrier }} on {{ tracker.created_at | date("l, F j") }}.
+    shipped via {{ tracker.carrier }} on {{ tracker.created_at | date("l, F j", "UTC") }}.
     {% if tracker.est_delivery_date %}
-      The estimated delivery date is {{ tracker.est_delivery_date | date("l, F j") }}.
+      The estimated delivery date is {{ tracker.est_delivery_date | date("l, F j", "UTC") }}.
     {% endif %}
   </p>
 
