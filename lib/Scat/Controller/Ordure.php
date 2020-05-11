@@ -292,18 +292,6 @@ class Ordure {
           $payment->save();
         }
 
-        /* Add a note */
-        $note= $txn->notes()->create();
-        $note->kind= 'txn';
-        $note->attach_id= $txn->id;
-        if ($data->sale->shipping_address_id == 1) {
-          $note->content= "Need to pick for in-store pick-up. Contact customer when ready!";
-        } else {
-          $note->content= "Need to pick & ship online order.";
-        }
-        $note->todo= 1;
-        $note->save();
-
         /* Add shipping address */
         if ($data->sale->shipping_address_id != 1) {
           $easypost_address= $shipping->createAddress([
