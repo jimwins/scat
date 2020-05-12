@@ -246,9 +246,8 @@ Txn.reopenAllocated= function(txn) {
 
 var lastItem;
 
-function updateValue(row, key, value, force= 0) {
+function updateValue(line, key, value, force= 0) {
   var txn= Txn.id();
-  var line= $(row).data('line_id');
   
   fetch("/sale/" + txn + '/item/' + line, {
     method: 'PATCH',
@@ -317,7 +316,7 @@ $(document).on('dblclick', '.editable', function() {
     var val= $('<span><i class="fa fa-spinner fa-spin"></i></span>');
     val.attr("class", key);
     $(this).replaceWith(val);
-    updateValue(row, key, value);
+    updateValue($(row).data('line_id'), key, value);
 
     return false;
   });
@@ -419,7 +418,7 @@ $(function() {
     // short integer and recently scanned? adjust quantity
     var val= parseInt(q, 10);
     if (q.length < 4 && lastItem && val != 0 && !isNaN(val)) {
-      updateValue(lastItem, 'quantity', val);
+      updateValue($(lastItem).data('line_id'), 'quantity', val);
       return false;
     }
 
@@ -1597,9 +1596,11 @@ viewModel.showPoints= function(data, event) {
 }
 
 viewModel.createGiftCard= function(item) {
-  Scat.api('giftcard-create', { balance: item.msrp(), txn: Txn.id() })
-      .done(function (data) {
+  scat.call('/gift-card', { balance: item.msrp(), txn_id: Txn.id() })
+      .then((res) => res.json())
+      .then((data) => {
               // save to txn
+              debugger
               updateValue(item.line_id(), 'data', { card: data.card }, 1);
             });
 }

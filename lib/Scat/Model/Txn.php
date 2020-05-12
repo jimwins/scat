@@ -250,7 +250,7 @@ class Txn extends \Scat\Model {
     }
 
     if ($this->shipping_address_id > 1) {
-      throw new Exception("Don't know how to calculate tax on shipped orders.");
+      throw new \Exception("Don't know how to calculate tax on shipped orders.");
     }
 
     /* Really need to nail down how TaxCloud does rounding. */

@@ -204,7 +204,7 @@ class Transactions {
     foreach ($line->getFields() as $field) {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
-      if (strlen($value)) {
+      if (is_array($value) || strlen($value)) {
         $line->set($field, $value);
       }
     }
@@ -245,8 +245,10 @@ class Transactions {
       $txn->save();
     }
 
-    $txn->applyPriceOverrides($catalog);
-    $txn->recalculateTax($tax);
+    if (in_array($txn->status, [ 'new', 'filled' ])) {
+      $txn->applyPriceOverrides($catalog);
+      $txn->recalculateTax($tax);
+    }
 
     \ORM::get_db()->commit();
 
