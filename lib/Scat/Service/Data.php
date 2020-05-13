@@ -14,6 +14,9 @@ class Data
     foreach ($this->options as $option => $value) {
       \ORM::configure($option, $value);
     }
+    \ORM::configure('driver_options', [
+      \PDO::MYSQL_ATTR_LOCAL_INFILE => true,
+    ]);
 
     /* Always want to throw exceptions for errors */
     \ORM::configure('error_mode', \PDO::ERRMODE_EXCEPTION);

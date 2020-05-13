@@ -170,8 +170,8 @@ class Person extends \Scat\Model {
     $tmpfn= ($stream->getMetaData())['uri'];
 
     /* Grab the first line for detecting file type */
-    $line= fgets($stream);
-    fclose($stream);
+    $line= $stream->read(1024);
+    $stream->close();
 
     ob_start();
 
@@ -361,7 +361,7 @@ class Person extends \Scat\Model {
     }
 
     $q= "INSERT INTO vendor_item
-                (vendor, item, code, vendor_sku, name,
+                (vendor_id, item_id, code, vendor_sku, name,
                  retail_price, net_price, promo_price, promo_quantity,
                  barcode, purchase_quantity,
                  length, width, height, weight,
