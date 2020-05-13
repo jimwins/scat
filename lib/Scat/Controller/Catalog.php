@@ -348,11 +348,11 @@ class Catalog {
       if ($vendor_item->barcode) {
         $barcode= $item->barcodes()->create();
         $barcode->code= $vendor_item->barcode;
-        $barcode->item_id= $item->id();
+        $barcode->item_id= $item->id;
         $barcode->save();
       }
       if (!$vendor_item->item) {
-        $vendor_item->item_id= $item->id();
+        $vendor_item->item_id= $item->id;
         $vendor_item->save();
       }
     }
