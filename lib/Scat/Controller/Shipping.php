@@ -50,6 +50,7 @@ class Shipping {
         $txn= $shipment->txn();
 
         if ($txn->status == 'shipped') {
+          error_log("Not sending notification for {$txn->id}, already sent!\n");
           break;
         }
 
@@ -59,7 +60,7 @@ class Shipping {
         }
 
         if (!$txn->person()->email) {
-          error_log("Don't know the email for txn {$txn->id}, can't update");
+          error_log("Don't know the email for txn {$txn->id}, can't update\n");
           break;
         }
 
