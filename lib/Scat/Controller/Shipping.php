@@ -27,7 +27,7 @@ class Shipping {
 
   function checkStalledTrackers(Request $request, Response $response) {
     $shipments= $this->txn->getShipments()
-      ->where('status', 'unknown')
+      ->where_in('status', [ 'unknown', 'pre_transit', 'in_transit' ])
       ->find_many();
 
     $updating= [];
