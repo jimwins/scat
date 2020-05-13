@@ -262,7 +262,7 @@ class Item extends \Scat\Model {
     return \ORM::for_table('txn')->raw_query($q);
   }
 
-  public function find_vendor_items() {
+  public function findVendorItems() {
     $q= "UPDATE vendor_item, item
             SET vendor_item.item_id = item.id
           WHERE (vendor_item.item_id IS NULL OR vendor_item.item_id = 0)
