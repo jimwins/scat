@@ -607,9 +607,9 @@
       .then((data) => {
         let icon= toggle.querySelector('i')
         icon.classList.remove('fa-square-o','fa-check-square-o')
-        icon.classList.add(data.newValue !== '0' ?
+        icon.classList.add(data.item[name] !== 0 ?
                            'fa-check-square-o' : 'fa-square-o')
-        toggle.setAttribute('data-value', data.newValue)
+        toggle.setAttribute('data-value', data.item[name])
       })
     }
 
