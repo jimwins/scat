@@ -212,7 +212,7 @@ class Person extends \Scat\Model {
                @abc_flag, @vendor, @group_code, @catalog_description,
                weight, @cm_product_line, @cm_product_line_desc,
                @category_manager, @price_contract, @case_qty, @case_net)
-            SET vendor_sku = code, special_order = IF(@abc_flag = 'S', 1, 0),
+            SET vendor_sku = code, special_order = IF(@reno != 'R', 1, 0),
                 promo_quantity = purchase_quantity";
 
       if (!\ORM::raw_execute($q))
