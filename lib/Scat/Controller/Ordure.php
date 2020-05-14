@@ -267,7 +267,7 @@ class Ordure {
         }
 
         /* Add shipping item */
-        if ($data->sale->shipping) {
+        if ($data->sale->shipping != 0) {
           $item= \Model::factory('Item')
                    ->where('code','ZZ-SHIPPING-CUSTOM')
                    ->find_one();
@@ -294,17 +294,24 @@ class Ordure {
 
         /* Add shipping address */
         if ($data->sale->shipping_address_id != 1) {
-          $easypost_address= $shipping->createAddress([
-            'name' => $data->shipping_address->name,
-            'company' => $data->shipping_address->company,
-            'street1' => $data->shipping_address->address1,
-            'street2' => $data->shipping_address->address2,
-            'city' => $data->shipping_address->city,
-            'state' => $data->shipping_address->state,
-            'zip' => $data->shipping_address->zip5,
-            'country' => 'US',
-            'phone' => $data->shipping_address->phone,
-          ]);
+          if ($data->shipping_address->easypost_id) {
+            $easypost_address= $shipping->retrieveAddress(
+              $data->shipping_address->easypost_id
+            );
+          } else {
+            $easypost_address= $shipping->createAddress([
+              'verify'  => [ 'delivery' ],
+              'name' => $data->shipping_address->name,
+              'company' => $data->shipping_address->company,
+              'street1' => $data->shipping_address->address1,
+              'street2' => $data->shipping_address->address2,
+              'city' => $data->shipping_address->city,
+              'state' => $data->shipping_address->state,
+              'zip' => $data->shipping_address->zip5,
+              'country' => 'US',
+              'phone' => $data->shipping_address->phone,
+            ]);
+          }
 
           $address= \Model::factory('Address')->create();
           $address->easypost_id= $easypost_address->id;
@@ -317,6 +324,8 @@ class Ordure {
           $address->zip= $easypost_address->zip;
           $address->country= $easypost_address->country;
           $address->phone= $easypost_address->phone;
+          $address->timezone=
+            $easypost_address->verifications->delivery->details->time_zone;
           $address->save();
 
           $txn->shipping_address_id= $address->id;

@@ -19,6 +19,10 @@ class Shipping
     return \EasyPost\Address::create($details);
   }
 
+  public function retrieveAddress($address_id) {
+    return \EasyPost\Address::retrieve($address_id);
+  }
+
   public function createTracker($details) {
     return \EasyPost\Tracker::create($details);
   }
