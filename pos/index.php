@@ -12,6 +12,14 @@ error_reporting(E_ALL & ~E_NOTICE);
 date_default_timezone_set($_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ']);
 bcscale(2);
 
+/* We just log deprecations or it screws with JSON output. */
+set_error_handler('log_deprecation_notice', E_DEPRECATED);
+function log_deprecation_notice($errno, $errstr, $errfile= null, $errline= null,
+                                $errcontext= null)
+{
+  error_log("DEPRECATED: $errstr in $errfile on line $errline\n");
+}
+
 $DEBUG= $ORM_DEBUG= false;
 $config= require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/../config.php';
 
