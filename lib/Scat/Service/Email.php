@@ -41,7 +41,6 @@ class Email {
 
     /* Always Bcc ourselves (for now) */
     if (!$GLOBALS['DEBUG']) {
-      error_log("Sending email (Bcc) to {$this->from_name} <{$this->from_email}>\n");
       $email->addBcc($this->from_email, $this->from_name);
     }
 
