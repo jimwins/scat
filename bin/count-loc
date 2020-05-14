@@ -1,0 +1,7 @@
+#!/bin/sh
+find api css db export js lib old-index.php old-report pos print scat.php ui \
+  -type f \
+  -not -name '*.png' \
+  -not -name '*.svg' \
+  -not -name 'jquery*' \
+  | xargs wc -l
