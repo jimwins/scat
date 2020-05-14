@@ -1,15 +1,15 @@
 <style type="text/css">
-  .thumbnail {
+  .product-thumbnail {
     position: relative;
     width: 100%;
     border: none;
   }
-  .thumbnail:before {
+  .product-thumbnail:before {
     content: "";
     display: block;
     padding-top: 100%;
   }
-  .thumbnail a {
+  .product-thumbnail a {
     margin: 0; padding: 0;
     display: block;
     position: absolute;
@@ -18,7 +18,7 @@
     bottom: 0;
     right: 0;
   }
-  .thumbnail a img {
+  .product-thumbnail a img {
     width: 100%;
     height: 100%;
     object-fit: scale-down;
@@ -28,7 +28,7 @@
   {% set slug = url_for('catalog') ~ '/' ~ p.full_slug %}
   <div class="row">
     <div class="col-sm-2">
-      <div class="thumbnail">
+      <div class="thumbnail product-thumbnail">
         <a href="{{ slug }}">
           {% set media = p.media %}
           {% if media is not empty %}
