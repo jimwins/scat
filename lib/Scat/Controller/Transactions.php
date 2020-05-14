@@ -467,11 +467,6 @@ class Transactions {
       $shipment->tracker_id= $tracker->id;
       /* Wait for webhook to update status. */
       $shipment->status= 'unknown';
-
-      if (in_array($txn->status, [ 'paid', 'processing' ])) {
-        $txn->status= 'shipped';
-        $txn->save();
-      }
     }
 
     $shipment->save();
