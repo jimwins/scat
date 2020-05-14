@@ -3,8 +3,8 @@
 include '../scat.php';
 include '../lib/item.php';
 
-include '../lib/fpdf/alphapdf.php';
-include '../lib/php-barcode.php';
+include '../extern/fpdf/alphapdf.php';
+include '../extern/php-barcode.php';
 
 use Smalot\Cups\Builder\Builder;
 use Smalot\Cups\Manager\JobManager;

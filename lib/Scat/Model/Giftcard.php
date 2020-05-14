@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-include dirname(__FILE__).'/../../php-barcode.php';
+include dirname(__FILE__).'/../../../extern/php-barcode.php';
 
 class Giftcard extends \Model implements \JsonSerializable {
   public function card() {

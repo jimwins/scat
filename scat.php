@@ -223,7 +223,7 @@ function format_phone($phone) {
   }
 }
 
-require 'lib/cryptor.php';
+require 'extern/cryptor.php';
 
 function include_encrypted($file) {
   $enc= file_get_contents($file);

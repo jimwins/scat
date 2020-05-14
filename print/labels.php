@@ -3,8 +3,8 @@
 include '../scat.php';
 include '../lib/item.php';
 
-include '../lib/fpdf/alphapdf.php';
-include '../lib/fpdf/ean13.php';
+include '../extern/fpdf/alphapdf.php';
+include '../extern/fpdf/ean13.php';
 
 $a= array();
 

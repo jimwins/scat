@@ -2,7 +2,7 @@
 <?php
 
 include basename(__FILENAME__) . '/../config.php';
-include basename(__FILENAME__) . '/../lib/cryptor.php';
+include basename(__FILENAME__) . '/../extern/cryptor.php';
 
 $file= $_SERVER['argv'][1];
 
