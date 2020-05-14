@@ -111,7 +111,7 @@
           </a>
           {% for b in brands %}
             <a class="list-group-item" style="break-inside: avoid-column"
-               href="{{ url_for('catalog-brand', { 'slug' : b.slug }) }}">
+               href="{{ url_for('catalog-brand', { 'brand' : b.slug }) }}">
               {{ b.name }}
             </a>
           {% endfor %}

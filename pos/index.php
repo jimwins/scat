@@ -149,9 +149,9 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->get('/whats-new', [ \Scat\Controller\Catalog::class, 'whatsNew' ])
       ->setName('catalog-whats-new');
 
-  $app->get('/brand[/{slug}]', [ \Scat\Controller\Catalog::class, 'brand' ])
+  $app->get('/brand[/{brand}]', [ \Scat\Controller\Catalog::class, 'brand' ])
       ->setName('catalog-brand');
-  $app->post('/brand[/{slug}]',
+  $app->post('/brand[/{brand}]',
               [ \Scat\Controller\Catalog::class, 'brandUpdate' ]);
 
   $app->get('/department[/{id:[0-9]+}]',

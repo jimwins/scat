@@ -83,58 +83,58 @@ class Catalog {
     ]);
   }
 
-  public function brand(Request $request, Response $response, $slug= null) {
+  public function brand(Request $request, Response $response, $brand= null) {
     $depts= $this->catalog->getDepartments();
 
-    $brand= $slug ? $this->catalog->getBrandBySlug($slug) : null;
-    if ($slug && !$brand)
+    $brandO= $brand ? $this->catalog->getBrandBySlug($brand) : null;
+    if ($brand && !$brandO)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    if ($brand)
-      $products= $brand->products()
+    if ($brandO)
+      $products= $brandO->products()
                        ->order_by_asc('name')
                        ->where('product.active', 1)
                        ->find_many();
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
-      return $response->withJson($brand);
+      return $response->withJson($brandO);
     }
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
       return $this->view->render($response, 'dialog/brand-edit.html', [
-        'brand' => $brand
+        'brand' => $brandO
       ]);
     }
 
-    $brands= $brand ? null : $this->catalog->getBrands();
+    $brands= $brandO ? null : $this->catalog->getBrands();
 
     return $this->view->render($response, 'catalog/brand.html', [
       'depts' => $depts,
       'brands' => $brands,
-      'brand' => $brand,
+      'brand' => $brandO,
       'products' => $products
     ]);
   }
 
-  public function brandUpdate(Request $request, Response $response, $slug= null)
+  public function brandUpdate(Request $request, Response $response, $brand= null)
   {
-    $brand= $slug ? $this->catalog->getBrandBySlug($slug) : null;
-    if ($slug && !$brand)
+    $brandO= $brand ? $this->catalog->getBrandBySlug($brand) : null;
+    if ($brand && !$brandO)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    if (!$brand)
-      $brand= $this->catalog->createBrand();
+    if (!$brandO)
+      $brandO= $this->catalog->createBrand();
 
-    $brand->name= $request->getParam('name');
-    $brand->slug= $request->getParam('slug');
-    $brand->description= $request->getParam('description');
-    $brand->active= (int)$request->getParam('active');
-    $brand->save();
+    $brandO->name= $request->getParam('name');
+    $brandO->slug= $request->getParam('slug');
+    $brandO->description= $request->getParam('description');
+    $brandO->active= (int)$request->getParam('active');
+    $brandO->save();
 
-    if ($slug) {
-      return $response->withJson($brand);
+    if ($brand) {
+      return $response->withJson($brandO);
     } else {
-      return $response->withRedirect('/catalog/brand/' . $brand->slug);
+      return $response->withRedirect('/catalog/brand/' . $brandO->slug);
     }
   }
 
