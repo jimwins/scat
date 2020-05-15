@@ -287,8 +287,14 @@ class Ordure {
           $payment= $txn->payments()->create();
           $payment->txn_id= $txn->id;
           $payment->method= ($pay->method == 'credit') ? 'stripe' : $pay->method;
+          if ($pay->method == 'credit') {
+            $payment->cc_type= $pay->data->cc_brand;
+            $payment->cc_lastfour= $pay->data->cc_last4;
+          }
+
           $payment->amount= $pay->amount;
           $payment->processed= $pay->processed;
+          $payment->data= json_encode($pay->data);
           $payment->save();
         }
 
