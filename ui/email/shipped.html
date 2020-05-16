@@ -20,7 +20,7 @@
     We wanted to let you know that your order ({{ txn.formatted_number }}) was
     shipped via {{ tracker.carrier }} on {{ tracker.created_at |  date("c", "UTC") | date("l, F j") }}.
     {% if tracker.est_delivery_date %}
-      The estimated delivery date is {{ tracker.est_delivery_date | date("c", "UTC") | date("l, F j") }}.
+      The estimated delivery date is {{ tracker.est_delivery_date | date("l, F j", "UTC") }}.
     {% endif %}
   </p>
 
