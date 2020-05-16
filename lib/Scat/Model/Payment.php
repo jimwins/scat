@@ -24,8 +24,14 @@ class Payment extends \Model {
 
   function pretty_method() {
     switch ($this->method) {
+    case 'stripe':
+      if (!$this->cc_type) {
+        return 'Paid by ' . self::$methods[$this->method];
+      }
+      /* fall through since we know credit card info */
     case 'credit':
-      return 'Paid by ' . $this->cc_type . ' ending in ' . $this->cc_lastfour;
+      return 'Paid by ' . $this->cc_type .
+             ($this->cc_lastfour ? ' ending in ' . $this->cc_lastfour : '');
     case 'discount':
       return sprintf("Discount (%d%%)", $this->discount);
     case 'change':
