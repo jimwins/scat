@@ -320,7 +320,7 @@ class Catalog {
     foreach ($item->getFields() as $field) {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
-      if (strlen($value)) {
+      if ($value !== null) {
         $item->setProperty($field, $value);
       }
     }
@@ -454,6 +454,7 @@ class Catalog {
       foreach ($item->getFields() as $field) {
         if ($field == 'id') continue;
         $value= $request->getParam($field);
+        // Important: check that value is not empty!
         if (strlen($value)) {
           $item->setProperty($field, $value);
         }

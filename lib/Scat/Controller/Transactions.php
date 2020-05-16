@@ -103,7 +103,7 @@ class Transactions {
     foreach ($txn->getFields() as $field) {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
-      if (strlen($value)) {
+      if ($value !== null) {
         $txn->set($field, $value);
       }
     }
@@ -204,7 +204,7 @@ class Transactions {
     foreach ($line->getFields() as $field) {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
-      if (is_array($value) || strlen($value)) {
+      if ($value !== null) {
         $line->set($field, $value);
       }
     }
@@ -395,7 +395,7 @@ class Transactions {
     foreach ($dropship->getFields() as $field) {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
-      if (strlen($value)) {
+      if ($value !== null) {
         $dropship->set($field, $value);
       }
     }
@@ -453,7 +453,7 @@ class Transactions {
     foreach ($shipment->getFields() as $field) {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
-      if (strlen($value)) {
+      if ($value !== null) {
         $shipment->setProperty($field, $value);
       }
     }
