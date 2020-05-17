@@ -301,7 +301,9 @@ class Transactions {
   /* Shipments */
 
   public function saleShipments(Request $request, Response $response,
-                                $id, $shipment_id= null) {
+                                \Scat\Service\Shipping $shipping,
+                                $id, $shipment_id= null)
+  {
     $txn= $this->txn->fetchById($id);
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
@@ -312,9 +314,14 @@ class Transactions {
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
-      return $this->view->render($response, 'dialog/shipment.html', [
+      $dialog= ($request->getParam('tracker') ?
+                'dialog/tracker.html' :
+                'dialog/shipment.html');
+      return $this->view->render($response, $dialog, [
         'txn' => $txn,
-        'shipment' => $shipment
+        'shipment' => $shipment,
+        'easypost' =>
+          $shipment ? $shipping->getShipment($shipment->easypost_id) : null,
       ]);
     }
 
@@ -340,6 +347,93 @@ class Transactions {
     $tracker= $shipping->getTracker($shipment->tracker_id);
 
     return $response->withRedirect($tracker->public_url);
+  }
+
+  public function updateShipment(Request $request, Response $response,
+                                  \Scat\Service\Shipping $shipping,
+                                  $id, $shipment_id= null)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $shipment= $shipment_id ? $txn->shipments()->find_one($shipment_id) : null;
+    if ($shipment_id && !$shipment)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if (!$shipment) {
+      $shipment= $txn->shipments()->create();
+      $shipment->txn_id= $txn->id;
+    }
+
+    foreach ($shipment->getFields() as $field) {
+      if ($field == 'id') continue;
+      $value= $request->getParam($field);
+      if ($value !== null) {
+        $shipment->setProperty($field, $value);
+      }
+    }
+
+    /* New tracking code? */
+    if (($tracking_code= $request->getParam('tracking_code'))) {
+      $extra= $shipping->createTracker([
+        'tracking_code' => $tracking_code,
+        'carrier' => $request->getParam('carrier'),
+      ]);
+      $shipment->tracker_id= $extra->id;
+      /* Wait for webhook to update status. */
+      $shipment->status= 'unknown';
+    }
+
+    /* New package info? */
+    if (($weight= $request->getParam('weight'))) {
+      list($length, $width, $height)=
+        preg_split('/\s*x\s*/', $request->getParam('dimensions'));
+      if (preg_match('/([0-9.]+\s+)?([0-9.]+) *oz/', $weight, $m)) {
+        $weight= (int)$m[1] + ($m[2] / 16);
+      }
+
+      $parcel= [
+        'weight' => $weight * 16, // Needs to be oz.
+        'length' => $length,
+        'width' => $width,
+        'height' => $height,
+      ];
+      $predefined_package= $request->getParam('predefined_package');
+      if (strlen($predefined_package)) {
+        $parcel['predefined_package']= $predefined_package;
+      }
+
+      $extra= $shipping->createShipment([
+        'from_address' => $shipping->getDefaultFromAddress(),
+        'to_address' =>
+          $shipping->retrieveAddress($txn->shipping_address()->easypost_id),
+        'parcel' => $parcel,
+        'options' => [
+          'invoice_number' => $txn->formatted_number(),
+        ],
+      ]);
+
+      $shipment->easypost_id= $extra->id;
+      $shipment->status= 'pending';
+    }
+
+    /* Select a rate? */
+    if (($rate_id= $request->getParam('rate_id'))) {
+      $ep= $shipping->getShipment($shipment->easypost_id);
+      // XXX insurance?
+      error_log((string)$ep);
+      error_log("Buying $rate_id\n");
+      $ep->buy([ 'rate' => \EasyPost\Rate::retrieve($rate_id) ]);
+
+      $shipment->status= 'unknown';
+      $shipment->tracker_id= $ep->tracker->id;
+    }
+
+    $shipment->save();
+
+    $data= $shipment->as_array();
+    return $response->withJson($data);
   }
 
   /* Drop-ships */
@@ -432,46 +526,6 @@ class Transactions {
     \ORM::get_db()->commit();
 
     return $response->withJson($dropship);
-  }
-
-  public function updateShipment(Request $request, Response $response,
-                                  \Scat\Service\Shipping $shipping,
-                                  $id, $shipment_id= null) {
-    $txn= $this->txn->fetchById($id);
-    if (!$txn)
-      throw new \Slim\Exception\HttpNotFoundException($request);
-
-    $shipment= $shipment_id ? $txn->shipments()->find_one($shipment_id) : null;
-    if ($shipment_id && !$shipment)
-      throw new \Slim\Exception\HttpNotFoundException($request);
-
-    if (!$shipment) {
-      $shipment= $txn->shipments()->create();
-      $shipment->txn_id= $txn->id;
-    }
-
-    foreach ($shipment->getFields() as $field) {
-      if ($field == 'id') continue;
-      $value= $request->getParam($field);
-      if ($value !== null) {
-        $shipment->setProperty($field, $value);
-      }
-    }
-
-    /* New tracking code? */
-    if (($tracking_code= $request->getParam('tracking_code'))) {
-      $tracker= $shipping->createTracker([
-        'tracking_code' => $tracking_code,
-        'carrier' => $request->getParam('carrier'),
-      ]);
-      $shipment->tracker_id= $tracker->id;
-      /* Wait for webhook to update status. */
-      $shipment->status= 'unknown';
-    }
-
-    $shipment->save();
-
-    return $response->withJson($shipment);
   }
 
   public function purchases(Request $request, Response $response) {

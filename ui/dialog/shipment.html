@@ -2,25 +2,50 @@
 {% import 'macros.twig' as scat %}
 
 {% block title %}
-  Add Shipment/Tracker
+  Add Shipment
 {% endblock %}
 
 {% block body %}
   <div class="modal-body">
 
     {% if shipment %}
-      {# TODO implement editing of shipment info #}
+      {% if easypost %}
+        <ul class="list-group">
+          {% for rate in easypost.rates %}
+            <a href="#" data-rate="{{ rate.id }}" class="list-group-item">
+              <span class="badge">{{ scat.amount(rate.rate) }}</span>
+              {{ rate.carrier }}: {{ rate.service }}
+              {% if rate.delivery_days %}
+                ({{ rate.delivery_days}} day{{ rate.delivery_days > 0 ? 's' }})
+              {% endif %}
+            </a>
+          {% endfor %}
+        </ul>
+      {% endif %}
     {% else %}
       <div class="form-group">
-        <label for="tracking_code">Tracking Code</label>
-        <input type="text" class="form-control" autofocus
-               name="tracking_code" placeholder="Tracking Code">
+        <label for="predefined_package">Package Type</label>
+        <select class="form-control" name="predefined_package">
+          <option value=""></option>
+          <option value="SmallFlatRateBox">Small Flat-Rate Box</option>
+          <option value="MediumFlatRateBox">Medium Flat-Rate Box</option>
+          <option value="LargeFlatRateBox">Large Flat-Rate Box</option>
+          <option value="LargeFlatRateBoxAPOFPO">Large Flat-Rate Box (APO/FPO)</option>
+          <option value="RegionalRateBoxA">Regional Rate Box A</option>
+          <option value="RegionalRateBoxB">Regional Rate Box B</option>
+        </select>
       </div>
 
       <div class="form-group">
-        <label for="carrier">Carrier</label>
+        <label for="weight">Weight</label>
         <input type="text" class="form-control"
-               name="carrier" placeholder="Carrier">
+               name="weight" placeholder="3 lbs">
+      </div>
+
+      <div class="form-group">
+        <label for="dimensions">Dimensions</label>
+        <input type="text" class="form-control"
+               name="dimensions" placeholder="15 x 10 x 9">
       </div>
 
     {% endif %}
@@ -30,11 +55,40 @@
 
 {% block submit %}
   <button type="submit" class="btn btn-primary">
-    {{ shipment ? 'Update' : 'Add' }}
+    {{ shipment ? 'Select' : 'Lookup' }}
   </button>
 {% endblock %}
 
 {% block script %}
+  form.addEventListener('click', (ev) => {
+    let rate= ev.target.closest('[data-rate]')
+    if (!rate) return;
+
+    ev.preventDefault()
+    ev.stopPropagation()
+
+    let rate_id= rate.getAttribute('data-rate')
+
+    fetch("/sale/{{ txn.id }}/shipment/{{ shipment.id }}", {
+      method: '{{ shipment ? 'PATCH' : 'POST' }}',
+      headers: {
+        'Accept' : 'application/json',
+        'Content-type' : 'application/json',
+      },
+      body: JSON.stringify({ rate_id: rate_id })
+    })
+    .then((res) => {
+      if (!res.ok) {
+        return Promise.reject(new Error(res.statusText))
+      }
+      return res.json()
+    })
+    .then((data) => {
+      scat.alert('info', 'Added shipment.')
+      $(dialog).modal('hide')
+    })
+  })
+
   form.onsubmit= (event) => {
     event.preventDefault()
 
@@ -50,10 +104,13 @@
     })
     .then((res) => {
       if (!res.ok) {
-        return Promise.reject(new Error(response.statusText))
+        return Promise.reject(new Error(res.statusText))
       }
-      scat.alert('info', 'Added shipment.')
+      return res.json()
+    })
+    .then((data) => {
       $(dialog).modal('hide')
+      scat.dialog([], '/sale/{{ txn.id }}/shipment/' + data.id)
     })
   }
 {% endblock %}

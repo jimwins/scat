@@ -521,6 +521,7 @@ $(function() {
      <ul class="dropdown-menu" role="menu">
       <li>
          <a data-bind="click: createDropShip">Create Drop Shipment</a>
+         <a data-bind="click: createShipment">Create Shipment</a>
          <a data-bind="click: addShippingTracker">Add Tracker</a>
       </li>
      </ul>
@@ -542,7 +543,16 @@ $(function() {
     </div>
     <ul>
     <!-- ko foreach: shipments -->
-      <li><a data-bind="text: $data.status, attr: { href: '/sale/' + $parent.txn.id() + '/shipment/' + $data.id() + '/track' }">Track</a></li>
+      <li>
+        <a data-bind="if: $data.tracker_id(),
+                      attr: { href: '/sale/' + $parent.txn.id() + '/shipment/' + $data.id() + '/track' }">
+          Track
+        </a>
+        <a data-bind="if: $data.easypost_id() && $data.status() == 'pending',
+                      click: $parent.finalizeShipment">
+          Finalize
+        </a>
+      </li>
     <!-- /ko -->
     </ul>
     <ul>
@@ -1347,7 +1357,19 @@ viewModel.createDropShip= () => {
 viewModel.addShippingTracker= () => {
   var id= Txn.id()
 
+  scat.dialog([], '/sale/' + id + '/shipment?tracker=1')
+}
+
+viewModel.createShipment= () => {
+  var id= Txn.id()
+
   scat.dialog([], '/sale/' + id + '/shipment')
+}
+
+viewModel.finalizeShipment= (shipment) => {
+  var id= Txn.id()
+
+  scat.dialog([], '/sale/' + id + '/shipment/' + shipment.id())
 }
 
 viewModel.deleteTransaction= function() {

@@ -217,7 +217,6 @@ class Item extends \Scat\Model {
 
   public function setWeight($weight) {
     if (preg_match('/([0-9.]+\s+)?([0-9.]+) *oz/', $weight, $m)) {
-      error_log(json_encode($m));
       $weight= (int)$m[1] + ($m[2] / 16);
     }
     $this->weight= $weight;

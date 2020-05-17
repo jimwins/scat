@@ -1,0 +1,59 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Add Tracker
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+
+    {% if shipment %}
+      {# TODO implement editing of tracker info #}
+    {% else %}
+      <div class="form-group">
+        <label for="tracking_code">Tracking Code</label>
+        <input type="text" class="form-control" autofocus
+               name="tracking_code" placeholder="Tracking Code">
+      </div>
+
+      <div class="form-group">
+        <label for="carrier">Carrier</label>
+        <input type="text" class="form-control"
+               name="carrier" placeholder="Carrier">
+      </div>
+
+    {% endif %}
+
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    {{ shipment ? 'Update' : 'Add' }}
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    fetch("/sale/{{ txn.id }}/shipment{{ shipment.id ? '/' ~ shipment.id }}", {
+      method: '{{ shipment ? 'PATCH' : 'POST' }}',
+      headers: {
+        'Accept' : 'application/json',
+        'Content-type' : 'application/json',
+      },
+      body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then((res) => {
+      if (!res.ok) {
+        return Promise.reject(new Error(response.statusText))
+      }
+      scat.alert('info', 'Added tracker.')
+      $(dialog).modal('hide')
+    })
+  }
+{% endblock %}
