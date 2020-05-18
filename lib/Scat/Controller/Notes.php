@@ -94,18 +94,14 @@ class Notes {
     $note->public= (int)$request->getParam('public');
 
     if ($sms) {
-      try {
-        $person= $note->about();
-        if (!$person) {
-          throw new \Exception("Nobody to send an SMS to.");
-        }
-        error_log("Sending message to {$person->phone}");
-        $data= $phone->sendSMS($person->phone,
-                                     $request->getParam('content'));
-        $note->save();
-       } catch (\Exception $e) {
-         error_log("Got exception: " . $e->getMessage());
-       }
+      $person= $note->about() ?: $note->parent()->about();
+      if (!$person) {
+        throw new \Exception("Nobody to send an SMS to.");
+      }
+      error_log("Sending message to {$person->phone}");
+      $data= $phone->sendSMS($person->phone,
+                                   $request->getParam('content'));
+      $note->save();
     }
 
     $note->save();
