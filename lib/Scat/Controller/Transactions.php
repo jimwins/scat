@@ -299,6 +299,62 @@ class Transactions {
                                 [ "message" => "Email sent." ]);
   }
 
+  /* Shipping address */
+  public function shippingAddress(Request $request, Response $response, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/address.html', [
+        'txn' => $txn,
+      ]);
+    }
+
+    return $response->withJson($txn->address());
+  }
+
+  public function updateShippingAddress(Request $request, Response $response,
+                                        \Scat\Service\Shipping $shipping,
+                                        \Scat\Service\Data $data,
+                                        $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $data->beginTransaction();
+
+    $details= $request->getParams();
+    $details['verify']= [ 'delivery' ];
+    $easypost_address= $shipping->createAddress($details);
+
+    /* We always create a new address. */
+    $address= $data->factory('Address')->create();
+    $address->easypost_id= $easypost_address->id;
+    $address->name= $easypost_address->name;
+    $address->company= $easypost_address->company;
+    $address->street1= $easypost_address->street1;
+    $address->street2= $easypost_address->street2;
+    $address->city= $easypost_address->city;
+    $address->state= $easypost_address->state;
+    $address->zip= $easypost_address->zip;
+    $address->country= $easypost_address->country;
+    $address->phone= $easypost_address->phone;
+    $address->timezone=
+      $easypost_address->verifications->delivery->details->time_zone;
+    $address->save();
+
+    $txn->shipping_address_id= $address->id;
+    $txn->save();
+
+    $data->commit();
+
+    return $response->withJson($address);
+  }
+
   /* Shipments */
 
   public function saleShipments(Request $request, Response $response,

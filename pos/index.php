@@ -109,6 +109,11 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->post('/{id:[0-9]+}/email-invoice',
               [ \Scat\Controller\Transactions::class, 'email' ]);
 
+  $app->get('/{id:[0-9]+}/shipping-address',
+            [ \Scat\Controller\Transactions::class, 'shippingAddress' ]);
+  $app->post('/{id:[0-9]+}/shipping-address',
+              [ \Scat\Controller\Transactions::class, 'updateShippingAddress' ]);
+
   /* Dropships */
   $app->get('/{id:[0-9]+}/dropship[/{dropship_id:[0-9]+}]',
             [ \Scat\Controller\Transactions::class, 'saleDropships' ]);

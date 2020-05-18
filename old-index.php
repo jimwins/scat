@@ -508,8 +508,7 @@ $(function() {
 </div>
 
 <!-- SHIPPING -->
-<div class="panel panel-default"
-     data-bind="visible: txn.shipping_address_id() > 0 || shipments().length">
+<div class="panel panel-default">
   <div class="panel-heading">
     <div class="btn-group pull-right">
      <button type="button" class="btn btn-default btn-xs dropdown-toggle"
@@ -520,9 +519,13 @@ $(function() {
      </button>
      <ul class="dropdown-menu" role="menu">
       <li>
-         <a data-bind="click: createDropShip">Create Drop Shipment</a>
-         <a data-bind="click: createShipment">Create Shipment</a>
-         <a data-bind="click: addShippingTracker">Add Tracker</a>
+        <a data-bind="click: editShippingAddress,
+                      text: txn.shipping_address_id() > 0 ? 'Edit Shipping Address' : 'Add Shipping Address'">
+          Add Shipping Address
+        </a>
+        <a data-bind="click: createDropShip">Create Drop Shipment</a>
+        <a data-bind="click: createShipment">Create Shipment</a>
+        <a data-bind="click: addShippingTracker">Add Tracker</a>
       </li>
      </ul>
     </div>
@@ -530,6 +533,12 @@ $(function() {
   </div>
   <div class="panel-body">
     <div data-bind="if: txn.shipping_address_id() > 0 && shipping_address">
+      <div class="pull-right">
+        <button type="button" class="btn btn-default btn-xs"
+                data-bind="click: editShippingAddress">
+          <i class="fa fa-pencil"></i>
+        </button>
+      </div>
       <div data-bind="text: shipping_address.name()"></div>
       <div data-bind="text: shipping_address.company()"></div>
       <div data-bind="text: shipping_address.street1()"></div>
@@ -541,7 +550,7 @@ $(function() {
       </div>
       <div data-bind="text: shipping_address.phone()"></div>
     </div>
-    <ul>
+    <ul data-bind="if: shipments.length">
     <!-- ko foreach: shipments -->
       <li>
         <a data-bind="if: $data.tracker_id(),
@@ -1348,6 +1357,12 @@ viewModel.setStatus= (x,ev) => {
   })
 }
 
+viewModel.editShippingAddress= () => {
+  var id= Txn.id()
+
+  scat.dialog([], '/sale/' + id + '/shipping-address')
+}
+
 viewModel.createDropShip= () => {
   var id= Txn.id()
 
@@ -1622,7 +1637,6 @@ viewModel.createGiftCard= function(item) {
       .then((res) => res.json())
       .then((data) => {
               // save to txn
-              debugger
               updateValue(item.line_id(), 'data', { card: data.card }, 1);
             });
 }
