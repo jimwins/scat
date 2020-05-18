@@ -74,6 +74,7 @@ class Transactions {
         $new= $sale->items()->create();
         $data= $line->as_array();
         unset($data['id']); // don't copy id!
+        unset($data['sale_price']); // or sale_price
         $new->set($data);
         $new->txn_id= $sale->id;
         $new->save();

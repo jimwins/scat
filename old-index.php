@@ -1396,8 +1396,8 @@ viewModel.copyTransaction= function() {
   var txn= Txn.id();
   scat.call('/sale', { copy_from_id: txn })
       .then((res) => {
-        if (res.redirected) {
-          window.location.href= res.url
+        if (res.headers.get('Location')) {
+          window.location.href= res.headers.get('Location')
         } else {
           alert("Got unexpected result.")
         }
