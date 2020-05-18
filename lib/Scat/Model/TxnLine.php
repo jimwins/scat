@@ -135,6 +135,8 @@ class TxnLine extends \Scat\Model {
       parent::set('discount', $discount);
       parent::set('discount_type', $discount_type);
       parent::set('discount_manual', $discount_manual);
+    } elseif ($name == 'sale_price') {
+      /* Don't do anything (can happen when we clone an item) */
     } elseif ($name == 'data') {
       return parent::set('data', json_encode($value));
     } elseif ($name == 'override_name') {
