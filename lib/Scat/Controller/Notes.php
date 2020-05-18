@@ -92,12 +92,13 @@ class Notes {
     $note->content= $request->getParam('content');
     $note->todo= (int)$request->getParam('todo');
     $note->public= (int)$request->getParam('public');
-    $note->save();
 
     if ($sms) {
       try {
-        $txn= $note->parent()->txn();
-        $person= $txn->person();
+        $person= $note->about();
+        if (!$person) {
+          throw new \Exception("Nobody to send an SMS to.");
+        }
         error_log("Sending message to {$person->phone}");
         $data= $phone->sendSMS($person->phone,
                                      $request->getParam('content'));
@@ -106,6 +107,8 @@ class Notes {
          error_log("Got exception: " . $e->getMessage());
        }
     }
+
+    $note->save();
 
     $response= $response->withStatus(201)
                         ->withHeader('Location', '/note/' . $note->id);
