@@ -57,4 +57,10 @@ class Settings {
 
     return $response->withJson($config);
   }
+
+  public function listPrinters(Request $request, Response $response,
+                                \Scat\Service\Printer $print)
+  {
+    return $response->withJson($print->getPrinters());
+  }
 }

@@ -458,6 +458,8 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
   $app->post('', [ \Scat\Controller\Settings::class, 'create' ]);
   $app->patch('/{id:[0-9]+}',
             [ \Scat\Controller\Settings::class, 'update' ]);
+  $app->get('/printers',
+            [ \Scat\Controller\Settings::class, 'listPrinters' ]);
 });
 
 /* Webhooks */
