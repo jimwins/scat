@@ -406,6 +406,30 @@ class Transactions {
     return $response->withRedirect($tracker->public_url);
   }
 
+  public function printShipmentLabel(Request $request, Response $response,
+                                      \Scat\Service\Printer $print,
+                                      \Scat\Service\Shipping $shipping,
+                                      $id, $shipment_id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $shipment= $shipment_id ? $txn->shipments()->find_one($shipment_id) : null;
+    if ($shipment_id && !$shipment)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if (!$shipment->easypost_id)
+      throw new \Slim\Exception\HttpNotFoundException($request,
+        "No details found for that shipment.");
+
+    $details= $shipping->getShipment($shipment->easypost_id);
+
+    $pdf= file_get_contents($details->postage_label->label_url);
+
+    return $print->printPNG($response, 'shipping-label', $pdf);
+  }
+
   public function updateShipment(Request $request, Response $response,
                                   \Scat\Service\Shipping $shipping,
                                   $id, $shipment_id= null)

@@ -125,6 +125,8 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Transactions::class, 'saleShipments' ]);
   $app->get('/{id:[0-9]+}/shipment/{shipment_id:[0-9]+}/track',
             [ \Scat\Controller\Transactions::class, 'trackShipment' ]);
+  $app->post('/{id:[0-9]+}/shipment/{shipment_id:[0-9]+}/~print-label',
+              [ \Scat\Controller\Transactions::class, 'printShipmentLabel' ]);
   $app->post('/{id:[0-9]+}/shipment',
               [ \Scat\Controller\Transactions::class, 'updateShipment' ]);
   $app->patch('/{id:[0-9]+}/shipment/{shipment_id:[0-9]+}',

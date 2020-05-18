@@ -52,11 +52,8 @@ class Printer
     return $mpdf->Output("not-used", \Mpdf\Output\Destination::STRING_RETURN);
   }
 
-  public function printFromTemplate(Response $response,
-                                    $pageType, $template, $data) {
-    $pdf= $this->generateFromTemplate($template, $data);
-
-    $printerManager= $this->getPrinteManager();
+  public function printPDF(Response $response, $pageType, $pdf) {
+    $printerManager= $this->getPrinterManager();
 
     list ($pageType, $modifier)= explode(':', $pageType);
     $printer_name= $this->config->get('printer.' . $pageType);
@@ -87,6 +84,48 @@ class Printer
     $result= $jobManager->send($printer, $job);
 
     return $response->withJson([ 'result' => 'Printed.' ]);
+  }
+
+  public function printPNG(Response $response, $pageType, $png) {
+    $printerManager= $this->getPrinterManager();
+
+    list ($pageType, $modifier)= explode(':', $pageType);
+    $printer_name= $this->config->get('printer.' . $pageType);
+
+    if (!$printerManager || !$printer_name) {
+      $response->getBody()->write($png);
+      return $response->withHeader('Content-type', 'image/png');
+    }
+
+    $printer= $printerManager->findByUri(
+      'ipp://' . $cups_host .  '/printers/' . $printer_name
+    );
+
+    $jobManager= new \Smalot\Cups\Manager\JobManager(
+      $builder,
+      $client,
+      $responseParser
+    );
+
+    $job= new \Smalot\Cups\Model\Job();
+    $job->setName('job create file');
+    $job->setCopies(1);
+    $job->setPageRanges('1-1000');
+    $job->addText($png, '', 'image/png');
+    if ($modifier == 'open') {
+      $job->addAttribute('CashDrawerSetting', '1OpenDrawer1');
+    }
+    $result= $jobManager->send($printer, $job);
+
+    return $response->withJson([ 'result' => 'Printed.' ]);
+  }
+
+  public function printFromTemplate(Response $response,
+                                    $pageType, $template, $data)
+  {
+    $pdf= $this->generateFromTemplate($template, $data);
+
+    return $this->printPDF($response, $pageType, $pdf);
   }
 
   public function getPrinters() {

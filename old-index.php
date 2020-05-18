@@ -550,7 +550,7 @@ $(function() {
       </div>
       <div data-bind="text: shipping_address.phone()"></div>
     </div>
-    <ul data-bind="if: shipments.length">
+    <ul data-bind="if: shipments().length">
     <!-- ko foreach: shipments -->
       <li>
         <a data-bind="if: $data.tracker_id(),
@@ -560,6 +560,10 @@ $(function() {
         <a data-bind="if: $data.easypost_id() && $data.status() == 'pending',
                       click: $parent.finalizeShipment">
           Finalize
+        </a>
+        <a data-bind="if: $data.easypost_id() && $data.status() != 'pending',
+                      click: $parent.printShipmentLabel">
+          - Print Label
         </a>
       </li>
     <!-- /ko -->
@@ -1385,6 +1389,12 @@ viewModel.finalizeShipment= (shipment) => {
   var id= Txn.id()
 
   scat.dialog([], '/sale/' + id + '/shipment/' + shipment.id())
+}
+
+viewModel.printShipmentLabel= (shipment) => {
+  var id= Txn.id()
+
+  scat.print('/sale/' + id + '/shipment/' + shipment.id() + '/~print-label')
 }
 
 viewModel.deleteTransaction= function() {
