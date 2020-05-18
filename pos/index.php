@@ -376,8 +376,11 @@ $app->get('/~webhook/tax',
 
 /* SMS */
 $app->group('/sms', function (RouteCollectorProxy $app) {
+  $app->get('', [ \Scat\Controller\SMS::class, 'home' ]);
   $app->map(['GET','POST'], '/~send',
             [ \Scat\Controller\SMS::class, 'send' ]);
+  $app->post('/~send-rewardsplus',
+            [ \Scat\Controller\SMS::class, 'sendRewardsPlus' ]);
   $app->post('/~receive',
              [ \Scat\Controller\SMS::class, 'receive' ]);
   $app->get('/~register', [ \Scat\Controller\SMS::class, 'register' ]);

@@ -1,0 +1,76 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  SMS
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-sm-6 col-sm-push-3">
+    <form id="send" class="panel panel-default">
+      <div class="panel-heading">
+        <h2 class="panel-title">Send Rewards+ Message</h2>
+      </div>
+      <div class="panel-body">
+        <label for="message">Message</label>
+        <div class="label label-default" id="message-length">0 / 139</div>
+        <textarea name="message" id="message"
+                  rows="4"
+                  class="form-control"></textarea>
+        <div class="help-block">"Reply STOP to cancel" will be appended.</div>
+      </div>
+      <div class="panel-footer text-right">
+        <button type="submit" class="btn btn-primary">
+          Send
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    let text= document.getElementById('message')
+    let label= document.getElementById('message-length')
+
+    text.addEventListener('keyup', (ev) => {
+      // Want the length in bytes
+      let len= (new TextEncoder().encode(text.value)).length
+      if (len > 140) {
+        label.classList.add('label-danger')
+      } else {
+        label.classList.remove('label-danger')
+      }
+      label.textContent= len + ' / 140'
+    })
+
+    document.getElementById('send').addEventListener('submit', (ev) => {
+      ev.preventDefault()
+
+      let form= ev.target
+
+      if (form.disabled) return;
+      form.disabled= true
+
+      if (!window.confirm("Are you sure you want to send this to everyone?")) {
+        form.disabled= false
+        return
+      }
+
+      scat.call('/sms/~send-rewardsplus', new FormData(ev.target))
+          .then((res) => res.json())
+          .then((data) => {
+            scat.alert('info', data.message)
+            form.reset()
+          })
+          .finally((res) => {
+            form.disabled= false
+          })
+    })
+
+  </script>
+{% endblock %}

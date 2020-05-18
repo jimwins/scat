@@ -4,25 +4,70 @@ namespace Scat\Controller;
 use \Psr\Container\ContainerInterface;
 use \Slim\Http\ServerRequest as Request;
 use \Slim\Http\Response as Response;
+use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class SMS {
-  function send(Request $request, Response $response,
-                \Scat\Service\Phone $phone) {
-    $data= $phone->sendSMS($request->getParam('to'),
-                           $request->getParam('text'));
+  private $phone;
+
+  public function __construct(\Scat\Service\Phone $phone) {
+    $this->phone= $phone;
+  }
+
+  function home(Request $request, Response $response, View $view) {
+    return $view->render($response, 'sms/index.html', [
+    ]);
+  }
+
+  function send(Request $request, Response $response) {
+    $data= $this->phone->sendSMS(
+      $request->getParam('to'),
+      $request->getParam('text')
+    );
     return $response->withJson($data);
   }
 
-  function register(Request $request, Response $response,
-                    \Scat\Service\Phone $phone) {
-    $data= $phone->registerWebhook();
+  function sendRewardsPlus(Request $request, Response $response,
+                            \Scat\Service\Data $data)
+  {
+    $people= $data->factory('Person')
+      ->where('rewardsplus', 1)
+      ->where('active', 1)
+      ->find_many();
+
+    $message= $request->getParam('message');
+    $message.= " Reply STOP to cancel";
+
+    if (strlen($message) > 160) {
+      throw new \Exception("Message is too long.");
+    }
+
+    // TODO should use an external queue for this, but we don't have many to
+    // send right now so premature optimization and all that
+
+    $sent= 0;
+    foreach ($people as $person) {
+      if ($person->loyalty_number) {
+        $this->phone->sendSMS($person->loyalty_number, $message);
+        sleep(1);
+        $sent++;
+        set_time_limit(20); // keep resetting php's time limit
+      }
+    }
+
+    return $response->withJson([
+      'message' => sprintf("Sent %d message%s.", $sent, $sent != 1 ? 's' : '')
+    ]);
+  }
+
+  function register(Request $request, Response $response) {
+    $data= $this->phone->registerWebhook();
     return $response->withJson($data);
   }
 
   function receive(Request $request, Response $response,
-                    \Scat\Service\Data $data, \Scat\Service\Config $config,
-                    \Scat\Service\Phone $phone) {
+                    \Scat\Service\Data $data, \Scat\Service\Config $config)
+  {
     if ($request->getParam('type') != 'sms.in') {
       error_log("Did not understand type of message from Phone.com\n");
       error_log(json_encode($request->getParams()));
@@ -33,7 +78,7 @@ class SMS {
 
     if (strtolower($payload['phone']) == 'help') {
       $message= $config->get('rewards.help_message');
-      $phone->sendSMS($payload['from_did'], $message);
+      $this->phone->sendSMS($payload['from_did'], $message);
       return $response;
     }
 
@@ -57,16 +102,16 @@ class SMS {
       $person->save();
       $message= $config->get('rewards.signup_message');
       $compliance= 'Reply STOP to unsubscribe or HELP for help. 6 msgs per month, Msg&Data rates may apply.';
-      $phone->sendSMS($person->loyalty_number, $message);
-      $phone->sendSMS($person->loyalty_number, $compliance);
+      $this->phone->sendSMS($person->loyalty_number, $message);
+      $this->phone->sendSMS($person->loyalty_number, $compliance);
       break;
 
     case 'stop':
       $person->rewardsplus= 0;
       $person->save();
       $message= $config->get('rewards.stop_message');
-      $phone->sendSMS($person->loyalty_number, $message);
-      $phone->sendSMS($person->loyalty_number, $compliance);
+      $this->phone->sendSMS($person->loyalty_number, $message);
+      $this->phone->sendSMS($person->loyalty_number, $compliance);
       break;
 
     default:
