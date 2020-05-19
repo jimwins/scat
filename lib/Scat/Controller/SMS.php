@@ -115,7 +115,18 @@ class SMS {
       break;
 
     default:
+      /* If there is an ongoing conversation, attach to that */
+      $convo= $data->factory('Note')
+                ->where('attach_id', $person->id)
+                ->where('kind', 'person')
+                ->where('todo', 1)
+                ->where('parent_id', 0)
+                ->find_one();
+
       $note= $data->factory('Note')->create();
+      if ($convo) {
+        $note->parent_id= $convo->id;
+      }
       $note->kind= 'person';
       $note->attach_id= $person->id;
       $note->source= 'sms';
