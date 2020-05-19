@@ -82,12 +82,21 @@ class Shipping {
           break;
         }
 
+        foreach ($tracker->tracking_details as $details) {
+          if ($details->status == 'in_transit') {
+            $shipped= $details->datetime;
+            break;
+          }
+        }
+
         $subject= $this->view->fetchBlock('email/shipped.html', 'title', [
           'tracker' => $tracker,
+          'shipped' => $shipped,
           'txn' => $txn,
         ]);
         $body= $this->view->fetch('email/shipped.html', [
           'tracker' => $tracker,
+          'shipped' => $shipped,
           'txn' => $txn,
         ]);
 
