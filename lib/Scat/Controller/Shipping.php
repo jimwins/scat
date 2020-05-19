@@ -59,6 +59,24 @@ class Shipping {
           $txn->save();
         }
 
+        if ($txn->online_sale_id) {
+          // TODO should be some sort of Ordure service
+
+          $url= ORDURE . '/sale/' . $txn->uuid . '/set-status';
+
+          $client= new \GuzzleHttp\Client();
+          $res= $client->request('POST', $url,
+                                 [
+                                   'headers' => [
+                                     'X-Requested-With' => 'XMLHttpRequest',
+                                   ],
+                                   'form_params' => [
+                                     'key' => ORDURE_KEY,
+                                     'status' => 'shipped'
+                                   ]
+                                 ]);
+        }
+
         if (!$txn->person()->email) {
           error_log("Don't know the email for txn {$txn->id}, can't update\n");
           break;
