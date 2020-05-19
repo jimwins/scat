@@ -123,7 +123,7 @@ class Transactions {
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    if (!in_array($txn->status, [ 'new', 'filled' ])) {
+    if (!in_array($txn->status, [ 'new', 'filled', 'template' ])) {
       throw new \Scat\Exception\HttpConflictException($request,
         "Unable to add items to transactions because it is {$txn->status}."
       );
