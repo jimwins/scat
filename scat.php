@@ -25,6 +25,8 @@ function foot() {
 $db= new ScatDB();
 if (!$db) die("mysqli_init failed");
 
+$db->options(MYSQLI_OPT_LOCAL_INFILE, true);
+
 preg_match('/mysql:host=(.+?);dbname=(.+?);charset=utf8/',
            $GLOBALS['config']['data']['dsn'], $m);
 
