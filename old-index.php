@@ -1698,14 +1698,14 @@ ko.applyBindings(viewModel);
 ?>
 $("body").html5Uploader({
   name: 'src',
-  postUrl: function() { return '/api/txn-upload-items.php?txn=' + Txn.id() },
+  postUrl: function() { return '/sale/' + Txn.id() + '/item' },
   onSuccess: function(e, file, response) {
     data= $.parseJSON(response);
     if (data.error) {
       Scat.alert(data);
       return;
     }
-    Txn.loadData(data);
+    Txn.loadId(Txn.id())
   },
   onServerError: function(e, file) {
     Scat.alert("File upload failed.");

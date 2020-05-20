@@ -8,11 +8,14 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Transactions {
-  private $view, $txn;
+  private $view, $txn, $data;
 
-  public function __construct(View $view, \Scat\Service\Txn $txn) {
+  public function __construct(View $view, \Scat\Service\Txn $txn,
+                              \Scat\Service\Data $data)
+  {
     $this->view= $view;
     $this->txn= $txn;
+    $this->data= $data;
   }
 
   public function sales(Request $request, Response $response) {
@@ -129,6 +132,10 @@ class Transactions {
       );
     }
 
+    if ($request->getUploadedFiles()) {
+      return $this->handleUploadedItems($request, $response, $txn);
+    }
+
     $item_id= $request->getParam('item_id');
     $item= $catalog->getItemById($item_id);
     if (!$item) {
@@ -179,6 +186,313 @@ class Transactions {
     $line->reload();
 
     return $response->withJson($line);
+  }
+
+  public function handleUploadedItems(Request $request, Response $response,
+                                      $txn)
+  {
+    foreach ($request->getUploadedFiles() as $file) {
+      $fn= $file->getClientFilename();
+      $stream= $file->getStream();
+      $tmpfn= ($stream->getMetaData())['uri'];
+
+      /* Grab the first line for detecting file type */
+      $line= $stream->read(1024);
+      $stream->close();
+
+      $temporary= "TEMPORARY";
+      // If DEBUG, we leave behind the vendor_order table
+      if ($GLOBALS['DEBUG']) {
+        $this->data->execute("DROP TABLE IF EXISTS vendor_order");
+        $temporary= "";
+      }
+
+      $q= "CREATE $temporary TABLE vendor_order (
+             line int,
+             status varchar(255),
+             item_no varchar(255),
+             item_id int unsigned,
+             sku varchar(255),
+             cust_item varchar(255),
+             description varchar(255),
+             ordered int,
+             shipped int,
+             backordered int,
+             msrp decimal(9,2),
+             discount decimal(9,2),
+             net decimal(9,2),
+             unit varchar(255),
+             ext decimal(9,2),
+             barcode varchar(255),
+             account_no varchar(255),
+             po_no varchar(255),
+             order_no varchar(255),
+             bo_no varchar(255),
+             invoice_no varchar(255),
+             box_no varchar(255),
+             key (item_id), key(item_no), key(sku))";
+
+      $this->data->execute($q);
+
+      // SLS order?
+      if (preg_match('/^"?linenum"?[,\t]"?qty/', $line)) {
+        // linenum,qty_shipped,sls_sku,cust_item_numb,description,upc,msrp,net_cost,pkg_id,extended_cost
+        $sep= preg_match("/,/", $line) ? "," : "\t";
+        $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+             INTO TABLE vendor_order
+             FIELDS TERMINATED BY '$sep' OPTIONALLY ENCLOSED BY '\"'
+             IGNORE 1 LINES
+             (line, @shipped, item_no, cust_item, description, @upc,
+              msrp, net, box_no, ext)
+             SET barcode = REPLACE(@upc, 'UPC->', ''),
+                 sku = item_no,
+                 ordered = @shipped, backordered = @shipped, shipped = 0";
+        $this->data->execute($q);
+
+      // SLS order (XLS)
+      } elseif (preg_match('/K.*\\.xls/i', $_FILES['src']['name'])) {
+        $reader= new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+        $reader->setReadDataOnly(true);
+
+        $spreadsheet= $reader->load($tmpfn);
+        $sheet= $spreadsheet->getActiveSheet();
+        $i= 0; $rows= [];
+        foreach ($sheet->getRowIterator() as $row) {
+          if ($i++) {
+            $data= [];
+            $cellIterator= $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+            foreach ($cellIterator as $cell) {
+              $data[]= "'" . $this->data->escape($cell->getValue()) . "'";
+            }
+            $rows[]= '(' . join(',', $data) . ')';
+          }
+        }
+        $q= "INSERT INTO vendor_order (line, ordered, item_no, cust_item, description, barcode, msrp, net, box_no, ext, bo_no) VALUES " . join(',', $rows);
+        $this->data->execute($q);
+
+        $q= "UPDATE vendor_order SET backordered = ordered, shipped = 0";
+        $this->data->execute($q);
+
+      } elseif (preg_match('/^Vendor Name	Assortment Item Number/', $line)) {
+        // MacPherson assortment
+        $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+             INTO TABLE vendor_order
+             FIELDS TERMINATED BY '\t'
+             IGNORE 1 LINES
+             (@vendor_name, @asst_item_no, item_no, @asst_description, @shipped,
+              @change_flag, @change_date, sku, description, unit, msrp, net,
+              @customer, @product_code_type, barcode, @reno, @elgin, @atlanta,
+              @catalog_code, @purchase_unit, @purchase_qty, cust_item,
+              @pending_msrp, @pending_date, @pending_net, @promo_net, @promo_name,
+              @abc_flag, @vendor, @group_code, @catalog_description)
+             SET ordered = @shipped, shipped = @shipped";
+        $this->data->execute($q);
+
+      } elseif (preg_match('/^"?sls_sku.*asst_qty/', $line)) {
+        // SLS assortment
+        # sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date,asst_qty,
+        $sep= preg_match("/,/", $line) ? "," : "\t";
+        $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+             INTO TABLE vendor_order
+             FIELDS TERMINATED BY '$sep'
+             OPTIONALLY ENCLOSED BY '\"'
+             LINES TERMINATED BY '\n'
+             IGNORE 1 LINES
+             (item_no, @cust_sku, description, @vendor_name,
+              msrp, net, @reg_discount, @promo_price, @promo_discount,
+              barcode, @upc2, @upc2_qty, @upc3, @upc3_qty,
+              @min_ord_qty, @level2, @level2, @level3, @level4, @level5,
+              @ltl_only, @add_date, @asst_qty)
+             SET ordered = @asst_qty, shipped = @asst_qty";
+        $this->data->execute($q);
+
+      } elseif (preg_match('/^,Name,MSRP/', $line)) {
+        // CSV
+        $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+             INTO TABLE vendor_order
+             FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
+             IGNORE 1 LINES
+             (item_no, description, @msrp, @sale, @net, @qty, @ext, barcode)
+             SET ordered = @qty, shipped = @qty,
+                 msrp = REPLACE(@msrp, '$', ''), net = REPLACE(@net, '$', '')";
+        $this->data->execute($q);
+
+      } elseif (preg_match('/^code\tqty/', $line)) {
+        // Order file
+        $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+             INTO TABLE vendor_order
+             FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
+             IGNORE 1 LINES
+             (item_no, @qty)
+             SET sku = item_no, ordered = @qty, shipped = @qty";
+        $this->data->execute($q);
+
+      } elseif (($json= json_decode(file_get_contents($tmpfn)))) {
+        // JSON
+        foreach ($json->items as $item) {
+          $q= "INSERT INTO vendor_order
+                  SET item_no = '" . $this->data->escape($item->code) . "',
+                      description = '" . $this->data->escape($item->name) . "',
+                      ordered = -" . (int)$item->quantity . ",
+                      shipped = -" . (int)$item->quantity . ",
+                      msrp = '" . $this->data->escape($item->retail_price) . "',
+                      net = '" . $this->data->escape($item->sale_price) . "'";
+          $this->data->execute($q);
+        }
+
+      } else {
+        // MacPherson's order
+        $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+             INTO TABLE vendor_order
+             CHARACTER SET 'latin1'
+             FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
+             IGNORE 1 LINES
+             (line, status, item_no, sku, cust_item, description, ordered,
+              shipped, backordered, msrp, discount, net, unit, ext, barcode,
+              account_no, po_no, order_no, bo_no, invoice_no, box_no)";
+        $this->data->execute($q);
+
+        /* Fix quantities on backorders */
+        $q= "SELECT SUM(shipped + backordered) AS ordered
+               FROM vendor_order
+              WHERE IFNULL(unit,'') != 'AS'";
+        $ordered=
+          $this->data->for_table('vendor_order')->raw_query($q)->find_one();
+
+        if (!$ordered->ordered) {
+          $this->data->execute("UPDATE vendor_order SET backordered = ordered");
+        }
+      }
+
+      $this->data->beginTransaction();
+
+      // Identify vendor items by SKU
+      $q= "UPDATE vendor_order, vendor_item
+              SET vendor_order.item_id = vendor_item.item_id
+            WHERE vendor_order.sku != '' AND vendor_order.sku IS NOT NULL
+              AND vendor_order.sku = vendor_item.vendor_sku
+              AND vendor_id = {$txn->person_id}
+              AND vendor_item.active";
+      $this->data->execute($q);
+
+      // Identify vendor items by code
+      $q= "UPDATE vendor_order, vendor_item
+              SET vendor_order.item_id = vendor_item.item_id
+            WHERE (NOT vendor_order.item_id OR vendor_order.item_id IS NULL)
+              AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
+              AND vendor_order.item_no = vendor_item.code
+              AND vendor_id = {$txn->person_id}
+              AND vendor_item.active";
+      $this->data->execute($q);
+
+      // Identify vendor items by barcode
+      $q= "UPDATE vendor_order
+              SET item_id = IF(barcode != '',
+                            IFNULL((SELECT item.id
+                                      FROM item
+                                      JOIN barcode ON barcode.item_id = item.id
+                                     WHERE vendor_order.barcode = barcode.code
+                                     LIMIT 1),
+                                   0),
+                            0)
+            WHERE NOT item_id OR item_id IS NULL";
+      $this->data->execute($q);
+
+      // Identify items by code
+      $q= "UPDATE vendor_order, item
+              SET vendor_order.item_id = item.id
+            WHERE (NOT vendor_order.item_id OR vendor_order.item_id IS NULL)
+              AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
+              AND vendor_order.item_no = item.code";
+      $this->data->execute($q);
+
+      // Identify items by barcode
+      $q= "UPDATE vendor_order, barcode
+              SET vendor_order.item_id = barcode.item_id
+            WHERE (NOT vendor_order.item_id OR vendor_order.item_id IS NULL)
+              AND vendor_order.barcode != '' AND vendor_order.barcode IS NOT NULL
+              AND vendor_order.barcode = barcode.code";
+      $this->data->execute($q);
+
+      // For non-vendor orders, fail if we didn't recognize all items
+      if ($txn->type != 'vendor') {
+        $count= $this->data->for_table('vendor_order')
+                     ->raw_query("SELECT COUNT(*) FROM vendor_order
+                                   WHERE (NOT item_id OR item_id IS NULL")
+                     ->find_one();
+        if ($count) {
+          throw new \Exception("Not all items available for order!");
+        }
+      }
+
+      // Make sure we have all the items
+      $q= "INSERT IGNORE INTO item (code, brand_id, name, retail_price, active)
+           SELECT item_no AS code,
+                  0 AS brand_id,
+                  description AS name,
+                  msrp AS retail_price,
+                  1 AS active
+             FROM vendor_order
+            WHERE (NOT item_id OR item_id IS NULL) AND msrp > 0 AND IFNULL(unit,'') != 'AS'";
+      $this->data->execute($q);
+
+      if ($this->data->get_last_statement()->rowCount()) {
+        # Attach order lines to new items
+        $q= "UPDATE vendor_order, item
+                SET vendor_order.item_id = item.id
+              WHERE (NOT vendor_order.item_id OR vendor_order.item_id IS NULL)
+                AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
+                AND vendor_order.item_no = item.code";
+        $this->data->execute($q);
+      }
+
+      // Make sure all the items are active
+      $q= "UPDATE item, vendor_order
+              SET item.active = 1
+            WHERE vendor_order.item_id = item.id";
+      $this->data->execute($q);
+
+      // Make sure we know all the barcodes
+      $q= "INSERT IGNORE INTO barcode (item_id, code, quantity)
+           SELECT item_id,
+                  REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS code,
+                  1 AS quantity
+            FROM vendor_order
+           WHERE item_id AND barcode != ''";
+      $this->data->execute($q);
+
+      // Link items to vendor items if they aren't already
+      $q= "UPDATE vendor_item, vendor_order
+              SET vendor_item.item_id = vendor_order.item_id
+            WHERE NOT vendor_item.item_id
+              AND vendor_item.code = vendor_order.item_no
+              AND vendor_item.active";
+      $this->data->execute($q);
+
+      // Get pricing for items if vendor_order didn't have them
+      $q= "UPDATE vendor_order, vendor_item
+              SET msrp = vendor_item.retail_price,
+                  net = vendor_item.net_price
+            WHERE msrp IS NULL
+              AND vendor_order.item_id = vendor_item.item_id
+              AND vendor_id = {$txn->person_id}
+              AND vendor_item.active";
+      $this->data->execute($q);
+
+      // Add items to order
+      $q= "INSERT INTO txn_line (txn_id, item_id, ordered, allocated, retail_price)
+           SELECT {$txn->id} txn_id, item_id,
+                  ordered, shipped, net
+             FROM vendor_order
+            WHERE (shipped OR backordered)
+              AND (item_id != 0 AND item_id IS NOT NULL)";
+      $this->data->execute($q);
+
+      $this->data->commit();
+    }
+
+    return $response->withJson($txn);
   }
 
   public function updateItem(Request $request, Response $response,
@@ -318,21 +632,20 @@ class Transactions {
 
   public function updateShippingAddress(Request $request, Response $response,
                                         \Scat\Service\Shipping $shipping,
-                                        \Scat\Service\Data $data,
                                         $id)
   {
     $txn= $this->txn->fetchById($id);
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    $data->beginTransaction();
+    $this->data->beginTransaction();
 
     $details= $request->getParams();
     $details['verify']= [ 'delivery' ];
     $easypost_address= $shipping->createAddress($details);
 
     /* We always create a new address. */
-    $address= $data->factory('Address')->create();
+    $address= $this->data->factory('Address')->create();
     $address->easypost_id= $easypost_address->id;
     $address->name= $easypost_address->name;
     $address->company= $easypost_address->company;
@@ -350,7 +663,7 @@ class Transactions {
     $txn->shipping_address_id= $address->id;
     $txn->save();
 
-    $data->commit();
+    $this->data->commit();
 
     return $response->withJson($address);
   }
@@ -519,7 +832,6 @@ class Transactions {
 
   /* Drop-ships */
   public function saleDropShips(Request $request, Response $response,
-                                \Scat\Service\Data $data,
                                 $id, $dropship_id= null)
   {
     $txn= $this->txn->fetchById($id);
@@ -532,7 +844,7 @@ class Transactions {
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
-      $vendors= $data->factory('Person')
+      $vendors= $this->data->factory('Person')
                       ->where('active', 1)
                       ->where('role', 'vendor')
                       ->order_by_asc(['company', 'name'])

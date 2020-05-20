@@ -49,4 +49,20 @@ class Data
   public function factory($name) {
     return \Model::factory($name);
   }
+
+  public function for_table($name) {
+    return \ORM::for_table($name);
+  }
+
+  public function execute($query, $params= []) {
+    return \ORM::raw_execute($query, $params);
+  }
+
+  public function get_last_statement() {
+    return \ORM::get_last_statement();
+  }
+
+  public function escape($value) {
+    return \ORM::get_pdo()->quote($value);
+  }
 }
