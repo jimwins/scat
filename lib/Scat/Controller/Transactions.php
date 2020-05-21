@@ -738,9 +738,13 @@ class Transactions {
 
     $details= $shipping->getShipment($shipment->easypost_id);
 
-    $pdf= file_get_contents($details->postage_label->label_url);
+    if (!$details->postage_label->label_pdf_url) {
+      $details->label([ 'file_format' => 'pdf' ]);
+    }
 
-    return $print->printPNG($response, 'shipping-label', $pdf);
+    $pdf= file_get_contents($details->postage_label->label_pdf_url);
+
+    return $print->printPDF($response, 'shipping-label', $pdf);
   }
 
   public function updateShipment(Request $request, Response $response,

@@ -7,6 +7,7 @@ class Printer
 {
   private $view;
   private $config;
+  private $builder, $client, $responseParser;
 
   public function __construct(\Slim\Views\Twig $view, Config $config) {
     $this->view= $view;
@@ -20,17 +21,17 @@ class Printer
 
     if (!$cups_host) return null;
 
-    $client= new \Smalot\Cups\Transport\Client($cups_user, $cups_pass, [
+    $this->client= new \Smalot\Cups\Transport\Client($cups_user, $cups_pass, [
       'remote_socket' => 'tcp://' .  $cups_host
     ]);
 
-    $builder= new \Smalot\Cups\Builder\Builder(null, true);
-    $responseParser= new \Smalot\Cups\Transport\ResponseParser();
+    $this->builder= new \Smalot\Cups\Builder\Builder(null, true);
+    $this->responseParser= new \Smalot\Cups\Transport\ResponseParser();
 
     return new \Smalot\Cups\Manager\PrinterManager(
-      $builder,
-      $client,
-      $responseParser
+      $this->builder,
+      $this->client,
+      $this->responseParser
     );
   }
 
@@ -68,9 +69,9 @@ class Printer
     );
 
     $jobManager= new \Smalot\Cups\Manager\JobManager(
-      $builder,
-      $client,
-      $responseParser
+      $this->builder,
+      $this->client,
+      $this->responseParser
     );
 
     $job= new \Smalot\Cups\Model\Job();
@@ -102,9 +103,9 @@ class Printer
     );
 
     $jobManager= new \Smalot\Cups\Manager\JobManager(
-      $builder,
-      $client,
-      $responseParser
+      $this->builder,
+      $this->client,
+      $this->responseParser
     );
 
     $job= new \Smalot\Cups\Model\Job();
