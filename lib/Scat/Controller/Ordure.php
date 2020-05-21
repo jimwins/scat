@@ -292,6 +292,10 @@ class Ordure {
             $payment->cc_lastfour= $pay->data->cc_last4;
           }
 
+          if ($pay->method == 'other') {
+            $payment->method= 'discount';
+          }
+
           $payment->amount= $pay->amount;
           $payment->processed= $pay->processed;
           $payment->data= json_encode($pay->data);
