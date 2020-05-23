@@ -641,4 +641,85 @@ class Catalog {
       throw $ex;
     }
   }
+
+  public function itemFeed(Request $request, Response $response) {
+    $items= $this->catalog->getItems()
+      ->select('*')
+      ->select_expr('COUNT(*) OVER (PARTITION BY product_id)', 'siblings')
+      ->where_gt('product_id', 0)
+      ->find_many();
+
+    $fields= [
+      'id', 'title', 'description', 'rich_text_description',
+      'availability', 'condition', 'price', 'sale_price',
+      'link', 'image_link', 'additional_image_link',
+      'brand', 'gtin', 'mpn',
+      'color', 'size',
+      'item_group_id',
+      #'google_product_category',
+      'product_type',
+      'inventory',
+      'return_policy_info'
+    ];
+
+    //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
+    $output= fopen("php://memory", 'r+');
+    fputcsv($output, $fields);
+
+    foreach ($items as $item) {
+      $html= $item->description ?: $item->product()->description;
+      $html= preg_replace('/\s+/', ' ', $html); // replace all whitespace
+      $html= preg_replace('/{{ *@STATIC *}}/', 'https:' . ORDURE_STATIC, $html);
+      $text= strip_tags($html);
+
+      // single-item products for now
+      if ($item->siblings > 1) {
+        continue;
+      }
+
+      $media= $item->product()->media();
+      if (!$media) continue;
+      if (is_array($media[0])) {
+        $image= 'https:' . ORDURE_STATIC . $media[0]['src'];
+      } else {
+        $image= 'https:' . $media[0]->large_square();
+      }
+
+      $product= $item->product();
+
+      $record= [
+        $item->code,
+        $item->name,
+        $text,
+        $html,
+        $item->minimum_quantity ?
+          ($item->stock() ? 'in stock' : 'out of stock') :
+          'available for order',
+        'new',
+        $item->retail_price . ' USD',
+        $item->sale_price() . ' USD',
+        ($item->siblings > 1 ?
+         ORDURE . '/' . $item->code :
+         ORDURE . '/art-supplies/' . $product->full_slug()),
+        $image,
+        '',#'additional_image_link',
+        $item->brand() ? $item->brand()->name : $product->brand()->name,
+        $item->barcodes()->find_many()[0]->code,
+        $item->code,
+        $item->short_name,
+        $item->variation,
+        $item->product_id,
+        #'google_product_category',
+        $product->dept()->parent()->name . ' > ' .  $product->dept()->name,
+        $item->stock(),
+        '{is_final_sale: "true", return_policy_days: "0"}'
+      ];
+
+      fputcsv($output, $record);
+    }
+
+    $response= $response->withBody(\GuzzleHttp\Psr7\stream_for($output));
+
+    return $response->withHeader("Content-type", "text/csv");
+  }
 }

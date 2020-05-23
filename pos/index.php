@@ -261,6 +261,9 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
                                          [ 'override' => $override ]);
             });
 
+  $app->get('/feed',
+            [ \Scat\Controller\Catalog::class, 'itemFeed' ]);
+
   $app->get('[/{dept}[/{subdept}[/{product}]]]',
             [ \Scat\Controller\Catalog::class, 'catalogPage' ])
       ->setName('catalog');
