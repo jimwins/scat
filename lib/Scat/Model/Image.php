@@ -18,6 +18,12 @@ class Image extends \Scat\Model {
            '/' . $this->uuid . '.jpg';
   }
 
+  public function large_square() {
+    return PUBLITIO_BASE .
+           '/file/w_1024,h_1024,c_fill' .
+           '/' . $this->uuid . '.jpg';
+  }
+
   public static function createFromUrl($url) {
     error_log("Creating image from URL '$url'");
 
