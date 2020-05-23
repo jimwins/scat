@@ -121,6 +121,40 @@ class Printer
     return $response->withJson([ 'result' => 'Printed.' ]);
   }
 
+  public function printZPL(Response $response, $pageType, $zpl) {
+    $printerManager= $this->getPrinterManager();
+
+    list ($pageType, $modifier)= explode(':', $pageType);
+    $printer_name= $this->config->get('printer.' . $pageType);
+
+    if (!$printerManager || !$printer_name) {
+      $response->getBody()->write($zpl);
+      return $response->withHeader('Content-type', 'text/plain');
+    }
+
+    $printer= $printerManager->findByUri(
+      'ipp://' . $cups_host .  '/printers/' . $printer_name
+    );
+
+    $jobManager= new \Smalot\Cups\Manager\JobManager(
+      $this->builder,
+      $this->client,
+      $this->responseParser
+    );
+
+    $job= new \Smalot\Cups\Model\Job();
+    $job->setName('job create file');
+    $job->setCopies(1);
+    $job->setPageRanges('1-1000');
+    $job->addText($zpl, '', 'application/vnd.cups-raw');
+    if ($modifier == 'open') {
+      $job->addAttribute('CashDrawerSetting', '1OpenDrawer1');
+    }
+    $result= $jobManager->send($printer, $job);
+
+    return $response->withJson([ 'result' => 'Printed.' ]);
+  }
+
   public function printFromTemplate(Response $response,
                                     $pageType, $template, $data)
   {
