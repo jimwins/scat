@@ -270,6 +270,9 @@ class Catalog {
       $product->addImage($image);
     } else {
       foreach ($request->getUploadedFiles() as $file) {
+        if ($file->getError() != UPLOAD_ERR_OK) {
+          throw new \Scat\Exception\FileUploadException($file->getError());
+        }
         $image= \Scat\Model\Image::createFromStream($file->getStream(),
                                               $file->getClientFilename());
         $product->addImage($image);
@@ -451,6 +454,9 @@ class Catalog {
       $item->addImage($image);
     } else {
       foreach ($request->getUploadedFiles() as $file) {
+        if ($file->getError() != UPLOAD_ERR_OK) {
+          throw new \Scat\Exception\FileUploadException($file->getError());
+        }
         $image= \Scat\Model\Image::createFromStream($file->getStream(),
                                               $file->getClientFilename());
         $item->addImage($image);

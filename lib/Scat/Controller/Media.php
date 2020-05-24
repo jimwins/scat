@@ -47,6 +47,9 @@ class Media {
       $image= \Scat\Model\Image::createFromUrl($url);
     } else {
       foreach ($request->getUploadedFiles() as $file) {
+        if ($file->getError() != UPLOAD_ERR_OK) {
+          throw new \Scat\Exception\FileUploadException($file->getError());
+        }
         $image= \Scat\Model\Image::createFromStream($file->getStream(),
                                               $file->getClientFilename());
       }
