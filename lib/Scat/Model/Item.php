@@ -290,9 +290,29 @@ class Item extends \Scat\Model {
     \ORM::raw_execute($q);
   }
 
-  public function jsonSerialize() {
-    return $this->asArray();
+  public function shipping_rate() {
+    $rate= $this->hazmat ? 'hazmat-' : '';
+
+    if ($this->oversized) {
+      return $rate . "truck";
+    }
+
+    if ($this->weight == 0 || $this->length == 0) {
+      return $rate . "unknown";
+    }
+
+    $size= [$this->height, $this->length, $this->width ];
+    sort($size, SORT_NUMERIC);
+
+    if ($size[0] > 8 || $size[1] > 19 || $size[2] > 25) {
+      return $rate . "large";
+    } else if ($size[0] > 8 || $size[1] > 15 || $size[2] > 18) {
+      return $rate . "medium";
+    }
+
+    return $rate . "small";
   }
+
 }
 
 class Barcode extends \Scat\Model {

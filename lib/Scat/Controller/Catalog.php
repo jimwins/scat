@@ -686,7 +686,8 @@ class Catalog {
       #'google_product_category',
       'product_type',
       'inventory',
-      'return_policy_info'
+      'return_policy_info',
+      'shipping_rate'
     ];
 
     //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
@@ -739,7 +740,8 @@ class Catalog {
         #'google_product_category',
         $product->dept()->parent()->name . ' > ' .  $product->dept()->name,
         $item->stock(),
-        '{is_final_sale: "true", return_policy_days: "0"}'
+        '{is_final_sale: "true", return_policy_days: "0"}',
+        $item->shipping_rate()
       ];
 
       fputcsv($output, $record);
