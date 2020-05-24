@@ -700,12 +700,16 @@ class Catalog {
       $html= preg_replace('/{{ *@STATIC *}}/', 'https:' . ORDURE_STATIC, $html);
       $text= strip_tags($html);
 
-      // single-item products for now
+      // only include items for which we have an image
       if ($item->siblings > 1) {
-        continue;
+        $media= $item->media();
+        if (!$media) {
+          continue;
+        }
+      } else {
+        $media= $item->product()->media();
       }
 
-      $media= $item->product()->media();
       if (!$media) continue;
       if (is_array($media[0])) {
         $image= 'https:' . ORDURE_STATIC . $media[0]['src'];
@@ -720,14 +724,12 @@ class Catalog {
         $item->name,
         $text,
         $html,
-        $item->minimum_quantity ?
-          ($item->stock() ? 'in stock' : 'out of stock') :
-          'available for order',
+        ($item->stock() ? 'in stock' : 'out of stock'),
         'new',
         $item->retail_price . ' USD',
         $item->sale_price() . ' USD',
         ($item->siblings > 1 ?
-         ORDURE . '/' . $item->code :
+         ORDURE . '/art-supplies/' . $product->full_slug() . '/' . $item->code :
          ORDURE . '/art-supplies/' . $product->full_slug()),
         $image,
         '',#'additional_image_link',
