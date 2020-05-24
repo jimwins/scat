@@ -19,6 +19,19 @@ class Item extends \Scat\Model {
     return $this->has_many('VendorItem')->where_gte('active', $active);
   }
 
+  public function media() {
+    return $this->has_many_through('Image')
+      ->order_by_asc('priority')
+      ->find_many();
+  }
+
+  public function addImage($image) {
+    $rel= \Model::factory('ImageItem')->create();
+    $rel->image_id= $image->id;
+    $rel->item_id= $this->id;
+    $rel->save();
+  }
+
   public function full_slug() {
     $product= $this->product();
     if ($product)

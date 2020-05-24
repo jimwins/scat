@@ -193,6 +193,9 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->delete('/item/{code:.*}/barcode/{barcode:.*}',
             [ \Scat\Controller\Catalog::class, 'deleteItemBarcode' ]);
 
+  $app->post('/item/{code:.+}/media',
+            [ \Scat\Controller\Catalog::class, 'itemAddMedia' ]);
+
   $app->post('/item/{code:.*}/vendor-item',
               [ \Scat\Controller\Catalog::class, 'findVendorItems' ]);
   $app->delete('/item/{code:.*}/vendor-item/{id:[0-9]+}',

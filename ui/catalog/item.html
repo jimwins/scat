@@ -351,6 +351,19 @@
     </div>
 
     <div class="col-sm-3">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Media</h3>
+        </div>
+        <div class="panel-body form-horizontal">
+          {% set media= item.media %}
+          {% if media is not empty %}
+            {{ include('carousel.twig', { images: media }) }}
+          {% endif %}
+        </div>
+      </div>
+
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Sales</h3>
@@ -747,4 +760,6 @@
     })
 
   </script>
+
+  {{ scat.file_upload('/catalog/item/' ~ item.code ~ '/media') }}
 {% endblock %}

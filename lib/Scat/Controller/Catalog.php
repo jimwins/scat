@@ -439,6 +439,27 @@ class Catalog {
     return $response->withJson($item);
   }
 
+  public function itemAddMedia(Request $request, Response $response, $code) {
+    $item= $code ? $this->catalog->getItemByCode($code) : null;
+    if ($code && !$item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    // TODO should be a Media service for this
+    $url= $request->getParam('url');
+    if ($url) {
+      $image= \Scat\Model\Image::createFromUrl($url);
+      $item->addImage($image);
+    } else {
+      foreach ($request->getUploadedFiles() as $file) {
+        $image= \Scat\Model\Image::createFromStream($file->getStream(),
+                                              $file->getClientFilename());
+        $item->addImage($image);
+      }
+    }
+
+    return $response->withJson($item);
+  }
+
   function bulkItemUpdate(Request $request, Response $response) {
     $items= $request->getParam('items');
 
