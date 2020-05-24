@@ -686,7 +686,6 @@ class Catalog {
       #'google_product_category',
       'product_type',
       'inventory',
-      'return_policy_info',
       'shipping_rate'
     ];
 
@@ -724,7 +723,7 @@ class Catalog {
         $item->name,
         $text,
         $html,
-        ($item->stock() ? 'in stock' : 'out of stock'),
+        ($item->stock() > 0 ? 'in stock' : 'out of stock'),
         'new',
         $item->retail_price . ' USD',
         $item->sale_price() . ' USD',
@@ -741,8 +740,7 @@ class Catalog {
         $item->product_id,
         #'google_product_category',
         $product->dept()->parent()->name . ' > ' .  $product->dept()->name,
-        $item->stock(),
-        '{is_final_sale: "true", return_policy_days: "0"}',
+        max($item->stock(), 0),
         $item->shipping_rate()
       ];
 
