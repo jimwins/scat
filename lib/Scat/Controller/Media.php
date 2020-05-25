@@ -8,10 +8,14 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Media {
-  private $data;
+  private $data, $media;
 
-  public function __construct(\Scat\Service\Data $data) {
+  public function __construct(
+    \Scat\Service\Data $data,
+    \Scat\Service\Media $media
+  ) {
     $this->data= $data;
+    $this->media= $media;
   }
 
   public function home(Request $request, Response $response, View $view) {
@@ -44,13 +48,13 @@ class Media {
   public function create(Request $request, Response $response) {
     $url= $request->getParam('url');
     if ($url) {
-      $image= \Scat\Model\Image::createFromUrl($url);
+      $image= $this->media->createFromUrl($url);
     } else {
       foreach ($request->getUploadedFiles() as $file) {
         if ($file->getError() != UPLOAD_ERR_OK) {
           throw new \Scat\Exception\FileUploadException($file->getError());
         }
-        $image= \Scat\Model\Image::createFromStream($file->getStream(),
+        $image= $this->media->createFromStream($file->getStream(),
                                               $file->getClientFilename());
       }
     }
@@ -126,7 +130,7 @@ class Media {
           ? $i['media_url']
           : $i['thumbnail_url'];
 
-      $image= \Scat\Model\Image::createFromUrl($url);
+      $image= $this->media->createFromUrl($url);
       $image->caption= $i['caption'];
       $image->data= json_encode($i);
       $image->save();

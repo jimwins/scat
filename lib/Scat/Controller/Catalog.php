@@ -258,7 +258,9 @@ class Catalog {
     }
   }
 
-  public function productAddMedia(Request $request, Response $response, $id) {
+  public function productAddMedia(Request $request, Response $response,
+                                  \Scat\Service\Media $merdia,$id)
+  {
     $product= $id ? $this->catalog->getProductById($id) : null;
     if ($id && !$product)
       throw new \Slim\Exception\HttpNotFoundException($request);
@@ -266,15 +268,15 @@ class Catalog {
     // TODO should be a Media service for this
     $url= $request->getParam('url');
     if ($url) {
-      $image= \Scat\Model\Image::createFromUrl($url);
+      $image= $media->createFromUrl($url);
       $product->addImage($image);
     } else {
       foreach ($request->getUploadedFiles() as $file) {
         if ($file->getError() != UPLOAD_ERR_OK) {
           throw new \Scat\Exception\FileUploadException($file->getError());
         }
-        $image= \Scat\Model\Image::createFromStream($file->getStream(),
-                                              $file->getClientFilename());
+        $image= $media->createFromStream($file->getStream(),
+                                          $file->getClientFilename());
         $product->addImage($image);
       }
     }
@@ -442,7 +444,9 @@ class Catalog {
     return $response->withJson($item);
   }
 
-  public function itemAddMedia(Request $request, Response $response, $code) {
+  public function itemAddMedia(Request $request, Response $response,
+                                \Scat\Service\Media $media, $code)
+  {
     $item= $code ? $this->catalog->getItemByCode($code) : null;
     if ($code && !$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
@@ -450,15 +454,15 @@ class Catalog {
     // TODO should be a Media service for this
     $url= $request->getParam('url');
     if ($url) {
-      $image= \Scat\Model\Image::createFromUrl($url);
+      $image= $media->createFromUrl($url);
       $item->addImage($image);
     } else {
       foreach ($request->getUploadedFiles() as $file) {
         if ($file->getError() != UPLOAD_ERR_OK) {
           throw new \Scat\Exception\FileUploadException($file->getError());
         }
-        $image= \Scat\Model\Image::createFromStream($file->getStream(),
-                                              $file->getClientFilename());
+        $image= $media->createFromStream($file->getStream(),
+                                          $file->getClientFilename());
         $item->addImage($image);
       }
     }
