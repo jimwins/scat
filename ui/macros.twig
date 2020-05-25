@@ -69,8 +69,12 @@
   let dropArea= document.currentScript.parentNode
 
   let preventDefaults= (ev) => {
-    ev.preventDefault()
-    ev.stopPropagation()
+    if (ev.dataTransfer.files.length ||
+        ev.dataTransfer.types.includes('text/uri-list'))
+    {
+      ev.preventDefault()
+      ev.stopPropagation()
+    }
   }
 
   ['dragenter', 'dragleave', 'dragend','dragover', 'drop']
