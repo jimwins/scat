@@ -259,7 +259,7 @@ class Catalog {
   }
 
   public function productAddMedia(Request $request, Response $response,
-                                  \Scat\Service\Media $merdia,$id)
+                                  \Scat\Service\Media $media, $id)
   {
     $product= $id ? $this->catalog->getProductById($id) : null;
     if ($id && !$product)
