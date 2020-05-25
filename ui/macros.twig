@@ -70,6 +70,7 @@
 
   let preventDefaults= (ev) => {
     if (ev.dataTransfer.files.length ||
+        ev.dataTransfer.types.includes('Files') ||
         ev.dataTransfer.types.includes('text/uri-list'))
     {
       ev.preventDefault()
