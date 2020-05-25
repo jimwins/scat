@@ -3,16 +3,20 @@ namespace Scat\Service;
 
 class Media
 {
-  private $data;
+  private $config, $data;
 
-  public function __construct(Data $data) {
+  public function __construct(Config $config, Data $data) {
+    $this->config= $config;
     $this->data= $data;
   }
 
   public function createFromUrl($url) {
     error_log("Creating image from URL '$url'");
 
-    $publitio= new \Publitio\API(PUBLITIO_KEY, PUBLITIO_SECRET);
+    $publitio= new \Publitio\API(
+      $this->config->get('publitio.key'),
+      $this->config->get('publitio.secret')
+    );
 
     $res= $publitio->call('/files/create', 'POST', [
       'file_url' => $url,
@@ -40,7 +44,10 @@ class Media
   }
 
   public function createFromStream($file, $name) {
-    $publitio= new \Publitio\API(PUBLITIO_KEY, PUBLITIO_SECRET);
+    $publitio= new \Publitio\API(
+      $this->config->get('publitio.key'),
+      $this->config->get('publitio.secret')
+    );
 
     $res= $publitio->uploadFile($file, 'file', [
       'title' => $name,
