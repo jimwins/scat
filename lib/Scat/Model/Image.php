@@ -24,22 +24,11 @@ class Image extends \Scat\Model {
            '/' . $this->uuid . '.jpg';
   }
 
-  public function delete() {
-    $publitio= new \Publitio\API(PUBLITIO_KEY, PUBLITIO_SECRET);
-
-    $res= $publitio->call("/files/delete/" . $this->publitio_id,
-                          'DELETE');
-
-    if (!$res->success) {
-      error_log(json_encode($res));
-      throw new \Exception($res->error->message ? $res->error->message :
-                           $res->message);
-    }
-
-    return parent::delete();
-  }
-
   public function productsUsedBy() {
     return $this->has_many_through('Product');
+  }
+
+  public function itemsUsedBy() {
+    return $this->has_many_through('Item');
   }
 }

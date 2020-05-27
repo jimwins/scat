@@ -115,8 +115,8 @@ class Media {
     if (!$image) {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
-    $image->delete();
-    return $response->withJson([ 'message' => 'Deleted.' ]);
+
+    return $response->withJson($this->media->deleteImage($image));
   }
 
   public function addFromInstagram(Request $request, Response $response) {

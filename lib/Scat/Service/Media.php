@@ -72,6 +72,7 @@ class Media
     // Save the details
     $image= $this->data->factory('Image')->create();
     $image->uuid= $res->public_id;
+    $image->b2_file_id= $b2_file->getId();
     $image->publitio_id= $res->id;
     $image->width= $res->width;
     $image->height= $res->height;
@@ -119,5 +120,49 @@ class Media
     $image->save();
 
     return $image;
+  }
+
+  public function deleteImage(\Scat\Model\Image $image) {
+    $b2= $this->getB2Client();
+    $bucket= $this->config->get('b2.bucketName');
+
+    $publitio= new \Publitio\API(
+      $this->config->get('publitio.key'),
+      $this->config->get('publitio.secret')
+    );
+
+    if ($image->publitio_id) {
+      try {
+        $res= $publitio->call("/files/delete/" . $image->publitio_id,
+                              'DELETE');
+      } catch (\Exception $e) {
+        error_log("failed to delete from publit.io: ". $e->getMessage());
+      }
+    }
+
+    if ($image->b2_file_id) {
+      $data= [ 'FileId' => $image->b2_file_id ];
+    } else {
+      $data= [
+        'BucketName' => $bucket,
+        'FileName' => "i/o/{$image->uuid}.{$image->ext}",
+      ];
+    }
+
+    try {
+      $b2_file= $b2->deleteFile($data);
+    } catch (\Exception $e) {
+      error_log("failed to delete from B2: ". $e->getMessage());
+    }
+
+    // Purge references (going behind the scenes here!)
+    $this->data->factory('ImageItem')
+      ->where('image_id', $image->id)->delete_many();
+    $this->data->factory('ImageProduct')
+      ->where('image_id', $image->id)->delete_many();
+
+    $image->delete();
+
+    return [];
   }
 }
