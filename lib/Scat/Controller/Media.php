@@ -101,6 +101,15 @@ class Media {
     return $response->withJson($image);
   }
 
+  public function repair(Request $request, Response $response, $id) {
+    $image= $this->data->factory('Image')->find_one($id);
+    if (!$image) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    return $response->withJson($this->media->repairImage($image));
+  }
+
   public function delete(Request $request, Response $response, $id) {
     $image= $this->data->factory('Image')->find_one($id);
     if (!$image) {

@@ -333,6 +333,7 @@ $app->group('/media', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Controller\Media::class, 'home' ]);
   $app->post('', [ \Scat\Controller\Media::class, 'create' ]);
   $app->get('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'show' ]);
+  $app->post('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'repair' ]);
   $app->patch('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'update' ]);
   $app->delete('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'delete' ]);
 });

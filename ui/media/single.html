@@ -6,6 +6,9 @@
 
 {% block content %}
   <div class="pull-right">
+    <button id="repair-image" class="btn btn-warning">
+      Repair
+    </button>
     <button id="delete-image" class="btn btn-danger">
       Delete
     </button>
@@ -99,6 +102,23 @@
       setTimeout(function() {
         editable.input.$input.select()
       }, 1)
+    })
+
+    document.getElementById('repair-image').addEventListener('click', (ev) => {
+      if (window.confirm("Are you sure that you want to repair this?")) {
+        return fetch("/media/{{ image.id }}", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+        .then((res) => {
+          if (!res.ok) {
+            return Promise.reject(new Error(res.statusText))
+          }
+          window.location.reload()
+        })
+      }
     })
 
     document.getElementById('delete-image').addEventListener('click', (ev) => {
