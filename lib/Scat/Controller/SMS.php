@@ -33,6 +33,7 @@ class SMS {
     $people= $data->factory('Person')
       ->where('rewardsplus', 1)
       ->where('active', 1)
+      ->where_in('preferred_contact', [ 'any', 'text' ])
       ->find_many();
 
     $message= $request->getParam('message');
