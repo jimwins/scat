@@ -305,6 +305,15 @@ class Catalog {
       return $response->withJson($item);
     }
 
+    if (($block= $request->getParam('block'))) {
+      $html= $this->view->fetchBlock('catalog/item.html', $block, [
+        'item' => $item,
+      ]);
+
+      $response->getBody()->write($html);
+      return $response;
+    }
+
     return $this->view->render($response, 'catalog/item.html', [
       'item' => $item,
     ]);
@@ -315,7 +324,7 @@ class Catalog {
   {
     \ORM::get_db()->beginTransaction();
 
-    $item= $code ? $this->catalog->getItemById($code) : null;
+    $item= $code ? $this->catalog->getItemByCode($code) : null;
     if ($code && !$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
@@ -366,7 +375,6 @@ class Catalog {
 
     return $response->withJson([
       'item' => $item,
-      'newValue' => $item->$name,
       'replaceRow' => $this->view->fetch('catalog/item-row.twig', [
                        'i' => $item,
                        'variations' => $item->variation,

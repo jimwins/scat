@@ -57,62 +57,68 @@
 
   <div class="row">
 
-    <!-- Pricing -->
     <div class="col-md-3">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <div class="pull-right">
-            <button class="btn btn-default btn-xs toggle"
-                    data-name="active" data-value="{{ item.active }}">
-              <i class="fa fa-fw {{ item.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
-              Active
-            </button>
-          </div>
-          <h3 class="panel-title">Pricing</h3>
-          <div class="clearfix"></div>
-        </div>
-        <div class="panel-body form-horizontal">
-          
-          <div class="well">
-            <h3 class="text-center" style="margin: 0px; padding: 0px">
-              <span class="editable"
-                    data-name="discount" data-value="{{ item.discount }}">
-                {{ scat.amount(item.sale_price) }}
-                {% if item.discount_type in [ 'percentage', 'relative' ] %}
-                  <br>
-                  <small>{{ scat.format_discount(item) }}</small>
-                {% endif %}
-              </span>
-            </h3>
-          </div>
-
-          <div class="form-group">
-            <label for="retail_price" class="col-sm-4 control-label">List</label>
-            <div class="col-sm-8">
-              <p class="form-control-static editable" data-name="retail_price">
-                {{ scat.amount(item.retail_price) }}
-              </p>
+      {% block pricing %}
+        {% import 'macros.twig' as scat %}
+        <div class="panel panel-default" id="pricing">
+          <div class="panel-heading">
+            <div class="pull-right">
+              <button class="btn btn-default btn-xs toggle"
+                      data-name="active" data-value="{{ item.active }}">
+                <i class="fa fa-fw {{ item.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+                Active
+              </button>
             </div>
+            <h3 class="panel-title">Pricing</h3>
+            <div class="clearfix"></div>
           </div>
+          <div class="panel-body form-horizontal">
+            <div class="well">
+              <h3 class="text-center" style="margin: 0px; padding: 0px">
+                <span class="editable" data-reload="pricing"
+                      data-name="discount"
+                      data-value="{{ scat.format_discount(item) }}">
+                  {{ scat.amount(item.sale_price) }}
+                  {% if item.discount_type in [ 'percentage', 'relative' ] %}
+                    <br>
+                    <small>{{ scat.format_discount(item) }}</small>
+                  {% endif %}
+                </span>
+              </h3>
+            </div>
 
-          {% set overrides= item.price_overrides.find_many %}
-          {% if overrides %}
             <div class="form-group">
-              <label class="col-sm-4 control-label">Overrides</label>
+              <label for="retail_price" class="col-sm-4 control-label">
+                List
+              </label>
               <div class="col-sm-8">
-                {% for over in overrides %}
-                  <p class="form-control-static">
-                    {{ scat.format_discount(over) }}
-                    for
-                    {{ over.minimum_quantity }}
-                  </p>
-                {% endfor %}
+                <p class="form-control-static editable"
+                   data-name="retail_price">
+                  {{ scat.amount(item.retail_price) }}
+                </p>
               </div>
             </div>
-          {% endif %}
 
+            {% set overrides= item.price_overrides.find_many %}
+            {% if overrides %}
+              <div class="form-group">
+                <label class="col-sm-4 control-label">Overrides</label>
+                <div class="col-sm-8">
+                  {% for over in overrides %}
+                    <p class="form-control-static">
+                      {{ scat.format_discount(over) }}
+                      for
+                      {{ over.minimum_quantity }}
+                    </p>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+          </div>
         </div>
-      </div>
+
+      {% endblock %}
 
       <!-- Barcodes -->
       <div class="panel panel-default">
@@ -232,20 +238,22 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="color" class="col-sm-4 control-label">
-              Color
-              <span style="{{ item.color ? "background: #" ~ item.color }}">
-                &nbsp; &nbsp; &nbsp;
-              </span>
-            </label>
-            <div class="col-sm-8">
-              <p class="form-control-static editable"
-                 data-name="color">
-                {{- item.color -}}
-              </p>
+          {% block color %}
+            <div class="form-group" id="color">
+              <label for="color" class="col-sm-4 control-label">
+                Color
+                <span style="{{ item.color ? "background: #" ~ item.color }}">
+                  &nbsp; &nbsp; &nbsp;
+                </span>
+              </label>
+              <div class="col-sm-8">
+                <p class="form-control-static editable"
+                   data-name="color" data-reload="color">
+                  {{- item.color -}}
+                </p>
+              </div>
             </div>
-          </div>
+          {% endblock %}
 
           <div class="form-group">
             <label for="weight" class="col-sm-4 control-label">
@@ -538,38 +546,78 @@
     .select2-container {
       z-index: 1080;
     }
+    .editable {
+      min-width: 10%;
+      border-bottom: 1px dashed #900;
+    }
   </style>
   <script>
-    $('.editable').editable({
-      pk: {{ item.id }},
-      url: (params) => {
-        return fetch("/catalog/item/" + params.pk, {
+  {
+    function editableContent() {
+      let el= this
+      let name= el.getAttribute('data-name')
+      let value= el.getAttribute('data-value')
+      if (!value) {
+        value= this.innerText
+      }
+      let html= scat.htmlToElement('<form><div class="input-group"><input type="text" name="' + name + '" class="form-control" value="' + value + '"><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-times"></i></button></span></div></form>')
+      html.addEventListener('submit', (ev) => {
+        ev.preventDefault()
+        let formData= new FormData(ev.target)
+        fetch("/catalog/item/{{ item.code }}", {
           method: 'PATCH',
           headers: {
             'Content-type': 'application/json',
             'Accept': 'application/json'
           },
-          body: JSON.stringify({ [params.name] : params.value })
+          body: JSON.stringify(Object.fromEntries(formData))
         })
         .then((res) => res.json())
         .then((data) => {
-          return { newValue: data.item[params.name] }
+          $(el).popover('hide')
+
+          let reload= el.closest('[data-reload]')
+          if (reload) {
+            reload= reload.getAttribute('data-reload')
+            fetch('/catalog/item/{{ item.code }}/?block=' + reload)
+            .then((res) => {
+              return res.text()
+            })
+            .then ((text) => {
+              let html= scat.htmlToElement(text)
+              let div= document.getElementById(reload)
+              div.replaceWith(html)
+            })
+          } else {
+            el.innerText= data.item[name]
+          }
         })
-      },
-      success: (response, newValue) => {
-        if (response.error) { return response.error }
-        if (response.newValue) { return response }
-      }
+      })
+      html.querySelector('.cancel').addEventListener('click', (ev) => {
+        $(el).popover('hide')
+      })
+      return html
+    }
+
+    $('body').popover({
+      selector: '.editable',
+      content: editableContent,
+      container: 'body',
+      html: true,
+      sanitize: false,
+      placement: 'auto right',
     })
-    .on('shown', function (e, editable) {
-      // Can't just do this directly because $input isn't focused yet
-      setTimeout(function() {
-        editable.input.$input.select()
-      }, 1)
-    });
+    .on('shown.bs.popover', (ev) => {
+      // focus on the first input or select element
+      let id= ev.target.getAttribute('aria-describedby')
+      let popover= document.getElementById(id)
+      popover.querySelector('input, select').focus()
+    })
+    .on('hidden.bs.popover', (ev) => {
+    })
 
     $('.editable-select2').editable({
-      pk: {{ item.id }},
+      pk: '{{ item.code }}',
       url: (params) => {
         return fetch("/catalog/item/" + params.pk, {
           method: 'PATCH',
@@ -608,7 +656,7 @@
       let name= ev.target.getAttribute('data-name')
       let value= current === '1' ? 0 : 1
 
-      fetch("/catalog/item/{{ item.id }}", {
+      fetch("/catalog/item/{{ item.code }}", {
         method: 'PATCH',
         headers: {
           'Content-type': 'application/json',
@@ -759,6 +807,7 @@
       }
     })
 
+  }
   </script>
 
   {{ scat.file_upload('/catalog/item/' ~ item.code ~ '/media') }}
