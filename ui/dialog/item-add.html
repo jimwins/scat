@@ -16,7 +16,8 @@
       <label for="code">Code</label>
       <div class="input-group">
         <input type="text" class="form-control" autofocus
-               name="code" placeholder="Code">
+               name="code" placeholder="Code"
+               value="{{ vendor_item ? vendor_item.code }}">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button"
                   id="load" title="Load from Vendor">
@@ -29,16 +30,18 @@
     <div class="form-group">
       <label for="name">Name</label>
       <input type="text" class="form-control"
-             name="name" placeholder="Name">
+             name="name" placeholder="Name"
+             value="{{ vendor_item ? vendor_item.name }}">
     </div>
 
     <div class="form-group">
       <label for="retail_price">Price</label>
       <input type="text" class="form-control"
-             name="retail_price" placeholder="$0.00">
+             name="retail_price" placeholder="$0.00"
+             value="{{ vendor_item ? vendor_item.retail_price }}">
     </div>
 
-    <input type="hidden" name="vendor_item" value="">
+    <input type="hidden" name="vendor_item" value="{{ vendor_item.id }}">
 
   </div>
 {% endblock %}

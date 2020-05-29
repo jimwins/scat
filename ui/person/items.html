@@ -55,7 +55,7 @@
   </thead>
   <tbody>
     {% for i in items %}
-      <tr>
+      <tr data-id="{{ i.id }}">
         <td>
           {% if i.item_id %}
             <a href="{{ url_for('catalog-item', { 'code' : i.item.code}) }}">
@@ -63,6 +63,9 @@
             </a>
           {% else %}
             {{ i.code }}
+            <a href="#" class="add-item">
+              <i class="fa fa-plus-square-o"></i>
+            </a>
           {% endif %}
         </td>
         <td>{{ i.vendor_sku }}</td>
@@ -82,4 +85,18 @@
     {% endfor %}
   </tbody>
   </table>
+{% endblock %}
+
+{% block script %}
+  <script>
+  {
+    document.addEventListener('click', (ev) => {
+      if (!ev.target.closest('.add-item')) return;
+      ev.preventDefault();
+
+      let id= ev.target.closest('[data-id]').getAttribute('data-id')
+      scat.dialog([], '/catalog/item?vendor_item_id=' + id)
+    })
+  }
+  </script>
 {% endblock %}

@@ -291,8 +291,13 @@ class Catalog {
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      if (($id= $request->getParam('vendor_item_id'))) {
+        $vendor_item= $this->catalog->getVendorItemById($id);
+      }
+
       return $this->view->render($response, 'dialog/item-add.html', [
         'product_id' => $request->getParam('product_id'),
+        'vendor_item' => $vendor_item,
         'item' => $item,
       ]);
     }
