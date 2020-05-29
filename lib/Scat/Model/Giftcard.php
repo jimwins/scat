@@ -3,7 +3,7 @@ namespace Scat\Model;
 
 include dirname(__FILE__).'/../../../extern/php-barcode.php';
 
-class Giftcard extends \Model implements \JsonSerializable {
+class Giftcard extends \Scat\Model {
   public function card() {
     return $this->id . $this->pin;
   }
@@ -44,7 +44,8 @@ class Giftcard extends \Model implements \JsonSerializable {
                          'amount' => $txn->amount,
                          'txn_id' => $txn->txn_id,
                          'txn_name' => $txn->txn_name );
-      $balance= bcadd($balance, $txn->amount);
+      $balance= (string)(new \Decimal\Decimal($balance) +
+                          new \Decimal\Decimal($txn->amount))->round(2);
       $latest= $txn->entered;
     }
 
@@ -75,7 +76,8 @@ class Giftcard extends \Model implements \JsonSerializable {
              ->find_many();
 
     foreach ($txns as $txn) {
-      $balance= bcadd($balance, $txn->amount);
+      $balance= (string)(new \Decimal\Decimal($balance) +
+                          new \Decimal\Decimal($txn->amount))->round(2);
     }
 
     $issued= (new \Datetime($this->issued))->format('l, F j, Y');
@@ -141,7 +143,7 @@ class Giftcard extends \Model implements \JsonSerializable {
   }
 }
 
-class Giftcard_Txn extends \Model {
+class Giftcard_Txn extends \Scat\Model {
   public function card() {
     return $this->belongs_to('Giftcard', 'card_id');
   }

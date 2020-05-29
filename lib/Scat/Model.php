@@ -55,19 +55,21 @@ class Model extends \Model implements \JsonSerializable {
   public function calcSalePrice($retail_price, $discount_type, $discount) {
     switch ($discount_type) {
     case 'percentage':
-      // TODO fix rounding
-      return bcmul($retail_price,
-                   bcdiv(bcsub(100, $discount),
-                         100));
+      $retail_price= new \Decimal\Decimal($this->retail_price);
+      $discount= 100 - new \Decimal\Decimal($this->discount);
+      $sale_price= $retail_price * ($discount / 100);
+      return (string)$sale_price->round(2, \Decimal\Decimal::ROUND_HALF_EVEN);
     case 'relative':
-      return bcsub($retail_price, $this->discount);
+      $price= new \Decimal\Decimal($this->retail_price) -
+              new \Decimal\Decimal($this->discount);
+      return (string)$price->round(2, \Decimal\Decimal::ROUND_HALF_EVEN);
     case 'fixed':
       return $discount;
     case '':
     case null:
       return $retail_price;
     default:
-      throw new Exception('Did not understand discount for item.');
+      throw new \Exception('Did not understand discount for item.');
     }
   }
 }

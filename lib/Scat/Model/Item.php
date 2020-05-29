@@ -49,22 +49,11 @@ class Item extends \Scat\Model {
   }
 
   public function sale_price() {
-    switch ($this->discount_type) {
-    case 'percentage':
-      // TODO fix rounding
-      return bcmul($this->retail_price,
-                   bcdiv(bcsub(100, $this->discount),
-                         100));
-    case 'relative':
-      return bcsub($this->retail_price, $this->discount);
-    case 'fixed':
-      return $this->discount;
-    case '':
-    case null:
-      return $this->retail_price;
-    default:
-      throw new Exception('Did not understand discount for item.');
-    }
+    return $this->calcSalePrice(
+      $this->retail_price,
+      $this->discount_type,
+      $this->discount
+    );
   }
 
   public function stock() {
@@ -157,16 +146,16 @@ class Item extends \Scat\Model {
   public function setDiscount($discount) {
     $discount= preg_replace('/^\\$/', '', $discount);
     if (preg_match('/^(\d*)(\/|%)( off)?$/', $discount, $m)) {
-      $discount = (float)$m[1];
+      $discount = $m[1];
       $discount_type = "percentage";
     } elseif (preg_match('/^(\d*\.?\d*)$/', $discount, $m)) {
-      $discount = (float)$m[1];
+      $discount = $m[1];
       $discount_type = "fixed";
     } elseif (preg_match('/^\$?(\d*\.?\d*)( off)?$/', $discount, $m)) {
-      $discount = (float)$m[1];
+      $discount = $m[1];
       $discount_type = "relative";
     } elseif (preg_match('/^-\$?(\d*\.?\d*)$/', $discount, $m)) {
-      $discount = (float)$m[1];
+      $discount = $m[1];
       $discount_type = "relative";
     } elseif (preg_match('/^(def|\.\.\.)$/', $discount)) {
       $discount= null;

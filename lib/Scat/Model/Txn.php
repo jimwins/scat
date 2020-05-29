@@ -253,21 +253,28 @@ class Txn extends \Scat\Model {
       throw new \Exception("Don't know how to calculate tax on shipped orders.");
     }
 
-    /* Really need to nail down how TaxCloud does rounding. */
-    $scale= bcscale(5);
-    $tax_rate= bcdiv($this->tax_rate, 100);
+    /*
+     * According to TaxCloud technical support in January 2017:
+     *   We round up at 5, to the fifth decimal, except for Florida and
+     *   Maryland, which rounds up at 9, not 5.
+     *
+     * And this matches the Streamlined Sales Tax agreement (section 324).
+     *
+     * There's no handling for FL and MD here.
+     */
+    $tax_rate= new \Decimal\Decimal($this->tax_rate) / 100;
 
     foreach ($this->items()->find_many() as $line) {
       if (!in_array($line->tic, [ '91082', '10005', '11000' ])) {
-        $tax= bcmul(bcmul($line->ordered * -1, $line->sale_price()),
-                    $tax_rate);
+        $tax= ($line->ordered * -1) *
+              new \Decimal\Decimal($line->sale_price()) *
+              $tax_rate;
+        $tax= (string)$tax->round(2, \Decimal\Decimal::ROUND_HALF_UP);
         if ($tax != $line->tax) {
           $line->tax= $tax;
           $line->save();
         }
       }
     }
-
-    bcscale($scale);
   }
 }

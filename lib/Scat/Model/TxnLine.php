@@ -42,7 +42,8 @@ class TxnLine extends \Scat\Model {
   }
 
   public function ext_price() {
-    return bcmul($this->sale_price(), $this->allocated);
+    $price= new \Decimal\Decimal($this->sale_price()) * $this->allocated;
+    return (string)$price->round(2);
   }
 
   public function vendor_sku() {
