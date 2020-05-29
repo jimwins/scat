@@ -135,6 +135,12 @@ class ScatUtils {
       if (response.status >= 200 && response.status < 300) {
         return Promise.resolve(response)
       }
+      if (res.headers.get('Content-type').indexOf("application/json") !== -1) {
+        return res.json()
+                  .then((data) => {
+                    return Promise.reject(new Error(data.exception[0].message))
+                  })
+      }
       return Promise.reject(new Error(response.statusText))
     })
     .then((response) => {
@@ -169,6 +175,39 @@ class ScatUtils {
         })
       }
       return response
+    })
+  }
+
+  patch (url, args, opts) {
+    const formData= args instanceof FormData ? args : new FormData()
+
+    // XXX should verify that url is not remove since we trust content
+
+    if (!(args instanceof FormData)) {
+      for (let prop in args) {
+        formData.append(prop, args[prop])
+      }
+    }
+
+    return fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then((res) => {
+      if (res.status >= 200 && res.status < 300) {
+        return Promise.resolve(res)
+      }
+      if (res.headers.get('Content-type').indexOf("application/json") !== -1) {
+        return res.json()
+                  .then((data) => {
+                    return Promise.reject(new Error(data.exception[0].message))
+                  })
+      }
+      return Promise.reject(new Error(res.statusText))
     })
   }
 

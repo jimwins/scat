@@ -172,7 +172,7 @@ class Item extends \Scat\Model {
       $discount= null;
       $discount_type= null;
     } else {
-      throw \Exception("Did not understand discount.");
+      throw new \Exception("Did not understand discount.");
     }
     $this->discount= $discount;
     $this->discount_type= $discount_type;

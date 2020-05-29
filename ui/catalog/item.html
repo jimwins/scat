@@ -560,38 +560,38 @@
       if (!value) {
         value= this.innerText
       }
-      let html= scat.htmlToElement('<form><div class="input-group"><input type="text" name="' + name + '" class="form-control" value="' + value + '"><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-times"></i></button></span></div></form>')
+      let html= scat.htmlToElement('<form><div class="form-group"><div class="input-group"><input type="text" name="' + name + '" class="form-control" value="' + value + '"><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-times"></i></button></span></div><span class="help-block"></span></div></form>')
       html.addEventListener('submit', (ev) => {
         ev.preventDefault()
         let formData= new FormData(ev.target)
-        fetch("/catalog/item/{{ item.code }}", {
-          method: 'PATCH',
-          headers: {
-            'Content-type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(Object.fromEntries(formData))
-        })
-        .then((res) => res.json())
-        .then((data) => {
-          $(el).popover('hide')
+        scat.patch("/catalog/item/{{ item.code }}", formData)
+            .then((res) => res.json())
+            .then((data) => {
+              $(el).popover('hide')
 
-          let reload= el.closest('[data-reload]')
-          if (reload) {
-            reload= reload.getAttribute('data-reload')
-            fetch('/catalog/item/{{ item.code }}/?block=' + reload)
-            .then((res) => {
-              return res.text()
+              let reload= el.closest('[data-reload]')
+              if (reload) {
+                reload= reload.getAttribute('data-reload')
+                fetch('/catalog/item/{{ item.code }}/?block=' + reload)
+                .then((res) => {
+                  return res.text()
+                })
+                .then ((text) => {
+                  let html= scat.htmlToElement(text)
+                  let div= document.getElementById(reload)
+                  div.replaceWith(html)
+                })
+              } else {
+                el.innerText= data.item[name]
+              }
             })
-            .then ((text) => {
-              let html= scat.htmlToElement(text)
-              let div= document.getElementById(reload)
-              div.replaceWith(html)
+            .catch((err) => {
+              let help= ev.target.querySelector('.help-block')
+              help.innerText= err.message
+              ev.target
+                .querySelector('.form-group')
+                .classList.add('has-error')
             })
-          } else {
-            el.innerText= data.item[name]
-          }
-        })
       })
       html.querySelector('.cancel').addEventListener('click', (ev) => {
         $(el).popover('hide')
