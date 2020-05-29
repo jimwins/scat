@@ -3,13 +3,19 @@ namespace Scat\Service;
 
 class Giftcard
 {
+  private $data;
+
+  public function __construct(\Scat\Service\Data $data) {
+    $this->data= $data;
+  }
+
   public function check_balance($card) {
     $card= preg_replace('/^RAW-/', '', $card);
 
     $id= substr($card, 0, 7);
     $pin= substr($card, -4);
 
-    $card= \Model::factory('Giftcard')
+    $card= $this->data->factory('Giftcard')
              ->where('id', $id)
              ->where('pin', $pin)
              ->find_one();

@@ -69,7 +69,7 @@ class Search
     $v= new \Scat\SearchVisitor();
     $query->accept($v);
 
-    $items= \Model::factory('Item')->select('item.*')
+    $items= $this->data->factory('Item')->select('item.*')
                                    ->select_expr('IFNULL((SELECT SUM(allocated)
                                                      FROM txn_line
                                                     WHERE txn_line.item_id =
@@ -94,7 +94,7 @@ class Search
   }
 
   public function searchBrands($q) {
-    return \Model::factory('Brand')
+    return $this->data->factory('Brand')
             ->where_raw('MATCH (name, slug) AGAINST (? IN NATURAL LANGUAGE MODE)', [ $q ])
             ->where('active', 1)
             ->find_many();
@@ -113,7 +113,7 @@ class Search
     $products= $stmt->fetchAll(\PDO::FETCH_COLUMN, 0);
 
     return $products ?
-           \Model::factory('Product')->where_in('product.id', $products)
+           $this->data->factory('Product')->where_in('product.id', $products)
                                      ->where_gte('product.active', 1)
                                      ->order_by_asc('product.name')
                                      ->find_many() : [];

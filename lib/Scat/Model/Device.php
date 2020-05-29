@@ -1,9 +1,9 @@
 <?php
 namespace Scat\Model;
 
-class Device extends \Model implements \JsonSerializable {
+class Device extends \Scat\Model {
   public function register($token) {
-    $device= \Model::factory('Device')->create();
+    $device= self::factory('Device')->create();
     $device->token= $token;
     $device->save();
 
@@ -11,12 +11,9 @@ class Device extends \Model implements \JsonSerializable {
   }
 
   public function forget($token) {
-    $device= \Model::factory('Device')->where('token', $token)->find_one();
+    $device= self::factory('Device')->where('token', $token)->find_one();
     $device->delete();
   }
 
-  public function jsonSerialize() {
-    return $this->as_array();
-  }
 }
 

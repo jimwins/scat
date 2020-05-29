@@ -188,10 +188,10 @@ class Txn extends \Scat\Model {
         ->where_raw('NOT `discount_manual`');
 
       /* turn off logging here, it's just too much */
-      \ORM::configure('logging', false);
+      $this->orm->configure('logging', false);
       $count= abs($items->sum('ordered'));
       $items->limit(null); // reset limit that sum() injects into $items
-      \ORM::configure('logging', true);
+      $this->orm->configure('logging', true);
 
       if (!$count) {
         continue;

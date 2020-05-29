@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-class Note extends \Model implements \JsonSerializable {
+class Note extends \Scat\Model {
   public function txn() {
     if ($this->kind == 'txn') {
       return $this->belongs_to('Txn', 'attach_id')->find_one();
@@ -31,7 +31,4 @@ class Note extends \Model implements \JsonSerializable {
     return $this->belongs_to('Note', 'parent_id')->find_one();
   }
 
-  public function jsonSerialize() {
-    return $this->as_array();
-  }
 }

@@ -7,8 +7,14 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Settings {
+  private $data;
+
+  public function __construct(\Scat\Service\Data $data) {
+    $this->data= $data;
+  }
+
   public function home(Response $response, View $view) {
-    $settings= \Model::factory('Config')->order_by_asc('name')->find_many();
+    $settings= $this->data->factory('Config')->order_by_asc('name')->find_many();
     return $view->render($response, 'settings/index.html', [
       'settings' => $settings,
     ]);
@@ -18,7 +24,7 @@ class Settings {
     $name= $request->getParam('name');
     // TODO validate
 
-    $config= \Model::factory('Config')->create();
+    $config= $this->data->factory('Config')->create();
     $config->name= $name;
     $config->value= $request->getParam('value') ?: '';
     $config->save();
@@ -27,7 +33,7 @@ class Settings {
   }
 
   public function update(Request $request, Response $response, $id) {
-    $config= \Model::factory('Config')->find_one($id);
+    $config= $this->data->factory('Config')->find_one($id);
     if (!$config)
       throw new \Slim\Exception\HttpNotFoundException($request);
 

@@ -3,6 +3,12 @@ namespace Scat\Service;
 
 class Report
 {
+  private $data;
+
+  public function __construct(\Scat\Service\Data $data) {
+    $this->data= $data;
+  }
+
   public function sales($span= '', $begin= null, $end= null) {
     $items= "1=1";
 
@@ -87,13 +93,13 @@ class Report
           GROUP BY 1
           ORDER BY 1 DESC";
 
-    $sales= \ORM::for_table('item')->raw_query($q)->find_many();
+    $sales= $this->data->for_table('item')->raw_query($q)->find_many();
 
     return [ "sales" => $sales ];
   }
 
   public function emptyProducts() {
-    return [ "products" => \Model::factory('Product')
+    return [ "products" => $this->data->factory('Product')
                              ->select('*')
                              ->select_expr('(SELECT COUNT(*)
                                                FROM item

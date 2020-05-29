@@ -57,7 +57,7 @@ class Product extends \Scat\Model {
   }
 
   public function addImage($image) {
-    $rel= \Model::factory('ImageProduct')->create();
+    $rel= self::factory('ImageProduct')->create();
     $rel->image_id= $image->id;
     $rel->product_id= $this->id;
     $rel->save();
@@ -77,7 +77,7 @@ class Product extends \Scat\Model {
       $new_slug= $this->full_slug();
       if ($new_slug != $this->old_slug) {
         error_log("Redirecting {$this->old_slug} to $new_slug");
-        $redir= \Model::factory('Redirect')->create();
+        $redir= self::factory('Redirect')->create();
         $redir->source= $this->old_slug;
         $redir->dest= $new_slug;
         $redir->save();

@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-class PriceOverride extends \Model {
+class PriceOverride extends \Scat\Model {
   function product() {
     return ($this->pattern_type == 'product' ? 
             $this->belongs_to('Product', 'pattern')->find_one() :

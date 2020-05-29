@@ -8,10 +8,12 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Till {
-  private $txn;
+  private $txn, $data;
 
-  public function __construct(\Scat\Service\Txn $txn, View $view) {
+  public function __construct(\Scat\Service\Txn $txn, \Scat\Service\Data $data)
+  {
     $this->txn= $txn;
+    $this->data= $data;
   }
 
   protected function getExpected() {
@@ -52,7 +54,7 @@ class Till {
 
     $expected= $this->getExpected();
 
-    \ORM::get_db()->beginTransaction();
+    $this->data->beginTransaction();
 
     $txn= $this->txn->create('drawer');
 
@@ -78,7 +80,7 @@ class Till {
       $payment->save();
     }
 
-    \ORM::get_db()->commit();
+    $this->data->commit();
 
     return $response->withJson([ 'expected' => $this->getExpected() ]);
   }
@@ -97,7 +99,7 @@ class Till {
     $amount= $request->getParam('amount');
     $reason= $request->getParam('reason');
 
-    \ORM::get_db()->beginTransaction();
+    $this->data->beginTransaction();
 
     $txn= $this->txn->create('drawer');
 
@@ -116,7 +118,7 @@ class Till {
 
     $note->save();
 
-    \ORM::get_db()->commit();
+    $this->data->commit();
 
     return $response->withJson($txn);
   }

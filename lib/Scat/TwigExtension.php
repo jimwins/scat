@@ -30,7 +30,7 @@ class TwigExtension
   }
 
   public function getNotes() {
-    return \Model::factory('Note')
+    return \Titi\Model::factory('Note')
              ->where('parent_id', 0)
              ->where('todo', 1)
              ->order_by_asc('id')

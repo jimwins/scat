@@ -57,7 +57,7 @@ class Giftcards {
     $txn_id= $request->getParam('txn_id');
     $balance= $request->getParam('balance');
 
-    \ORM::get_db()->beginTransaction();
+    $this->data->beginTransaction();
 
     $card= $this->data->factory('Giftcard')->create();
 
@@ -80,7 +80,7 @@ class Giftcards {
       $txn->save();
     }
 
-    \ORM::get_db()->commit();
+    $this->data->commit();
 
     return $response->withJson($card);
   }

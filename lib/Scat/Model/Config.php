@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-class Config extends \Model {
+class Config extends \Scat\Model {
   static protected $cache= [];
 
   static public function getValue($name) {
@@ -9,7 +9,7 @@ class Config extends \Model {
       return $cache[$name];
     }
 
-    $row= \Model::factory('Config')->where('name', $name)->find_one();
+    $row= self::factory('Config')->where('name', $name)->find_one();
 
     if ($row) {
       return ($cache[$name]= $row->value);
@@ -19,10 +19,10 @@ class Config extends \Model {
   }
 
   static public function setValue($name, $value, $type= null) {
-    $row= \Model::factory('Config')->where('name', $name)->find_one();
+    $row= self::factory('Config')->where('name', $name)->find_one();
 
     if (!$row) {
-      $row= \Model::factory('Config')->create();
+      $row= self::factory('Config')->create();
       $row->name= $name;
     }
 
@@ -37,7 +37,7 @@ class Config extends \Model {
   }
 
   static public function forgetValue($name) {
-    $row= \Model::factory('Config')->where('name', $name)->find_one();
+    $row= self::factory('Config')->where('name', $name)->find_one();
     if ($row) {
       $row->delete();
     }

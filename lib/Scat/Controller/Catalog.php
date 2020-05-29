@@ -8,10 +8,15 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Catalog {
-  private $catalog, $view;
+  private $catalog, $view, $data;
 
-  public function __construct(\Scat\Service\Catalog $catalog, View $view) {
+  public function __construct(
+    \Scat\Service\Catalog $catalog,
+    \Scat\Service\Data $data,
+    View $view
+  ) {
     $this->catalog= $catalog;
+    $this->data= $data;
     $this->view= $view;
   }
 
@@ -327,7 +332,7 @@ class Catalog {
   public function updateItem(Request $request, Response $response,
                               $code= null)
   {
-    \ORM::get_db()->beginTransaction();
+    $this->data->beginTransaction();
 
     $item= $code ? $this->catalog->getItemByCode($code) : null;
     if ($code && !$item)
@@ -376,7 +381,7 @@ class Catalog {
       }
     }
 
-    \ORM::get_db()->commit();
+    $this->data->commit();
 
     return $response->withJson([
       'item' => $item,

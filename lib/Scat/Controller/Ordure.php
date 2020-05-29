@@ -7,10 +7,12 @@ use \Slim\Http\Response as Response;
 use \Respect\Validation\Validator as v;
 
 class Ordure {
-  protected $txn;
+  protected $txn, $data;
 
-  public function __construct(\Scat\Service\Txn $txn) {
+  public function __construct(\Scat\Service\Txn $txn, \Scat\Service\Data $data)
+  {
     $this->txn= $txn;
+    $this->data= $data;
   }
 
   public function pushPrices(Response $response,
@@ -92,20 +94,20 @@ class Ordure {
 
       /* First we look by number, and then by email. */
       if (!empty($update->loyalty_number)) {
-        $person= \Model::factory('Person')->where('loyalty_number',
+        $person= $this->data->factory('Person')->where('loyalty_number',
                                                   $update->loyalty_number)
                                           ->find_one();
       }
 
       if (!$person && !empty($update->email)) {
-        $person= \Model::factory('Person')->where('email',
+        $person= $this->data->factory('Person')->where('email',
                                                   $update->email)
                                           ->find_one();
       }
 
       /* Didn't find them? Create them. */
       if (!$person) {
-        $person= \Model::factory('Person')->create();
+        $person= $this->data->factory('Person')->create();
         $person->name= $update->name;
         $person->email= $update->email;
         $person->setProperty('phone', $update->phone);
@@ -213,15 +215,15 @@ class Ordure {
 
         $data= json_decode($res->getBody());
 
-        \ORM::get_db()->beginTransaction();
+        $this->data->beginTransaction();
 
-        $person= \Model::factory('Person')->where('email', $data->sale->email)
+        $person= $this->data->factory('Person')->where('email', $data->sale->email)
                                           ->where('active', 1)
                                           ->find_one();
 
         /* Didn't find them? Create them. */
         if (!$person) {
-          $person= \Model::factory('Person')->create();
+          $person= $this->data->factory('Person')->create();
           $person->name= $data->sale->name;
           $person->email= $data->sale->email;
           $person->save();
@@ -268,7 +270,7 @@ class Ordure {
 
         /* Add shipping item */
         if ($data->sale->shipping != 0) {
-          $item= \Model::factory('Item')
+          $item= $this->data->factory('Item')
                    ->where('code','ZZ-SHIPPING-CUSTOM')
                    ->find_one();
 
@@ -323,7 +325,7 @@ class Ordure {
             ]);
           }
 
-          $address= \Model::factory('Address')->create();
+          $address= $this->data->factory('Address')->create();
           $address->easypost_id= $easypost_address->id;
           $address->name= $easypost_address->name;
           $address->company= $easypost_address->company;
@@ -355,12 +357,12 @@ class Ordure {
                                  ]
                                ]);
 
-        \ORM::get_db()->commit();
+        $this->data->commit();
 
         $messages[]= "Created transaction for sale {$data->sale->id}.";
       }
       catch (Exception $e) {
-        \ORM::get_db()->rollBack();
+        $this->data->rollBack();
         throw $e;
       }
     }

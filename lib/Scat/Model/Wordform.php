@@ -1,5 +1,5 @@
 <?php
 namespace Scat\Model;
 
-class Wordform extends \Model {
+class Wordform extends \Scat\Model {
 }

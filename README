@@ -35,10 +35,10 @@ Scat includes the Knockout JavaScript MVVM library:
 Scat uses PhpSpreadSheet for writing Excel spreadsheets:
   https://phpspreadsheet.readthedocs.io/
 
-Scat uses the Idiorm & Paris minimalist database toolkit:
-  http://j4mie.github.io/idiormandparis/
-
 Scat includes X-editable:
  https://vitalets.github.io/x-editable/index.html
+
+Scat uses the Titi minimalist database toolkit:
+  https://github.com/jimwins/titi
 
 See the LICENSE file for licensing information.

@@ -51,7 +51,7 @@ class Transactions {
   public function createSale(Request $request, Response $response,
                               \Scat\Service\Config $config)
   {
-    \ORM::get_db()->beginTransaction();
+    $this->data->beginTransaction();
 
     $copy_from_id= $request->getParam('copy_from_id');
     $copy= $copy_from_id ? $this->txn->fetchById($copy_from_id) : null;
@@ -86,7 +86,7 @@ class Transactions {
 
     /* We don't copy notes. */
 
-    \ORM::get_db()->commit();
+    $this->data->commit();
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
@@ -142,7 +142,7 @@ class Transactions {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
-    \ORM::get_db()->beginTransaction();
+    $this->data->beginTransaction();
 
     $unique= preg_match('/^ZZ-(frame|print|univ|canvas|stretch|float|panel|giftcard)/i', $item->code);
 
@@ -181,7 +181,7 @@ class Transactions {
 
     // TODO push new price to pole
 
-    \ORM::get_db()->commit();
+    $this->data->commit();
 
     $line->reload();
 
@@ -514,7 +514,7 @@ class Transactions {
     if (!$line)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    \ORM::get_db()->beginTransaction();
+    $this->data->beginTransaction();
 
     foreach ($line->getFields() as $field) {
       if ($field == 'id') continue;
@@ -565,7 +565,7 @@ class Transactions {
       $txn->recalculateTax($tax);
     }
 
-    \ORM::get_db()->commit();
+    $this->data->commit();
 
     return $response->withJson($line);
   }
@@ -875,7 +875,7 @@ class Transactions {
     if ($dropship_id && !$dropship)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    \ORM::get_db()->beginTransaction();
+    $this->data->beginTransaction();
 
     if (!$dropship) {
       $dropship= $this->txn->create('vendor');
@@ -920,7 +920,7 @@ class Transactions {
       $txn->save();
     }
 
-    \ORM::get_db()->commit();
+    $this->data->commit();
 
     return $response->withJson($dropship);
   }
@@ -992,7 +992,7 @@ class Transactions {
 
     $code= trim($request->getParam('code'));
     if ($code) {
-      $extra.= " AND code LIKE " . \ORM::get_db()->quote($code.'%');
+      $extra.= " AND code LIKE " . $this->data->escape($code.'%');
     }
     $criteria= ($all ? '1=1'
                      : '(ordered IS NULL OR NOT ordered)
@@ -1035,15 +1035,16 @@ class Transactions {
            ORDER BY code
           ";
 
-    \ORM::configure('logging', false);
-    $items= \ORM::for_table('item')->raw_query($q)->find_many();
+    $this->data->configure('logging', false);
+    $items= $this->data->for_table('item')->raw_query($q)->find_many();
+    $this->data->configure('logging', true);
 
     return $this->view->render($response, 'purchase/reorder.html', [
       'items' => $items,
       'all' => $all,
       'code' => $code,
       'vendor' => $vendor,
-      'person' => \Model::factory('Person')->find_one($vendor)
+      'person' => $this->data->factory('Person')->find_one($vendor)
     ]);
   }
 
@@ -1073,7 +1074,7 @@ class Transactions {
       throw new \Exception("Unable to find transaction.");
     }
 
-    \ORM::get_db()->beginTransaction();
+    $this->data->beginTransaction();
 
     $vendor_id= $purchase->person_id;
 
@@ -1088,6 +1089,7 @@ class Transactions {
           continue;
         }
 
+        // TODO should be using Catalog Service for this
         $vendor_items=
           \Scat\Model\VendorItem::findByItemIdForVendor($item_id,
                                                   $vendor_id);
@@ -1119,7 +1121,7 @@ class Transactions {
       }
     }
 
-    \ORM::get_db()->commit();
+    $this->data->commit();
 
     $path= '/purchase/' . $purchase->id;
 

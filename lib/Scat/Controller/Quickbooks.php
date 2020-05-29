@@ -10,10 +10,14 @@ use \Slim\Views\Twig as View;
 class Quickbooks {
   protected $qb;
 
-  protected $config;
+  protected $config, $data;
 
-  public function __construct(\Scat\Service\Config $config) {
+  public function __construct(
+    \Scat\Service\Config $config,
+    \Scat\Service\Data $data
+  ) {
     $this->config= $config;
+    $this->data= $data;
   }
 
   public function getConfig(Request $request) {
@@ -132,7 +136,7 @@ class Quickbooks {
   }
 
   protected function getLastSyncedPayment() {
-    return \Model::factory('Payment')
+    return $this->data->factory('Payment')
             ->where_gt('amount', '0')
             ->where('qb_je_id', '')
             ->where_gte('processed', '2020-01-01')
@@ -140,7 +144,7 @@ class Quickbooks {
   }
 
   protected function getLastSyncedSale() {
-    return \Model::factory('Txn')
+    return $this->data->factory('Txn')
             ->where('type', 'customer')
             ->where('qb_je_id', '')
             ->where_gte('paid', '2020-01-01')
@@ -257,7 +261,7 @@ class Quickbooks {
 
     error_log("Finding transactions on $date");
 
-    $txns= \Model::factory('Txn')
+    $txns= $this->data->factory('Txn')
             ->where_raw("qb_je_id = '' AND
                          ((type = 'correction' AND
                            created BETWEEN ? AND ? + INTERVAL 1 DAY) OR
@@ -407,7 +411,7 @@ class Quickbooks {
 
     $date= (new \DateTime($date))->format('Y-m-d');
 
-    $payments= \Model::factory('Payment')
+    $payments= $this->data->factory('Payment')
                 ->where_raw("processed BETWEEN ? and ? + INTERVAL 1 DAY",
                             [ $date, $date ])
                 ->where_not_equal('amount', '0.00')

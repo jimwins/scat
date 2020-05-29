@@ -90,7 +90,7 @@ class Person extends \Scat\Model {
 
     $sql_criteria= join(' AND ', $criteria);
 
-    $people= \Model::factory('Person')->select('person.*')
+    $people= self::factory('Person')->select('person.*')
                                       ->where_raw($sql_criteria)
                                       ->where_gte('person.active',
                                                   $all ? 0 : 1)

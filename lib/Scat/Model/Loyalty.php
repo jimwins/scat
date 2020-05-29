@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-class Loyalty extends \Model implements \JsonSerializable {
+class Loyalty extends \Scat\Model {
   public function person() {
     return $this->belongs_to('Person');
   }
@@ -9,7 +9,4 @@ class Loyalty extends \Model implements \JsonSerializable {
     return $this->belongs_to('Txn');
   }
 
-  public function jsonSerialize() {
-    return $this->asArray();
-  }
 }

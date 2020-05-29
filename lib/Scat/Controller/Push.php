@@ -55,8 +55,9 @@ class Push {
   }
 
   function pushNotification(Request $request, Response $response,
+                            \Scat\Service\Data $data,
                             \Scat\Service\Push $push) {
-     $devices= \Model::factory('Device')->find_many();
+     $devices= $data->factory('Device')->find_many();
 
      foreach ($devices as $device) {
        $push->sendNotification(

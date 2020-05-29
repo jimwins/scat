@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-class Payment extends \Model {
+class Payment extends \Scat\Model {
   public static $methods= array(
     'cash' => "Cash",
     'change' => "Change",

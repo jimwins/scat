@@ -13,7 +13,6 @@ class Media
   protected function getB2Client() {
     $id= $this->config->get('b2.keyID');
     $key= $this->config->get('b2.applicationKey');
-    error_log("keyID = $id, key = $key\n");
     return new \ChrisWhite\B2\Client($id, $key);
   }
 

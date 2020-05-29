@@ -26,7 +26,7 @@ class Item extends \Scat\Model {
   }
 
   public function addImage($image) {
-    $rel= \Model::factory('ImageItem')->create();
+    $rel= self::factory('ImageItem')->create();
     $rel->image_id= $image->id;
     $rel->item_id= $this->id;
     $rel->save();
@@ -76,7 +76,7 @@ class Item extends \Scat\Model {
             AND item_id = {$this->id}
             AND created BETWEEN NOW() - INTERVAL $days DAY AND NOW()";
 
-    $res= \ORM::for_table('txn')->raw_query($q)->find_one();
+    $res= $this->orm->for_table('txn')->raw_query($q)->find_one();
 
     return $res;
   }
@@ -177,7 +177,7 @@ class Item extends \Scat\Model {
   public function setStock($stock) {
     $current= $this->stock();
     if ($stock != $current) {
-      $cxn= \Model::factory('Txn')
+      $cxn= self::factory('Txn')
         ->where_raw("type = 'correction' AND DATE(NOW()) = DATE(created)")
         ->find_one();
       if (!$cxn) {
@@ -193,10 +193,10 @@ class Item extends \Scat\Model {
             WHERE item_id = {$this->id} AND type = 'vendor'
             ORDER BY created DESC
             LIMIT 1";
-      $res= \ORM::for_table('txn_line')->raw_query($q)->find_one();
+      $res= $this->orm->for_table('txn_line')->raw_query($q)->find_one();
       $cost= $res ? $res->cost : 0.00;
 
-      $txn_line= \Model::factory('TxnLine')
+      $txn_line= self::factory('TxnLine')
         ->where_equal('txn_id', $cxn->id)
         ->where_equal('item_id', $this->id)
         ->find_one();
@@ -206,7 +206,7 @@ class Item extends \Scat\Model {
         $txn_line->allocated+= $diff;
         $txn_line->retail_price= $txn_line->ordered < 0 ? $cost : 0.00;
       } else {
-        $txn_line= \Model::factory('TxnLine')->create();
+        $txn_line= self::factory('TxnLine')->create();
         $txn_line->txn_id= $cxn->id;
         $txn_line->item_id= $this->id;
         $txn_line->ordered= $diff;
@@ -239,7 +239,7 @@ class Item extends \Scat\Model {
   }
 
   public function price_overrides() {
-    return \Model::factory('PriceOverride')
+    return self::factory('PriceOverride')
             ->where_raw("(pattern_type = 'product' AND pattern = ?) OR
                          (pattern_type = 'like'  AND ? LIKE pattern) OR
                          (pattern_type = 'rlike' AND ? RLIKE pattern)",
@@ -248,7 +248,7 @@ class Item extends \Scat\Model {
   }
 
   public function txns() {
-    return \Model::factory('Txn')
+    return self::factory('Txn')
             ->join('txn_line', [ 'txn.id', '=', 'txn_line.txn_id' ])
             ->select('txn.*')
             ->select_expr('AVG(sale_price(retail_price, discount_type, discount))',
@@ -267,7 +267,7 @@ class Item extends \Scat\Model {
           WHERE txn_line.item_id = {$this->id}
           GROUP BY txn.id
           ORDER BY txn.created";
-    return \ORM::for_table('txn')->raw_query($q);
+    return $this->orm->for_table('txn')->raw_query($q);
   }
 
   public function findVendorItems() {
@@ -276,14 +276,14 @@ class Item extends \Scat\Model {
           WHERE (vendor_item.item_id IS NULL OR vendor_item.item_id = 0)
             AND vendor_item.code = item.code
             AND item.id = {$this->id}";
-    \ORM::raw_execute($q);
+    $this->orm->raw_execute($q);
 
     $q= "UPDATE vendor_item, barcode
             SET vendor_item.item_id = barcode.item_id
           WHERE (vendor_item.item_id IS NULL OR vendor_item.item_id = 0)
             AND vendor_item.barcode = barcode.code
             AND barcode.item_id = {$this->id}";
-    \ORM::raw_execute($q);
+    $this->orm->raw_execute($q);
   }
 
   public function shipping_rate() {

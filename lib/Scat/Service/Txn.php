@@ -31,11 +31,11 @@ class Txn
   }
 
   public function fetchById($id) {
-    return \Model::factory('Txn')->find_one($id);
+    return $this->data->factory('Txn')->find_one($id);
   }
 
   public function find($type, $page, $limit= 25) {
-    return \Model::factory('Txn')
+    return $this->data->factory('Txn')
                 ->select('*')
                 ->select_expr('COUNT(*) OVER()', 'records')
                 ->order_by_desc('created')

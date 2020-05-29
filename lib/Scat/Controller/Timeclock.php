@@ -8,8 +8,14 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Timeclock {
+  private $data;
+
+  public function __construct(\Scat\Service\Data $data) {
+    $this->data= $data;
+  }
+
   function home(Request $request, Response $response, View $view) {
-    $people= \Model::factory('Person')
+    $people= $this->data->factory('Person')
       ->select('*')
       ->where('role', 'employee')
       ->order_by_asc('name')
@@ -30,7 +36,7 @@ class Timeclock {
 
   function punch(Request $request, Response $response) {
     $id= $request->getParam('id');
-    $person= \Model::factory('Person')->find_one($id);
+    $person= $this->data->factory('Person')->find_one($id);
     return $response->withJson($person->punch());
   }
 }

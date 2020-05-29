@@ -1,9 +1,9 @@
 <?php
 namespace Scat;
 
-class Model extends \Model implements \JsonSerializable {
+class Model extends \Titi\Model implements \JsonSerializable {
 
-  /* Memoize this, not sure why \Model doesn't store it on creation. */
+  /* Memoize this, not sure why \Titi\Model doesn't store it on creation. */
   private $_table_name;
   public function table_name() {
     if (isset($this->_table_name)) return $this->_table_name;
@@ -30,6 +30,9 @@ class Model extends \Model implements \JsonSerializable {
   }
 
   public function reload() {
+    // punt if we don't have an id
+    if (!$this->id) return $this;
+
     $this->orm->where_id_is($this->id);
     $this->orm->limit(1);
     $rows= $this->orm->_run();

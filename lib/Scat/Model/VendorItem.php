@@ -13,7 +13,7 @@ use OE\Lukas\QueryTree\ConjunctiveExpressionList;
 class VendorItem extends \Scat\Model {
   public static
   function findByItemIdForVendor($item_id, $vendor_id, $active= 1) {
-    return \Model::factory('VendorItem')
+    return self::factory('VendorItem')
              ->where('vendor_id', $vendor_id)
              ->where('item_id', $item_id)
              ->where('active', $active)
@@ -38,7 +38,7 @@ class VendorItem extends \Scat\Model {
     $v= new VendorItemSearchVisitor();
     $query->accept($v);
 
-    $items= \Model::factory('VendorItem')->select('vendor_item.*')
+    $items= self::factory('VendorItem')->select('vendor_item.*')
                                    ->where('vendor_item.vendor_id', $vendor_id)
                                    ->where_raw($v->where_clause())
                                    ->where_gte('vendor_item.active',

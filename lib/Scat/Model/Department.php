@@ -1,7 +1,7 @@
 <?php
 namespace Scat\Model;
 
-class Department extends \Model implements \JsonSerializable {
+class Department extends \Scat\Model {
   private $old_slug;
 
   public function full_slug() {
@@ -24,11 +24,6 @@ class Department extends \Model implements \JsonSerializable {
                 ->where_gte('product.active', (int)$only_active);
   }
 
-  public function jsonSerialize() {
-    $array= $this->as_array();
-    return $array;
-  }
-
   // XXX A gross hack to find when slug changes.
   function set_orm($orm) {
     parent::set_orm($orm);
@@ -42,7 +37,7 @@ class Department extends \Model implements \JsonSerializable {
         ($this->is_dirty('slug') || $this->is_dirty('parent_id'))) {
       $new_slug= $this->full_slug();
       error_log("Redirecting {$this->old_slug} to $new_slug");
-      $redir= \Model::factory('Redirect')->create();
+      $redir= self::factory('Redirect')->create();
       $redir->source= $this->old_slug;
       $redir->dest= $new_slug;
       $redir->save();
