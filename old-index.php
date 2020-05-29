@@ -84,11 +84,11 @@ Txn.loadData= function (data) {
 }
 
 Txn.loadId= function (id) {
-  Txn.callAndLoad('txn-load', { type: 'customer', id: id });
+  return Txn.callAndLoad('txn-load', { type: 'customer', id: id });
 }
 
 Txn.loadNumber= function(num) {
-  Txn.callAndLoad('txn-load', { type: 'customer', number: num });
+  return Txn.callAndLoad('txn-load', { type: 'customer', number: num });
 }
 
 Txn.addPayment= function (id, options) {
@@ -128,6 +128,9 @@ Txn.addItem= function (txn, item) {
       .then((res) => res.json())
       .then((data) => {
         Txn.loadId(txn)
+        .then(() => {
+          setActiveRow($('#items tbody tr[data-line_id=' + data.id + ']'))
+        })
       })
 }
 
