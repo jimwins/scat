@@ -768,7 +768,7 @@ class Transactions {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
       if ($value !== null) {
-        $shipment->setProperty($field, $value);
+        $shipment->set($field, $value);
       }
     }
 
