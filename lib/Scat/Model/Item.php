@@ -143,6 +143,13 @@ class Item extends \Scat\Model {
     return $fields;
   }
 
+  public function as_array() {
+    $data= parent::as_array();
+    $data['dimensions']= $this->dimensions();
+    $data['stock']= $this->stock();
+    return $data;
+  }
+
   public function setDiscount($discount) {
     $discount= preg_replace('/^\\$/', '', $discount);
     if (preg_match('/^(\d*)(\/|%)( off)?$/', $discount, $m)) {
