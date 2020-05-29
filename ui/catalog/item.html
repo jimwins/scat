@@ -613,8 +613,6 @@
       let popover= document.getElementById(id)
       popover.querySelector('input, select').focus()
     })
-    .on('hidden.bs.popover', (ev) => {
-    })
 
     $('.editable-select2').editable({
       pk: '{{ item.code }}',
