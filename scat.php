@@ -6,14 +6,14 @@ if (!$GLOBALS['app']) {
 
   require dirname(__FILE__).'/vendor/autoload.php';
 
-  Model::$auto_prefix_models= '\\Scat\\Model\\';
-  Model::$short_table_names= true;
+  \Titi\Model::$auto_prefix_models= '\\Scat\\Model\\';
+  \Titi\Model::$short_table_names= true;
 
-  ORM::configure($config['data']['dsn']);
+  \Titi\ORM::configure($config['data']['dsn']);
   foreach ($config['data']['options'] as $option => $value) {
-    ORM::configure($option, $value);
+    \Titi\ORM::configure($option, $value);
   }
-  ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
+  \Titi\ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
 }
 
 function head($title, $x= null) {
