@@ -10,7 +10,7 @@ if (!$term) {
               'results' => [] ]);
 }
 
-$products= Model::factory('Product')
+$products= \Titi\Model::factory('Product')
              ->select("product.*")
              ->select("department.name", "department_name")
              ->select("department.slug", "department_slug")
