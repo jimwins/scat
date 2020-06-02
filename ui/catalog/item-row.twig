@@ -24,20 +24,20 @@
   </td>
   <td style="{{ s.style_item_color(i.color) }}">
     <span class="editable"
-          data-pk="{{ i.id }}"
+          data-pk="{{ i.code }}"
           data-name="{{ variations|length ? 'short_name' : 'name' }}">
     {{- variations|length ? (i.short_name ?: i.name) : i.name -}}
   </td>
   <td class="text-right" nowrap>
     <span class="editable"
-          data-pk="{{ i.id }}"
+          data-pk="{{ i.code }}"
           data-name="retail_price" data-value="{{ i.retail_price }}">
       {{ scat.amount(i.retail_price) }}
     </span>
   </td>
   <td class="text-right" nowrap>
     <span class="editable"
-          data-pk="{{ i.id }}"
+          data-pk="{{ i.code }}"
           data-name="discount" data-value="{{ i.discount }}">
       {{ scat.amount(i.sale_price) }}
       {% if i.discount_type in [ 'percentage', 'relative' ] %}
@@ -48,14 +48,14 @@
   </td>
   <td class="text-center">
     <span class="editable"
-          data-pk="{{ i.id }}"
+          data-pk="{{ i.code }}"
           data-name="stock" data-value="{{ i.stock }}">
       {{ i.stock }}
     </span>
   </td>
   <td class="text-center">
     <span class="editable"
-          data-pk="{{ i.id }}"
+          data-pk="{{ i.code }}"
           data-name="minimum_quantity" data-value="{{ i.minimum_quantity }}">
       {{ i.minimum_quantity }}
     </span>
