@@ -185,13 +185,13 @@ class Person extends \Scat\Model {
     // XXX using global $DEBUG
     if ($GLOBALS['DEBUG']) {
       $q= "DROP TABLE IF EXISTS vendor_upload";
-      if (!\ORM::raw_execute($q))
+      if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to drop 'vendor_upload'");
       $temporary= "";
     }
 
     $q= "CREATE $temporary TABLE vendor_upload LIKE vendor_item";
-    if (!\ORM::raw_execute($q))
+    if (!$this->orm->raw_execute($q))
       throw new \Exception("Unable to create 'vendor_upload'");
 
     /* START Vendors */
@@ -215,7 +215,7 @@ class Person extends \Scat\Model {
             SET vendor_sku = code, special_order = IF(@reno != 'R', 1, 0),
                 promo_quantity = purchase_quantity";
 
-      if (!\ORM::raw_execute($q))
+      if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load Mac data file");
 
     } elseif (preg_match('/^"?sls_sku"?(,|\t)/', $line, $m)) {
@@ -240,7 +240,7 @@ class Person extends \Scat\Model {
                 oversized = IF(@ltl_only = 'Y', 1, NULL),
                 promo_quantity = purchase_quantity";
 
-      if (!\ORM::raw_execute($q))
+      if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load SLS data file");
 
     } elseif (preg_match('/Alvin SRP/', $line)) {
@@ -268,7 +268,7 @@ class Person extends \Scat\Model {
             SET vendor_sku = code,
                 promo_quantity = purchase_quantity";
 
-      if (!\ORM::raw_execute($q))
+      if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load Alvin data file");
 
     } elseif (preg_match('/Golden Ratio/', $line)) {
@@ -298,13 +298,13 @@ class Person extends \Scat\Model {
                 promo_quantity = purchase_quantity,
                 name = IF(@size, CONCAT(@size, ' ', @description), @description)";
 
-      if (!\ORM::raw_execute($q))
+      if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load Masterpiece data file");
 
       // toss junk from header lines
       $q= "DELETE FROM vendor_upload WHERE purchase_quantity = 0";
 
-      if (!\ORM::raw_execute($q))
+      if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load Masterpiece data file");
 
     } else {
@@ -336,27 +336,27 @@ class Person extends \Scat\Model {
                promo_quantity = IF(@promo_quantity, @promo_quantity,
                                    IF(@promo_price, purchase_quantity, NULL))";
 
-      if (!\ORM::raw_execute($q))
+      if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load generic data file");
     }
     /* END Vendors */
 
     /* Just toss bad barcodes to avoid grief */
     $q= "UPDATE vendor_upload SET barcode = NULL WHERE LENGTH(barcode) < 3";
-    if (!\ORM::raw_execute($q))
+    if (!$this->orm->raw_execute($q))
       throw new \Exception("Unable to toss bad barcodes");
 
     /* If we are replacing vendor data, mark the old stuff inactive */
     if ($action == 'replace') {
       $q= "UPDATE vendor_item SET active = 0 WHERE vendor_id = {$this->id}";
-      if (!\ORM::raw_execute($q))
+      if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to deactive old items");
     }
     /* If this is a promo, unset existing promos for this vendor */
     if ($action == 'promo') {
       $q= "UPDATE vendor_item SET promo_price = NULL, promo_quantity = NULL
             WHERE vendor_id = {$this->id}";
-      if (!\ORM::raw_execute($q))
+      if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to clear old promos");
     }
 
@@ -417,7 +417,7 @@ class Person extends \Scat\Model {
            active = 1
          ";
 
-    if (!\ORM::raw_execute($q))
+    if (!$this->orm->raw_execute($q))
       throw new \Exception("Unable to add and update items");
 
     $added_or_updated= $db->affected_rows;
@@ -429,7 +429,7 @@ class Person extends \Scat\Model {
                               0)
          WHERE vendor_id = {$this->id}
            AND (item_id IS NULL OR item_id = 0)";
-    if (!\ORM::raw_execute($q))
+    if (!$this->orm->raw_execute($q))
       throw new \Exception("Unable to match items by code");
 
     // Find by barcode
@@ -442,7 +442,7 @@ class Person extends \Scat\Model {
            AND (item_id IS NULL OR item_id = 0)
            AND barcode IS NOT NULL
            AND barcode != ''";
-    if (!\ORM::raw_execute($q))
+    if (!$this->orm->raw_execute($q))
       throw new \Exception("Unable to match items by barcode");
 
     return [ "result" => "Added or updated " . $added_or_updated . " items." ];
