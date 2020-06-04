@@ -7,7 +7,7 @@ if (!$id) die("No transaction specified.");
 
 date_default_timezone_set('America/Los_Angeles');
 
-$txn= \Model::factory('Txn')->find_one($id);
+$txn= \Titi\Model::factory('Txn')->find_one($id);
 $variation= $_REQUEST['variation'];
 
 $fn= (($txn->type == 'vendor') ? 'PO' : 'I') .
