@@ -115,7 +115,20 @@ class ScatUtils {
     }
   }
 
-  call (url, args, opts) {
+  _handleResponse (res) {
+    if (res.status >= 200 && res.status < 300) {
+      return Promise.resolve(res)
+    }
+    if (res.headers.get('Content-type').indexOf("application/json") !== -1) {
+      return res.json()
+                .then((data) => {
+                  return Promise.reject(new Error(data.exception[0].message))
+                })
+    }
+    return Promise.reject(new Error(res.statusText))
+  }
+
+  post (url, args, opts) {
     const formData= args instanceof FormData ? args : new FormData()
 
     // XXX should verify that url is not remove since we trust content
@@ -131,51 +144,29 @@ class ScatUtils {
       headers: { 'Accept': 'application/json' },
       body: formData
     })
-    .then((response) => {
-      if (response.status >= 200 && response.status < 300) {
-        return Promise.resolve(response)
-      }
-      if (res.headers.get('Content-type').indexOf("application/json") !== -1) {
-        return res.json()
-                  .then((data) => {
-                    return Promise.reject(new Error(data.exception[0].message))
-                  })
-      }
-      return Promise.reject(new Error(response.statusText))
-    })
-    .then((response) => {
-      /* Look for some headers to change title, reload page sections */
-      let title= response.headers.get('X-Scat-Title')
-      if (title) {
-        window.document.title= title
-      }
+    .then((response) => this._handleResponse(response))
+  }
 
-      if (response.headers.has('X-Scat-Reload')) {
-        let tokens= response.headers.get('X-Scat-Reload')
-        tokens.split(',').forEach((token) => {
-          console.log("Requested reload of " + token.trim())
-          let el= document.getElementById(token.trim())
-          if (el && el.hasAttribute('data-reload')) {
-            let reload= el.getAttribute('data-reload')
-            fetch(reload)
-            .then((res) => {
-              if (res.status >= 200 && res.status < 300) {
-                return Promise.resolve(res)
-              }
-              return Promise.reject(new Error(res.statusText))
-            })
-            .then((res) => res.text())
-            .then((text) => {
-              // Yes, we trust this HTML
-              el.innerHTML= text
-            })
-          } else {
-            console.error(`Could not find "${token}" to be replaced`)
-          }
-        })
+  call (url, args, opts) {
+    return this.post(url, args, opts)
+  }
+
+  get (url, args, opts) {
+    const formData= args instanceof FormData ? args : new FormData()
+
+    // XXX should verify that url is not remove since we trust content
+
+    if (!(args instanceof FormData)) {
+      for (let prop in args) {
+        formData.append(prop, args[prop])
       }
-      return response
+    }
+
+    let query= new URLSearchParams(formData).toString()
+    return fetch(url + (query ? '?' + query : ''), {
+      method: 'GET',
     })
+    .then((response) => this._handleResponse(response))
   }
 
   patch (url, args, opts) {
@@ -197,23 +188,12 @@ class ScatUtils {
       },
       body: JSON.stringify(Object.fromEntries(formData))
     })
-    .then((res) => {
-      if (res.status >= 200 && res.status < 300) {
-        return Promise.resolve(res)
-      }
-      if (res.headers.get('Content-type').indexOf("application/json") !== -1) {
-        return res.json()
-                  .then((data) => {
-                    return Promise.reject(new Error(data.exception[0].message))
-                  })
-      }
-      return Promise.reject(new Error(res.statusText))
-    })
+    .then((response) => this._handleResponse(response))
   }
 
   api (func, args, opts) {
     let url= '/api/' + func + '.php';
-    return this.call(url, args, opts)
+    return this.post(url, args, opts)
   }
 
   print (url, args) {

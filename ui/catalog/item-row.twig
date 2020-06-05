@@ -22,11 +22,17 @@
       {{- i.code -}}
     </a>
   </td>
-  <td style="{{ s.style_item_color(i.color) }}">
+  <td class="item-name" style="{{ s.style_item_color(i.color) }}">
     <span class="editable"
           data-pk="{{ i.code }}"
-          data-name="{{ variations|length ? 'short_name' : 'name' }}">
-    {{- variations|length ? (i.short_name ?: i.name) : i.name -}}
+          data-name="name">
+    {{- i.name -}}
+  </td>
+  <td class="item-short-name" style="{{ s.style_item_color(i.color) }}">
+    <span class="editable"
+          data-pk="{{ i.code }}"
+          data-name="short_name">
+    {{- i.short_name -}}
   </td>
   <td class="text-right" nowrap>
     <span class="editable"
@@ -94,16 +100,23 @@
       .then((res) => res.json())
     },
     success: (response, newValue) => {
-      if (response.error) { return response.error }
-      if (response.replaceRow) {
-        let replace= scat.htmlToElement(response.replaceRow)
+      if (response.exception.length) {
+        return response.exception[0].message
+      }
+      scat.get('/catalog/item/' + response.code + '?row=1')
+      .then((res) => res.text())
+      .then((text) => {
+        let replace= scat.htmlToElement(text)
         row.replaceWith(replace)
         // Re-inject the script to get it to execute
         let code= replace.getElementsByTagName('script')[0].innerHTML
         let script= document.createElement('script')
         script.appendChild(document.createTextNode(code))
         replace.appendChild(script).parentNode.removeChild(script)
-      }
+      })
+      .catch((err) => {
+        scat.alert('danger', err.message)
+      })
     }
   }).on('shown', function (e, editable) {
     // Can't just do this directly because $input isn't focused yet

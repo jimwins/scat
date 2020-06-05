@@ -315,6 +315,12 @@ class Catalog {
       return $response->withJson($item);
     }
 
+    if (($row= $request->getParam('row'))) {
+      return $this->view->render($response, 'catalog/item-row.twig', [
+        'i' => $item,
+      ]);
+    }
+
     if (($block= $request->getParam('block'))) {
       $html= $this->view->fetchBlock('catalog/item.html', $block, [
         'item' => $item,
@@ -383,14 +389,7 @@ class Catalog {
 
     $this->data->commit();
 
-    return $response->withJson([
-      'item' => $item,
-      'replaceRow' => $this->view->fetch('catalog/item-row.twig', [
-                       'i' => $item,
-                       'variations' => $item->variation,
-                       'product' => $item->product_id,
-                     ])
-    ]);
+    return $response->withJson($item);
   }
 
   public function printItemLabel(Request $request, Response $response, $code) {
@@ -661,7 +660,7 @@ class Catalog {
         $variations= array_unique(
           array_map(function ($i) {
             return $i->variation;
-          }, $items));
+          }, (array)$items));
       }
 
       $brands= $deptO ? null : $this->catalog->getBrands();
