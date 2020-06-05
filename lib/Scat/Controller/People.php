@@ -90,7 +90,7 @@ class People {
       throw new \Exception("That person is not a vendor.");
     }
 
-    $limit= 25;
+    $limit= $request->getParam('limit') ?: 25;
 
     $q= $request->getParam('q');
 
