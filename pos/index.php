@@ -180,6 +180,8 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
       ->setName('catalog-item');
   $app->post('/item',
               [ \Scat\Controller\Catalog::class, 'updateItem' ]);
+  $app->post('/item/~bulk-add',
+              [ \Scat\Controller\Catalog::class, 'bulkAddItems' ]);
   $app->patch('/item/{code:.*}',
               [ \Scat\Controller\Catalog::class, 'updateItem' ]);
 

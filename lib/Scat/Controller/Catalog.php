@@ -392,6 +392,49 @@ class Catalog {
     return $response->withJson($item);
   }
 
+  public function bulkAddItems(Request $request, Response $response) {
+    $this->data->beginTransaction();
+
+    $items= $request->getParam('items');
+
+    foreach (explode(',', $items) as $item) {
+      $vendor_item= $this->catalog->getVendorItemById($item);
+      if (!$vendor_item)
+        throw new \Slim\Exception\HttpNotFoundException($request);
+
+      $item= $this->catalog->createItem();
+      $item->code= $vendor_item->code;
+      $item->name= $vendor_item->name;
+      $item->retail_price= $vendor_item->retail_price;
+      $item->purchase_quantity= $vendor_item->purchase_quantity;
+      $item->length= $vendor_item->length;
+      $item->width= $vendor_item->width;
+      $item->height= $vendor_item->height;
+      $item->weight= $vendor_item->weight;
+      $item->prop65= $vendor_item->prop65;
+      $item->hazmat= $vendor_item->hazmat;
+      $item->oversized= $vendor_item->oversized;
+
+      $item->save();
+
+      if ($vendor_item->barcode) {
+        $barcode= $item->barcodes()->create();
+        $barcode->code= $vendor_item->barcode;
+        $barcode->item_id= $item->id;
+        $barcode->save();
+      }
+
+      if (!$vendor_item->item) {
+        $vendor_item->item_id= $item->id;
+        $vendor_item->save();
+      }
+    }
+
+    $this->data->commit();
+
+    return $response->withJson($item);
+  }
+
   public function printItemLabel(Request $request, Response $response, $code) {
     $item= $this->catalog->getItemByCode($code);
     if (!$item)
