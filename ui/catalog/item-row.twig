@@ -100,7 +100,7 @@
       .then((res) => res.json())
     },
     success: (response, newValue) => {
-      if (response.exception.length) {
+      if (response.exception && response.exception.length) {
         return response.exception[0].message
       }
       scat.get('/catalog/item/' + response.code + '?row=1')
