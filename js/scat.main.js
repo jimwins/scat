@@ -205,19 +205,9 @@ class ScatUtils {
       }
     }
 
-    return fetch(url, {
-      method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      body: formData
-    })
-    .then((response) => {
-      if (response.status >= 200 && response.status < 300) {
-        return Promise.resolve(response)
-      }
-      return Promise.reject(new Error(response.statusText))
-    })
+    return scat.post(url, formData)
     .then((res) => {
-      if (res.headers.get('Content-type').indexOf("application/pdf") != 1) {
+      if (res.headers.get('Content-type').includes("application/pdf")) {
         res.blob().then((blob) => {
           /* XXX
            * This doesn't work with Firefox, because it uses PDF.js
@@ -235,7 +225,7 @@ class ScatUtils {
           document.body.appendChild(lpr)
         })
       } else
-      if (res.headers.get('Content-type').indexOf("application/json") == -1) {
+      if (!res.headers.get('Content-type').includes("application/json")) {
         res.text().then((html) => {
           let lpr= document.createElement('iframe')
           lpr.style.display= 'none'
@@ -247,7 +237,7 @@ class ScatUtils {
         })
       } else {
         res.json().then((data) => {
-          scat.alert('success', data.message)
+          scat.alert('success', data.result)
         })
       }
     })
