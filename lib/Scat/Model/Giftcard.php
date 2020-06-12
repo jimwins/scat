@@ -62,7 +62,7 @@ class Giftcard extends \Scat\Model {
   public function getPDF() {
     $card= $this->id . $this->pin;
 
-    $balance= 0.00;
+    $balance= new \Decimal\Decimal(0);
 
     $txns= $this->txns()
              ->select('*')
@@ -75,8 +75,7 @@ class Giftcard extends \Scat\Model {
              ->find_many();
 
     foreach ($txns as $txn) {
-      $balance= (string)(new \Decimal\Decimal($balance) +
-                          new \Decimal\Decimal($txn->amount))->round(2);
+      $balance= $balance + new \Decimal\Decimal($txn->amount);
     }
 
     $issued= (new \Datetime($this->issued))->format('l, F j, Y');
@@ -101,6 +100,7 @@ class Giftcard extends \Scat\Model {
     $pdf->SetFontSize(($basefontsize= 18));
 
     if ($balance) {
+      $balance= (string)$balance->round(2);
       $width= $pdf->GetStringWidth('$' . $balance);
       $pdf->SetXY(4.25 - ($width / 2), 2.5);
       $pdf->Write(0, '$' . $balance);
