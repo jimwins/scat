@@ -26,7 +26,7 @@ class Giftcard extends \Scat\Model {
 
   public function jsonSerialize() {
     $history= array();
-    $balance= 0.00;
+    $balance= new \Decimal\Decimal(0);
     $latest= "";
 
     $txns= $this->txns()
@@ -44,8 +44,7 @@ class Giftcard extends \Scat\Model {
                          'amount' => $txn->amount,
                          'txn_id' => $txn->txn_id,
                          'txn_name' => $txn->txn_name );
-      $balance= (string)(new \Decimal\Decimal($balance) +
-                          new \Decimal\Decimal($txn->amount))->round(2);
+      $balance= $balance + new \Decimal\Decimal($txn->amount);
       $latest= $txn->entered;
     }
 
@@ -55,7 +54,7 @@ class Giftcard extends \Scat\Model {
       'card' => $this->id . $this->pin,
       'expires' => $this->expires,
       'history' => $history,
-      'balance' => $balance,
+      'balance' => (string)$balance->round(2),
       'latest' => $latest,
     );
   }
