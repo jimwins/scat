@@ -738,6 +738,22 @@ class Transactions {
 
     $details= $shipping->getShipment($shipment->easypost_id);
 
+    if ($PNG) {
+      $png= file_get_contents($details->postage_label->label_url);
+
+      return $print->printPNG($response, 'shipping-label', $png);
+    }
+
+    if ($ZPL) {
+      if (!$details->postage_label->label_zpl_url) {
+        $details->label([ 'file_format' => 'zpl' ]);
+      }
+
+      $zpl= file_get_contents($details->postage_label->label_zpl_url);
+
+      return $print->printZPL($response, 'shipping-label', $zpl);
+    }
+
     if (!$details->postage_label->label_pdf_url) {
       $details->label([ 'file_format' => 'pdf' ]);
     }
