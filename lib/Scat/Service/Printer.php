@@ -109,14 +109,24 @@ class Printer
     );
 
     $job= new \Smalot\Cups\Model\Job();
-    $job->setName('job create file');
+    $job->setName('label.png');
     $job->setCopies(1);
     $job->setPageRanges('1-1000');
-    $job->addText($png, '', 'image/png');
+
+    /* Using addText doesn't work for some reason, so just make a tmpfile */
+    $tmpfn= tempnam(sys_get_temp_dir(), 'Scat');
+    file_put_contents($tmpfn, $png);
+
+    $job->addFile($tmpfn, 'label.png', 'image/png');
+    $job->addAttribute('Rotate', '2');
+    $job->addAttribute('PageSize', 'Custom.6x4in');
+
     if ($modifier == 'open') {
       $job->addAttribute('CashDrawerSetting', '1OpenDrawer1');
     }
     $result= $jobManager->send($printer, $job);
+
+    unlink($tmpfn);
 
     return $response->withJson([ 'result' => 'Printed.' ]);
   }

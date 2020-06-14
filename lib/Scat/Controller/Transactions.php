@@ -738,6 +738,8 @@ class Transactions {
 
     $details= $shipping->getShipment($shipment->easypost_id);
 
+    $PNG= 1;
+
     if ($PNG) {
       $png= file_get_contents($details->postage_label->label_url);
 
