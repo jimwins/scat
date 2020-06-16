@@ -250,7 +250,8 @@ class Txn extends \Scat\Model {
     }
 
     if ($this->shipping_address_id > 1) {
-      throw new \Exception("Don't know how to calculate tax on shipped orders.");
+      error_log("Don't know how to calculate tax on shipped orders.");
+      return;
     }
 
     /*
