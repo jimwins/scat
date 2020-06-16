@@ -837,10 +837,11 @@ class Transactions {
     /* Select a rate? */
     if (($rate_id= $request->getParam('rate_id'))) {
       $ep= $shipping->getShipment($shipment->easypost_id);
-      $ep->buy([
-        'rate' => [ 'id' => $rate_id ],
-        'insurance' => $txn->subtotal()
-      ]);
+      $details= [ 'rate' => [ 'id' => $rate_id ] ];
+      if ($txn->subtotal()) {
+        $details['insurance']= $txn->subtotal();
+      }
+      $ep->buy($details);
 
       $shipment->status= 'unknown';
       $shipment->tracker_id= $ep->tracker->id;
