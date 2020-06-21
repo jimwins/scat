@@ -180,8 +180,11 @@ class Item extends \Scat\Model {
       $cxn= self::factory('Txn')
         ->where_raw("type = 'correction' AND DATE(NOW()) = DATE(created)")
         ->find_one();
+
+      // XXX this is kind of gross, need to think about alternative here
       if (!$cxn) {
-        $cxn= \Scat\Model\Txn::create([ 'type' => 'correction', 'tax_rate' => 0 ]);
+        $txn= $GLOBALS['container']->get('\\Scat\\Service\\Txn');
+        $cxn= $txn->create('correction');
       }
 
       $diff= $stock - $current;
