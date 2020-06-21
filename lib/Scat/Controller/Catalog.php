@@ -750,7 +750,7 @@ class Catalog {
       #'google_product_category',
       'product_type',
       'inventory',
-      'shipping_rate'
+      'shipping_label'
     ];
 
     //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
