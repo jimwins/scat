@@ -504,6 +504,16 @@ class Catalog {
     return $response->withJson($item);
   }
 
+  public function itemGetMedia(Request $request, Response $response,
+                                \Scat\Service\Media $media, $code)
+  {
+    $item= $code ? $this->catalog->getItemByCode($code) : null;
+    if ($code && !$item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    return $response->withJson($item->media);
+  }
+
   public function itemAddMedia(Request $request, Response $response,
                                 \Scat\Service\Media $media, $code)
   {
