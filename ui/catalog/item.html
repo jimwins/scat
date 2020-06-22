@@ -657,6 +657,10 @@
       let name= ev.target.getAttribute('data-name')
       let value= current === '1' ? 0 : 1
 
+      let icon= toggle.querySelector('i')
+      icon.classList.remove('fa-square-o','fa-check-square-o')
+      icon.classList.add('fa-spin','fa-spinner')
+
       fetch("/catalog/item/{{ item.code }}", {
         method: 'PATCH',
         headers: {
@@ -667,11 +671,10 @@
       })
       .then((res) => res.json())
       .then((data) => {
-        let icon= toggle.querySelector('i')
-        icon.classList.remove('fa-square-o','fa-check-square-o')
-        icon.classList.add(data.item[name] !== 0 ?
+        icon.classList.remove('fa-spin','fa-spinner')
+        icon.classList.add(data[name] !== 0 ?
                            'fa-check-square-o' : 'fa-square-o')
-        toggle.setAttribute('data-value', data.item[name])
+        toggle.setAttribute('data-value', data[name])
       })
     }
 
