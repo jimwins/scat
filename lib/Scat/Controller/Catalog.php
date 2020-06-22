@@ -511,7 +511,7 @@ class Catalog {
     if ($code && !$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    return $response->withJson($item->media);
+    return $response->withJson($item->media());
   }
 
   public function itemAddMedia(Request $request, Response $response,

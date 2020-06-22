@@ -1009,20 +1009,20 @@
         },
         {
             "name": "jimwins/titi",
-            "version": "v0.0.2",
+            "version": "v0.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jimwins/titi.git",
-                "reference": "bb75a80dda2bb3e84e9026523576183c3ff0ce02"
+                "reference": "0e24cc102a16e197206e90078e98affe99345613"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jimwins/titi/zipball/bb75a80dda2bb3e84e9026523576183c3ff0ce02",
-                "reference": "bb75a80dda2bb3e84e9026523576183c3ff0ce02",
+                "url": "https://api.github.com/repos/jimwins/titi/zipball/0e24cc102a16e197206e90078e98affe99345613",
+                "reference": "0e24cc102a16e197206e90078e98affe99345613",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.0"
+                "php": ">=5.3.0"
             },
             "require-dev": {
                 "ext-pdo_sqlite": "*",
@@ -1057,7 +1057,7 @@
                 "query builder",
                 "titi"
             ],
-            "time": "2020-05-19T05:38:18+00:00"
+            "time": "2020-06-22T17:46:38+00:00"
         },
         {
             "name": "kriswallsmith/assetic",
@@ -5041,6 +5041,7 @@
                 "slack",
                 "yarn"
             ],
+            "abandoned": true,
             "time": "2019-06-27T06:47:18+00:00"
         }
     ],
