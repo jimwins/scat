@@ -7,7 +7,7 @@ $id= (int)$_REQUEST['txn'];
 if (!$id)
   die_jsonp("no transaction specified.");
 
-$txn= Model::factory('Txn')->find_one($id);
+$txn= \Titi\Model::factory('Txn')->find_one($id);
 $txn->clearItems();
 
 // XXX replace when Txn serializes same as txn_load gives us
