@@ -820,14 +820,19 @@ class Transactions {
         $parcel['predefined_package']= $predefined_package;
       }
 
+      $options= [
+        'invoice_number' => $txn->formatted_number(),
+      ];
+      if ($request->getParam('ormd')) {
+        $options['hazmat']= 'ORMD';
+      }
+
       $extra= $shipping->createShipment([
         'from_address' => $shipping->getDefaultFromAddress(),
         'to_address' =>
           $shipping->retrieveAddress($txn->shipping_address()->easypost_id),
         'parcel' => $parcel,
-        'options' => [
-          'invoice_number' => $txn->formatted_number(),
-        ],
+        'options' => $options,
       ]);
 
       $shipment->easypost_id= $extra->id;
