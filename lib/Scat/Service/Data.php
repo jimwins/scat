@@ -50,6 +50,10 @@ class Data
     return \Titi\Model::factory($name);
   }
 
+  public function configure($name) {
+    return \Titi\ORM::configure($name);
+  }
+
   public function for_table($name) {
     return \Titi\ORM::for_table($name);
   }
