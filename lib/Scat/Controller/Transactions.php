@@ -953,11 +953,15 @@ class Transactions {
     $page= (int)$request->getParam('page');
     $limit= 25;
     $txns= $this->txn->find('vendor', $page, $limit);
+    if (($status= $request->getParam('status'))) {
+      $txns= $txns->where('status', $status);
+    }
     return $this->view->render($response, 'txn/index.html', [
       'type' => 'vendor',
       'txns' => $txns->find_many(),
       'page' => $page,
       'limit' => $limit,
+      'status' => $status,
     ]);
   }
 
