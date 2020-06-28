@@ -135,7 +135,7 @@ class Txn extends \Scat\Model {
 
   public function allocated() {
     $total= $this->_loadTotals();
-    return $total['ordered'];
+    return $total['allocated'];
   }
 
   public function getInvoicePDF($variation= '') {
