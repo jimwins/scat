@@ -162,7 +162,7 @@ while ($row= $r->fetch_assoc()) {
     $change= (($row['current_amount'] - $row['previous_amount']) / $row['previous_amount']) * 100;
   }
 ?>
-  <tr class="XXX<?=($change < 0) ? 'danger' : ($change > 100) ? 'success' : ''?>">
+  <tr class="XXX<?=($change < 0) ? 'danger' : (($change > 100) ? 'success' : '')?>">
    <td><a href="/report/categor?begin=<?=ashtml($begin)?>&end=<?=ashtml($end)?>&items=<?=ashtml($items)?>+brand:<?=$row['slug']?>"><?=ashtml($row['name'])?></a></td>
    <td align="right"><?=amount($row['current_amount'])?></td>
    <td align="right"><?=amount($row['previous_amount'])?></td>
