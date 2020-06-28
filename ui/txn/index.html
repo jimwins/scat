@@ -1,5 +1,10 @@
 {% extends 'layout/page.html' %}
 {% import 'macros.twig' as scat %}
+{% if type == 'vendor' %}
+  {% set variations= [ 'new', 'filled', 'template' ] %}
+{% else %}
+  {% set variations= [ 'new', 'filled', 'paid', 'processing', 'shipped', 'complete', 'template' ] %}
+{% endif %}
 
 {% block controls %}
 <nav>
@@ -7,7 +12,7 @@
       <li {{ '' == status ? 'class="active"' }}>
         <a href="?">All</a>
       </li>
-      {% for s in [ 'new', 'filled', 'paid', 'processing', 'shipped', 'complete', 'template' ] %}
+      {% for s in variations %}
         <li {{ s == status ? 'class="active"' }}>
           <a href="?status={{ s }}">{{ s|title }}</a>
         </li>
