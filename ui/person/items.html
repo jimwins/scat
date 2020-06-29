@@ -117,7 +117,7 @@
 
       scat.post('/catalog/item/~bulk-add', { items: items })
       .then((res) => {
-        debugger
+        scat.alert('info', "Added items.")
       })
     })
   }
