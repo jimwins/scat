@@ -403,8 +403,8 @@ class Catalog {
         throw new \Slim\Exception\HttpNotFoundException($request);
 
       $item= $this->catalog->createItem();
-      $item->code= $vendor_item->code;
-      $item->name= $vendor_item->name;
+      $item->code= trim($vendor_item->code);
+      $item->name= trim($vendor_item->name);
       $item->retail_price= $vendor_item->retail_price;
       $item->purchase_quantity= $vendor_item->purchase_quantity;
       $item->length= $vendor_item->length;
