@@ -186,6 +186,9 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->post('/item/{code:.*}/~print-label',
             [ \Scat\Controller\Catalog::class, 'printItemLabel' ]);
 
+  $app->post('/item/{code:.*}/~merge',
+            [ \Scat\Controller\Catalog::class, 'mergeItem' ]);
+
   $app->post('/item/{code:.*}/barcode',
             [ \Scat\Controller\Catalog::class, 'addItemBarcode' ]);
   $app->patch('/item/{code:.*}/barcode/{barcode:.*}',

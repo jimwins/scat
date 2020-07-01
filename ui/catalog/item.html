@@ -542,6 +542,10 @@
     </div>
   </div>
 
+  <button id="merge-item" class="btn btn-default">
+    Merge Item
+  </button>
+
 {% endblock %}
 
 {% block script %}
@@ -815,6 +819,21 @@
           }
           alert(message);
         })
+      }
+    })
+
+    document.getElementById('merge-item').addEventListener('click', (ev) => {
+      let to= window.prompt("What item should we merge this into?", "")
+      if (to) {
+        scat.post('/catalog/item/' + to + '/~merge',
+                  { from: '{{ item.code }}' })
+            .then((res) => res.json())
+            .then((data) => {
+              window.location.href= data.code
+            })
+            .catch((err) => {
+              scat.alert('danger', err.message)
+            })
       }
     })
 

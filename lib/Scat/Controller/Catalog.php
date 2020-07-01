@@ -445,6 +445,71 @@ class Catalog {
     return $response->withHeader("Content-type", "application/pdf");
   }
 
+  public function mergeItem(Request $request, Response $response, $code) {
+    $item= $this->catalog->getItemByCode($code);
+    if (!$item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $from= $this->catalog->getItemByCode($request->getParam('from'));
+    if (!$from)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if ($item->id == $from->id)
+      throw new \Exception("Can't merge an item into itself");
+
+    $this->data->beginTransaction();
+
+    /* Move over barcodes */
+    $q= "UPDATE IGNORE barcode
+            SET item_id = {$item->id}
+          WHERE item_id = {$from->id}";
+    $this->data->execute($q);
+
+    /* Leftovers? Nuke them. */
+    $q= "DELETE FROM barcode
+          WHERE item_id = {$from->id}";
+    $this->data->execute($q);
+
+    /* Move over images */
+    $q= "UPDATE IGNORE item_to_image
+            SET item_id = {$item->id}
+          WHERE item_id = {$from->id}";
+    $this->data->execute($q);
+
+    /* Leftovers? Nuke them. */
+    $q= "DELETE FROM item_to_image
+          WHERE item_id = {$from->id}";
+    $this->data->execute($q);
+
+    /* Change references to old item to new one */
+    $q= "UPDATE txn_line
+            SET item_id = {$item->id}
+          WHERE item_id = {$from->id}";
+    $this->data->execute($q);
+
+    $q= "UPDATE vendor_item
+            SET item_id = {$item->id}
+          WHERE item_id = {$from->id}";
+    $this->data->execute($q);
+
+    $q= "UPDATE loyalty_reward
+            SET item_id = {$item->id}
+          WHERE item_id = {$from->id}";
+    $this->data->execute($q);
+
+    $q= "UPDATE note
+            SET attach_id = {$item->id}
+          WHERE attach_id = {$from->id}
+            AND kind = 'item'";
+    $this->data->execute($q);
+
+    $from->delete();
+
+    $this->data->commit();
+
+    return $response->withJson($item);
+  }
+
   public function addItemBarcode(Request $request, Response $response, $code) {
     $item= $this->catalog->getItemByCode($code);
     if (!$item)
