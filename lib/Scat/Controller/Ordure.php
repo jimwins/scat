@@ -217,9 +217,15 @@ class Ordure {
 
         $this->data->beginTransaction();
 
-        $person= $this->data->factory('Person')->where('email', $data->sale->email)
+        if ($data->sale->person_id) {
+          $person=
+            $this->data->factory('Person')->find_one($data->sale->person_id);
+        } elseif ($data->sale->name) {
+          $person=
+            $this->data->factory('Person')->where('email', $data->sale->email)
                                           ->where('active', 1)
                                           ->find_one();
+        }
 
         /* Didn't find them? Create them. */
         if (!$person) {
