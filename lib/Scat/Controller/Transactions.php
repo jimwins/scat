@@ -971,26 +971,26 @@ class Transactions {
     $all= (int)$request->getParam('all');
 
     $vendor_code= "NULL";
-    $vendor= (int)$request->getParam('vendor');
-    if ($vendor > 0) {
-      $vendor_code= "(SELECT code FROM vendor_item WHERE vendor_id = $vendor AND item_id = item.id AND vendor_item.active LIMIT 1)";
+    $vendor_id= (int)$request->getParam('vendor_id');
+    if ($vendor_id > 0) {
+      $vendor_code= "(SELECT code FROM vendor_item WHERE vendor_id = $vendor_id AND item_id = item.id AND vendor_item.active LIMIT 1)";
       $extra= "AND EXISTS (SELECT id
                              FROM vendor_item
-                            WHERE vendor_id = $vendor
+                            WHERE vendor_id = $vendor_id
                               AND item_id = item.id
                               AND vendor_item.active)";
       $extra_field= "(SELECT MIN(IF(promo_quantity, promo_quantity,
                                     purchase_quantity))
                         FROM vendor_item
                        WHERE item_id = item.id
-                         AND vendor_id = $vendor
+                         AND vendor_id = $vendor_id
                          AND vendor_item.active)
                       AS minimum_order_quantity,
                      (SELECT MIN(IF(promo_price, promo_price, net_price))
                         FROM vendor_item
                         JOIN person ON vendor_item.vendor_id = person.id
                       WHERE item_id = item.id
-                        AND vendor_id = $vendor
+                        AND vendor_id = $vendor_id
                         AND vendor_item.active)
                       AS cost,
                      (SELECT MIN(IF(promo_price, promo_price, net_price)
@@ -998,7 +998,7 @@ class Transactions {
                         FROM vendor_item
                         JOIN person ON vendor_item.vendor_id = person.id
                       WHERE item_id = item.id
-                        AND vendor_id = $vendor
+                        AND vendor_id = $vendor_id
                         AND vendor_item.active) -
                      (SELECT MIN(IF(promo_price, promo_price, net_price)
                                  * ((100 - vendor_rebate) / 100))
@@ -1006,11 +1006,11 @@ class Transactions {
                         JOIN person ON vendor_item.vendor_id = person.id
                        WHERE item_id = item.id
                          AND NOT special_order
-                         AND vendor_id != $vendor
+                         AND vendor_id != $vendor_id
                          AND vendor_item.active)
                      cheapest, ";
       $extra_field_name= "minimum_order_quantity, cheapest, cost,";
-    } else if ($vendor < 0) {
+    } else if ($vendor_id < 0) {
       // No vendor
       $extra= "AND NOT EXISTS (SELECT id
                                  FROM vendor_item
@@ -1071,13 +1071,13 @@ class Transactions {
       'items' => $items,
       'all' => $all,
       'code' => $code,
-      'vendor' => $vendor,
-      'person' => $this->data->factory('Person')->find_one($vendor)
+      'vendor_id' => $vendor_id,
+      'person' => $this->data->factory('Person')->find_one($vendor_id)
     ]);
   }
 
   public function createPurchase(Request $request, Response $response) {
-    $vendor_id= $request->getParam('vendor');
+    $vendor_id= $request->getParam('vendor_id');
 
     error_log("Creating purchase for $vendor_id");
 
