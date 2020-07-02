@@ -191,6 +191,28 @@ class ScatUtils {
     .then((response) => this._handleResponse(response))
   }
 
+  delete (url, args, opts) {
+    const formData= args instanceof FormData ? args : new FormData()
+
+    // XXX should verify that url is not remove since we trust content
+
+    if (!(args instanceof FormData)) {
+      for (let prop in args) {
+        formData.append(prop, args[prop])
+      }
+    }
+
+    return fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then((response) => this._handleResponse(response))
+  }
+
   api (func, args, opts) {
     let url= '/api/' + func + '.php';
     return this.post(url, args, opts)

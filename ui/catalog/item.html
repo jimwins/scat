@@ -126,27 +126,30 @@
         <div class="panel-heading">
           <h3 class="panel-title">Barcodes</h3>
         </div>
-        <table id="barcodes" class="table table-striped">
-          <tbody>
-            {% for barcode in item.barcodes.find_many %}
-              <tr>
-                <td>{{ barcode.code }}</td>
-                <td class="edit-barcode-quantity"
-                    data-pk="{{ barcode.code }}"
-                    data-name="quantity">
-                  {{- barcode.quantity -}}
-                </td>
-                <td>
-                  <button type="button"
-                          class="btn btn-default btn-xs remove-barcode"
-                          data-barcode="{{ barcode.code }}">
-                    <i class="fa fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        {% block barcodes %}
+          <table id="barcodes" data-reload="barcodes"
+                 class="table table-striped">
+            <tbody>
+              {% for barcode in item.barcodes.find_many %}
+                <tr>
+                  <td>{{ barcode.code }}</td>
+                  <td class="edit-barcode-quantity"
+                      data-pk="{{ barcode.code }}"
+                      data-name="quantity">
+                    {{- barcode.quantity -}}
+                  </td>
+                  <td>
+                    <button type="button"
+                            class="btn btn-default btn-xs remove-barcode"
+                            data-barcode="{{ barcode.code }}">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endblock %}
 
         <div class="panel-footer">
           <button id="new-barcode" class="btn btn-default">
@@ -566,6 +569,28 @@
   </style>
   <script>
   {
+    function reloadBlock(el, def) {
+      let reload= el.closest('[data-reload]')
+      if (reload) {
+        reload= reload.getAttribute('data-reload')
+        return fetch('/catalog/item/{{ item.code }}/?block=' + reload)
+        .then((res) => {
+          return res.text()
+        })
+        .then ((text) => {
+          let html= scat.htmlToElement(text)
+          // force panels open
+          if (html.classList.contains('collapse'))
+            html.classList.add('in')
+          let div= document.getElementById(reload)
+          div.replaceWith(html)
+        })
+      } else {
+        el.innerText= def
+        return Promise.resolve(el)
+      }
+    }
+
     function editableContent() {
       let el= this
       let name= el.getAttribute('data-name')
@@ -585,22 +610,7 @@
             .then((res) => res.json())
             .then((data) => {
               $(el).popover('hide')
-
-              let reload= el.closest('[data-reload]')
-              if (reload) {
-                reload= reload.getAttribute('data-reload')
-                fetch('/catalog/item/{{ item.code }}/?block=' + reload)
-                .then((res) => {
-                  return res.text()
-                })
-                .then ((text) => {
-                  let html= scat.htmlToElement(text)
-                  let div= document.getElementById(reload)
-                  div.replaceWith(html)
-                })
-              } else {
-                el.innerText= data[name]
-              }
+              return reloadBlock(el, data[name])
             })
             .catch((err) => {
               let help= ev.target.querySelector('.help-block')
@@ -717,24 +727,17 @@
       }, 1)
     });
 
-    let removeBarcode= (ev) => {
-      let barcode= ev.target.closest('[data-barcode]').getAttribute('data-barcode')
-      return fetch("/catalog/item/{{ item.code }}/barcode/" + barcode, {
-        method: 'DELETE',
-        headers: {
-          'Accept': 'application/json'
-        }
-      })
-      .then((res) => {
-        if (!res.ok) {
-          return Promise.reject(new Error(res.statusText))
-        }
-        window.location.reload()
-      })
+    let removeBarcode= (barcode) => {
+      return scat.delete("/catalog/item/{{ item.code }}/barcode/" + barcode)
+            .then((res) => {
+              return reloadBlock(document.getElementById('barcodes'), "")
+            })
     }
-
-    document.querySelectorAll('.remove-barcode').forEach((toggle) => {
-      toggle.addEventListener('click', removeBarcode)
+    document.addEventListener('click', (ev) => {
+      if (ev.target.closest('.remove-barcode')) {
+        let barcode= ev.target.closest('[data-barcode]')
+        return removeBarcode(barcode.getAttribute('data-barcode'))
+      }
     })
 
     document.querySelector('#new-barcode').addEventListener('click', (ev) => {
@@ -743,7 +746,7 @@
 
       scat.call('/catalog/item/{{ item.code }}/barcode', { barcode: barcode })
       .then((res) => {
-        window.location.reload()
+        reloadBlock(document.getElementById('barcodes'), '')
       })
     })
 
@@ -766,31 +769,12 @@
       el.addEventListener('click', printBarcode)
     })
 
-    let reloadVendorItems= (act) => {
-      let reload= act.closest('[data-reload]')
-      if (reload) {
-        reload= reload.getAttribute('data-reload')
-        fetch('/catalog/item/{{ item.code }}/?block=' + reload)
-        .then((res) => {
-          return res.text()
-        })
-        .then ((text) => {
-          let html= scat.htmlToElement(text)
-          html.classList.add('in')
-          let div= document.getElementById(reload)
-          div.replaceWith(html)
-        })
-      } else {
-        el.innerText= data[name]
-      }
-    }
-
-    document.querySelector('#vendors').addEventListener('click', (ev) => {
+    document.addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'find-vendor-items') {
         scat.call('/catalog/item/{{ item.code }}/vendor-item', {})
         .then((res) => {
-          reloadVendorItems(act)
+          reloadBlock(act)
         })
       }
     })
@@ -810,18 +794,10 @@
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'unlink-vendor-item') {
         let id= ev.target.closest('[data-id]').getAttribute('data-id')
-        return fetch("/catalog/item/{{ item.code }}/vendor-item/" + id, {
-          method: 'DELETE',
-          headers: {
-            'Accept': 'application/json'
-          }
-        })
-        .then((res) => {
-          if (!res.ok) {
-            return Promise.reject(new Error(res.statusText))
-          }
-          reloadVendorItems(act)
-        })
+        return scat.delete("/catalog/item/{{ item.code }}/vendor-item/" + id)
+                    .then((res) => {
+                      reloadBlock(act)
+                    })
       }
     })
 
@@ -829,13 +805,8 @@
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'check-vendor-stock') {
         let id= ev.target.closest('[data-id]').getAttribute('data-id')
-        fetch('/catalog/vendor-item/' + id + '/stock')
-        .then((res) => {
-          if (!res.ok) {
-            return Promise.reject(new Error(res.statusText))
-          }
-          return res.json()
-        })
+        return scat.get('/catalog/vendor-item/' + id + '/stock')
+        .then((res) => res.json())
         .then((data) => {
           message= "";
           for (const [key, value] of Object.entries(data)) {
