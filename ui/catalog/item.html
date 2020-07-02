@@ -415,84 +415,89 @@
   </div><!-- .row -->
 
   <!-- Vendor Items -->
-  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel-group" id="accordion"
+       role="tablist" aria-multiselectable="true">
     <div class="panel panel-default">
       <div class="panel-heading" role="tab" id="vendorsHeader">
         <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" href="#vendors" aria-expanded="false" aria-controls="vendors">
           <h4 class="panel-title">Vendors</h4>
         </a>
       </div>
-      <div id="vendors" class="panel-collapse collapse" role="tabpanel" aria-labelledby="vendorsHeader">
-        <table class="table table-striped table-hover">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Company</th>
-              <th>Code</th>
-              <th>List</th>
-              <th>Net</th>
-              <th>Promo</th>
-              <th>Sale</th>
-              <th>Special?</th>
-              <th>Quantity</th>
-            </tr>
-          </thead>
-          <tfoot>
-            {# XXX implement #}
-            <tr>
-              <td colspan="9">
-                <button class="btn btn-primary"
-                        data-action="edit-vendor-item">
-                  Add Vendor Item
-                </button>
-                <button class="btn btn-primary"
-                        data-action="find-vendor-items">
-                  Find Vendor Items
-                </button>
-              </td>
-            </tr>
-          </tfoot>
-          <tbody>
-            {% for vi in item.vendor_items.find_many() %}
-              <tr data-id="{{ vi.id }}">
-                <td>
-                  <button type="button" class="btn btn-default btn-xs"
-                          data-action="edit-vendor-item">
-                    <i class="fa fa-edit"></i>
-                  </button>
-                  <button type="button" class="btn btn-default btn-xs"
-                          data-action="unlink-vendor-item">
-                    <i class="fa fa-unlink"></i>
-                  </button>
-                  {% if vi.vendor_id in [ 7, 3757 ] %}
-                    <button type="button" class="btn btn-default btn-xs"
-                          data-action="check-vendor-stock">
-                      <i class="fa fa-search"></i>
-                    </button>
-                  {% endif %}
-                </td>
-                <td>
-                  <a href="/person/{{ vi.vendor_id }}">
-                    {{ vi.vendor().friendly_name }}
-                  </a>
-                </td>
-                <td>{{ vi.code }}</td>
-                <td>{{ scat.amount(vi.retail_price) }}</td>
-                <td>{{ scat.amount(vi.net_price) }}</td>
-                <td>{{ scat.amount(vi.promo_price) }}</td>
-                <td>
-                  {{ scat.amount(vi.net_price / 0.6) }} -
-                  {{ scat.amount(vi.net_price / 0.5) }}
-                </td>
-                <td>
-                  <i class="fa {{ vi.special_order ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
-                </td>
-                <td>{{ vi.purchase_quantity }}</td>
+      {% block vendors %}
+        {% import 'macros.twig' as scat %}
+        <div id="vendors" data-reload="vendors" class="panel-collapse collapse"
+             role="tabpanel" aria-labelledby="vendorsHeader">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Company</th>
+                <th>Code</th>
+                <th>List</th>
+                <th>Net</th>
+                <th>Promo</th>
+                <th>Sale</th>
+                <th>Special?</th>
+                <th>Quantity</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tfoot>
+              {# XXX implement #}
+              <tr>
+                <td colspan="9">
+                  <button class="btn btn-primary"
+                          data-action="edit-vendor-item">
+                    Add Vendor Item
+                  </button>
+                  <button class="btn btn-primary"
+                          data-action="find-vendor-items">
+                    Find Vendor Items
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+            <tbody>
+              {% for vi in item.vendor_items.find_many() %}
+                <tr data-id="{{ vi.id }}">
+                  <td>
+                    <button type="button" class="btn btn-default btn-xs"
+                            data-action="edit-vendor-item">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-default btn-xs"
+                            data-action="unlink-vendor-item">
+                      <i class="fa fa-unlink"></i>
+                    </button>
+                    {% if vi.vendor_id in [ 7, 3757 ] %}
+                      <button type="button" class="btn btn-default btn-xs"
+                            data-action="check-vendor-stock">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="/person/{{ vi.vendor_id }}">
+                      {{ vi.vendor().friendly_name }}
+                    </a>
+                  </td>
+                  <td>{{ vi.code }}</td>
+                  <td>{{ scat.amount(vi.retail_price) }}</td>
+                  <td>{{ scat.amount(vi.net_price) }}</td>
+                  <td>{{ scat.amount(vi.promo_price) }}</td>
+                  <td>
+                    {{ scat.amount(vi.net_price / 0.6) }} -
+                    {{ scat.amount(vi.net_price / 0.5) }}
+                  </td>
+                  <td>
+                    <i class="fa {{ vi.special_order ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+                  </td>
+                  <td>{{ vi.purchase_quantity }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endblock %}
     </div>
   </div>
 
@@ -761,17 +766,36 @@
       el.addEventListener('click', printBarcode)
     })
 
+    let reloadVendorItems= (act) => {
+      let reload= act.closest('[data-reload]')
+      if (reload) {
+        reload= reload.getAttribute('data-reload')
+        fetch('/catalog/item/{{ item.code }}/?block=' + reload)
+        .then((res) => {
+          return res.text()
+        })
+        .then ((text) => {
+          let html= scat.htmlToElement(text)
+          html.classList.add('in')
+          let div= document.getElementById(reload)
+          div.replaceWith(html)
+        })
+      } else {
+        el.innerText= data[name]
+      }
+    }
+
     document.querySelector('#vendors').addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'find-vendor-items') {
         scat.call('/catalog/item/{{ item.code }}/vendor-item', {})
         .then((res) => {
-          window.location.reload()
+          reloadVendorItems(act)
         })
       }
     })
 
-    document.querySelector('#vendors').addEventListener('click', (ev) => {
+    document.addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'edit-vendor-item') {
         let vi= ev.target.closest('[data-id]')
@@ -782,7 +806,7 @@
       }
     })
 
-    document.querySelector('#vendors').addEventListener('click', (ev) => {
+    document.addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'unlink-vendor-item') {
         let id= ev.target.closest('[data-id]').getAttribute('data-id')
@@ -796,12 +820,12 @@
           if (!res.ok) {
             return Promise.reject(new Error(res.statusText))
           }
-          window.location.reload()
+          reloadVendorItems(act)
         })
       }
     })
 
-    document.querySelector('#vendors').addEventListener('click', (ev) => {
+    document.addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'check-vendor-stock') {
         let id= ev.target.closest('[data-id]').getAttribute('data-id')
