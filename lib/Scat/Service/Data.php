@@ -67,6 +67,6 @@ class Data
   }
 
   public function escape($value) {
-    return \Titi\ORM::get_pdo()->quote($value);
+    return \Titi\ORM::get_db()->quote($value);
   }
 }

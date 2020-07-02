@@ -263,7 +263,7 @@ class Transactions {
             $cellIterator= $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
             foreach ($cellIterator as $cell) {
-              $data[]= "'" . $this->data->escape($cell->getValue()) . "'";
+              $data[]= $this->data->escape($cell->getValue());
             }
             $rows[]= '(' . join(',', $data) . ')';
           }
