@@ -258,7 +258,7 @@ class Person extends \Scat\Model {
                barcode, purchase_quantity,
                @inner_pack, @case_pack, @trade_discount, @promo_discount,
                retail_price, net_price, @extended_net, @map_price,
-               @a, $assortments,
+               @a, $assortments
                @tariff, height, width, length, @cubic, weight)
               SET code = CONCAT('$prefix', vendor_sku),
                   weight = weight / 16,
