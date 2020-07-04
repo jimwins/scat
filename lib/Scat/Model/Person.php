@@ -243,6 +243,45 @@ class Person extends \Scat\Model {
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load SLS data file");
 
+    } elseif (preg_match('/(.*),,,,,,Customer #/', $line, $m)) {
+      $prefix= $m[1];
+      // ColArt
+#,Order,Product Code,Description,Health Label,Series,Bar Code,MOQ,Inner Pack,Case Pack,Trade Discount,Promo Discount,2020 MSRP,Net,Extended Net,,,N/A,N/A,N/A,N/A,N/A,N/A,Harmonized Tariff Codes,Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),,,,,,,,,,,,,,
+      $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+                INTO TABLE vendor_upload
+              FIELDS TERMINATED BY ','
+              OPTIONALLY ENCLOSED BY '\"'
+               LINES TERMINATED BY '\r\n'
+              IGNORE 1 LINES
+              (@a, @order, vendor_sku, name, @health_label, @series,
+               barcode, purchase_quantity,
+               @inner_pack, @case_pack, @trade_discount, @promo_discount,
+               retail_price, net_price, @extended_net, @map_price,
+               @a, @a, @a, @a, @a, @a, @a, @a,
+               @tariff, height, width, length, @cubic, weight)
+              SET code = CONCAT('$prefix', vendor_sku),
+                  weight = weight / 16,
+                  prop65 = IF(@health_label = '65', 1, 0)
+              ";
+
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to load ColArt data file");
+
+      // toss junk from header lines
+      $q= "DELETE FROM vendor_upload WHERE purchase_quantity = 0";
+
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to load Masterpiece data file");
+
+      /* ColArt files are just a chunk of the updates, by prefix */
+      $action= 'special';
+      $q= "UPDATE vendor_item
+              SET active = 0
+            WHERE vendor_id = {$this->id}
+              AND code LIKE '$prefix%'";
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to deactive old items");
+
     } elseif (preg_match('/Alvin SRP/', $line)) {
       // Alvin Account Pricing Report
 #Manufacturer	BrandName	SubBrand	AlvinItem#	Description	New	UoM	Alvin SRP	RegularMultiplier	RegularNet	CurrentMultiplier	CurrentNetPrice	CurrentPriceSource	SaleStarted	SaleExpiration	Buying Quantity (BQ)	DropShip	UPC or EAN	Weight	Length	Width	Height	Ship Truck	CountryofOrigin	HarmonizedCode	DropShipDiscount	CatalogPage	VendorItemNumber
