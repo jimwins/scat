@@ -986,6 +986,13 @@ class Transactions {
                          AND vendor_id = $vendor_id
                          AND vendor_item.active)
                       AS minimum_order_quantity,
+                     (SELECT MIN(vendor_item.id)
+                        FROM vendor_item
+                        JOIN person ON vendor_item.vendor_id = person.id
+                      WHERE item_id = item.id
+                        AND vendor_id = $vendor_id
+                        AND vendor_item.active)
+                      AS vendor_item_id,
                      (SELECT MIN(IF(promo_price, promo_price, net_price))
                         FROM vendor_item
                         JOIN person ON vendor_item.vendor_id = person.id
@@ -1009,7 +1016,7 @@ class Transactions {
                          AND vendor_id != $vendor_id
                          AND vendor_item.active)
                      cheapest, ";
-      $extra_field_name= "minimum_order_quantity, cheapest, cost,";
+      $extra_field_name= "minimum_order_quantity, vendor_item_id, cheapest, cost,";
     } else if ($vendor_id < 0) {
       // No vendor
       $extra= "AND NOT EXISTS (SELECT id

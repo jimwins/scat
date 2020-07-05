@@ -38,6 +38,13 @@
           <tr>
             <td class="num">{{ loop.index }}</td>
             <td>
+              {% if vendor_id in [ 7, 3757 ] %}
+                <button type="button" class="btn btn-default btn-xs"
+                      data-id="{{ item.vendor_item_id }}"
+                      data-action="check-vendor-stock">
+                  <i class="fa fa-search"></i>
+                </button>
+              {% endif %}
               <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
                 {{- item.vendor_code ?: item.code -}}
               </a>
@@ -266,4 +273,33 @@
   <strong>Total: &nbsp;</strong>
   <span id="total">$0.00</span>
   (<span id="units">0</span>)
+{% endblock %}
+
+{% block script %}
+  <script>
+  {
+    document.addEventListener('click', (ev) => {
+      let act= ev.target.closest('[data-action]')
+      if (act && act.getAttribute('data-action') === 'check-vendor-stock') {
+        let id= ev.target.closest('[data-id]').getAttribute('data-id')
+        let icon= act.querySelector('i')
+        icon.classList.remove('fa-search')
+        icon.classList.add('fa-spin','fa-spinner')
+        return scat.get('/catalog/vendor-item/' + id + '/stock')
+        .then((res) => res.json())
+        .then((data) => {
+          message= "";
+          for (const [key, value] of Object.entries(data)) {
+            message+= `${value} in ${key}` + "\n";
+          }
+          alert(message);
+        })
+        .finally(() => {
+          icon.classList.remove('fa-spin','fa-spinner')
+          icon.classList.add('fa-search')
+        })
+      }
+    })
+  }
+  </script>
 {% endblock %}
