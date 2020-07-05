@@ -114,11 +114,7 @@ function expand_field($data, $class, $meta = null) {
     if (!$company && !$name) $name= format_phone($loyalty);
     return '<a href="/person/'.ashtml($id).'">'.ashtml($company).($name&&$company?" (":"").ashtml($name).($name&&$company?")":"").'</a>';
   case '$item':
-    if ($meta) {
-      return '<a href="/catalog/item/'.ashtml($meta).'">'.ashtml($data).'</a>';
-    } else {
-      return '<a href="/catalog/item/'.ashtml($data).'">'.ashtml($data).'</a>';
-    }
+    return '<a href="/catalog/item/'.ashtml($data).'">'.ashtml($data).'</a>';
   case '$dollar':
     if ($data == null)
       return $data;
