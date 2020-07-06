@@ -60,6 +60,10 @@ class TxnLine extends \Scat\Model {
         $sku= $item->vendor_sku;
       }
     }
+    /* Just use the first one if the quantity < all of the purchase_quantity */
+    if (!$sku) {
+      $sku= $vendor_items[0]->vendor_sku;
+    }
     return $sku;
   }
 
