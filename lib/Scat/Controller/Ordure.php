@@ -350,6 +350,18 @@ class Ordure {
           $txn->save();
         }
 
+        /* Add notes */
+        foreach ($data->notes as $sale_note) {
+          $note= $txn->notes()->create();
+          $note->kind= 'txn';
+          $note->attach_id= $txn->id;
+          $note->person_id= $sale_note->person_id;
+          $note->content= $sale_note->content;
+          $note->added= $sale_note->added;
+          $note->todo= 1;
+          $note->save();
+        }
+
         $url= ORDURE . '/sale/' . $summary->uuid . '/set-status';
         $res= $client->request('POST', $url,
                                [
