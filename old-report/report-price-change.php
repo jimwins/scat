@@ -94,7 +94,7 @@ $q= "SELECT
       ORDER BY 2";
 
 function Change($row) {
-  echo '<a class="price-change" data-id="' . $row[0] . '" data-msrp="' . $row[4] . '"><i class="fa fa-money"></i></a>';
+  echo '<a class="price-change" data-code="' . $row[1] . '" data-msrp="' . $row[4] . '"><i class="fa fa-money"></i></a>';
 }
 
 dump_table($db->query($q), 'Change$right');
@@ -105,7 +105,7 @@ foot();
 ?>
 <script type="text/html" id="change-template">
   <form class="form price-change-form">
-    <input type="hidden" name="id">
+    <input type="hidden" name="code">
     <div class="form-group">
       <label for="retail_price" class="control-label">New Retail Price</label>
       <input type="text" class="form-control" name="retail_price"
@@ -138,7 +138,7 @@ $('.price-change').popover({
   placement: 'bottom',
   content: function(e) {
     var tmpl= $($('#change-template').html());
-    $('input[name="id"]', tmpl).val($(this).data('id'));
+    $('input[name="code"]', tmpl).val($(this).data('code'));
     $('input[name="retail_price"]', tmpl).val($(this).data('msrp'));
     return tmpl;
   },
@@ -148,20 +148,9 @@ $('body').on('submit', '.price-change-form', function(ev) {
   ev.preventDefault();
   var form= $(this);
   let formData= new FormData(ev.target)
-  fetch('/catalog/item/' + formData.get('id'), {
-    method: 'PATCH',
-    headers: {
-      'Content-type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify(Object.fromEntries(formData))
-  })
-  .then((res) => {
-    if (!res.ok) {
-      return Promise.reject(new Error(res.statusText))
-    }
-    return res.json()
-  })
+  if (formData.get('discount') === '') formData.delete('discount')
+  scat.patch('/catalog/item/' + formData.get('code'), formData)
+  .then((res) => res.json())
   .then((data) => {
     if ($('input[name="print"]:checked', form).length) {
       Scat.printDirect('labels-price', { id: formData.get('id') });
