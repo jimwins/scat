@@ -100,8 +100,8 @@ class TxnLine extends \Scat\Model {
     if ($name == 'sale_price') {
       $item= $this->item();
 
-      if (preg_match('/^[\d.]*(\/|%)$/', $value)) {
-        $discount= $value;
+      if (preg_match('/^([\d.]*)(\/|%)$/', $value, $m)) {
+        $discount= $m[1];
         $discount_type= 'percentage';
         $retail_price= $item->retail_price ?: $this->retail_price;
         $discount_manual= 1;
