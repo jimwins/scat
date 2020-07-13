@@ -101,12 +101,12 @@ class TxnLine extends \Scat\Model {
       $item= $this->item();
 
       if (preg_match('/^[\d.]*(\/|%)$/', $value)) {
-        $discount = (float)$value;
-        $discount_type = 'percentage';
+        $discount= $value;
+        $discount_type= 'percentage';
         $retail_price= $item->retail_price ?: $this->retail_price;
         $discount_manual= 1;
       } elseif (preg_match('/^(-)?\$?(-?\d*\.?\d*)$/', $value, $m)) {
-        $value= (float)"$m[1]$m[2]";
+        $value= "$m[1]$m[2]";
         if ($this->txn()->type == 'vendor') {
           $discount_type= null;
           $discount= null;
