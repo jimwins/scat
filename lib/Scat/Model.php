@@ -58,8 +58,8 @@ class Model extends \Titi\Model implements \JsonSerializable {
   public function calcSalePrice($retail_price, $discount_type, $discount) {
     switch ($discount_type) {
     case 'percentage':
-      $retail_price= new \Decimal\Decimal($this->retail_price);
-      $discount= 100 - new \Decimal\Decimal($this->discount);
+      $retail_price= new \Decimal\Decimal($retail_price);
+      $discount= 100 - new \Decimal\Decimal($discount);
       $sale_price= $retail_price * ($discount / 100);
       return (string)$sale_price->round(2, \Decimal\Decimal::ROUND_HALF_EVEN);
     case 'relative':
