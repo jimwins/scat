@@ -114,9 +114,17 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
-    scat.call("/catalog/vendor-item", formData)
-    .then((res) => {
-      window.location.reload()
-    })
+    let id= formData.get('id')
+    if (id) {
+      scat.patch("/catalog/vendor-item/" + id, formData)
+      .then((res) => {
+        window.location.reload()
+      })
+    } else {
+      scat.post("/catalog/vendor-item", formData)
+      .then((res) => {
+        window.location.reload()
+      })
+    }
   }
 {% endblock %}
