@@ -1145,6 +1145,8 @@ class Transactions {
 
         if (!$price) {
           error_log("Failed to get price for $item_id");
+          // Just use the first one we found
+          $price= $vendor_items[0]->net_price;
         }
 
         $item= $purchase->items()->create();
