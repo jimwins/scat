@@ -410,7 +410,7 @@
     })
 
     document.getElementById('create-order').addEventListener('click', (ev) => {
-      scat.call("/purchase?vendor={{ person.id }}")
+      scat.call("/purchase?vendor_id={{ person.id }}")
           .then((res) => {
             if (res.redirected) {
               window.location.href= res.url
