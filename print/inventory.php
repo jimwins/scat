@@ -33,7 +33,7 @@ foreach ($items as $item) {
 }
 
 $product= ($use_short_name ?
-           \Model::factory('Product')->where('id', $product_id)->find_one() :
+           \Titi\Model::factory('Product')->where('id', $product_id)->find_one() :
            null);
 
 if ($product && !$q) {
