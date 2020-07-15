@@ -55,8 +55,8 @@
         "php-di/php-di": "^6.1",
         "slim/http": "^1.0",
         "php-di/slim-bridge": "^3.0",
-        "sendgrid/sendgrid": "^7.5",
-        "respect/validation": "^2.0"
+        "respect/validation": "^2.0",
+        "wildbit/postmark-php": "^2.11"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"

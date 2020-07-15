@@ -609,8 +609,7 @@ class Transactions {
     $res= $email->send([ $to_email => $to_name ],
                        $subject, $body, $attachments);
 
-    return $response->withJson($res->body() ?:
-                                [ "message" => "Email sent." ]);
+    return $response->withJson([ "message" => "Email sent." ]);
   }
 
   /* Shipping address */

@@ -147,8 +147,7 @@ class Giftcards {
                         ]
                        ]);
 
-    return $response->withJson($res->body() ?:
-                                [ "message" => "Email sent." ]);
+    return $response->withJson([ "message" => "Email sent." ]);
   }
 
   public function addTransaction(Request $request, Response $response, $card) {

@@ -2,11 +2,11 @@
 namespace Scat\Service;
 
 class Email {
-  private $sendgrid_key;
+  private $postmark_key;
   public $from_email, $from_name;
 
   public function __construct(Config $config) {
-    $this->sendgrid_key= $config->get('sendgrid.key');
+    $this->postmark_token= $config->get('postmark.token');
     $this->from_email= $config->get('email.from_email');
     $this->from_name= $config->get('email.from_name');
   }
@@ -14,14 +14,15 @@ class Email {
   public function send($to, $subject, $body,
                         $attachments= null, $options= null)
   {
-    $email= new \SendGrid\Mail\Mail();
+    $postmark= new \Postmark\PostmarkClient($this->postmark_token);
 
     if ($options['from']) {
-      $email->setFrom($options['from']['email'], $options['from']['name']);
+      $from= $options['from']['name'] . " " . $options['from']['email'];
     } else {
-      $email->setFrom($this->from_email, $this->from_name);
+      $from= $this->from_name . " " . $this->from_email;
     }
-    $email->setSubject($subject);
+
+    $addr= [];
 
     /* We might have just gotten an email in $to */
     foreach (is_array($to) ? $to : [ $to => '' ] as $address => $name) {
@@ -31,36 +32,42 @@ class Email {
       }
 
       error_log("Sending email to $name <$address>\n");
-      $email->addTo($address, $name);
+      $addr[]= str_replace(',', '', $name) . " " . $address;
 
       /* And just send to one recipient. */
       if ($GLOBALS['DEBUG']) {
         break;
       }
     }
+    $to_list= join(', ', $addr);
 
     /* Always Bcc ourselves (for now) */
+    $bcc= NULL;
     if (!$GLOBALS['DEBUG']) {
-      $email->addBcc($this->from_email, $this->from_name);
+      $bcc= $this->from_name . " " . $this->from_email;
     }
 
-    $email->addContent("text/html", $body);
-
-    $email->addAttachment(
-        base64_encode(file_get_contents('../ui/logo.png')),
-        'image/png',
-        'logo.png',
-        'inline',
-        'logo.png'
+    $logo= \Postmark\Models\PostmarkAttachment::fromFile(
+      '../ui/logo.png',
+      'logo.png',
+      'image/png',
+      'cid:logo.png',
     );
 
+    $attach= [ $logo ];
+
     if ($attachments) {
-      $email->addAttachments($attachments);
+      foreach ($attachments as $part) {
+        $attach[]= \Postmark\Models\PostmarkAttachment::fromBase64EncodedData(
+          $part[0], $part[2], $part[1]
+        );
+      }
     }
 
-    $sendgrid= new \SendGrid($this->sendgrid_key);
-
-    return $sendgrid->send($email);
+    return $postmark->sendEmail(
+      $from, $to_list, $subject, $body, NULL, NULL, NULL,
+      NULL, NULL, $bcc, NULL, $attach, NULL
+    );
   }
 
 }
