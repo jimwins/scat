@@ -15,8 +15,8 @@ class ScatUtils {
     let url= name
 
     let params= new URLSearchParams(data)
-    if (params.keys().length) {
-      url+= (url.match(/\?/) ? '&' : '?') + params
+    if (params.toString().length) {
+      url+= (url.match(/\?/) ? '&' : '?') + params.toString()
     }
 
     if (from.disabled) return false
