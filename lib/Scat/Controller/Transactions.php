@@ -105,18 +105,25 @@ class Transactions {
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $rate_changed= false;
+
     foreach ($txn->getFields() as $field) {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
       if ($field == 'tax_rate' && $value == 'def') {
         $value= $this->tax->default_rate;
       }
+      if ($field == 'tax_rate') {
+        $rate_changed= true;
+      }
       if ($value !== null) {
         $txn->set($field, $value);
       }
     }
 
-    $txn->recalculateTax($this->tax);
+    if ($rate_changed) {
+      $txn->recalculateTax($this->tax);
+    }
 
     $txn->save();
 
