@@ -113,10 +113,10 @@ class Transactions {
       if ($field == 'tax_rate' && $value == 'def') {
         $value= $this->tax->default_rate;
       }
-      if ($field == 'tax_rate') {
-        $rate_changed= true;
-      }
       if ($value !== null) {
+        if ($field == 'tax_rate') {
+          $rate_changed= true;
+        }
         $txn->set($field, $value);
       }
     }
