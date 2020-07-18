@@ -8,14 +8,16 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Transactions {
-  private $view, $txn, $data;
+  private $view, $txn, $data, $tax;
 
   public function __construct(View $view, \Scat\Service\Txn $txn,
-                              \Scat\Service\Data $data)
+                              \Scat\Service\Data $data,
+                              \Scat\Service\Tax $tax)
   {
     $this->view= $view;
     $this->txn= $txn;
     $this->data= $data;
+    $this->tax= $tax;
   }
 
   public function sales(Request $request, Response $response) {
@@ -48,8 +50,7 @@ class Transactions {
     return $response->withRedirect("/?id=$id");
   }
 
-  public function createSale(Request $request, Response $response,
-                              \Scat\Service\Config $config)
+  public function createSale(Request $request, Response $response)
   {
     $this->data->beginTransaction();
 
@@ -57,7 +58,7 @@ class Transactions {
     $copy= $copy_from_id ? $this->txn->fetchById($copy_from_id) : null;
 
     $sale= $this->txn->create('customer', [
-      'tax_rate' => $config->get("tax.default_rate"),
+      'tax_rate' => $this->tax->default_rate,
     ]);
 
     if ($copy) {
@@ -107,10 +108,15 @@ class Transactions {
     foreach ($txn->getFields() as $field) {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
+      if ($field == 'tax_rate' && $value == 'def') {
+        $value= $this->tax->default_rate;
+      }
       if ($value !== null) {
         $txn->set($field, $value);
       }
     }
+
+    $txn->recalculateTax($this->tax);
 
     $txn->save();
 
@@ -119,8 +125,7 @@ class Transactions {
 
   /* Items (aka lines) */
   public function addItem(Request $request, Response $response,
-                          \Scat\Service\Catalog $catalog,
-                          \Scat\Service\Tax $tax, $id)
+                          \Scat\Service\Catalog $catalog, $id)
   {
     $txn= $this->txn->fetchById($id);
     if (!$txn)
@@ -177,7 +182,7 @@ class Transactions {
     }
 
     $txn->applyPriceOverrides($catalog);
-    $txn->recalculateTax($tax);
+    $txn->recalculateTax($this->tax);
 
     // TODO push new price to pole
 
@@ -497,7 +502,7 @@ class Transactions {
 
   public function updateItem(Request $request, Response $response,
                               \Scat\Service\Catalog $catalog,
-                              \Scat\Service\Tax $tax, $id, $line_id)
+                              $id, $line_id)
   {
     $txn= $this->txn->fetchById($id);
     if (!$txn)
@@ -562,7 +567,7 @@ class Transactions {
 
     if (in_array($txn->status, [ 'new', 'filled' ])) {
       $txn->applyPriceOverrides($catalog);
-      $txn->recalculateTax($tax);
+      $txn->recalculateTax($this->tax);
     }
 
     $this->data->commit();

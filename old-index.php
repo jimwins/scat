@@ -703,6 +703,10 @@ $("#txn-load").submit(function(ev) {
                    Earns Points
                </a>
             </li>
+            <li data-bind="visible: txn.type() != 'vendor',
+                           css: { disabled: !txn.id() || !items().length }">
+               <a data-bind="click: resetTax">Reset Tax</a>
+            </li>
             <li data-bind="visible: txn.type() == 'vendor',
                            css: { disabled: !txn.id() || !items().length }">
                <a data-bind="click: clearItems">Clear Items</a>
@@ -1411,6 +1415,16 @@ viewModel.toggleNoRewards= function() {
   Txn.callAndLoad('txn-update', {
     txn: txn, no_rewards: no_rewards ? '0' : '1'
   });
+}
+
+viewModel.resetTax= function() {
+  let txn= viewModel.txn.id()
+
+  scat.patch('/sale/' + txn, { tax_rate: 'def' })
+      .then((res) => res.json())
+      .then((data) => {
+        Txn.loadId(txn)
+      })
 }
 
 viewModel.clearItems= function() {
