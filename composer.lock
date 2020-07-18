@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "724b650c36b1394e179f687dbec5ee96",
+    "content-hash": "b39c86fc5b7d0ba3f3c975ed35d095ae",
     "packages": [
         {
             "name": "aptoma/twig-markdown",
@@ -3948,6 +3948,63 @@
             ],
             "description": "Client library for interfacing with the SparkPost API.",
             "time": "2019-06-04T20:00:21+00:00"
+        },
+        {
+            "name": "stripe/stripe-php",
+            "version": "v7.41.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stripe/stripe-php.git",
+                "reference": "36c9cd7a33439186da05dc8bce1e6d361d25a225"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/36c9cd7a33439186da05dc8bce1e6d361d25a225",
+                "reference": "36c9cd7a33439186da05dc8bce1e6d361d25a225",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "2.16.1",
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "^3.3",
+                "symfony/process": "~3.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Stripe\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stripe and contributors",
+                    "homepage": "https://github.com/stripe/stripe-php/contributors"
+                }
+            ],
+            "description": "Stripe PHP Library",
+            "homepage": "https://stripe.com/",
+            "keywords": [
+                "api",
+                "payment processing",
+                "stripe"
+            ],
+            "time": "2020-07-15T23:11:12+00:00"
         },
         {
             "name": "symfony/config",

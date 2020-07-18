@@ -56,7 +56,8 @@
         "slim/http": "^1.0",
         "php-di/slim-bridge": "^3.0",
         "respect/validation": "^2.0",
-        "wildbit/postmark-php": "^2.11"
+        "wildbit/postmark-php": "^2.11",
+        "stripe/stripe-php": "^7.41"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"
