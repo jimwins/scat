@@ -4,15 +4,20 @@ namespace Scat\Controller;
 use \Psr\Container\ContainerInterface;
 use \Slim\Http\ServerRequest as Request;
 use \Slim\Http\Response as Response;
+use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Ordure {
-  protected $txn, $data;
+  protected $txn, $data, $email;
 
-  public function __construct(\Scat\Service\Txn $txn, \Scat\Service\Data $data)
-  {
+  public function __construct(
+    \Scat\Service\Txn $txn,
+    \Scat\Service\Data $data,
+    \Scat\Service\Email $email
+  ) {
     $this->txn= $txn;
     $this->data= $data;
+    $this->email= $email;
   }
 
   public function pushPrices(Response $response,
@@ -183,7 +188,8 @@ class Ordure {
   }
 
   public function pullOrders(Request $request, Response $response,
-                              \Scat\Service\Shipping $shipping)
+                              \Scat\Service\Shipping $shipping,
+                              View $view)
   {
     $messages= [];
 
@@ -362,6 +368,8 @@ class Ordure {
           $note->save();
         }
 
+        // Mark status on Ordure
+
         $url= ORDURE . '/sale/' . $summary->uuid . '/set-status';
         $res= $client->request('POST', $url,
                                [
@@ -376,6 +384,29 @@ class Ordure {
                                ]);
 
         $this->data->commit();
+
+        // Send order confirmation
+        $invoice= $txn->formatted_number();
+        $subject= "Thanks for shopping with us! (Invoice #{$invoice})";
+
+        $method= $txn->shipping_address_id == 1
+                  ? "is ready for pick up" : "has been shipped";
+        $content= <<<EMAIL
+Thank you for shopping at Raw Materials Art Supplies!
+
+Your order is now being processed, and you will receive another email when your order $method or if we have other updates.
+
+Let us know if there is anything else that we can do to help.
+EMAIL;
+
+        $body= $view->fetch('email/invoice.html', [
+          'txn' => $txn,
+          'subject' => $subject,
+          'content' => $content,
+        ]);
+
+        $res= $this->email->send([ $person->email => $person->name],
+                                  $subject, $body, $attachments);
 
         $messages[]= "Created transaction for sale {$data->sale->id}.";
       }
