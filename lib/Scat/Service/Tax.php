@@ -51,4 +51,8 @@ class Tax
     return $this->callApi('GetTICs');
   }
 
+  public function lookup($data) {
+    return $this->callApi('Lookup', $data);
+  }
+
 }

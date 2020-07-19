@@ -380,16 +380,9 @@ $app->group('/push', function (RouteCollectorProxy $app) {
 
 /* Tax stuff */
 $app->group('/tax', function (RouteCollectorProxy $app) {
-  $app->get('/~ping',
-             function (Request $request, Response $response,
-                       \Scat\Service\Tax $tax) {
-                return $response->withJson($tax->ping());
-             });
-  $app->get('/tic',
-             function (Request $request, Response $response,
-                       \Scat\Service\Tax $tax) {
-                return $response->withJson($tax->getTICs());
-             });
+  $app->get('/~ping', [ \Scat\Controller\Tax::class, 'ping' ]);
+  $app->get('/tic', [ \Scat\Controller\Tax::class, 'getTICs' ]);
+  $app->get('/test', [ \Scat\Controller\Tax::class, 'test' ]);
 });
 $app->get('/~webhook/tax',
              function (Request $request, Response $response,
