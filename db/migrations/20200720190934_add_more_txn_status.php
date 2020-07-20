@@ -8,7 +8,7 @@ class AddMoreTxnStatus extends AbstractMigration
     {
       $table= $this->table('txn');
       $table
-        ->addColumn('status', 'enum', [
+        ->changeColumn('status', 'enum', [
           'values' => [
             'new',
             'filled',
