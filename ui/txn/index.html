@@ -45,7 +45,7 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-sm-1">
+    <div class="col-sm-2">
       <ul class="nav nav-pills nav-stacked">
         <li {{ '' == status ? 'class="active"' }}>
           <a href="?">All</a>
@@ -57,7 +57,7 @@
         {% endfor %}
       </ul>
     </div>
-    <div class="col-sm-11">
+    <div class="col-sm-10">
       {{ block('controls') }}
       <table class="table table-striped">
         <thead>
