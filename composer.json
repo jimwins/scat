@@ -30,7 +30,6 @@
         "giggsey/libphonenumber-for-php": "^8.1",
         "guzzlehttp/guzzle": "^6.2",
         "php-http/guzzle6-adapter": "^1.1",
-        "sparkpost/sparkpost": "^2.0",
         "jimwins/titi": "^0.0",
         "select2/select2": "^4.0",
         "michelf/php-markdown": "^1.8",

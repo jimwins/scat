@@ -465,52 +465,9 @@ EMAIL;
 
       $template= $twig->load('email/abandoned-cart.html');
 
-      $httpClient= new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client());
-      $sparky= new \SparkPost\SparkPost($httpClient,
-                                        [ 'key' => SPARKPOST_KEY ]);
-
-      $promise= $sparky->transmissions->post([
-        'content' => [
-          'html' => $template->render($data),
-          'subject' => $template->renderBlock('title', $data),
-          'from' => array('name' => "Raw Materials Art Supplies",
-                          'email' => OUTGOING_EMAIL_ADDRESS),
-          'inline_images' => [
-            [
-              'name' => 'logo.png',
-              'type' => 'image/png',
-              'data' => base64_encode(file_get_contents(__DIR__ .
-                                                        '/../../../ui/logo.png')),
-            ],
-          ],
-        ],
-        'recipients' => [
-          [
-            'address' => [
-              'name' => $data['sale']['name'],
-              'email' => $data['sale']['email'],
-            ],
-          ],
-          [
-            // BCC ourselves
-            'address' => [
-              'header_to' => $data['sale']['email'],
-              'email' => OUTGOING_EMAIL_ADDRESS,
-            ],
-          ],
-        ],
-        'options' => [
-          'inlineCss' => true,
-        ],
-      ]);
-
-      try {
-        $res= $promise->wait();
-
-      } catch (\Exception $e) {
-        error_log(sprintf("SparkPost failure: %s (%s)",
-                          $e->getMessage(), $e->getCode()));
-      }
+      $this->email->send([ $data['sale']['email'] => $data['sale']['name'] ],
+                          $template->renderBlock('title', $data),
+                          $template->render($data));
     }
 
     return $response;
