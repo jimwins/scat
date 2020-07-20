@@ -8,16 +8,18 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Shipping {
-  private $shipping, $txn, $email, $view;
+  private $shipping, $txn, $email, $view, $odure;
 
   public function __construct(\Scat\Service\Shipping $shipping,
                               \Scat\Service\Txn $txn,
                               \Scat\Service\Email $email,
+                              \Scat\Service\Ordure $ordure,
                               View $view)
   {
     $this->txn= $txn;
     $this->shipping= $shipping;
     $this->email= $email;
+    $this->ordure= $ordure;
     $this->view= $view;
   }
 
@@ -60,21 +62,7 @@ class Shipping {
         }
 
         if ($txn->online_sale_id) {
-          // TODO should be some sort of Ordure service
-
-          $url= ORDURE . '/sale/' . $txn->uuid . '/set-status';
-
-          $client= new \GuzzleHttp\Client();
-          $res= $client->request('POST', $url,
-                                 [
-                                   'headers' => [
-                                     'X-Requested-With' => 'XMLHttpRequest',
-                                   ],
-                                   'form_params' => [
-                                     'key' => ORDURE_KEY,
-                                     'status' => 'shipped'
-                                   ]
-                                 ]);
+          $this->ordure->markOrderShipped($txn->uuid);
         }
 
         if (!$txn->person()->email) {

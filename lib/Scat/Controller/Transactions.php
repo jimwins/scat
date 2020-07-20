@@ -99,13 +99,14 @@ class Transactions {
     return $response->withRedirect('/sale/' . $sale->id);
   }
 
-  public function updateSale(Request $request, Response $response, $id)
+  public function updateSale(Request $request, Response $response,
+                              \Scat\Service\Ordure $ordure, $id)
   {
     $txn= $this->txn->fetchById($id);
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    $rate_changed= false;
+    $changed= [];
 
     foreach ($txn->getFields() as $field) {
       if ($field == 'id') continue;
@@ -113,16 +114,21 @@ class Transactions {
       if ($field == 'tax_rate' && $value == 'def') {
         $value= $this->tax->default_rate;
       }
-      if ($value !== null) {
-        if ($field == 'tax_rate') {
-          $rate_changed= true;
-        }
+      if ($value !== null && $value != $txn->get($field)) {
+        $changed[$field]++;
         $txn->set($field, $value);
       }
     }
 
-    if ($rate_changed) {
+    if ($changed['tax_rate']) {
       $txn->recalculateTax($this->tax);
+    }
+
+    // Pass along status change to Ordure when shipping
+    if ($changed['status'] && $txn->online_sale_id) {
+      if (in_array($txn->status, [ 'readyforpickup', 'shipping', 'shipped'])) {
+        $ordure->markOrderShipped($txn->uuid);
+      }
     }
 
     $txn->save();
