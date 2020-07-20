@@ -107,6 +107,10 @@ class Txn extends \Scat\Model {
     return ($this->_totals= $st->fetch(\PDO::FETCH_ASSOC));
   }
 
+  public function taxed() {
+    return $this->_loadTotals()['taxed'];
+  }
+
   public function subtotal() {
     return $this->_loadTotals()['subtotal'];
   }
@@ -277,5 +281,51 @@ class Txn extends \Scat\Model {
         }
       }
     }
+  }
+
+  public function loyalty() {
+    return $this->has_many('Loyalty');
+  }
+
+  public function rewardLoyalty() {
+    // No person? No loyalty.
+    if (!$this->person_id)
+      return;
+
+    // Use rewards
+    $q= "INSERT INTO loyalty (txn_id, person_id, processed, note, points)
+         SELECT {$this->id} txn_id,
+                {$this->person_id} person_id,
+                NOW() processed,
+                name note,
+                cost * allocated points
+           FROM loyalty_reward
+           JOIN txn_line ON loyalty_reward.item_id = txn_line.item_id
+           JOIN item ON txn_line.item_id = item.id
+          WHERE txn_line.txn_id = {$this->id}";
+
+    $this->orm->raw_execute($q);
+
+    // No rewards for this txn?
+    if ($this->no_rewards)
+      return;
+
+    // Award new points
+    $taxed= $this->taxed();
+    $points= (int)$taxed *
+              (defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1);
+    if ($points == 0 && $taxed > 0) $points= 1;
+
+    $loyalty= $this->loyalty()->create();
+    $loyalty->txn_id= $this->id;
+    $loyalty->person_id= $this->person_id;
+    $loyalty->set_expr('processed', 'NOW()');
+    $loyalty->note= 'Pt Earned';
+    $loyalty->points= $points;
+    $loyalty->save();
+  }
+
+  public function clearLoyalty() {
+    $this->loyalty()->delete_many();
   }
 }

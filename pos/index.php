@@ -435,6 +435,7 @@ $app->post('/~ready-for-publish',
 
 /* Ordure */
 $app->group('/ordure', function (RouteCollectorProxy $app) {
+  $app->get('/~fix-loyalty', [ \Scat\Controller\Ordure::class, 'fixLoyalty' ]);
   $app->get('/~push-prices', [ \Scat\Controller\Ordure::class, 'pushPrices' ]);
   $app->get('/~pull-orders', [ \Scat\Controller\Ordure::class, 'pullOrders' ]);
   $app->get('/~pull-signups',

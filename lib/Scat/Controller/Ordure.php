@@ -368,6 +368,9 @@ class Ordure {
           $note->save();
         }
 
+        // Reward loyalty
+        $txn->rewardLoyalty();
+
         // Mark status on Ordure
 
         $url= ORDURE . '/sale/' . $summary->uuid . '/set-status';
@@ -471,6 +474,20 @@ EMAIL;
     }
 
     return $response;
+  }
+
+  public function fixLoyalty(Request $request, Response $response) {
+    $txns= $this->txn->find('customer', 0, 100000)
+                ->where_not_null('online_sale_id')
+                ->find_many();
+
+    foreach ($txns as $txn) {
+      if (!count($txn->loyalty()->find_many())) {
+        $txn->rewardLoyalty();
+      }
+    }
+
+    return $response->withJson([]);
   }
 
 }
