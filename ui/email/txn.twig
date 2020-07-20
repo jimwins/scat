@@ -84,4 +84,26 @@
       </tr>
     </tfoot>
   </table>
+  {% if txn.shipping_address_id > 1 %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          <i class="fa fa-address-card-o"></i>
+          Shipping Address
+        </h3>
+      </div>
+      <div class="panel-body">
+        {% set shipping_address= txn.shipping_address() %}
+        <div>{{ shipping_address.name }}</div>
+        <div>{{ shipping_address.company }}</div>
+        <div>{{ shipping_address.phone }}</div>
+        <div>{{ shipping_address.street1 }}</div>
+        <div>{{ shipping_address.street2 }}</div>
+        <div>
+          {{ shipping_address.city }}, {{ shipping_address.state }}
+          {{ shipping_address.zip }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
 </div>
