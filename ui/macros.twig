@@ -27,6 +27,12 @@
     <span class="text-danger">Paid</span>
   {%- elseif status == 'processing' -%}
     <span class="text-danger">Processing</span>
+  {%- elseif status == 'waitingforitems' -%}
+    <span class="text-danger">Waiting for Items</span>
+  {%- elseif status == 'shipping' -%}
+    <span class="text-success">Shipping</span>
+  {%- elseif status == 'readyforpickup' -%}
+    <span class="text-success">Ready for Pickup</span>
   {%- elseif status == 'shipped' -%}
     <span class="text-success">Shipped</span>
   {%- elseif status == 'complete' -%}

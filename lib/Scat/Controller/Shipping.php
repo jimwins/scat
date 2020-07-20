@@ -54,7 +54,7 @@ class Shipping {
           break;
         }
 
-        if (in_array($txn->status, [ 'paid', 'processing' ])) {
+        if (in_array($txn->status, [ 'paid', 'processing', 'shipping' ])) {
           $txn->status= 'shipped';
           $txn->save();
         }
@@ -111,7 +111,7 @@ class Shipping {
         // send order delivered email
         $txn= $shipment->txn();
 
-        if (in_array($txn->status, [ 'paid', 'processing', 'shipped' ])) {
+        if (in_array($txn->status, [ 'paid', 'processing', 'shipping', 'shipped' ])) {
           $txn->status= 'complete';
           $txn->save();
         }

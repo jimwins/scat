@@ -3,7 +3,7 @@
 {% if type == 'vendor' %}
   {% set variations= [ 'new', 'filled', 'template' ] %}
 {% else %}
-  {% set variations= [ 'new', 'filled', 'paid', 'processing', 'shipped', 'complete', 'template' ] %}
+  {% set variations= [ 'new', 'filled', 'paid', 'processing', 'waitingforitems', 'readyforpickup, 'shipping', 'shipped', 'complete', 'template' ] %}
 {% endif %}
 
 {% block controls %}
