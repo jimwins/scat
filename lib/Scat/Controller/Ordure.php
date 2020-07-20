@@ -353,8 +353,10 @@ class Ordure {
           $address->save();
 
           $txn->shipping_address_id= $address->id;
-          $txn->save();
+        } else {
+          $txn->shipping_address_id= 1;
         }
+        $txn->save();
 
         /* Add notes */
         foreach ($data->notes as $sale_note) {
