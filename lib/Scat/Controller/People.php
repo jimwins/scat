@@ -43,6 +43,7 @@ class People {
                       [ 'loyalty_number' => $loyalty_number ?: 'no' ],
                       [ 'email' => $loyalty ]
                     ])
+                    ->where('active', 1)
                     ->find_one();
       $people= $person ? [ $person ] : [];
     } else {
