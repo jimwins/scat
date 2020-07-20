@@ -1027,7 +1027,7 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
            </button>
            <ul class="dropdown-menu" role="menu">
             <li>
-               <?foreach (['new','filled','paid','processing','waitingforitem','readyforpickup','shipping','shipped','complete','template'] as $status) {?>
+               <?foreach (['new','filled','paid','processing','waitingforitems','readyforpickup','shipping','shipped','complete','template'] as $status) {?>
                  <a data-bind="click: setStatus"><?=$status?></a>
                <?}?>
             </li>
