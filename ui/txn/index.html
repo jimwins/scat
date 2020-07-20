@@ -1,24 +1,27 @@
 {% extends 'layout/page.html' %}
 {% import 'macros.twig' as scat %}
 {% if type == 'vendor' %}
-  {% set variations= [ 'new', 'filled', 'template' ] %}
+  {% set variations= {
+      'new': 'New',
+      'filled': 'Filled',
+      'template': 'Template'
+   } %}
 {% else %}
-  {% set variations= [ 'new', 'filled', 'paid', 'processing', 'waitingforitems', 'readyforpickup, 'shipping', 'shipped', 'complete', 'template' ] %}
+  {% set variations= {
+      'new': 'New',
+      'filled': 'Filled',
+      'paid': 'Paid',
+      'processing': 'Processing',
+      'waitingforitems': 'Waiting for Items',
+      'readyforpickup': 'Ready for Pickup',
+      'shipping': 'Shipping',
+      'shipped': 'Shipped',
+      'complete': 'Complete',
+      'template': 'Template'
+    } %}
 {% endif %}
 
 {% block controls %}
-<nav>
-    <ul class="nav nav-pills nav-justified">
-      <li {{ '' == status ? 'class="active"' }}>
-        <a href="?">All</a>
-      </li>
-      {% for s in variations %}
-        <li {{ s == status ? 'class="active"' }}>
-          <a href="?status={{ s }}">{{ s|title }}</a>
-        </li>
-      {% endfor %}
-    </ul>
-    </nav>
   <nav aria-label="Controls for Activity List">
     <ul class="pager">
       <li class="previous {{ not page ? 'disabled' }}">
@@ -41,52 +44,68 @@
 {% endblock %}
 
 {% block content %}
-  {{ block('controls') }}
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th class="num">#</th>
-        <th>Number</th>
-        <th>Status</th>
-        <th>Created</th>
-        <th>Filled</th>
-        <th>Person</th>
-        <th>Ordered</th>
-        <th>Allocated</th>
-        <th class="text-right">Total</th>
-        <th class="text-right">Paid</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for txn in txns %}
-        <tr>
-          <td class="num">{{ (page * limit) + loop.index }}</td>
-          <td>
-            <a href="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
-              {{ txn.formatted_number }}
-              {% if txn.online_sale_id %}
-                <br><small>({{ "%07d"|format(txn.online_sale_id) }})</small>
-              {% endif %}
-            </a>
-          </td>
-          <td>{{ scat.format_txn_status(txn.status) }}</td>
-          <td>{{ txn.created }}</td>
-          <td>{{ txn.filled }}</td>
-          <td>
-            {% if txn.person_id %}
-              <a href="/person/{{ txn.person_id }}">
-                {{ txn.person.friendly_name }}
-              </a>
-            {% endif %}
-          </td>
-          <td>{{ txn.ordered }}</td>
-          <td>{{ txn.allocated }}</td>
-          <td class="text-right">{{ scat.amount(txn.total) }}</td>
-          <td class="text-right">{{ scat.amount(txn.total_paid) }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="row">
+    <div class="col-sm-1">
+      <ul class="nav nav-pills nav-stacked">
+        <li {{ '' == status ? 'class="active"' }}>
+          <a href="?">All</a>
+        </li>
+        {% for s,label in variations %}
+          <li {{ s == status ? 'class="active"' }}>
+            <a href="?status={{ s }}">{{ label }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-sm-11">
+      {{ block('controls') }}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Number</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Filled</th>
+            <th>Person</th>
+            <th>Ordered</th>
+            <th>Allocated</th>
+            <th class="text-right">Total</th>
+            <th class="text-right">Paid</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for txn in txns %}
+            <tr>
+              <td class="num">{{ (page * limit) + loop.index }}</td>
+              <td>
+                <a href="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
+                  {{ txn.formatted_number }}
+                  {% if txn.online_sale_id %}
+                    <br><small>({{ "%07d"|format(txn.online_sale_id) }})</small>
+                  {% endif %}
+                </a>
+              </td>
+              <td>{{ scat.format_txn_status(txn.status) }}</td>
+              <td>{{ txn.created | date('n/j/y G:i') }}</td>
+              <td>{{ txn.filled | date('n/j/y G:i') }}</td>
+              <td>
+                {% if txn.person_id %}
+                  <a href="/person/{{ txn.person_id }}">
+                    {{ txn.person.friendly_name }}
+                  </a>
+                {% endif %}
+              </td>
+              <td align="center">{{ txn.ordered }}</td>
+              <td align="center">{{ txn.allocated }}</td>
+              <td class="text-right">{{ scat.amount(txn.total) }}</td>
+              <td class="text-right">{{ scat.amount(txn.total_paid) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
-  {{ block('controls') }}
+      {{ block('controls') }}
+    </div>
+  </div>
 {% endblock %}
