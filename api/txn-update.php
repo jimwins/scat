@@ -20,6 +20,15 @@ foreach(array('number', 'no_rewards') as $key) {
   }
 }
 
+if (isset($_REQUEST['no_rewards'])) {
+  $txn= new Transaction($db, $txn_id);
+  if ((int)$_REQUEST['no_rewards']) {
+    $txn->clearLoyalty();
+  } else {
+    $txn->rewardLoyalty();
+  }
+}
+
 $txn= txn_load($db, $txn_id);
 
 echo jsonp(array('txn' => $txn));
