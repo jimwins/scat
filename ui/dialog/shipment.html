@@ -98,6 +98,8 @@
     })
     .then((data) => {
       scat.alert('info', 'Added shipment.')
+      // TODO print label and set status = 'shipping'
+      Txn.loadId({{ txn.id }})
       $(dialog).modal('hide')
     })
   })
