@@ -127,7 +127,7 @@ class Transactions {
     // Pass along status change to Ordure when shipping
     if ($changed['status'] && $txn->online_sale_id) {
       if (in_array($txn->status,
-                    [ 'readyforpickup', 'shipping', 'shipped', 'complete'])
+                    [ 'readyforpickup', 'shipping', 'shipped', 'complete']))
       {
         $ordure->markOrderShipped($txn->uuid);
       }
