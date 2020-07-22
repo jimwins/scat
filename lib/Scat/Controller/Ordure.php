@@ -326,6 +326,7 @@ class Ordure {
             $easypost_address= $shipping->createAddress([
               'verify'  => [ 'delivery' ],
               'name' => $data->shipping_address->name,
+              'email' => $data->shipping_address->email,
               'company' => $data->shipping_address->company,
               'street1' => $data->shipping_address->address1,
               'street2' => $data->shipping_address->address2,
@@ -340,6 +341,7 @@ class Ordure {
           $address= $this->data->factory('Address')->create();
           $address->easypost_id= $easypost_address->id;
           $address->name= $easypost_address->name;
+          $address->email= $easypost_address->email;
           $address->company= $easypost_address->company;
           $address->street1= $easypost_address->street1;
           $address->street2= $easypost_address->street2;
