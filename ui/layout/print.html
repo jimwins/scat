@@ -36,9 +36,11 @@
     <table width="100%">
       <tr>
         <td width="33%">
-          <span style="font-weight: bold; font-style: italic;">
-            {DATE Y-m-d H:i:s}
-          </span>
+          {% block page_footer %}
+            <span style="font-weight: bold; font-style: italic;">
+              {DATE Y-m-d H:i:s}
+            </span>
+          {% endblock %}
         </td>
         <td width="33%" align="center">
           <span style="font-weight: bold; font-style: italic;">

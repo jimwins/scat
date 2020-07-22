@@ -24,7 +24,7 @@
     {% endif %}
   </div>
   <div id="store_info">
-    <small>From:</small><br>
+    <small>{{ txn.type == 'vendor' ? 'Ship To' : 'From' }}:</small><br>
     <b>Raw Materials Art Supplies</b><br>
     645 South Los Angeles Street<br>
     Los Angeles, CA 90014<br>
@@ -34,9 +34,21 @@
   </div>
   <div id="client_info">
   {% if txn.person_id %}
+    <small>{{ txn.type == 'vendor' ? 'From' : 'To' }}:</small><br>
     {% set person= txn.person %}
-    <small>To:</small><br>
-    {% if txn.shipping_address_id %}
+    <b>
+      {{ person.company }}
+      {% if person.company and person.name %}<br>{% endif %}
+      {{ person.name }}
+    </b><br>
+    {% if person.phone %}
+      {{ person.phone|phone_number_format }}<br>
+    {% endif %}
+    {% if person.email %}
+      {{ person.email }}<br>
+    {% endif %}
+    {% if txn.shipping_address_id > 1 %}
+      <br>
       {% set addr= txn.shipping_address %}
       <b>
         {{ addr.company }}
@@ -47,20 +59,9 @@
       {% if addr.street2 %} {{ addr.street2 }}<br>{% endif %}
       {{ addr.city }}, {{ addr.state }}
       {{ addr.zip }}<br>
-      {% if addr.phone %} {{ addr.phone }}<br>{% endif %}
-    {% else %}
-      <b>
-        {{ person.company }}
-        {% if person.company and person.name %}<br>{% endif %}
-        {{ person.name }}
-      </b><br>
-      {{ person.address | nl2br }}<br>
-    {% endif %}
-    {% if person.phone %}
-      {{ person.phone }}<br>
-    {% endif %}
-    {% if person.email %}
-      {{ person.email }}<br>
+      {% if addr.phone %} {{ addr.phone|phone_number_format }}<br>{% endif %}
+    {% elseif txn.shipping_address_id == 1 %}
+      <br><b>CURBSIDE PICKUP</b>
     {% endif %}
   {% endif %}
   {% for note in txn.notes.find_many %}
@@ -162,4 +163,8 @@
   {% endif %}
 </div>
 
+{% endblock %}
+
+{% block page_footer %}
+  <barcode code="@INV-{{ txn.id }}" type="C128B" class="barcode" />
 {% endblock %}
