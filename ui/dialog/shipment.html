@@ -108,6 +108,12 @@
     event.preventDefault()
 
     let form= dialog.getElementsByTagName('form')[0]
+
+    if (form.disabled) return;
+
+    form.disabled= true
+    form.style.filter= 'brightness(80%)'
+
     let formData= new FormData(form)
     fetch("/sale/{{ txn.id }}/shipment{{ shipment.id ? '/' ~ shipment.id }}", {
       method: '{{ shipment ? 'PATCH' : 'POST' }}',
@@ -117,15 +123,18 @@
       },
       body: JSON.stringify(Object.fromEntries(formData))
     })
-    .then((res) => {
-      if (!res.ok) {
-        return Promise.reject(new Error(res.statusText))
-      }
-      return res.json()
-    })
+    .then((res) => scat._handleResponse(res))
+    .then((res) => res.json())
     .then((data) => {
       $(dialog).modal('hide')
       scat.dialog([], '/sale/{{ txn.id }}/shipment/' + data.id)
+    })
+    .catch((err) => {
+      scat.alert('danger', err.message)
+    })
+    .finally(() => {
+      form.disabled= false
+      form.style.filter= ''
     })
   }
 {% endblock %}

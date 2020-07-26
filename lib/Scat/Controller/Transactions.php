@@ -871,10 +871,13 @@ class Transactions {
       $shipment->tracker_id= $ep->tracker->id;
     }
 
+    if (!$shipment->easypost_id) {
+      throw new \Exception("Not enough information to create shipment.");
+    }
+
     $shipment->save();
 
-    $data= $shipment->as_array();
-    return $response->withJson($data);
+    return $response->withJson($shipment);
   }
 
   /* Drop-ships */
