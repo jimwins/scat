@@ -21,11 +21,11 @@
     <a href="{{ url_for('catalog-item', { 'code' : i.code }) }}">
       {{- i.code -}}
     </a><br>
-    {% if i.media|length %}
-      <small><i class="fa fa-file-image-o"></i>
-    {% endif %}
     {% if not i.width or not i.weight %}
       <small class="text-danger"><i class="fa fa-cube"></i>
+    {% endif %}
+    {% if not i.media|length %}
+      <small class="text-danger"><i class="fa fa-file-image-o"></i>
     {% endif %}
   </td>
   <td class="item-name" style="{{ s.style_item_color(i.color) }}">
