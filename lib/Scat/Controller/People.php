@@ -133,12 +133,80 @@ class People {
   }
 
   public function updatePerson(Request $request, Response $response, $id,
-                                \Scat\Service\Data $data) {
+                                \Scat\Service\Data $data)
+  {
     $person= $data->factory('Person')->find_one($id);
     if (!$person)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
     return $this->processPerson($request, $response, $data, $person);
+  }
+
+  public function mergePerson(Request $request, Response $response,
+                              \Scat\Service\Data $data, $id)
+  {
+    $person= $data->factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $from= $data->factory('Person')->find_one($request->getParam('from'));
+    if (!$from)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if ($person->id == $from->id)
+      throw new \Exception("Can't merge a person into themself");
+
+    $data->beginTransaction();
+
+    /* Move over devices */
+    $q= "UPDATE IGNORE device
+            SET person_id = {$person->id}
+          WHERE person_id = {$from->id}";
+    $data->execute($q);
+
+    /* Leftovers? Nuke them. */
+    $q= "DELETE FROM device
+          WHERE person_id = {$from->id}";
+    $data->execute($q);
+
+    /* Move over loyalty */
+    $q= "UPDATE IGNORE loyalty
+            SET person_id = {$person->id}
+          WHERE person_id = {$from->id}";
+    $data->execute($q);
+
+    /* Change references to old person to new one */
+    $q= "UPDATE note
+            SET person_id = {$person->id}
+          WHERE person_id = {$from->id}";
+    $data->execute($q);
+
+    $q= "UPDATE note
+            SET attach_id = {$person->id}
+          WHERE attach_id = {$from->id}
+            AND kind = 'person'";
+    $data->execute($q);
+
+    $q= "UPDATE timeclock
+            SET person_id = {$person->id}
+          WHERE person_id = {$from->id}";
+    $data->execute($q);
+
+    $q= "UPDATE txn
+            SET person_id = {$person->id}
+          WHERE person_id = {$from->id}";
+    $data->execute($q);
+
+    $q= "UPDATE vendor_item
+            SET vendor_id = {$person->id}
+          WHERE vendor_id = {$from->id}";
+    $data->execute($q);
+
+    $from->delete();
+
+    $data->commit();
+
+    return $response->withJson($person);
   }
 
   public function processPerson(Request $request, Response $response,

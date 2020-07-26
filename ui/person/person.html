@@ -348,6 +348,10 @@
       </div><!-- .col-sm-12 -->
     </div><!-- .row -->
   {% endif %}
+
+  <button id="merge-person" class="btn btn-default">
+    Merge Person
+  </button>
 {% endblock %}
 
 {% block script %}
@@ -409,7 +413,7 @@
       })
     })
 
-    document.getElementById('create-order').addEventListener('click', (ev) => {
+    document.getElementById('create-order')?.addEventListener('click', (ev) => {
       scat.call("/purchase?vendor_id={{ person.id }}")
           .then((res) => {
             if (res.redirected) {
@@ -417,8 +421,24 @@
             }
           })
     })
+
+    document.getElementById('merge-person').addEventListener('click', (ev) => {
+      let to= window.prompt("What person should we merge this into?", "")
+      if (to) {
+        scat.post('/person/' + to + '/~merge',
+                  { from: '{{ person.id }}' })
+            .then((res) => res.json())
+            .then((data) => {
+              window.location.href= data.id
+            })
+            .catch((err) => {
+              scat.alert('danger', err.message)
+            })
+      }
+    })
   </script>
 
   {# TODO better target? just update status, don't reload #}
   {{ scat.file_upload('/person/' ~ person.id ~ '/items') }}
+
 {% endblock %}

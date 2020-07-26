@@ -303,6 +303,9 @@ $app->group('/person', function (RouteCollectorProxy $app) {
              [ \Scat\Controller\People::class, 'uploadItems' ]);
   $app->get('/{id:[0-9]+}/loyalty',
             [ \Scat\Controller\People::class, 'loyalty' ]);
+  $app->post('/{id:[0-9]+}/~merge',
+            [ \Scat\Controller\People::class, 'mergePerson' ]);
+
 });
 
 /* Clock */
