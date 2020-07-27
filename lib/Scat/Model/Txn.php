@@ -145,6 +145,7 @@ class Txn extends \Scat\Model {
   public function getInvoicePDF($variation= '') {
     $loader= new \Twig\Loader\FilesystemLoader('../ui/');
     $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
+    $twig->addExtension(new \Scat\TwigExtension());
 
     $template= $twig->load('print/invoice.html');
     $html= $template->render([ 'txn' => $this, 'variation' => $variation ]);
