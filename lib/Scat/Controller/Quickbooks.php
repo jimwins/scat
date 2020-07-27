@@ -205,8 +205,7 @@ class Quickbooks {
 
   public function sync(Request $request, Response $response) {
     try {
-      v::in(['sales','payments'])->assert($request->getParam('from'));
-      v::date()->assert($request->getParam('date'));
+      v::in(['sales','payments','both'])->assert($request->getParam('from'));
     } catch (\Respect\Validation\Exceptions\ValidationException $e) {
       return $response->withJson([
         'error' => "Validation failed.",
@@ -218,8 +217,9 @@ class Quickbooks {
       throw new \Exception("Unable to refresh OAuth2 token");
     }
 
+    $date= $this->config->get('qb.startDate');
+
     $from= $request->getParam('from');
-    $date= $request->getParam('date');
 
     switch ($from) {
     case 'payments':
@@ -228,6 +228,11 @@ class Quickbooks {
       break;
     case 'sales':
       $this->syncSales($date);
+      $latest= $this->getLastSyncedSale();
+      break;
+    case 'both':
+      $this->syncSales($date);
+      $this->syncPayments($date);
       $latest= $this->getLastSyncedSale();
       break;
     }
@@ -259,15 +264,15 @@ class Quickbooks {
 
     $date= (new \DateTime($date))->format('Y-m-d');
 
-    error_log("Finding transactions on $date");
+    error_log("Finding transactions since $date");
 
     $txns= $this->data->factory('Txn')
             ->where_raw("qb_je_id = '' AND
                          ((type = 'correction' AND
-                           created BETWEEN ? AND ? + INTERVAL 1 DAY) OR
+                           created > ?) OR
                           (type = 'customer' AND
-                           paid BETWEEN ? AND ? + INTERVAL 1 DAY))",
-                          [ $date, $date, $date, $date ])
+                           paid > ?))",
+                          [ $date, $date ])
             ->find_many();
 
     $success= [];
@@ -412,8 +417,7 @@ class Quickbooks {
     $date= (new \DateTime($date))->format('Y-m-d');
 
     $payments= $this->data->factory('Payment')
-                ->where_raw("processed BETWEEN ? and ? + INTERVAL 1 DAY",
-                            [ $date, $date ])
+                ->where_raw("processed > ?", [ $date ])
                 ->where_not_equal('amount', '0.00')
                 ->where_equal('qb_je_id', '')
                 ->find_many();
