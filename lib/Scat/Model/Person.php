@@ -196,6 +196,7 @@ class Person extends \Scat\Model {
 
     /* START Vendors */
     if (preg_match('/MACITEM.*\.zip$/i', $fn)) {
+      error_log("Importing '$fn' as Mac price list\n");
       $base= basename($fn, '.zip');
 
       $q= "LOAD DATA LOCAL INFILE 'zip://$tmpfn#$base.txt'
@@ -221,6 +222,7 @@ class Person extends \Scat\Model {
     } elseif (preg_match('/^"?sls_sku"?(,|\t)/', $line, $m)) {
       // SLS
 #sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date,ormd,prop65,no_calif,no_canada,
+      error_log("Importing '$fn' as SLS price list\n");
 
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
                 INTO TABLE vendor_upload
@@ -248,6 +250,7 @@ class Person extends \Scat\Model {
       $assortments= str_repeat('@a,',$m[2]);
       // ColArt
 #,Order,Product Code,Description,Health Label,Series,Bar Code,MOQ,Inner Pack,Case Pack,Trade Discount,Promo Discount,2020 MSRP,Net,Extended Net,,,N/A,N/A,N/A,N/A,N/A,N/A,Harmonized Tariff Codes,Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),,,,,,,,,,,,,,
+      error_log("Importing '$fn' as ColArt price list\n");
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
                 INTO TABLE vendor_upload
               FIELDS TERMINATED BY ','
@@ -286,6 +289,7 @@ class Person extends \Scat\Model {
     } elseif (preg_match('/Alvin SRP/', $line)) {
       // Alvin Account Pricing Report
 #Manufacturer	BrandName	SubBrand	AlvinItem#	Description	New	UoM	Alvin SRP	RegularMultiplier	RegularNet	CurrentMultiplier	CurrentNetPrice	CurrentPriceSource	SaleStarted	SaleExpiration	Buying Quantity (BQ)	DropShip	UPC or EAN	Weight	Length	Width	Height	Ship Truck	CountryofOrigin	HarmonizedCode	DropShipDiscount	CatalogPage	VendorItemNumber
+      error_log("Importing '$fn' as Alvin price list\n");
       $sep= preg_match("/\t/", $line) ? "\t" : ",";
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
                 INTO TABLE vendor_upload
@@ -313,6 +317,7 @@ class Person extends \Scat\Model {
 
     } elseif (preg_match('/Golden Ratio/', $line)) {
       // Masterpiece
+      error_log("Importing '$fn' as Masterpiece price list\n");
       $sep= preg_match("/\t/", $line) ? "\t" : ",";
 
 #,SN,PK Sort,SKU Sort,,SKU,Golden Ratio,Size,Item Description,,,,,,,,,2020 Retail,Under $500 Net Order,Net $500 Order,Units Per Pkg,Pkgs Per Box,Weight,UPC,Freight Status,DIM. Weight,Est. Freight EACH,Est. Freight CASE,Item length,Item Width,Item Height,Carton Length,Carton Width,Carton Height,HTS,Origin,
@@ -349,6 +354,7 @@ class Person extends \Scat\Model {
 
     } else {
       // Generic
+      error_log("Importing '$fn' as generic price list\n");
       if (preg_match('/\t/', $line)) {
         $format= "FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'";
       } else {
