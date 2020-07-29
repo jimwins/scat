@@ -171,6 +171,7 @@ class Person extends \Scat\Model {
 
     /* Grab the first line for detecting file type */
     $line= $stream->read(1024);
+    $line= strstr($line, "\n", true);
     $stream->close();
 
     ob_start();
@@ -354,12 +355,14 @@ class Person extends \Scat\Model {
 
     } else {
       // Generic
-      error_log("Importing '$fn' as generic price list\n");
-      if (preg_match('/\t/', $line)) {
+      if (preg_match("/\\t/", $line)) {
+        $fmt= 'TSV';
         $format= "FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'";
       } else {
+        $fmt= 'CSV';
         $format= "FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'";
       }
+      error_log("Importing '$fn' as generic $fmt price list\n");
       if (preg_match('/promo/i', $line)) {
         $action= 'promo';
       }
