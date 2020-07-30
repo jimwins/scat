@@ -931,7 +931,7 @@ class Catalog {
         ($item->stock() > 2 ? 'in stock' :
          ($item->stock() > 0 ? 'limited availability' : 'out of stock')),
         'buy',
-        'same-day'
+        'same day'
       ];
 
       fputcsv($output, $record);
