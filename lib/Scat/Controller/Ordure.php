@@ -80,7 +80,6 @@ class Ordure {
   }
 
   public function pullSignups(Request $request, Response $response) {
-    $exit= 0;
     $messages= [];
 
     $client= new \GuzzleHttp\Client();
@@ -117,9 +116,6 @@ class Ordure {
         $person->email= $update->email;
         $person->setProperty('phone', $update->phone);
         $person->save();
-
-        $messages[]=
-          "Created new person '".($person->name?:$person->email)."'";
       }
       /* Otherwise update name, email */
       else {
@@ -128,9 +124,6 @@ class Ordure {
         if ($update->phone)
           $person->setProperty('phone', $update->phone);
         $person->save();
-
-        $messages[]=
-          "Updated details for person '".($person->name?:$person->email)."'";
       }
 
       /* This may trigger an SMS message if it's a new signup. */
@@ -162,12 +155,9 @@ class Ordure {
 
           $txn->person_id= $person->id;
           $txn->save();
-
-          $messages[]= "Attached transaction {$id} to person.";
         }
       } catch (\Exception $e) {
         $messages[]= "Exception: " . $e->getMessage();
-        $exit= 1;
       }
 
       $url= ORDURE . '/mark-rewards-processed';
@@ -178,8 +168,6 @@ class Ordure {
                                             'id' => $update->id ]
                              ]);
 
-      $messages[]=
-        "Completed update for '".($update->name?:$update->email)."'.";
     }
 
     $response->getBody()->write(join("\n", $messages));
@@ -191,9 +179,8 @@ class Ordure {
                               \Scat\Service\Shipping $shipping,
                               View $view)
   {
-    $messages= [];
-
     $client= new \GuzzleHttp\Client();
+    $messages= [];
 
     $url= ORDURE . '/sale/list';
     $res= $client->request('GET', $url,
@@ -239,16 +226,12 @@ class Ordure {
           $person->name= $data->sale->name;
           $person->email= $data->sale->email;
           $person->save();
-
-          $messages[]= "Created new person '{$person->name}'.";
         }
         /* Otherwise update name, email */
         else {
           if ($data->sale->name) $person->name= $data->sale->name;
           if ($data->sale->email) $person->email= $data->sale->email;
           $person->save();
-
-          $messages[]= "Updated details for person '{$person->name}'.";
         }
 
         /* Create the base transaction */
@@ -414,16 +397,12 @@ EMAIL;
 
         $res= $this->email->send([ $person->email => $person->name],
                                   $subject, $body, $attachments);
-
-        $messages[]= "Created transaction for sale {$data->sale->id}.";
       }
       catch (Exception $e) {
         $this->data->rollBack();
-        throw $e;
+        $messages[]= "Exception: " . $e->getMessage();
       }
     }
-
-    $response->getBody()->write(join("\n", $messages));
 
     return $response;
   }
@@ -433,8 +412,6 @@ EMAIL;
     $twig= new \Twig\Environment($loader, [
       'cache' => false
     ]);
-
-    $exit= 0;
 
     $client= new \GuzzleHttp\Client();
 
