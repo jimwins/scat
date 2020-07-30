@@ -903,7 +903,8 @@ class Catalog {
       ->find_many();
 
     $fields= [
-      'store_code', 'id', 'quantity', 'price', 'sale_price', 'availability'
+      'store code', 'id', 'quantity', 'price', 'sale price', 'availability',
+      'pickup method', 'pickup sla'
     ];
 
     //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
@@ -927,7 +928,10 @@ class Catalog {
         $item->stock() > 0 ? $item->stock() : 0,
         $item->retail_price . ' USD',
         $item->sale_price() . ' USD',
-        ($item->stock() > 0 ? 'in stock' : 'out of stock')
+        ($item->stock() > 2 ? 'in stock' :
+         ($item->stock() > 0 ? 'limited availability' : 'out of stock')),
+        'buy',
+        'same-day'
       ];
 
       fputcsv($output, $record);
