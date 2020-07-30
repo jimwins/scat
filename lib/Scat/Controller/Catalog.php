@@ -890,4 +890,51 @@ class Catalog {
 
     return $response->withHeader("Content-type", "text/csv");
   }
+
+  public function itemLocalFeed(Request $request, Response $response,
+                                \Scat\Service\Config $config)
+  {
+    $store_code= $config->get('google.store_code') ?: 'dummy';
+
+    $items= $this->catalog->getItems()
+      ->select('*')
+      ->select_expr('COUNT(*) OVER (PARTITION BY product_id)', 'siblings')
+      ->where_gt('product_id', 0)
+      ->find_many();
+
+    $fields= [
+      'store_code', 'id', 'quantity', 'price', 'sale_price', 'availability'
+    ];
+
+    //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
+    $output= fopen("php://memory", 'r+');
+    fputcsv($output, $fields);
+
+    foreach ($items as $item) {
+      // only include items for which we have an image
+      if ($item->siblings > 1) {
+        $media= $item->media();
+        if (!$media) {
+          continue;
+        }
+      } else {
+        $media= $item->product()->media();
+      }
+
+      $record= [
+        $store_code,
+        $item->code,
+        $item->stock() > 0 ? $item->stock() : 0,
+        $item->retail_price . ' USD',
+        $item->sale_price() . ' USD',
+        ($item->stock() > 0 ? 'in stock' : 'out of stock')
+      ];
+
+      fputcsv($output, $record);
+    }
+
+    $response= $response->withBody(\GuzzleHttp\Psr7\stream_for($output));
+
+    return $response->withHeader("Content-type", "text/csv");
+  }
 }

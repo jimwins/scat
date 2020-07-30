@@ -275,6 +275,8 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
 
   $app->get('/feed',
             [ \Scat\Controller\Catalog::class, 'itemFeed' ]);
+  $app->get('/localFeed',
+            [ \Scat\Controller\Catalog::class, 'itemLocalFeed' ]);
 
   $app->get('[/{dept}[/{subdept}[/{product}]]]',
             [ \Scat\Controller\Catalog::class, 'catalogPage' ])
