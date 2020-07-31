@@ -59,7 +59,7 @@
     scat.call("/sale/{{ txn.id }}/email-invoice", formData)
     .then((res) => res.json())
     .then((data) => {
-      alert(data.message)
+      scat.alert('success', data.message)
       $(dialog).modal('hide')
     })
   }
