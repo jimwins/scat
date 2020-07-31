@@ -16,7 +16,7 @@ if (!$r)
 $row= $r->fetch_assoc();
 
 $person= $txn['person_id'] ? $txn['person_id'] : 'NULL';
-$uuid= $txn['uuid'] ? "REVERSE('{$txn['uuid']}')" : 'NULL';
+$uuid= sprintf("%08x%02x%s", time(), 0, bin2hex(random_bytes(8)));
 
 $q= "INSERT INTO txn
         SET created= NOW(),
