@@ -329,4 +329,10 @@ class Txn extends \Scat\Model {
   public function clearLoyalty() {
     $this->loyalty()->delete_many();
   }
+
+  public function as_array() {
+    $res= parent::as_array();
+    $res['items']= $this->items()->find_many();
+    return $res;
+  }
 }

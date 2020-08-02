@@ -46,7 +46,14 @@ class Transactions {
     ]);
   }
 
-  public function sale(Response $response, $id) {
+  public function sale(Request $request, Response $response, $id) {
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      $txn= $this->txn->fetchById($id);
+      if (!$txn)
+        throw new \Slim\Exception\HttpNotFoundException($request);
+      return $response->withJson($txn);
+    }
     return $response->withRedirect("/?id=$id");
   }
 
