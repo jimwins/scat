@@ -320,7 +320,7 @@ class Quickbooks {
         $sales= [];
         $costs= $total= "0.00";
 
-        foreach ($txn->items() as $line) {
+        foreach ($txn->items()->find_many() as $line) {
           $item= $line->item();
 
           $category= 'supplies';
@@ -642,7 +642,7 @@ class Quickbooks {
         $sales= [];
         $costs= $total= "0.00";
 
-        foreach ($txn->items() as $line) {
+        foreach ($txn->items()->find_many() as $line) {
           $item= $line->item();
 
           $category= 'supplies';
