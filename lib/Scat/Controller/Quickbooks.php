@@ -588,7 +588,7 @@ class Quickbooks {
       'shrink'     => 'Shrinkage',
     ];
 
-    $date= (new \DateTime($date))->format('Y-m-d');
+    $date= (new \DateTime('2020-03-20'))->format('Y-m-d');
 
     error_log("Finding transactions since $date");
 
