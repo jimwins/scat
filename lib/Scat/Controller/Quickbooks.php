@@ -205,7 +205,7 @@ class Quickbooks {
 
   public function sync(Request $request, Response $response) {
     try {
-      v::in(['sales','payments','both'])->assert($request->getParam('from'));
+      v::in(['sales','payments','both','fix'])->assert($request->getParam('from'));
     } catch (\Respect\Validation\Exceptions\ValidationException $e) {
       return $response->withJson([
         'error' => "Validation failed.",
@@ -228,6 +228,10 @@ class Quickbooks {
       break;
     case 'sales':
       $this->syncSales($date);
+      $latest= $this->getLastSyncedSale();
+      break;
+    case 'fix':
+      $this->fixSales($date);
       $latest= $this->getLastSyncedSale();
       break;
     case 'both':
@@ -562,4 +566,160 @@ class Quickbooks {
       ]
     ];
   }
+
+  // temporary code to fix horked entries
+  function fixSales($date) {
+    $account= [
+      // assets
+      'receivable' => 'Accounts Receivable',
+      'inventory'  => 'Art Supplies',
+      // liabilities
+      'gift'       => 'Unclaimed Gift Certificates',
+      'salestax'   => 'Sales Tax Payable',
+      // sales
+      'art'        => 'Sales of Art',
+      'supplies'   => 'Sales of Art Supplies',
+      'class'      => 'Class Fees',
+      'freight'    => 'Delivery/Shipping & Handling',
+      // cost of sales
+      'costofgoods'=> 'Cost of Goods Sold',
+      'loyalty'    => 'Discounts Given',
+      // shrink
+      'shrink'     => 'Shrinkage',
+    ];
+
+    $date= (new \DateTime($date))->format('Y-m-d');
+
+    error_log("Finding transactions since $date");
+
+    $txns= $this->data->factory('Txn')
+            ->where_raw("qb_je_id AND qb_je_id != 'skipped' AND
+                         ((type = 'correction' AND
+                           created > ?) OR
+                          (type = 'customer' AND
+                           paid > ?))",
+                          [ $date, $date ])
+            ->find_many();
+
+    $success= [];
+    foreach ($txns as $txn) {
+      error_log("Updating {$txn->id}");
+      switch ($txn->type) {
+      case 'correction':
+        if ($txn->total() == 0)
+          continue 2;
+
+        $memo= "{$txn->id}: Correction {$txn->formatted_number()}";
+
+        $data= [
+          "DocNumber" => 'S' . $txn->id,
+          "TxnDate" => (new \DateTime($txn->created))->format('Y-m-d'),
+          'Line' => [
+            $this->generateLine($memo, 'Shrinkage',    bcmul($txn->total(),-1)),
+            $this->generateLine($memo, 'Art Supplies', $txn->total()),
+          ]
+        ];
+
+        break;
+
+      case 'customer':
+        $memo= "{$txn->id}: Invoice {$txn->formatted_number()}";
+
+        $data= [
+          "DocNumber" => 'S' . $txn->id,
+          "TxnDate" => (new \DateTime($txn->created))->format('Y-m-d'),
+          'Line' => [
+            // receivable
+            $this->generateLine($memo, 'Accounts Receivable', $txn->total()),
+          ]
+        ];
+
+        if ($txn->tax() != 0) {
+          $data['Line'][]= $this->generateLine($memo, 'Sales Tax Payable',
+                                 bcmul($txn->tax(), -1));
+        }
+
+        $sales= [];
+        $costs= $total= "0.00";
+
+        foreach ($txn->items() as $line) {
+          $item= $line->item();
+
+          $category= 'supplies';
+          if (preg_match('/^ZZ-frame/i', $item->code)) {
+            $category= 'framing';
+          } elseif (preg_match('/^ZZ-(print|scan)/i', $item->code)) {
+            $category= 'printing';
+          } elseif (preg_match('/^ZZ-art/i', $item->code)) {
+            $category= 'art';
+          } elseif (preg_match('/^ZZ-online/i', $item->code)) {
+            $category= 'online';
+          } elseif (preg_match('/^ZZ-class/i', $item->code)) {
+            $category= 'class';
+          } elseif (preg_match('/^ZZ-gift/i', $item->code)) {
+            $category= 'gift';
+          } elseif (preg_match('/^ZZ-loyalty/i', $item->code)) {
+            $category= 'loyalty';
+          } elseif (preg_match('/^ZZ-shipping/i', $item->code)) {
+            $category= 'freight';
+          }
+
+          $sales[$category]= bcadd($sales[$category], $line->ext_price());
+          $total= bcadd($total, $line->ext_price());
+          $costs= bcadd($costs, $line->cost_of_goods());
+        }
+
+        // $txn->subtotal has polarity opposite what we've done for total
+        if ($total != bcmul($txn->subtotal(), -1)) {
+          $sales['supplies']= bcsub($sales['supplies'],
+                                    bcadd($txn->subtotal(), $total));
+        }
+
+        foreach ($sales as $category => $amount) {
+          // sale
+          $data['Line'][]= $this->generateLine($memo, $account[$category], $amount);
+        }
+
+        if ($costs != "0.00") {
+          $data['Line'][]= $this->generateLine($memo, $account['inventory'],   $costs);
+          $data['Line'][]= $this->generateLine($memo, $account['costofgoods'], bcmul($costs, -1));
+        }
+
+        break;
+
+      default:
+        throw new \Exception("ERROR: Unable to handle transaction type '$sale[type]'");
+      }
+
+      $data['Line']= array_values(array_filter($data['Line']));
+
+      if (count($data['Line']) == 0) {
+        error_log("Transaction {$txn->id} was a wash, skipping");
+        $txn->qb_je_id= 'skipped';
+        $txn->save();
+        continue;
+      }
+
+      error_log("Finding journal entry {$txn->qb_je_id}\n");
+      $je= $this->qb->FindbyId('journalentry', $txn->qb_je_id);
+
+      if (!$je) {
+        error_log("Didn't find entry for {$txn->qb_je_id}\n");
+        continue;
+      }
+      $update= \QuickBooksOnline\API\Facades\JournalEntry::update($je, $data);
+
+      $res= $this->qb->Update($update);
+      $error = $this->qb->getLastError();
+      if ($error) {
+        throw new \Exception($error->getResponseBody());
+      }
+      else {
+        $txn->qb_je_id= $res->Id;
+        $txn->save();
+        $success[]= $res->Id;
+      }
+    }
+  }
+
 }
