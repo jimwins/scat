@@ -265,8 +265,21 @@ class Ordure {
 
         /* Add shipping item */
         if ($data->sale->shipping != 0) {
+          switch ($data->sale->shipping_method) {
+          case 'bike':
+            $code= 'ZZ-DELIVERY';
+            break;
+          case 'cargo':
+            $code= 'ZZ-DELIVERY-CARGO';
+            break;
+          case 'truck':
+          case 'default':
+          default:
+            $code= 'ZZ-SHIPPING-CUSTOM';
+          }
+
           $item= $this->data->factory('Item')
-                   ->where('code','ZZ-SHIPPING-CUSTOM')
+                   ->where('code', $code)
                    ->find_one();
 
           $txn_line= $txn->items()->create();
