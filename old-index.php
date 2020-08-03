@@ -551,6 +551,7 @@ $(function() {
         <span data-bind="text: shipping_address.state()"></span>
         <span data-bind="text: shipping_address.zip()"></span>
       </div>
+      <div data-bind="text: shipping_address.email()"></div>
       <div data-bind="text: shipping_address.phone()"></div>
     </div>
     <ul data-bind="if: shipments().length">
@@ -1286,6 +1287,7 @@ var model= {
     city: '',
     state: '',
     zip: '',
+    email: '',
     phone: ''
   },
   orders: [],
