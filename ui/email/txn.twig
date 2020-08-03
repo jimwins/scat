@@ -96,11 +96,15 @@
         {% set shipping_address= txn.shipping_address() %}
         <div>{{ shipping_address.name }}</div>
         <div>{{ shipping_address.company }}</div>
+        <div>{{ shipping_address.email }}</div>
         <div>{{ shipping_address.phone }}</div>
         <div>{{ shipping_address.street1 }}</div>
         <div>{{ shipping_address.street2 }}</div>
         <div>
-          {{ shipping_address.city }}, {{ shipping_address.state }}
+          {% if shipping_address.city %}
+            {{ shipping_address.city }},
+          {% endif %}
+          {{ shipping_address.state }}
           {{ shipping_address.zip }}
         </div>
       </div>
