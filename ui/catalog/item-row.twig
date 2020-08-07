@@ -21,7 +21,7 @@
     <a href="{{ url_for('catalog-item', { 'code' : i.code }) }}">
       {{- i.code -}}
     </a><br>
-    {% if not i.width or not i.weight %}
+    {% if i.width == 0 or i.weight == 0 %}
       <small class="text-danger"><i class="fa fa-cube"></i>
     {% endif %}
     {% if not i.media|length %}
