@@ -182,10 +182,29 @@ class Transactions {
       $line->txn_id= $txn->id;
       $line->item_id= $item->id;
 
-      /* TODO figure out pricing for vendor items */
-      $line->retail_price= $item->retail_price;
-      $line->discount= $item->discount;
-      $line->discount_type= $item->discount_type;
+      if ($txn->type == 'vendor') {
+        // default to full retail
+        $line->retail_price= $item->retail_price;
+
+        if ($txn->person_id) {
+          $vendor_item=
+            $txn->person()->items()->where('item_id', $item->id)->find_one();
+          if ($vendor_item) {
+            if ($vendor_item->promo_price > 0) {
+              /* Sometimes promo_price > net_price */
+              $line->retail_price=
+                min($vendor_item->net_price, $vendor_item->promo_price);
+            } else {
+              $line->retail_price= $vendor_item->net_price;
+            }
+          }
+        }
+
+      } else {
+        $line->retail_price= $item->retail_price;
+        $line->discount= $item->discount;
+        $line->discount_type= $item->discount_type;
+      }
 
       $line->taxfree= $item->taxfree;
       $line->tic= $item->tic;
