@@ -27,6 +27,12 @@ class Transactions {
     if (($status= $request->getParam('status'))) {
       $txns= $txns->where('status', $status);
     }
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($txns->find_many());
+    }
+
     return $this->view->render($response, 'txn/index.html', [
       'type' => 'customer',
       'txns' => $txns->find_many(),
@@ -1004,6 +1010,12 @@ class Transactions {
     if (($status= $request->getParam('status'))) {
       $txns= $txns->where('status', $status);
     }
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($txns->find_many());
+    }
+
     return $this->view->render($response, 'txn/index.html', [
       'type' => 'vendor',
       'txns' => $txns->find_many(),
