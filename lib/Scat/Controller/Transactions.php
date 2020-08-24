@@ -625,9 +625,17 @@ class Transactions {
   public function emailForm(Request $request, Response $response, $id) {
     $txn= $this->txn->fetchById($id);
 
-    return $this->view->render($response, 'dialog/email-invoice.html', [
-      'txn' => $txn
-    ]);
+    $data= [];
+    if (($canned= $request->getParam('canned'))) {
+      $data= $this->data->factory('CannedMessage')
+        ->where('slug', $canned)
+        ->find_one();
+      $data= $data->as_array();
+    }
+
+    $data['txn']= $txn;
+
+    return $this->view->render($response, 'dialog/email-invoice.html', $data);
   }
 
   public function email(Request $request, Response $response, $id,
@@ -660,6 +668,11 @@ class Transactions {
 
     $res= $email->send([ $to_email => $to_name ],
                        $subject, $body, $attachments);
+
+    if (($status= $request->getParam('new_status'))) {
+      $txn->set('status', $status);
+      $txn->save();
+    }
 
     return $response->withJson([ "message" => "Email sent." ]);
   }

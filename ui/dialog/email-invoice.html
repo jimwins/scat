@@ -24,18 +24,18 @@
       <label for="name">Subject</label>
       <input type="text" class="form-control"
              name="subject"
-             value="{{ txn.person.company }} {{ (txn.type == 'vendor') ? 'PO' : 'Invoice' }} {{ txn.formatted_number }}">
+             value="{% if subject %}{{ subject }}{% else %}{{ txn.person.company }} {{ (txn.type == 'vendor') ? 'PO' : 'Invoice' }} {{ txn.formatted_number }}{% endif %}">
     </div>
 
     <div class="form-group">
       <label for="description">Content</label>
-      <textarea class="form-control" rows="10" name="content"></textarea>
+      <textarea class="form-control" rows="10" name="content">{{ content }}</textarea>
     </div>
 
     <div class="form-group">
       <div class="checkbox">
         <label>
-          <input type="checkbox" value="1" name="include_details" checked>
+          <input type="checkbox" value="1" name="include_details" {{ txn.type == 'vendor' ? 'checked' }}>
           Include {{ txn.type == 'vendor' ? 'Purchase Order' : 'Invoice' }} PDF
         </label>
       </div>
@@ -45,6 +45,9 @@
 {% endblock %}
 
 {% block submit %}
+  {% if new_status %}
+    <input type="hidden" name="new_status" value="{{ new_status }}">
+  {% endif %}
   <button type="submit" class="btn btn-primary">
     Send
   </a>

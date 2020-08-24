@@ -572,6 +572,11 @@ $(function() {
       <li><a data-bind="text: $data.id, attr: { href: '/purchase/' + $data.id() }">Drop Ship</a></li>
     <!-- /ko -->
     </ul>
+    <div data-bind="if: ['paid','processing','waitingforitems'].includes(txn.status()) && txn.shipping_address_id() == 1, click: cannedMessage" data-message="pickup">
+      <button class="btn btn-primary">
+        Ready for Pickup
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1399,6 +1404,12 @@ viewModel.printShipmentLabel= (shipment) => {
   var id= Txn.id()
 
   scat.print('/sale/' + id + '/shipment/' + shipment.id() + '/~print-label')
+}
+
+viewModel.cannedMessage= (data, ev) => {
+  var id= Txn.id()
+  var message= ev.currentTarget.getAttribute('data-message')
+  scat.dialog({}, '/sale/' + id + '/email-invoice-form', { canned: message })
 }
 
 viewModel.deleteTransaction= function() {
