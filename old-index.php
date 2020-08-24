@@ -552,7 +552,8 @@ $(function() {
     <!-- ko foreach: shipments -->
       <li>
         <a data-bind="if: $data.tracker_id(),
-                      attr: { href: '/sale/' + $parent.txn.id() + '/shipment/' + $data.id() + '/track' }">
+                      attr: { href: '/sale/' + $parent.txn.id() + '/shipment/' + $data.id() + '/track' }"
+            target="_blank">
           Track
         </a>
         <a data-bind="if: $data.easypost_id() && $data.status() == 'pending',
