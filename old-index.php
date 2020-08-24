@@ -536,17 +536,11 @@ $(function() {
   </div>
   <div class="panel-body">
     <div data-bind="if: txn.shipping_address_id() > 0 && shipping_address">
-      <div class="pull-right">
-        <button type="button" class="btn btn-default btn-xs"
-                data-bind="click: editShippingAddress">
-          <i class="fa fa-pencil"></i>
-        </button>
-      </div>
       <div data-bind="text: shipping_address.name()"></div>
       <div data-bind="text: shipping_address.company()"></div>
       <div data-bind="text: shipping_address.street1()"></div>
       <div data-bind="text: shipping_address.street2()"></div>
-      <div>
+      <div data-bind="if: shipping_address.city() != ''">
         <span data-bind="text: shipping_address.city()"></span>,
         <span data-bind="text: shipping_address.state()"></span>
         <span data-bind="text: shipping_address.zip()"></span>
