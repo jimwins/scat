@@ -128,7 +128,11 @@ class Ordure {
 
       /* This may trigger an SMS message if it's a new signup. */
       if ($update->rewardsplus) {
-        $person->setProperty('rewardsplus', $update->rewardsplus);
+        try {
+          $person->setProperty('rewardsplus', $update->rewardsplus);
+        } catch (\Exception $e) {
+          $messages[]= "Exception: " . $e->getMessage();
+        }
       }
 
       /* Handle code */
