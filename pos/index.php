@@ -416,6 +416,8 @@ $app->group('/shipping', function (RouteCollectorProxy $app) {
 });
 $app->post('/~webhook/shipping',
             [ \Scat\Controller\Shipping::class, 'handleWebhook' ]);
+$app->post('/~webhook/shippo',
+            [ \Scat\Controller\Shipping::class, 'handleShippoWebhook' ]);
 
 $app->get('/dialog/{dialog}',
           function (Request $request, Response $response, $dialog, View $view) {

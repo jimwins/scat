@@ -9,6 +9,7 @@ class Shipping
   public function __construct(Config $config, Data $data) {
     $this->data= $data;
     \EasyPost\EasyPost::setApiKey($config->get('shipping.key'));
+    \Shippo::setApiKey($config->get('shipping.shippo_key'));
 
     $this->webhook_url= $config->get('shipping.webhook_url');
   }

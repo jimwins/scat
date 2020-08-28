@@ -173,4 +173,130 @@ class Shipping {
     return $response->withJson([ 'status' => 'Processed.' ]);
   }
 
+  function handleShippoWebhook(Request $request, Response $response)
+  {
+    $data= json_decode($request->getBody());
+
+    if ($data->event != 'track_updated') {
+      throw new \Exception("Don't know how to handle this update.");
+    }
+
+    $tracker= $data->data;
+
+    if (!$tracker->metadata) {
+      error_log(json_encode($data->data));
+      throw new \Exception("No metadata available.");
+    }
+
+    $shipment= $this->txn->fetchShipmentByTracker($tracker->metadata);
+    if (!$shipment)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $status= strtolower($tracker->tracking_status->status);
+
+    if ($shipment->status != $status) {
+      switch ($status) {
+      case 'in_transit':
+        // send order shipped email
+        $txn= $shipment->txn();
+
+        if ($txn->status == 'shipped') {
+          error_log("Not sending notification for {$txn->id}, already sent!\n");
+          break;
+        }
+
+        if (in_array($txn->status, [ 'paid', 'processing', 'shipping' ])) {
+          $txn->status= 'shipped';
+          $txn->save();
+        }
+
+        if ($txn->online_sale_id) {
+          $this->ordure->markOrderShipped($txn->uuid);
+        }
+
+        if (!$txn->person()->email) {
+          error_log("Don't know the email for txn {$txn->id}, can't update\n");
+          break;
+        }
+
+        foreach ($tracker->tracking_history as $details) {
+          if ($details->status == 'TRANSIT') {
+            $shipped= $details->status_date;
+            break;
+          }
+        }
+
+        $subject= $this->view->fetchBlock('email/shipped.html', 'title', [
+          'tracker' => $tracker,
+          'shipped' => $shipped,
+          'txn' => $txn,
+        ]);
+        $body= $this->view->fetch('email/shipped.html', [
+          'tracker' => $tracker,
+          'shipped' => $shipped,
+          'txn' => $txn,
+        ]);
+
+        $res= $this->email->send(
+          [ $txn->person()->email => $txn->person()->name ],
+          $subject, $body
+        );
+
+        break;
+
+      case 'delivered':
+        // send order delivered email
+        $txn= $shipment->txn();
+
+        if (in_array($txn->status, [ 'paid', 'processing', 'shipping', 'shipped' ])) {
+          $txn->status= 'complete';
+          $txn->save();
+        }
+
+        if (!$txn->person()->email) {
+          error_log("Don't know the email for txn {$txn->id}, can't update");
+          break;
+        }
+
+        foreach ($tracker->tracking_history as $details) {
+          if ($details->status == 'DELIVERED') {
+            $delivered= $details->status_date;
+          }
+        }
+
+        $subject= $this->view->fetchBlock('email/delivered.html', 'title', [
+          'tracker' => $tracker,
+          'delivered' => $delivered,
+          'txn' => $txn,
+        ]);
+        $body= $this->view->fetch('email/delivered.html', [
+          'tracker' => $tracker,
+          'delivered' => $delivered,
+          'txn' => $txn,
+        ]);
+
+        $res= $this->email->send(
+          [ $txn->person()->email => $txn->person()->name ],
+          $subject, $body
+        );
+
+        break;
+
+      case 'unknown':
+      case 'pre_transit':
+      case 'returned':
+      case 'failure':
+        // TODO should really handle at least those last two
+        break;
+
+      default:
+        throw new \Exception("Did not understand new shipping status '$status'");
+      }
+
+      $shipment->status= $status;
+      $shipment->save();
+    }
+
+    return $response->withJson([ 'status' => 'Processed.' ]);
+  }
 }
