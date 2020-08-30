@@ -56,6 +56,10 @@ $app->add(new \Middlewares\TrailingSlash());
 
 $errorMiddleware= $app->addErrorMiddleware($DEBUG, true, true);
 
+$errorHandler= $errorMiddleware->getDefaultErrorHandler();
+$errorHandler->registerErrorRenderer('application/json',
+                                     \Scat\JsonErrorRenderer::class);
+
 /* 404 */
 $errorMiddleware->setErrorHandler(
   \Slim\Exception\HttpNotFoundException::class,
