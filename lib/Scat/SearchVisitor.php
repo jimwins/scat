@@ -138,6 +138,14 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
                FROM vendor_item
               WHERE vendor_item.item_id = item.id AND vendor_item.active)) / sale_price(item.retail_price, item.discount_type, item.discount) < $value)";
       break;
+    case 'image':
+    case 'media':
+      if ($value) {
+        $this->current[]= "(SELECT COUNT(*) FROM item_to_image WHERE item_id = item.id) > 0";
+      } else {
+        $this->current[]= "(SELECT COUNT(*) FROM item_to_image WHERE item_id = item.id) = 0";
+      }
+      break;
     default:
       throw new \Exception("Don't know how to handle '$name'");
     }
