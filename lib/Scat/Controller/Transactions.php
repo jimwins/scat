@@ -755,7 +755,7 @@ class Transactions {
         'txn' => $txn,
         'shipment' => $shipment,
         'easypost' =>
-          $shipment ? $shipping->getShipment($shipment->easypost_id) : null,
+          $shipment ? $shipping->getShipment($shipment) : null,
       ]);
     }
 
@@ -796,11 +796,11 @@ class Transactions {
     if ($shipment_id && !$shipment)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    if (!$shipment->easypost_id)
+    if (!$shipment->method_id)
       throw new \Slim\Exception\HttpNotFoundException($request,
         "No details found for that shipment.");
 
-    $details= $shipping->getShipment($shipment->easypost_id);
+    $details= $shipping->getShipment($shipment);
 
     $PNG= 1;
 
@@ -899,13 +899,13 @@ class Transactions {
         'options' => $options,
       ]);
 
-      $shipment->easypost_id= $extra->id;
+      $shipment->method_id= $extra->id;
       $shipment->status= 'pending';
     }
 
     /* Select a rate? */
     if (($rate_id= $request->getParam('rate_id'))) {
-      $ep= $shipping->getShipment($shipment->easypost_id);
+      $ep= $shipping->getShipment($shipment);
       $insurance= $txn->subtotal() ?: '50.00';
       $ep->buy([
         'rate' => [ 'id' => $rate_id ],
@@ -916,7 +916,7 @@ class Transactions {
       $shipment->tracker_id= $ep->tracker->id;
     }
 
-    if (!$shipment->easypost_id && !$shipment->tracker_id) {
+    if (!$shipment->method_id && !$shipment->tracker_id) {
       throw new \Exception("Not enough information to create shipment.");
     }
 

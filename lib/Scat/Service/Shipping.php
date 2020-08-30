@@ -48,8 +48,12 @@ class Shipping
     return \EasyPost\Shipment::create($details);
   }
 
-  public function getShipment($shipment_id) {
-    return \EasyPost\Shipment::retrieve($shipment_id);
+  public function getShipment($shipment) {
+    if ($shipment->method == 'easypost') {
+      return \EasyPost\Shipment::retrieve($shipment->method_id);
+    } else {
+      return \Shippo_Shipment::retrieve($shipment->method_id);
+    }
   }
 
   public function getTracker($tracker_id) {
