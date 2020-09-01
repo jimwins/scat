@@ -556,11 +556,11 @@ $(function() {
             target="_blank">
           Track
         </a>
-        <a data-bind="if: $data.easypost_id() && $data.status() == 'pending',
+        <a data-bind="if: $data.method_id() && $data.status() == 'pending',
                       click: $parent.finalizeShipment">
           Finalize
         </a>
-        <a data-bind="if: $data.easypost_id() && $data.status() != 'pending',
+        <a data-bind="if: $data.method_id() && $data.status() != 'pending',
                       click: $parent.printShipmentLabel">
           - Print Label
         </a>
