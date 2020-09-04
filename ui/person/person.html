@@ -2,13 +2,14 @@
 {% import 'macros.twig' as scat %}
 
 {% block title %}
+  Person:
   {{ person.name ?: person.company ?: person.email ?: person.pretty_phone }}
 {% endblock %}
 
 {% block content %}
   {% include 'person/searchform.twig' %}
   <h1 class="page-header {{ not person.active ? 'text-danger' }}">
-    {{ block('title') }}
+    {{ person.name ?: person.company ?: person.email ?: person.pretty_phone }}
     <small>{% if person.name %}{{ person.company }}{% endif %}</small>
     <div class="pull-right">
       <div class="dropdown">
