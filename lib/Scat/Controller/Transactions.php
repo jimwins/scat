@@ -583,7 +583,7 @@ class Transactions {
       if (preg_match('!^(\d+)/(\d+)$!', $quantity, $m)) {
         $quantity= (int)$m[2] * ($txn->type == 'customer' ? -1 : 1);
 
-        $new= $txn->lines()->create();
+        $new= $txn->items()->create();
         $new->txn_id= $txn->id;
         $new->item_id= $line->item_id;
         $new->ordered= $quantity;
@@ -778,9 +778,9 @@ class Transactions {
       throw new \Slim\Exception\HttpNotFoundException($request,
         "No tracker_id found for that shipment.");
 
-    $tracker= $shipping->getTracker($shipment->tracker_id);
+    $tracker_url= $shipping->getTrackerUrl($shipment);
 
-    return $response->withRedirect($tracker->public_url);
+    return $response->withRedirect($tracker_url);
   }
 
   public function printShipmentLabel(Request $request, Response $response,
@@ -856,11 +856,12 @@ class Transactions {
 
     /* New tracking code? */
     if (($tracking_code= $request->getParam('tracking_code'))) {
-      $extra= $shipping->createTracker([
-        'tracking_code' => $tracking_code,
-        'carrier' => $request->getParam('carrier'),
-      ]);
-      $shipment->tracker_id= $extra->id;
+      $shipment->method= $request->getParam('method');
+      $shipment->tracker_id= $shipping->createTracker(
+        $shipment->method,
+        $tracking_code,
+        $request->getParam('carrier'),
+      );
       /* Wait for webhook to update status. */
       $shipment->status= 'unknown';
     }
