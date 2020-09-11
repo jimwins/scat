@@ -8,7 +8,7 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Shipping {
-  private $shipping, $txn, $email, $view, $odure;
+  private $shipping, $txn, $email, $view, $ordure;
 
   public function __construct(\Scat\Service\Shipping $shipping,
                               \Scat\Service\Txn $txn,
@@ -182,13 +182,13 @@ class Shipping {
     }
 
     $tracker= $data->data;
+    $id= ($tracker->carrier ?: 'shippo') . '/' . $tracker->tracking_number;
 
-    if (!$tracker->metadata) {
-      error_log(json_encode($data->data));
-      throw new \Exception("No metadata available.");
+    if (!$id) {
+      throw new \Exception("No tracking_status id available.");
     }
 
-    $shipment= $this->txn->fetchShipmentByTracker($tracker->metadata);
+    $shipment= $this->txn->fetchShipmentByTracker($id);
     if (!$shipment)
       throw new \Slim\Exception\HttpNotFoundException($request);
 

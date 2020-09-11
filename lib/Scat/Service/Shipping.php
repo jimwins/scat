@@ -5,11 +5,14 @@ class Shipping
 {
   private $webhook_url;
   private $data;
+  private $shippo_tracking_baseurl;
 
   public function __construct(Config $config, Data $data) {
     $this->data= $data;
     \EasyPost\EasyPost::setApiKey($config->get('shipping.key'));
     \Shippo::setApiKey($config->get('shipping.shippo_key'));
+    $this->shippo_tracking_baseurl=
+      $config->get('shipping.shippo_tracking_baseurl');
 
     $this->webhook_url= $config->get('shipping.webhook_url');
   }
@@ -40,8 +43,23 @@ class Shipping
     return \EasyPost\Address::retrieve($address_id);
   }
 
-  public function createTracker($details) {
-    return \EasyPost\Tracker::create($details);
+  public function createTracker($method, $tracking_code, $carrier) {
+    switch ($method) {
+    case 'easypost':
+      $tracker= \EasyPost\Tracker::create([
+        'tracking_code' => $tracking_code,
+        'carrier' => $carrier,
+      ]);
+      return $tracker->id;
+    case 'shippo':
+      $tracker= \Shippo_Track::create([
+        'carrier' => $carrier,
+        'tracking_number' => $tracking_code,
+      ]);
+      return $tracker->carrier . '/' . $tracker->tracking_number;
+    default:
+      throw new \Exception("Didn't understand shipment method '{$method}'");
+    }
   }
 
   public function createShipment($details) {
@@ -56,8 +74,17 @@ class Shipping
     }
   }
 
-  public function getTracker($tracker_id) {
-    return \EasyPost\Tracker::retrieve($tracker_id);
+  public function getTrackerUrl($shipment) {
+    switch ($shipment->method) {
+    case 'easypost':
+      $tracker= \EasyPost\Tracker::retrieve($shipment->tracker_id);
+      return $tracker->public_url;
+    case 'shippo':
+    error_log("baseurl {$this->shippo_tracking_baseurl}\n");
+      return $this->shippo_tracking_baseurl . $shipment->tracker_id;
+    default:
+      throw new \Exception("Didn't understand shipment method '{$method}'");
+    }
   }
 }
 
