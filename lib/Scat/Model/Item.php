@@ -221,7 +221,7 @@ class Item extends \Scat\Model {
   }
 
   public function setDimensions($dimensions) {
-    list($l, $w, $h)= preg_split('/[^\d.]+/', $dimensions);
+    list($l, $w, $h)= preg_split('/[^\d.]+/', trim($dimensions));
     $this->length= $l;
     $this->width= $w;
     $this->height= $h;
