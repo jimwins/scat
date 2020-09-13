@@ -219,7 +219,10 @@ Txn.choosePayMethod= function() {
   Scat.dialog('pay-choose-method').done(function (html) {
     var panel= $(html);
 
-    var data= { due: Txn.due() }
+    var data= {
+      due: Txn.due(),
+      returned_from_id: viewModel.txn.returned_from_id()
+    }
     var dataModel= ko.mapping.fromJS(data);
 
     ko.applyBindings(dataModel, panel[0]);
@@ -788,6 +791,8 @@ $("#pay-credit-refund").on("submit", function (ev) {
   $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false });
 });
 </script>
+
+<!-- pay-credit -->
 <form id="pay-credit" class="pay-method" style="display: none">
  <div class="form-group">
    <input class="amount form-control input-lg text-center"
@@ -823,6 +828,44 @@ $("#pay-credit").on("submit", function (ev) {
   $.smodal($("#pay-credit-progress"), { persist: true, overlayClose: false, escClose: false });
 });
 </script>
+
+<!-- pay-stripe-refund -->
+<form id="pay-stripe-refund" class="pay-method" style="display: none">
+ <div class="form-group">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="[-.0-9]*">
+ </div>
+ <input class="btn btn-default" type="submit" value="Refund">
+ <button class="btn btn-default" name="cancel">Cancel</button>
+</form>
+<script>
+$("#pay-stripe-refund").on("submit", function (ev) {
+  ev.preventDefault();
+  var txn= Txn.id();
+  var amount= $("#pay-stripe-refund .amount").val();
+  scat.post('/sale/' + txn + '/payment', {
+    method: 'stripe',
+    amount: parseFloat(-1 * amount).toFixed(2)
+  })
+  .then((res) => res.json())
+  .then((data) => {
+    scat.alert('info', "Refund processed.");
+    Txn.loadId(txn);
+  })
+  .catch((err) => {
+    scat.alert('danger', err.message)
+  })
+  .finally(() => {
+    $.smodal.close()
+  })
+
+  $.smodal.close();
+  $("#pay-stripe-progress .amount").val(amount);
+  $.smodal($("#pay-stripe-progress"), { persist: true, overlayClose: false });
+});
+</script>
+
+<!-- pay-credit-manual -->
 <div id="pay-credit-manual" class="pay-method" style="display: none">
  <div class="form-group">
    <input class="amount form-control input-lg text-center"

@@ -622,6 +622,84 @@ class Transactions {
     return $response->withJson($line);
   }
 
+  /* Payments */
+  public function addPayment(Request $request, Response $response,
+                              \Scat\Service\Config $config, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $this->data->beginTransaction();
+
+    $method= $request->getParam('method');
+    $amount= $request->getParam('amount');
+
+    switch ($method) {
+    case 'stripe':
+      if ($amount <= 0) {
+        throw new \Exception("Can only handle refunds.");
+      }
+      if (!$txn->returned_from_id) {
+        throw new \Exception("Can't find original transaction to refund.");
+      }
+
+      $original= $txn->returned_from();
+      $original_payment= null;
+
+      foreach ($original->payments()->find_many() as $pay) {
+        if ($pay->method == 'stripe') {
+          $original_payment= $pay;
+          break;
+        }
+      }
+
+      if (!$original_payment) {
+        throw new \Exception("Unable to find Stripe payment on original transaction");
+      }
+
+      $charge= json_decode($original_payment->data);
+
+      $stripe= new \Stripe\StripeClient($config->get('stripe.secret_key'));
+
+      $refund= $stripe->refunds->create([
+        'charge' => $charge->charge_id,
+        'amount' => (integer)(new \Decimal\Decimal(100) * $amount),
+      ]);
+
+      $payment= $txn->payments()->create();
+      $payment->method= 'stripe';
+      $payment->txn_id= $txn->id();
+      $payment->amount= -$amount;
+      $payment->data= json_encode($refund);
+      $payment->set_expr('processed', 'NOW()');
+      $payment->save();
+
+      break;
+
+    default:
+      throw new \Exception("Don't know how to handle a '$method' payment");
+    }
+
+    if ($txn->total() == $txn->total_paid()) {
+      $txn->set_expr('paid', 'NOW()');
+      if (in_array($txn->status, [ 'new', 'filled' ])) {
+        $txn->status= 'complete';
+      }
+    } else {
+      $txn->paid= NULL;
+      $txn->status= 'new'; // not right, what about filled?
+    }
+    $txn->save();
+
+    $this->data->commit();
+
+    $txn->reload();
+
+    return $response->withJson($txn);
+  }
+
+
   public function emailForm(Request $request, Response $response, $id) {
     $txn= $this->txn->fetchById($id);
 

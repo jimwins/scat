@@ -17,9 +17,14 @@
         Credit Card
       </button>
       <button class="btn btn-default btn-lg"
-              data-bind="visible: due() < 0"
+              data-bind="visible: due() < 0 && returned_from_id()"
               data-value="credit-refund">
         Refund Credit Card
+      </button>
+      <button class="btn btn-default btn-lg"
+              data-bind="visible: due() < 0 && returned_from_id()"
+              data-value="stripe-refund">
+        Refund Stripe
       </button>
 
       <br><br>

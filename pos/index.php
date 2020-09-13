@@ -108,6 +108,10 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->patch('/{id:[0-9]+}/item/{line_id:[0-9]+}',
               [ \Scat\Controller\Transactions::class, 'updateItem' ]);
 
+  /* Payments */
+  $app->post('/{id:[0-9]+}/payment',
+              [ \Scat\Controller\Transactions::class, 'addPayment' ]);
+
   $app->get('/{id:[0-9]+}/email-invoice-form',
             [ \Scat\Controller\Transactions::class, 'emailForm' ]);
   $app->post('/{id:[0-9]+}/email-invoice',

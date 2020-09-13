@@ -51,6 +51,10 @@ class Txn extends \Scat\Model {
                 ->where('type', 'vendor');
   }
 
+  public function returned_from() {
+    return $this->belongs_to('Txn', 'returned_from_id')->find_one();
+  }
+
   function clearItems() {
     $this->orm->get_db()->beginTransaction();
     $this->items()->delete_many();
