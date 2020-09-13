@@ -572,6 +572,11 @@ $(function() {
       <li><a data-bind="text: $data.id, attr: { href: '/purchase/' + $data.id() }">Drop Ship</a></li>
     <!-- /ko -->
     </ul>
+    <div data-bind="if: ['paid','processing','waitingforitems'].includes(txn.status()) && txn.shipping_address_id() > 1, click: createShipment">
+      <button class="btn btn-primary btn-block">
+        Create Shipment
+      </button>
+    </div>
     <div data-bind="if: ['paid','processing','waitingforitems'].includes(txn.status()) && txn.shipping_address_id() == 1, click: cannedMessage" data-message="pickup">
       <button class="btn btn-primary btn-block">
         Ready for Pickup
