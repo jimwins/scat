@@ -80,6 +80,12 @@
     ev.preventDefault()
     ev.stopPropagation()
 
+    let form= dialog.getElementsByTagName('form')[0]
+
+    if (form.disabled) return;
+
+    form.disabled= true
+    form.style.filter= 'brightness(80%)'
     let rate_id= rate.getAttribute('data-rate')
 
     fetch("/sale/{{ txn.id }}/shipment/{{ shipment.id }}", {
@@ -101,6 +107,13 @@
       // TODO print label and set status = 'shipping'
       Txn.loadId({{ txn.id }})
       $(dialog).modal('hide')
+    })
+    .catch((err) => {
+      scat.alert('danger', err.message)
+    })
+    .finally(() => {
+      form.disabled= false
+      form.style.filter= ''
     })
   })
 
