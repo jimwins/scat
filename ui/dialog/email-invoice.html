@@ -58,13 +58,18 @@
     event.preventDefault()
 
     let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+
+    if (formData.get('content').match(/XXX/g)) {
+      scat.alert('warning', 'Placeholder text not updated!')
+      return
+    }
 
     if (form.disabled) return;
 
     form.disabled= true
     form.style.filter= 'brightness(80%)'
 
-    let formData= new FormData(form)
     scat.call("/sale/{{ txn.id }}/email-invoice", formData)
     .then((res) => res.json())
     .then((data) => {
