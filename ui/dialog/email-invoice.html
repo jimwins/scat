@@ -74,6 +74,9 @@
     .then((res) => res.json())
     .then((data) => {
       scat.alert('success', data.message)
+      if (formData.get('new_status')) {
+        Txn.loadId(Txn.id())
+      }
       $(dialog).modal('hide')
     })
     .finally(() => {
