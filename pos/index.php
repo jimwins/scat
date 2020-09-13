@@ -483,6 +483,11 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Settings::class, 'update' ]);
   $app->get('/printers',
             [ \Scat\Controller\Settings::class, 'listPrinters' ]);
+
+  $app->get('/message[/{message_id}]',
+            [ \Scat\Controller\Settings::class, 'message' ]);
+  $app->post('/message[/{message_id}]',
+              [ \Scat\Controller\Settings::class, 'messageUpdate' ]);
 });
 
 /* Webhooks */

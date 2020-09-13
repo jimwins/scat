@@ -1,0 +1,95 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% set variations= {
+    'new': 'New',
+    'filled': 'Filled',
+    'paid': 'Paid',
+    'processing': 'Processing',
+    'waitingforitems': 'Waiting for Items',
+    'readyforpickup': 'Ready for Pickup',
+    'shipping': 'Shipping',
+    'shipped': 'Shipped',
+    'complete': 'Complete',
+    'template': 'Template'
+  } %}
+
+{% block title %}
+  Canned Message
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    {% if message.id %}
+      <input type="hidden" name="id" value="{{ message.id }}">
+    {% endif %}
+
+    <div class="form-group">
+      <label for="active">
+        Active
+        <select name="active" class="form-control">
+          <option value="1" {{ message.active ? 'selected' }}>Yes</option>
+          <option value="0" {{ message.id and not message.active ? 'selected' }}>No</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="slug">Slug</label>
+      <input type="text" class="form-control" autofocus
+             name="slug" value="{{ message.slug }}">
+    </div>
+
+    <div class="form-group">
+      <label for="subject">Subject</label>
+      <input type="text" class="form-control"
+             name="subject" value="{{ message.subject }}">
+    </div>
+
+    <div class="form-group">
+      <label for="content">Content</label>
+      <textarea class="form-control" rows="10" name="content">
+        {{- message.content -}}
+      </textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="new_status">
+        New Status
+        <select name="new_status" class="form-control">
+          <option value=""></option>
+          {% for v,label in variations %}
+            <option value="{{ v }}" {{ message.new_status == v ? 'selected' }}>
+              {{- label -}}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div class="form-group">
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-default">
+    {{- message.id ? 'Update' : 'Add' -}}
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    scat.post("/settings/message{{ message.id ? '/' ~ message.id }}", formData)
+        .then((res) => {
+          if (res.redirected) {
+            window.location.href= res.url
+          } else {
+            window.location.reload()
+          }
+        })
+  }
+{% endblock %}

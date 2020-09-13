@@ -1,0 +1,61 @@
+{% extends 'layout/page.html' %}
+
+{% block title %}
+  Canned Messages
+{% endblock %}
+
+{% block content %}
+
+  <h1 class="page-header">Canned Messages</h1>
+
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>Slug</th>
+        <th>Subject</th>
+        <th>New Status</th>
+        <th>Last Modified</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for message in messages %}
+        <tr data-id="{{ message.id }}">
+          <td>
+            {{- message.slug -}}
+          </td>
+          <td>
+            {{- message.subject -}}
+          </td>
+          <td>
+            {{- message.new_status -}}
+          </td>
+          <td>
+            {{- message.modified -}}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <td colspan="4">
+        <button id="create-new" class="btn btn-primary">
+          Create New Message
+        </button>
+    </tfoot>
+  </table>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    document.querySelectorAll('tbody tr').forEach((el) => {
+      el.addEventListener('click', (ev) => {
+        const id= el.getAttribute('data-id')
+        scat.dialog([], '/settings/message/' + id)
+      })
+    })
+
+    document.getElementById('create-new').addEventListener('click', (ev) => {
+      scat.dialog([], '/settings/message')
+    })
+  </script>
+{% endblock %}

@@ -69,4 +69,56 @@ class Settings {
   {
     return $response->withJson($print->getPrinters());
   }
+
+  public function message(Request $request, Response $response, View $view,
+                          $message_id= null)
+  {
+    if ($message_id) {
+      $message= $this->data->factory('CannedMessage')->find_one($message_id);
+    }
+
+    if ($message_id && !$message)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($message);
+    }
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $view->render($response, 'dialog/message.html', [
+        'message' => $message
+      ]);
+    }
+
+    $messages=
+      $this->data->factory('CannedMessage')
+           ->order_by_asc('slug')->find_many();
+    return $view->render($response, 'settings/messages.html', [
+      'messages' => $messages,
+    ]);
+  }
+
+  public function messageUpdate(Request $request, Response $response,
+                                $message_id= null)
+  {
+    if ($message_id) {
+      $message= $this->data->factory('CannedMessage')->find_one($message_id);
+    } else {
+      $message= $this->data->factory('CannedMessage')->create();
+    }
+
+    if ($message_id && !$message)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    foreach ($message->getFields() as $field) {
+      $value= $request->getParam($field);
+      if (isset($value)) {
+        $message->set($field, $value);
+      }
+    }
+
+    $message->save();
+
+    return $response->withJson($message);
+  }
 }
