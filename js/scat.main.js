@@ -163,9 +163,9 @@ class ScatUtils {
     }
 
     let query= new URLSearchParams(formData).toString()
-    return fetch(url + (query ? '?' + query : ''), {
-      method: 'GET',
-    })
+    return fetch(url + (query ? '?' + query : ''),
+      Object.assign(opts, { method: 'GET' })
+    )
     .then((response) => this._handleResponse(response))
   }
 
