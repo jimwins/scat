@@ -58,12 +58,22 @@
     event.preventDefault()
 
     let form= dialog.getElementsByTagName('form')[0]
+
+    if (form.disabled) return;
+
+    form.disabled= true
+    form.style.filter= 'brightness(80%)'
+
     let formData= new FormData(form)
     scat.call("/sale/{{ txn.id }}/email-invoice", formData)
     .then((res) => res.json())
     .then((data) => {
       scat.alert('success', data.message)
       $(dialog).modal('hide')
+    })
+    .finally(() => {
+      form.disabled= false
+      form.style.filter= ''
     })
   }
 {% endblock %}
