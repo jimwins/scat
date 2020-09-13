@@ -573,8 +573,18 @@ $(function() {
     <!-- /ko -->
     </ul>
     <div data-bind="if: ['paid','processing','waitingforitems'].includes(txn.status()) && txn.shipping_address_id() == 1, click: cannedMessage" data-message="pickup">
-      <button class="btn btn-primary">
+      <button class="btn btn-primary btn-block">
         Ready for Pickup
+      </button>
+    </div>
+    <div data-bind="if: ['paid','processing','waitingforitems'].includes(txn.status()) && txn.shipping_address_id() == 1, click: cannedMessage" data-message="pickupmost">
+      <button class="btn btn-warning btn-block">
+        Ready for Pickup (Partial)
+      </button>
+    </div>
+    <div data-bind="if: ['paid','complete'].includes(txn.status()) && txn.returned_from_id(), click: cannedMessage" data-message="refunded">
+      <button class="btn btn-primary btn-block">
+        Refund Processed
       </button>
     </div>
   </div>
