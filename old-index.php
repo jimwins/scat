@@ -1230,7 +1230,7 @@ $('#tax_rate .val').editable({
         <span class="allocated" data-bind="text: $data.allocated"></span>
       </td>
       <td align="left">
-        <span data-bind="text: $data.code, click: $parent.showItemDetails"></span>
+        <a role="button" tabindex="0" data-bind="text: $data.code, click: $parent.showItemDetails"></a>
       </td>
       <td class="editable">
         <!-- ko if: $data.code() == 'ZZ-GIFTCARD' && $parent.txn.paid() -->
@@ -1508,12 +1508,6 @@ viewModel.showAllocated= function() {
 }
 
 viewModel.showItemDetails= function(data, event) {
-  // probably some better way to test if there's already a popup
-  if (event.currentTarget.hasAttribute('data-original-title')) {
-    $(event.currentTarget).popover('destroy')
-    event.currentTarget.removeAttribute('data-original-title')
-    return
-  }
   scat.get('/catalog/item/' + data.code(), null, {
     headers: { 'Accept': 'application/json' },
   })
@@ -1524,7 +1518,7 @@ viewModel.showItemDetails= function(data, event) {
       content: "<b>Stock:</b> " + item.stock +
                "<div class='pull-right'><a href='/catalog/item/" + item.code + "' target='_blank' class='btn btn-default btn-xs'>Details</a></div>",
       html: true,
-      trigger: 'manual'
+      trigger: 'focus'
     }).popover('show')
   })
 }
