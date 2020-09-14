@@ -35,6 +35,20 @@ class Transactions {
     return $client;
   }
 
+  private function getPaypalClient(\Scat\Service\Config $config) {
+    $client_id= $config->get('paypal.client_id');
+    $secret= $config->get('paypal.secret');
+
+    if ($GLOBALS['DEBUG']) {
+      $env= new \PayPalCheckoutSdk\Core\SandboxEnvironment($client_id, $secret);
+    } else {
+      $env=
+        new \PayPalCheckoutSdk\Core\ProductionEnvironment($client_id, $secret);
+    }
+
+    return new \PayPalCheckoutSdk\Core\PayPalHttpClient($env);
+  }
+
   public function sales(Request $request, Response $response) {
     $page= (int)$request->getParam('page');
     $limit= 25;
@@ -710,6 +724,54 @@ class Transactions {
       $payment->txn_id= $txn->id();
       $payment->amount= -$amount;
       $payment->data= json_encode($refund->toArray());
+      $payment->set_expr('processed', 'NOW()');
+      $payment->save();
+
+      break;
+
+    case 'paypal':
+      if ($amount <= 0) {
+        throw new \Exception("Can only handle refunds.");
+      }
+      if (!$txn->returned_from_id) {
+        throw new \Exception("Can't find original transaction to refund.");
+      }
+
+      $original= $txn->returned_from();
+      $original_payment= null;
+
+      foreach ($original->payments()->find_many() as $pay) {
+        if ($pay->method == 'paypal') {
+          $original_payment= $pay;
+          break;
+        }
+      }
+
+      if (!$original_payment) {
+        throw new \Exception("Unable to find PayPal payment on original transaction");
+      }
+
+      $charge= json_decode($original_payment->data);
+
+      $paypal= $this->getPaypalClient($config);
+
+      $capture_id= $charge->purchase_units[0]->payments->captures[0]->id;
+      $req= new \PayPalCheckoutSdk\Payments\CapturesRefundRequest($capture_id);
+      $req->body= [
+        'amount' => [
+          'value' => $amount,
+          'currency_code' => 'USD',
+        ],
+      ];
+      $req->prefer('return=representation');
+
+      $res= $paypal->execute($req);
+
+      $payment= $txn->payments()->create();
+      $payment->method= 'paypal';
+      $payment->txn_id= $txn->id();
+      $payment->amount= -$amount;
+      $payment->data= json_encode($res->result);
       $payment->set_expr('processed', 'NOW()');
       $payment->save();
 

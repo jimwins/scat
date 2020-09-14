@@ -31,6 +31,11 @@
               data-value="amazon-refund">
         Refund Amazon
       </button>
+      <button class="btn btn-default btn-lg"
+              data-bind="visible: due() < 0 && returned_from_id()"
+              data-value="paypal-refund">
+        Refund PayPal
+      </button>
 
       <br><br>
 
