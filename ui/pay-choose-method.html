@@ -26,6 +26,11 @@
               data-value="stripe-refund">
         Refund Stripe
       </button>
+      <button class="btn btn-default btn-lg"
+              data-bind="visible: due() < 0 && returned_from_id()"
+              data-value="amazon-refund">
+        Refund Amazon
+      </button>
 
       <br><br>
 

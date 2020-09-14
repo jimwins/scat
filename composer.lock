@@ -4,8 +4,58 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8cd064a9c0c70568f747caa71d2fe31c",
+    "content-hash": "a4b719602decfe750e52b6546006fc72",
     "packages": [
+        {
+            "name": "amzn/amazon-pay-sdk-php",
+            "version": "3.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/amzn/amazon-pay-sdk-php.git",
+                "reference": "9b59f3a5b258df8a35f5f4b912a4596b3f118d7c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/amzn/amazon-pay-sdk-php/zipball/9b59f3a5b258df8a35f5f4b912a4596b3f118d7c",
+                "reference": "9b59f3a5b258df8a35f5f4b912a4596b3f118d7c",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AmazonPay\\": "AmazonPay/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Amazon Pay SDK",
+                    "email": "amazon-pay-sdk@amazon.com"
+                }
+            ],
+            "description": "Amazon Pay SDK (PHP)",
+            "homepage": "https://github.com/amzn/amazon-pay-sdk-php",
+            "keywords": [
+                "amazon",
+                "amazon pay",
+                "amazon payments",
+                "pay",
+                "pay with amazon",
+                "payment",
+                "payments"
+            ],
+            "time": "2019-11-21T21:15:11+00:00"
+        },
         {
             "name": "aptoma/twig-markdown",
             "version": "3.3.0",

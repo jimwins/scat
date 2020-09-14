@@ -57,7 +57,8 @@
         "respect/validation": "^2.0",
         "wildbit/postmark-php": "^2.11",
         "stripe/stripe-php": "^7.41",
-        "shippo/shippo-php": "^1.4"
+        "shippo/shippo-php": "^1.4",
+        "amzn/amazon-pay-sdk-php": "^3.6"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"

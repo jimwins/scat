@@ -865,6 +865,42 @@ $("#pay-stripe-refund").on("submit", function (ev) {
 });
 </script>
 
+<!-- pay-amazon-refund -->
+<form id="pay-amazon-refund" class="pay-method" style="display: none">
+ <div class="form-group">
+   <input class="amount form-control input-lg text-center"
+          type="text" pattern="[-.0-9]*">
+ </div>
+ <input class="btn btn-default" type="submit" value="Refund">
+ <button class="btn btn-default" name="cancel">Cancel</button>
+</form>
+<script>
+$("#pay-amazon-refund").on("submit", function (ev) {
+  ev.preventDefault();
+  var txn= Txn.id();
+  var amount= $("#pay-amazon-refund .amount").val();
+  scat.post('/sale/' + txn + '/payment', {
+    method: 'amazon',
+    amount: parseFloat(-1 * amount).toFixed(2)
+  })
+  .then((res) => res.json())
+  .then((data) => {
+    scat.alert('info', "Refund processed.");
+    Txn.loadId(txn);
+  })
+  .catch((err) => {
+    scat.alert('danger', err.message)
+  })
+  .finally(() => {
+    $.smodal.close()
+  })
+
+  $.smodal.close();
+  $("#pay-amazon-progress .amount").val(amount);
+  $.smodal($("#pay-amazon-progress"), { persist: true, overlayClose: false });
+});
+</script>
+
 <!-- pay-credit-manual -->
 <div id="pay-credit-manual" class="pay-method" style="display: none">
  <div class="form-group">

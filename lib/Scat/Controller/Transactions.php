@@ -20,6 +20,21 @@ class Transactions {
     $this->tax= $tax;
   }
 
+  private function getAmazonClient(\Scat\Service\Config $config) {
+    $config= [
+      'merchant_id' => $config->get('amazon.merchant_id'),
+      'access_key' => $config->get('amazon.access_key'),
+      'secret_key' => $config->get('amazon.secret_key'),
+      'client_id' => $config->get('amazon.client_id'),
+      'region' => $config->get('amazon.region'),
+      'currency_code' => $config->get('amazon.currency_code'),
+      'sandbox' => (bool)$GLOBALS['DEBUG']
+    ];
+
+    $client= new \AmazonPay\Client($config);
+    return $client;
+  }
+
   public function sales(Request $request, Response $response) {
     $page= (int)$request->getParam('page');
     $limit= 25;
@@ -636,6 +651,70 @@ class Transactions {
     $amount= $request->getParam('amount');
 
     switch ($method) {
+    case 'amazon':
+      if ($amount <= 0) {
+        throw new \Exception("Can only handle refunds.");
+      }
+      if (!$txn->returned_from_id) {
+        throw new \Exception("Can't find original transaction to refund.");
+      }
+
+      $original= $txn->returned_from();
+      $original_payment= null;
+
+      foreach ($original->payments()->find_many() as $pay) {
+        if ($pay->method == 'amazon') {
+          $original_payment= $pay;
+          break;
+        }
+      }
+
+      if (!$original_payment) {
+        throw new \Exception("Unable to find Amazon payment on original transaction");
+      }
+
+      $charge= json_decode($original_payment->data);
+
+      $amazon= $this->getAmazonClient($config);
+
+      // we only have the authorization here
+      error_log("getting details for {$charge->AmazonAuthorizationId}\n");
+      $authorization= $amazon->getAuthorizationDetails([
+        'amazon_authorization_id' => $charge->AmazonAuthorizationId,
+      ]);
+      $details= $authorization->toArray();
+
+      if (!$amazon->success) {
+        error_log("Amazon FAIL: " . json_encode($details) . "\n");
+        throw new \Exception("An unexpected Amazon error occured.");
+      }
+
+      $refund= $amazon->refund([
+        // XXX We assume only one capture per authorization
+        'amazon_capture_id' => $details['GetAuthorizationDetailsResult']
+                                        ['AuthorizationDetails']
+                                        ['IdList']
+                                        ['member'],
+        'refund_reference_id' => uniqid(),
+        'refund_amount' => $amount,
+      ]);
+      $details= $refund->toArray();
+
+      if (!$amazon->success) {
+        error_log("Amazon FAIL: " . json_encode($details) . "\n");
+        throw new \Exception("An unexpected Amazon error occured.");
+      }
+
+      $payment= $txn->payments()->create();
+      $payment->method= 'amazon';
+      $payment->txn_id= $txn->id();
+      $payment->amount= -$amount;
+      $payment->data= json_encode($refund->toArray());
+      $payment->set_expr('processed', 'NOW()');
+      $payment->save();
+
+      break;
+
     case 'stripe':
       if ($amount <= 0) {
         throw new \Exception("Can only handle refunds.");
