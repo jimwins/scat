@@ -111,6 +111,8 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   /* Payments */
   $app->post('/{id:[0-9]+}/payment',
               [ \Scat\Controller\Transactions::class, 'addPayment' ]);
+  $app->get('/{id:[0-9]+}/payment[/{payment_id:[0-9]+}]',
+            [ \Scat\Controller\Transactions::class, 'payments' ]);
 
   $app->get('/{id:[0-9]+}/email-invoice-form',
             [ \Scat\Controller\Transactions::class, 'emailForm' ]);

@@ -652,6 +652,30 @@ class Transactions {
   }
 
   /* Payments */
+  public function payments(Request $request, Response $response,
+                            $id, $payment_id= null)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $payment= $payment_id ? $txn->payments()->find_one($payment_id) : null;
+    if ($payment_id && !$payment)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      $method= $request->getParam('method') ?: 'choose';
+      return $this->view->render($response, 'dialog/pay-' . $method . '.html', [
+        'txn' => $txn,
+        'payment' => $payment,
+      ]);
+    }
+
+    return $response->withJson($payment);
+  }
+
+
   public function addPayment(Request $request, Response $response,
                               \Scat\Service\Config $config, $id)
   {

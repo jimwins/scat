@@ -216,30 +216,7 @@ Txn.askAboutTaxExemption= function(person) {
 }
 
 Txn.choosePayMethod= function() {
-  Scat.dialog('pay-choose-method').done(function (html) {
-    var panel= $(html);
-
-    var data= {
-      due: Txn.due(),
-      returned_from_id: viewModel.txn.returned_from_id()
-    }
-    var dataModel= ko.mapping.fromJS(data);
-
-    ko.applyBindings(dataModel, panel[0]);
-
-    panel.on("click", "button", function(ev) {
-      var method= $(this).data("value");
-      $.smodal.close();
-      var id= "#pay-" + method;
-      var due= Txn.due();
-      $(".amount", id).val(due);
-      $.smodal($(id), { persist: true, overlayClose: false });
-      $(".amount", id).focus().select();
-    });
-
-    // XXX SimpleModal
-    $.smodal(panel);
-  });
+  scat.dialog([], '/sale/' + Txn.id() + '/payment')
 }
 
 Txn.allocate= function(txn) {

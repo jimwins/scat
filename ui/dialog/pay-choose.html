@@ -1,0 +1,97 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Choose Payment Method
+{% endblock %}
+
+{% block size 'modal-sm' %}
+
+{% block body %}
+  <div style="text-align: center">
+    <button class="btn btn-primary btn-lg" data-value="cash">
+      Cash
+    </button>
+
+    {% if txn.due > 0 %}
+      <button class="btn btn-default btn-lg"
+              data-value="credit">
+        Credit Card
+      </button>
+    {% endif %}
+
+    {% set return_methods= {
+          'amazon' : 'Amazon Pay',
+          'credit' : 'Credit Card',
+          'paypal' : 'PayPal',
+          'stripe' : 'Stripe',
+        } %}
+
+    {% if txn.due < 0 and txn.returned_from_id %}
+      {% for pay in txn.returned_from.payments.find_many %}
+        {% if pay.method in return_methods|keys %}
+          <button class="btn btn-default btn-lg"
+                  data-id="{{ pay.id }}"
+                  data-value="{{ pay.method }}-refund">
+            Refund {{ return_methods[pay.method] }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    <br><br>
+
+    <button class="btn btn-default" data-value="credit-manual">
+      Credit Card (Manual)
+    </button>
+
+    <br><br>
+
+    <button class="btn btn-default" data-value="gift">
+      Gift Card
+    </button>
+    <button class="btn btn-default" data-value="check">
+      Check
+    </button>
+    <button class="btn btn-default" data-value="other">
+      Other
+    </button>
+
+    <br><br>
+
+    <button class="btn btn-default" data-value="discount">
+      Discount
+    </button>
+    <button class="btn btn-default" data-value="donation">
+      Donation
+    </button>
+    <button class="btn btn-default" data-value="bad-debt">
+      Bad Debt
+    </button>
+  </div>
+{% endblock %}
+
+{% block submit %}
+{% endblock %}
+
+{% block script %}
+  {
+    let choose= (ev) => {
+      ev.preventDefault()
+
+      var method= ev.currentTarget.getAttribute('data-value')
+      $(dialog).modal('hide')
+
+      var id= "#pay-" + method;
+      var due= Txn.due();
+      $(".amount", id).val(due);
+      $.smodal($(id), { persist: true, overlayClose: false });
+      $(".amount", id).focus().select();
+    }
+
+    dialog.querySelectorAll('button').forEach((button) => {
+      if (!button.hasAttribute('data-dismiss'))
+        button.addEventListener('click', choose)
+    })
+  }
+{% endblock %}
