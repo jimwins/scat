@@ -598,7 +598,9 @@
       if (!value) {
         value= this.innerText
       }
-      let html= scat.htmlToElement('<form><div class="form-group"><div class="input-group"><input type="text" name="' + name + '" class="form-control" value="' + value + '"><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-fw fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-fw fa-ban"></i></button></span></div><span class="help-block"></span></div></form>')
+      let html= scat.htmlToElement('<form><div class="form-group"><div class="input-group"><input type="text" name="" class="form-control" value=""><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-fw fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-fw fa-ban"></i></button></span></div><span class="help-block"></span></div></form>')
+      html.querySelector('input').setAttribute('name', name)
+      html.querySelector('input').setAttribute('value', value)
       html.addEventListener('submit', (ev) => {
         ev.preventDefault()
         let formData= new FormData(ev.target)
