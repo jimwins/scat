@@ -65,8 +65,7 @@
             <th class="num">#</th>
             <th>Number</th>
             <th>Status</th>
-            <th>Created</th>
-            <th>Filled</th>
+            <th>Created / Filled</th>
             <th>Person</th>
             <th>Ordered</th>
             <th>Allocated</th>
@@ -77,7 +76,12 @@
         <tbody>
           {% for txn in txns %}
             <tr>
-              <td class="num">{{ (page * limit) + loop.index }}</td>
+              <td class="num">
+                {{ (page * limit) + loop.index }}
+                {% if txn.shipping_address_id %}
+                  <br><i class="fa {{ txn.shipping_address_id == 1 ? 'fa-building': 'fa-truck' }}"></i>
+                {% endif %}
+              </td>
               <td>
                 <a href="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
                   {{ txn.formatted_number }}
@@ -87,8 +91,10 @@
                 </a>
               </td>
               <td>{{ scat.format_txn_status(txn.status) }}</td>
-              <td>{{ txn.created | date('n/j/y G:i') }}</td>
-              <td>{{ txn.filled | date('n/j/y G:i') }}</td>
+              <td>
+                {{ txn.created | date('n/j/y G:i') }}<br>
+                {{ txn.filled | date('n/j/y G:i') }}
+              </td>
               <td>
                 {% if txn.person_id %}
                   <a href="/person/{{ txn.person_id }}">
