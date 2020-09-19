@@ -140,6 +140,7 @@ class Item extends \Scat\Model {
     $fields= parent::getFields();
     $fields[]= 'dimensions';
     $fields[]= 'stock';
+    $fields[]= 'sale_price';
     return $fields;
   }
 
@@ -147,6 +148,7 @@ class Item extends \Scat\Model {
     $data= parent::as_array();
     $data['dimensions']= $this->dimensions();
     $data['stock']= $this->stock();
+    $data['sale_price']= $this->sale_price();
     return $data;
   }
 
