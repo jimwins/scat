@@ -505,7 +505,7 @@ class Person extends \Scat\Model {
     if (!$this->orm->raw_execute($q))
       throw new \Exception("Unable to add and update items");
 
-    $added_or_updated= $db->affected_rows;
+    $added_or_updated= \Titi\ORM::get_last_statement()->rowCount();
 
     // Find by code/item_no
     $q= "UPDATE vendor_item
