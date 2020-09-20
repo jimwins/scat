@@ -44,7 +44,7 @@
   {%- endif -%}
 {% endmacro %}
 
-{% macro file_upload(dest) %}
+{% macro file_upload(dest, reload= true) %}
 <style>
 #droptarget {
   position: absolute;
@@ -127,23 +127,19 @@
 
     scat.dialog([], '/dialog/file-upload.html')
     .then((modal) => {
-      return fetch(url, {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: formData
-      })
-      .then((response) => {
-        if (response.status >= 200 && response.status < 300) {
-          return Promise.resolve(response)
-        }
-        return Promise.reject(new Error(response.statusText))
-      })
+      return scat.post(url, formData)
       .finally((res) => {
         modal.modal('hide')
       })
     })
     .then((res) => {
-      window.location.reload()
+      {% if reload %}
+        window.location.reload()
+      {% else %}
+        return res.json().then((data) => {
+          scat.alert('info', data.message)
+        })
+      {% endif %}
     })
     .catch((res) => {
       alert("Sorry, there was a problem with the upload.")

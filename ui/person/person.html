@@ -443,7 +443,6 @@
     })
   </script>
 
-  {# TODO better target? just update status, don't reload #}
-  {{ scat.file_upload('/person/' ~ person.id ~ '/items') }}
+  {{ scat.file_upload('/person/' ~ person.id ~ '/items', false) }}
 
 {% endblock %}
