@@ -85,3 +85,19 @@ input[type=search]::-webkit-search-cancel-button {
     appearance: none;
   }
 }
+
+/* Help for old reference to glyphicons */
+.icon-arrow-left, .icon-arrow-right {
+  display: inline-block;
+  font: normal normal normal 14px/1 ForkAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-arrow-left:before {
+  content: "\f053";
+}
+.icon-arrow-right:before {
+  content: "\f054";
+}
