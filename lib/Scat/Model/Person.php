@@ -171,7 +171,9 @@ class Person extends \Scat\Model {
 
     /* Grab the first line for detecting file type */
     $line= $stream->read(1024);
-    $line= strstr($line, "\n", true);
+    if (($nl= strpos($line, "\n"))) {
+      $line= substr($line, 0, $nl);
+    }
     $stream->close();
 
     ob_start();
@@ -219,6 +221,40 @@ class Person extends \Scat\Model {
 
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load Mac data file");
+
+    } elseif (preg_match('/^Mac Item #(,|\t)/', $line, $m)) {
+      // Mac Catalog data
+
+      error_log("Importing '$fn' as Mac catalog data\n");
+      $action= 'update';
+
+      $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+                INTO TABLE vendor_upload
+              FIELDS TERMINATED BY '$m[1]'
+              OPTIONALLY ENCLOSED BY '\"'
+              IGNORE 1 LINES
+              (code, @product_id, @ean, @upc, @brand,
+               name,
+               @title_general, @short_description, @long_copy,
+               @bullet_1, @bullet_2, @bullet_3, @bullet_4, @bullet_5,
+               @bullet_6, @bullet_7,
+               @color, @color_family,
+               @shape, @size, @subfamily_description, @key_features_list,
+               @key_features_list_2, @key_features_list_3, @keywords,
+               @catalog_code_description, @item_category,
+               @ecplus20, @ecplus, @future_msrp, @map,
+               height, length, weight, width,
+               @state_restrictions, @has_state_restriction,
+               @prop65, @prop65_label, @voc, @hazmat_flag,
+               @web_item_description, @ormd,
+               @lots_more)
+            SET vendor_sku = code,
+                barcode = IF(@ean, @ean, @upc),
+                prop65 = IF(@prop65 = 'Yes', 1, NULL),
+                hazmat = IF(@ormd = 'ORMD', 1, NULL)";
+
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to load Mac Catalog file");
 
     } elseif (preg_match('/^"?sls_sku"?(,|\t)/', $line, $m)) {
       // SLS
@@ -494,7 +530,7 @@ class Person extends \Scat\Model {
     if (!$this->orm->raw_execute($q))
       throw new \Exception("Unable to match items by barcode");
 
-    return [ "result" => "Added or updated " . $added_or_updated . " items." ];
+    return [ "message" => "Added or updated " . $added_or_updated . " items." ];
   }
 
   public function punches() {
