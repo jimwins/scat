@@ -68,6 +68,9 @@ class Txn extends \Scat\Model {
   private function _loadTotals() {
     if ($this->_totals) return $this->_totals;
 
+    /* turn off logging here, it's just too much */
+    $this->orm->configure('logging', false);
+
     $q= "SELECT ordered, allocated,
                 taxed, untaxed,
                 CAST(tax_rate AS DECIMAL(9,2)) tax_rate,
@@ -108,6 +111,9 @@ class Txn extends \Scat\Model {
           WHERE txn.id = {$this->id}) t";
     $this->orm->raw_execute($q);
     $st= $this->orm->get_last_statement();
+
+    $this->orm->configure('logging', true);
+
     return ($this->_totals= $st->fetch(\PDO::FETCH_ASSOC));
   }
 
