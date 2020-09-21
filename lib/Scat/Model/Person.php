@@ -312,7 +312,7 @@ class Person extends \Scat\Model {
       $q= "DELETE FROM vendor_upload WHERE purchase_quantity = 0";
 
       if (!$this->orm->raw_execute($q))
-        throw new \Exception("Unable to load Masterpiece data file");
+        throw new \Exception("Unable to load ColArt data file");
 
       /* ColArt files are just a chunk of the updates, by prefix */
       $action= 'special';
@@ -352,7 +352,7 @@ class Person extends \Scat\Model {
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load Alvin data file");
 
-    } elseif (preg_match('/Golden Ratio/', $line)) {
+    } elseif (preg_match('/masterpiece/', $line)) {
       // Masterpiece
       error_log("Importing '$fn' as Masterpiece price list\n");
       $sep= preg_match("/\t/", $line) ? "\t" : ",";
@@ -363,17 +363,18 @@ class Person extends \Scat\Model {
                 INTO TABLE vendor_upload
               FIELDS TERMINATED BY '$sep'
               OPTIONALLY ENCLOSED BY '\"'
-              IGNORE 1 LINES
+              IGNORE 3 LINES
               (@x, @sn, @pk_sort, @sku_sort, @y,
                vendor_sku, @gr, @size, @description,
                @x1, @x2, @x3, @x4, @x5, @x6, @x7, @x8,
                @retail_price, @net_price, @promo_price,
                @units, purchase_quantity,
-               weight, barcode, @freight, @dim_weight,
+               @weight, barcode, @freight, @dim_weight,
                @est_freight, @est_freight_case,
                length, width, height,
                @carton_length, @carton_width, @carton_height, @hts, @origin)
             SET code = CONCAT('MA', vendor_sku),
+                weight = @weight / @purchase_quantity,
                 retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
                 net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
                 promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', ''),
