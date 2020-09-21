@@ -323,35 +323,6 @@ class Person extends \Scat\Model {
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to deactive old items");
 
-    } elseif (preg_match('/Alvin SRP/', $line)) {
-      // Alvin Account Pricing Report
-#Manufacturer	BrandName	SubBrand	AlvinItem#	Description	New	UoM	Alvin SRP	RegularMultiplier	RegularNet	CurrentMultiplier	CurrentNetPrice	CurrentPriceSource	SaleStarted	SaleExpiration	Buying Quantity (BQ)	DropShip	UPC or EAN	Weight	Length	Width	Height	Ship Truck	CountryofOrigin	HarmonizedCode	DropShipDiscount	CatalogPage	VendorItemNumber
-      error_log("Importing '$fn' as Alvin price list\n");
-      $sep= preg_match("/\t/", $line) ? "\t" : ",";
-      $q= "LOAD DATA LOCAL INFILE '$tmpfn'
-                INTO TABLE vendor_upload
-              FIELDS TERMINATED BY '$sep'
-              OPTIONALLY ENCLOSED BY '\"'
-              LINES TERMINATED BY '\r\n'
-              IGNORE 1 LINES
-              (@manufacturer, @brand, @subbrand, code,
-               name, @new, @uom,
-               retail_price,
-               @regular_multiplier, net_price,
-               @current_multiplier, promo_price, @current_price_source,
-               @sale_started, @sale_ends,
-               purchase_quantity,
-               @dropship,
-               barcode,
-               weight, length, width, height, @ship_truck,
-               @country_of_origin, @harmonized_code, @drop_ship_discount,
-               @catalog_page, @vendor_item_number)
-            SET vendor_sku = code,
-                promo_quantity = purchase_quantity";
-
-      if (!$this->orm->raw_execute($q))
-        throw new \Exception("Unable to load Alvin data file");
-
     } elseif (preg_match('/masterpiece/', $line)) {
       // Masterpiece
       error_log("Importing '$fn' as Masterpiece price list\n");
