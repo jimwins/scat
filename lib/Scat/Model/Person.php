@@ -384,7 +384,8 @@ class Person extends \Scat\Model {
               $format
               IGNORE 1 LINES
               (code, vendor_sku, name, @retail_price, @net_price, @promo_price,
-               @barcode, @purchase_quantity, @promo_quantity)
+               @barcode, @purchase_quantity, @promo_quantity,
+               weight, length, width, height)
            SET
                retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
                net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
