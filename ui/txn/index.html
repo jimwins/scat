@@ -21,6 +21,13 @@
     } %}
 {% endif %}
 
+{% block title %}
+  {{ type == 'vendor' ? 'Purchases' : 'Sales' }}
+  {% if status != '' %}
+    ({{ variations[status] }})
+  {% endif %}
+{% endblock %}
+
 {% block controls %}
   <nav aria-label="Controls for Activity List">
     <ul class="pager">
