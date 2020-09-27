@@ -712,8 +712,10 @@
       })
     }
 
-    document.querySelectorAll('.toggle').forEach((toggle) => {
-      toggle.addEventListener('click', handleToggle)
+    document.addEventListener('click', (ev) => {
+      if (ev.target.classList.contains('toggle')) {
+        handleToggle(ev)
+      }
     })
 
     $('.edit-barcode-quantity').editable({
