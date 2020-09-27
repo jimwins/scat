@@ -345,7 +345,7 @@ class Person extends \Scat\Model {
                length, width, height,
                @carton_length, @carton_width, @carton_height, @hts, @origin)
             SET code = CONCAT('MA', vendor_sku),
-                weight = @weight / @purchase_quantity,
+                weight = @weight / purchase_quantity,
                 oversized = IF(@freight = 'OS' OR @freight = 'LTL', 1, 0),
                 retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
                 net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
