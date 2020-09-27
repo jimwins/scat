@@ -5,33 +5,43 @@
   Media
 {% endblock %}
 
-{% block content %}
-
+{% block pager %}
   <nav aria-label="Page navigation">
-    <ul class="pagination">
+    <ul class="pager">
       {% if page > 0 %}
-        <li>
+        <li class="previous">
           <a href="media?page={{ page - 1 }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
+            <i class="fa fa-arrow-left"></i> Previous
           </a>
         </li>
+      {% else %}
+        <li class="previous disabled">
+          <span><i class="fa fa-arrow-left"></i> Previous</span>
+        </li>
       {% endif %}
-      {% for p in 0..(total / page_size) %}
-        {% if p == page %}
-          <li class="active"><span>{{ p + 1 }}</span></li>
-        {% else %}
-          <li><a href="media?page={{ p }}">{{ p + 1 }}</a></li>
-        {% endif %}
-      {% endfor %}
+      <li>
+        {{ page * page_size + 1 }} -
+        {{ min((page + 1) * page_size, total) }}
+        of {{ total }}
+      </li>
       {% if page < (total / page_size)|round(0,'floor') %}
-        <li>
+        <li class="next">
           <a href="media?page={{ page + 1 }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
+            Next <i class="fa fa-arrow-right"></i>
           </a>
+        </li>
+      {% else %}
+        <li class="next disabled">
+          <span>Next <i class="fa fa-arrow-right"></i></span>
         </li>
       {% endif %}
     </ul>
   </nav>
+{% endblock %}
+
+{% block content %}
+
+  {{ block('pager') }}
 
   <div class="row">
     {% for i in media %}
@@ -49,6 +59,8 @@
       </div>
     {% endfor %}
   </div>
+
+  {{ block('pager') }}
 
 {% endblock %}
 
