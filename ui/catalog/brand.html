@@ -1,7 +1,7 @@
 {% extends 'catalog/layout.html' %}
 
 {% block title %}
-  Catalog Brand
+  {{ brand ? brand.name : 'Brands' }}
 {% endblock %}
 
 {% block catalog_crumb %}
