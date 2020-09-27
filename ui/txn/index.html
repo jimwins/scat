@@ -31,21 +31,35 @@
 {% block controls %}
   <nav aria-label="Controls for Activity List">
     <ul class="pager">
-      <li class="previous {{ not page ? 'disabled' }}">
-        <a href="?page={{ page - 1 }}&status={{ status }}">
-          <span aria-hidden="true">&larr;</span> Previous
-        </a>
-      </li>
+      {% if page %}
+        <li class="previous">
+          <a href="?page={{ page - 1 }}&status={{ status }}">
+            <span aria-hidden="true">&larr;</span> Previous
+          </a>
+        </li>
+      {% else %}
+        <li class="previous disabled">
+          <span><span aria-hidden="true">&larr;</span> Previous</span>
+        </li>
+      {% endif %}
       <li>
         {{ page * limit + 1 }} -
         {{ min((page + 1) * limit, txns[0].records) }}
         of {{ txns[0].records }}
       </li>
-      <li class="next {{ ((page + 1) * limit) >= txns[0].records ? 'disabled' }}">
-        <a href="?page={{ page + 1 }}&status={{ status }}">
-          Next <span aria-hidden="true">&rarr;</span>
-        </a>
-      </li>
+      {% if ((page + 1) * limit) < txns[0].records %}
+        <li class="next">
+          <a href="?page={{ page + 1 }}&status={{ status }}">
+            Next <span aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="next disabled">
+          <span>
+            Next <span aria-hidden="true">&rarr;</span>
+          </span>
+        </li>
+      {% endif %}
     </ul>
   </nav>
 {% endblock %}
