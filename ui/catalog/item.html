@@ -684,11 +684,10 @@
       }, 1)
     });
 
-    let handleToggle= (ev) => {
-      let toggle= ev.target
-      let current= ev.target.getAttribute('data-value')
+    let handleToggle= (toggle) => {
+      let current= toggle.getAttribute('data-value')
 
-      let name= ev.target.getAttribute('data-name')
+      let name= toggle.getAttribute('data-name')
       let value= current === '1' ? 0 : 1
 
       let icon= toggle.querySelector('i')
@@ -713,9 +712,8 @@
     }
 
     document.addEventListener('click', (ev) => {
-      if (ev.target.classList.contains('toggle')) {
-        handleToggle(ev)
-      }
+      let toggle= ev.target.closest('.toggle')
+      if (toggle) handleToggle(toggle)
     })
 
     $('.edit-barcode-quantity').editable({
