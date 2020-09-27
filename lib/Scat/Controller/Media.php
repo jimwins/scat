@@ -21,17 +21,25 @@ class Media {
   public function home(Request $request, Response $response, View $view) {
     $page= (int)$request->getParam('page');
     $page_size= 20;
+
     $media= $this->data->factory('Image')
+      ->select('*')
+      ->select_expr('COUNT(*) OVER()', 'records')
       ->order_by_desc('created_at')
-      ->limit($page_size)->offset($page * $page_size)
-      ->find_many();
-    $total= $this->data->factory('Image')->count();
+      ->limit($page_size)->offset($page * $page_size);
+
+    $q= $request->getParam('q');
+    if ($q) {
+      $media= $media->where_raw('MATCH (name, alt_text, caption) AGAINST (? IN NATURAL LANGUAGE MODE)', [ $q ]);
+    }
+
+    $media= $media->find_many();
 
     return $view->render($response, 'media/index.html', [
       'media' => $media,
+      'q' => $q,
       'page' => $page,
       'page_size' => $page_size,
-      'total' => $total,
     ]);
   }
 

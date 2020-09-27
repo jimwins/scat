@@ -10,7 +10,7 @@
     <ul class="pager">
       {% if page > 0 %}
         <li class="previous">
-          <a href="media?page={{ page - 1 }}" aria-label="Previous">
+          <a href="media?{{ { 'page': page - 1, 'q': q } | url_encode }}">
             <i class="fa fa-arrow-left"></i> Previous
           </a>
         </li>
@@ -20,13 +20,28 @@
         </li>
       {% endif %}
       <li>
-        {{ page * page_size + 1 }} -
-        {{ min((page + 1) * page_size, total) }}
-        of {{ total }}
+        <form class="form-inline" style="display: inline" method="GET" action="media">
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button type="submit" class="btn btn-default">
+                <i class="fa fa-search"></i>
+                <span class="sr-only">Search</span>
+              </button>
+            </span>
+            <input type="text" class="form-control" name="q" value="{{ q }}">
+            {% if media|length %}
+              <span class="input-group-addon">
+                {{ page * page_size + 1 }} -
+                {{ min((page + 1) * page_size, media[0].records) }}
+                of {{ media[0].records }}
+              </span>
+            {% endif %}
+          </div>
+        </form>
       </li>
-      {% if page < (total / page_size)|round(0,'floor') %}
+      {% if page < (media[0].records / page_size)|round(0,'floor') %}
         <li class="next">
-          <a href="media?page={{ page + 1 }}" aria-label="Next">
+          <a href="media?{{ { 'page': page + 1, 'q': q } | url_encode }}">
             Next <i class="fa fa-arrow-right"></i>
           </a>
         </li>
@@ -43,22 +58,30 @@
 
   {{ block('pager') }}
 
-  <div class="row">
-    {% for i in media %}
-      <div class="col-sm-3">
-        <div class="thumbnail responsive-thumbnail" data-id="{{ i.id }}">
-          <a href="/media/{{ i.id }}">
-            <img class="img-responsive"
-                 src="{{ i.medium ?: i.thumbnail }}"
-                 {{ i.alt_text ? 'alt="' ~ i.alt_text ~ '"' }}>
-          </a>
-          <div class="caption">{{ i.caption }}</div>
+  {% if media|length %}
+    <div class="row">
+      {% for i in media %}
+        <div class="col-sm-3">
+          <div class="thumbnail responsive-thumbnail" data-id="{{ i.id }}">
+            <a href="/media/{{ i.id }}">
+              <img class="img-responsive"
+                   src="{{ i.medium ?: i.thumbnail }}"
+                   {{ i.alt_text ? 'alt="' ~ i.alt_text ~ '"' }}>
+            </a>
+            <div class="caption">{{ i.caption }}</div>
+          </div>
         </div>
-      </div>
-    {% endfor %}
-  </div>
+      {% endfor %}
+    </div>
 
-  {{ block('pager') }}
+    {{ block('pager') }}
+
+  {% else %}
+    <p class="lead">
+      <b>Nothing found!</b>
+      Try refining your search or searching for something else.
+    </p>
+  {% endif %}
 
 {% endblock %}
 
