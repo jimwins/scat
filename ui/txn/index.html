@@ -38,7 +38,7 @@
       </li>
       <li>
         {{ page * limit + 1 }} -
-        {{ min((page + 1) * limit + 1, txns[0].records) }}
+        {{ min((page + 1) * limit, txns[0].records) }}
         of {{ txns[0].records }}
       </li>
       <li class="next {{ ((page + 1) * limit) >= txns[0].records ? 'disabled' }}">
