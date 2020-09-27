@@ -609,7 +609,13 @@
         btn.classList.remove('fa-check')
         btn.classList.add('fa-spin','fa-spinner')
         scat.patch("/catalog/item/{{ item.code }}", formData)
-            .then((res) => res.json())
+            .then((res) => {
+              if (res.redirected) {
+                window.location.href= res.url
+                return
+              }
+              return res.json()
+            })
             .then((data) => {
               $(el).popover('hide')
               return reloadBlock(el, data[name])

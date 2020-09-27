@@ -389,6 +389,11 @@ class Catalog {
 
     $this->data->commit();
 
+    /* If the code changed, redirect to the new resource */
+    if ($code != $item->code) {
+      return $response->withRedirect('/catalog/item/' . $item->code);
+    }
+
     return $response->withJson($item);
   }
 

@@ -71,21 +71,14 @@
   form.onsubmit= (event) => {
     event.preventDefault()
 
-    let form= dialog.getElementsByTagName('form')[0]
-    let formData= new FormData(form)
-    fetch("/catalog/item", {
-      method: 'POST',
-      body: formData
-    })
+    let formData= new FormData(event.currentTarget)
+    scat.post("/catalog/item", formData)
     .then((res) => {
-      if (res.ok) {
-        return res.json()
+      if (res.redirected) {
+        window.location.href= res.url
       } else {
-        alert(res.statusText)
+        alert(res.statusText ? res.statusText : 'An unknown error occured.')
       }
-    })
-    .then((data) => {
-      window.location.href= "/catalog/item/" + data.code
     })
   }
 {% endblock %}
