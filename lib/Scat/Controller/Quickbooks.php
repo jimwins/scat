@@ -408,6 +408,7 @@ class Quickbooks {
         'check' =>      ['Undeposited Funds', 'Accounts Receivable'],
         'paypal'=>      ['PayPal', 'Accounts Receivable'],
         'discount'=>    ['Discounts Given', 'Accounts Receivable'],
+        'loyalty'=>     ['Discounts Given', 'Accounts Receivable'],
         'bad'=>         ['Shrinkage', 'Accounts Receivable'],
         'donation'=>    ['Donation', 'Accounts Receivable'],
         'internal'=>    ['Store Supplies', 'Accounts Receivable'],
