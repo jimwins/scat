@@ -303,7 +303,7 @@ class Txn extends \Scat\Model {
     if (!$this->person_id)
       return;
 
-    // Use rewards
+    // Use rewards (added as items, old style)
     $q= "INSERT INTO loyalty (txn_id, person_id, processed, note, points)
          SELECT {$this->id} txn_id,
                 {$this->person_id} person_id,
@@ -314,6 +314,19 @@ class Txn extends \Scat\Model {
            JOIN txn_line ON loyalty_reward.item_id = txn_line.item_id
            JOIN item ON txn_line.item_id = item.id
           WHERE txn_line.txn_id = {$this->id}";
+
+    $this->orm->raw_execute($q);
+
+    // Use rewards (used as payments, new style)
+    $q= "INSERT INTO loyalty (txn_id, person_id, processed, note, points)
+         SELECT {$this->id} txn_id,
+                {$this->person_id} person_id,
+                NOW() processed,
+                'Used online' note,
+                -1 * JSON_EXTRACT(CONVERT(data USING utf8mb4), '$.points')
+                  points
+           FROM payment
+          WHERE txn_id = {$this->id}";
 
     $this->orm->raw_execute($q);
 
