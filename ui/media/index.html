@@ -46,15 +46,13 @@
   <div class="row">
     {% for i in media %}
       <div class="col-sm-3">
-        <div class="thumbnail" data-id="{{ i.id }}">
-          <div style="position: relative; width: 100%; height: 100%">
-            <a href="/media/{{ i.id }}">
-              <img class="img-responsive"
-                   src="{{ i.medium ?: i.thumbnail }}"
-                   {{ i.alt_text ? 'alt="' ~ i.alt_text ~ '"' }}>
-            </a>
-            <div class="caption">{{ i.caption }}</div>
-          </div>
+        <div class="thumbnail responsive-thumbnail" data-id="{{ i.id }}">
+          <a href="/media/{{ i.id }}">
+            <img class="img-responsive"
+                 src="{{ i.medium ?: i.thumbnail }}"
+                 {{ i.alt_text ? 'alt="' ~ i.alt_text ~ '"' }}>
+          </a>
+          <div class="caption">{{ i.caption }}</div>
         </div>
       </div>
     {% endfor %}

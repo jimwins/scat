@@ -101,3 +101,42 @@ input[type=search]::-webkit-search-cancel-button {
 .icon-arrow-right:before {
   content: "\f054";
 }
+
+.responsive-thumbnail {
+  position: relative;
+  width: 100%;
+  border: none;
+}
+.responsive-thumbnail:before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+.responsive-thumbnail a {
+  margin: 0; padding: 0;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+.responsive-thumbnail a img {
+  width: 100%;
+  height: 100%;
+  object-fit: scale-down;
+}
+.responsive-thumbnail .caption {
+  width: 100%;
+  height: 30%;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  overflow: scroll;
+  background: rgba(0,0,0,0.3);
+  color: #eee;
+  font-size: 80%;
+}
+.responsive-thumbnail .caption:empty {
+  display: none;
+}
