@@ -50,8 +50,20 @@ class Transactions {
   }
 
   public function search(Request $request, Response $response, $type) {
+    $q= $request->getParam('q');
+
+    if (preg_match('/^((%V|@)INV-)?(\d+)/', $q, $m)) {
+      $txn= $this->txn->fetchById($m[3]);
+      if ($txn) {
+        return $response->withRedirect(
+          ($type == 'customer' ? '/sale/' : '/purchase/') . $txn->id
+        );
+      }
+    }
+
     $page= (int)$request->getParam('page');
     $limit= 25;
+
     $txns= $this->txn->find($type, $page, $limit);
     if (($status= $request->getParam('status'))) {
       $txns= $txns->where('status', $status);
