@@ -49,10 +49,10 @@ class Transactions {
     return new \PayPalCheckoutSdk\Core\PayPalHttpClient($env);
   }
 
-  public function sales(Request $request, Response $response) {
+  public function search(Request $request, Response $response, $type) {
     $page= (int)$request->getParam('page');
     $limit= 25;
-    $txns= $this->txn->find('customer', $page, $limit);
+    $txns= $this->txn->find($type, $page, $limit);
     if (($status= $request->getParam('status'))) {
       $txns= $txns->where('status', $status);
     }
@@ -63,12 +63,16 @@ class Transactions {
     }
 
     return $this->view->render($response, 'txn/index.html', [
-      'type' => 'customer',
+      'type' => $type,
       'txns' => $txns->find_many(),
       'page' => $page,
       'limit' => $limit,
       'status' => $status,
     ]);
+  }
+
+  public function sales(Request $request, Response $response) {
+    return $this->search($request, $response, 'customer');
   }
 
   public function newSale(Response $response) {
@@ -1261,25 +1265,7 @@ class Transactions {
   }
 
   public function purchases(Request $request, Response $response) {
-    $page= (int)$request->getParam('page');
-    $limit= 25;
-    $txns= $this->txn->find('vendor', $page, $limit);
-    if (($status= $request->getParam('status'))) {
-      $txns= $txns->where('status', $status);
-    }
-
-    $accept= $request->getHeaderLine('Accept');
-    if (strpos($accept, 'application/json') !== false) {
-      return $response->withJson($txns->find_many());
-    }
-
-    return $this->view->render($response, 'txn/index.html', [
-      'type' => 'vendor',
-      'txns' => $txns->find_many(),
-      'page' => $page,
-      'limit' => $limit,
-      'status' => $status,
-    ]);
+    return $this->search($request, $response, 'vendor');
   }
 
   public function reorderForm(Request $request, Response $response) {
