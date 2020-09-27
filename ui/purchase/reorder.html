@@ -39,11 +39,12 @@
             <td class="num">{{ loop.index }}</td>
             <td>
               {% if vendor_id in [ 7, 3757 ] %}
-                <button type="button" class="btn btn-default btn-xs"
-                      data-id="{{ item.vendor_item_id }}"
-                      data-action="check-vendor-stock">
+                <a class="btn btn-default btn-xs"
+                    role="button" tabindex="0"
+                    data-id="{{ item.vendor_item_id }}"
+                    data-action="check-vendor-stock">
                   <i class="fa fa-search"></i>
-                </button>
+                </a>
               {% endif %}
               <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
                 {{- item.vendor_code ?: item.code -}}
@@ -289,9 +290,14 @@
         .then((data) => {
           message= "";
           for (const [key, value] of Object.entries(data)) {
-            message+= `${value} in ${key}` + "\n";
+            message+= `${value} in ${key}` + "<br>";
           }
-          alert(message);
+          $(act).popover({
+            title: 'Stock',
+            content: message,
+            html: true,
+            trigger: 'focus'
+          }).popover('show')
         })
         .finally(() => {
           icon.classList.remove('fa-spin','fa-spinner')

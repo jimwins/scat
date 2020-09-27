@@ -472,10 +472,11 @@
                       <i class="fa fa-unlink"></i>
                     </button>
                     {% if vi.vendor_id in [ 7, 3757 ] %}
-                      <button type="button" class="btn btn-default btn-xs"
-                            data-action="check-vendor-stock">
+                      <a class="btn btn-default btn-xs"
+                          role="button" tabindex="1"
+                          data-action="check-vendor-stock">
                         <i class="fa fa-search"></i>
-                      </button>
+                      </a>
                     {% endif %}
                   </td>
                   <td>
@@ -648,7 +649,8 @@
       // focus on the first input or select element
       let id= ev.target.getAttribute('aria-describedby')
       let popover= document.getElementById(id)
-      popover.querySelector('input, select').focus()
+      let input= popover.querySelector('input, select')
+      if (input) input.focus()
     })
 
     $('.editable-select2').editable({
@@ -813,14 +815,26 @@
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'check-vendor-stock') {
         let id= ev.target.closest('[data-id]').getAttribute('data-id')
+        let icon= act.querySelector('i')
+        icon.classList.remove('fa-search')
+        icon.classList.add('fa-spin','fa-spinner')
         return scat.get('/catalog/vendor-item/' + id + '/stock')
         .then((res) => res.json())
         .then((data) => {
           message= "";
           for (const [key, value] of Object.entries(data)) {
-            message+= `${value} in ${key}` + "\n";
+            message+= `${value} in ${key}` + "<br>";
           }
-          alert(message);
+          $(act).popover({
+            title: 'Stock',
+            content: message,
+            html: true,
+            trigger: 'focus'
+          }).popover('show')
+        })
+        .finally(() => {
+          icon.classList.remove('fa-spin','fa-spinner')
+          icon.classList.add('fa-search')
         })
       }
     })
