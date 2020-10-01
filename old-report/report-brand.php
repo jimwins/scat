@@ -86,9 +86,13 @@ $q= "CREATE TEMPORARY TABLE current
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 $q= "UPDATE current
-        SET brand_id = IFNULL((SELECT brand_id FROM item
+        SET brand_id = IFNULL((SELECT product.brand_id
+                                 FROM item
+                                 JOIN product ON item.product_id = product.id
                                 WHERE item.id = current.item_id),
-                              0)";
+                              IFNULL((SELECT brand_id FROM item
+                                       WHERE item.id = current.item_id),
+                                     0))";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
@@ -119,9 +123,13 @@ $q= "CREATE TEMPORARY TABLE previous
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
 $q= "UPDATE previous
-        SET brand_id = IFNULL((SELECT brand_id FROM item
+        SET brand_id = IFNULL((SELECT product.brand_id
+                                 FROM item
+                                 JOIN product ON item.product_id = product.id
                                 WHERE item.id = previous.item_id),
-                              0)";
+                              IFNULL((SELECT brand_id FROM item
+                                       WHERE item.id = previous.item_id),
+                                     0))";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
