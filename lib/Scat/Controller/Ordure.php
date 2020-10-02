@@ -22,6 +22,7 @@ class Ordure {
 
   public function pushPrices(Response $response,
                               \Scat\Service\Catalog $catalog) {
+    error_log("pushing prices\n");
     $url= ORDURE . '/update-pricing';
     $key= ORDURE_KEY;
 
@@ -57,6 +58,8 @@ class Ordure {
               ($item->is_dropshippable ?: '0') . "\r\n";
     }
 
+    error_log("generated data, uploading\n");
+
     $client= new \GuzzleHttp\Client();
 
     $res= $client->request('POST', $url, [
@@ -75,6 +78,8 @@ class Ordure {
                            ]);
 
     $body= $res->getBody();
+
+    error_log("done uploading, got: {$body}\n");
 
     return $response;
   }
