@@ -128,16 +128,18 @@
   {% endfor %}
   {% set span= txn.type == 'vendor' ? 5 : 4 %}
   {% if variation != 'packing-slip' %}
-    <tr class="sub">
-      <td class="right" colspan="{{ span }}">Subtotal:</td>
-      <td class="price">{{ scat.amount(txn.subtotal) }}</td>
-    </tr>
-    <tr>
-      <td class="right" colspan="{{ span }}">
-        Sales Tax {% if txn.tax_rate %}({{ txn.tax_rate }}%){% endif %}:
-      </td>
-      <td class="price">{{ scat.amount(txn.total - txn.subtotal) }}</td>
-    </tr>
+    {% if txn.type != 'vendor' %}
+      <tr class="sub">
+        <td class="right" colspan="{{ span }}">Subtotal:</td>
+        <td class="price">{{ scat.amount(txn.subtotal) }}</td>
+      </tr>
+      <tr>
+        <td class="right" colspan="{{ span }}">
+          Sales Tax {% if txn.tax_rate %}({{ txn.tax_rate }}%){% endif %}:
+        </td>
+        <td class="price">{{ scat.amount(txn.total - txn.subtotal) }}</td>
+      </tr>
+    {% endif %}
     <tr class="total">
       <td class="right" colspan="{{ span }}">Total:</td>
       <td class="price">{{ scat.amount(txn.total) }}</td>
