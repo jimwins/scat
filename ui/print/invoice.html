@@ -25,12 +25,26 @@
   </div>
   <div id="store_info">
     <small>{{ txn.type == 'vendor' ? 'Ship To' : 'From' }}:</small><br>
-    <b>Raw Materials Art Supplies</b><br>
-    645 South Los Angeles Street<br>
-    Los Angeles, CA 90014<br>
-    (800) 729-7060<br>
-    info@RawMaterialsLA.com<br>
-    http://RawMaterialsLA.com/
+    {% if txn.type == 'vendor' and shipping_address_id > 1 %}
+      {% set addr= txn.shipping_address %}
+      <b>
+        {{ addr.company }}
+        {% if addr.company and addr.name %}<br>{% endif %}
+        {{ addr.name }}<br>
+      </b>
+      {{ addr.street1 }}<br>
+      {% if addr.street2 %} {{ addr.street2 }}<br>{% endif %}
+      {{ addr.city }}, {{ addr.state }}
+      {{ addr.zip }}<br>
+      {% if addr.phone %} {{ addr.phone|phone_number_format }}<br>{% endif %}
+    {% else %}
+      <b>Raw Materials Art Supplies</b><br>
+      645 South Los Angeles Street<br>
+      Los Angeles, CA 90014<br>
+      (800) 729-7060<br>
+      info@RawMaterialsLA.com<br>
+      http://RawMaterialsLA.com/
+    {% endif %}
   </div>
   <div id="client_info">
   {% if txn.person_id %}
