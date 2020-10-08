@@ -25,7 +25,7 @@
   </div>
   <div id="store_info">
     <small>{{ txn.type == 'vendor' ? 'Ship To' : 'From' }}:</small><br>
-    {% if txn.type == 'vendor' and shipping_address_id > 1 %}
+    {% if txn.type == 'vendor' and txn.shipping_address_id > 1 %}
       {% set addr= txn.shipping_address %}
       <b>
         {{ addr.company }}
@@ -61,7 +61,7 @@
     {% if person.email %}
       {{ person.email }}<br>
     {% endif %}
-    {% if txn.shipping_address_id > 1 %}
+    {% if txn.type == 'customer' and txn.shipping_address_id > 1 %}
       <br>
       {% set addr= txn.shipping_address %}
       <b>
@@ -74,7 +74,7 @@
       {{ addr.city }}, {{ addr.state }}
       {{ addr.zip }}<br>
       {% if addr.phone %} {{ addr.phone|phone_number_format }}<br>{% endif %}
-    {% elseif txn.shipping_address_id == 1 %}
+    {% elseif txn.type == 'vendor' and txn.shipping_address_id == 1 %}
       <br><b>CURBSIDE PICKUP</b>
     {% endif %}
   {% endif %}
