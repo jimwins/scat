@@ -358,6 +358,13 @@
                 {{ item.inventoried ?: 'Not yet' }}
             </div>
           </div>
+
+          <button type="button" class="btn btn-default toggle"
+                  data-name="is_kit" data-value="{{ item.is_kit }}">
+            <i class="fa fa-fw {{ item.is_kit ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+            Kit?
+          </button>
+
         </div>
       </div>
     </div>
@@ -417,6 +424,83 @@
 
   </div><!-- .row -->
 
+  <!-- Kit Contents -->
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="kitHeader">
+      <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" href="#kit" aria-expanded="false" aria-controls="kit">
+        <h4 class="panel-title">Kit Contents</h4>
+      </a>
+    </div>
+    {% block kit %}
+      {% import 'macros.twig' as scat %}
+      <div id="kit" data-reload="kit"
+           class="panel-collapse collapse collapsed"
+           role="tabpanel" aria-labelledby="kitHeader">
+        {% if item.is_kit %}
+          <form id="add-kit-item" style="padding: 1em">
+            <input type="hidden" name="scope" value="items">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
+              <input type="text" class="form-control"
+                     name="q" placeholder="Enter code or search terms">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Find Items</button>
+              </span>
+            </div>
+          </form>
+          <table class="table table-striped table-header">
+            <thead>
+              <th class="num">#</th>
+              <th>Code</th>
+              <th>Name</th>
+              <th class="text-right">Retail</th>
+              <th class="text-right">Sale</th>
+              <th class="text-right">Quantity</th>
+            </thead>
+            {% set ext_sale, ext_retail, ext_quantity= 0, 0, 0 %}
+            <tbody>
+              {% for k in item.kit_items.find_many() %}
+                {% set i = k.item %}
+                {% set ext_retail= ext_retail + (k.quantity * i.retail_price) %}
+                {% set ext_sale= ext_sale + (k.quantity * i.sale_price) %}
+                {% set ext_quantity= ext_quantity + k.quantity %}
+                <tr data-id="{{ k.id }}" data-editable-base="/catalog/item/{{ item.code }}/kit/{{ k.id}}" data-editable-reload="kit">
+                  <td class="num">{{ loop.index }}</td>
+                  <td>{{ i.code }}</td>
+                  <td>{{ i.name }}</td>
+                  <td class="text-right">
+                    {{ scat.amount(i.retail_price) }}
+                  </td>
+                  <td class="text-right">
+                    {{ scat.amount(i.sale_price) }}
+                  </td>
+                  <td class="text-right">
+                    <span class="editable" data-name="quantity">
+                      {{- k.quantity -}}
+                    </span>
+                    <button class="btn btn-default btn-xs remove-kit-item">
+                      <i class="fa fa-trash-o">
+                        <span class="sr-only">Remove</span>
+                      </i>
+                    </button>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr style="border-top: 6px double #dbcbb1">
+                <td colspan="3"></td>
+                <td class="text-right">{{ scat.amount(ext_retail) }}</td>
+                <td class="text-right">{{ scat.amount(ext_sale) }}</td>
+                <td class="text-right">{{ ext_quantity }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        {% endif %}
+      </div>
+    {% endblock %}
+  </div>
+
   <!-- Vendor Items -->
   <div class="panel-group" id="accordion"
        role="tablist" aria-multiselectable="true">
@@ -445,7 +529,6 @@
               </tr>
             </thead>
             <tfoot>
-              {# XXX implement #}
               <tr>
                 <td colspan="9">
                   <button class="btn btn-primary"
@@ -599,6 +682,11 @@
       if (!value) {
         value= this.innerText
       }
+      let base_el= el.closest('[data-editable-base]')
+      let base= (base_el ?
+                  base_el.getAttribute('data-editable-base') :
+                  "/catalog/item/{{ item.code }}")
+      let reload_el= el.closest('[data-editable-reload]')
       let html= scat.htmlToElement('<form><div class="form-group"><div class="input-group"><input type="text" name="" class="form-control" value=""><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-fw fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-fw fa-ban"></i></button></span></div><span class="help-block"></span></div></form>')
       html.querySelector('input').setAttribute('name', name)
       html.querySelector('input').setAttribute('value', value)
@@ -609,7 +697,7 @@
         let btn= ev.target.querySelector('.fa-check')
         btn.classList.remove('fa-check')
         btn.classList.add('fa-spin','fa-spinner')
-        scat.patch("/catalog/item/{{ item.code }}", formData)
+        scat.patch(base, formData)
             .then((res) => {
               if (res.redirected) {
                 window.location.href= res.url
@@ -619,7 +707,7 @@
             })
             .then((data) => {
               $(el).popover('hide')
-              return reloadBlock(el, data[name])
+              return reloadBlock(reload_el ? reload_el : el, data[name])
             })
             .catch((err) => {
               let help= ev.target.querySelector('.help-block')
@@ -854,6 +942,53 @@
       }
     })
 
+    /* Kit handling */
+    document.addEventListener('submit', (ev) => {
+      if (ev.target.id != 'add-kit-item') return;
+
+      ev.stopPropagation()
+      ev.preventDefault()
+
+      let form= ev.target
+
+      form.classList.remove('has-error')
+
+      scat.get('/catalog/search', new FormData(form), {
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.items.length) {
+          form.classList.add('has-error')
+        } else if (data.items.length == 1) {
+          scat.post('/catalog/item/{{ item.code }}/kit', {
+            id: data.items[0].id
+          })
+          .then((res) => res.json())
+          .then((res) => {
+            reloadBlock(form)
+          })
+        } else {
+          scat.alert('warning', 'Too many matches!')
+        }
+      })
+      .catch((err) => {
+        scat.alert('danger', err.message)
+      })
+    })
+
+    document.addEventListener('click', (ev) => {
+      if (ev.target.closest('.remove-kit-item')) {
+        let id= ev.target.closest('[data-id]').getAttribute('data-id')
+        scat.delete("/catalog/item/{{ item.code }}/kit/" + id)
+            .then((res) => {
+              return reloadBlock(document.getElementById('kit'), "")
+            })
+      }
+    })
   }
   </script>
 

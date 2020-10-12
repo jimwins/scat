@@ -190,8 +190,6 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
               [ \Scat\Controller\Catalog::class, 'updateItem' ]);
   $app->post('/item/~bulk-add',
               [ \Scat\Controller\Catalog::class, 'bulkAddItems' ]);
-  $app->patch('/item/{code:.*}',
-              [ \Scat\Controller\Catalog::class, 'updateItem' ]);
 
   $app->post('/item/{code:.*}/~print-label',
             [ \Scat\Controller\Catalog::class, 'printItemLabel' ]);
@@ -205,6 +203,13 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Catalog::class, 'updateItemBarcode' ]);
   $app->delete('/item/{code:.*}/barcode/{barcode:.*}',
             [ \Scat\Controller\Catalog::class, 'deleteItemBarcode' ]);
+
+  $app->post('/item/{code:.*}/kit',
+            [ \Scat\Controller\Catalog::class, 'addKitItem' ]);
+  $app->patch('/item/{code:.*}/kit/{id:[0-9]+}',
+            [ \Scat\Controller\Catalog::class, 'updateKitItem' ]);
+  $app->delete('/item/{code:.*}/kit/{id:[0-9]+}',
+            [ \Scat\Controller\Catalog::class, 'deleteKitItem' ]);
 
   $app->get('/item/{code:.+}/media',
             [ \Scat\Controller\Catalog::class, 'itemGetMedia' ]);
@@ -222,6 +227,8 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
   /* Needs to be after other /item */
   $app->get('/item[/{code:.*}]', [ \Scat\Controller\Catalog::class, 'item' ])
       ->setName('catalog-item');
+  $app->patch('/item/{code:.*}',
+              [ \Scat\Controller\Catalog::class, 'updateItem' ]);
 
   $app->get('/vendor-item[/{id:[0-9]+}]',
             [ \Scat\Controller\Catalog::class, 'vendorItem' ]);

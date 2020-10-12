@@ -574,6 +574,61 @@ class Catalog {
     return $response->withJson($item);
   }
 
+  public function addKitItem(Request $request, Response $response, $code) {
+    $item= $this->catalog->getItemByCode($code);
+    if (!$item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $kit_item= $item->kit_items()->create();
+    $kit_item->kit_id= $item->id;
+    $kit_item->item_id= $request->getParam('id');
+    $kit_item->quantity= 1;
+    $kit_item->save();
+
+    return $response->withJson($item);
+  }
+
+  public function updateKitItem(Request $request, Response $response,
+                                $code, $id)
+  {
+    $item= $this->catalog->getItemByCode($code);
+    if (!$item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $kit_item= $item->kit_items()->find_one($id);
+
+    if (!$kit_item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    foreach ($kit_item->getFields() as $field) {
+      $value= $request->getParam($field);
+      if (isset($value)) {
+        $kit_item->set($field, $value);
+      }
+    }
+
+    $kit_item->save();
+
+    return $response->withJson($item);
+  }
+
+  public function deleteKitItem(Request $request, Response $response,
+                                $code, $id)
+  {
+    $item= $this->catalog->getItemByCode($code);
+    if (!$item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $kit_item= $item->kit_items()->find_one($id);
+
+    if (!$kit_item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $kit_item->delete();
+
+    return $response->withJson($item);
+  }
+
   public function itemGetMedia(Request $request, Response $response,
                                 \Scat\Service\Media $media, $code)
   {

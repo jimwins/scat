@@ -19,6 +19,13 @@ class Item extends \Scat\Model {
     return $this->has_many('VendorItem')->where_gte('active', $active);
   }
 
+  public function kit_items() {
+    if ($this->is_kit) {
+      return $this->has_many('KitItem', 'kit_id')
+        ->order_by_asc('sort');
+    }
+  }
+
   public function media() {
     return $this->has_many_through('Image')
       ->order_by_asc('priority')
