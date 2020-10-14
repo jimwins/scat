@@ -326,7 +326,8 @@ class Txn extends \Scat\Model {
                 -1 * JSON_EXTRACT(CONVERT(data USING utf8mb4), '$.points')
                   points
            FROM payment
-          WHERE txn_id = {$this->id}";
+          WHERE txn_id = {$this->id}
+            AND method = 'loyalty'";
 
     $this->orm->raw_execute($q);
 
