@@ -408,7 +408,7 @@ $(function() {
     // (%V|@)INV-(\d+) is an invoice to load
     var m= q.match(/^(%V|@)INV-(\d+)/);
     if (m) {
-      Txn.loadId(m[2]);
+      window.location.href= '/sale/' + m[2];
       return false;
     }
 
@@ -1456,7 +1456,7 @@ viewModel.load= function(txn) {
 }
 
 viewModel.loadReturnedFrom= function() {
-  Txn.loadId(viewModel.txn.returned_from_id());
+  window.location.href= '/sale/' + viewModel.txn.returned_from_id();
 }
 
 viewModel.setStatus= (x,ev,status) => {
@@ -1592,7 +1592,7 @@ viewModel.removeItem= function(item) {
 }
 
 viewModel.loadOrder= function(order) {
-  Txn.loadId(order.id());
+  window.location.href= '/sale/' + order.id();
 }
 
 viewModel.showAllocated= function() {
