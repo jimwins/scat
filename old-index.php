@@ -577,6 +577,16 @@ $(function() {
         Refund Processed
       </button>
     </div>
+    <div data-bind="if: ['readyforpickup'].includes(txn.status()) && txn.shipping_address_id() == 1, click: cannedMessage" data-message="pickup-reminder">
+      <button class="btn btn-info btn-block">
+        Pickup Reminder
+      </button>
+    </div>
+    <div data-bind="if: ['paid','readyforpickup','waitingforitems'].includes(txn.status()) && txn.shipping_address_id() == 1, click: function () { viewModel.setStatus(null, null, 'complete') }">
+      <button class="btn btn-primary btn-block">
+        Complete
+      </button>
+    </div>
   </div>
 </div>
 
