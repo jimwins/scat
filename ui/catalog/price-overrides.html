@@ -10,7 +10,7 @@
     {{- '/catalog/search?q=code:' ~ override.pattern -}}
   {%- endif -%}
   {%- if override.pattern_type == 'rlike' -%}
-    {{- '/catalog/search?q=re:' ~ override.pattern -}}
+    {{- '/catalog/search?q=re:"' ~ override.pattern ~ '"' -}}
   {%- endif -%}
 {% endmacro %}
 
