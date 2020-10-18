@@ -246,7 +246,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
 
   $app->get('/price-overrides',
              function (Request $request, Response $response, View $view) {
-               $price_overrides= \Model::factory('PriceOverride')
+               $price_overrides= \Titi\Model::factory('PriceOverride')
                                   ->order_by_asc('pattern')
                                   ->order_by_asc('minimum_quantity')
                                   ->find_many();
