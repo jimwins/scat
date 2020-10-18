@@ -257,7 +257,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              })->setName('catalog-price-overrides');
   $app->post('/price-overrides/~delete',
              function (Request $request, Response $response) {
-               $override= \Model::factory('PriceOverride')
+               $override= \Titi\Model::factory('PriceOverride')
                             ->find_one($request->getParam('id'));
                if (!$override) {
                  throw new \Slim\Exception\HttpNotFoundException($request);
@@ -267,10 +267,10 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              });
   $app->post('/price-overrides/~edit',
              function (Request $request, Response $response) {
-               $override= \Model::factory('PriceOverride')
+               $override= \Titi\Model::factory('PriceOverride')
                             ->find_one($request->getParam('id'));
                if (!$override) {
-                 $override= \Model::factory('PriceOverride')->create();
+                 $override= \Titi\Model::factory('PriceOverride')->create();
                }
                $override->pattern_type= $request->getParam('pattern_type');
                $override->pattern= $request->getParam('pattern');
@@ -283,7 +283,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              });
   $app->get('/price-override-form',
             function (Request $request, Response $response, View $view) {
-              $override= \Model::factory('PriceOverride')
+              $override= \Titi\Model::factory('PriceOverride')
                            ->find_one($request->getParam('id'));
               return $view->render($response,
                                          'dialog/price-override-edit.html',
