@@ -1163,6 +1163,14 @@ class Transactions {
       $shipment->status= 'pending';
     }
 
+    /* Re-rate? */
+    if (($rerate= $request->getParam('rerate'))) {
+      $ep= $shipping->getShipment($shipment);
+      $ep->get_rates();
+
+      $shipment->status= 'pending';
+    }
+
     /* Select a rate? */
     if (($rate_id= $request->getParam('rate_id'))) {
       $ep= $shipping->getShipment($shipment);

@@ -540,6 +540,10 @@ $(function() {
                       click: $parent.finalizeShipment">
           Finalize
         </a>
+        <a data-bind="if: $data.method_id() && $data.status() == 'pending',
+                      click: $parent.rerateShipment">
+          - Re-rate
+        </a>
         <a data-bind="if: $data.method_id() && $data.status() != 'pending',
                       click: $parent.printShipmentLabel">
           - Print Label
@@ -1516,6 +1520,15 @@ viewModel.createShipment= () => {
   var id= Txn.id()
 
   scat.dialog([], '/sale/' + id + '/shipment')
+}
+
+viewModel.rerateShipment= (shipment) => {
+  var id= Txn.id()
+
+  scat.patch('/sale/' + id + '/shipment/' + shipment.id(), { rerate: 1 })
+  .then((res) => {
+    scat.dialog([], '/sale/' + id + '/shipment/' + shipment.id())
+  })
 }
 
 viewModel.finalizeShipment= (shipment) => {
