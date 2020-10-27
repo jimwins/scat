@@ -62,7 +62,11 @@ class Shipping {
         }
 
         if ($txn->online_sale_id) {
-          $this->ordure->markOrderShipped($txn->uuid);
+          try {
+            $this->ordure->markOrderShipped($txn->uuid);
+          } catch (\Exception $e) {
+            error_log("failed to mark txn {$txn->id} shipped: " . $e->getMessage());
+          }
         }
 
         if (!$txn->person()->email) {
