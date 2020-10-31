@@ -282,11 +282,9 @@ class Person extends \Scat\Model {
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load SLS data file");
 
-    } elseif (preg_match('/(.*),(.*),,,,,Customer #/', $line, $m)) {
-      $prefix= $m[1];
-      $assortments= str_repeat('@a,',$m[2]);
+    } elseif (preg_match('/^ColArt/', $line, $m)) {
       // ColArt
-#,Order,Product Code,Description,Health Label,Series,Bar Code,MOQ,Inner Pack,Case Pack,Trade Discount,Promo Discount,2020 MSRP,Net,Extended Net,,,N/A,N/A,N/A,N/A,N/A,N/A,Harmonized Tariff Codes,Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),,,,,,,,,,,,,,
+#,Order,Product Code,Description,Health Label,Series,Bar Code,MOQ,Inner Pack,Case Pack,Trade Discount,,Promo Discount,2020 MSRP,Net,Extended Net,USA MAP Pricing,Country of Origin,Harmonized Tariff Codes,Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),,,,,,,,,,,,,,
       error_log("Importing '$fn' as ColArt price list\n");
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
                 INTO TABLE vendor_upload
@@ -296,11 +294,11 @@ class Person extends \Scat\Model {
               IGNORE 1 LINES
               (@a, @order, vendor_sku, name, @health_label, @series,
                barcode, purchase_quantity,
-               @inner_pack, @case_pack, @trade_discount, @promo_discount,
+               @inner_pack, @case_pack, @trade_discount, @a, @promo_discount,
                retail_price, net_price, @extended_net, @map_price,
-               @a, $assortments
+               @country_of_origin,
                @tariff, height, width, length, @cubic, weight)
-              SET code = CONCAT('$prefix', vendor_sku),
+              SET code = CONCAT('COL-', vendor_sku),
                   weight = weight / 16,
                   prop65 = IF(@health_label = '65', 1, 0)
               ";
