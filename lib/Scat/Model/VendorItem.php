@@ -69,8 +69,12 @@ class VendorItem extends \Scat\Model {
     }
   }
 
-  public function jsonSerialize() {
-    return $this->asArray();
+  public function set($name, $value= null) {
+    if ($name == 'promo_price') {
+      if (!strlen($value)) $value= null;
+    }
+
+    return parent::set($name, $value);
   }
 }
 
