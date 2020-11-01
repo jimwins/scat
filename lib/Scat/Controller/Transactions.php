@@ -225,7 +225,11 @@ class Transactions {
     $unique= preg_match('/^ZZ-(frame|print|univ|canvas|stretch|float|panel|giftcard)/i', $item->code);
 
     if (!$unique) {
-      $line= $txn->items()->where('item_id', $item->id)->find_one();
+      $line=
+        $txn->items()
+            ->where('item_id', $item->id)
+            ->where_null('kit_id') /* Don't include kit items */
+            ->find_one();
     }
 
     if ($unique || !$line) {
@@ -233,6 +237,7 @@ class Transactions {
       $line->txn_id= $txn->id;
       $line->item_id= $item->id;
 
+      /* Get pricing for vendor items */
       if ($txn->type == 'vendor') {
         // default to full retail
         $line->retail_price= $item->retail_price;
@@ -262,9 +267,15 @@ class Transactions {
     }
 
     $quantity= $request->getParam('quantity') ?: 1;
+
     $line->ordered+= $quantity * ($txn->type == 'customer') ? -1 : 1;
 
     $line->save();
+
+    /* Is this a kit? Need to add kit items or adjust quantities */
+    if ($item->is_kit) {
+      $this->updateKitQuantities($txn, $line, $item);
+    }
 
     // txn no longer filled?
     if ($txn->status == 'filled') {
@@ -283,6 +294,31 @@ class Transactions {
     $line->reload();
 
     return $response->withJson($line);
+  }
+
+  // XXX this assumes kit contents haven't changed
+  public function updateKitQuantities($txn, $line, $item) {
+    foreach ($item->kit_items()->find_many() as $kit_item) {
+      $kit_line= null;
+      if ($line->id) {
+        $kit_line= $txn->items()
+          ->where('item_id', $kit_item->item_id)
+          ->where('kit_id', $item->id)
+          ->find_one();
+      }
+      if (!$kit_line) {
+        $kit_line= $txn->items()->create();
+        $kit_line->txn_id= $txn->id;
+        $kit_line->kit_id= $item->id;
+        $kit_line->item_id= $kit_item->item_id;
+        $kit_line->retail_price= 0.00;
+        $kit_line->tax= 0.00;
+      }
+
+      $kit_line->ordered= $line->ordered * $kit_item->quantity;
+
+      $kit_line->save();
+    }
   }
 
   public function handleUploadedItems(Request $request, Response $response,
@@ -646,6 +682,11 @@ class Transactions {
 
       $mul= ($txn->type == 'customer' ? -1 : 1);
       $line->ordered= $mul * $quantity;
+
+      $item= $line->item();
+      if ($item->is_kit) {
+        $this->updateKitQuantities($txn, $line, $item);
+      }
     }
 
     $line->save();
