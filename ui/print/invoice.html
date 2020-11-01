@@ -120,8 +120,16 @@
           {% endif %}
         </td>
         {% if variation != 'packing-slip' %}
-          <td class="right">{{ scat.amount(line.sale_price) }}</td>
-          <td class="right">{{ scat.amount(line.sale_price * line.ordered * (txn.type == 'customer' ? -1 : 1)) }}</td>
+          <td class="right">
+            {% if not line.kit_id %}
+              {{ scat.amount(line.sale_price) }}
+            {% endif %}
+          </td>
+          <td class="right">
+            {% if not line.kit_id %}
+              {{ scat.amount(line.sale_price * line.ordered * (txn.type == 'customer' ? -1 : 1)) }}
+            {% endif %}
+          </td>
         {% endif %}
       </tr>
     {% endif %}

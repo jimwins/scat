@@ -41,9 +41,14 @@
               <span>{{ data.name }}</span>
               <div class="small">{{ data.pricing_detail }}</div>
             </td>
-            <td class="text-right">{{ scat.amount(data.sale_price) }}</td>
             <td class="text-right">
-              {{ scat.amount(data.sale_price * (txn.type == 'vendor' ? data.ordered : -data.ordered)) }}
+              {% if not data.kit_id %}
+                {{ scat.amount(data.sale_price) }}</td>
+              {% endif %}
+            <td class="text-right">
+              {% if not data.kit_id %}
+                {{ scat.amount(data.sale_price * (txn.type == 'vendor' ? data.ordered : -data.ordered)) }}
+              {% endif %}
             </td>
           </tr>
         {% endif %}
