@@ -96,7 +96,7 @@ function txn_load($db, $id) {
 
 function txn_load_items($db, $id) {
   $q= "SELECT
-              txn_line.id AS line_id, item.code, item.id AS item_id,
+              txn_line.id AS line_id, item.code, item.id AS item_id, kit_id,
               IF(type = 'vendor' && txn.person_id,
                  (SELECT vendor_sku
                     FROM vendor_item

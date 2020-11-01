@@ -1321,12 +1321,15 @@ $('#tax_rate .val').editable({
         data-bind="attr: { 'data-line_id': $data.line_id }">
       <td>
         <a class="remove"
-           data-bind="click: $parent.removeItem">
+           data-bind="click: $parent.removeItem, visible: !$data.kit_id()">
           <i class="fa fa-trash-o" title="Remove"></i>
         </a>
       </td>
-      <td align="center" class="editable"
-          data-bind="css: { over: $parent.txn.type() != 'vendor' && $data.quantity() > $data.stock() }">
+      <td align="center"
+          data-bind="css: {
+                      over: $parent.txn.type() != 'vendor' && $data.quantity() > $data.stock(),
+                      editable: !$data.kit_id()
+                    }">
         <span class="quantity" data-bind="text: $data.quantity"></span>
       </td>
       <td align="center" class="editable"
@@ -1351,10 +1354,10 @@ $('#tax_rate .val').editable({
       </td>
       <td class="editable" class="right">
         <span class="sale_price"
-              data-bind="text: Scat.amount($data.price())"></span>
+              data-bind="text: Scat.amount($data.price()), visible: !$data.kit_id()"></span>
       </td>
       <td class="right">
-        <span data-bind="text: Scat.amount($data.ext_price())"></span>
+        <span data-bind="text: Scat.amount($data.ext_price()), visible: !$data.kit_id()"></span>
       </td>
     </tr>
   </tbody>
