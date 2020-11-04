@@ -429,12 +429,9 @@ EMAIL;
     return $response;
   }
 
-  public function processAbandonedCarts(Request $request, Response $response) {
-    $loader= new \Twig\Loader\FilesystemLoader('../ui');
-    $twig= new \Twig\Environment($loader, [
-      'cache' => false
-    ]);
-
+  public function processAbandonedCarts(Request $request, Response $response,
+                                        View $view)
+  {
     $client= new \GuzzleHttp\Client();
 
     $url= ORDURE . '/sale/list';
@@ -469,7 +466,7 @@ EMAIL;
 
       $data['call_to_action_url']= ORDURE . '/cart?uuid=' . $data['sale']['uuid'];
 
-      $template= $twig->load('email/abandoned-cart.html');
+      $template= $view->getEnvironment()->load('email/abandoned-cart.html');
 
       $this->email->send([ $data['sale']['email'] => $data['sale']['name'] ],
                           $template->renderBlock('title', $data),

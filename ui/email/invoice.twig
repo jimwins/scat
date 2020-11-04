@@ -144,7 +144,9 @@
             {% if shipping_address.id %}
               <div>{{ shipping_address.name }}</div>
               <div>{{ shipping_address.company }}</div>
-              <div>{{ shipping_address.phone | phone_number_format }}</div>
+              {% if shipping_address.phone %}
+                <div>{{ shipping_address.phone | phone_number_format }}</div>
+              {% endif %}
               <div>{{ shipping_address.address1 }}</div>
               <div>{{ shipping_address.address2 }}</div>
               <div>
