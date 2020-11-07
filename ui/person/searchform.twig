@@ -1,3 +1,8 @@
+<div class="pull-right">
+  <button id="add-new-person" class="btn btn-default">
+    Add New Person
+  </button>
+</div>
 <form method="GET" action="/person/search">
   <div class="input-group">
     <input class="form-control" type="text" name="q" value="{{ q }}" autofocus
@@ -12,3 +17,8 @@
   </div>
 </form>
 <hr style="border-color: rgba(0,0,0,0.1)">
+<script>
+document.getElementById('add-new-person').addEventListener('click', (ev) => {
+  scat.dialog([], '/person')
+})
+</script>

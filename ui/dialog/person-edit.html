@@ -1,0 +1,108 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Person
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12">
+        <label for="name">Role</label>
+        <select name="role" class="form-control">
+          <option value="customer">Customer</option>
+          <option value="vendor" {{ person.role == 'vendor' ? 'selected' }}>
+            Vendor
+          </option>
+          <option value="employee" {{ person.role == 'employee' ? 'selected' }}>
+            Employee
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="name">Name</label>
+        <input type="text" class="form-control initial-focus" name="name"
+               placeholder="Vincent Van Gogh"
+               value="{{ person.name }}">
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="company">Company</label>
+        <input type="text" class="form-control" name="company"
+               placeholder="(optional)"
+               value="{{ person.company }}">
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="email">Email</label>
+        <input type="text" class="form-control" name="email"
+               placeholder="vincent.van.gogh@example.com"
+               value="{{ person.email }}">
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="phone">Phone</label>
+        <input type="text" class="form-control" name="phone"
+               placeholder="213 627 7223"
+               value="{{ person.phone }}">
+      </div>
+
+{# not yet
+      <div class="form-group col-sm-12">
+        <label for="instagram">Instagram</label>
+        <input type="text" class="form-control" name="instagram"
+               placeholder="vincentvangogh"
+               value="{{ person.instagram }}">
+      </div>
+#}
+
+      <div class="form-group col-sm-12">
+        <label for="tax_id">Tax ID</label>
+        <div class="input-group">
+          <span class="input-group-addon hidden"></span>
+          <input type="text" class="form-control" name="tax_id"
+                 value="{{ person.tax_id }}">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="verify-tax-id">
+              Verify
+            </button>
+          </span>
+        </div>
+      </div>
+
+    </div><!-- /.row -->
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <input type="hidden" name="id" value="{{ person.id }}">
+  <button type="submit" class="btn btn-primary">
+    {{ person.id ? 'Update' : 'Add' }}
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let formData= new FormData(form)
+    let id= formData.get('id');
+
+    (id ? scat.patch('/person/' + id, formData) : scat.post('/person', formData))
+    .then((res) => {
+      if (res.status == 201) {
+        window.location.href= res.headers.get('Location')
+      } else if (res.redirected) {
+        window.location.href= res.url
+      } else {
+        window.location.reload()
+      }
+    })
+  }
+
+  document.getElementById('verify-tax-id').addEventListener('click', (ev) => {
+    alert("Not yet.")
+  })
+{% endblock %}

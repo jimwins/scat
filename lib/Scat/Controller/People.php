@@ -8,7 +8,13 @@ use \Respect\Validation\Validator as v;
 
 class People {
   public function home(Request $request, Response $response, View $view,
-                        \Scat\Service\Data $data) {
+                        \Scat\Service\Data $data)
+  {
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $view->render($response, 'dialog/person-edit.html', [ ]);
+    }
+
     $limit= $request->getParam('limit') ?: 20;
     $people= $data->factory('Person')
                   ->select('*')
