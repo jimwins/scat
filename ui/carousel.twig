@@ -74,7 +74,7 @@
   }
 </style>
 
-<figure class="thumbnail carousel">
+<figure class="thumbnail carousel" {{ not images[0].id ? 'style="border: 1px solid red"' }}>
   <ol class="carousel-content">
     {% for image in images %}
       <li>
