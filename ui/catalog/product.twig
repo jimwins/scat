@@ -31,6 +31,9 @@
     {% set media = product.media %}
     {% if media is not empty %}
       {{ include('carousel.twig', { images: product.media }) }}
+      {% for i in media %}
+        <a href="/media/{{ i.id }}/"><i class="fa fa-file-image-o"></i></a>
+      {% endfor %}
     {% endif %}
   </div>
 </div>
