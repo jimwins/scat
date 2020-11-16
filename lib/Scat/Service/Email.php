@@ -66,7 +66,7 @@ class Email {
 
     return $postmark->sendEmail(
       $from, $to_list, $subject, $body, NULL, NULL, NULL,
-      NULL, NULL, $bcc, NULL, $attach, NULL
+      NULL, NULL, $bcc, NULL, $attach, $options['stream']
     );
   }
 

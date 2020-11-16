@@ -470,7 +470,8 @@ EMAIL;
 
       $this->email->send([ $data['sale']['email'] => $data['sale']['name'] ],
                           $template->renderBlock('title', $data),
-                          $template->render($data));
+                          $template->render($data), [],
+                          [ 'stream' => 'abandoned-cart' ]);
     }
 
     return $response;
