@@ -122,7 +122,7 @@ class ScatUtils {
     if (res.headers.get('Content-type').indexOf("application/json") !== -1) {
       return res.json()
                 .then((data) => {
-                  return Promise.reject(new Error(data.exception[0].message))
+                  return Promise.reject(new Error(data.message))
                 })
     }
     return Promise.reject(new Error(res.statusText))
