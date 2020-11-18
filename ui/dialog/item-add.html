@@ -80,5 +80,8 @@
         alert(res.statusText ? res.statusText : 'An unknown error occured.')
       }
     })
+    .catch((err) => {
+      alert(err.message)
+    })
   }
 {% endblock %}
