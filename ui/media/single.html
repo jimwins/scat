@@ -70,6 +70,24 @@
         </div>
       {% endif %}
 
+      {% set items= image.itemsUsedBy.find_many %}
+      {% if items|length %}
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              Referenced by Items
+            </h3>
+          </div>
+          <ul class="list-group">
+            {% for item in items %}
+              <a class="list-group-item"
+                 href="/catalog/item/{{ item.code }}">
+                {{- item.name -}}
+              </a>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
     </div>
     <div class="col-sm-6">
       <figure>
