@@ -1215,7 +1215,8 @@ class Transactions {
     /* Select a rate? */
     if (($rate_id= $request->getParam('rate_id'))) {
       $ep= $shipping->getShipment($shipment);
-      $insurance= $txn->subtotal() ?: '50.00';
+      $insurance= $txn->subtotal() ?: 50.00;
+      error_log("insurance = $insurance\n");
       $ep->buy([
         'rate' => [ 'id' => $rate_id ],
         'insurance' => $insurance
