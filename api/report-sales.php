@@ -110,6 +110,8 @@ while ($row= $r->fetch_assoc()) {
   $row['tax']= (float)$row['tax'];
   $row['total_taxed']= (float)$row['total_taxed'];
   $row['online']= (float)$row['online'];
+  $row['pickup']= (float)$row['pickup'];
+  $row['shipped']= (float)$row['shipped'];
   $sales[]= $row;
 }
 
