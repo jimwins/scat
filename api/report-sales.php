@@ -67,6 +67,7 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
             COUNT(*) AS transactions
        FROM (SELECT 
                     txn.uuid,
+                    txn.online_sale_id, txn.shipping_address_id,
                     filled,
                     CAST(ROUND_TO_EVEN(
                       SUM(IF(txn_line.taxfree, 1, 0) *
