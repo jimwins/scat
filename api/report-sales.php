@@ -59,7 +59,7 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
               AS total_taxed,
             SUM(IF(online_sale_id, untaxed + taxed + tax, 0))
               AS online,
-            SUM(IF(shipping_address_id == 1, untaxed + taxed + tax, 0))
+            SUM(IF(shipping_address_id = 1, untaxed + taxed + tax, 0))
               AS pickup,
             SUM(IF(shipping_address_id > 1, untaxed + taxed + tax, 0))
               AS shipped,
