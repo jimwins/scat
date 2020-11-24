@@ -62,7 +62,7 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
             SUM(IF(shipping_address_id == 1, untaxed + taxed + tax, 0))
               AS pickup,
             SUM(IF(shipping_address_id > 1, untaxed + taxed + tax, 0))
-              AS shipped
+              AS shipped,
             MIN(DATE(filled)) AS raw_date,
             COUNT(*) AS transactions
        FROM (SELECT 
