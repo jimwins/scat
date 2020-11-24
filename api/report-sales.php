@@ -57,8 +57,12 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
             SUM(IF(uuid, untaxed + taxed + tax,
                    ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed))
               AS total_taxed,
-            SUM(IF(uuid, untaxed + taxed + tax, 0))
+            SUM(IF(online_sale_id, untaxed + taxed + tax, 0))
               AS online,
+            SUM(IF(shipping_address_id == 1, untaxed + taxed + tax, 0))
+              AS pickup,
+            SUM(IF(shipping_address_id > 1, untaxed + taxed + tax, 0))
+              AS shipped
             MIN(DATE(filled)) AS raw_date,
             COUNT(*) AS transactions
        FROM (SELECT 
