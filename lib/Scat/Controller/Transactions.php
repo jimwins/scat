@@ -35,20 +35,6 @@ class Transactions {
     return $client;
   }
 
-  private function getPaypalClient(\Scat\Service\Config $config) {
-    $client_id= $config->get('paypal.client_id');
-    $secret= $config->get('paypal.secret');
-
-    if ($GLOBALS['DEBUG']) {
-      $env= new \PayPalCheckoutSdk\Core\SandboxEnvironment($client_id, $secret);
-    } else {
-      $env=
-        new \PayPalCheckoutSdk\Core\ProductionEnvironment($client_id, $secret);
-    }
-
-    return new \PayPalCheckoutSdk\Core\PayPalHttpClient($env);
-  }
-
   public function search(Request $request, Response $response, $type) {
     $q= $request->getParam('q');
 
@@ -734,6 +720,7 @@ class Transactions {
 
 
   public function addPayment(Request $request, Response $response,
+                              \Scat\Service\PayPal $paypal,
                               \Scat\Service\Config $config, $id)
   {
     $txn= $this->txn->fetchById($id);
@@ -834,19 +821,9 @@ class Transactions {
 
       $charge= json_decode($original_payment->data);
 
-      $paypal= $this->getPaypalClient($config);
-
       $capture_id= $charge->purchase_units[0]->payments->captures[0]->id;
-      $req= new \PayPalCheckoutSdk\Payments\CapturesRefundRequest($capture_id);
-      $req->body= [
-        'amount' => [
-          'value' => $amount,
-          'currency_code' => 'USD',
-        ],
-      ];
-      $req->prefer('return=representation');
 
-      $res= $paypal->execute($req);
+      $res= $paypal->refund($capture_id, $amount);
 
       $payment= $txn->payments()->create();
       $payment->method= 'paypal';

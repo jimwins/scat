@@ -8,18 +8,20 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Shipping {
-  private $shipping, $txn, $email, $view, $ordure;
+  private $shipping, $txn, $email, $view, $ordure, $paypal;
 
   public function __construct(\Scat\Service\Shipping $shipping,
                               \Scat\Service\Txn $txn,
                               \Scat\Service\Email $email,
                               \Scat\Service\Ordure $ordure,
+                              \Scat\Service\PayPal $paypal,
                               View $view)
   {
     $this->txn= $txn;
     $this->shipping= $shipping;
     $this->email= $email;
     $this->ordure= $ordure;
+    $this->paypal= $paypal;
     $this->view= $view;
   }
 
@@ -96,6 +98,12 @@ class Shipping {
           [ $txn->person()->email => $txn->person()->name ],
           $subject, $body
         );
+
+        foreach ($txn->payments()->find_many() as $payment) {
+          if ($payment->method == 'paypal') {
+            $this->paypal->addTracker($payment, $tracker);
+          }
+        }
 
         break;
 
