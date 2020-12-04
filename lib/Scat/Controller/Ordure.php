@@ -29,9 +29,15 @@ class Ordure {
     $items= $catalog
               ->getItems()
               ->select_many('retail_price','discount_type','discount')
-              ->select_expr('(SELECT SUM(allocated)
-                                FROM txn_line
-                               WHERE item_id = item.id)',
+              ->select_expr('IF(is_kit,
+                                (SELECT MIN((SELECT SUM(allocated)
+                                               FROM txn_line
+                                              WHERE txn_line.item_id = kit_item.item_id))
+                                   FROM kit_item
+                                  WHERE kit_id = item.id),
+                                (SELECT SUM(allocated)
+                                   FROM txn_line
+                                  WHERE item_id = item.id))',
                             'stock')
               ->select_many('code', 'minimum_quantity', 'purchase_quantity')
               ->select_expr('(SELECT MIN(purchase_quantity)
