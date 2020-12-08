@@ -7,7 +7,7 @@ $card= $_REQUEST['card'];
 $id= substr($card, 0, 7);
 $pin= substr($card, -4);
 
-$card= Model::factory('Giftcard')
+$card= \Titi\Model::factory('Giftcard')
          ->where('id', $id)
          ->where('pin', $pin)
          ->find_one();
