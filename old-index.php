@@ -503,8 +503,12 @@ $(function() {
      <ul class="dropdown-menu" role="menu">
       <li>
         <a data-bind="click: editShippingAddress,
-                      text: txn.shipping_address_id() > 0 ? 'Edit Shipping Address' : 'Add Shipping Address'">
+                      text: txn.shipping_address_id() > 1 ? 'Edit Shipping Address' : 'Add Shipping Address'">
           Add Shipping Address
+        </a>
+        <a data-bind="click: setInstorePickup,
+                      css: { disabled: txn.shipping_address_id() == 1 }">
+          Set for In-Store Pickup
         </a>
         <a data-bind="click: createDropShip">Create Drop Shipment</a>
         <a data-bind="click: createShipment">Create Shipment</a>
@@ -1505,6 +1509,23 @@ viewModel.editShippingAddress= () => {
   var id= Txn.id()
 
   scat.dialog([], '/sale/' + id + '/shipping-address')
+}
+
+viewModel.setInstorePickup= () => {
+  var id= Txn.id()
+
+  fetch("/sale/" + id + '/shipping-address', {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({ pickup: 1 })
+  })
+  .then((res) => res.json())
+  .then((data) => {
+    Txn.loadId(id)
+  })
 }
 
 viewModel.createDropShip= () => {

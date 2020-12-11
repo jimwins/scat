@@ -982,26 +982,32 @@ class Transactions {
     $this->data->beginTransaction();
 
     $details= $request->getParams();
-    $details['verify']= [ 'delivery' ];
-    $easypost_address= $shipping->createAddress($details);
 
-    /* We always create a new address. */
-    $address= $this->data->factory('Address')->create();
-    $address->easypost_id= $easypost_address->id;
-    $address->name= $easypost_address->name;
-    $address->company= $easypost_address->company;
-    $address->street1= $easypost_address->street1;
-    $address->street2= $easypost_address->street2;
-    $address->city= $easypost_address->city;
-    $address->state= $easypost_address->state;
-    $address->zip= $easypost_address->zip;
-    $address->country= $easypost_address->country;
-    $address->phone= $easypost_address->phone;
-    $address->timezone=
-      $easypost_address->verifications->delivery->details->time_zone;
-    $address->save();
+    if ($details['pickup'] == 1) {
+      $txn->shipping_address_id= 1;
+    } else {
+      $details['verify']= [ 'delivery' ];
+      $easypost_address= $shipping->createAddress($details);
 
-    $txn->shipping_address_id= $address->id;
+      /* We always create a new address. */
+      $address= $this->data->factory('Address')->create();
+      $address->easypost_id= $easypost_address->id;
+      $address->name= $easypost_address->name;
+      $address->company= $easypost_address->company;
+      $address->street1= $easypost_address->street1;
+      $address->street2= $easypost_address->street2;
+      $address->city= $easypost_address->city;
+      $address->state= $easypost_address->state;
+      $address->zip= $easypost_address->zip;
+      $address->country= $easypost_address->country;
+      $address->phone= $easypost_address->phone;
+      $address->timezone=
+        $easypost_address->verifications->delivery->details->time_zone;
+      $address->save();
+
+      $txn->shipping_address_id= $address->id;
+    }
+
     $txn->save();
 
     $this->data->commit();
