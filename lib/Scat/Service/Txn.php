@@ -34,13 +34,23 @@ class Txn
     return $this->data->factory('Txn')->find_one($id);
   }
 
-  public function find($type, $page, $limit= 25) {
-    return $this->data->factory('Txn')
+  public function find($type, $page, $limit= 25, $q= null) {
+    $res= $this->data->factory('Txn')
                 ->select('*')
                 ->select_expr('COUNT(*) OVER()', 'records')
                 ->order_by_desc('created')
                 ->where('type', $type)
                 ->limit($limit)->offset($page * $limit);
+
+    if (preg_match('/^online:(\d+)/', $q, $m)) {
+      $res= $res->where('online_sale_id', $m[1]);
+    }
+
+    if (preg_match('/^uuid:([a-z0-9]+)/', $q, $m)) {
+      $res= $res->where('uuid', $m[1]);
+    }
+
+    return $res;
   }
 
   /* Till needs to get payments directly. */
