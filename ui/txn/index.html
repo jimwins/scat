@@ -127,11 +127,13 @@
               </td>
               <td>
                 {{ scat.format_txn_status(txn.status) }}<br>
-                {% if txn.shipping_address.id > 1 %}
-                  {% for shipment in txn.shipments().find_many() %}
-                    <a href="/sale/{{ txn.id }}/shipment/{{ shipment.id }}/track" target="_blank"><i class="fa fa-truck"></i></a>
-                  {% endfor %}
-                {% endif %}
+                <small>
+                  {% if txn.shipping_address.id > 1 %}
+                    {% for shipment in txn.shipments().find_many() %}
+                      <a href="/sale/{{ txn.id }}/shipment/{{ shipment.id }}/track" target="_blank"><i class="fa fa-truck"></i></a>
+                    {% endfor %}
+                  {% endif %}
+                </small>
               </td>
               <td>
                 {{ txn.created | date('n/j/y G:i') }}<br>
