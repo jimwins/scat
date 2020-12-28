@@ -145,6 +145,9 @@
           ({{ "%07d"|format(txn.online_sale_id) }})
         {% endif %}
       </h1>
+      <small data-toggle="tooltip" title="{{ (txn.filled ? ('Filled: ' ~ txn.filled|date("F j Y g:ia"))) ~ "\n" ~ (txn.paid ? ('Paid: ' ~ txn.paid|date("F j Y g:ia"))) }}">
+        {{ txn.created|date("l, F j Y g:ia") }}
+      </small>
     </div>
     <div class="panel-body">
       <div class="btn-group btn-block">
@@ -298,4 +301,10 @@
 
     </div>
   </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    $('[data-toggle="tooltip"]').tooltip();
+  </script>
 {% endblock %}
