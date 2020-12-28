@@ -1,0 +1,253 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  {{ txn.friendly_type }} {{ txn.formatted_number }}
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-sm-9">
+      {{ block('search') }}
+      <br>
+      {{ block('invoice') }}
+    </div>
+    <div class="col-md-3">
+      {{ block('sidebar') }}
+    </div>
+  </div>
+{% endblock %}
+
+{% block search %}
+  <form class="form form-inline">
+    <div class="input-group">
+      <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
+      <input type="text" class="form-control autofocus"
+             name="q"
+             autocomplete="off" autocorrect="off" autocapitalize="off"
+             spellcheck="false"
+             placeholder="Scan item or enter search terms"
+             value="" size="200">
+      <span class="input-group-btn">
+        <input type="submit" class="btn btn-default" value="Find Items">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle"
+                  data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false">
+            Custom <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#">Gift Card</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Floater Frame</a></li>
+            <li><a href="#">Canvas</a></li>
+            <li><a href="#">Wood Panel</a></li>
+          </ul>
+        </div>
+      </span>
+    </div>
+  </form>
+{% endblock %}
+
+{% block invoice %}
+  <div class="panel panel-default">
+    <style>
+      #txn th:last-child, #txn td:last-child {
+        padding-right: 1rem;
+      }
+    </style>
+    <table id="txn" class="table table-striped table-condensed table-hover">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Qty</th>
+          <th>Code</th>
+          <th width="50%">Name</th>
+          <th style="text-align: right">Price</th>
+          <th style="text-align: right">Ext</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in txn.items.find_many %}
+          <tr>
+            <td>
+              <small>
+                <a href="#"><i class="fa fa-trash-o"></i></a>
+              </small>
+            </td>
+            <td>{{ (txn.type == 'vendor' ? 1 : -1) * line.ordered }}</td>
+            <td><a href="#">{{ line.code }}</a></td>
+            <td>
+              {{ line.name }}<br>
+              <small>{{ line.pricing_detail }}</small>
+            </td>
+            <td style="text-align: right">
+              {{ scat.amount(line.sale_price) }}
+            </td>
+            <td style="text-align: right">
+              {{ scat.amount((txn.type == 'vendor' ? 1 : -1) * line.ext_price) }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5" style="text-align: right">
+            Subtotal:
+          </th>
+          <td style="text-align: right">{{ scat.amount(txn.subtotal) }}</td>
+        </tr>
+        <tr>
+          <th colspan="5" style="text-align: right">
+            Tax:
+          </th>
+          <td style="text-align: right">{{ scat.amount(txn.tax) }}</td>
+        </tr>
+        <tr>
+          <th colspan="5" style="text-align: right">
+            Total:
+          </th>
+          <td style="text-align: right">{{ scat.amount(txn.total) }}</td>
+        </tr>
+        {% for payment in txn.payments.find_many %}
+          <tr>
+            <th colspan="5" style="text-align: right">
+              {{ payment.pretty_method }}:
+            </th>
+            <td style="text-align: right">
+              {{ scat.amount(-1 * payment.amount) }}
+            </td>
+          </tr>
+        {% endfor %}
+        <tr>
+          <th colspan="5" style="text-align: right">
+            Due:
+          </th>
+          <td style="text-align: right">{{ scat.amount(txn.due) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+{% endblock %}
+
+{% block sidebar %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h1 class="panel-title">
+        {{ block('title') }}
+        {% if txn.online_sale_id %}
+          ({{ "%07d"|format(txn.online_sale_id) }})
+        {% endif %}
+      </h1>
+    </div>
+    <div class="panel-body">
+      <div class="well">
+        <h1 class="text-center {{ txn.due < 0 ? 'text-danger' }}"
+            style="margin: 0px; padding: 0px">
+          {{ scat.amount(txn.due) }}
+        </h1>
+        {% if 0 and txn.change %}
+          <h4 class="text-center text-success"
+              style="margin: 0px; padding: 0px">
+            Change: {{ scat.amount(txn.change) }}
+          </h4>
+        {% endif %}
+      </div>
+
+      <div class="text-center">
+        <div class="btn-group btn-group-lg">
+         <button type="button" class="btn btn-default">
+          <u>P</u>rint
+         </button>
+         <button type="button" class="btn btn-default dropdown-toggle" 
+                 data-toggle="dropdown" aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+         </button>
+         <ul class="dropdown-menu" role="menu">
+          <li><a href="#">Invoice</a></li>
+          <li><a href="#">Receipt</a></li>
+          <li><a href="#">Gift Receipt</a></li>
+          <li><a href="#">Packing Slip</a></li>
+          <li><a href="#">Download</a></li>
+          <li><a href="#">Email</a></li>
+         </ul>
+        </div>
+
+        <button class="btn btn-lg btn-default">
+          Pa<u>y</u>
+        </button>
+      </div>
+
+      <hr>
+
+      <a href="#" class="btn btn-default btn-sm pull-right">
+        <i class="fa fa-user-o"></i>
+      </a>
+      <a href="#">
+        {{ txn.person.friendly_name ?: 'Anonymous' }}
+      </a>
+
+      {% set person= txn.person %}
+
+      {% if person.id %}
+        <div>{{ person.email }}</div>
+        <div>{{ person.pretty_phone }}</div>
+        <a href="#">
+          <i class="fa fa-star"></i>
+          {{ person.points_available }}
+        </a>
+        {% if person.points_pending %}
+          + <i class="fa fa-star"></i> {{ person.points_pending }}
+          = {{ person.points_available + person.points_pending }}
+        {% endif %}
+        {% if txn.due > 0 %}
+          {# subtract points being used #}
+          {% if not txn.no_rewards %}
+            + <i class="fa fa-star"></i> {{ txn.taxed }}
+            = {{ person.points_available + person.points_pending + (txn.taxed) }}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+
+      <div class="clearfix"></div>
+      <hr>
+
+      <a href="#" class="btn btn-default btn-sm pull-right">
+        <i class="fa fa-truck"></i>
+      </a>
+
+      {% if txn.shipping_address_id == 1 %}
+        <h3>Curbside Pickup</h3>
+        <button class="btn btn-block btn-primary">
+          Complete
+        </button>
+      {% elseif txn.shipping_address_id %}
+        <h3>{{ txn.is_bike_delivery ? 'Deliver to' : 'Ship to' }}:</h3>
+        {% set shipping_address= txn.shipping_address() %}
+        <div>{{ shipping_address.name }}</div>
+        <div>{{ shipping_address.company }}</div>
+        <div>{{ shipping_address.email }}</div>
+        {% if shipping_address.phone %}
+          <div>{{ shipping_address.phone | phone_number_format }}</div>
+        {% endif %}
+        <div>{{ shipping_address.street1 }}</div>
+        <div>{{ shipping_address.street2 }}</div>
+        <div>
+          {% if shipping_address.city %}
+            {{ shipping_address.city }},
+          {% endif %}
+          {{ shipping_address.state }}
+          {{ shipping_address.zip }}
+        </div>
+      {% endif %}
+
+      {% for shipment in txn.shipments.find_many() %}
+        <a href="#" class="btn btn-link">
+          <i class="fa fa-cube"></i>
+        </a>
+      {% endfor %}
+
+    </div>
+  </div>
+{% endblock %}
