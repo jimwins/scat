@@ -42,7 +42,7 @@ class TxnLine extends \Scat\Model {
   }
 
   public function ext_price() {
-    $price= new \Decimal\Decimal($this->sale_price()) * $this->allocated;
+    $price= new \Decimal\Decimal($this->sale_price()) * $this->ordered;
     return (string)$price->round(2);
   }
 
