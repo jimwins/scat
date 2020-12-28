@@ -27,7 +27,7 @@ class TxnLine extends \Scat\Model {
     return ($item->retail_price ? 'MSRP $' : 'List $') .
            $this->retail_price .
            ($this->discount_type == 'percentage' ?
-            ' / Sale: ' . $this->discount . '% off' :
+            ' / Sale: ' . sprintf('%.0f', $this->discount) . '% off' :
             ($this->discount_type == 'relative' ?
              ' / Sale: $' . $this->discount . ' off' :
              ''));
