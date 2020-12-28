@@ -46,6 +46,12 @@ class Txn extends \Scat\Model {
     return $this->belongs_to('Address', 'shipping_address_id')->find_one();
   }
 
+  public function is_bike_delivery() {
+    /* XXX Fix hardcoded list */
+    return $this->shipping_address_id > 1 &&
+      $this->items()->where_in('item_id', [ 11405, 87072, 89017 ])->find_one();
+  }
+
   public function dropships() {
     return $this->has_many('Txn', 'returned_from_id')
                 ->where('type', 'vendor');
