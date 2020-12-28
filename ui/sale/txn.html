@@ -71,9 +71,11 @@
         {% for line in txn.items.find_many %}
           <tr>
             <td>
-              <small>
-                <a href="#"><i class="fa fa-trash-o"></i></a>
-              </small>
+              {% if not line.kit_id %}
+                <a href="#" class="btn btn-link btn-xs">
+                  <i class="fa fa-trash-o"></i>
+                </a>
+              {% endif %}
             </td>
             <td>{{ (txn.type == 'vendor' ? 1 : -1) * line.ordered }}</td>
             <td><a href="#">{{ line.code }}</a></td>
@@ -82,10 +84,14 @@
               <small>{{ line.pricing_detail }}</small>
             </td>
             <td style="text-align: right">
-              {{ scat.amount(line.sale_price) }}
+              {% if not line.kit_id %}
+                {{ scat.amount(line.sale_price) }}
+              {% endif %}
             </td>
             <td style="text-align: right">
-              {{ scat.amount((txn.type == 'vendor' ? 1 : -1) * line.ext_price) }}
+              {% if not line.kit_id %}
+                {{ scat.amount((txn.type == 'vendor' ? 1 : -1) * line.ext_price) }}
+              {% endif %}
             </td>
           </tr>
         {% endfor %}
