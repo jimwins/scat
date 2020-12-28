@@ -138,6 +138,12 @@
         {% if txn.online_sale_id %}
           ({{ "%07d"|format(txn.online_sale_id) }})
         {% endif %}
+        {% if txn.returned_from_id %}
+          <a href="/sale/{{ txn.returned_from_id }}"
+             class="btn btn-xs btn-link">
+            <i class="fa fa-reply"></i>
+          </a>
+        {% endif %}
       </h1>
     </div>
     <div class="panel-body">
@@ -178,6 +184,18 @@
           Pa<u>y</u>
         </button>
       </div>
+
+      {% set returns= txn.returns.find_many() %}
+      {% if returns|length %}
+        <h4>Returns</h4>
+        <ul class="list-group">
+          {% for return in returns %}
+            <a class="list-group-item" href="/sale/{{ return.id }}">
+              {{ return.friendly_type ~ " " ~ return.formatted_number }}
+            </a>
+          {% endfor %}
+        </ul>
+      {% endif %}
 
       <hr>
 

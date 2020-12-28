@@ -61,6 +61,11 @@ class Txn extends \Scat\Model {
     return $this->belongs_to('Txn', 'returned_from_id')->find_one();
   }
 
+  public function returns() {
+    return $this->has_many('Txn', 'returned_from_id')
+                ->where('type', $this->type);
+  }
+
   function clearItems() {
     $this->orm->get_db()->beginTransaction();
     $this->items()->delete_many();
