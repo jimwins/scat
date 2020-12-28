@@ -107,6 +107,8 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
               [ \Scat\Controller\Transactions::class, 'addItem' ]);
   $app->patch('/{id:[0-9]+}/item/{line_id:[0-9]+}',
               [ \Scat\Controller\Transactions::class, 'updateItem' ]);
+  $app->delete('/{id:[0-9]+}/item/{line_id:[0-9]+}',
+                [ \Scat\Controller\Transactions::class, 'removeItem' ]);
 
   /* Payments */
   $app->post('/{id:[0-9]+}/payment',

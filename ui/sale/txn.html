@@ -10,9 +10,11 @@
     <div class="col-sm-9">
       {{ block('search') }}
       <br>
-      {{ block('invoice') }}
+      <div data-reload="invoice">
+        {{ block('invoice') }}
+      </div>
     </div>
-    <div class="col-md-3">
+    <div data-reload="sidebar" class="col-md-3">
       {{ block('sidebar') }}
     </div>
   </div>
@@ -50,6 +52,7 @@
 {% endblock %}
 
 {% block invoice %}
+  {% import 'macros.twig' as scat %}
   <div class="panel panel-default">
     <style>
       #txn th:last-child, #txn td:last-child {
@@ -69,10 +72,10 @@
       </thead>
       <tbody>
         {% for line in txn.items.find_many %}
-          <tr>
+          <tr data-id="{{ line.id }}">
             <td>
               {% if not line.kit_id %}
-                <a href="#" class="btn btn-link btn-xs">
+                <a data-action="remove-item" class="btn btn-link btn-xs">
                   <i class="fa fa-trash-o"></i>
                 </a>
               {% endif %}
@@ -137,6 +140,7 @@
 {% endblock %}
 
 {% block sidebar %}
+  {% import 'macros.twig' as scat %}
   <div class="panel panel-default">
     <div class="panel-heading">
       <h1 class="panel-title">
@@ -307,5 +311,31 @@
 {% block script %}
   <script>
     $('[data-toggle="tooltip"]').tooltip();
+
+    let removeItem= (ev) => {
+      ev.stopPropagation();
+      ev.preventDefault();
+
+      let line_id= ev.target.closest('[data-id]').getAttribute('data-id')
+
+      scat.delete('/sale/{{ txn.id }}/item/' + line_id)
+          .then((res) => {
+            scat.reload('invoice', 'sidebar') // XXX reload less of sidebar
+          })
+    }
+
+    document.addEventListener('click', (ev) => {
+      let match= ev.target.closest('[data-action]')
+      if (match) {
+        let action= match.getAttribute('data-action');
+        switch (action) {
+          case 'remove-item':
+            removeItem(ev)
+            break
+          default:
+            console.log(`Unknown action ${action}.`)
+        }
+      }
+    })
   </script>
 {% endblock %}

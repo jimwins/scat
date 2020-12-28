@@ -305,6 +305,25 @@ class ScatUtils {
 
     holder.appendChild(alert)
   }
+
+  reload (...blocks) {
+    blocks.forEach((block) => {
+      let reload= document.querySelector(`[data-reload=${block}]`)
+      if (reload) {
+        return fetch(window.location.href + '?block=' + block)
+        .then((res) => {
+          return res.text()
+        })
+        .then ((text) => {
+          let html= scat.htmlToElement(text)
+          // force panels open
+          if (html.classList.contains('collapse'))
+            html.classList.add('in')
+          reload.children[0].replaceWith(html)
+        })
+      }
+    })
+  }
 }
 
 let scat= new ScatUtils()

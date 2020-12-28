@@ -84,14 +84,29 @@ class Transactions {
   }
 
   public function sale(Request $request, Response $response, $id) {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
-      $txn= $this->txn->fetchById($id);
-      if (!$txn)
-        throw new \Slim\Exception\HttpNotFoundException($request);
       return $response->withJson($txn);
     }
+
     return $response->withRedirect("/?id=$id");
+
+    if (($block= $request->getParam('block'))) {
+      $html= $this->view->fetchBlock('sale/txn.html', $block, [
+        'txn' => $txn,
+      ]);
+
+      $response->getBody()->write($html);
+      return $response;
+    }
+
+    return $this->view->render($response, 'sale/txn.html', [
+      'txn' => $txn,
+    ]);
   }
 
   public function createSale(Request $request, Response $response)
@@ -692,6 +707,43 @@ class Transactions {
     $this->data->commit();
 
     return $response->withJson($line);
+  }
+
+  public function removeItem(Request $request, Response $response,
+                              \Scat\Service\Catalog $catalog,
+                              $id, $line_id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if (!$request->getParam('force') &&
+        !in_array($txn->status, [ 'new', 'filled' ])) {
+      throw new \Scat\Exception\HttpConflictException($request,
+        "Unable to remove item because transaction is {$txn->status}."
+      );
+    }
+
+    $line= $txn->items()->find_one($line_id);
+    if (!$line)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $this->data->beginTransaction();
+
+    if ($line->item()->is_kit) {
+      $txn->items()->where('kit_id', $line->item_id)->delete_many();
+    }
+
+    $line->delete();
+
+    if (in_array($txn->status, [ 'new', 'filled' ])) {
+      $txn->applyPriceOverrides($catalog);
+      $txn->recalculateTax($this->tax);
+    }
+
+    $this->data->commit();
+
+    return $response->withJson(true);
   }
 
   /* Payments */
