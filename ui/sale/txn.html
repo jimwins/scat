@@ -10,6 +10,7 @@
     <div class="col-sm-9">
       {{ block('search') }}
       <br>
+      <div id="search-results"></div>
       <div data-reload="invoice">
         {{ block('invoice') }}
       </div>
@@ -21,9 +22,10 @@
 {% endblock %}
 
 {% block search %}
-  <form class="form form-inline">
+  <form id="search" class="form form-inline">
     <div class="input-group">
       <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
+      <input type="hidden" name="scope" value="items">
       <input type="text" class="form-control autofocus"
              name="q"
              autocomplete="off" autocorrect="off" autocapitalize="off"
@@ -312,6 +314,74 @@
   <script>
     $('[data-toggle="tooltip"]').tooltip();
 
+    let findAndAddItem= (form) => {
+      let formData= new FormData(form)
+      form.elements['q'].parentNode.classList.remove('has-error');
+
+      scat.get('/catalog/search', formData, {
+        headers: { 'Accept': 'application/json' }
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.items.length == 0) {
+          // No items? Highlight the search field and add a note
+          form.elements['q'].parentNode.classList.add('has-error');
+          let msg=
+            document.getElementById('item-not-found').content.cloneNode(true);
+          msg.querySelector('.message').innerText=
+            "Didn't find anything for '" + formData.get('q') + "'.";
+          document.getElementById('search-results').append(msg)
+        } else if (data.items.length > 1) {
+          // Multiple items? Show the choices
+          let msg=
+            document.getElementById('multiple-items').content.cloneNode(true);
+          let tbody= msg.querySelector('tbody');
+          let row= tbody.removeChild(tbody.children[0]);
+
+          data.items.forEach((item) => {
+            row.setAttribute('data-id', item.id);
+            if (item.stock > 0) {
+              row.classList.add('stocked')
+            } else {
+              row.classList.remove('stocked')
+            }
+            row.children[0].innerText= item.name
+            row.children[1].innerText= item.brand_name ? item.brand_name : ''
+            row.children[2].innerText= scat.amount(item.retail_price)
+            row.children[2].style.innerTextDecorationLine=
+              (item.sale_price ? 'line-through' : 'inherit')
+            row.children[3].innerText= scat.amount(item.sale_price)
+            tbody.append(row.cloneNode(true))
+          })
+
+          document.getElementById('search-results').append(msg)
+        } else {
+          addItem(data.items[0].id)
+        }
+      })
+    }
+
+    let addItem= (item_id) => {
+      scat.post('/sale/{{ txn.id }}/item', { item_id: item_id })
+          .then((res) => res.json())
+          .then((data) => {
+            scat.reload('invoice','sidebar')
+            // set active row to data.id
+          })
+    }
+
+    let addItemAction= (ev) => {
+      ev.stopPropagation();
+      ev.preventDefault();
+
+      let item_id= ev.target.closest('[data-id]').getAttribute('data-id')
+
+      addItem(item_id)
+
+      let choices= ev.target.closest('.choices')
+      if (choices) choices.parentElement.removeChild(choices)
+    }
+
     let removeItem= (ev) => {
       ev.stopPropagation();
       ev.preventDefault();
@@ -320,7 +390,7 @@
 
       scat.delete('/sale/{{ txn.id }}/item/' + line_id)
           .then((res) => {
-            scat.reload('invoice', 'sidebar') // XXX reload less of sidebar
+            scat.reload('invoice', 'sidebar') // XXX reload less of sidebar?
           })
     }
 
@@ -329,6 +399,9 @@
       if (match) {
         let action= match.getAttribute('data-action');
         switch (action) {
+          case 'add-item':
+            addItemAction(ev)
+            break;
           case 'remove-item':
             removeItem(ev)
             break
@@ -337,5 +410,57 @@
         }
       }
     })
+
+    document.getElementById('search').addEventListener('submit', (ev) => {
+      ev.stopPropagation();
+      ev.preventDefault();
+      return findAndAddItem(ev.target)
+    })
   </script>
+
+  <template id="item-not-found">
+    <div class="alert alert-danger alert-dismissable" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <span class="message"></span>
+    </div>
+  </template>
+
+  <style>
+    .choices {
+      max-height: 300px;
+      overflow: scroll;
+      position: relative;
+    }
+
+    .choices tr.stocked {
+      color: #339;
+    }
+
+    .choices tr {
+      cursor:pointer;
+    }
+    .choices tr:hover {
+      text-decoration: underline;
+    }
+
+    .choices .close {
+      position: sticky;
+    }
+  </style>
+
+  <template id="multiple-items">
+    <div class="choices alert alert-warning alert-dismissable" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <table class="table table-condensed">
+        <tbody>
+          <tr data-action="add-item">
+            <td><!-- name --></td>
+            <td><!-- brand --></td>
+            <td><!-- retail_price --></td>
+            <td><!-- sale_price --></td>
+          <tr>
+        </tbody>
+      </table>
+    </div>
+  </template>
 {% endblock %}
