@@ -41,11 +41,27 @@
             Custom <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#">Gift Card</a></li>
+            <li>
+              <a data-action="add-item-by-code" data-code="ZZ-GIFT">
+                Gift Card
+              </a>
+            </li>
             <li role="separator" class="divider"></li>
-            <li><a href="#">Floater Frame</a></li>
-            <li><a href="#">Canvas</a></li>
-            <li><a href="#">Wood Panel</a></li>
+            <li>
+              <a data-action="add-item-by-code" data-code="ZZ-FLOAT">
+                Floater Frame
+              </a>
+            </li>
+            <li>
+              <a data-action="add-item-by-code" data-code="ZZ-CANVAS">
+                Canvas
+              </a>
+            </li>
+            <li>
+              <a data-action="add-item-by-code" data-code="ZZ-PANEL">
+                Panel
+              </a>
+            </li>
           </ul>
         </div>
       </span>
@@ -83,7 +99,11 @@
               {% endif %}
             </td>
             <td>{{ (txn.type == 'vendor' ? 1 : -1) * line.ordered }}</td>
-            <td><a href="#">{{ line.code }}</a></td>
+            <td>
+              <a data-action="show-item-info" data-id="{{ line.item_id }}">
+                {{ line.code }}
+              </a>
+            </td>
             <td>
               {{ line.name }}<br>
               <small>{{ line.pricing_detail }}</small>
@@ -170,7 +190,9 @@
           <li>
             {% set options= ['new','filled','paid','processing','waitingforitems','readyforpickup','shipping','shipped','complete','template'] %}
             {% for opt in options %}
-               <a href="#">{{ scat.format_txn_status(opt) }}</a>
+              <a data-action="set-status" data-status="{{ opt }}">
+                {{ scat.format_txn_status(opt) }}
+              </a>
             {% endfor %}
           </li>
         </ul>
@@ -199,12 +221,28 @@
           <span class="sr-only">Toggle Dropdown</span>
          </button>
          <ul class="dropdown-menu" role="menu">
-          <li><a href="#">Invoice</a></li>
-          <li><a href="#">Receipt</a></li>
-          <li><a href="#">Gift Receipt</a></li>
-          <li><a href="#">Packing Slip</a></li>
-          <li><a href="#">Download</a></li>
-          <li><a href="#">Email</a></li>
+          <li><a data-action="print-invoice">Invoice</a></li>
+          <li><a data-action="print-receipt">Receipt</a></li>
+          <li>
+            <a data-action="print-receipt" data-option="gift">
+              Gift Receipt
+            </a>
+          </li>
+          <li>
+            <a data-action="print-invoice" data-option="packing">
+              Packing Slip
+            </a>
+          </li>
+          <li>
+            <a data-action="print-invoice" data-option="download">
+              Download
+            </a>
+          </li>
+          <li>
+            <a data-action="email-invoice">
+              Email
+            </a>
+          </li>
          </ul>
         </div>
 
@@ -237,10 +275,11 @@
 
       <h3>{{ txn.type == 'customer' ? 'Customer' : 'Vendor' }}</h3>
 
-      <a href="#" class="btn btn-default btn-sm pull-right">
+      <a data-action="person-button" class="btn btn-default btn-sm pull-right">
         <i class="fa fa-user-o"></i>
       </a>
-      <a href="#">
+
+      <a data-action="edit-person" data-id="{{ txn.person_id }}">
         {{ txn.person.friendly_name ?: 'Anonymous' }}
       </a>
 
@@ -249,7 +288,7 @@
       {% if person.id %}
         <div>{{ person.email }}</div>
         <div>{{ person.pretty_phone }}</div>
-        <a href="#">
+        <a data-action="show-loyalty">
           <i class="fa fa-star"></i>
           {{ person.points_available }}
         </a>
@@ -270,9 +309,28 @@
 
       <h3>Shipping</h3>
 
-      <a href="#" class="btn btn-default btn-sm pull-right">
+      <div class="btn-group pull-right">
+       <button type="button" class="btn btn-default btn-sm dropdown-toggle"
+               data-toggle="dropdown" aria-expanded="false">
         <i class="fa fa-truck"></i>
-      </a>
+        <span class="caret"></span>
+       </button>
+       <ul class="dropdown-menu" role="menu">
+        <li>
+          <a data-action="edit-shipping-address">
+            {{ txn.shipping_address_id > 1 ? 'Edit' : 'Add' }} Shipping Address
+          </a>
+          {% if txn.shipping_address_id != 1 %}
+            <a data-action="set-in-store-pickup">
+              Set for In-Store Pickup
+            </a>
+          {% endif %}
+          <a data-action="create-dropship">Create Drop Shipment</a>
+          <a data-action="create-shipment">Create Shipment</a>
+          <a data-action="add-tracker">Add Tracker</a>
+        </li>
+       </ul>
+      </div>
 
       {% if txn.shipping_address_id == 1 %}
         <h4>Curbside Pickup</h4>
@@ -302,7 +360,8 @@
       {% for shipment in txn.shipments.find_many() %}
         <h4>Shipments</h4>
         <ul class="list-group">
-          <a href="#" class="list-group-item">
+          <a class="list-group-item"
+             data-action="shipment-action" data-id="{{ shipment.id }}">
             {{ shipment.created|date("l, F j") }}
             {{ shipment.status }}
           </a>
@@ -409,7 +468,7 @@
             removeItem(ev)
             break
           default:
-            console.log(`Unknown action ${action}.`)
+            scat.alert('danger', `Unknown action ${action}.`)
         }
       }
     })
