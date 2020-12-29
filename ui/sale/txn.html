@@ -418,12 +418,12 @@
 
           document.getElementById('search-results').append(msg)
         } else {
-          addItem(data.items[0].id)
+          addItemById(data.items[0].id)
         }
       })
     }
 
-    let addItem= (item_id) => {
+    let addItemById= (item_id) => {
       scat.post('/sale/{{ txn.id }}/item', { item_id: item_id })
           .then((res) => res.json())
           .then((data) => {
@@ -432,13 +432,13 @@
           })
     }
 
-    let addItemAction= (ev) => {
+    let addItem= (ev) => {
       ev.stopPropagation();
       ev.preventDefault();
 
       let item_id= ev.target.closest('[data-id]').getAttribute('data-id')
 
-      addItem(item_id)
+      addItemById(item_id)
 
       let choices= ev.target.closest('.choices')
       if (choices) choices.parentElement.removeChild(choices)
@@ -462,7 +462,7 @@
         let action= match.getAttribute('data-action');
         switch (action) {
           case 'add-item':
-            addItemAction(ev)
+            addItem(ev)
             break;
           case 'remove-item':
             removeItem(ev)
