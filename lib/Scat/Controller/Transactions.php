@@ -93,7 +93,9 @@ class Transactions {
       return $response->withJson($txn);
     }
 
-    return $response->withRedirect("/?id=$id");
+    if (!$GLOBALS['DEBUG']) {
+      return $response->withRedirect("/?id=$id");
+    }
 
     if (($block= $request->getParam('block'))) {
       $html= $this->view->fetchBlock('sale/txn.html', $block, [
@@ -207,7 +209,7 @@ class Transactions {
 
     if (!in_array($txn->status, [ 'new', 'filled', 'template' ])) {
       throw new \Scat\Exception\HttpConflictException($request,
-        "Unable to add items to transactions because it is {$txn->status}."
+        "Unable to add item to transaction because it is {$txn->status}."
       );
     }
 

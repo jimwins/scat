@@ -436,7 +436,7 @@
       let formData= new FormData(form)
       form.elements['q'].parentNode.classList.remove('has-error');
 
-      scat.get('/catalog/search', formData, {
+      return scat.get('/catalog/search', formData, {
         headers: { 'Accept': 'application/json' }
       })
       .then((res) => res.json())
@@ -474,68 +474,69 @@
 
           document.getElementById('search-results').append(msg)
         } else {
-          addItemById(data.items[0].id)
+          return addItemById(data.items[0].id)
         }
       })
     }
 
     let addItemById= (item_id) => {
-      scat.post('/sale/{{ txn.id }}/item', { item_id: item_id })
-          .then((res) => res.json())
-          .then((data) => {
-            scat.reload('invoice','sidebar')
-            // set active row to data.id
-          })
+      return scat.post('/sale/{{ txn.id }}/item', { item_id: item_id })
+        .then((res) => res.json())
+        .then((data) => {
+          scat.reload('invoice','sidebar')
+          // set active row to data.id
+        })
     }
 
-    let addItem= (ev) => {
-      ev.stopPropagation();
-      ev.preventDefault();
+    let actions= {
 
-      let item_id= ev.target.closest('[data-id]').getAttribute('data-id')
+      addItem: (ev) => {
+        let item_id= ev.target.closest('[data-id]').getAttribute('data-id')
 
-      addItemById(item_id)
+        return addItemById(item_id).then((res) => {
+          let choices= ev.target.closest('.choices')
+          if (choices) choices.parentElement.removeChild(choices)
+        })
+      },
 
-      let choices= ev.target.closest('.choices')
-      if (choices) choices.parentElement.removeChild(choices)
-    }
+      removeItem: (ev) => {
+        let line_id= ev.target.closest('[data-id]').getAttribute('data-id')
 
-    let removeItem= (ev) => {
-      ev.stopPropagation();
-      ev.preventDefault();
-
-      let line_id= ev.target.closest('[data-id]').getAttribute('data-id')
-
-      scat.delete('/sale/{{ txn.id }}/item/' + line_id)
+        return scat.delete('/sale/{{ txn.id }}/item/' + line_id)
           .then((res) => {
             scat.reload('invoice', 'sidebar') // XXX reload less of sidebar?
           })
-    }
+      },
 
-    let setStatus= (ev) => {
-      let status= ev.target.closest('[data-status]').getAttribute('data-status')
-      scat.patch("/sale/{{ txn.id}}", { status: status })
+      setStatus: (ev) => {
+        let status= ev.target.closest('[data-status]').getAttribute('data-status')
+        return scat.patch("/sale/{{ txn.id}}", { status: status })
           .then((res) => {
             scat.reload('sidebar')
           })
+      },
+
     }
 
     document.addEventListener('click', (ev) => {
       let match= ev.target.closest('[data-action]')
       if (match) {
         let action= match.getAttribute('data-action');
-        switch (action) {
-          case 'add-item':
-            addItem(ev)
-            break;
-          case 'remove-item':
-            removeItem(ev)
-            break
-          case 'set-status':
-            setStatus(ev);
-            break;
-          default:
-            scat.alert('danger', `Unknown action ${action}.`)
+        let func= action.replaceAll(/-./g, (m) => { return m[1].toUpperCase() })
+
+        if (actions[func]) {
+          ev.stopPropagation();
+          ev.preventDefault();
+
+          actions[func](ev)
+          .catch((err) => {
+            scat.alert('danger', err.message)
+          })
+          .finally(() => {
+            // restore button
+          })
+        } else {
+          scat.alert('danger', `Unknown action ${action}.`)
         }
       }
     })
