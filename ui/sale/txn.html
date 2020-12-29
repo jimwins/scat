@@ -259,6 +259,15 @@
             {{ txn.returned_from.formatted_number }}
           </a>
         </ul>
+
+        {% if txn.status in [ 'paid', 'complete' ] %}
+          <a data-action="send-canned-message" data-message="refunded"
+              class="btn btn-block btn-primary">
+            <i class="fa fa-envelope-o"></i>
+            Refund Processed
+          </a>
+        {% endif %}
+
       {% endif %}
 
       {% set returns= txn.returns.find_many() %}
@@ -334,9 +343,6 @@
 
       {% if txn.shipping_address_id == 1 %}
         <h4>Curbside Pickup</h4>
-        <button class="btn btn-block btn-primary">
-          Complete
-        </button>
       {% elseif txn.shipping_address_id %}
         <h4>{{ txn.is_bike_delivery ? 'Deliver to' : 'Ship to' }}:</h4>
         {% set shipping_address= txn.shipping_address() %}
@@ -355,6 +361,56 @@
           {{ shipping_address.state }}
           {{ shipping_address.zip }}
         </div>
+      {% endif %}
+
+      {% if txn.status in [ 'paid' ] %}
+        <a data-action="print-packing-slip-and-start-processing"
+            class="btn btn-block btn-success">
+          <i class="fa fa-print"></i>
+          Print Packing Slip
+        </a>
+      {% endif %}
+
+      {% if txn.status in [ 'readyforpickup' ] %}
+        <a data-action="send-canned-message" data-message="pickup-reminder"
+            class="btn btn-block btn-info">
+          <i class="fa fa-envelope-o"></i>
+          Pickup Reminder
+        </a>
+      {% endif %}
+
+      {% if txn.status in [ 'paid', 'processing', 'waitingforitems' ] %}
+        {% if txn.shipping_address_id > 1 %}
+          <a data-action="create-shipment"
+              class="btn btn-block btn-primary">
+            <i class="fa fa-truck"></i>
+            Create Shipment
+          </a>
+        {% endif %}
+
+        {% if txn.shipping_address_id == 1 %}
+          <a data-action="send-canned-message" data-message="pickup"
+              class="btn btn-block btn-primary">
+            <i class="fa fa-envelope-o"></i>
+            Ready for Pickup
+          </a>
+        {% endif %}
+
+        {% if txn.shipping_address_id == 1 %}
+          <a data-action="send-canned-message" data-message="pickupmost"
+              class="btn btn-block btn-warning">
+            <i class="fa fa-envelope-o"></i>
+            Ready for Pickup (Most)
+          </a>
+        {% endif %}
+      {% endif %}
+
+      {% if txn.status in [ 'paid', 'processing', 'waitingforitems', 'readyforpickup' ] and txn.shipping_address_id == 1 %}
+        <a data-action="set-status" data-status="complete"
+            class="btn btn-block btn-primary">
+          <i class="fa fa-check-square-o"></i>
+          Complete
+        </a>
       {% endif %}
 
       {% for shipment in txn.shipments.find_many() %}
@@ -456,6 +512,14 @@
           })
     }
 
+    let setStatus= (ev) => {
+      let status= ev.target.closest('[data-status]').getAttribute('data-status')
+      scat.patch("/sale/{{ txn.id}}", { status: status })
+          .then((res) => {
+            scat.reload('sidebar')
+          })
+    }
+
     document.addEventListener('click', (ev) => {
       let match= ev.target.closest('[data-action]')
       if (match) {
@@ -467,6 +531,9 @@
           case 'remove-item':
             removeItem(ev)
             break
+          case 'set-status':
+            setStatus(ev);
+            break;
           default:
             scat.alert('danger', `Unknown action ${action}.`)
         }
