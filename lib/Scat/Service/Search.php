@@ -76,9 +76,13 @@ class Search
                                                            item.id),
                                                          0)',
                                                     'stock')
+                                   ->select('brand.name', 'brand_name')
+                                   ->left_outer_join('product',
+                                                     array('product.id', '=',
+                                                           'item.product_id'))
                                    ->left_outer_join('brand',
                                                      array('brand.id', '=',
-                                                           'item.brand_id'))
+                                                           'product.brand_id'))
                                    ->left_outer_join('barcode',
                                                      array('barcode.item_id',
                                                            '=', 'item.id'))
