@@ -15,7 +15,7 @@
         {{ block('invoice') }}
       </div>
     </div>
-    <div data-reload="sidebar" class="col-md-3">
+    <div data-reload="sidebar" id="sidebar" class="col-md-3">
       {{ block('sidebar') }}
     </div>
   </div>
@@ -235,7 +235,7 @@
         </ul>
       {% endif %}
 
-      <hr style="border-color: rgba(0,0,0,0.1)">
+      <h3>{{ txn.type == 'customer' ? 'Customer' : 'Vendor' }}</h3>
 
       <a href="#" class="btn btn-default btn-sm pull-right">
         <i class="fa fa-user-o"></i>
@@ -268,19 +268,19 @@
 
       <div class="clearfix"></div>
 
-      <hr style="border-color: rgba(0,0,0,0.1)">
+      <h3>Shipping</h3>
 
       <a href="#" class="btn btn-default btn-sm pull-right">
         <i class="fa fa-truck"></i>
       </a>
 
       {% if txn.shipping_address_id == 1 %}
-        <h3>Curbside Pickup</h3>
+        <h4>Curbside Pickup</h4>
         <button class="btn btn-block btn-primary">
           Complete
         </button>
       {% elseif txn.shipping_address_id %}
-        <h3>{{ txn.is_bike_delivery ? 'Deliver to' : 'Ship to' }}:</h3>
+        <h4>{{ txn.is_bike_delivery ? 'Deliver to' : 'Ship to' }}:</h4>
         {% set shipping_address= txn.shipping_address() %}
         <div>{{ shipping_address.name }}</div>
         <div>{{ shipping_address.company }}</div>
@@ -429,6 +429,12 @@
   </template>
 
   <style>
+    #sidebar h3 {
+      margin-top: 1em;
+      color: rgb(0,0,0,0.3);
+      border-bottom: 1px solid rgb(0,0,0,0.1);
+    }
+
     .choices {
       max-height: 300px;
       overflow: scroll;
