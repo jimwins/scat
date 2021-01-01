@@ -5,6 +5,7 @@ LABEL maintainer="Jim Winstead <jimw@trainedmonkey.com>"
 RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         freetype-dev \
         gifsicle \
+        git \
         jpegoptim \
         libjpeg-turbo-dev \
         libpng-dev \
