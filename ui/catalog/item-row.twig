@@ -32,7 +32,24 @@
     <span class="editable"
           data-pk="{{ i.code }}"
           data-name="name">
-    {{- i.name -}}
+      {{- i.name -}}
+    </span>
+    {% if i.product_id %}
+      <br>
+      <small class="product-link text-muted ">
+        <a href="{{ i.product.dept.parent.full_slug }}">
+          {{ i.product.dept.parent.name }}
+        </a>
+        /
+        <a href="{{ i.product.dept.full_slug }}">
+          {{ i.product.dept.name }}
+        </a>
+        /
+        <a href="{{ i.product.full_slug }}">
+          {{ i.product.name }}
+        </a>
+      </small>
+    {% endif %}
   </td>
   <td class="item-short-name" style="{{ s.style_item_color(i.color) }}">
     <span class="editable"
@@ -82,11 +99,6 @@
     {% endif %}
     {% if i.oversized %}
       <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="fa fa-truck"></i></span>
-    {% endif %}
-    {% if i.product_id %}
-      <a class="product-link" href="{{ i.product.full_slug }}">
-        <i class="fa fa-cubes"></i>
-      </a>
     {% endif %}
   </td>
 {# critical that <script> be inside tr so currentScript.parentNode works #}
