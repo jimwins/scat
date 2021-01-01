@@ -84,8 +84,14 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     case 'name':
       $this->current[]= "(item.name LIKE '%$value%')";
       break;
+    case 'retail':
+    case 'retail_price':
     case 'msrp':
       $this->current[]= "(item.retail_price = '$value')";
+      break;
+    case 'sale':
+    case 'sale_price':
+      $this->current[]= "(sale_price(item.retail_price, item.discount_type, item.discount) = '$value')";
       break;
     case 'discount':
       $this->current[]= "(item.discount = '$value')";
