@@ -127,9 +127,7 @@ class People {
       $details[]= $person->loadVendorData($file);
     }
 
-    return $response->withJson([
-      'details' => $details
-    ]);
+    return $response->withJson($details[0]);
   }
 
   public function createPerson(Request $request, Response $response,
