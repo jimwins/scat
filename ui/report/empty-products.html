@@ -3,3 +3,28 @@
 {% block title %}
   Empty Products
 {% endblock %}
+
+{% block catalog_crumb %}
+  <p>
+    <a id="set-all-inactive" class="btn btn-primary">Set All Inactive</a>
+  </p>
+{% endblock %}
+
+{% block script %}
+<script>
+  document.getElementById('set-all-inactive').addEventListener('click', (ev) => {
+    ev.preventDefault(); ev.stopPropagation();
+
+    let products= document.querySelectorAll('.product')
+
+    products.forEach((product) => {
+      let id= product.getAttribute('data-id')
+      scat.post('/catalog/product/' + id, { active: 0 })
+          .then((res) => res.json())
+          .then((data) => {
+            product.setAttribute('data-active', data.active)
+          })
+    })
+  })
+</script>
+{% endblock %}

@@ -1,6 +1,6 @@
 {% for p in products %}
   {% set slug = url_for('catalog') ~ '/' ~ p.full_slug %}
-  <div class="row">
+  <div class="row product" data-id="{{ p.id }}" data-active="{{ p.active }}">
     <div class="col-sm-2">
       <div class="thumbnail responsive-thumbnail">
         <a href="{{ slug }}">
@@ -37,3 +37,8 @@
     </div>
   </div>
 {% endfor %}
+<style>
+  .product[data-active="0"] .media-heading {
+    text-decoration: line-through;
+  }
+</style>
