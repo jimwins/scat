@@ -12,6 +12,7 @@
 {% endmacro %}
 
 <tr data-id="{{ i.id }}"
+    data-code="{{ i.code }}"
     class="{{ (item and item.id == i.id) ? 'info' }}
            {{ not i.active ? 'inactive' }}">
   <td class="item-select">
@@ -100,6 +101,7 @@
     {% if i.oversized %}
       <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="fa fa-truck"></i></span>
     {% endif %}
+    <i class="active fa {{ i.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
   </td>
 {# critical that <script> be inside tr so currentScript.parentNode works #}
 <script>
@@ -141,6 +143,24 @@
     setTimeout(function() {
       editable.input.$input.select()
     }, 1)
+  })
+
+  row.querySelector('.active').addEventListener('click', (ev) => {
+    let code= ev.target.closest('[data-id]').getAttribute('data-code')
+    let active= ev.target.classList.contains('fa-check-square-o')
+    ev.target.classList.remove('fa-check-square-o', 'fa-square-o')
+    ev.target.classList.add('fa-spin', 'fa-spinner')
+    scat.patch('/catalog/item/' + code, { active: active ? 0 : 1 })
+        .then((res) => res.json())
+        .then((data) => {
+          ev.target.classList.add(data.active != '0' ? 'fa-check-square-o' : 'fa-square-o')
+        })
+        .catch((err) => {
+          ev.target.classList.add(active ? 'fa-check-square-o' : 'fa-square-o')
+        })
+        .finally((data) => {
+          ev.target.classList.remove('fa-spin', 'fa-spinner')
+        })
   })
 }
 </script>
