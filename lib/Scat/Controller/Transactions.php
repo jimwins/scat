@@ -1252,12 +1252,12 @@ class Transactions {
     /* Select a rate? */
     if (($rate_id= $request->getParam('rate_id'))) {
       $ep= $shipping->getShipment($shipment);
+      $details= [ 'rate' => [ 'id' => $rate_id ] ];
       $insurance= $txn->subtotal();
-      if ($insurance == 0.00) $insurance= 50.00;
-      $ep->buy([
-        'rate' => [ 'id' => $rate_id ],
-        'insurance' => $insurance
-      ]);
+      if ($insurance > 100.00) {
+        $details['insurance']= $insurance;
+      }
+      $ep->buy($details);
 
       $shipment->status= 'unknown';
       $shipment->tracker_id= $ep->tracker->id;
