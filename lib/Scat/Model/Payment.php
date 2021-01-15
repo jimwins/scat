@@ -14,6 +14,7 @@ class Payment extends \Scat\Model {
     'paypal' => "PayPal",
     'amazon' => "Amazon Pay",
     'eventbrite' => "Eventbrite",
+    'postmates' => "Postmates",
     'venmo' => "Venmo",
     'loyalty' => "Loyalty Reward",
     'discount' => "Discount",
