@@ -15,6 +15,7 @@ class Shipping {
                               \Scat\Service\Email $email,
                               \Scat\Service\Ordure $ordure,
                               \Scat\Service\PayPal $paypal,
+                              \Scat\Service\Data $data,
                               View $view)
   {
     $this->txn= $txn;
@@ -22,9 +23,36 @@ class Shipping {
     $this->email= $email;
     $this->ordure= $ordure;
     $this->paypal= $paypal;
+    $this->data= $data;
     $this->view= $view;
   }
 
+  function index(Request $request, Response $response) {
+    $page= (int)$request->getParam('page');
+    $page_size= 20;
+
+    $shipments= $this->data->factory('Shipment')
+      ->select('*')
+      ->select_expr('COUNT(*) OVER()', 'records')
+      ->order_by_desc('created')
+      ->limit($page_size)->offset($page * $page_size);
+
+    $q= $request->getParam('q');
+    if ($q) {
+      // todo
+    }
+
+    $shipments= $shipments->find_many();
+
+    return $this->view->render($response, 'shipping/index.html', [
+      'shipments' => $shipments,
+      'q' => $q,
+      'page' => $page,
+      'page_size' => $page_size,
+    ]);
+  }
+
+  /* Webhooks */
   function register(Request $request, Response $response) {
     return $response->withJson($this->shipping->registerWebhook());
   }

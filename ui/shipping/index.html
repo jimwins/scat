@@ -1,0 +1,65 @@
+{% extends 'layout/page.html' %}
+
+{% block title %}
+  Shipments
+{% endblock %}
+
+{% block content %}
+
+  {% if q and not shipments %}
+    <p class="lead">
+      <strong>No results found.</strong>
+      Nothing was found for those search parameters.
+      {% if not (q matches '/active:0/') %}
+        <a href="{{ current_url(true) ~ ' active:0' }}">Try again with inactive people.</a>
+      {% endif %}
+    </p>
+  {% endif %}
+
+  {% if shipments %}
+    <table id="shipments" class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Created</th>
+          <th>Modified</th>
+          <th>Status</th>
+          <th>Transaction</th>
+          <th>Recipient</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for shipment in shipments %}
+        <tr>
+          <td class="num">
+            <a href="/shipment/{{ shipment.id }}">{{ loop.index }}</a>
+          </td>
+          <td>
+            <a href="/shipment/{{ shipment.id }}">{{ shipment.created | date('Y-m-d') }}</a>
+          </td>
+          <td>
+            <a href="/shipment/{{ shipment.id }}">{{ shipment.modified | date('Y-m-d') }}</a>
+          </td>
+          <td>
+            {{ shipment.status }}
+          </td>
+          <td>
+            <a href="/sale/{{ shipment.txn_id }}">
+              {{ shipment.txn.friendly_type }}
+              {{ shipment.txn.formatted_number }}
+            </a>
+          </td>
+          <td>
+            {{ shipment.txn.shipping_address.name }} /
+            {{ shipment.txn.shipping_address.city }},
+            {{ shipment.txn.shipping_address.state }}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <style>
+      #shipments a { display: block }
+    </style>
+  {% endif %}
+{% endblock %}

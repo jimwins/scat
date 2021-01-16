@@ -157,6 +157,11 @@ $app->group('/purchase', function (RouteCollectorProxy $app) {
               [ \Scat\Controller\Transactions::class, 'addToPurchase' ]);
 });
 
+/* Shipping */
+$app->group('/shipment', function (RouteCollectorProxy $app) {
+  $app->get('', [ \Scat\Controller\Shipping::class, 'index' ]);
+});
+
 /* Catalog */
 $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->get('/search', [ \Scat\Controller\Catalog::class, 'search' ])
