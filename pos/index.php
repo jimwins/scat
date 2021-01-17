@@ -332,6 +332,9 @@ $app->group('/person', function (RouteCollectorProxy $app) {
   $app->post('/{id:[0-9]+}/~merge',
             [ \Scat\Controller\People::class, 'mergePerson' ]);
 
+  $app->get('/remarketing-list',
+            [ \Scat\Controller\People::class, 'remarketingList' ]);
+
 });
 
 /* Clock */

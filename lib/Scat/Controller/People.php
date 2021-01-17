@@ -258,4 +258,40 @@ class People {
     return $response->withJson($activity);
   }
 
+  public function remarketingList(Request $request, Response $response,
+                                  \Scat\Service\Data $data)
+  {
+    $people= $data->factory('Person')
+      ->where('role', 'customer')
+      ->where('active', 1)
+      ->find_many();
+
+    $fields= [ 'Email', 'Phone' ];
+
+    //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
+    $output= fopen("php://memory", 'r+');
+    fputcsv($output, $fields);
+
+    $phoneUtil= \libphonenumber\PhoneNumberUtil::getInstance();
+
+    foreach ($people as $person) {
+      $email= strtolower(trim($person->email));
+      try {
+        $phone= $phoneUtil->parse($person->phone, 'US');
+        $phone= $phoneUtil->format($phone,
+                                    \libphonenumber\PhoneNumberFormat::E164);
+      } catch (\Exception $e) {
+        $phone= '';
+      }
+      if (!$phone && !$email) continue;
+      fputcsv($output, [
+        $email ? hash('sha256', $email) : '',
+        $phone ? hash('sha256', $phone) : ''
+      ]);
+    }
+
+    $response= $response->withBody(\GuzzleHttp\Psr7\stream_for($output));
+
+    return $response->withHeader("Content-type", "text/csv");
+  }
 }
