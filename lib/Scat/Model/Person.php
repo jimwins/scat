@@ -381,10 +381,14 @@ class Person extends \Scat\Model {
                 INTO TABLE vendor_upload
               $format
               IGNORE 1 LINES
-              (code, vendor_sku, name, @retail_price, @net_price, @promo_price,
+              (@code, @vendor_sku, @name,
+               @retail_price, @net_price, @promo_price,
                @barcode, @purchase_quantity, @promo_quantity,
                weight, length, width, height)
            SET
+               code = TRIM(@code),
+               vendor_sku = TRIM(@vendor_sku),
+               name = TRIM(@name),
                retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
                net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
                promo_price = REPLACE(REPLACE(@promo_price, ',', ''), '$', ''),
