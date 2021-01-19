@@ -1225,8 +1225,8 @@ class Transactions {
       $options= [
         'invoice_number' => $txn->formatted_number(),
       ];
-      if ($request->getParam('ormd')) {
-        $options['hazmat']= 'ORMD';
+      if ($request->getParam('hazmat')) {
+        $options['hazmat']= 'LIMITED_QUANTITY';
       }
 
       $extra= $shipping->createShipment([
