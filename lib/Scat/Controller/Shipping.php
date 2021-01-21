@@ -175,6 +175,35 @@ class Shipping {
 
       case 'available_for_pickup':
         // send order available for pickup
+        $txn= $shipment->txn();
+
+        if (!$txn->person()->email) {
+          error_log("Don't know the email for txn {$txn->id}, can't update");
+          break;
+        }
+
+        foreach ($tracker->tracking_details as $details) {
+          if ($details->status == 'available_for_pickup') {
+            $available_for_pickup= $details->datetime;
+          }
+        }
+
+        $subject= $this->view->fetchBlock('email/available_for_pickup.html', 'title', [
+          'tracker' => $tracker,
+          'available_for_pickup' => $available_for_pickup,
+          'txn' => $txn,
+        ]);
+        $body= $this->view->fetch('email/available_for_pickup.html', [
+          'tracker' => $tracker,
+          'available_for_pickup' => $available_for_pickup,
+          'txn' => $txn,
+        ]);
+
+        $res= $this->email->send(
+          [ $txn->person()->email => $txn->person()->name ],
+          $subject, $body
+        );
+
         break;
 
       case 'pre_transit':

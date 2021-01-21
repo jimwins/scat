@@ -1,0 +1,41 @@
+{% extends 'layout/email.html' %}
+
+{% block title -%}
+  Your order is ready for pickup!
+{%- endblock %}
+
+{% block content_top %}
+  <p>
+    {% if txn.person.name %}
+      Dear {{ txn.person.name }},
+    {% else %}
+      Dear,
+    {% endif %}
+  </p>
+
+  <p>
+    Thank you for your order from Raw Materials Art Supplies!
+  </p>
+  <p>
+    We wanted to let you know that your order ({{ txn.formatted_number }}) was
+    reported to be ready for pickup by {{ tracker.carrier }} on
+    {{ (available_for_pickup ?: tracker.updated_at) | date("c", "UTC") | date("l, F j", txn.shipping_address.timezone) }}.
+    {% if available_for_pickup and available_for_pickup|date("Y-m-d") != tracker.updated_at|date("Y-m-d") %}
+      (Sorry for the slow update, we just got the news!)
+    {% endif %}
+  </p>
+  <p>
+    If there are any problems with picking up your package, please let us know right away so we can get it sorted out!
+  </p>
+
+{% endblock %}
+
+{% set call_to_action_url= tracker.public_url %}
+{% block call_to_action "Track Your Shipment" %}
+
+{% block content_bottom %}
+  <p>
+    Thank you for your business and we look forward to serving you in the
+    future!
+  </p>
+{% endblock %}
