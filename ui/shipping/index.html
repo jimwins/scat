@@ -4,6 +4,42 @@
   Shipments
 {% endblock %}
 
+{% block controls %}
+  <nav aria-label="Controls for Activity List">
+    <ul class="pager">
+      {% if page %}
+        <li class="previous">
+          <a href="?page={{ page - 1 }}&status={{ status }}">
+            <span aria-hidden="true">&larr;</span> Previous
+          </a>
+        </li>
+      {% else %}
+        <li class="previous disabled">
+          <span><span aria-hidden="true">&larr;</span> Previous</span>
+        </li>
+      {% endif %}
+      <li>
+        {{ page * page_size + 1 }} -
+        {{ min((page + 1) * page_size, shipments[0].records) }}
+        of {{ shipments[0].records }}
+      </li>
+      {% if ((page + 1) * page_size) < shipments[0].records %}
+        <li class="next">
+          <a href="?page={{ page + 1 }}&status={{ status }}">
+            Next <span aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="next disabled">
+          <span>
+            Next <span aria-hidden="true">&rarr;</span>
+          </span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endblock %}
+
 {% block content %}
 
   {% if q and not shipments %}
@@ -17,6 +53,7 @@
   {% endif %}
 
   {% if shipments %}
+    {{ block('controls') }}
     <table id="shipments" class="table table-striped table-hover">
       <thead>
         <tr>
@@ -61,5 +98,6 @@
     <style>
       #shipments a { display: block }
     </style>
+    {{ block('controls') }}
   {% endif %}
 {% endblock %}
