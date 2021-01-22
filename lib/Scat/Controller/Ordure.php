@@ -437,6 +437,8 @@ EMAIL;
   {
     $client= new \GuzzleHttp\Client();
 
+    $seen= [];
+
     $url= ORDURE . '/sale/list';
     $res= $client->request('GET', $url,
                            [
@@ -463,8 +465,25 @@ EMAIL;
 
       $data= json_decode($res->getBody(), true);
 
-      if (!count($data['items']) || !$data['sale']['email']) {
+      $email= $data['sale']['email'];
+
+      if (!count($data['items']) || !$email) {
         continue;
+      }
+
+      if ($seen[$email]++) {
+        error_log("Skipping abandoned cart email: already today to $email\n");
+        continue;
+      }
+
+      // Look up this person
+      $person= $this->data->factory('Person')->where('email', $email)->find_one();
+      if ($person) {
+        $recent_orders= $person->txns()->where_raw('created BETWEEN NOW() - INTERVAL 1 DAY AND NOW()')->find_many();
+        if ($recent_orders) {
+          error_log("Skipping abandoned cart email: $email already placed order today\n");
+          continue;
+        }
       }
 
       $data['call_to_action_url']= ORDURE . '/cart?uuid=' . $data['sale']['uuid'];
