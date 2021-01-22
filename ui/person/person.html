@@ -290,7 +290,7 @@
 
   </div><!-- .row -->
 
-  {% set activity= person.txns(page, limit) %}
+  {% set activity= person.txns(page, limit).find_many %}
   {% if activity %}
     <div class="row">
       <div class="col-sm-12">

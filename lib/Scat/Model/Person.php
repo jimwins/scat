@@ -122,8 +122,7 @@ class Person extends \Scat\Model {
                 ->select('*')
                 ->select_expr('COUNT(*) OVER()', 'records')
                 ->order_by_desc('created')
-                ->limit($limit)->offset($page * $limit)
-                ->find_many();
+                ->limit($limit)->offset($page * $limit);
   }
 
   public function setProperty($name, $value) {
