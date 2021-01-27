@@ -17,6 +17,9 @@ class Media
   }
 
   public function createFromUrl($url) {
+    // Special hack to get full-size Salsify images
+    $url= str_replace('/c_limit,cs_srgb,h_600,w_600', '', $url);
+
     error_log("Creating image from URL '$url'\n");
 
     $client= new \GuzzleHttp\Client();
