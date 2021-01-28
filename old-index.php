@@ -570,6 +570,11 @@ $(function() {
         Create Shipment
       </button>
     </div>
+    <div data-bind="if: ['paid','processing','waitingforitems'].includes(txn.status()) && txn.shipping_address_id() > 1, click: cannedMessage" data-message="ship-delay">
+      <button class="btn btn-warning btn-block">
+        Shipping Delay
+      </button>
+    </div>
     <div data-bind="if: ['paid','processing','waitingforitems'].includes(txn.status()) && txn.shipping_address_id() == 1, click: cannedMessage" data-message="pickup">
       <button class="btn btn-primary btn-block">
         Ready for Pickup
