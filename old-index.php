@@ -406,7 +406,7 @@ $(function() {
     }
 
     // (%V|@)INV-(\d+) is an invoice to load
-    var m= q.match(/^(%V|@)INV-(\d+)/);
+    var m= q.match(/^\s*(%V|@)INV-(\d+)/);
     if (m) {
       window.location.href= '/sale/' + m[2];
       return false;
