@@ -63,7 +63,7 @@ foreach ($items as $item) {
   $pdf->SetTextColor(0);
 
   // write the name
-  $name= utf8_decode($short ? $item['short_name'] ? $item['name']);
+  $name= utf8_decode($short ? $item['short_name'] : $item['name']);
 
   if ($trim)
     $name= trim(preg_replace("!$trim!i", '', $name));
