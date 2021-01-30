@@ -34,8 +34,18 @@
             </a>
           </li>
           <li>
-            <a class="print-labels" data-trim="yes" data-noprice="1">
+            <a class="print-labels" data-trim="ask" data-noprice="1">
               Trim name, no price
+            </a>
+          </li>
+          <li>
+            <a class="print-labels" data-short="1">
+              Short name
+            </a>
+          </li>
+          <li>
+            <a class="print-labels" data-short="1" data-noprice="1">
+              Short name, no price
             </a>
           </li>
         </ul>
@@ -102,12 +112,13 @@
                     'labels-price-brush' : 'labels-price')
           let items= collectItems(list)
           let noprice= ev.target.getAttribute('data-noprice')
+          let short= ev.target.getAttribute('data-short')
           let trim= ev.target.getAttribute('data-trim')
           if (trim == 'ask') {
             trim= window.prompt("Please enter the part of the name to trim from the labels", "");
           }
           // trim, noprice, size
-          scat.printDocument(doc, { items: items, noprice: noprice, trim: trim })
+          scat.printDocument(doc, { items: items, noprice: noprice, short: short, trim: trim })
         })
       })
 

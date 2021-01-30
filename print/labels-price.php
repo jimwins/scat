@@ -36,6 +36,7 @@ if ($q= $_REQUEST['q']) {
 }
 
 $trim= trim($_REQUEST['trim']);
+$short= (int)$_REQUEST['short'];
 $noprice= (int)$_REQUEST['noprice'];
 
 $left_margin= 0.2;
@@ -62,7 +63,7 @@ foreach ($items as $item) {
   $pdf->SetTextColor(0);
 
   // write the name
-  $name= utf8_decode($item['name']);
+  $name= utf8_decode($short ? $item['short_name'] ? $item['name']);
 
   if ($trim)
     $name= trim(preg_replace("!$trim!i", '', $name));
