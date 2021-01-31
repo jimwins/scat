@@ -1,0 +1,59 @@
+{% extends 'layout/email.html' %}
+
+{% block title -%}
+  Thanks for shopping with us! (Invoice {{txn.formatted_number }})
+{%- endblock %}
+
+{% block content_top %}
+  <p>
+    {% if txn.person.name %}
+      Dear {{ txn.person.name }},
+    {% else %}
+      Dear,
+    {% endif %}
+  </p>
+
+  {% if txn.shipping_address_id == 1 %}
+    <p>
+      Thank you for your curbside pickup order from Raw Materials Art
+      Supplies!
+    </p>
+    <p>
+      We will send another email when your order is ready for pickup.
+      Pickup times are Tuesday – Saturday, noon to 3pm. Most orders
+      placed during our pickup times are ready within 30 minutes, and
+      orders placed overnight or over the weekend are ready soon after
+      we open. <b>Please wait for confirmation that your order is ready
+      before coming to pick up your order.</b>
+    </p>
+  {% elseif txn.is_bike_delivery() %}
+    <p>
+      Thank you for your local bike delivery order from Raw Materials Art
+      Supplies!
+    </p>
+    <p>
+      We will call you before your order leaves the store for delivery.
+      Delivery times are Tuesday – Saturday, noon to 3pm. Most orders
+      placed before 2pm on Tuesday - Saturday are delivered the same day,
+      and orders placed overnight or over the weekend will be delivered
+      when we are open next.
+    </p>
+  {% else %}
+    <p>
+      Thank you for your order from Raw Materials Art Supplies!
+    </p>
+    <p>
+      We will send another email with tracking information after your order
+      has shipped. Most orders are shipped out within two business days
+      (Tuesday - Saturday).
+    </p>
+  {% endif %}
+
+{% endblock %}
+
+{% block content_bottom %}
+  <p>
+    Thank you for your business and we look forward to serving you in the
+    future!
+  </p>
+{% endblock %}

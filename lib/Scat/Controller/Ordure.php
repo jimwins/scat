@@ -400,28 +400,13 @@ class Ordure {
 
         $this->data->commit();
 
-        // Send order confirmation
-        $invoice= $txn->formatted_number();
-        $subject= "Thanks for shopping with us! (Invoice #{$invoice})";
+        $data= [ 'txn' => $txn ];
 
-        $method= $txn->shipping_address_id == 1
-                  ? "is ready for pick up" : "has been shipped";
-        $content= <<<EMAIL
-Thank you for shopping at Raw Materials Art Supplies!
+        $template= $view->getEnvironment()->load('email/confirmed.html');
 
-Your order is now being processed, and you will receive another email when your order $method or if we have other updates.
-
-Let us know if there is anything else that we can do to help.
-EMAIL;
-
-        $body= $view->fetch('email/invoice.html', [
-          'txn' => $txn,
-          'subject' => $subject,
-          'content' => $content,
-        ]);
-
-        $res= $this->email->send([ $person->email => $person->name],
-                                  $subject, $body, $attachments);
+        $this->email->send([ $person->email => $person->name],
+                            $template->renderBlock('title', $data),
+                            $template->render($data));
       }
       catch (Exception $e) {
         $this->data->rollBack();
