@@ -24,6 +24,13 @@
       {% endif %}
     {% else %}
       <div class="form-group">
+        <label for="label_date">Label Date</label>
+        <input type="text" class="form-control"
+               name="label_date"
+               value="{{ label_date ?: "now"|date("Y-m-d") }}">
+      </div>
+
+      <div class="form-group">
         <label for="predefined_package">Package Type</label>
         <select class="form-control" name="predefined_package">
           <option value=""></option>

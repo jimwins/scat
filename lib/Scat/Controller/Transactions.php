@@ -1224,6 +1224,7 @@ class Transactions {
 
       $options= [
         'invoice_number' => $txn->formatted_number(),
+        'label_date' => $request->getParam('label_date'),
       ];
       if ($request->getParam('hazmat')) {
         $options['hazmat']= 'LIMITED_QUANTITY';
