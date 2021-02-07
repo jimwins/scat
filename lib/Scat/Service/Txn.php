@@ -50,6 +50,10 @@ class Txn
       $res= $res->where('uuid', $m[1]);
     }
 
+    if (preg_match('/^\d{4}-(\d+)/', $q, $m)) {
+      $res= $res->where('number', $m[1]);
+    }
+
     return $res;
   }
 
