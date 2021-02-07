@@ -251,9 +251,12 @@ class Ordure {
         $txn->uuid= $data->sale->uuid;
         $txn->online_sale_id= $data->sale->id;
         $txn->status= 'paid';
-        $txn->created= $data->sale->created;
+        // We update created to when the transaction was paid, otherwise it's
+        // the cart creation date, which may be long ago
+        $txn->created= $data->sale->modified;
         $txn->filled= $data->sale->modified;
         $txn->paid= $data->sale->modified;
+        $txn->tax_captured= $data->sale->modified;
         $txn->person_id= $person->id;
         $txn->tax_rate= 0.0;
 
