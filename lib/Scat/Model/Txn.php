@@ -271,13 +271,86 @@ class Txn extends \Scat\Model {
     }
   }
 
+  public function recalculateTaxOnReturns() {
+    $original= $this->returned_from();
+
+    foreach ($this->items()->where_not_null('returned_from_id')->find_many()
+              as $i)
+    {
+      $orig_item= $original->items()->find_one($i->returned_from_id);
+
+      $tax= (new \Decimal\Decimal($orig_item->tax) / $orig_item->ordered);
+      $tax= $i->ordered * $tax;
+      $tax= (string)$tax->round(2, \Decimal\Decimal::ROUND_HALF_UP);
+
+      if ($tax != $i->tax) {
+        $i->tax= $tax;
+        $i->save();
+      }
+    }
+  }
+
   public function recalculateTax(\Scat\Service\Tax $tax) {
     if ($this->type != 'customer') {
       return;
     }
 
+    if ($this->returned_from_id) {
+      $this->recalculateTaxOnReturns();
+    }
+
     if ($this->shipping_address_id > 1) {
-      error_log("Don't know how to calculate tax on shipped orders.");
+      $address= $this->shipping_address();
+
+      // Look up all non-returned items
+      $data= [
+        'customerId' => $this->person_id,
+        'cartId' => $this->uuid,
+        'deliveredBySeller' => false,
+        // XXX get from default shipping address
+        'origin' => [
+          'Zip4' => '1320',
+          'Zip5' => '90014',
+          'State' => 'CA',
+          'City' => 'Los Angeles',
+          'Address2' => '',
+          'Address1' => '645 S Los Angeles St',
+        ],
+        'destination' => [
+          'Zip5' => $address->zip,
+          'State' => $address->state,
+          'City' => $address->city,
+          'Address2' => $address->address2,
+          'Address1' => $address->address1,
+        ],
+        'cartItems' => [],
+      ];
+
+      foreach ($this->items()->where_null('returned_from_id')->find_many() as $i) {
+        $data['cartItems'][]= [
+          'Index' => $i->id,
+          'ItemID' => $i->item_id,
+          'TIC' => $i->item->tic,
+          'Price' => $i->sale_price(),
+          'Qty' => -1 * $i->ordered,
+        ];
+      }
+
+      // Done if there's nothing to look up
+      if (!count($data['cartItems'])) return;
+
+      $response= $tax->lookup($data);
+
+      if ($response->ResponseType < 2) {
+        throw new \Exception($response->Messages[0]->Message);
+      }
+
+      foreach ($response->CartItemsResponse as $i) {
+        $line= $this->lines()->find_one($i->CartItemIndex);
+        $line->tax= $i->TaxAmount;
+        $line->save();
+      }
+
       return;
     }
 
@@ -292,7 +365,7 @@ class Txn extends \Scat\Model {
      */
     $tax_rate= new \Decimal\Decimal($this->tax_rate) / 100;
 
-    foreach ($this->items()->find_many() as $line) {
+    foreach ($this->items()->where_null('returned_from_id')->find_many() as $line) {
       if (!in_array($line->tic, [ '91082', '10005', '11000' ])) {
         $tax= ($line->ordered * -1) *
               new \Decimal\Decimal($line->sale_price()) *
