@@ -33,7 +33,7 @@
     <ul class="pager">
       {% if page %}
         <li class="previous">
-          <a href="?page={{ page - 1 }}&status={{ status }}">
+          <a href="?page={{ page - 1 }}&status={{ status }}&q={{ q }}">
             <span aria-hidden="true">&larr;</span> Previous
           </a>
         </li>
@@ -49,7 +49,7 @@
       </li>
       {% if ((page + 1) * limit) < txns[0].records %}
         <li class="next">
-          <a href="?page={{ page + 1 }}&status={{ status }}">
+          <a href="?page={{ page + 1 }}&status={{ status }}&q={{ q }}">
             Next <span aria-hidden="true">&rarr;</span>
           </a>
         </li>
@@ -70,6 +70,7 @@
       <form method="GET"
             action="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}">
         <div class="input-group">
+          <input type="hidden" name="status" value="{{ status }}">
           <input type="text" class="form-control" autofocus
                   name="q" value="{{ q }}">
           <span class="input-group-btn">
@@ -87,7 +88,7 @@
         </li>
         {% for s,label in variations %}
           <li {{ s == status ? 'class="active"' }}>
-            <a href="?status={{ s }}">{{ label }}</a>
+            <a href="?status={{ s }}&q={{ q }}">{{ label }}</a>
           </li>
         {% endfor %}
       </ul>
