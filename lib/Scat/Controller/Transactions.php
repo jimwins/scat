@@ -66,6 +66,7 @@ class Transactions {
       'page' => $page,
       'limit' => $limit,
       'status' => $status,
+      'q' => $q,
     ]);
   }
 
