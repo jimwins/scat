@@ -326,11 +326,18 @@ class Txn extends \Scat\Model {
         'cartItems' => [],
       ];
 
-      foreach ($this->items()->where_null('returned_from_id')->find_many() as $i) {
+      $index_map= []; $n= 1;
+
+      foreach ($this->items()->where_null('returned_from_id')->find_many()
+                as $i)
+      {
+        $tic= $i->item->tic;
+        $index= ($tic == '11000') ? 0 : $n++;
+        $index_map[$index]= $i->id;
         $data['cartItems'][]= [
-          'Index' => $i->id,
+          'Index' => $index,
           'ItemID' => $i->item_id,
-          'TIC' => $i->item->tic,
+          'TIC' => $tic,
           'Price' => $i->sale_price(),
           'Qty' => -1 * $i->ordered,
         ];
@@ -346,7 +353,7 @@ class Txn extends \Scat\Model {
       }
 
       foreach ($response->CartItemsResponse as $i) {
-        $line= $this->lines()->find_one($i->CartItemIndex);
+        $line= $this->items()->find_one($index_map[$i->CartItemIndex]);
         $line->tax= $i->TaxAmount;
         $line->save();
       }
