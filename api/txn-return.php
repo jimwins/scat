@@ -32,10 +32,12 @@ if (!$r)
 
 $new_txn_id= $db->insert_id;
 
-$q= "INSERT INTO txn_line (txn_id, item_id, ordered, allocated, override_name,
+$q= "INSERT INTO txn_line (txn_id, returned_from_id,
+                           item_id, ordered, allocated, override_name,
                            retail_price, discount_type, discount, taxfree,
                            tic, tax)
      SELECT $new_txn_id AS txn_id,
+            id AS returned_from_id,
             item_id,
             -ordered AS ordered,
             -allocated AS allocated,
