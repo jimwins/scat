@@ -436,7 +436,7 @@ class Txn extends \Scat\Model {
           $data['cartItems'][]= $item;
         }
 
-        if (!$count($data['cartItems'])) {
+        if (!count($data['cartItems'])) {
           throw new \Exception("No items to be returned.");
         }
 
