@@ -435,21 +435,6 @@ class Txn extends \Scat\Model {
         foreach ($this->items()->where_not_null('returned_from_id')->find_many()
                   as $i)
         {
-*/
-        $online= $this->returned_from()->getOnlineDetails ();
-
-        foreach ($this->items()->where_gt('ordered', 0)->find_many()
-                  as $i)
-        {
-          list($on)= array_filter($online->items, function($v) {
-            return $v->item_id == $i->item_id;
-          });
-
-          if (!$on) {
-            throw new \Exception("Unable to find {$i->returned_from_id} in original transaction");
-          }
-/* END */
-
           $index= $index_map[$i->returned_from_id];
 
           list($item)= array_filter($cartItems, function ($v) {
@@ -460,9 +445,36 @@ class Txn extends \Scat\Model {
             throw new \Exception("Unable to find {$i->returned_from_id} in original transaction");
           }
 
-/* MORE */
-          $item['Index']= $on->id;
-/* END */
+          $item['Qty']= $i->ordered;
+
+          $data['cartItems'][]= $item;
+        }
+*/
+        $online= $this->returned_from()->getOnlineDetails();
+
+        foreach ($this->items()->where_gt('ordered', 0)->find_many()
+                  as $i)
+        {
+          if ($i->tic == '11000') {
+            list($item)= array_filter($cartItems, function ($v) {
+              return $v->Index == 'shipping';
+            });
+          } else {
+            list($item)= array_filter($cartItems, function ($v) {
+              return $v->ItemID == $i->item_id;
+            });
+            list($on)= array_filter($online->items, function($v) {
+              return $v->item_id == $i->item_id;
+            });
+            if (!$on) {
+              throw new \Exception("Unable to find {$i->item_id} in online transaction");
+            }
+            $item['Index']= $on->id;
+          }
+
+          if (!$item) {
+            throw new \Exception("Unable to find {$i->item_id} in original transaction");
+          }
 
           $item['Qty']= $i->ordered;
 
@@ -470,7 +482,8 @@ class Txn extends \Scat\Model {
         }
 
         error_log(json_encode($data));
-        throw new \Exception("Testing gross hack on live data, of course.");
+        throw new \Exception("Testing ross hack.");
+/* END GROSS HACK */
 
         if (!count($data['cartItems'])) {
           throw new \Exception("No items to be returned.");
