@@ -1230,6 +1230,9 @@ class Transactions {
       if ($request->getParam('hazmat')) {
         $options['hazmat']= 'LIMITED_QUANTITY';
       }
+      if ($request->getParam('signature')) {
+        $options['delivery_confirmation']= 'SIGNATURE';
+      }
 
       $extra= $shipping->createShipment([
         'from_address' => $shipping->getDefaultFromAddress(),
