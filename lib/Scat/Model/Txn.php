@@ -438,7 +438,7 @@ class Txn extends \Scat\Model {
 */
         $online= $this->returned_from()->getOnlineDetails ();
 
-        foreach ($this->items()->where_get('ordered', 0)->find_many()
+        foreach ($this->items()->where_gt('ordered', 0)->find_many()
                   as $i)
         {
           list($on)= array_filter($online->items, function($v) {
