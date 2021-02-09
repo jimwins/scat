@@ -437,7 +437,7 @@ class Txn extends \Scat\Model {
         {
           $index= $index_map[$i->returned_from_id];
 
-          list($item)= array_filter($cartItems, function ($v) {
+          list($item)= array_filter($cartItems, function ($v) use($index) {
             return $v->Index == $index;
           });
 
@@ -456,14 +456,14 @@ class Txn extends \Scat\Model {
                   as $i)
         {
           if ($i->tic == '11000') {
-            list($item)= array_filter($cartItems, function ($v) {
+            list($item)= array_filter($cartItems, function ($v) use($i) {
               return $v->Index == 'shipping';
             });
           } else {
-            list($item)= array_filter($cartItems, function ($v) {
+            list($item)= array_filter($cartItems, function ($v) use($i) {
               return $v->ItemID == $i->item_id;
             });
-            list($on)= array_filter($online->items, function($v) {
+            list($on)= array_filter($online->items, function($v) use($i) {
               error_log("return {$v->item_id} == {$i->item_id};\n");
               return $v->item_id == $i->item_id;
             });
