@@ -437,9 +437,9 @@ class Txn extends \Scat\Model {
         {
           $index= $index_map[$i->returned_from_id];
 
-          list($item)= array_filter($cartItems, function ($v) use($index) {
+          list($item)= array_values(array_filter($cartItems, function ($v) use($index) {
             return $v->Index == $index;
-          });
+          }));
 
           if (!$item) {
             throw new \Exception("Unable to find {$i->returned_from_id} in original transaction");
@@ -483,8 +483,6 @@ class Txn extends \Scat\Model {
           $data['cartItems'][]= $item;
         }
 
-        error_log(json_encode($data));
-        throw new \Exception("Testing ross hack.");
 /* END GROSS HACK */
 
         if (!count($data['cartItems'])) {
