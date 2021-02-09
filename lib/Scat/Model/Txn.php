@@ -467,6 +467,7 @@ class Txn extends \Scat\Model {
               return $v->item_id == $i->item_id;
             });
             if (!$on) {
+              error_log(json_encode($online));
               throw new \Exception("Unable to find {$i->item_id} in online transaction");
             }
             $item['Index']= $on->id;
