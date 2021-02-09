@@ -25,7 +25,8 @@ function txn_load_full($db, $id) {
 
 function txn_load($db, $id) {
   $q= "SELECT id, uuid, online_sale_id, type,
-              number, status, created, filled, paid, returned_from_id,
+              number, status, created, filled, paid, tax_captured,
+              returned_from_id,
               no_rewards,
               IF(type = 'vendor' && YEAR(created) > 2013,
                  CONCAT(SUBSTRING(YEAR(created), 3, 2), number),
@@ -49,7 +50,7 @@ function txn_load($db, $id) {
         FROM (SELECT
               txn.id, txn.uuid, txn.online_sale_id,
               txn.type, txn.number, txn.status,
-              txn.created, txn.filled, txn.paid,
+              txn.created, txn.filled, txn.paid, txn.tax_captured,
               txn.returned_from_id, txn.no_rewards,
               txn.person_id,
               CONCAT(IFNULL(person.name, ''),

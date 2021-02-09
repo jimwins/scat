@@ -1365,6 +1365,23 @@ class Transactions {
     return $response->withJson($dropship);
   }
 
+  public function captureTax(Request $request, Response $response, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if ($txn->tax_captured) {
+      return $response->withJson([ 'message' => 'Already captured.' ]);
+    }
+
+    $txn->captureTax($this->tax);
+
+    return $response->withJson($txn);
+  }
+
+  /* PURCHASES */
+
   public function purchases(Request $request, Response $response) {
     return $this->search($request, $response, 'vendor');
   }

@@ -25,6 +25,7 @@ $q= "INSERT INTO txn
             person_id = $person,
             uuid = '$uuid',
             returned_from_id = $txn_id,
+            shipping_address_id = {$txn['shipping_address_id']},
             tax_rate = {$txn['tax_rate']}";
 $r= $db->query($q);
 if (!$r)

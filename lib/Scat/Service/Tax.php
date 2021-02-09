@@ -55,4 +55,12 @@ class Tax
     return $this->callApi('Lookup', $data);
   }
 
+  public function authorizedWithCapture($data) {
+    return $this->callApi('AuthorizedWithCapture', $data);
+  }
+
+  public function returned($data) {
+    return $this->callApi('Returned', $data);
+  }
+
 }

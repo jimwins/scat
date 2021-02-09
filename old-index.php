@@ -1155,6 +1155,11 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
                            attr: { title: txn.paid() ? moment(txn.paid()).format('MMMM D YYYY h:mm:ss a') : '' }">
             <i class="fa fa-money"></i>
           </span>
+          <span data-bind="css: { 'text-muted': !txn.tax_captured() },
+                           attr: { title: txn.tax_captured() ? moment(txn.tax_captured()).format('MMMM D YYYY h:mm:ss a') : '' },
+                           click: captureTax">
+            <i class="fa fa-bank"></i>
+          </span>
           <div class="btn-group">
            <button type="button" class="btn btn-default btn-xs dropdown-toggle"
                    data-bind="enable: txn.id()"
@@ -1392,6 +1397,7 @@ var model= {
     created: null,
     filled: null,
     paid: null,
+    tax_captured: null,
     number: 0,
     formatted_number: 0,
     no_rewards: 0,
@@ -1887,6 +1893,14 @@ viewModel.returnTransaction= function() {
     return false;
   }
   Txn.callAndLoad('txn-return', { txn: txn });
+}
+
+viewModel.captureTax= function() {
+  var txn= Txn.id();
+  scat.call('/sale/' + txn + '/~capture-tax')
+      .then((res) => {
+        Txn.loadId(txn)
+      })
 }
 
 ko.applyBindings(viewModel);

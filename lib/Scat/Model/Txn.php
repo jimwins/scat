@@ -290,6 +290,28 @@ class Txn extends \Scat\Model {
     }
   }
 
+  public function generateCartItems() {
+    $cartItems= []; $index_map= [];
+    $n= 1;
+
+    foreach ($this->items()->where_null('returned_from_id')->find_many()
+              as $i)
+    {
+      $tic= $i->item->tic;
+      $index= ($tic == '11000') ? 0 : $n++;
+      $index_map[$index]= $i->id;
+      $cartItems[]= [
+        'Index' => $index,
+        'ItemID' => $i->item_id,
+        'TIC' => $tic,
+        'Price' => $i->sale_price(),
+        'Qty' => -1 * $i->ordered,
+      ];
+    }
+
+    return [ $cartItems, $index_map ];
+  }
+
   public function recalculateTax(\Scat\Service\Tax $tax) {
     if ($this->type != 'customer') {
       return;
@@ -302,9 +324,11 @@ class Txn extends \Scat\Model {
     if ($this->shipping_address_id > 1) {
       $address= $this->shipping_address();
 
+      list($zip5, $zip4)= explode('-', $address->zip);
+
       // Look up all non-returned items
       $data= [
-        'customerId' => $this->person_id,
+        'customerId' => $this->person_id ?: 0,
         'cartId' => $this->uuid,
         'deliveredBySeller' => false,
         // XXX get from default shipping address
@@ -317,7 +341,8 @@ class Txn extends \Scat\Model {
           'Address1' => '645 S Los Angeles St',
         ],
         'destination' => [
-          'Zip5' => $address->zip,
+          'Zip4' => $zip4,
+          'Zip5' => $zip5,
           'State' => $address->state,
           'City' => $address->city,
           'Address2' => $address->address2,
@@ -326,22 +351,9 @@ class Txn extends \Scat\Model {
         'cartItems' => [],
       ];
 
-      $index_map= []; $n= 1;
+      list($cartItems, $index_map)= $this->generateCartItems();
 
-      foreach ($this->items()->where_null('returned_from_id')->find_many()
-                as $i)
-      {
-        $tic= $i->item->tic;
-        $index= ($tic == '11000') ? 0 : $n++;
-        $index_map[$index]= $i->id;
-        $data['cartItems'][]= [
-          'Index' => $index,
-          'ItemID' => $i->item_id,
-          'TIC' => $tic,
-          'Price' => $i->sale_price(),
-          'Qty' => -1 * $i->ordered,
-        ];
-      }
+      $data['cartItems']= $cartItems;
 
       // Done if there's nothing to look up
       if (!count($data['cartItems'])) return;
@@ -384,6 +396,125 @@ class Txn extends \Scat\Model {
         }
       }
     }
+  }
+
+  public function captureTax(\Scat\Service\Tax $tax) {
+    if ($this->tax_captured) {
+      throw new \Exception("Tax already captured.");
+    }
+
+    /* If tax on an exchange was a wash, we don't bother reporting it */
+    if ($this->tax() != 0) {
+      // Is this a return or exchange?
+      if ($this->returned_from_id) {
+        $data= [
+          'orderID' => $this->returned_from()->uuid,
+          'returnedDate' => $this->paid,
+          'cartItems' => [],
+        ];
+
+        // These are the cartItems and index_map of the *returned txn*
+        list($cartItems, $index_map)=
+          $this->returned_from()->generateCartItems();
+        $index_map= array_flip($index_map); // we're going from id to index
+
+        foreach ($this->items()->where_not_null('returned_from_id')->find_many()
+                  as $i)
+        {
+          $index= $index_map[$i->returned_from_id];
+
+          list($item)= array_filter($cartItems, function ($v) {
+            return $v->Index == $index;
+          });
+
+          if (!$item) {
+            throw new \Exception("Unable to find {$i->returned_from_id} in original transaction");
+          }
+
+          $item['Qty']= $i->ordered;
+
+          $data['cartItems'][]= $item;
+        }
+
+        $response= $tax->returned($data);
+
+        if ($response->ResponseType < 2) {
+          throw new \Exception($response->Messages[0]->Message);
+        }
+      }
+
+      // If we have new items, have to report it as new sale
+      if ($this->items()->where_null('returned_from_id')->count()) {
+        // Was this a local transaction? If so, we need to lookup the tax
+        if (!$this->shipping_address_id) {
+          // Look up all non-returned items
+          $data= [
+            'customerId' => $this->person_id ?: 0,
+            'cartId' => $this->uuid,
+            'deliveredBySeller' => false,
+            // XXX get from default shipping address
+            'origin' => [
+              'Zip4' => '1320',
+              'Zip5' => '90014',
+              'State' => 'CA',
+              'City' => 'Los Angeles',
+              'Address2' => '',
+              'Address1' => '645 S Los Angeles St',
+            ],
+            'destination' => [
+              'Zip4' => '1320',
+              'Zip5' => '90014',
+              'State' => 'CA',
+              'City' => 'Los Angeles',
+              'Address2' => '',
+              'Address1' => '645 S Los Angeles St',
+            ],
+            'cartItems' => [],
+          ];
+
+          $index_map= []; $n= 1;
+
+          foreach ($this->items()->where_null('returned_from_id')->find_many()
+                    as $i)
+          {
+            $tic= $i->item->tic;
+            $index= ($tic == '11000') ? 0 : $n++;
+            $index_map[$index]= $i->id;
+            $data['cartItems'][]= [
+              'Index' => $index,
+              'ItemID' => $i->item_id,
+              'TIC' => $tic,
+              'Price' => $i->sale_price(),
+              'Qty' => -1 * $i->ordered,
+            ];
+          }
+
+          if (count($data['cartItems'])) {
+            $response= $tax->lookup($data);
+
+            if ($response->ResponseType < 2) {
+              throw new \Exception($response->Messages[0]->Message);
+            }
+          }
+        }
+
+        $data= [
+          'customerID' => $this->person_id ?: 0,
+          'cartID' => $this->uuid,
+          'orderID' => $this->uuid,
+          'dateAuthorized' => $this->paid,
+          'dateCaptured' => $this->paid,
+        ];
+
+        $response= $tax->authorizedWithCapture($data);
+        if ($response->ResponseType < 2) {
+          throw new \Exception($response->Messages[0]->Message);
+        }
+      }
+    }
+
+    $this->set_expr('tax_captured', 'NOW()');
+    $this->save();
   }
 
   public function loyalty() {
