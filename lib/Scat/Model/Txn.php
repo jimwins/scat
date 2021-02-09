@@ -302,7 +302,7 @@ class Txn extends \Scat\Model {
       $index_map[$index]= $i->id;
       $cartItems[]= [
         'Index' => $index,
-        'ItemID' => $i->item_id,
+        'ItemID' => ($tic == '11000') ? 'shipping' : $i->item_id,
         'TIC' => $tic,
         'Price' => $i->sale_price(),
         'Qty' => -1 * $i->ordered,
