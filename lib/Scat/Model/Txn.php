@@ -398,6 +398,19 @@ class Txn extends \Scat\Model {
     }
   }
 
+  public function getOnlineDetails() {
+    $client= new \GuzzleHttp\Client();
+
+    $url= ORDURE . '/sale/' . $this->uuid . '/json';
+    $res= $client->request('GET', $url,
+                           [
+                             'debug' => $DEBUG,
+                             'query' => [ 'key' => ORDURE_KEY ]
+                           ]);
+
+    return json_decode($res->getBody());
+  }
+
   public function captureTax(\Scat\Service\Tax $tax) {
     if ($this->tax_captured) {
       throw new \Exception("Tax already captured.");
@@ -418,9 +431,25 @@ class Txn extends \Scat\Model {
           $this->returned_from()->generateCartItems();
         $index_map= array_flip($index_map); // we're going from id to index
 
+/* TEMPORARY GROSS HACK COMING
         foreach ($this->items()->where_not_null('returned_from_id')->find_many()
                   as $i)
         {
+*/
+        $online= $this->returned_from()->getOnlineDetails ();
+
+        foreach ($this->items()->where_get('ordered', 0)->find_many()
+                  as $i)
+        {
+          list($on)= array_filter($online->items, function($v) {
+            return $v->item_id == $i->item_id;
+          });
+
+          if (!$on) {
+            throw new \Exception("Unable to find {$i->returned_from_id} in original transaction");
+          }
+/* END */
+
           $index= $index_map[$i->returned_from_id];
 
           list($item)= array_filter($cartItems, function ($v) {
@@ -431,10 +460,17 @@ class Txn extends \Scat\Model {
             throw new \Exception("Unable to find {$i->returned_from_id} in original transaction");
           }
 
+/* MORE */
+          $item['Index']= $on->id;
+/* END */
+
           $item['Qty']= $i->ordered;
 
           $data['cartItems'][]= $item;
         }
+
+        error_log(json_encode($data));
+        throw new \Exception("Testing gross hack on live data, of course.");
 
         if (!count($data['cartItems'])) {
           throw new \Exception("No items to be returned.");
