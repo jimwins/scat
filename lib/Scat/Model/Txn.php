@@ -457,7 +457,7 @@ class Txn extends \Scat\Model {
         {
           if ($i->tic == '11000') {
             list($item)= array_values(array_filter($cartItems, function ($v) use($i) {
-              return $v->Index == 'shipping';
+              return $v->Index == 0;
             }));
           } else {
             list($item)= array_values(array_filter($cartItems, function ($v) use($i) {
