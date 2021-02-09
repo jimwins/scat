@@ -463,14 +463,14 @@ class Txn extends \Scat\Model {
             list($item)= array_filter($cartItems, function ($v) {
               return $v->ItemID == $i->item_id;
             });
-            list($on)= array_filter($online->items, function($v) {
-              return $v->item_id == $i->item_id;
+            list($on)= array_filter($online['items'], function($v) {
+              return $v['item_id'] == $i->item_id;
             });
             if (!$on) {
               error_log(json_encode($online));
               throw new \Exception("Unable to find {$i->item_id} in online transaction");
             }
-            $item['Index']= $on->id;
+            $item['Index']= $on['id'];
           }
 
           if (!$item) {
