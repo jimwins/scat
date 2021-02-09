@@ -436,6 +436,10 @@ class Txn extends \Scat\Model {
           $data['cartItems'][]= $item;
         }
 
+        if (!$count($data['cartItems'])) {
+          throw new \Exception("No items to be returned.");
+        }
+
         $response= $tax->returned($data);
 
         if ($response->ResponseType < 2) {
