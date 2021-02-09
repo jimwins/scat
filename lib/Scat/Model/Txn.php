@@ -456,17 +456,17 @@ class Txn extends \Scat\Model {
                   as $i)
         {
           if ($i->tic == '11000') {
-            list($item)= array_filter($cartItems, function ($v) use($i) {
+            list($item)= array_values(array_filter($cartItems, function ($v) use($i) {
               return $v->Index == 'shipping';
-            });
+            }));
           } else {
-            list($item)= array_filter($cartItems, function ($v) use($i) {
+            list($item)= array_values(array_filter($cartItems, function ($v) use($i) {
               return $v->ItemID == $i->item_id;
-            });
-            list($on)= array_filter($online->items, function($v) use($i) {
+            }));
+            list($on)= array_values(array_filter($online->items, function($v) use($i) {
               error_log("return {$v->item_id} == {$i->item_id};\n");
               return $v->item_id == $i->item_id;
-            });
+            }));
             if (!$on) {
               error_log(json_encode($online));
               throw new \Exception("Unable to find {$i->item_id} in online transaction");
