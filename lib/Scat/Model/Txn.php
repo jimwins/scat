@@ -431,7 +431,6 @@ class Txn extends \Scat\Model {
           $this->returned_from()->generateCartItems();
         $index_map= array_flip($index_map); // we're going from id to index
 
-/* TEMPORARY GROSS HACK COMING
         foreach ($this->items()->where_not_null('returned_from_id')->find_many()
                   as $i)
         {
@@ -449,54 +448,6 @@ class Txn extends \Scat\Model {
 
           $data['cartItems'][]= $item;
         }
-*/
-        $online= $this->returned_from()->getOnlineDetails();
-
-        foreach ($this->items()->where_gt('ordered', 0)->find_many()
-                  as $i)
-        {
-	  $item= [];
-
-          if ($i->tic == '11000') {
-            $item= array_shift(array_filter($cartItems, function ($v) use($i) {
-              return $v['ItemID'] == $i->item_id;
-            }));
-            if (!$item) {
-              error_log(json_encode($cartItems));
-              throw new \Exception("Unable to find {$i->item_id} in cartItems");
-            }
-            $item['Index']= 0;
-          } else {
-            $item= array_shift(array_filter($cartItems, function ($v) use($i) {
-              return $v['ItemID'] == $i->item_id;
-            }));
-            $on= array_shift(array_filter($online->items, function($v) use($i) {
-              return $v->item_id == $i->item_id;
-            }));
-            if (!$on) {
-              error_log(json_encode($online));
-              throw new \Exception("Unable to find {$i->item_id} in online transaction");
-            }
-            if (!$item) {
-              error_log(json_encode($cartItems));
-              throw new \Exception("Unable to find {$i->item_id} in cartItems");
-            }
-            $item['Index']= $on->id;
-          }
-
-          if (!$item) {
-            throw new \Exception("Unable to find {$i->item_id} in original transaction");
-          }
-
-
-          $item['Qty']= $i->ordered;
-          $item['ItemID']= ($i->tic == '11000') ? 'shipping' : $i->item_id;
-
-          $data['cartItems'][]= $item;
-        }
-
-	error_log(json_encode($data));
-/* END GROSS HACK */
 
         if (!count($data['cartItems'])) {
           throw new \Exception("No items to be returned.");
@@ -510,7 +461,7 @@ class Txn extends \Scat\Model {
       }
 
       // If we have new items, have to report it as new sale
-      if ($this->items()->where_lt('ordered', 0)->count()) {
+      if ($this->items()->where_null('returned_from_id')->count()) {
         // Was this a local transaction? If so, we need to lookup the tax
         if (!$this->shipping_address_id) {
           // Look up all non-returned items
