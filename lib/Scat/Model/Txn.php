@@ -436,14 +436,17 @@ class Txn extends \Scat\Model {
         {
           $index= $index_map[$i->returned_from_id];
 
-          list($item)= array_values(array_filter($cartItems, function ($v) use($index) {
-            return $v->Index == $index;
+          $item= array_shift(array_filter($cartItems, function ($v) use($index) {
+            return $v['Index'] == $index;
           }));
 
           if (!$item) {
             throw new \Exception("Unable to find {$i->returned_from_id} in original transaction");
           }
 
+          if ($i->tic == '11000') {
+            $item['ItemID']= 'shipping';
+          }
           $item['Qty']= $i->ordered;
 
           $data['cartItems'][]= $item;
