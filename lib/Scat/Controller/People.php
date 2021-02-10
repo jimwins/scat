@@ -379,7 +379,7 @@ class People {
       ]);
     }
 
-    $person->exemption_certificate_id= $response->CertificateId;
+    $person->exemption_certificate_id= $res->CertificateID;
     $person->save();
 
     return $response->withJson([ 'message' => 'Success!' ]);
