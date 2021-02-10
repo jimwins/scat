@@ -63,4 +63,16 @@ class Tax
     return $this->callApi('Returned', $data);
   }
 
+  public function addExemptCertificate($data) {
+    return $this->callApi('AddExemptCertificate', $data);
+  }
+
+  public function getExemptCertificates($data) {
+    return $this->callApi('GetExemptCertificates', $data);
+  }
+
+  public function deleteExemptCertificate($data) {
+    return $this->callApi('DeleteExemptCertificate', $data);
+  }
+
 }

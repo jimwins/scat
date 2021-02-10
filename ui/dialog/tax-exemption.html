@@ -1,0 +1,114 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Tax Exemption for {{ person.friendly_name }}
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12">
+        <label for="business_type">Business Type</label>
+        <!-- TODO add support for other types -->
+        <select name="business_type" class="form-control">
+          <option value="RetailTrade">Retail Trade</option>
+        </select>
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="exemption_reason">Exemption Reason</label>
+        <!-- TODO add support for other reasons -->
+        <select name="exemption_reason" class="form-control">
+          <option value="Resale">Resale</option>
+        </select>
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="tax_id">Tax ID</label>
+        <input type="text" class="form-control initial-focus" name="tax_id"
+               placeholder="101-0001234"
+               value="{{ exemption.Detail.PurchaserTaxID.IDNumber ?: person.tax_id }}">
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="state">State</label>
+        <!-- TODO add support for other states -->
+        <select name="state" class="form-control">
+          <option value="CA">CA - California</option>
+        </select>
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="first_name">First Name</label>
+        <input type="text" class="form-control"
+               name="first_name" placeholder="Vincent"
+               value="{{ exemption.Detail.PurchaserFirstName ?: person.name }}">
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="last_name">Last Name</label>
+        <input type="text" class="form-control"
+               name="last_name" placeholder="Vincent"
+               value="{{ exemption.Detail.PurchaserLastName ?: person.name }}">
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="address1">Address</label>
+        <input type="text" class="form-control"
+               name="address1" placeholder="645 S Los Angeles St"
+               value="{{ exemption.Detail.PurchaserAddress1 }}">
+        <input type="text" class="form-control"
+               name="address2" placeholder="Apt 2-B"
+               value="{{ exemption.Detail.PurchaserAddress2 }}">
+      </div>
+
+      <div class="form-group col-sm-7">
+        <label for="city">City</label>
+        <input type="text" class="form-control" name="city" required
+               autocomplete="address-level-2"
+               value="{{ exemption.Detail.PurchaserCity }}"
+               placeholder="Los Angeles">
+      </div>
+      <div class="form-group col-sm-2">
+        <label for="state">State</label>
+        <input type="text" class="form-control" name="state" required
+               autocomplete="address-level-1"
+               maxlength="2"
+               value="{{ exemption.Detail.PurchaserState }}"
+               placeholder="CA">
+      </div>
+      <div class="form-group col-sm-3">
+        <label for="zip">ZIP</label>
+        <input type="text" class="form-control" name="zip" required
+               autocomplete="postal-code"
+               value="{{ exemption.Detail.PurchaserZip }}"
+               placeholder="90014">
+      </div>
+
+    </div><!-- /.row -->
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">Save</button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let formData= new FormData(form)
+
+    scat.post('/person/{{ person.id }}/tax-exemption', formData)
+    .then((res) => {
+      if (res.status == 201) {
+        window.location.href= res.headers.get('Location')
+      } else if (res.redirected) {
+        window.location.href= res.url
+      } else {
+        window.location.reload()
+      }
+    })
+  }
+{% endblock %}

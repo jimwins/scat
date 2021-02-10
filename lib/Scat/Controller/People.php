@@ -294,4 +294,94 @@ class People {
 
     return $response->withHeader("Content-type", "text/csv");
   }
+
+  public function getTaxExemption(Request $request, Response $response, $id,
+                                  \Scat\Service\Data $data,
+                                  \Scat\Service\Tax $tax,
+                                  View $view)
+  {
+    $person= $data->factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if ($person->exemption_certificate_id) {
+      $exemption= $tax->getExemptCertificates([ 'customerID' => $person->id ]);
+    }
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $view->render($response, 'dialog/tax-exemption.html', [
+        'person' => $person,
+        'exemption' => $exemption->ExemptCertificates[0],
+      ]);
+    }
+
+    return $response->withJson($person->tax_exemption_certificate);
+  }
+
+  public function setTaxExemption(Request $request, Response $response, $id,
+                                  \Scat\Service\Data $data,
+                                  \Scat\Service\Tax $tax)
+  {
+    $person= $data->factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $data= [
+      'customerID' => $person->id,
+      'exemptCert' => [
+        'Detail' => [
+          'ExemptStates' => [
+            [
+              'IdentificationNumber' => 1,
+              'ReasonForExemption' =>
+                $request->getParam('exemption_reason'),
+              'StateAbbr' => $request->getParam('state'),
+            ],
+          ],
+          'PurchaserBusinessType' =>
+            $request->getParam('business_type'),
+          'PurchaserExemptionReason' =>
+            $request->getParam('exemption_reason'),
+          'PurchaserTaxID' => [
+            'IDNumber' => $request->getParam('tax_id'),
+            'StateOfIssue' => $request->getParam('state'),
+            'TaxType' => 'StateIssued',
+          ],
+          'PurchaserFirstName' =>
+            $request->getParam('first_name'),
+          'PurchaserLastName' =>
+            $request->getParam('last_name'),
+          'PurchaserAddress1' =>
+            $request->getParam('address1'),
+          'PurchaserAddress2' =>
+            $request->getParam('address2'),
+          'PurchaserCity' =>
+            $request->getParam('city'),
+          'PurchaserState' =>
+            $request->getParam('state'),
+          'PurchaserZip' =>
+            $request->getParam('zip'),
+        ],
+      ],
+    ];
+
+    $res= $tax->addExemptCertificate($data);
+
+    if ($res->ResponseType < 2) {
+      throw new \Exception($res->Messages[0]->Message);
+    }
+
+    // Had an old one? Go ahead and delete it.
+    if ($person->exemption_certificate_id) {
+      $tax->deleteExemptCertificate([
+        'certificateId' => $person->exemption_certificate_id
+      ]);
+    }
+
+    $person->exemption_certificate_id= $response->CertificateId;
+    $person->save();
+
+    return $response->withJson([ 'message' => 'Success!' ]);
+  }
 }
