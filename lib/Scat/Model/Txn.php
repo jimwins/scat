@@ -455,21 +455,31 @@ class Txn extends \Scat\Model {
         foreach ($this->items()->where_gt('ordered', 0)->find_many()
                   as $i)
         {
+	  $item= [];
+
           if ($i->tic == '11000') {
-            list($item)= array_values(array_filter($cartItems, function ($v) use($i) {
-              return $v->Index == 0;
+            $item= array_shift(array_filter($cartItems, function ($v) use($i) {
+              return $v['ItemID'] == $i->item_id;
             }));
+            if (!$item) {
+              error_log(json_encode($cartItems));
+              throw new \Exception("Unable to find {$i->item_id} in cartItems");
+            }
+            $item['Index']= 0;
           } else {
-            list($item)= array_values(array_filter($cartItems, function ($v) use($i) {
-              return $v->ItemID == $i->item_id;
+            $item= array_shift(array_filter($cartItems, function ($v) use($i) {
+              return $v['ItemID'] == $i->item_id;
             }));
-            list($on)= array_values(array_filter($online->items, function($v) use($i) {
-              error_log("return {$v->item_id} == {$i->item_id};\n");
+            $on= array_shift(array_filter($online->items, function($v) use($i) {
               return $v->item_id == $i->item_id;
             }));
             if (!$on) {
               error_log(json_encode($online));
               throw new \Exception("Unable to find {$i->item_id} in online transaction");
+            }
+            if (!$item) {
+              error_log(json_encode($cartItems));
+              throw new \Exception("Unable to find {$i->item_id} in cartItems");
             }
             $item['Index']= $on->id;
           }
@@ -478,11 +488,14 @@ class Txn extends \Scat\Model {
             throw new \Exception("Unable to find {$i->item_id} in original transaction");
           }
 
+
           $item['Qty']= $i->ordered;
+          $item['ItemID']= ($i->tic == '11000') ? 'shipping' : $i->item_id;
 
           $data['cartItems'][]= $item;
         }
 
+	error_log(json_encode($data));
 /* END GROSS HACK */
 
         if (!count($data['cartItems'])) {
@@ -497,7 +510,7 @@ class Txn extends \Scat\Model {
       }
 
       // If we have new items, have to report it as new sale
-      if ($this->items()->where_null('returned_from_id')->count()) {
+      if ($this->items()->where_lt('ordered', 0)->count()) {
         // Was this a local transaction? If so, we need to lookup the tax
         if (!$this->shipping_address_id) {
           // Look up all non-returned items
