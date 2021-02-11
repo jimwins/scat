@@ -374,9 +374,10 @@ class Shipping {
       'Priority',
       'First',
       'Ground',
+      'CaliforniaParcelService',
       'NoonPriorityService',
       'FEDEX_GROUND',
-      'FEDEX_HOME',
+      'GROUND_HOME_DELIVERY',
     ];
 
     $addresses= [
@@ -387,6 +388,7 @@ class Shipping {
         'city' => 'Claremont',
         'state' => 'CA',
         'zip' => '91711',
+        'residential' => true,
       ],
       [
         'name' => 'Richard Q. Jonnes',
@@ -419,6 +421,7 @@ class Shipping {
         'city' => 'Greenville',
         'state' => 'NC',
         'zip' => '27834',
+        'residential' => true,
       ],
     ];
 
@@ -518,7 +521,7 @@ class Shipping {
         ]);
 
         foreach ($shipment->rates as $rate) {
-          if (in_array($service, $services)) {
+          if (in_array($rate->service, $services)) {
             $results[]= [
               'parcel' => $parcel->name,
               'address' => "{$address->city}, {$address->state}",
