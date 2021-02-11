@@ -1,0 +1,30 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Shipping Analysis
+{% endblock %}
+
+{% block content %}
+
+  <table class="table table-striped table-hover">
+    <thead>
+      <th>Parcel</th>
+      <th>State</th>
+      <th>Carrier</th>
+      <th>Service</th>
+      <th>Rate</th>
+    </thead>
+    <tbody>
+      {% for rate in results %}
+        <tr>
+          <td>{{ rate.parcel }}</td>
+          <td>{{ rate.address }}</td>
+          <td>{{ rate.carrier }}</td>
+          <td>{{ rate.service }}</td>
+          <td>{{ scat.amount(rate.rate) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

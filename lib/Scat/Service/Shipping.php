@@ -62,6 +62,10 @@ class Shipping
     }
   }
 
+  public function createParcel($details) {
+    return \EasyPost\Parcel::create($details);
+  }
+
   public function createShipment($details) {
     return \EasyPost\Shipment::create($details);
   }
@@ -87,4 +91,3 @@ class Shipping
     }
   }
 }
-

@@ -368,4 +368,172 @@ class Shipping {
 
     return $response->withJson([ 'status' => 'Processed.' ]);
   }
+
+  public function analyze(Request $request, Response $response) {
+    $services= [
+      'Priority',
+      'First',
+      'Ground',
+      'NoonPriorityService',
+      'FEDEX_GROUND',
+      'FEDEX_HOME',
+    ];
+
+    $addresses= [
+      [
+        'name' => 'Richard Q. Jonnes',
+        'company' => 'WIBSTR',
+        'street1' => '301 Platt Blvd',
+        'city' => 'Claremont',
+        'state' => 'CA',
+        'zip' => '91711',
+      ],
+      [
+        'name' => 'Richard Q. Jonnes',
+        'company' => 'WIBSTR',
+        'street1' => '226 West 46th St',
+        'city' => 'New York',
+        'state' => 'NY',
+        'zip' => '10036',
+      ],
+      [
+        'name' => 'Richard Q. Jonnes',
+        'company' => 'WIBSTR',
+        'street1' => '411 Elm St',
+        'city' => 'Dallas',
+        'state' => 'TX',
+        'zip' => '75202',
+      ],
+      [
+        'name' => 'Richard Q. Jonnes',
+        'company' => 'WIBSTR',
+        'street1' => '605 S Main St',
+        'city' => 'Seattle',
+        'state' => 'WA',
+        'zip' => '98104',
+      ],
+      [
+        'name' => 'Richard Q. Jonnes',
+        'company' => 'WIBSTR',
+        'street1' => '302 S Greene St',
+        'city' => 'Greenville',
+        'state' => 'NC',
+        'zip' => '27834',
+      ],
+    ];
+
+    $addresses= array_map(function($address) {
+      return $this->shipping->createAddress($address);
+    }, $addresses);
+
+    $parcels= [
+      [
+        'name' => '6x6x4 <1lb',
+        'length' => 6.25,
+        'width' => 6.25,
+        'height' => 4.5,
+        'weight' => 15,
+      ],
+      [
+        'name' => '6x6x4 2lb',
+        'length' => 6.25,
+        'width' => 6.25,
+        'height' => 4.5,
+        'weight' => 2 * 16,
+      ],
+      [
+        'name' => '8x6x3 <1lb',
+        'length' => 8.25,
+        'width' => 6.25,
+        'height' => 3.5,
+        'weight' => 15,
+      ],
+      [
+        'name' => '8x6x3 2lb',
+        'length' => 8.25,
+        'width' => 6.25,
+        'height' => 3.5,
+        'weight' => 2 * 16,
+      ],
+      [
+        'name' => '12x9.5x4 3lb',
+        'length' => 12.25,
+        'width' => 9.75,
+        'height' => 4.5,
+        'weight' => 3 * 16,
+      ],
+      [
+        'name' => '18x16x4 5lb',
+        'length' => 18.25,
+        'width' => 16.25,
+        'height' => 4.5,
+        'weight' => 5 * 16,
+      ],
+      [
+        'name' => '3x3x12.25 <1lb',
+        'length' => 3.25,
+        'width' => 3.25,
+        'height' => 12.5,
+        'weight' => 15,
+      ],
+      [
+        'name' => '3x3x12.25 3lb',
+        'length' => 3.25,
+        'width' => 3.25,
+        'height' => 12.5,
+        'weight' => 3*16,
+      ],
+      [
+        'name' => '3x3x18.25 <1lb',
+        'length' => 3.25,
+        'width' => 3.25,
+        'height' => 19.5,
+        'weight' => 15,
+      ],
+      [
+        'name' => '3x3x18.25 3lb',
+        'length' => 3.25,
+        'width' => 3.25,
+        'height' => 19.5,
+        'weight' => 3 * 16,
+      ],
+    ];
+
+    $parcels= array_map(function($parcel) {
+      $res= $this->shipping->createParcel($parcel);
+      $res->name= $parcel['name'];
+      return $res;
+    }, $parcels);
+
+    $from= $this->shipping->getDefaultFromAddress();
+
+    $results= [];
+
+    foreach ($parcels as $parcel) {
+      foreach ($addresses as $address) {
+        $shipment= $this->shipping->createShipment([
+          'to_address' => $address,
+          'from_address' => $from,
+          'parcel' => $parcel,
+        ]);
+
+        foreach ($shipment->rates as $rate) {
+          if (in_array($service, $services)) {
+            $results[]= [
+              'parcel' => $parcel->name,
+              'address' => "{$address->city}, {$address->state}",
+              'carrier' => $rate->carrier,
+              'service' => $rate->service,
+              'rate' => $rate->rate,
+            ];
+          }
+        }
+      }
+    }
+
+    return $this->view->render($response, 'shipping/analyze.html', [
+      'results' => $results,
+    ]);
+
+  }
 }

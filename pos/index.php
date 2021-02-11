@@ -164,6 +164,7 @@ $app->group('/purchase', function (RouteCollectorProxy $app) {
 /* Shipping */
 $app->group('/shipment', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Controller\Shipping::class, 'index' ]);
+  $app->get('/analyze', [ \Scat\Controller\Shipping::class, 'analyze' ]);
 });
 
 /* Catalog */
