@@ -21,6 +21,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/jimwins/cups-ipp"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/jimwins/php-laff"
         }
     ],
     "require": {

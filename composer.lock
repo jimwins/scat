@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "83d5f19ac8b467c1298db5542a547a05",
+    "content-hash": "74f0b5021c45273ecaa7215002518441",
     "packages": [
         {
             "name": "amzn/amazon-pay-api-sdk-php",
@@ -559,12 +559,12 @@
             "version": "v1.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Cloudstek/php-laff.git",
+                "url": "https://github.com/jimwins/php-laff.git",
                 "reference": "41f9d0f328d8ac91b18d7b931597f876b1244401"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Cloudstek/php-laff/zipball/41f9d0f328d8ac91b18d7b931597f876b1244401",
+                "url": "https://api.github.com/repos/jimwins/php-laff/zipball/41f9d0f328d8ac91b18d7b931597f876b1244401",
                 "reference": "41f9d0f328d8ac91b18d7b931597f876b1244401",
                 "shasum": ""
             },
@@ -574,7 +574,6 @@
                     "Cloudstek\\PhpLaff\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
