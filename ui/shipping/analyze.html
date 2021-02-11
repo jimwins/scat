@@ -7,24 +7,54 @@
 
 {% block content %}
 
-  <table class="table table-striped table-hover">
-    <thead>
-      <th>Parcel</th>
-      <th>State</th>
-      <th>Carrier</th>
-      <th>Service</th>
-      <th>Rate</th>
-    </thead>
-    <tbody>
-      {% for rate in results %}
-        <tr>
-          <td>{{ rate.parcel }}</td>
-          <td>{{ rate.address }}</td>
-          <td>{{ rate.carrier }}</td>
-          <td>{{ rate.service }}</td>
-          <td>{{ scat.amount(rate.rate) }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <ul class="nav nav-tabs">
+    <li role="presentation" class="{{ rates ? 'active' }}">
+      <a href="analyze?rates=1">Rates</a>
+    </li>
+    <li role="presentation" class="{{ sizes ? 'active' }}">
+      <a href="analyze?sizes=1">Sizes</a>
+    </li>
+  </ul>
+
+  {% if rates|length %}
+    <table class="table table-striped table-hover">
+      <thead>
+        <th>Parcel</th>
+        <th>State</th>
+        <th>Carrier</th>
+        <th>Service</th>
+        <th>Rate</th>
+      </thead>
+      <tbody>
+        {% for rate in rates %}
+          <tr>
+            <td>{{ rate.parcel }}</td>
+            <td>{{ rate.address }}</td>
+            <td>{{ rate.carrier }}</td>
+            <td>{{ rate.service }}</td>
+            <td>{{ scat.amount(rate.rate) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  {% if sizes|length %}
+    <table class="table table-striped table-hover">
+      <thead>
+        <th>Name</th>
+        <th>Median</th>
+        <th>Maximum</th>
+      </thead>
+      <tbody>
+        {% for size in sizes %}
+          <tr>
+            <td>{{ size.name }}</td>
+            <td>{{ size.count }}</td>
+            <td>{{ size.median }}</td>
+            <td>{{ size.maximum }}</td>
+          </tr>
+        {% endfor %}
+    </table>
+  {% endif %}
 {% endblock %}

@@ -370,173 +370,266 @@ class Shipping {
   }
 
   public function analyze(Request $request, Response $response) {
-    $services= [
-      'Priority',
-      'First',
-      'Ground',
-      'CaliforniaParcelService',
-      'NoonPriorityService',
-      'FEDEX_GROUND',
-      'GROUND_HOME_DELIVERY',
-    ];
 
-    $addresses= [
-      [
-        'name' => 'Richard Q. Jonnes',
-        'company' => 'WIBSTR',
-        'street1' => '301 Platt Blvd',
-        'city' => 'Claremont',
-        'state' => 'CA',
-        'zip' => '91711',
-        'residential' => true,
-      ],
-      [
-        'name' => 'Richard Q. Jonnes',
-        'company' => 'WIBSTR',
-        'street1' => '226 West 46th St',
-        'city' => 'New York',
-        'state' => 'NY',
-        'zip' => '10036',
-      ],
-      [
-        'name' => 'Richard Q. Jonnes',
-        'company' => 'WIBSTR',
-        'street1' => '411 Elm St',
-        'city' => 'Dallas',
-        'state' => 'TX',
-        'zip' => '75202',
-      ],
-      [
-        'name' => 'Richard Q. Jonnes',
-        'company' => 'WIBSTR',
-        'street1' => '605 S Main St',
-        'city' => 'Seattle',
-        'state' => 'WA',
-        'zip' => '98104',
-      ],
-      [
-        'name' => 'Richard Q. Jonnes',
-        'company' => 'WIBSTR',
-        'street1' => '302 S Greene St',
-        'city' => 'Greenville',
-        'state' => 'NC',
-        'zip' => '27834',
-        'residential' => true,
-      ],
-    ];
+    if ($request->getParam('rates')) {
+      $services= [
+        'Priority',
+        'First',
+        'Ground',
+        'CaliforniaParcelService',
+        'NoonPriorityService',
+        'FEDEX_GROUND',
+        'GROUND_HOME_DELIVERY',
+      ];
 
-    $addresses= array_map(function($address) {
-      return $this->shipping->createAddress($address);
-    }, $addresses);
+      $addresses= [
+        [
+          'name' => 'Richard Q. Jonnes',
+          'company' => 'WIBSTR',
+          'street1' => '301 Platt Blvd',
+          'city' => 'Claremont',
+          'state' => 'CA',
+          'zip' => '91711',
+          'residential' => true,
+        ],
+        [
+          'name' => 'Richard Q. Jonnes',
+          'company' => 'WIBSTR',
+          'street1' => '226 West 46th St',
+          'city' => 'New York',
+          'state' => 'NY',
+          'zip' => '10036',
+        ],
+        [
+          'name' => 'Richard Q. Jonnes',
+          'company' => 'WIBSTR',
+          'street1' => '411 Elm St',
+          'city' => 'Dallas',
+          'state' => 'TX',
+          'zip' => '75202',
+        ],
+        [
+          'name' => 'Richard Q. Jonnes',
+          'company' => 'WIBSTR',
+          'street1' => '605 S Main St',
+          'city' => 'Seattle',
+          'state' => 'WA',
+          'zip' => '98104',
+        ],
+        [
+          'name' => 'Richard Q. Jonnes',
+          'company' => 'WIBSTR',
+          'street1' => '302 S Greene St',
+          'city' => 'Greenville',
+          'state' => 'NC',
+          'zip' => '27834',
+          'residential' => true,
+        ],
+      ];
 
-    $parcels= [
-      [
-        'name' => '6x6x4 <1lb',
-        'length' => 6.25,
-        'width' => 6.25,
-        'height' => 4.5,
-        'weight' => 15,
-      ],
-      [
-        'name' => '6x6x4 2lb',
-        'length' => 6.25,
-        'width' => 6.25,
-        'height' => 4.5,
-        'weight' => 2 * 16,
-      ],
-      [
-        'name' => '8x6x3 <1lb',
-        'length' => 8.25,
-        'width' => 6.25,
-        'height' => 3.5,
-        'weight' => 15,
-      ],
-      [
-        'name' => '8x6x3 2lb',
-        'length' => 8.25,
-        'width' => 6.25,
-        'height' => 3.5,
-        'weight' => 2 * 16,
-      ],
-      [
-        'name' => '12x9.5x4 3lb',
-        'length' => 12.25,
-        'width' => 9.75,
-        'height' => 4.5,
-        'weight' => 3 * 16,
-      ],
-      [
-        'name' => '18x16x4 5lb',
-        'length' => 18.25,
-        'width' => 16.25,
-        'height' => 4.5,
-        'weight' => 5 * 16,
-      ],
-      [
-        'name' => '3x3x12.25 <1lb',
-        'length' => 3.25,
-        'width' => 3.25,
-        'height' => 12.5,
-        'weight' => 15,
-      ],
-      [
-        'name' => '3x3x12.25 3lb',
-        'length' => 3.25,
-        'width' => 3.25,
-        'height' => 12.5,
-        'weight' => 3*16,
-      ],
-      [
-        'name' => '3x3x18.25 <1lb',
-        'length' => 3.25,
-        'width' => 3.25,
-        'height' => 19.5,
-        'weight' => 15,
-      ],
-      [
-        'name' => '3x3x18.25 3lb',
-        'length' => 3.25,
-        'width' => 3.25,
-        'height' => 19.5,
-        'weight' => 3 * 16,
-      ],
-    ];
+      $addresses= array_map(function($address) {
+        return $this->shipping->createAddress($address);
+      }, $addresses);
 
-    $parcels= array_map(function($parcel) {
-      $res= $this->shipping->createParcel($parcel);
-      $res->name= $parcel['name'];
-      return $res;
-    }, $parcels);
+      $parcels= [
+        [
+          'name' => '6x6x4 12oz',
+          'length' => 6.25,
+          'width' => 6.25,
+          'height' => 4.5,
+          'weight' => 12,
+        ],
+        [
+          'name' => '6x6x4 2lb',
+          'length' => 6.25,
+          'width' => 6.25,
+          'height' => 4.5,
+          'weight' => 2 * 16,
+        ],
+        [
+          'name' => '8x6x3 12oz',
+          'length' => 8.25,
+          'width' => 6.25,
+          'height' => 3.5,
+          'weight' => 12,
+        ],
+        [
+          'name' => '8x6x3 2lb',
+          'length' => 8.25,
+          'width' => 6.25,
+          'height' => 3.5,
+          'weight' => 2 * 16,
+        ],
+        [
+          'name' => '12x9.5x4 3lb',
+          'length' => 12.25,
+          'width' => 9.75,
+          'height' => 4.5,
+          'weight' => 3 * 16,
+        ],
+        [
+          'name' => '18x16x4 5lb',
+          'length' => 18.25,
+          'width' => 16.25,
+          'height' => 4.5,
+          'weight' => 5 * 16,
+        ],
+        [
+          'name' => '3x3x12.25 12oz',
+          'length' => 3.25,
+          'width' => 3.25,
+          'height' => 12.5,
+          'weight' => 12,
+        ],
+        [
+          'name' => '3x3x12.25 3lb',
+          'length' => 3.25,
+          'width' => 3.25,
+          'height' => 12.5,
+          'weight' => 3*16,
+        ],
+        [
+          'name' => '3x3x18.25 12oz',
+          'length' => 3.25,
+          'width' => 3.25,
+          'height' => 19.5,
+          'weight' => 12,
+        ],
+        [
+          'name' => '3x3x18.25 3lb',
+          'length' => 3.25,
+          'width' => 3.25,
+          'height' => 19.5,
+          'weight' => 3 * 16,
+        ],
+      ];
 
-    $from= $this->shipping->getDefaultFromAddress();
+      $parcels= array_map(function($parcel) {
+        $res= $this->shipping->createParcel($parcel);
+        $res->name= $parcel['name'];
+        return $res;
+      }, $parcels);
 
-    $results= [];
+      $from= $this->shipping->getDefaultFromAddress();
 
-    foreach ($parcels as $parcel) {
-      foreach ($addresses as $address) {
-        $shipment= $this->shipping->createShipment([
-          'to_address' => $address,
-          'from_address' => $from,
-          'parcel' => $parcel,
-        ]);
+      $results= [];
 
-        foreach ($shipment->rates as $rate) {
-          if (in_array($rate->service, $services)) {
-            $results[]= [
-              'parcel' => $parcel->name,
-              'address' => "{$address->city}, {$address->state}",
-              'carrier' => $rate->carrier,
-              'service' => $rate->service,
-              'rate' => $rate->rate,
-            ];
+      foreach ($parcels as $parcel) {
+        foreach ($addresses as $address) {
+          $shipment= $this->shipping->createShipment([
+            'to_address' => $address,
+            'from_address' => $from,
+            'parcel' => $parcel,
+          ]);
+
+          foreach ($shipment->rates as $rate) {
+            if (in_array($rate->service, $services)) {
+              $results[]= [
+                'parcel' => $parcel->name,
+                'address' => "{$address->city}, {$address->state}",
+                'carrier' => $rate->carrier,
+                'service' => $rate->service,
+                'rate' => $rate->rate,
+              ];
+            }
           }
         }
       }
+
+      return $this->view->render($response, 'shipping/analyze.html', [
+        'rates' => $results,
+      ]);
     }
 
-    return $this->view->render($response, 'shipping/analyze.html', [
-      'results' => $results,
-    ]);
+    if ($request->getParam('sizes')) {
+      $sizes= [
+        [ 6, 6, 4 ],
+        [ 8, 6, 3 ],
+        [ 3, 3, 12.25 ],
+        [ 3, 3, 18.25 ],
+        [ 12, 9.5, 4 ],
+        [ 18, 16, 4 ],
+      ];
 
+      $laff= new \Cloudstek\PhpLaff\Packer();
+
+      $results= [];
+
+      $txns= $this->txn->find('customer', 0, 1000)
+        ->where_null('returned_from_id')
+        ->where_gt('shipping_address_id', 1)
+        ->find_many();
+
+      foreach ($txns as $txn) {
+        $items= []; $weight= 0;
+        foreach ($txn->items()->find_many() as $line) {
+          $item= $line->item();
+          if ($item->tic != 0) continue;
+          $items= array_merge($items, array_fill(0, $line->ordered * -1,
+            [
+              'length' => $item->length,
+              'width' => $item->width,
+              'height' => $item->height,
+            ]));
+          $weight+= -1 * $line->ordered * $item->weight;
+        }
+
+        if (!count($items)) continue;
+
+        foreach ($sizes as $size) {
+          error_log("packing " . json_encode($items) . " into " . json_encode($size));
+          $laff->pack($items, [
+            'length' => $size[0],
+            'width' => $size[1],
+            'height' => $size[2],
+          ]);
+
+          $container= $laff->get_container_dimensions();
+
+          error_log("dimensions: " . json_encode($container));
+          if (!count($laff->get_remaining_boxes())) {
+            $results[join('x',$size)][]= $weight;
+            continue 2; // done with this $txn
+          }
+        }
+
+        $results["oversized"][]= $weight;
+      }
+
+      $processed= [];
+
+      foreach ($results as $name => $values) {
+        sort($values);
+        $processed[]= [
+          'name' => $name,
+          'count' => count($values),
+          'median' => self::median($values),
+          'maximum' => array_pop($values),
+        ];
+      }
+
+      return $this->view->render($response, 'shipping/analyze.html', [
+        'sizes' => $processed,
+      ]);
+    }
+
+    return $this->view->render($response, 'shipping/analyze.html', []);
+  }
+
+  static function median($array) {
+    if (!is_array($array)) {
+      throw new \Exception('$array must be an array.');
+    }
+
+    $n= count($array);
+    if (!$n) return false; // empty array has no median value
+
+    $middle= floor(($n - 1) / 2);
+
+    if ($n % 2) {
+      return $array[$middle];
+    } else {
+      return ($array[$middle] + $array[$middle + 1]) / 2;
+    }
   }
 }
