@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "74f0b5021c45273ecaa7215002518441",
+    "content-hash": "a54039b8f58208af66fc3cd55082f167",
     "packages": [
         {
             "name": "amzn/amazon-pay-api-sdk-php",
@@ -556,18 +556,19 @@
         },
         {
             "name": "cloudstek/php-laff",
-            "version": "v1.1.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jimwins/php-laff.git",
-                "reference": "41f9d0f328d8ac91b18d7b931597f876b1244401"
+                "reference": "f9e7ea7c3c4bee9ebb5474b8a85cc37228beacef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jimwins/php-laff/zipball/41f9d0f328d8ac91b18d7b931597f876b1244401",
-                "reference": "41f9d0f328d8ac91b18d7b931597f876b1244401",
+                "url": "https://api.github.com/repos/jimwins/php-laff/zipball/f9e7ea7c3c4bee9ebb5474b8a85cc37228beacef",
+                "reference": "f9e7ea7c3c4bee9ebb5474b8a85cc37228beacef",
                 "shasum": ""
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -595,7 +596,7 @@
                 "issues": "https://github.com/Cloudstek/php-laff/issues",
                 "source": "https://github.com/Cloudstek/php-laff"
             },
-            "time": "2019-09-19T14:43:20+00:00"
+            "time": "2021-02-11T05:50:16+00:00"
         },
         {
             "name": "clue/stream-filter",
@@ -6174,7 +6175,8 @@
     "stability-flags": {
         "oe/lukas": 20,
         "smalot/cups-ipp": 20,
-        "publitio/publitio": 20
+        "publitio/publitio": 20,
+        "cloudstek/php-laff": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
