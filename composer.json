@@ -60,7 +60,8 @@
         "shippo/shippo-php": "^1.4",
         "amzn/amazon-pay-sdk-php": "^3.6",
         "paypal/paypal-checkout-sdk": "^1.0",
-        "amzn/amazon-pay-api-sdk-php": "^2.2"
+        "amzn/amazon-pay-api-sdk-php": "^2.2",
+        "cloudstek/php-laff": "^1.1"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"

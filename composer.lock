@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8a67183a3d409db27e88de1f1e009b30",
+    "content-hash": "83d5f19ac8b467c1298db5542a547a05",
     "packages": [
         {
             "name": "amzn/amazon-pay-api-sdk-php",
@@ -553,6 +553,50 @@
                 "source": "https://github.com/cakephp/utility"
             },
             "time": "2020-08-18T13:55:20+00:00"
+        },
+        {
+            "name": "cloudstek/php-laff",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Cloudstek/php-laff.git",
+                "reference": "41f9d0f328d8ac91b18d7b931597f876b1244401"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Cloudstek/php-laff/zipball/41f9d0f328d8ac91b18d7b931597f876b1244401",
+                "reference": "41f9d0f328d8ac91b18d7b931597f876b1244401",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cloudstek\\PhpLaff\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maarten de Boer",
+                    "email": "maarten@cloudstek.nl",
+                    "homepage": "https://cloudstek.nl",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Erik de Boer",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Largest Area Fit First (LAFF) 3D box packing algorithm class for PHP",
+            "homepage": "https://github.com/Cloudstek/php-laff",
+            "support": {
+                "issues": "https://github.com/Cloudstek/php-laff/issues",
+                "source": "https://github.com/Cloudstek/php-laff"
+            },
+            "time": "2019-09-19T14:43:20+00:00"
         },
         {
             "name": "clue/stream-filter",
