@@ -555,7 +555,8 @@ class Shipping {
 
       $results= [];
 
-      $txns= $this->txn->find('customer', 0, 1000)
+      $limit= $request->getParam('limit') ?: 1000;
+      $txns= $this->txn->find('customer', 0, $limit)
         ->where_null('returned_from_id')
         ->where_gt('shipping_address_id', 1)
         ->find_many();
@@ -577,7 +578,6 @@ class Shipping {
         if (!count($items)) continue;
 
         foreach ($sizes as $size) {
-          error_log("packing " . json_encode($items) . " into " . json_encode($size));
           $laff->pack($items, [
             'length' => $size[0],
             'width' => $size[1],
@@ -586,8 +586,9 @@ class Shipping {
 
           $container= $laff->get_container_dimensions();
 
-          error_log("dimensions: " . json_encode($container));
-          if (!count($laff->get_remaining_boxes())) {
+          if ($container['height'] <= $size[2] &&
+              !count($laff->get_remaining_boxes()))
+          {
             $results[join('x',$size)][]= $weight;
             continue 2; // done with this $txn
           }
