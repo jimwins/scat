@@ -560,13 +560,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jimwins/php-laff.git",
-                "reference": "f9e7ea7c3c4bee9ebb5474b8a85cc37228beacef"
+                "reference": "8bf525b15ec9ba8bfce3612359442df4067f5bb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jimwins/php-laff/zipball/f9e7ea7c3c4bee9ebb5474b8a85cc37228beacef",
-                "reference": "f9e7ea7c3c4bee9ebb5474b8a85cc37228beacef",
+                "url": "https://api.github.com/repos/jimwins/php-laff/zipball/8bf525b15ec9ba8bfce3612359442df4067f5bb4",
+                "reference": "8bf525b15ec9ba8bfce3612359442df4067f5bb4",
                 "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
             },
             "default-branch": true,
             "type": "library",
@@ -574,6 +577,11 @@
                 "psr-4": {
                     "Cloudstek\\PhpLaff\\": "src/"
                 }
+            },
+            "scripts": {
+                "test": [
+                    "./vendor/bin/phpunit ./tests"
+                ]
             },
             "license": [
                 "MIT"
@@ -596,7 +604,7 @@
                 "issues": "https://github.com/Cloudstek/php-laff/issues",
                 "source": "https://github.com/Cloudstek/php-laff"
             },
-            "time": "2021-02-11T05:50:16+00:00"
+            "time": "2021-02-12T03:02:46+00:00"
         },
         {
             "name": "clue/stream-filter",
