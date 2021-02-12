@@ -57,5 +57,14 @@
           </tr>
         {% endfor %}
     </table>
+
+    <ul class="list-group">
+      {% for size in box_sizes %}
+        <li class="list-group-item">
+          {{ size|join(" × ") }} =
+          {{ "%.2f"|format((size[0] * size[1] * size[2]) / 1728) }}
+        </li>
+      {% endfor %}
+    </ul>
   {% endif %}
 {% endblock %}

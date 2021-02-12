@@ -611,6 +611,7 @@ class Shipping {
 
       return $this->view->render($response, 'shipping/analyze.html', [
         'sizes' => $processed,
+        'box_sizes' => $sizes
       ]);
     }
 
