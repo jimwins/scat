@@ -276,10 +276,17 @@ class Person extends \Scat\Model {
                 prop65 = IF(@prop65 = 'Y', 1, NULL),
                 hazmat = IF(@ormd = 'Y', 1, NULL),
                 oversized = IF(@ltl_only = 'Y', 1, NULL),
+                special_order = IF(@level1 = 'DROP-SHIP ONLY PRODUCTS', 1,
+                                   IF(@level1 = 'ASSORTMENTS AND DISPLAYS', 2, 0)),
                 promo_quantity = purchase_quantity";
 
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load SLS data file");
+
+      // delete assortments
+      $q= "DELETE FROM vendor_upload WHERE special_order = 2";
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to delete assortments from SLS data");
 
     } elseif (preg_match('/^ColArt/', $line, $m)) {
       // ColArt
