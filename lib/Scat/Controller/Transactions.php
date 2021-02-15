@@ -1242,6 +1242,11 @@ class Transactions {
         'options' => $options,
       ]);
 
+      $shipment->weight= $weight;
+      $shipment->length= $length;
+      $shipment->width= $width;
+      $shipment->height= $height;
+
       $shipment->method_id= $extra->id;
       $shipment->status= 'pending';
     }
@@ -1262,7 +1267,13 @@ class Transactions {
       if ($insurance > 100.00) {
         $details['insurance']= $insurance;
       }
-      $ep->buy($details);
+
+      $res= $ep->buy($details);
+
+      $shipment->carrier= $res->selected_rate->carrier;
+      $shipment->service= $res->selected_rate->service;
+      $shipment->rate= $res->selected_rate->rate;
+      $shipment->insurance= $res->insurance;
 
       $shipment->status= 'unknown';
       $shipment->tracker_id= $ep->tracker->id;

@@ -1,4 +1,5 @@
 {% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
 
 {% block title %}
   Shipments
@@ -63,6 +64,9 @@
           <th>Status</th>
           <th>Transaction</th>
           <th>Recipient</th>
+          <th>Carrier</th>
+          <th>Service</th>
+          <th>Rate (Insurance)</th>
         </tr>
       </thead>
       <tbody>
@@ -90,6 +94,18 @@
             {{ shipment.txn.shipping_address.name }} /
             {{ shipment.txn.shipping_address.city }},
             {{ shipment.txn.shipping_address.state }}
+          </td>
+          <td>
+            {{ shipment.carrier }}
+          </td>
+          <td>
+            {{ shipment.service }}
+          </td>
+          <td>
+            {{ scat.amount(shipment.rate) }}
+            {% if shipment.insurance %}
+              ({{ scat.amount(shipment.insurance) }})
+            {% endif %}
           </td>
         </tr>
       {% endfor %}
