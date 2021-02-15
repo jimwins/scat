@@ -635,4 +635,27 @@ class Shipping {
       return ($array[$middle] + $array[$middle + 1]) / 2;
     }
   }
+
+  function populateShipmentData(Request $request, Response $response) {
+    $shipments= $this->data->factory('Shipment')
+      ->select('*')
+      ->select_expr('COUNT(*) OVER()', 'records')
+      ->where_null('rate')
+      ->where_not_equal('status', 'pending')
+      ->where_equal('method', 'easypost')
+      ->where_not_null('method_id')
+      ->order_by_desc('created')
+      ->find_many();
+
+    foreach ($shipments as $shipment) {
+      $ep= $this->shipping->getShipment($shipment);
+      $shipment->carrier= $ep->selected_rate->carrier;
+      $shipment->service= $ep->selected_rate->service;
+      $shipment->rate= $ep->selected_rate->rate;
+      $shipment->insurance= $ep->insurance;
+      $shipment->save();
+    }
+
+    return $response->withJson([]);
+  }
 }

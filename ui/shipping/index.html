@@ -104,7 +104,7 @@
           <td>
             {{ scat.amount(shipment.rate) }}
             {% if shipment.insurance %}
-              ({{ scat.amount(shipment.insurance) }})
+              ({{ scat.amount(max(shipment.insurance * 0.01, 1)) }})
             {% endif %}
           </td>
         </tr>
