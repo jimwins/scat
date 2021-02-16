@@ -1243,9 +1243,11 @@ class Transactions {
       ]);
 
       $shipment->weight= $weight;
-      $shipment->length= $length;
-      $shipment->width= $width;
-      $shipment->height= $height;
+      if ($shipment->length) {
+        $shipment->length= $length;
+        $shipment->width= $width;
+        $shipment->height= $height;
+      }
 
       $shipment->method_id= $extra->id;
       $shipment->status= 'pending';
