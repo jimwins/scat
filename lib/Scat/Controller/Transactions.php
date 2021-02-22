@@ -1452,8 +1452,11 @@ class Transactions {
                          AND NOT special_order
                          AND vendor_id != $vendor_id
                          AND vendor_item.active)
-                     cheapest, ";
-      $extra_field_name= "minimum_order_quantity, vendor_item_id, cheapest, cost,";
+                     cheapest,
+                     (SELECT MIN(special_order) FROM vendor_item
+                       WHERE item_id = item.id
+                         AND vendor_id = $vendor_id) special_order, ";
+      $extra_field_name= "minimum_order_quantity, vendor_item_id, cheapest, cost,special_order,";
     } else if ($vendor_id < 0) {
       // No vendor
       $extra= "AND NOT EXISTS (SELECT id

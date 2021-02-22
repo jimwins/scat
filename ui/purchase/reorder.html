@@ -55,7 +55,7 @@
             <td align="center">{{ item.minimum_quantity }}</td>
             <td align="center">{{ item.last3months }}</td>
             <td align="center">{{ item.minimum_order_quantity }}</td>
-            <td align="center">
+            <td align="center" class="{{ item.special_order ? 'text-danger' }}">
               {% if item.cheapest is null %}
                 <i class="fa fa-check-square-o text-success"></i>
               {% else %}
