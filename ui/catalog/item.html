@@ -116,6 +116,17 @@
               </div>
             {% endif %}
 
+            {% set cost= item.cost %}
+            {% if cost %}
+              <div class="form-group">
+                <label class="col-sm-4 control-label">Margin</label>
+                <div class="col-sm-8">
+                  <p class="form-control-static">
+                    {{ "%.1f"|format((item.sale_price - item.cost) / item.sale_price * 100) }}%
+                  </p>
+                </div>
+              </div>
+            {% endif %}
           </div>
         </div>
 

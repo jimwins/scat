@@ -516,6 +516,15 @@
           })
       },
 
+      sendCannedMessage: (ev) => {
+        var message= ev.target.closest('[data-message]').getAttribute('data-message')
+        scat.dialog({}, '/sale/{{ txn.id }}/email-invoice-form', { canned: message })
+      },
+
+      createShipment: (ev) => {
+        scat.dialog([], '/sale/{{ txn.id }}/shipment')
+      },
+
     }
 
     document.addEventListener('click', (ev) => {
