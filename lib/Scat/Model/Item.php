@@ -19,6 +19,17 @@ class Item extends \Scat\Model {
     return $this->has_many('VendorItem')->where_gte('active', $active);
   }
 
+  public function cost() {
+    $q= "SELECT retail_price AS cost
+           FROM txn_line
+           JOIN txn ON (txn_line.txn_id = txn.id)
+          WHERE item_id = {$this->id} AND type = 'vendor'
+          ORDER BY created DESC
+          LIMIT 1";
+    $res= $this->orm->for_table('txn_line')->raw_query($q)->find_one();
+    return $res ? $res->cost : null;
+  }
+
   public function kit_items() {
     if ($this->is_kit) {
       return $this->has_many('KitItem', 'kit_id')
@@ -199,15 +210,7 @@ class Item extends \Scat\Model {
 
       $diff= $stock - $current;
 
-      // TODO should have a \Scat\Model\Item method for this
-      $q= "SELECT retail_price AS cost
-             FROM txn_line
-             JOIN txn ON (txn_line.txn_id = txn.id)
-            WHERE item_id = {$this->id} AND type = 'vendor'
-            ORDER BY created DESC
-            LIMIT 1";
-      $res= $this->orm->for_table('txn_line')->raw_query($q)->find_one();
-      $cost= $res ? $res->cost : 0.00;
+      $cost= $this->cost() ?: 0.00; // need 0.00 instead of null
 
       $txn_line= self::factory('TxnLine')
         ->where_equal('txn_id', $cxn->id)
