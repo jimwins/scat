@@ -19,7 +19,7 @@ class Item extends \Scat\Model {
     return $this->has_many('VendorItem')->where_gte('active', $active);
   }
 
-  public function cost() {
+  public function most_recent_cost() {
     $q= "SELECT retail_price AS cost
            FROM txn_line
            JOIN txn ON (txn_line.txn_id = txn.id)
@@ -27,6 +27,18 @@ class Item extends \Scat\Model {
           ORDER BY created DESC
           LIMIT 1";
     $res= $this->orm->for_table('txn_line')->raw_query($q)->find_one();
+
+    return $res ? $res->cost : null;
+  }
+
+  public function expected_cost() {
+    $q= "SELECT MIN(IF(promo_price && promo_price < net_price,
+                        promo_price, net_price)) AS cost
+           FROM vendor_item
+          WHERE item_id = {$this->id}
+            AND active";
+    $res= $this->orm->for_table('vendor_item')->raw_query($q)->find_one();
+
     return $res ? $res->cost : null;
   }
 
@@ -210,7 +222,7 @@ class Item extends \Scat\Model {
 
       $diff= $stock - $current;
 
-      $cost= $this->cost() ?: 0.00; // need 0.00 instead of null
+      $cost= $this->most_recent_cost() ?: 0.00; // need 0.00 instead of null
 
       $txn_line= self::factory('TxnLine')
         ->where_equal('txn_id', $cxn->id)
