@@ -1243,7 +1243,7 @@ class Transactions {
       ]);
 
       $shipment->weight= $weight;
-      if ($shipment->length) {
+      if ($length) {
         $shipment->length= $length;
         $shipment->width= $width;
         $shipment->height= $height;
