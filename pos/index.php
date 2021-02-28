@@ -167,6 +167,8 @@ $app->group('/shipment', function (RouteCollectorProxy $app) {
   $app->get('/analyze', [ \Scat\Controller\Shipping::class, 'analyze' ]);
   $app->get('/~populate',
             [ \Scat\Controller\Shipping::class, 'populateShipmentData' ]);
+  $app->get('/{id}', [ \Scat\Controller\Shipping::class, 'shipment' ])
+      ->setName('shipment');
 });
 
 /* Catalog */

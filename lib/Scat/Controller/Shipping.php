@@ -52,6 +52,17 @@ class Shipping {
     ]);
   }
 
+  function shipment(Request $request, Response $response, $id) {
+    $shipment= $this->data->factory('Shipment')->find_one($id);
+    if (!$shipment) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    return $this->view->render($response, 'shipping/shipment.html', [
+      'shipment' => $shipment
+    ]);
+  }
+
   /* Webhooks */
   function register(Request $request, Response $response) {
     return $response->withJson($this->shipping->registerWebhook());

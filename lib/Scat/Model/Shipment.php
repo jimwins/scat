@@ -6,4 +6,8 @@ class Shipment extends \Scat\Model {
     return $this->belongs_to('Txn')->find_one();
   }
 
+  public function dimensions() {
+    return "{$this->length}x{$this->width}x{$this->height}";
+  }
+
 }
