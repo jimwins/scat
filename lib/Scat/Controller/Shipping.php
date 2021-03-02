@@ -513,6 +513,20 @@ class Shipping {
           'height' => 19.5,
           'weight' => 3 * 16,
         ],
+        [
+          'name' => '33x42x5 5lb',
+          'length' => 32,
+          'width' => 42,
+          'height' => 5,
+          'weight' => 5 * 16,
+        ],
+        [
+          'name' => '33x42x5 25lb',
+          'length' => 32,
+          'width' => 42,
+          'height' => 5,
+          'weight' => 25 * 16,
+        ],
       ];
 
       $parcels= array_map(function($parcel) {
