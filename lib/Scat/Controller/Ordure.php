@@ -284,10 +284,17 @@ class Ordure {
           case 'bike':
             $code= 'ZZ-DELIVERY';
             break;
-          case 'cargo':
+          case 'cargo_bike':
             $code= 'ZZ-DELIVERY-CARGO';
             break;
-          case 'truck':
+          case 'local_sm':
+          case 'local_md':
+          case 'local_lg':
+          case 'local_xl':
+          case 'local_xxl':
+          case 'local_xxxl':
+            $code= 'ZZ-DELIVERY-VEHICLE';
+            break;
           case 'default':
           default:
             $code= 'ZZ-SHIPPING-CUSTOM';
