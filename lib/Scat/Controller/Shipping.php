@@ -443,6 +443,7 @@ class Shipping {
       }, $addresses);
 
       $parcels= [
+/*
         [
           'name' => '6x6x4 12oz',
           'length' => 6.25,
@@ -513,6 +514,35 @@ class Shipping {
           'height' => 19.5,
           'weight' => 3 * 16,
         ],
+*/
+        [
+          'name' => '15x18x8 5lb',
+          'length' => 15,
+          'width' => 18,
+          'height' => 8,
+          'weight' => 10 * 16,
+        ],
+        [
+          'name' => '15x18x8 10lb',
+          'length' => 15,
+          'width' => 18,
+          'height' => 8,
+          'weight' => 10 * 16,
+        ],
+        [
+          'name' => '19x25x8 5lb',
+          'length' => 19,
+          'width' => 25,
+          'height' => 8,
+          'weight' => 10 * 16,
+        ],
+        [
+          'name' => '19x25x8 20lb',
+          'length' => 19,
+          'width' => 25,
+          'height' => 8,
+          'weight' => 10 * 16,
+        ],
         [
           'name' => '33x42x5 5lb',
           'length' => 32,
@@ -521,11 +551,11 @@ class Shipping {
           'weight' => 5 * 16,
         ],
         [
-          'name' => '33x42x5 25lb',
+          'name' => '33x42x5 30lb',
           'length' => 32,
           'width' => 42,
           'height' => 5,
-          'weight' => 25 * 16,
+          'weight' => 30 * 16,
         ],
       ];
 
