@@ -90,4 +90,8 @@ class Shipping
       throw new \Exception("Didn't understand shipment method '{$method}'");
     }
   }
+
+  public function createBatch($shipments) {
+      return \EasyPost\Batch::create([ 'shipments' => $shipments ]);
+  }
 }

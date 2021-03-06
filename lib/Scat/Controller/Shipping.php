@@ -713,4 +713,23 @@ class Shipping {
 
     return $response->withJson([]);
   }
+
+  public function createBatch(Request $request, Response $response) {
+    $ids= $request->getParam('shipments');
+
+    $shipments= $this->data->factory('Shipment')
+      ->where_in('id', $ids)
+      ->find_many();
+
+    $ep_ids= [];
+    foreach ($shipments as $shipment) {
+      $ep_ids[]= $shipment->method_id;
+    }
+
+    $batch= $this->shipping->createBatch($ep_ids);
+
+    $scan_form= $batch->create_scan_form();
+
+    return $response->withJson([ 'form' => $scan_form->scan_form->from_url ]);
+  }
 }
