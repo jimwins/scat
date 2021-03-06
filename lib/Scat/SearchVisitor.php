@@ -135,6 +135,7 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     case 'prop65':
     case 'hazmat':
     case 'oversized':
+    case 'no_backorder':
       $this->current[]= "(item.$name = '$value')";
       break;
     case 'margin':
