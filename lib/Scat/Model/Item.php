@@ -127,6 +127,7 @@ class Item extends \Scat\Model {
       case 'minimum_quantity':
       case 'prop65':
       case 'hazmat':
+      case 'no_backorder':
       case 'oversized':
       case 'is_kit':
       case 'length':
