@@ -295,6 +295,9 @@ class Ordure {
           case 'local_xxxl':
             $code= 'ZZ-DELIVERY-VEHICLE';
             break;
+          case 'economy':
+            $code= 'ZZ-SHIPPING-ECONOMY';
+            break;
           case 'default':
           default:
             $code= 'ZZ-SHIPPING-CUSTOM';
