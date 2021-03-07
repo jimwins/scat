@@ -63,6 +63,11 @@
       style="{{ not brand.active ? 'text-decoration: line-through' }}">
     {{ brand.name }}
   </h1>
+  {% if brand.warning %}
+    <div class="alert alert-danger">
+      {{ brand.warning }}
+    </div>
+  {% endif %}
   {% if brand.description %}
     <p>{{ brand.description|markdown }}</p>
     <div class="clearfix"></div>

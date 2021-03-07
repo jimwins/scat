@@ -133,6 +133,7 @@ class Catalog {
     $brandO->name= $request->getParam('name');
     $brandO->slug= $request->getParam('slug');
     $brandO->description= $request->getParam('description');
+    $brandO->warning= $request->getParam('warning');
     $brandO->active= (int)$request->getParam('active');
     $brandO->save();
 
