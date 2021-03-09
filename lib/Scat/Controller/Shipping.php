@@ -730,6 +730,6 @@ class Shipping {
 
     $scan_form= $batch->create_scan_form();
 
-    return $response->withJson([ 'form' => $scan_form->scan_form->from_url ]);
+    return $response->withJson([ 'form' => $scan_form->from_url, 'id' => $scan_form->id ]);
   }
 }
