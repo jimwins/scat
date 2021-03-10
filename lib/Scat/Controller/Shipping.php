@@ -234,7 +234,8 @@ class Shipping {
     }
   }
 
-  function handleWebhook(Request $request, Response $response)
+  function handleWebhook(Request $request, Response $response,
+                          \Scat\Service\Printer $printer)
   {
     $data= json_decode($request->getBody());
 
@@ -248,6 +249,14 @@ class Shipping {
         throw new \Slim\Exception\HttpNotFoundException($request);
 
       $this->handleUpdate($shipment, $tracker);
+    }
+
+    if ($data->description == 'scan_form.updated' &&
+        $data->result->status == 'created')
+    {
+      $form= $data->result->form_url;
+      $pdf= file_get_contents($form);
+      return $printer->printPDF($response, 'letter', $pdf);
     }
 
     return $response->withJson([ 'status' => 'Processed.' ]);
