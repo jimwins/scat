@@ -37,7 +37,7 @@ case 'month':
   $format= '%Y-%m';
   break;
 case 'week':
-  $format= '%X-W%v';
+  $format= '%x-W%v';
   break;
 case 'hour':
   $format= '%w (%a) %H:00';
