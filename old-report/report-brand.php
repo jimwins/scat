@@ -139,7 +139,7 @@ $q= "SELECT
             (SELECT SUM(amount) FROM previous WHERE brand_id = id)
               AS previous_amount
        FROM brand 
-      HAVING current_amount AND previous_amount
+     HAVING current_amount OR previous_amount
       ORDER BY name";
 
 $r= $db->query($q) or die($db->error);
