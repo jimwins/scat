@@ -74,7 +74,8 @@ $q= "SELECT
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn_id
        LEFT JOIN item ON txn_line.item_id = item.id
-       LEFT JOIN brand ON item.brand_id = brand.id
+       LEFT JOIN product ON item.product_id = product.id
+       LEFT JOIN brand ON product.brand_id = brand.id
        LEFT JOIN barcode ON (item.id = barcode.item_id)
       WHERE type = 'customer'
         AND ($sql_criteria)
