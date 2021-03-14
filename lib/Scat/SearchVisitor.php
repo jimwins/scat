@@ -73,6 +73,15 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
         $this->current[]= "(brand.slug = '$value')";
       }
       break;
+    case 'category':
+    case 'department':
+      if (is_numeric($value)) {
+        $this->current[]= "(product.department_id = '$value')";
+      } else {
+        // XXX search name and slug?
+        $this->current[]= "(department.slug = '$value')";
+      }
+      break;
     case 'product':
       if (is_numeric($value)) {
         $this->current[]= "(item.product_id = '$value')";

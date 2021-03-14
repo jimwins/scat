@@ -83,6 +83,9 @@ class Search
                                    ->left_outer_join('brand',
                                                      array('brand.id', '=',
                                                            'product.brand_id'))
+                                   ->left_outer_join('department',
+                                                     array('department.id', '=',
+                                                           'product.department_id'))
                                    ->left_outer_join('barcode',
                                                      array('barcode.item_id',
                                                            '=', 'item.id'))
