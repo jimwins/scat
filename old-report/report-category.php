@@ -173,7 +173,7 @@ while ($row= $r->fetch_assoc()) {
     $change= (($row['current_amount'] - $row['previous_amount']) / $row['previous_amount']) * 100;
   }
 ?>
-  <tr class="XXX<?=($change < 0) ? 'danger' : ($change > 100) ? 'success' : ''?>">
+  <tr class="XXX<?=($change < 0) ? 'danger' : (($change > 100) ? 'success' : '')?>">
    <td><?=$row['parent_id'] ? ' &nbsp; ' . ashtml($row['name']) : '<b> ' . ashtml($row['name']) . '</b>' ?></td>
    <td align="right"><?=amount($row['current_amount'])?></td>
    <td align="right"><?=amount($row['previous_amount'])?></td>
