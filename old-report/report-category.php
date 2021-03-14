@@ -106,9 +106,9 @@ $q= "CREATE TEMPORARY TABLE report_previous
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn_id
             JOIN item ON txn_line.item_id = item.id
-            JOIN brand ON item.brand_id = brand.id
        LEFT JOIN barcode ON item.id = barcode.item_id
        LEFT JOIN product ON product_id = product.id
+       LEFT JOIN brand ON product.brand_id = brand.id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' - INTERVAL 1 YEAR
