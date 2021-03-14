@@ -169,7 +169,7 @@ while ($row= $r->fetch_assoc()) {
   }
 ?>
   <tr class="XXX<?=($change < 0) ? 'danger' : (($change > 100) ? 'success' : '')?>">
-   <td><a href="/report/categor?begin=<?=ashtml($begin)?>&end=<?=ashtml($end)?>&items=<?=ashtml($items)?>+brand:<?=$row['slug']?>"><?=ashtml($row['name'])?></a></td>
+   <td><a href="/report/category?begin=<?=ashtml($begin)?>&end=<?=ashtml($end)?>&items=<?=ashtml($items)?>+brand:<?=$row['slug']?>"><?=ashtml($row['name'])?></a></td>
    <td align="right"><?=amount($row['current_amount'])?></td>
    <td align="right"><?=amount($row['previous_amount'])?></td>
    <td align="right"><?=sprintf("%.1f%%", $change)?></td>
