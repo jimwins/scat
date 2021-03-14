@@ -121,11 +121,12 @@ $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 /* Report */
 $q= "SELECT
             name, parent_id,
-            IF(parent_id,
+              IF(parent_id,
                CONCAT((SELECT slug FROM department d
                         WHERE d.id = department.parent_id), '/', slug),
                slug)
-              AS slug,
+              AS full_slug,
+            slug,
             (SELECT SUM(amount) FROM report_current WHERE department_id = id)
               AS current_amount,
             (SELECT SUM(amount) FROM report_previous WHERE department_id = id)
@@ -144,7 +145,7 @@ $q= "SELECT
                                WHERE department_id IS NULL)
               AS previous_amount
 */
-      ORDER BY slug
+      ORDER BY full_slug
       ";
 
 $r= $db->query($q) or die($db->error);
@@ -174,10 +175,14 @@ while ($row= $r->fetch_assoc()) {
   }
 ?>
   <tr class="XXX<?=($change < 0) ? 'danger' : (($change > 100) ? 'success' : '')?>">
-   <td><?=$row['parent_id'] ? ' &nbsp; ' . ashtml($row['name']) : '<b> ' . ashtml($row['name']) . '</b>' ?></td>
-   <td align="right"><?=amount($row['current_amount'])?></td>
-   <td align="right"><?=amount($row['previous_amount'])?></td>
-   <td align="right"><?=sprintf("%.1f%%", $change)?></td>
+    <td>
+      <a href="/catalog/search?q=<?=rawurlencode($items)?>+category:<?=$row['slug']?>">
+        <?=$row['parent_id'] ? ' &nbsp; ' . ashtml($row['name']) : '<b> ' . ashtml($row['name']) . '</b>' ?>
+      </a>
+    </td>
+    <td align="right"><?=amount($row['current_amount'])?></td>
+    <td align="right"><?=amount($row['previous_amount'])?></td>
+    <td align="right"><?=sprintf("%.1f%%", $change)?></td>
   </tr>
 <?}?>
  </tbody>
