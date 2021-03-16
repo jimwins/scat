@@ -29,7 +29,7 @@ class Shipping {
 
   function index(Request $request, Response $response) {
     $page= (int)$request->getParam('page');
-    $page_size= 20;
+    $page_size= 50;
 
     $shipments= $this->data->factory('Shipment')
       ->select('*')
