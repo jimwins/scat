@@ -18,6 +18,13 @@
       Thank you for your curbside pickup order from Raw Materials Art
       Supplies!
     </p>
+    {% if txn.total > 100 %}
+      <p>
+        <b>Card and ID required for orders over $100.</b> You must be able to
+        present the credit card used for the purchase and a matching ID for
+        orders over $100.
+      </p>
+    {% endif %}
     <p>
       We will send another email when your order is ready for pickup.
       Pickup times are Tuesday – Saturday, noon to 3pm. Most orders
