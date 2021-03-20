@@ -18,7 +18,7 @@
   </p>
   <p>
     We wanted to let you know that your order ({{ txn.formatted_number }}) was
-    reported to be ready for pickup by {{ tracker.carrier }} on
+    reported to be ready for pickup from {{ tracker.carrier }} on
     {{ (available_for_pickup ?: tracker.updated_at) | date("c", "UTC") | date("l, F j", txn.shipping_address.timezone) }}.
     {% if available_for_pickup and available_for_pickup|date("Y-m-d") != tracker.updated_at|date("Y-m-d") %}
       (Sorry for the slow update, we just got the news!)
