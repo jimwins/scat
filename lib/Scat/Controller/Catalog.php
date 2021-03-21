@@ -39,12 +39,19 @@ class Catalog {
       }
 
       $data= [ 'items' => $items ];
+    } elseif ($scope == 'products') {
+      $products= $search->searchProducts($q);
+
+      $data= [ 'products' => $products ];
     } else {
       $data= $search->search($q);
     }
 
     $accept= $request->getHeaderLine('Accept');
-    if (strpos($accept, 'application/json') !== false) {
+    $xrequestedwith= $request->getHeaderLine('X-Requested-With');
+    if (strpos($accept, 'application/json') !== false ||
+        strtolower($xrequestedwith) === 'xmlhttprequest')
+    {
       return $response->withJson($data);
     }
 
