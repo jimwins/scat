@@ -40,8 +40,6 @@ class Search
     }
 
     try {
-      # / trips up SphinxSearch parser, but we like to use it
-      $q= preg_replace('#([/])#', '\\/', $q);
       $products= $this->searchProducts($q);
     } catch (\Exception $e) {
       $errors[]= $e->getMessage();
@@ -108,6 +106,9 @@ class Search
   }
 
   public function searchProducts($terms) {
+    # / trips up SphinxSearch parser, but we like to use it
+    $terms= preg_replace('#([/])#', '\\/', $terms);
+
     // This should rank products for which we stock items higher
     $q= "SELECT id, WEIGHT() weight
            FROM scat
@@ -115,7 +116,7 @@ class Search
          OPTION ranker=expr('sum(lcs*user_weight)*1000+bm25+if(items, 4000, 0)')";
 
     $stmt= $this->pdo->prepare($q);
-    $stmt->execute(array($terms));
+    $stmt->execute([ $terms ]);
 
     $products= $stmt->fetchAll(\PDO::FETCH_COLUMN, 0);
 
