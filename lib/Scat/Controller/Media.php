@@ -35,6 +35,14 @@ class Media {
 
     $media= $media->find_many();
 
+    $accept= $request->getHeaderLine('Accept');
+    $xrequestedwith= $request->getHeaderLine('X-Requested-With');
+    if (strpos($accept, 'application/json') !== false ||
+        strtolower($xrequestedwith) === 'xmlhttprequest')
+    {
+      return $response->withJson([ 'media' => $media ]);
+    }
+
     return $view->render($response, 'media/index.html', [
       'media' => $media,
       'q' => $q,
