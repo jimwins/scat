@@ -1,0 +1,104 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Internal Ads
+{% endblock %}
+
+{% block pager %}
+  <nav aria-label="Page navigation">
+    <ul class="pager">
+      {% if page > 0 %}
+        <li class="previous">
+          <a href="ad?{{ { 'page': page - 1, 'q': q } | url_encode }}">
+            <i class="fa fa-arrow-left"></i> Previous
+          </a>
+        </li>
+      {% else %}
+        <li class="previous disabled">
+          <span><i class="fa fa-arrow-left"></i> Previous</span>
+        </li>
+      {% endif %}
+      <li>
+        <form class="form-inline" style="display: inline" method="GET" action="ad">
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button type="submit" class="btn btn-default">
+                <i class="fa fa-search"></i>
+                <span class="sr-only">Search</span>
+              </button>
+            </span>
+            <input type="text" class="form-control" name="q" value="{{ q }}">
+            {% if ads|length %}
+              <span class="input-group-addon">
+                {{ page * page_size + 1 }} -
+                {{ min((page + 1) * page_size, ads[0].records) }}
+                of {{ ads[0].records }}
+              </span>
+            {% endif %}
+          </div>
+        </form>
+        <button class="btn btn-default" id="create-new-ad">
+          Create New Ad
+        </button>
+      </li>
+      {% if page < (ads[0].records / page_size)|round(0,'floor') %}
+        <li class="next">
+          <a href="ad?{{ { 'page': page + 1, 'q': q } | url_encode }}">
+            Next <i class="fa fa-arrow-right"></i>
+          </a>
+        </li>
+      {% else %}
+        <li class="next disabled">
+          <span>Next <i class="fa fa-arrow-right"></i></span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endblock %}
+
+{% block content %}
+
+  {{ block('pager') }}
+
+  {% if ads|length %}
+    <div class="row">
+      {% for ad in ads %}
+        <div class="col-sm-3">
+          {{ include('ad.twig', { ad: ad }) }}
+          <button data-id="{{ ad.id }}" data-action="edit-ad"
+                  class="btn btn-default btn-xs btn-block">
+            <i class="fa fa-edit"></i> Edit
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+
+    {{ block('pager') }}
+
+  {% else %}
+    <p class="lead">
+      <b>Nothing found!</b>
+      Try refining your search or searching for something else.
+    </p>
+  {% endif %}
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    document.getElementById('create-new-ad').addEventListener('click', (ev) => {
+      ev.stopPropagation(); ev.preventDefault();
+
+      scat.dialog([], '/ad');
+    })
+
+    document.addEventListener('click', (ev) => {
+      let act= ev.target.closest('[data-action]')
+      if (act && act.getAttribute('data-action') === 'edit-ad') {
+        let id= act.getAttribute('data-id')
+        scat.dialog([], '/ad/' + id)
+      }
+    })
+  </script>
+{% endblock %}

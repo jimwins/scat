@@ -1,0 +1,19 @@
+<div class="well">
+  {% if ad.tag %}
+    <h5 class="text-danger" style="margin-top: 0">
+      <a href="{{ ad.href }}">{{ ad.tag }}</a>
+    </h5>
+  {% endif %}
+  <h4>
+    <a href="{{ ad.href }}">{{ ad.headline }}</a>
+  </h4>
+  <a href="{{ ad.href }}">
+    {{ include('carousel.twig', { images: [ ad.image ]}) }}
+  </a>
+  {% if ad.caption %}
+    <p>{{ ad.caption }}</p>
+  {% endif %}
+  <a class="btn btn-primary btn-block" href="{{ ad.href }}">
+    {{ ad.button_label }}
+  </a>
+</div>

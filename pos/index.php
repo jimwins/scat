@@ -394,6 +394,14 @@ $app->group('/media', function (RouteCollectorProxy $app) {
   $app->delete('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'delete' ]);
 });
 
+/* Ads */
+$app->group('/ad', function (RouteCollectorProxy $app) {
+  $app->get('', [ \Scat\Controller\InternalAd::class, 'home' ]);
+  $app->post('', [ \Scat\Controller\InternalAd::class, 'update' ]);
+  $app->get('/{id:[0-9]+}', [ \Scat\Controller\InternalAd::class, 'show' ]);
+  $app->post('/{id:[0-9]+}', [ \Scat\Controller\InternalAd::class, 'update' ]);
+});
+
 /* Notes */
 $app->group('/note', function (RouteCollectorProxy $app) {
   $app->get('[/{id:[0-9]+}]', [ \Scat\Controller\Notes::class, 'view' ]);

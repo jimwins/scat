@@ -1,0 +1,174 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Internal Ad
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    {% if ad.id %}
+      <input type="hidden" name="id" value="{{ ad.id }}">
+    {% endif %}
+
+    <div class="form-group">
+      <label for="active">
+        Active
+        <select name="active" class="form-control">
+          <option value="1" {{ ad.active ? 'selected' }}>Yes</option>
+          <option value="0" {{ ad.id and not ad.active ? 'selected' }}>No</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="name">Tag</label>
+      <input type="text" class="form-control" autofocus
+             name="tag" value="{{ ad.tag }}">
+    </div>
+
+    <div class="form-group">
+      <label for="headline">Headline</label>
+      <input type="text" class="form-control"
+             name="headline" value="{{ ad.headline }}">
+    </div>
+
+    <!-- Link/Item/Product -->
+    <ul id="link_type" class="nav nav-justified nav-tabs" role="tablist">
+      <li role="presentation" class="{{ (not ad.link_type or ad.link_type == 'link') ? 'active' }}"><a href="#link" aria-controls="link" role="tab" data-toggle="tab">Link</a></li>
+      <li role="presentation" class="{{ (ad.link_type == 'item') ? 'active' }}"><a href="#item" aria-controls="item" role="tab" data-toggle="tab">Item</a></li>
+      <li role="presentation" class="{{ (ad.link_type == 'product') ? 'active' }}"><a href="#product" aria-controls="product" role="tab" data-toggle="tab">Product</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content" style="border: 1px solid #83693d; border-top: none; padding: 1em; margin-bottom: 1em">
+      <div role="tabpanel" class="tab-pane {{ (not ad.link_type or ad.link_type == 'link') ? 'active' }}" id="link">
+        <div class="form-group">
+          <label for="headline">URL</label>
+          <input type="text" class="form-control"
+                 name="link_url" value="{{ ad.link_url }}">
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane {{ (ad.link_type == 'item') ? 'active' }}" id="item">
+        <div class="form-group">
+          <label for="item_id">Item</label>
+          <select class="form-control" name="item_id">
+            {% if ad.link_type == 'item' and ad.link_id %}
+              <option value="{{ ad.link_id }}">
+                {{- ad.item().name -}}
+              </option>
+            {% endif %}
+          </select>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane {{ (ad.link_type == 'product') ? 'active' }}" id="product">
+        <div class="form-group">
+          <label for="product_id">Product</label>
+          <select class="form-control" name="product_id">
+            {% if ad.link_type == 'product' and ad.link_id %}
+              <option value="{{ ad.link_id }}">
+                {{- ad.product().name -}}
+              </option>
+            {% endif %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="image_id">Image</label>
+      <select class="form-control" name="image_id">
+        {% if ad.image_id %}
+          <option value="{{ ad.image_id }}">
+            {{- ad.image().name -}}
+          </option>
+        {% endif %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="caption">Caption (optional)</label>
+      <textarea class="form-control" rows="10" name="caption">
+        {{- ad.caption -}}
+      </textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="button_label">Button Label</label>
+      <input type="text" class="form-control"
+             name="button_label" value="{{ ad.button_label }}"
+             placeholder="See More">
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-default">
+    {{- ad.id ? 'Update' : 'Add' -}}
+  </button>
+{% endblock %}
+
+{% block script %}
+  $('[name="item_id"]', form).select2({
+    ajax: {
+      url: '/catalog/search?scope=items',
+      datatype: 'json',
+      processResults: function (data) {
+        return {
+          results: data.items.map((d) => {
+            return { id: d.id, text: d.name }
+          })
+        }
+      }
+    }
+  })
+
+  $('[name="product_id"]', form).select2({
+    ajax: {
+      url: '/catalog/search?scope=products',
+      datatype: 'json',
+      processResults: function (data) {
+        return {
+          results: data.products.map((d) => {
+            return { id: d.id, text: d.name }
+          })
+        }
+      }
+    }
+  })
+
+  $('[name="image_id"]', form).select2({
+    ajax: {
+      url: '/media',
+      datatype: 'json',
+      processResults: function (data) {
+        return {
+          results: data.media.map((d) => {
+            return { id: d.id, text: d.name }
+          })
+        }
+      }
+    }
+  })
+
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+
+    // figure out link_type
+    let link_type= document.querySelector('.nav li.active a').getAttribute('aria-controls')
+    formData.set('link_type', link_type)
+
+    scat.post("/ad{{ ad.id ? '/' ~ ad.id }}", formData)
+        .then((res) => {
+          if (res.redirected) {
+            window.location.href= res.url
+          } else {
+            window.location.reload()
+          }
+        })
+  }
+{% endblock %}
