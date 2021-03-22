@@ -38,7 +38,8 @@ class Media
 
     $uuid= sprintf("%08x%02x%s", time(), 0, bin2hex(random_bytes(8)));
 
-    $ext= pathinfo($name, PATHINFO_EXTENSION);
+    // No extension? Probably a JPEG
+    $ext= pathinfo($name, PATHINFO_EXTENSION) ?: 'jpg';
 
     $b2_file= $b2->upload([
       'BucketName' => $bucket,
