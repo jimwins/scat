@@ -42,6 +42,13 @@
     <div class="col-sm-6">
       <div class="panel panel-default">
         <div class="panel-heading">
+          <div class="pull-right">
+            <button class="btn btn-default btn-xs toggle"
+                    data-name="active" data-value="{{ person.active }}">
+              <i class="fa fa-fw {{ person.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+              Active
+            </button>
+          </div>
           <h2 class="panel-title">Contact Info</h2>
         </div>
         <div class="panel-body form-horizontal">
@@ -448,6 +455,32 @@
     document.getElementById('tax-exemption-certificate').addEventListener('click', (ev) => {
       scat.dialog([], '/person/{{ person.id }}/tax-exemption' )
     })
+
+    let handleToggle= (toggle) => {
+      let current= toggle.getAttribute('data-value')
+
+      let name= toggle.getAttribute('data-name')
+      let value= current === '1' ? 0 : 1
+
+      let icon= toggle.querySelector('i')
+      icon.classList.remove('fa-square-o','fa-check-square-o')
+      icon.classList.add('fa-spin','fa-spinner')
+
+      scat.patch("/person/{{ person.id }}", { [name] : value })
+      .then((res) => res.json())
+      .then((data) => {
+        icon.classList.remove('fa-spin','fa-spinner')
+        icon.classList.add(data[name] !== '0' ?
+                           'fa-check-square-o' : 'fa-square-o')
+        toggle.setAttribute('data-value', data[name])
+      })
+    }
+
+    document.addEventListener('click', (ev) => {
+      let toggle= ev.target.closest('.toggle')
+      if (toggle) handleToggle(toggle)
+    })
+
   </script>
 
   {{ scat.file_upload('/person/' ~ person.id ~ '/items', false) }}

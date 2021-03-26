@@ -157,7 +157,7 @@ class Person extends \Scat\Model {
       $this->$name= $value;
     }
     elseif (isset($this, $name)) {
-      $this->$name= $value ?: null;
+      $this->$name= ($value !== '') ? $value : null;
     } else {
       throw new \Exception("No way to set '$name' on a person.");
     }
