@@ -110,4 +110,18 @@ class Report
                              ->order_by_asc('name')
                              ->find_many() ];
   }
+
+  public function backorderedItems() {
+    return [ "items" => $this->data->factory('Item')
+                             ->select('*')
+                             ->select_expr('(SELECT SUM(allocated)
+                                               FROM txn_line
+                                              WHERE item.id = txn_line.item_id)',
+                                           'stock')
+                             ->where_gt('active', 0)
+                             ->where_gt('purchase_quantity', 0)
+                             ->having_lt('stock', 0)
+                             ->order_by_asc('code')
+                             ->find_many() ];
+  }
 }

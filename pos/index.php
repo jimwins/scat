@@ -381,6 +381,8 @@ $app->group('/report', function (RouteCollectorProxy $app) {
   $app->get('/quick', [ \Scat\Controller\Reports::class, 'quick' ]);
   $app->get('/empty-products',
             [ \Scat\Controller\Reports::class, 'emptyProducts' ]);
+  $app->get('/backordered-items',
+            [ \Scat\Controller\Reports::class, 'backorderedItems' ]);
   $app->get('/{name}', [ \Scat\Controller\Reports::class, 'oldReport' ]);
 });
 
