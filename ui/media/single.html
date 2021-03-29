@@ -88,7 +88,20 @@
           </ul>
         </div>
       {% endif %}
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            &lt;img&gt;
+          </h3>
+        </div>
+        <div class="panel-body">
+          <textarea class="form-control" rows="10"><img src="{{ image.medium }}" srcset="{{ image.thumbnail }} 128w, {{ image.medium }} 384w, {{ image.large_square }} 1024w" alt="{{ image.alt_text }}"></textarea>
+        </div>
+      </div>
+
     </div>
+
     <div class="col-sm-6">
       <figure>
         <img class="img-responsive center-block"
