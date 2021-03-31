@@ -88,6 +88,12 @@ class Shipping {
   function handleUpdate($shipment, $tracker) {
     if ($shipment->status != $tracker->status) {
       switch ($tracker->status) {
+      case 'pre_transit':
+        /* We treat pre_transit/arrived_at_facility as in_transit */
+        if ($tracker->status_detail != 'arrived_at_facility') {
+          break;
+        }
+        /* FALLTHROUGH */
       case 'in_transit':
         // send order shipped email
         $txn= $shipment->txn();
@@ -116,7 +122,10 @@ class Shipping {
         }
 
         foreach ($tracker->tracking_details as $details) {
-          if ($details->status == 'in_transit') {
+          if ($details->status == 'in_transit' ||
+              ($details->status == 'pre_transit' &&
+                $details->status_detail = 'arrived_at_facility'))
+          {
             $shipped= $details->datetime;
             break;
           }
