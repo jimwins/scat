@@ -90,7 +90,8 @@ class Shipping {
       switch ($tracker->status) {
       case 'pre_transit':
         /* We treat pre_transit/arrived_at_facility as in_transit */
-        if ($tracker->status_detail != 'arrived_at_facility') {
+        $last= $tracker->tracking_details[count($tracker->tracking_details)-1];
+        if ($last->status_detail != 'arrived_at_facility') {
           break;
         }
         /* FALLTHROUGH */
@@ -750,4 +751,5 @@ class Shipping {
 
     return $response->withJson([ 'form' => $scan_form->from_url, 'id' => $scan_form->id ]);
   }
+
 }
