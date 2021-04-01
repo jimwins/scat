@@ -752,4 +752,26 @@ class Shipping {
     return $response->withJson([ 'form' => $scan_form->from_url, 'id' => $scan_form->id ]);
   }
 
+  public function createShipmentReturn(Request $request, Response $response,
+                                        $id)
+  {
+    $shipment= $this->data->factory('Shipment')->find_one($id);
+    if (!$shipment) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    $txn= $shipment->txn();
+
+    $new_shipment= $txn->shipments()->create();
+    $new_shipment->txn_id= $txn->id;
+
+    $return_shipment= $this->shipping->createReturn($shipment);
+
+    $new_shipment->method_id= $return_shipment->id;
+    $new_shipment->status= 'pending';
+
+    $new_shipment->save();
+
+    return $response->withJson($new_shipment);
+  }
 }

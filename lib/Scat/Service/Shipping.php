@@ -78,6 +78,17 @@ class Shipping
     }
   }
 
+  public function createReturn($shipment) {
+    $ep= \EasyPost\Shipment::retrieve($shipment->method_id);
+    $details= [
+      'to_address' => $ep->from_address,
+      'from_address' => $ep->to_address,
+      'parcel' => $ep->parcel,
+      'is_return' => true,
+    ];
+    return \EasyPost\Shipment::create($details);
+  }
+
   public function getTrackerUrl($shipment) {
     switch ($shipment->method) {
     case 'easypost':

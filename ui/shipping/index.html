@@ -69,8 +69,7 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Created</th>
-            <th>Modified</th>
+            <th>Created / Modified</th>
             <th>Status</th>
             <th>Transaction</th>
             <th>Recipient</th>
@@ -82,18 +81,23 @@
         </thead>
         <tbody>
         {% for shipment in shipments %}
-          <tr>
+          <tr data-id="{{ shipment.id }}">
             <td class="num">
               <a href="/shipment/{{ shipment.id }}">{{ loop.index }}</a>
             </td>
             <td>
-              <a href="/shipment/{{ shipment.id }}">{{ shipment.created | date('Y-m-d') }}</a>
-            </td>
-            <td>
-              <a href="/shipment/{{ shipment.id }}">{{ shipment.modified | date('Y-m-d') }}</a>
+              <a href="/shipment/{{ shipment.id }}">
+                {{ shipment.created | date('Y-m-d') }}
+                <br>
+                {{ shipment.modified | date('Y-m-d') }}
+              </a>
             </td>
             <td>
               {{ shipment.status }}
+              <br>
+              <button class="btn btn-xs btn-link" data-action="create-return">
+                <i class="fa fa-reply"></i> Return
+              </button>
             </td>
             <td>
               <a href="/sale/{{ shipment.txn_id }}">
@@ -145,6 +149,22 @@
         .then((data) => {
           console.log(data.form);
         })
+  })
+
+  document.addEventListener('click', (ev) => {
+    let act= ev.target.closest('[data-action]')
+    if (act && act.getAttribute('data-action') === 'create-return') {
+      ev.stopPropagation(); ev.preventDefault();
+      let id= act.closest('[data-id]').getAttribute('data-id')
+      scat.post('/shipment/' + id + '/~create-return')
+          .then((res) =>  {
+            if (res.redirected) {
+              window.location.href= res.url
+            } else {
+              window.location.reload()
+            }
+          })
+    }
   })
 </script>
 

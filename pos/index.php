@@ -170,6 +170,8 @@ $app->group('/shipment', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Shipping::class, 'populateShipmentData' ]);
   $app->get('/{id}', [ \Scat\Controller\Shipping::class, 'shipment' ])
       ->setName('shipment');
+  $app->post('/{id:[0-9]+}/~create-return',
+              [ \Scat\Controller\Shipping::class, 'createShipmentReturn' ]);
 });
 
 /* Catalog */
