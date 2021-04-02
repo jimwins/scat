@@ -113,7 +113,7 @@ Txn.voidPayment= function (payment_id) {
 
 Txn.addItem= function (txn, item) {
   if (!txn) {
-    scat.call('/sale')
+    return scat.call('/sale')
         .then((res) => res.json())
         .then((data) => {
           if (!data.id) {
@@ -121,10 +121,9 @@ Txn.addItem= function (txn, item) {
           }
           Txn.addItem(data.id, item)
         })
-    return;
   }
 
-  scat.call('/sale/' + txn + '/item', { item_id: item.id })
+  return scat.call('/sale/' + txn + '/item', { item_id: item.id })
       .then((res) => res.json())
       .then((data) => {
         Txn.loadId(txn)
@@ -140,7 +139,7 @@ Txn.removeItem= function (id, item) {
 
 Txn.findAndAddItem= function(q) {
   // go find!
-  fetch('/catalog/search?scope=items&q=' + encodeURI(q), {
+  return fetch('/catalog/search?scope=items&q=' + encodeURI(q), {
     headers: { 'Accept': 'application/json' }
   })
   .then((res) => {
@@ -171,7 +170,6 @@ Txn.findAndAddItem= function(q) {
                  "</tr>");
         n.click(item, function(ev) {
           Txn.addItem(Txn.id(), ev.data);
-          $(this).closest(".choices").remove();
         });
         list.append(n);
       });
@@ -179,7 +177,7 @@ Txn.findAndAddItem= function(q) {
       $("#items").before(choices);
     } else {
       // Just one item? Add it
-      Txn.addItem(Txn.id(), data.items[0]);
+      return Txn.addItem(Txn.id(), data.items[0]);
     }
   })
 };
@@ -390,9 +388,8 @@ $(function() {
     viewModel.showAdmin(true);
   });
 
-  $('#lookup').submit(function(ev) {
-    ev.preventDefault();
-    $("#lookup").removeClass("error");
+  scat.handleAction('submit', 'lookup', (act) => {
+    act.classList.remove('error');
 
     $('input[name="q"]', this).focus().select();
 
@@ -402,19 +399,17 @@ $(function() {
     var val= parseInt(q, 10);
     if (q.length < 4 && lastItem && val != 0 && !isNaN(val)) {
       updateValue($(lastItem).data('line_id'), 'quantity', val);
-      return false;
+      return Promise.resolve(true);
     }
 
     // (%V|@)INV-(\d+) is an invoice to load
     var m= q.match(/^\s*(%V|@)INV-(\d+)/);
     if (m) {
       window.location.href= '/sale/' + m[2];
-      return false;
+      return Promise.resolve(true);
     }
 
-    Txn.findAndAddItem(q);
-
-    return false;
+    return Txn.findAndAddItem(q);
   });
 
   $("#sidebar a[id='active']").click();
@@ -666,9 +661,9 @@ $("#txn-load").submit(function(ev) {
 </div><!-- /sidebar -->
 
 <div class="col-md-9 col-md-pull-3" id="txn">
-<form class="form form-inline" id="lookup">
+<form class="form form-inline" id="lookup" data-action="lookup">
   <div class="input-group">
-    <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
+    <span class="input-group-addon"><i class="fa fa-fw fa-barcode"></i></span>
     <input type="text" class="form-control autofocus"
            name="q"
            autocomplete="off" autocorrect="off" autocapitalize="off"
