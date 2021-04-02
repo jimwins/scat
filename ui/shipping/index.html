@@ -85,14 +85,29 @@
               <a href="/shipment/{{ shipment.id }}">{{ loop.index }}</a>
             </td>
             <td>
-              {% if shipment.tracker_id %}
-                <div class="pull-right">
+              <div class="pull-right">
+                {% if shipment.tracker_id %}
                   <a target="_blank" href="/shipment/{{ shipment.id }}/track"
-                     class="btn btn-link">
+                     class="btn btn-link btn-xs">
                     <i class="fa fa-truck"></i>
                   </a>
-                </div>
-              {% endif %}
+                {% endif %}
+                {% if shipment.status == 'pending' %}
+                  <a class="btn btn-link btn-xs" data-action="delete-shipment">
+                    <i class="fa fa-trash-o"></i>
+                  </a>
+                {% endif %}
+                {% if shipment.status in [ 'unknown', 'pre_transit ' ] %}
+                  <a class="btn btn-link btn-xs" data-action="refund-shipment">
+                    <i class="fa fa-trash-o"></i>
+                  </a>
+                {% endif %}
+                  {% if shipment.status in ['delivered' ] %}
+                    <a class="btn btn-xs btn-link" data-action="create-return">
+                      <i class="fa fa-reply"></i>
+                    </a>
+                  {% endif %}
+              </div>
               <a href="/shipment/{{ shipment.id }}">
                 {{ shipment.created | date('Y-m-d') }}
                 <br>
@@ -101,10 +116,6 @@
             </td>
             <td>
               {{ shipment.status }}
-              <br>
-              <button class="btn btn-xs btn-link" data-action="create-return">
-                <i class="fa fa-reply"></i> Return
-              </button>
             </td>
             <td>
               <a href="/sale/{{ shipment.txn_id }}">
@@ -158,12 +169,9 @@
         })
   })
 
-  document.addEventListener('click', (ev) => {
-    let act= ev.target.closest('[data-action]')
-    if (act && act.getAttribute('data-action') === 'create-return') {
-      ev.stopPropagation(); ev.preventDefault();
-      let id= act.closest('[data-id]').getAttribute('data-id')
-      scat.post('/shipment/' + id + '/~create-return')
+  scat.handleAction('click', 'create-return', (act) => {
+    let id= act.closest('[data-id]').getAttribute('data-id')
+    return scat.post('/shipment/' + id + '/~create-return')
           .then((res) =>  {
             if (res.redirected) {
               window.location.href= res.url
@@ -171,7 +179,29 @@
               window.location.reload()
             }
           })
-    }
+  })
+
+  scat.handleAction('click', 'delete-shipment', (act) => {
+    let id= act.closest('[data-id]').getAttribute('data-id')
+    return scat.delete('/shipment/' + id)
+          .then((res) =>  {
+            window.location.reload()
+          })
+          .catch((err) => {
+            scat.alert('danger', err.message)
+          })
+  })
+
+  scat.handleAction('click', 'refund-shipment', (act) => {
+    let id= act.closest('[data-id]').getAttribute('data-id')
+    return scat.post('/shipment/' + id + '/~refund')
+          .then((res) =>  {
+            debugger
+            window.location.reload()
+          })
+          .catch((err) => {
+            scat.alert('danger', err.message)
+          })
   })
 </script>
 

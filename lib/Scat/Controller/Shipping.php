@@ -792,4 +792,30 @@ class Shipping {
     return $response->withRedirect($tracker_url);
   }
 
+  public function deleteShipment(Request $request, Response $response, $id)
+  {
+    $shipment= $this->data->factory('Shipment')->find_one($id);
+    if (!$shipment) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    if ($shipment->status != 'pending') {
+      throw new \Exception("Unable to delete {$shipment->status} shipment");
+    }
+
+    $shipment->delete();
+
+    return $response->withJson([]);
+  }
+
+  public function refundShipment(Request $request, Response $response, $id)
+  {
+    $shipment= $this->data->factory('Shipment')->find_one($id);
+    if (!$shipment) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    return $response->withJson($this->shipping->refundShipment($shipment));
+  }
+
 }

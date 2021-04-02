@@ -168,10 +168,14 @@ $app->group('/shipment', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Shipping::class, 'populateShipmentData' ]);
   $app->get('/{id}', [ \Scat\Controller\Shipping::class, 'shipment' ])
       ->setName('shipment');
+  $app->delete('/{id:[0-9]+}',
+                [ \Scat\Controller\Shipping::class, 'deleteShipment' ]);
   $app->get('/{shipment_id:[0-9]+}/track',
             [ \Scat\Controller\Shipping::class, 'trackShipment' ]);
   $app->post('/{id:[0-9]+}/~create-return',
               [ \Scat\Controller\Shipping::class, 'createShipmentReturn' ]);
+  $app->post('/{id:[0-9]+}/~refund',
+              [ \Scat\Controller\Shipping::class, 'refundShipment' ]);
 });
 
 /* Catalog */

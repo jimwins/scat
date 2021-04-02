@@ -105,4 +105,10 @@ class Shipping
   public function createBatch($shipments) {
       return \EasyPost\Batch::create([ 'shipments' => $shipments ]);
   }
+
+  public function refundShipment($shipment) {
+    $ep= \EasyPost\Shipment::retrieve($shipment->method_id);
+
+    return $ep->refund();
+  }
 }
