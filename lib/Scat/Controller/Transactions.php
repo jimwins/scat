@@ -1100,27 +1100,6 @@ class Transactions {
     return $response->withJson($shipment);
   }
 
-  public function trackShipment(Request $request, Response $response,
-                                \Scat\Service\Shipping $shipping,
-                                $id, $shipment_id)
-  {
-    $txn= $this->txn->fetchById($id);
-    if (!$txn)
-      throw new \Slim\Exception\HttpNotFoundException($request);
-
-    $shipment= $shipment_id ? $txn->shipments()->find_one($shipment_id) : null;
-    if ($shipment_id && !$shipment)
-      throw new \Slim\Exception\HttpNotFoundException($request);
-
-    if (!$shipment->tracker_id)
-      throw new \Slim\Exception\HttpNotFoundException($request,
-        "No tracker_id found for that shipment.");
-
-    $tracker_url= $shipping->getTrackerUrl($shipment);
-
-    return $response->withRedirect($tracker_url);
-  }
-
   public function printShipmentLabel(Request $request, Response $response,
                                       \Scat\Service\Printer $print,
                                       \Scat\Service\Shipping $shipping,

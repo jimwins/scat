@@ -69,12 +69,11 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Created / Modified</th>
+            <th>Created / Last</th>
             <th>Status</th>
             <th>Transaction</th>
             <th>Recipient</th>
-            <th>Carrier</th>
-            <th>Service</th>
+            <th>Carrier / Service</th>
             <th>Rate (Insurance)</th>
             <th></th>
           </tr>
@@ -86,6 +85,14 @@
               <a href="/shipment/{{ shipment.id }}">{{ loop.index }}</a>
             </td>
             <td>
+              {% if shipment.tracker_id %}
+                <div class="pull-right">
+                  <a target="_blank" href="/shipment/{{ shipment.id }}/track"
+                     class="btn btn-link">
+                    <i class="fa fa-truck"></i>
+                  </a>
+                </div>
+              {% endif %}
               <a href="/shipment/{{ shipment.id }}">
                 {{ shipment.created | date('Y-m-d') }}
                 <br>
@@ -106,19 +113,19 @@
               </a>
             </td>
             <td>
-              {{ shipment.txn.shipping_address.name }} /
+              {{ shipment.txn.shipping_address.name }}<br>
               {{ shipment.txn.shipping_address.city }},
               {{ shipment.txn.shipping_address.state }}
             </td>
             <td>
               {{ shipment.carrier }}
-            </td>
-            <td>
+              <br>
               {{ shipment.service }}
             </td>
             <td>
               {{ scat.amount(shipment.rate) }}
               {% if shipment.insurance %}
+                <br>
                 ({{ scat.amount(max(shipment.insurance * 0.01, 1)) }})
               {% endif %}
             </td>

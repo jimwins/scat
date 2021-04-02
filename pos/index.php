@@ -135,8 +135,6 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   /* Shipments */
   $app->get('/{id:[0-9]+}/shipment[/{shipment_id:[0-9]+}]',
             [ \Scat\Controller\Transactions::class, 'saleShipments' ]);
-  $app->get('/{id:[0-9]+}/shipment/{shipment_id:[0-9]+}/track',
-            [ \Scat\Controller\Transactions::class, 'trackShipment' ]);
   $app->post('/{id:[0-9]+}/shipment/{shipment_id:[0-9]+}/~print-label',
               [ \Scat\Controller\Transactions::class, 'printShipmentLabel' ]);
   $app->post('/{id:[0-9]+}/shipment',
@@ -170,6 +168,8 @@ $app->group('/shipment', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Shipping::class, 'populateShipmentData' ]);
   $app->get('/{id}', [ \Scat\Controller\Shipping::class, 'shipment' ])
       ->setName('shipment');
+  $app->get('/{shipment_id:[0-9]+}/track',
+            [ \Scat\Controller\Shipping::class, 'trackShipment' ]);
   $app->post('/{id:[0-9]+}/~create-return',
               [ \Scat\Controller\Shipping::class, 'createShipmentReturn' ]);
 });

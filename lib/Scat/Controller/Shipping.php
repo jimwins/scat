@@ -774,4 +774,22 @@ class Shipping {
 
     return $response->withJson($new_shipment);
   }
+
+  public function trackShipment(Request $request, Response $response,
+                                $shipment_id)
+  {
+    $shipment= $this->data->factory('Shipment')->find_one($shipment_id);
+    if (!$shipment) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    if (!$shipment->tracker_id)
+      throw new \Slim\Exception\HttpNotFoundException($request,
+        "No tracker_id found for that shipment.");
+
+    $tracker_url= $this->shipping->getTrackerUrl($shipment);
+
+    return $response->withRedirect($tracker_url);
+  }
+
 }
