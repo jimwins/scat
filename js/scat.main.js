@@ -335,7 +335,7 @@ class ScatUtils {
         act.disabled= true;
 
         let old= '';
-        let icon= act.querySelector('i')
+        let icon= act.querySelector('i.fa')
         if (icon) {
           let newIcon= 'fa fa-spinner fa-spin'
           if (icon.classList.contains('fa-fw')) {
