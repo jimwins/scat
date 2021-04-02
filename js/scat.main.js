@@ -324,6 +324,37 @@ class ScatUtils {
       }
     })
   }
+
+  handleAction (eventName, action, func) {
+    document.addEventListener(eventName, (ev) => {
+      let act= ev.target.closest('[data-action]')
+      if (act && act.getAttribute('data-action') === action) {
+        ev.stopPropagation(); ev.preventDefault();
+
+        if (act.disabled) return;
+        act.disabled= true;
+
+        let old= '';
+        let icon= act.querySelector('i')
+        if (icon) {
+          let newIcon= 'fa fa-spinner fa-spin'
+          if (icon.classList.contains('fa-fw')) {
+            newIcon+= " fa-fw"
+          }
+          old= icon.classList.value
+          icon.classList.value= newIcon
+        }
+
+        func.call(this, act).finally(() => {
+          if (icon) {
+            icon.classList.value= old;
+            act.disabled= false;
+          }
+        })
+      }
+    })
+  }
+
 }
 
 let scat= new ScatUtils()
