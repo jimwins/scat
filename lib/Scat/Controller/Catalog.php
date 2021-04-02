@@ -21,10 +21,20 @@ class Catalog {
   }
 
   public function search(Request $request, Response $response,
+                          \Scat\Service\Txn $txn,
                           \Scat\Service\Search $search)
   {
     $q= trim($request->getParam('q'));
     $scope= $request->getParam('scope');
+
+    if (preg_match('/^((%V|@)INV-)?(\d+)/', $q, $m)) {
+      $match= $txn->fetchById($m[3]);
+      if ($match) {
+        return $response->withRedirect(
+          ($type == 'customer' ? '/sale/' : '/purchase/') . $match->id
+        );
+      }
+    }
 
     if ($scope == 'items') {
       $items= $search->searchItems($q);
