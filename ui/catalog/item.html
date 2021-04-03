@@ -755,7 +755,7 @@
       let id= ev.target.getAttribute('aria-describedby')
       let popover= document.getElementById(id)
       let input= popover.querySelector('input, select')
-      if (input) input.focus()
+      if (input) { input.select(); input.focus(); }
     })
 
     $('.editable-select2').editable({
