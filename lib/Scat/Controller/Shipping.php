@@ -109,6 +109,10 @@ class Shipping {
           $txn->save();
         }
 
+        if ($txn->type != 'customer') {
+          break;
+        }
+
         if ($txn->online_sale_id) {
           try {
             $this->ordure->markOrderShipped($txn->uuid);
@@ -176,6 +180,10 @@ class Shipping {
           }
         }
 
+        if ($txn->type != 'customer') {
+          break;
+        }
+
         $subject= $this->view->fetchBlock('email/delivered.html', 'title', [
           'tracker' => $tracker,
           'delivered' => $delivered,
@@ -197,6 +205,10 @@ class Shipping {
       case 'available_for_pickup':
         // send order available for pickup
         $txn= $shipment->txn();
+
+        if ($txn->type != 'customer') {
+          break;
+        }
 
         if (!$txn->person()->email) {
           error_log("Don't know the email for txn {$txn->id}, can't update");
