@@ -202,6 +202,7 @@ class Transactions {
 
   /* Items (aka lines) */
   public function addItem(Request $request, Response $response,
+                          \Scat\Service\PoleDisplay $pole,
                           \Scat\Service\Catalog $catalog, $id)
   {
     $txn= $this->txn->fetchById($id);
@@ -291,7 +292,7 @@ class Transactions {
     $txn->applyPriceOverrides($catalog);
     $txn->recalculateTax($this->tax);
 
-    // TODO push new price to pole
+    $pole->displayPrice($item->name, $item->sale_price());
 
     $this->data->commit();
 
