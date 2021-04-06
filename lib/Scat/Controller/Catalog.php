@@ -27,7 +27,7 @@ class Catalog {
     $q= trim($request->getParam('q'));
     $scope= $request->getParam('scope');
 
-    if (preg_match('/^((%V|@)INV-)?(\d+)/', $q, $m)) {
+    if (preg_match('/^((%V|@)INV-)(\d+)/', $q, $m)) {
       $match= $txn->fetchById($m[3]);
       if ($match) {
         return $response->withRedirect(
