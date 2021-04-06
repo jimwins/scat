@@ -61,7 +61,6 @@
         "respect/validation": "^2.0",
         "wildbit/postmark-php": "^2.11",
         "stripe/stripe-php": "^7.41",
-        "shippo/shippo-php": "^1.4",
         "amzn/amazon-pay-sdk-php": "^3.6",
         "paypal/paypal-checkout-sdk": "^1.0",
         "amzn/amazon-pay-api-sdk-php": "^2.2",

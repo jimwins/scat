@@ -1173,9 +1173,7 @@ class Transactions {
 
     /* New tracking code? */
     if (($tracking_code= $request->getParam('tracking_code'))) {
-      $shipment->method= $request->getParam('method');
       $shipment->tracker_id= $shipping->createTracker(
-        $shipment->method,
         $tracking_code,
         $request->getParam('carrier'),
       );

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a54039b8f58208af66fc3cd55082f167",
+    "content-hash": "2f7f4e6a9eb23e15f678cfc53542568c",
     "packages": [
         {
             "name": "amzn/amazon-pay-api-sdk-php",
@@ -4431,64 +4431,6 @@
                 }
             ],
             "time": "2020-08-27T06:55:47+00:00"
-        },
-        {
-            "name": "shippo/shippo-php",
-            "version": "v1.4.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/goshippo/shippo-php-client.git",
-                "reference": "a2edfa7766f322ef9b719710a5b90df089a4008e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/goshippo/shippo-php-client/zipball/a2edfa7766f322ef9b719710a5b90df089a4008e",
-                "reference": "a2edfa7766f322ef9b719710a5b90df089a4008e",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "php": ">=5.2"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "5.5.*"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "lib/Shippo/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Shippo & Contributors",
-                    "homepage": "https://goshippo.com/"
-                }
-            ],
-            "description": "A PHP library for connecting with multiple carriers (FedEx, UPS, USPS) using Shippo.",
-            "homepage": "https://goshippo.com/",
-            "keywords": [
-                "FedEx",
-                "Uber",
-                "address",
-                "dhl",
-                "shipping",
-                "shyp",
-                "tracking",
-                "ups",
-                "usps"
-            ],
-            "support": {
-                "issues": "https://github.com/goshippo/shippo-php-client/issues",
-                "source": "https://github.com/goshippo/shippo-php-client/tree/v1.4.4"
-            },
-            "time": "2020-09-14T13:26:17+00:00"
         },
         {
             "name": "slim/http",
