@@ -130,25 +130,6 @@ Scat.getFocusedElement= function() {
               elem.className.includes("select2-selection") ) ? elem : [] );
 };
 
-$(function() {
-  $(document).keydown(function(ev) {
-    if (ev.keyCode == 16 || ev.keyCode == 17
-        || ev.keyCode == 18 || ev.keyCode == 91
-        || ev.metaKey || ev.altKey || ev.ctrlKey) {
-      return true;
-    }
-    var el= Scat.getFocusedElement();
-    if (!el.length &&
-        !$('#simplemodal-overlay').length && !$('.modal-backdrop').length) {
-      var inp= $('.autofocus', this);
-      if (ev.keyCode != 13) {
-        inp.val('');
-      }
-      inp.focus();
-    }
-  });
-});
-
 ko.bindingHandlers.cleave= {
   init: function(element, valueAccessor, allBindingsAccessor) {
     var options= allBindingsAccessor().cleaveOptions || {};

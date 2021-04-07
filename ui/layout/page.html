@@ -224,6 +224,32 @@
 <div id="notification-holder"></div>
 
 {% block script %}{% endblock %}
+<script>
+
+  document.addEventListener('keydown', (ev) => {
+    if (([ 16, 17, 18, 91, 92, 93 ].indexOf(ev.keyCode) != -1) ||
+        ev.metaKey || ev.altKey || ev.ctrlKey)
+    {
+      // nothing special for modifier keys (shift, ctrl, alt, etc)
+      return true
+    }
+
+    var el= document.activeElement
+
+    if (!el.type && !el.href && !el.className.includes("select2-selection")) {
+      var doc= (document.getElementById('simplemodal-overlay') ??
+                document.querySelector('.modal-dialog') ??
+                document)
+      var inp= doc.querySelector('.autofocus')
+      if (inp) {
+        if (ev.keyCode != 13) {
+          inp.value= ''
+        }
+        inp.focus()
+      }
+    }
+  })
+</script>
 
 </body>
 </html>
