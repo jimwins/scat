@@ -240,7 +240,7 @@ class ScatUtils {
           let lpr= document.createElement('iframe')
           lpr.style.display= 'none'
           lpr.addEventListener('load', (ev) => {
-            ev.target.contentWindow.print()
+            setTimeout((() => ev.target.contentWindow.print()), 500)
           })
           // holy moly, this is magic!
           lpr.src= URL.createObjectURL(blob)
