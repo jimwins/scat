@@ -22,9 +22,9 @@
 {% endblock %}
 
 {% block search %}
-  <form id="search" class="form form-inline">
+  <form class="form form-inline" data-action="search">
     <div class="input-group">
-      <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
+      <span class="input-group-addon"><i class="fa fa-fw fa-barcode"></i></span>
       <input type="hidden" name="scope" value="items">
       <input type="text" class="form-control autofocus"
              name="q"
@@ -94,7 +94,7 @@
             <td>
               {% if not line.kit_id %}
                 <a data-action="remove-item" class="btn btn-link btn-xs">
-                  <i class="fa fa-trash-o"></i>
+                  <i class="fa fa-fw fa-trash-o"></i>
                 </a>
               {% endif %}
             </td>
@@ -364,7 +364,7 @@
       {% endif %}
 
       {% if txn.status in [ 'paid' ] %}
-        <a data-action="print-packing-slip-and-start-processing"
+        <a data-action="print-packing-slip-and-process"
             class="btn btn-block btn-success">
           <i class="fa fa-print"></i>
           Print Packing Slip
@@ -488,73 +488,62 @@
         })
     }
 
-    let actions= {
+    scat.handleAction('click', 'add-item', (act) => {
+      let item_id= act.closest('[data-id]').getAttribute('data-id')
 
-      addItem: (ev) => {
-        let item_id= ev.target.closest('[data-id]').getAttribute('data-id')
+      return addItemById(item_id).then((res) => {
+        let choices= act.closest('.choices')
+        if (choices) choices.parentElement.removeChild(choices)
+      })
+    })
 
-        return addItemById(item_id).then((res) => {
-          let choices= ev.target.closest('.choices')
-          if (choices) choices.parentElement.removeChild(choices)
+    scat.handleAction('click', 'remove-item', (act) => {
+      let line_id= act.closest('[data-id]').getAttribute('data-id')
+
+      return scat.delete('/sale/{{ txn.id }}/item/' + line_id)
+        .then((res) => {
+          scat.reload('invoice', 'sidebar') // XXX reload less of sidebar?
         })
-      },
+    })
 
-      removeItem: (ev) => {
-        let line_id= ev.target.closest('[data-id]').getAttribute('data-id')
+    scat.handleAction('click', 'set-status', (act) => {
+      let status= act.closest('[data-status]').getAttribute('data-status')
+      return scat.patch("/sale/{{ txn.id}}", { status: status })
+        .then((res) => {
+          scat.reload('sidebar')
+        })
+    })
 
-        return scat.delete('/sale/{{ txn.id }}/item/' + line_id)
-          .then((res) => {
-            scat.reload('invoice', 'sidebar') // XXX reload less of sidebar?
-          })
-      },
-
-      setStatus: (ev) => {
-        let status= ev.target.closest('[data-status]').getAttribute('data-status')
-        return scat.patch("/sale/{{ txn.id}}", { status: status })
-          .then((res) => {
-            scat.reload('sidebar')
-          })
-      },
-
-      sendCannedMessage: (ev) => {
-        var message= ev.target.closest('[data-message]').getAttribute('data-message')
-        scat.dialog({}, '/sale/{{ txn.id }}/email-invoice-form', { canned: message })
-      },
-
-      createShipment: (ev) => {
-        scat.dialog([], '/sale/{{ txn.id }}/shipment')
-      },
-
-    }
-
-    document.addEventListener('click', (ev) => {
-      let match= ev.target.closest('[data-action]')
-      if (match) {
-        let action= match.getAttribute('data-action');
-        let func= action.replaceAll(/-./g, (m) => { return m[1].toUpperCase() })
-
-        if (actions[func]) {
-          ev.stopPropagation();
-          ev.preventDefault();
-
-          actions[func](ev)
-          .catch((err) => {
-            scat.alert('danger', err.message)
-          })
-          .finally(() => {
-            // restore button
-          })
-        } else {
-          scat.alert('danger', `Unknown action ${action}.`)
+    scat.handleAction('click', 'print-packing-slip-and-process', (act) => {
+      scat.printDocument(
+        'invoice',
+        {
+          id: {{ txn.id }},
+          variation: 'packing-slip'
         }
-      }
+      )
+      return scat.patch("/sale/{{ txn.id}}", { status: 'processing' })
+        .then((res) => {
+          scat.reload('sidebar')
+        })
     })
 
-    document.getElementById('search').addEventListener('submit', (ev) => {
-      ev.stopPropagation();
-      ev.preventDefault();
-      return findAndAddItem(ev.target)
+    scat.handleAction('click', 'send-canned-message', (act) => {
+      var message= act.closest('[data-message]').getAttribute('data-message')
+      scat.dialog(
+        {},
+        '/sale/{{ txn.id }}/email-invoice-form',
+        { canned: message }
+      )
+      return Promise.resolve()
     })
+
+    scat.handleAction('click', 'create-shipment', (act) => {
+      scat.dialog([], '/sale/{{ txn.id }}/shipment')
+      return Promise.resolve()
+    })
+
+    scat.handleQueuedAction('submit', 'search', findAndAddItem)
   </script>
 
   <template id="item-not-found">
