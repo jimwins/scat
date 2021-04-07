@@ -355,6 +355,46 @@ class ScatUtils {
     })
   }
 
+  // from https://advancedweb.hu/how-to-serialize-calls-to-an-async-function/
+  serialize (fn) {
+    let queue= Promise.resolve();
+    return (...args) => {
+      const res= queue.then(() => fn(...args));
+      queue= res.catch(() => {});
+      return res;
+    };
+  }
+
+  handleQueuedAction (eventName, action, func) {
+    document.addEventListener(eventName, (ev) => {
+      let act= ev.target.closest('[data-action]')
+      if (act && act.getAttribute('data-action') === action) {
+        ev.stopPropagation(); ev.preventDefault();
+
+        let icon= act.querySelector('i.fa')
+        if (icon) {
+          let newIcon= 'fa fa-spinner fa-spin'
+          if (icon.classList.contains('fa-fw')) {
+            newIcon+= " fa-fw"
+          }
+          if (!icon.old) {
+            icon.old= icon.classList.value
+          }
+          icon.classList.value= newIcon
+        }
+
+        let fn= this.serialize((() => {
+          func.call(this, act).finally(() => {
+            if (icon) {
+              icon.classList.value= icon.old;
+            }
+          })
+        })());
+
+        return fn();
+      }
+    })
+  }
 }
 
 let scat= new ScatUtils()
