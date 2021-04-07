@@ -169,7 +169,10 @@ Txn.findAndAddItem= function(q) {
                  "<td align='right'>" + amount(item.sale_price ? item.sale_price : item.retail_price) + "</td>" +
                  "</tr>");
         n.click(item, function(ev) {
-          Txn.addItem(Txn.id(), ev.data);
+          return Txn.addItem(Txn.id(), ev.data)
+            .then((res) => {
+              choices.remove()
+            });
         });
         list.append(n);
       });
