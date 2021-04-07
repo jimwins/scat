@@ -143,7 +143,7 @@
       </tr>
       <tr>
         <td class="right" colspan="{{ span }}">
-          Sales Tax {% if txn.tax_rate %}({{ txn.tax_rate }}%){% endif %}:
+          Sales Tax {% if txn.tax_rate > 0 %}({{ txn.tax_rate }}%){% endif %}:
         </td>
         <td class="price">{{ scat.amount(txn.total - txn.subtotal) }}</td>
       </tr>
