@@ -90,7 +90,7 @@ class ScatUtils {
     lpr.addEventListener('load', (ev) => {
       /* If we got JSON, we printed directly */
       if (ev.target.contentDocument.contentType != 'application/json') {
-        ev.target.contentWindow.print()
+        setTimeout((() => ev.target.contentWindow.print()), 500)
       }
     })
 

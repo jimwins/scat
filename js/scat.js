@@ -52,7 +52,7 @@ Scat.print= function(name, options) {
   lpr.on("load", function() {
     /* If we got JSON, we printed directly */
     if (this.contentDocument.contentType != 'application/json') {
-      this.contentWindow.print();
+      setTimeout((() => ev.target.contentWindow.print()), 500)
     }
   });
 
