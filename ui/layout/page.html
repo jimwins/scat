@@ -197,13 +197,13 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-          <a onclick="scat.dialog(this, '/note')">
+          <a data-action="show-notes">
             <i class="fa fa-sticky-note-o"></i>
             <span class="badge">{{ notes()|length }}</span>
           </a>
         </li>
         <li>
-          <a onclick="scat.dialog(this, '/report/quick')">
+          <a data-action="show-quick-report">
             <i class="fa fa-line-chart"></i>
           </a>
         </li>
@@ -248,6 +248,13 @@
         inp.focus()
       }
     }
+  })
+
+  scat.handleAction('click', 'show-notes', (act) => {
+    return scat.dialog([], '/note')
+  })
+  scat.handleAction('click', 'show-quick-report', (act) => {
+    return scat.dialog([], '/report/quick')
   })
 </script>
 
