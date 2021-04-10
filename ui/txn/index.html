@@ -71,7 +71,7 @@
             action="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}">
         <div class="input-group">
           <input type="hidden" name="status" value="{{ status }}">
-          <input type="text" class="form-control" autofocus
+          <input type="text" class="form-control autofocus"
                   name="q" value="{{ q }}">
           <span class="input-group-btn">
             <button type="submit" class="btn btn-default">
