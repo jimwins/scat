@@ -51,6 +51,7 @@ class Media
     $image->name= $res->title;
     $image->save();
 
+    return $image;
   }
 
   public function createFromStream($file, $name) {
