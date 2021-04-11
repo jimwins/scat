@@ -59,7 +59,7 @@ class Printer
     list ($pageType, $modifier)= explode(':', $pageType);
     $printer_name= $this->config->get('printer.' . $pageType);
 
-    if (!$printerManager || !$printer_name) {
+    if ($GLOBALS['DEBUG'] || !$printerManager || !$printer_name) {
       $response->getBody()->write($pdf);
       return $response->withHeader('Content-type', 'application/pdf');
     }

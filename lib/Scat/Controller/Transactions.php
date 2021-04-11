@@ -200,6 +200,20 @@ class Transactions {
     return $response->withJson($txn);
   }
 
+  public function printSaleInvoice(Request $request, Response $response,
+                                    \Scat\Service\Printer $print, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $var= $request->getParam('variation') ?: 'invoice';
+
+    $pdf= $txn->getInvoicePDF($var);
+
+    return $print->printPDF($response, 'letter', $pdf->Output('', 'S'));
+  }
+
   /* Items (aka lines) */
   public function addItem(Request $request, Response $response,
                           \Scat\Service\PoleDisplay $pole,
