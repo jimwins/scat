@@ -3,11 +3,12 @@ namespace Scat\Service;
 
 class Media
 {
-  private $config, $data;
+  private $config, $data, $ordure;
 
-  public function __construct(Config $config, Data $data) {
+  public function __construct(Config $config, Data $data, Ordure $ordure) {
     $this->config= $config;
     $this->data= $data;
+    $this->ordure= $ordure;
   }
 
   protected function getB2Client() {
@@ -17,18 +18,39 @@ class Media
   }
 
   public function createFromUrl($url) {
-    // Special hack to get full-size Salsify images
-    $url= str_replace('/c_limit,cs_srgb,h_600,w_600', '', $url);
+    $upload= $this->ordure->grabImage($url);
 
-    error_log("Creating image from URL '$url'\n");
+    $publitio= new \Publitio\API(
+      $this->config->get('publitio.key'),
+      $this->config->get('publitio.secret')
+    );
 
-    $client= new \GuzzleHttp\Client();
-    $response= $client->get($url);
+    $res= $publitio->call('/files/create', 'POST', [
+      'file_url' => $upload->path,
+      'public_id' => $upload->uuid,
+      'title' => $upload->name,
+      'privacy' => 1,
+      'option_ad' => 0,
+      'tags' => $GLOBALS['DEBUG'] ? 'debug' : '',
+    ]);
 
-    $file= $response->getBody();
-    $name= basename(parse_url($url, PHP_URL_PATH));
+    if (!$res->success) {
+      error_log(json_encode($res));
+      throw new \Exception($res->error->message ? $res->error->message :
+                           $res->message);
+    }
 
-    return $this->createFromStream($file, $name);
+    // Save the details
+    $image= $this->data->factory('Image')->create();
+    $image->uuid= $res->public_id;
+    $image->b2_file_id= $upload->id;
+    $image->publitio_id= $res->id;
+    $image->width= $res->width;
+    $image->height= $res->height;
+    $image->ext= $res->extension;
+    $image->name= $res->title;
+    $image->save();
+
   }
 
   public function createFromStream($file, $name) {

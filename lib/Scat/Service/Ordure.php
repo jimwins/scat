@@ -29,4 +29,20 @@ class Ordure
                            ]);
     // XXX do something with $res?
   }
+
+  public function grabImage($url) {
+    $client= new \GuzzleHttp\Client();
+    $res= $client->request('POST', $this->url . '/~grab-image',
+                           [
+                             'headers' => [
+                               'X-Requested-With' => 'XMLHttpRequest',
+                             ],
+                             'form_params' => [
+                               'key' => $this->key,
+                               'url' => $url,
+                             ]
+                           ]);
+
+    return json_decode($res->getBody());
+  }
 }
