@@ -391,7 +391,7 @@ $(function() {
     viewModel.showAdmin(true);
   });
 
-  scat.handleAction('submit', 'lookup', (act) => {
+  scat.handleQueuedAction('submit', 'lookup', (act) => {
     act.classList.remove('error');
 
     $('input[name="q"]', this).focus().select();
