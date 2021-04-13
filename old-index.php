@@ -139,7 +139,7 @@ Txn.removeItem= function (id, item) {
 
 Txn.findAndAddItem= function(q) {
   // go find!
-  return fetch('/catalog/search?scope=items&q=' + encodeURI(q), {
+  return fetch('/catalog/search?scope=items&limit=50&q=' + encodeURI(q), {
     headers: { 'Accept': 'application/json' }
   })
   .then((res) => {
@@ -163,8 +163,8 @@ Txn.findAndAddItem= function(q) {
       var list= $('<table class="table table-condensed" style="width: 95%;">');
       $.each(data.items, function(i,item) {
         var n= $("<tr" + (item.stock > 0 ? " class='stocked'" : "") + ">" +
+                 "<td><small>" + item.code + "</small></td>" +
                  "<td>" + item.name + "</td>" +
-                 // XXX "<td>" + item.brand + "</td>" +
                  "<td align='right'>" + (item.sale_price ? ("<s>" + amount(item.retail_price) + "</s>") : "") + "</td>" +
                  "<td align='right'>" + amount(item.sale_price ? item.sale_price : item.retail_price) + "</td>" +
                  "</tr>");

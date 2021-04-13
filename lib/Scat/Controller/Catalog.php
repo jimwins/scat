@@ -26,6 +26,7 @@ class Catalog {
   {
     $q= trim($request->getParam('q'));
     $scope= $request->getParam('scope');
+    $limit= $request->getParam('limit');
 
     if (preg_match('/^((%V|@)INV-)(\d+)/', $q, $m)) {
       $match= $txn->fetchById($m[3]);
@@ -37,7 +38,7 @@ class Catalog {
     }
 
     if ($scope == 'items') {
-      $items= $search->searchItems($q);
+      $items= $search->searchItems($q, $limit);
 
       /*
         Fallback: if we found nothing and it looks like a barcode, try
@@ -50,11 +51,11 @@ class Catalog {
 
       $data= [ 'items' => $items ];
     } elseif ($scope == 'products') {
-      $products= $search->searchProducts($q);
+      $products= $search->searchProducts($q, $limit);
 
       $data= [ 'products' => $products ];
     } else {
-      $data= $search->search($q);
+      $data= $search->search($q, $limit);
     }
 
     $accept= $request->getHeaderLine('Accept');

@@ -24,11 +24,11 @@ class Search
     $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
   }
 
-  public function search($q) {
+  public function search($q, $limit= null) {
     $items= $brands= $products= $errors= [];
 
     try {
-      $items= $this->searchItems($q);
+      $items= $this->searchItems($q, $limit);
     } catch (\Exception $e) {
       $errors[]= $e->getMessage();
     }
@@ -40,7 +40,7 @@ class Search
     }
 
     try {
-      $products= $this->searchProducts($q);
+      $products= $this->searchProducts($q, $limit);
     } catch (\Exception $e) {
       $errors[]= $e->getMessage();
     }
@@ -53,7 +53,7 @@ class Search
     ];
   }
 
-  public function searchItems($q) {
+  public function searchItems($q, $limit= null) {
     $scanner= new \OE\Lukas\Parser\QueryScanner();
     $parser= new \OE\Lukas\Parser\QueryParser($scanner);
     $parser->readString($q);
@@ -92,10 +92,12 @@ class Search
                                                $v->force_all ? 0 : 1)
                                    ->where_not_equal('item.deleted', 1)
                                    ->group_by('item.id')
-                                   ->order_by_expr('!(minimum_quantity > 0 OR stock != 0), item.code')
-                                   ->find_many();
+                                   ->order_by_expr('!(minimum_quantity > 0 OR stock != 0), item.code');
+    if ($limit) {
+      $items= $items->limit($limit);
+    }
 
-    return $items;
+    return $items->find_many();
   }
 
   public function searchBrands($q) {
@@ -105,7 +107,7 @@ class Search
             ->find_many();
   }
 
-  public function searchProducts($terms) {
+  public function searchProducts($terms, $limit) {
     # / trips up SphinxSearch parser, but we like to use it
     $terms= preg_replace('#([/])#', '\\/', $terms);
 
