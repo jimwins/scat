@@ -61,9 +61,10 @@ class Shipping
 
   public function createReturn($shipment) {
     $ep= \EasyPost\Shipment::retrieve($shipment->method_id);
+    // Keep original to/from, is_return signals to flip them
     $details= [
-      'to_address' => $ep->from_address,
-      'from_address' => $ep->to_address,
+      'to_address' => $ep->to_address,
+      'from_address' => $ep->from_address,
       'parcel' => $ep->parcel,
       'is_return' => true,
     ];
