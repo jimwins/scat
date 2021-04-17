@@ -118,7 +118,7 @@ class Printer
     file_put_contents($tmpfn, $png);
 
     $job->addFile($tmpfn, 'label.png', 'image/png');
-    $job->addAttribute('Rotate', '2');
+    //$job->addAttribute('Rotate', '2');
     $job->addAttribute('PageSize', 'Custom.6x4in');
 
     if ($modifier == 'open') {
