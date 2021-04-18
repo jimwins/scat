@@ -1,18 +1,24 @@
 {% extends 'layout/dialog.html' %}
 {% import 'macros.twig' as scat %}
 
+{% set preferred_rates= {
+  'USPS': [ 'Priority', 'ParcelSelect', 'First' ],
+  'GSO': [ 'CaliforniaParcelService' ],
+  'FedEx': [ 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY' ],
+  'UPS':  [ 'Ground' ],
+} %}
+
 {% block title %}
   Add Shipment
 {% endblock %}
 
 {% block body %}
   <div class="modal-body">
-
     {% if shipment %}
       {% if easypost %}
         <ul class="list-group">
           {% for rate in easypost.rates %}
-            <a href="#" data-rate="{{ rate.id }}" class="list-group-item">
+            <a href="#" data-rate="{{ rate.id }}" class="list-group-item {{ rate.service in preferred_rates[rate.carrier] ? 'preferred' : 'hidden' }}">
               <span class="badge">{{ scat.amount(rate.rate) }}</span>
               {{ rate.carrier }}: {{ rate.service }}
               {% if rate.delivery_days %}
@@ -20,6 +26,9 @@
               {% endif %}
             </a>
           {% endfor %}
+          <a data-action="show-all" class="list-group-item">
+            Show All
+          </a>
         </ul>
       {% endif %}
     {% else %}
@@ -190,4 +199,12 @@
       form.style.filter= ''
     })
   }
+
+  scat.handleAction('click', 'show-all', (act) => {
+    act.parentElement.querySelectorAll('.hidden').forEach((el) => {
+      el.classList.remove('hidden')
+    })
+    act.remove()
+    return Promise.resolve()
+  })
 {% endblock %}
