@@ -52,6 +52,10 @@ class Txn extends \Scat\Model {
       $this->items()->where_in('item_id', [ 11405, 87072, 89017 ])->find_one();
   }
 
+  public function has_hazmat_items() {
+    return $this->items()->join('item', [ 'item.id', '=', 'txn_line.item_id' ])->where_gt('item.hazmat', 0)->count();
+  }
+
   public function dropships() {
     return $this->has_many('Txn', 'returned_from_id')
                 ->where('type', 'vendor');

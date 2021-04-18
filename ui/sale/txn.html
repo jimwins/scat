@@ -550,8 +550,7 @@
     })
 
     scat.handleAction('click', 'create-shipment', (act) => {
-      scat.dialog([], '/sale/{{ txn.id }}/shipment')
-      return Promise.resolve()
+      return scat.dialog([], '/sale/{{ txn.id }}/shipment')
     })
 
     scat.handleQueuedAction('submit', 'search', findAndAddItem)
