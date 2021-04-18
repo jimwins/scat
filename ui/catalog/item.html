@@ -723,7 +723,7 @@
               return res.json()
             })
             .then((data) => {
-              $(el).popover('hide')
+              (($(el).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
               return reloadBlock(reload_el ? reload_el : el, data[name])
             })
             .catch((err) => {
@@ -738,7 +738,7 @@
             })
       })
       html.querySelector('.cancel').addEventListener('click', (ev) => {
-        $(el).popover('hide')
+        (($(el).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
       })
       return html
     }
@@ -761,7 +761,7 @@
       popover.dismisser= (ev) => {
         if (!popover.contains(ev.target)) {
           ev.stopPropagation(); ev.preventDefault();
-          $(target).popover('hide')
+          (($(target).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
         }
       }
       document.addEventListener('click', popover.dismisser, true)
@@ -958,7 +958,7 @@
                 let popover= document.getElementById(id)
                 if (!popover.contains(ev.target)) {
                   ev.stopPropagation(); ev.preventDefault();
-                  $(target).popover('hide')
+                  (($(target).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
                 }
               }
             }
