@@ -704,7 +704,7 @@
                   base_el.getAttribute('data-editable-base') :
                   "/catalog/item/{{ item.code }}")
       let reload_el= el.closest('[data-editable-reload]')
-      let html= scat.htmlToElement('<form><div class="form-group"><div class="input-group"><input type="text" name="" class="form-control" value=""><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-fw fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-fw fa-ban"></i></button></span></div><span class="help-block"></span></div></form>')
+      let html= scat.htmlToElement('<form><div class="form-group" style="margin-bottom: 0"><div class="input-group"><input type="text" name="" class="form-control" value=""><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-fw fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-fw fa-ban"></i></button></span></div><span class="help-block hidden" style="margin-bottom: 0"></span></div></form>')
       html.querySelector('input').setAttribute('name', name)
       html.querySelector('input').setAttribute('value', value)
       html.addEventListener('submit', (ev) => {
@@ -729,6 +729,7 @@
             .catch((err) => {
               let help= ev.target.querySelector('.help-block')
               help.innerText= err.message
+              help.classList.remove('hidden')
               ev.target
                 .querySelector('.form-group')
                 .classList.add('has-error')
@@ -752,10 +753,24 @@
     })
     .on('shown.bs.popover', (ev) => {
       // focus on the first input or select element
+      let target= ev.target
       let id= ev.target.getAttribute('aria-describedby')
       let popover= document.getElementById(id)
       let input= popover.querySelector('input, select')
       if (input) { input.select(); input.focus(); }
+      popover.dismisser= (ev) => {
+        if (!popover.contains(ev.target)) {
+          ev.stopPropagation(); ev.preventDefault();
+          $(target).popover('hide')
+        }
+      }
+      document.addEventListener('click', popover.dismisser, true)
+    })
+    .on('hide.bs.popover', (ev) => {
+      let id= ev.target.getAttribute('aria-describedby')
+      let popover= document.getElementById(id)
+      if (popover && popover.dismisser)
+        document.removeEventListener('click', popover.dismisser, true)
     })
 
     $('.editable-select2').editable({
@@ -934,8 +949,33 @@
             title: 'Stock',
             content: message,
             html: true,
-            trigger: 'focus'
           }).popover('show')
+          .on('shown.bs.popover', (ev, x, y) => {
+            let target= ev.target
+            ev.target.dismisser= (ev) => {
+              let id= target.getAttribute('aria-describedby')
+              if (id) {
+                let popover= document.getElementById(id)
+                if (!popover.contains(ev.target)) {
+                  ev.stopPropagation(); ev.preventDefault();
+                  $(target).popover('hide')
+                }
+              }
+            }
+            document.addEventListener('click', ev.target.dismisser, true)
+          })
+          .on('hide.bs.popover', (ev) => {
+            let target= ev.target
+            if (ev.target.dismisser) {
+              document.removeEventListener('click', ev.target.dismisser, true)
+              ev.target.dismisser= null
+            }
+          })
+          .on('hidden.bs.popover', (ev) => {
+            // actually calls hide() so this gets called again, but
+            // just spits out console errors and does what we want
+            $(act).popover('destroy')
+          })
         })
         .finally(() => {
           icon.classList.remove('fa-spin','fa-spinner')
