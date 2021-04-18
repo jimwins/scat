@@ -64,6 +64,9 @@ class ScatUtils {
         from.disabled= false
       })
     })
+    .catch((err) => {
+      scat.alert('danger', err.message)
+    })
   }
 
   generateSlug (...parts) {
