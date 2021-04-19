@@ -98,6 +98,9 @@
   $('[name="vendor_id"]', form).select2({
     ajax: {
       url: '/person/search',
+      data: function (params) {
+        return { q: params.term + ' role:vendor', '_type': 'query' }
+      },
       datatype: 'json',
       processResults: function (data) {
         return {
