@@ -77,7 +77,8 @@
   let preventDefaults= (ev) => {
     if (ev.dataTransfer.files.length ||
         ev.dataTransfer.types.includes('Files') ||
-        ev.dataTransfer.types.includes('text/uri-list'))
+        ev.dataTransfer.types.includes('text/uri-list') ||
+        ev.dataTransfer.types.includes('text/plain'))
     {
       ev.preventDefault()
       ev.stopPropagation()
@@ -115,7 +116,7 @@
     let fileUrl= dt.getData('text/uri-list')
     if (!fileUrl) fileUrl= dt.getData('text/plain')
 
-    if (fileUrl) {
+    if (fileUrl && fileUrl.startsWith('http')) { // has to look like URL
       formData.append('url', fileUrl)
     } else if (files.length) {
       formData.append('file', files[0])
