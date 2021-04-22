@@ -314,6 +314,8 @@ var paymentMethods= <?=json_encode(\Scat\Model\Payment::$methods)?>;
 function formatMethod(payment) {
   if (payment.method() == 'discount' && payment.discount()) {
     return 'Discount (' + payment.discount() + '%):';
+  } elseif (payment.method() == 'credit' || payment.method() == 'stripe') {
+    return payment.cc_type + (payment.cc_lastfour ? ' ending in ' + payment.cc_lastfour : '') + ':'
   } else {
     return paymentMethods[payment.method()] + ':';
   }
