@@ -57,6 +57,7 @@
       <th style="text-align: right">Retail</th>
       <th style="text-align: right">Net</th>
       <th style="text-align: right">Promo</th>
+      <th>Barcode</th>
     </tr>
   </thead>
   <tbody>
@@ -87,6 +88,7 @@
             {{ i.promo_quantity }}
           {% endif %}
         </td>
+        <td>{{ i.barcode }}</td>
       </tr>
     {% endfor %}
   </tbody>
