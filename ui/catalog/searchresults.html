@@ -56,6 +56,7 @@
 
   {# Item(s) #}
   {% if items|length %}
+    <h3>{{ items|length }} matches</h3>
     {% include 'catalog/item-list.twig' %}
   {% endif %}
 
