@@ -24,13 +24,16 @@ class Tax
 
     $response= $client->post($uri, [ 'json' => array_merge($cred, $params) ]);
 
-    $data= json_decode($response->getBody());
+    $body= $response->getBody();
+    $data= json_decode($body);
 
     if (json_last_error() != JSON_ERROR_NONE) {
       throw new \Exception(json_last_error_msg());
     }
 
     if (property_exists($data, 'ErrNumber') && $data->ErrNumber != "0") {
+      file_put_contents("/tmp/taxcloud-in.json", json_encode($params));
+      file_put_contents("/tmp/taxcloud-out.json", $body);
       throw new \Exception($data->ErrDescription);
     }
 
