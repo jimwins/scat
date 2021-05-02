@@ -129,6 +129,7 @@ class Report
   public function kitItems() {
     return [ "items" => $this->data->factory('Item')
                              ->select('*')
+                             ->distinct()
                              ->select_expr('(SELECT SUM(allocated)
                                                FROM txn_line
                                               WHERE item.id = txn_line.item_id)',
