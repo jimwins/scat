@@ -135,7 +135,8 @@ class Report
                                            'stock')
                              ->select_expr('(SELECT COUNT(*)
                                                FROM kit_item
-                                              WHERE item.id = kit_item.item_id)',
+                                               JOIN item i2 ON kit_item.kit_id = i2.id
+                                              WHERE i2.active AND item.id = kit_item.item_id)',
                                            'in_kit')
                              ->where_gt('active', 0)
                              ->where_gt('purchase_quantity', 0)
