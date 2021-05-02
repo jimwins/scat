@@ -129,7 +129,6 @@ class Report
   public function kitItems() {
     return [ "items" => $this->data->factory('Item')
                              ->select('*')
-                             ->distinct()
                              ->select_expr('(SELECT SUM(allocated)
                                                FROM txn_line
                                               WHERE item.id = txn_line.item_id)',
@@ -138,6 +137,7 @@ class Report
                              ->where_gt('active', 0)
                              ->where_gt('purchase_quantity', 0)
                              ->where_not_equal('is_kit', 1)
+                             ->group_by('code')
                              ->order_by_asc('code')
                              ->find_many() ];
   }
