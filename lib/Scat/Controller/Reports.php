@@ -38,6 +38,11 @@ class Reports {
     return $this->view->render($response, 'report/backordered-items.html', $data);
   }
 
+  public function kitItems(Request $request, Response $response) {
+    $data= $this->report->kitItems();
+    return $this->view->render($response, 'report/kit-items.html', $data);
+  }
+
   public function oldReport(Request $request, Response $response, $name) {
     ob_start();
     include "../old-report/report-$name.php";
