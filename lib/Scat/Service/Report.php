@@ -120,7 +120,7 @@ class Report
                                            'stock')
                              ->where_gt('active', 0)
                              ->where_gt('purchase_quantity', 0)
-                             ->where_not('is_kit')
+                             ->where_not_equal('is_kit', 1)
                              ->having_lt('stock', 0)
                              ->order_by_asc('code')
                              ->find_many() ];
