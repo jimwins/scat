@@ -133,11 +133,14 @@ class Report
                                                FROM txn_line
                                               WHERE item.id = txn_line.item_id)',
                                            'stock')
-                             ->join('kit_item', [ 'item.id', '=', 'kit_item.item_id' ])
+                             ->select_expr('(SELECT COUNT(*)
+                                               FROM kit_item
+                                              WHERE item.id = kit_item.item_id)',
+                                           'in_kit')
                              ->where_gt('active', 0)
                              ->where_gt('purchase_quantity', 0)
                              ->where_not_equal('is_kit', 1)
-                             ->group_by('code')
+                             ->having_gt('in_kit', 0)
                              ->order_by_asc('code')
                              ->find_many() ];
   }
