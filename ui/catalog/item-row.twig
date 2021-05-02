@@ -38,15 +38,15 @@
     {% if i.product_id %}
       <br>
       <small class="product-link text-muted ">
-        <a href="{{ i.product.dept.parent.full_slug }}">
+        <a href="{{ url_for('catalog', { 'dept' : i.product.dept.parent.slug }) }}">
           {{ i.product.dept.parent.name }}
         </a>
         /
-        <a href="{{ i.product.dept.full_slug }}">
+        <a href="{{ url_for('catalog', { 'dept' : i.product.dept.parent.slug, 'subdept' : i.product.dept.slug }) }}">
           {{ i.product.dept.name }}
         </a>
         /
-        <a href="{{ i.product.full_slug }}">
+        <a href="{{ url_for('catalog', { 'dept' : i.product.dept.parent.slug, 'subdept' : i.product.dept.slug, 'product' : i.product.slug }) }}">
           {{ i.product.name }}
         </a>
       </small>
