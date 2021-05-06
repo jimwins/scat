@@ -49,7 +49,7 @@ Scat.print= function(name, options) {
   var url= '/print/' + name + '.php?' + $.param(options);
   var lpr= $('<iframe id="scat-print" src="' + url + '"></iframe>').hide();
 
-  lpr.on("load", function() {
+  lpr.on("load", function(ev) {
     /* If we got JSON, we printed directly */
     if (this.contentDocument.contentType != 'application/json') {
       setTimeout((() => ev.target.contentWindow.print()), 500)
