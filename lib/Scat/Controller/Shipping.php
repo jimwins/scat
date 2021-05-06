@@ -87,13 +87,20 @@ class Shipping {
 
   function handleUpdate($shipment, $tracker) {
     if ($shipment->status != $tracker->status) {
+      $status= $tracker->status;
+      $shipped= null;
+
       switch ($tracker->status) {
       case 'pre_transit':
         /* We treat pre_transit/arrived_at_facility as in_transit */
-        $last= $tracker->tracking_details[count($tracker->tracking_details)-1];
-        if ($last->status_detail != 'arrived_at_facility') {
-          break;
+        foreach ($tracker->tracking_details as $details) {
+          if ($details->status_detail == 'arrived_at_facility') {
+            $shipped= $details;
+            $status= 'in_transit';
+            break;
+          }
         }
+        if (!$shipped) break;
         /* FALLTHROUGH */
       case 'in_transit':
         // send order shipped email
@@ -126,13 +133,13 @@ class Shipping {
           break;
         }
 
-        foreach ($tracker->tracking_details as $details) {
-          if ($details->status == 'in_transit' ||
-              ($details->status == 'pre_transit' &&
-                $details->status_detail = 'arrived_at_facility'))
-          {
-            $shipped= $details->datetime;
-            break;
+        if (!$shipped) {
+          foreach ($tracker->tracking_details as $details) {
+            if ($details->status == 'in_transit')
+            {
+              $shipped= $details->datetime;
+              break;
+            }
           }
         }
 
@@ -239,7 +246,6 @@ class Shipping {
 
         break;
 
-      case 'pre_transit':
       case 'out_for_delivery':
       case 'return_to_sender':
       case 'failure':
@@ -251,7 +257,7 @@ class Shipping {
         throw new \Exception("Did not understand new shipping status {$tracker->status}");
       }
 
-      $shipment->status= $tracker->status;
+      $shipment->status= $status;
       $shipment->save();
     }
   }
