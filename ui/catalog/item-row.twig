@@ -71,8 +71,9 @@
           data-name="discount" data-value="{{ i.discount }}">
       {{ scat.amount(i.sale_price) }}
       {% if i.discount_type in [ 'percentage', 'relative' ] %}
-        <br>
-        <small>{{ scat.format_discount(i) }}</small>
+        <div>
+          <small>{{ scat.format_discount(i) }}</small>
+        </div>
       {% endif %}
     </span>
   </td>
