@@ -353,7 +353,6 @@ class Shipping {
       }, $addresses);
 
       $parcels= [
-/*
         [
           'name' => '6x6x4 12oz',
           'length' => 6.25,
@@ -424,7 +423,7 @@ class Shipping {
           'height' => 19.5,
           'weight' => 3 * 16,
         ],
-*/
+/*
         [
           'name' => '15x18x8 5lb',
           'length' => 15,
@@ -467,6 +466,7 @@ class Shipping {
           'height' => 5,
           'weight' => 30 * 16,
         ],
+*/
       ];
 
       $parcels= array_map(function($parcel) {
