@@ -48,7 +48,7 @@ default:
   break;
 }
 
-$q= "SELECT DATE_FORMAT(filled, '$format') AS span,
+$q= "SELECT DATE_FORMAT(paid, '$format') AS span,
             SUM(taxed + untaxed) AS total,
             SUM(IF(tax_rate OR uuid, 0, taxed + untaxed)) AS resale,
             SUM(IF(uuid, tax,
@@ -63,12 +63,12 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
               AS pickup,
             SUM(IF(shipping_address_id > 1, untaxed + taxed + tax, 0))
               AS shipped,
-            MIN(DATE(filled)) AS raw_date,
+            MIN(DATE(paid)) AS raw_date,
             COUNT(*) AS transactions
        FROM (SELECT 
                     txn.uuid,
                     txn.online_sale_id, txn.shipping_address_id,
-                    filled,
+                    paid,
                     CAST(ROUND_TO_EVEN(
                       SUM(IF(txn_line.taxfree, 1, 0) *
                         IF(type = 'customer', -1, 1) * ordered *
@@ -91,8 +91,8 @@ $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
                LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
                     JOIN item ON (txn_line.item_id = item.id)
                     JOIN brand ON (item.brand_id = brand.id)
-              WHERE filled IS NOT NULL
-                AND filled BETWEEN $begin AND $end
+              WHERE paid IS NOT NULL
+                AND paid BETWEEN $begin AND $end
                 AND type = 'customer'
                 AND code NOT LIKE 'ZZ-gift%'
                 AND ($items)
