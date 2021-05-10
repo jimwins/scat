@@ -439,7 +439,14 @@
 
     let findAndAddItem= (form) => {
       let formData= new FormData(form)
-      form.elements['q'].parentNode.classList.remove('has-error');
+      let q= form.elements['q']
+
+      // clear error
+      q.parentNode.classList.remove('has-error');
+
+      // focus and select so more typing will overwrite the query
+      q.focus()
+      q.select()
 
       return scat.get('/catalog/search', formData, {
         headers: { 'Accept': 'application/json' }
