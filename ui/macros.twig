@@ -126,17 +126,12 @@
       return Promise.reject(new Error("No file dropped."))
     }
 
-/*
- *  TODO short-circuit this now, dialog works different
-    scat.dialog([], '/dialog/file-upload.html')
-    .then((modal) => {
+    scat.dialog('/dialog/file-upload.html', null, (modal) => {
       return scat.post(url, formData)
       .finally((res) => {
-        modal.modal('hide')
+        $(modal).modal('hide')
       })
     })
-*/
-    return scat.post(url, formData)
     .then((res) => {
       {% if reload %}
         window.location.reload()

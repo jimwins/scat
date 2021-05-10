@@ -107,7 +107,7 @@
     let row= ev.target.closest('[data-id]')
     let id= row ? row.getAttribute('data-id') : 0;
 
-    scat.dialog([], '/catalog/price-override-form', { id: id })
+    scat.dialog('/catalog/price-override-form', { id: id })
   })
 </script>
 {% endblock %}

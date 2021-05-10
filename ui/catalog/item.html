@@ -914,7 +914,7 @@
       if (act && act.getAttribute('data-action') === 'edit-vendor-item') {
         let vi= ev.target.closest('[data-id]')
         let id= vi ? vi.getAttribute('data-id') : 0
-        scat.dialog(ev.target, '/catalog/vendor-item' + (id ? '/' + id : ''), {
+        scat.dialog('/catalog/vendor-item' + (id ? '/' + id : ''), {
           item_id: {{ item.id }}
         })
       }

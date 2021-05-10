@@ -103,7 +103,7 @@
       ev.preventDefault();
 
       let id= ev.target.closest('[data-id]').getAttribute('data-id')
-      scat.dialog([], '/catalog/item?vendor_item_id=' + id)
+      scat.dialog('/catalog/item?vendor_item_id=' + id)
     })
 
     document.addEventListener('click', (ev) => {

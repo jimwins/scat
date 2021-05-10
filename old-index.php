@@ -217,7 +217,7 @@ Txn.askAboutTaxExemption= function(person) {
 }
 
 Txn.choosePayMethod= function() {
-  scat.dialog([], '/sale/' + Txn.id() + '/payment')
+  scat.dialog('/sale/' + Txn.id() + '/payment')
 }
 
 Txn.allocate= function(txn) {
@@ -372,7 +372,7 @@ function emailInvoice() {
     Scat.alert("No sale to email.");
     return false;
   }
-  scat.dialog({}, '/sale/' + txn + '/email-invoice-form')
+  scat.dialog('/sale/' + txn + '/email-invoice-form')
   return false;
 }
 
@@ -1520,7 +1520,7 @@ viewModel.setStatus= (x,ev,status) => {
 viewModel.editShippingAddress= () => {
   var id= Txn.id()
 
-  scat.dialog([], '/sale/' + id + '/shipping-address')
+  scat.dialog('/sale/' + id + '/shipping-address')
 }
 
 viewModel.setInstorePickup= () => {
@@ -1543,19 +1543,19 @@ viewModel.setInstorePickup= () => {
 viewModel.createDropShip= () => {
   var id= Txn.id()
 
-  scat.dialog([], '/sale/' + id + '/dropship')
+  scat.dialog('/sale/' + id + '/dropship')
 }
 
 viewModel.addShippingTracker= () => {
   var id= Txn.id()
 
-  scat.dialog([], '/sale/' + id + '/shipment?tracker=1')
+  scat.dialog('/sale/' + id + '/shipment?tracker=1')
 }
 
 viewModel.createShipment= () => {
   var id= Txn.id()
 
-  scat.dialog([], '/sale/' + id + '/shipment')
+  scat.dialog('/sale/' + id + '/shipment')
 }
 
 viewModel.rerateShipment= (shipment) => {
@@ -1563,14 +1563,14 @@ viewModel.rerateShipment= (shipment) => {
 
   scat.patch('/sale/' + id + '/shipment/' + shipment.id(), { rerate: 1 })
   .then((res) => {
-    scat.dialog([], '/sale/' + id + '/shipment/' + shipment.id())
+    scat.dialog('/sale/' + id + '/shipment/' + shipment.id())
   })
 }
 
 viewModel.finalizeShipment= (shipment) => {
   var id= Txn.id()
 
-  scat.dialog([], '/sale/' + id + '/shipment/' + shipment.id())
+  scat.dialog('/sale/' + id + '/shipment/' + shipment.id())
 }
 
 viewModel.printShipmentLabel= (shipment) => {
@@ -1582,7 +1582,7 @@ viewModel.printShipmentLabel= (shipment) => {
 viewModel.cannedMessage= (data, ev) => {
   var id= Txn.id()
   var message= ev.currentTarget.getAttribute('data-message')
-  scat.dialog({}, '/sale/' + id + '/email-invoice-form', { canned: message })
+  scat.dialog('/sale/' + id + '/email-invoice-form', { canned: message })
 }
 
 viewModel.deleteTransaction= function() {
@@ -1643,7 +1643,7 @@ viewModel.reopenAllocated= function() {
 }
 
 viewModel.showNotes= function() {
-  scat.dialog(this, '/note?kind=txn&attach_id=' + Txn.id())
+  scat.dialog('/note?kind=txn&attach_id=' + Txn.id())
 }
 
 viewModel.removeItem= function(item) {
@@ -1876,7 +1876,7 @@ viewModel.printGiftCard= function(item) {
 
 viewModel.emailGiftCard= function(item) {
   var card= item.data.card();
-  scat.dialog([], '/gift-card/' + card + '/email-form')
+  scat.dialog('/gift-card/' + card + '/email-form')
 }
 
 viewModel.payTransaction= function() {

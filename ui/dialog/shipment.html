@@ -190,7 +190,7 @@
     .then((res) => res.json())
     .then((data) => {
       $(dialog).modal('hide')
-      scat.dialog([], '/sale/{{ txn.id }}/shipment/' + data.id)
+      scat.dialog('/sale/{{ txn.id }}/shipment/' + data.id)
     })
     .catch((err) => {
       scat.alert('danger', err.message)

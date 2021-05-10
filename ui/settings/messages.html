@@ -50,12 +50,12 @@
     document.querySelectorAll('tbody tr').forEach((el) => {
       el.addEventListener('click', (ev) => {
         const id= el.getAttribute('data-id')
-        scat.dialog([], '/settings/message/' + id)
+        scat.dialog('/settings/message/' + id)
       })
     })
 
     document.getElementById('create-new').addEventListener('click', (ev) => {
-      scat.dialog([], '/settings/message')
+      scat.dialog('/settings/message')
     })
   </script>
 {% endblock %}

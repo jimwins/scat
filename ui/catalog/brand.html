@@ -33,7 +33,7 @@
           <ul class="dropdown-menu dropdown-menu-right"
               aria-labelledby="settingsMenu">
             <li>
-              <a onclick="scat.dialog(this, '/catalog/brand/{{ brand.slug }}')">
+              <a data-action="edit-brand">
                 Edit Brand
               </a>
             </li>
@@ -79,4 +79,12 @@
   {% include 'catalog/products.twig' %}
 {% endif %}
 
+{% endblock %}
+
+{% block script %}
+  <script>
+    scat.handleAction('click', 'edit-brand', (ev) => {
+      return scat.dialog('/catalog/brand/{{ brand.slug }}')
+    })
+  </script>
 {% endblock %}

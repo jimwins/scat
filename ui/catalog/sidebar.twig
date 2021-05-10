@@ -82,26 +82,25 @@
     nav.querySelector('.add-brand').addEventListener('click', (ev) => {
       ev.preventDefault()
       ev.stopPropagation()
-      scat.dialog(ev.target, '/catalog/brand')
+      scat.dialog('/catalog/brand')
     })
     nav.querySelector('.add-department').addEventListener('click', (ev) => {
       ev.preventDefault()
       ev.stopPropagation()
       let department= {{ dept ? dept.id : 0 }}
-      scat.dialog(ev.target, '/catalog/department',
-                  { parent_id : department })
+      scat.dialog('/catalog/department', { parent_id : department })
     })
     nav.querySelector('.add-product').addEventListener('click', (ev) => {
       ev.preventDefault()
       ev.stopPropagation()
       let department= {{ subdept ? subdept.id : 0 }}
-      scat.dialog(ev.target, '/catalog/product', { department_id: department })
+      scat.dialog('/catalog/product', { department_id: department })
     })
     nav.querySelector('.add-item').addEventListener('click', (ev) => {
       ev.preventDefault()
       ev.stopPropagation()
       let product= {{ product ? product.id : 0 }}
-      scat.dialog(ev.target, '/catalog/item', { product_id: product })
+      scat.dialog('/catalog/item', { product_id: product })
     })
   </script>
 </nav>

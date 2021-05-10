@@ -453,7 +453,7 @@
     })
 
     document.getElementById('tax-exemption-certificate').addEventListener('click', (ev) => {
-      scat.dialog([], '/person/{{ person.id }}/tax-exemption' )
+      scat.dialog('/person/{{ person.id }}/tax-exemption' )
     })
 
     let handleToggle= (toggle) => {

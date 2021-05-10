@@ -92,7 +92,7 @@
           })
 
           form.querySelector('.email-card').addEventListener('click', (ev) => {
-            scat.dialog(ev.target, '/gift-card/{{ card.card }}/email-form')
+            scat.dialog('/gift-card/{{ card.card }}/email-form')
           })
 
           form.addEventListener('submit', (ev) => {

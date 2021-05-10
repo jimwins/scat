@@ -90,14 +90,14 @@
     document.getElementById('create-new-ad').addEventListener('click', (ev) => {
       ev.stopPropagation(); ev.preventDefault();
 
-      scat.dialog([], '/ad');
+      scat.dialog('/ad');
     })
 
     document.addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'edit-ad') {
         let id= act.getAttribute('data-id')
-        scat.dialog([], '/ad/' + id)
+        scat.dialog('/ad/' + id)
       }
     })
   </script>

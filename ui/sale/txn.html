@@ -541,16 +541,14 @@
 
     scat.handleAction('click', 'send-canned-message', (act) => {
       var message= act.closest('[data-message]').getAttribute('data-message')
-      scat.dialog(
-        {},
+      return scat.dialog(
         '/sale/{{ txn.id }}/email-invoice-form',
         { canned: message }
       )
-      return Promise.resolve()
     })
 
     scat.handleAction('click', 'create-shipment', (act) => {
-      return scat.dialog([], '/sale/{{ txn.id }}/shipment')
+      return scat.dialog('/sale/{{ txn.id }}/shipment')
     })
 
     scat.handleQueuedAction('submit', 'search', findAndAddItem)

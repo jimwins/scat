@@ -67,13 +67,13 @@
                   aria-labelledby="settingsMenu">
                 {% if product %}
                   <li>
-                    <a onclick="scat.dialog(this, '/catalog/product/{{ product.id }}')">
+                    <a data-action="edit-product">
                       Edit Product
                     </a>
                   </li>
                 {% else %}
                   <li>
-                    <a onclick="scat.dialog(this, '/catalog/department/{{ subdept ? subdept.id : dept.id }}')">
+                    <a data-action="edit-department">
                       Edit Department
                     </a>
                   </li>
@@ -146,6 +146,14 @@
 {% endblock %}
 
 {% block script %}
+  <script>
+    scat.handleAction('click', 'edit-product', (ev) => {
+      return scat.dialog('/catalog/product/{{ product.id }}')
+    })
+    scat.handleAction('click', 'edit-department', (ev) => {
+      return scat.dialog('/catalog/department/{{ subdept ? subdept.id : dept.id }}')
+    })
+  </script>
   {% if product %}
     {{ scat.file_upload('/catalog/product/' ~ product.id ~ '/media') }}
   {% endif %}

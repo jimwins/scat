@@ -11,16 +11,13 @@ class ScatUtils {
   }
 
   // Pop up a dialog
-  dialog (from, name, data= null) {
+  dialog (name, data= null, action= null) {
     let url= name
 
     let params= new URLSearchParams(data)
     if (params.toString().length) {
       url+= (url.match(/\?/) ? '&' : '?') + params.toString()
     }
-
-    if (from.disabled) return false
-    from.disabled= true
 
     return fetch(url, {
       headers: {
@@ -45,10 +42,9 @@ class ScatUtils {
           script.modal= this
           script.appendChild(document.createTextNode(code))
           this.appendChild(script).parentNode.removeChild(script)
-          /* Attach dialog to each object with event handler */
+          /* Attach dialog to each object with onsubmit handler */
           this.querySelectorAll('*').forEach((el) => {
-            if (typeof el.onclick === 'function' ||
-                typeof el.onsubmit === 'function') {
+            if (typeof el.onsubmit === 'function') {
               el.dialog= this
             }
           })
@@ -59,9 +55,9 @@ class ScatUtils {
           resolve()
         });
         $(modal).modal()
-        from.disabled= false
-      }).finally(() => {
-        from.disabled= false
+        if (action) {
+          action(modal);
+        }
       })
     })
     .catch((err) => {
