@@ -34,6 +34,7 @@ class ScatUtils {
     .then((text) => {
       return new Promise((resolve, reject) => {
         let modal= this.htmlToElement(text)
+        modal.resolution= null
         document.body.insertAdjacentElement('beforeend', modal)
         $(modal).on('show.bs.modal', function(e) {
           // Re-inject the script to get it to execute
@@ -52,7 +53,7 @@ class ScatUtils {
         $(modal).on('hidden.bs.modal', function(e) {
           $(this.script).remove()
           $(this).remove()
-          resolve()
+          resolve(modal.resolution)
         });
         $(modal).modal()
         if (action) {
