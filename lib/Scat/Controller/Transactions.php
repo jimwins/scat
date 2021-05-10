@@ -94,7 +94,7 @@ class Transactions {
       return $response->withJson($txn);
     }
 
-    if (!$GLOBALS['DEBUG']) {
+    if (!$GLOBALS['DEBUG'] && !$request->getParam('force')) {
       return $response->withRedirect("/?id=$id");
     }
 
