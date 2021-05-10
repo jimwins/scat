@@ -57,6 +57,7 @@ class Person extends \Scat\Model {
     /* Need to decode our JSON field */
     $data['subscriptions']= json_decode($this->subscriptions);
     $data['friendly_name']= $this->friendly_name();
+    $data['pretty_phone']= $this->pretty_phone();
     $data['points_available']= $this->points_available();
     $data['points_pending']= $this->points_pending();
     return $data;

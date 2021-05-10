@@ -284,7 +284,8 @@
 
 
       <h3>
-        <a data-action="edit-person" class="btn btn-default btn-sm pull-right">
+        <a data-action="change-person"
+           class="btn btn-default btn-sm pull-right">
           <i class="fa fa-user-o"></i>
         </a>
         {{ txn.type == 'customer' ? 'Customer' : 'Vendor' }}
@@ -556,6 +557,30 @@
 
     scat.handleAction('click', 'create-shipment', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/shipment')
+    })
+
+    let changePerson= () => {
+      return scat.dialog('/person/search').then((res) => {
+        if (res > 0) {
+          return scat.patch("/sale/{{ txn.id}}", { person_id: res })
+            .then((res) => {
+              scat.reload('sidebar')
+            })
+        }
+      })
+    }
+
+    scat.handleAction('click', 'change-person', (act) => {
+      return changePerson()
+    })
+
+    scat.handleAction('click', 'edit-person', (act) => {
+      var id= act.closest('[data-id]').getAttribute('data-id')
+      if (id) {
+        return scat.dialog('/person/' + id)
+      } else {
+        return changePerson()
+      }
     })
 
     scat.handleQueuedAction('submit', 'search', findAndAddItem)

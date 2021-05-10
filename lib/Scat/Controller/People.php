@@ -62,6 +62,11 @@ class People {
       return $response->withJson($people);
     }
 
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $view->render($response, 'dialog/person-find.html', [ ]);
+    }
+
     return $view->render($response, 'person/index.html', [
       'people' => $people,
       'q' => $q
@@ -76,6 +81,13 @@ class People {
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
       return $response->withJson($person);
+    }
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $view->render($response, 'dialog/person-edit.html', [
+        'person' => $person
+      ]);
     }
 
     $page= (int)$request->getParam('page');
