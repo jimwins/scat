@@ -58,19 +58,6 @@
       </textarea>
     </div>
     <div class="form-group">
-      <label for="variation_style">Variation Style</label>
-      <select class="form-control" name="variation_style">
-        <option value="flat"
-                {{ product.variation_style == 'flat' ? 'selected' }}>
-          Flat
-        </option>
-        <option value="tabs"
-                {{ product.variation_style == 'tabs' ? 'selected' }}>
-          Tabs
-        </option>
-      </select>
-    </div>
-    <div class="form-group">
       <label for="parent">Department</label>
       <select class="form-control" name="department_id">
         {% for d in depts %}
