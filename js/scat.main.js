@@ -350,9 +350,9 @@ class ScatUtils {
 
         func.call(this, act).finally(() => {
           if (icon) {
-            icon.classList.value= old;
-            act.disabled= false;
+            icon.classList.value= old
           }
+          act.disabled= false
         })
       }
     })
