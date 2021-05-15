@@ -376,10 +376,6 @@ function emailInvoice() {
   return false;
 }
 
-function printChargeRecord(id) {
-  return Scat.print('charge-record', { id: id });
-}
-
 $(function() {
   Mousetrap.bindGlobal('mod+p', function (ev) {
     printReceipt();
@@ -1273,10 +1269,6 @@ $(".pay-method").on("click", "button[name='cancel']", function(ev) {
           class="payment-buttons">
         <a data-bind="visible: $parent.showAdmin() || (method() == 'discount' && !$parent.txn.paid())" name="remove">
           <i class="fa fa-trash-o"></i>
-        </a>
-        <a data-bind="visible: method() == 'credit',
-                      click: function (data) { printChargeRecord(data.id()) }">
-          <i class="fa fa-print"></i>
         </a>
         <a data-bind="visible: method() == 'credit',
                       click: function (data) { Txn.voidPayment(data.id()) }">
