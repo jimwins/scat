@@ -100,7 +100,7 @@
             </td>
             <td>{{ (txn.type == 'vendor' ? 1 : -1) * line.ordered }}</td>
             <td>
-              <a data-action="show-item-info" data-id="{{ line.item_id }}">
+              <a data-action="show-item-info" data-code="{{ line.code }}">
                 {{ line.code }}
               </a>
             </td>
@@ -108,7 +108,7 @@
               {{ line.name }}<br>
               <small>{{ line.pricing_detail }}</small>
             </td>
-            <td style="text-align: right">
+            <td style="text-align: right" data-action="edit-price">
               {% if not line.kit_id %}
                 {{ scat.amount(line.sale_price) }}
               {% endif %}
@@ -584,6 +584,40 @@
     })
 
     scat.handleQueuedAction('submit', 'search', findAndAddItem)
+
+    scat.handleAction('click', 'show-item-info', (act) => {
+      var code= act.closest('[data-code]').getAttribute('data-code')
+      return scat.get('/catalog/item/' + code, null, {
+        headers: { 'Accept': 'application/json' },
+      })
+      .then((res) => res.json())
+      .then((item) => {
+        $(act).popover({
+          title: item.name,
+          content: "<b>Stock:</b> " + item.stock +
+                   "<div class='pull-right'><a href='/catalog/item/" + item.code + "' target='_blank' class='btn btn-default btn-xs'>Details</a></div>",
+          html: true
+        })
+        .popover('show')
+        .on('shown.bs.popover', (ev) => {
+          let target= ev.target
+          let id= ev.target.getAttribute('aria-describedby')
+          let popover= document.getElementById(id)
+          target.dismisser= (ev) => {
+            if (!popover.contains(ev.target)) {
+              ev.stopPropagation(); ev.preventDefault();
+              (($(target).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
+            }
+          }
+          document.addEventListener('click', target.dismisser, true)
+        })
+        .on('hide.bs.popover', (ev) => {
+          if (ev.target.dismisser)
+            document.removeEventListener('click', ev.target.dismisser, true)
+            ev.target.dismisser= null
+        })
+      })
+    })
   </script>
 
   <template id="item-not-found">
