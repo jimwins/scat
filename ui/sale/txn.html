@@ -601,6 +601,14 @@
       })
     })
 
+    scat.handleAction('click', 'set-in-store-pickup', (act) => {
+      return scat
+        .patch('/sale/{{ txn.id }}', { shipping_address_id: 1 })
+        .then((res) => {
+          scat.reload('sidebar')
+        })
+    })
+
     scat.handleAction('click', 'create-shipment', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/shipment')
     })
