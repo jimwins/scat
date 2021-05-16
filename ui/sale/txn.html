@@ -227,14 +227,14 @@
 
       <div class="text-center">
         <div class="btn-group btn-group-lg">
-         <button type="button" class="btn btn-default">
-          <u>P</u>rint
+         <button type="button" class="btn btn-default" data-action="print-receipt">
+           <u>P</u>rint
          </button>
          <button type="button" class="btn btn-default dropdown-toggle" 
                  data-toggle="dropdown" aria-expanded="false">
           <span class="caret"></span>
-          <span class="sr-only">Toggle Dropdown</span>
-         </button>
+           <span class="sr-only">Toggle Dropdown</span>
+          </button>
          <ul class="dropdown-menu" role="menu">
           <li><a data-action="print-invoice">Invoice</a></li>
           <li><a data-action="print-receipt">Receipt</a></li>
@@ -546,6 +546,13 @@
       let data= act.closest('[data-variation]')
       let variation= data ? data.getAttribute('data-variation') : undefined
       scat.print( '/sale/{{ txn.id }}/~print-invoice', { variation: variation })
+      return Promise.resolve()
+    })
+
+    scat.handleAction('click', 'print-receipt', (act) => {
+      let data= act.closest('[data-variation]')
+      let variation= data ? data.getAttribute('data-variation') : undefined
+      scat.print( '/sale/{{ txn.id }}/~print-receipt', { variation: variation })
       return Promise.resolve()
     })
 
