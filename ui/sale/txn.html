@@ -611,6 +611,20 @@
 
     scat.handleAction('click', 'create-shipment', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/shipment')
+        .then((res) => {
+          scat.reload('sidebar')
+        })
+    })
+
+    scat.handleAction('click', 'create-dropship', (act) => {
+      return scat.dialog('/sale/{{ txn.id }}/dropship')
+    })
+
+    scat.handleAction('click', 'add-tracker', (act) => {
+      return scat.dialog('/sale/{{ txn.id }}/shipment?tracker=1')
+        .then((res) => {
+          scat.reload('sidebar')
+        })
     })
 
     let changePerson= () => {
