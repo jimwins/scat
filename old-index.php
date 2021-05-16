@@ -1513,6 +1513,9 @@ viewModel.editShippingAddress= () => {
   var id= Txn.id()
 
   scat.dialog('/sale/' + id + '/shipping-address')
+      .then((data) => {
+        ko.mapping.fromJS({ shipping_address: data }, viewModel)
+      })
 }
 
 viewModel.setInstorePickup= () => {

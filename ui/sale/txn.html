@@ -453,17 +453,7 @@
   <script>
     $('[data-toggle="tooltip"]').tooltip();
 
-    let findAndAddItem= (form) => {
-      let formData= new FormData(form)
-      let q= form.elements['q']
-
-      // clear error
-      q.parentNode.classList.remove('has-error');
-
-      // focus and select so more typing will overwrite the query
-      q.focus()
-      q.select()
-
+    let findAndAddItem= (formData) => {
       return scat.get('/catalog/search', formData, {
         headers: { 'Accept': 'application/json' }
       })
@@ -507,6 +497,21 @@
       })
     }
 
+    let handleFindAndAddItem= (form) => {
+      let formData= new FormData(form)
+      let q= form.elements['q']
+
+      // clear error
+      q.parentNode.classList.remove('has-error');
+
+      // focus and select so more typing will overwrite the query
+      q.focus()
+      q.select()
+
+      return findAndAddItem(formData)
+
+    }
+
     let addItemById= (item_id) => {
       return scat.post('/sale/{{ txn.id }}/item', { item_id: item_id })
         .then((res) => res.json())
@@ -523,6 +528,15 @@
         let choices= act.closest('.choices')
         if (choices) choices.parentElement.removeChild(choices)
       })
+    })
+
+    scat.handleAction('click', 'add-item-by-code', (act) => {
+      let code= act.closest('[data-code]').getAttribute('data-code')
+
+      let formData= new FormData()
+      formData.append('q', 'code:' + code)
+
+      return findAndAddItem(formData)
     })
 
     scat.handleAction('click', 'remove-item', (act) => {
@@ -577,6 +591,12 @@
       )
     })
 
+    scat.handleAction('click', 'edit-shipping-address', (act) => {
+      return scat.dialog('/sale/{{ txn.id }}/shipping-address').then(() => {
+        scat.reload('sidebar')
+      })
+    })
+
     scat.handleAction('click', 'create-shipment', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/shipment')
     })
@@ -605,7 +625,7 @@
       }
     })
 
-    scat.handleQueuedAction('submit', 'search', findAndAddItem)
+    scat.handleQueuedAction('submit', 'search', handleFindAndAddItem)
 
     scat.handleAction('click', 'show-item-info', (act) => {
       var code= act.closest('[data-code]').getAttribute('data-code')

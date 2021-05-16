@@ -81,8 +81,8 @@
     scat.call("/sale/{{ txn.id }}/shipping-address", formData)
     .then((res) => res.json())
     .then((data) => {
-      ko.mapping.fromJS({ shipping_address: data }, viewModel)
       scat.alert('info', 'Updated shipping address.')
+      dialog.resolution= data;
       $(dialog).modal('hide')
     })
   }
