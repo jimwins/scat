@@ -327,7 +327,7 @@ function printReceipt() {
     Scat.alert("No sale to print.");
     return false;
   }
-  return Scat.print('receipt', { id: txn, gift: 0 });
+  scat.print('/sale/' + txn + '/~print-receipt')
 }
 
 function printGiftReceipt() {
@@ -336,7 +336,7 @@ function printGiftReceipt() {
     Scat.alert("No sale to print.");
     return false;
   }
-  return Scat.print('receipt', { id: txn, gift: 1 });
+  scat.print('/sale/' + txn + '/~print-receipt', { variation: 'gift' })
 }
 
 function printInvoice() {

@@ -43,24 +43,6 @@ Scat.dialog= function (name) {
   return $.ajax({ url: url, cache: false });
 }
 
-Scat.print= function(name, options) {
-  $('#scat-print').remove();
-
-  var url= '/print/' + name + '.php?' + $.param(options);
-  var lpr= $('<iframe id="scat-print" src="' + url + '"></iframe>').hide();
-
-  lpr.on("load", function(ev) {
-    /* If we got JSON, we printed directly */
-    if (this.contentDocument.contentType != 'application/json') {
-      setTimeout((() => ev.target.contentWindow.print()), 500)
-    }
-  });
-
-  $('body').append(lpr);
-
-  return false;
-}
-
 Scat.printDirect= function(name, options) {
   $.getJSON("/print/" + name + ".php?callback=?",
             options,

@@ -214,6 +214,20 @@ class Transactions {
     return $print->printPDF($response, 'letter', $pdf->Output('', 'S'));
   }
 
+  public function printSaleReceipt(Request $request, Response $response,
+                                    \Scat\Service\Printer $print, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $var= $request->getParam('variation') ?: 'invoice';
+
+    $pdf= $txn->getReceiptPDF($var);
+
+    return $print->printPDF($response, 'receipt', $pdf->Output('', 'S'));
+  }
+
   /* Items (aka lines) */
   public function addItem(Request $request, Response $response,
                           \Scat\Service\PoleDisplay $pole,

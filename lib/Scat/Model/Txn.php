@@ -188,6 +188,29 @@ class Txn extends \Scat\Model {
     return $mpdf;
   }
 
+  public function getReceiptPDF($variation= '') {
+    $loader= new \Twig\Loader\FilesystemLoader('../ui/');
+    $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
+    $twig->addExtension(new \Scat\TwigExtension());
+
+    $template= $twig->load('print/receipt.html');
+    $html= $template->render([ 'txn' => $this, 'variation' => $variation ]);
+
+    define('_MPDF_TTFONTDATAPATH', '/tmp/ttfontdata');
+    @mkdir(_MPDF_TTFONTDATAPATH);
+
+    $mpdf= new \Mpdf\Mpdf([ 'mode' => 'utf-8', 'format' => 'letter',
+                            'tempDir' => '/tmp',
+                            'margin_left' => 15, 'margin_right' => 15,
+                            'margin_top' => 9, 'margin_bottom' => 10,
+                            'default_font_size' => 28  ]);
+    $mpdf->setAutoTopMargin= 'stretch';
+    $mpdf->setAutoBottomMargin= 'stretch';
+    $mpdf->writeHTML($html);
+
+    return $mpdf;
+  }
+
   public function shipments() {
     return $this->has_many('Shipment');
   }

@@ -1,0 +1,203 @@
+{% import 'macros.twig' as scat %}
+<style type="text/css">
+body {
+  font-family: Monaco, monospace;
+  font-size: 28px;
+  text-align: left;
+  color: #000;
+}
+
+.right {
+  text-align: right;
+}
+.left {
+  text-align: left;
+}
+
+#doc_header {
+  padding-top: 1em;
+  margin-bottom: 2em;
+  padding-bottom:1em;
+  border-bottom:2px solid #000;
+  text-align:center;
+}
+table#products {font-size:1em; width:100%; margin:2em 0;
+        border-top:2px solid #000; border-bottom:2px solid #000; border-left:0; border-right:0;}
+th {padding:0.2em 0.1em; border-bottom:1px solid #000;}
+.qty {padding:0.2em 0.5em; text-align:right;} /* tr's and th's */
+.price {padding:0.2em 0.1em; white-space:nowrap; text-align:right;}
+.description { font-size: 0.75em; }
+td {padding:0.2em 0.1em; vertical-align:top;}
+tr.sub td {border-top:2px solid #000; border-bottom:2px solid #000;}
+tr.total td {border-top:6px solid #000; text-align:right; }
+
+.cc-info {font-size:1em; width:100%; margin:2em 0;
+        border-bottom:2px solid #000; border-left:0; border-right:0;}
+.cc-info th { border: none; }
+.cc-info th:after { content: ":" }
+
+#loyalty {
+  text-align: center;
+  margin: 1em 2em;
+  padding: 1em;
+  border: 2px solid black;
+}
+
+#doc_info {text-align:center;}
+#signature {margin:2em 0; padding:5px 0px; text-align:center;}
+#nosignature {margin:2em 0; text-align: center; padding: 5px 0px; }
+#store_footer {margin:2em 0; padding:5px 0px; text-align:center;}
+
+</style>
+<div id="doc_header">
+  <div id="store_name">
+  <img src="/ui/logo.svg" width="80%" alt="Raw Materials Art Supplies">
+  </div>
+  645 South Los Angeles Street<br>
+  Los Angeles, CA 90014<br>
+  (800) 729-7060<br>
+  M-F 10-7, Sat 11-6, Sun 12-5<br>
+  info@RawMaterialsLA.com<br>
+  https://RawMaterialsLA.com/
+</div>
+<table id="products" cellspacing="0" cellpadding="0">
+  <tr>
+    <th class="qty">QTY</th>
+    <th class="left">PRODUCT</th>
+    {% if variation != 'gift' %}
+      <th class="price">PRICE</th>
+    {% endif %}
+  </tr>
+  {% for item in txn.items.find_many() %}
+    <tr>
+      <td class="qty">{{ item.allocated * -1 }}</td>
+      <td class="left">
+        {{ item.name }}
+        {% if variation != 'gift' and item.discount %}
+          <div class="description">
+            {{ item.discount }}
+          </div>
+        {% endif %}
+      </td>
+      {% if variation != 'gift' %}
+        <td class="price">
+          {{ scat.amount(item.ext_price * -1) }}
+        </td>
+      {% endif %}
+    </tr>
+  {% endfor %}
+
+  {% if variation != 'gift' %}
+    {% if txn.type != 'vendor' %}
+      <tr class="sub">
+        <td class="right" colspan="2">Subtotal:</td>
+        <td class="price">{{ scat.amount(txn.subtotal) }}</td>
+      </tr>
+      <tr>
+        <td class="right" colspan="2">
+          Sales Tax {% if txn.tax_rate > 0 %}({{ '%.2f'|format(txn.tax_rate) }}%){% endif %}:
+        </td>
+        <td class="price">{{ scat.amount(txn.total - txn.subtotal) }}</td>
+      </tr>
+    {% endif %}
+    <tr class="total">
+      <td class="right" colspan="2">Total:</td>
+      <td class="price">{{ scat.amount(txn.total) }}</td>
+    </tr>
+    {% set payments= txn.payments.find_many() %}
+    {% for p in payments %}
+      <tr>
+        <td class="right" colspan="2"
+          {{ p.pretty_method }}:
+        </td>
+        <td class="price">{{ scat.amount(p.amount * -1) }}</td>
+      </tr>
+    {% endfor %}
+    {% if payments %}
+      <tr class="total">
+        <td class="right" colspan="2">Total Due:</td>
+        <td class="price">{{ scat.amount(txn.total - txn.total_paid) }}</td>
+      </tr>
+    {% endif %}
+  {% endif %}
+</table>
+
+{% if variation != 'gift' %}
+  {% for p in payments %}
+    {% if p.method == 'credit' %}
+      <table class="cc-info">
+        <tr><th>Date</th><td>{{ p.processed }}</td></tr>
+        <tr><th>ID</th><td>{{ p.id }}</td></tr>
+        <tr><th>Card Type</th><td>{{ p.cc_type }}</td></tr>
+        <tr>
+          <th>Card Number</th>
+          <td>
+            {% for i in 1..(p.cc_type == 'AmericanExpress' ? 11 : 12) -%}
+              #
+            {%- endfor -%}
+            {{- p.cc_lastfour }}
+          </td>
+        </tr>
+        <tr><th>Expiration</th><td>##/##</td></tr>
+        {% if p.cc_approval %}
+          <tr><th>Approval</th><td>{{ p.cc_approval }}</td></tr>
+        {% endif %}
+        {% if p.cc_txn %}
+          <tr><th>Ref #</th><td>{{ p.cc_txn }}</td></tr>
+        {% endif %}
+        <tr><th>Amount</th><td>{{ scat.amount(p.amount) }}</td></tr>
+      </table>
+    {% endif %}
+  {% endfor %}
+
+  {% set person= txn.person %}
+  {% if not person.suppress_loyalty %}
+    <div id="loyalty">
+      {% if person %}
+        {% set points= txn.subtotal|round(0, 'floor') %}
+        {% if points == 0 and txn.subtotal > 0 %}
+          {% set points= 1 %}
+        {% endif %}
+        You earned {{ "%d point%s"|format(points, points > 1 ? 's' : '') }}
+        with this purchase.
+        <br><br>
+        {% set t= person.points_pending + person.points_available %}
+        That means you have {{ "%d point%s"|format(t, t > 1 ? 's' : '')  }}
+        to redeem towards rewards tomorrow!
+      {% else %}
+        Earn store credit by signing up for our rewards program!
+        <br><br>
+        https://rawm.us/rewards
+        <br><br>
+        Code: {{ "%08X %08X"|format(txn.created|date('U'), txn.id) }}
+      {% endif %}
+    </div>
+  {% endif %}
+{% endif %}
+
+<div id="doc_info">
+  {% if variation == 'gift' %}
+    GIFT RECEIPT
+    <br>
+  {% endif %}
+  Invoice {{ txn.formatted_number }}
+  <br>
+  {% if txn.paid %}
+    Created: 
+  {% endif %}
+  {{ txn.created|date('F j, Y g:i A') }}
+  {% if txn.paid %}
+    <br>
+    Paid:
+    {{ txn.paid|date('F j, Y g:i A') }}
+  {% endif %}
+  <br><br>
+  <barcode code="@INV-{{ txn.id }}" type="C128B" class="barcode" size="2" />
+</div>
+
+<div id="store_footer">
+Items purchased from stock may be returned in original condition and packaging
+within 30 days with receipt. All easels are subject to a 50% restocking fee. No returns without original receipt.
+<br><br>
+http://RawMaterialsLA.com/
+</div>
