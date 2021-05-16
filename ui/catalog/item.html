@@ -757,7 +757,7 @@
       let id= ev.target.getAttribute('aria-describedby')
       let popover= document.getElementById(id)
       let input= popover.querySelector('input, select')
-      if (input) { input.select(); input.focus(); }
+      if (input) { if (input.select) input.select(); input.focus(); }
       popover.dismisser= (ev) => {
         if (!popover.contains(ev.target)) {
           ev.stopPropagation(); ev.preventDefault();
@@ -790,8 +790,15 @@
       select2: {
         width: '30em',
         ajax: {
-          url: "/api/product-find.php",
-          dataType: 'json'
+          url: "/catalog/search?scope=products",
+          dataType: 'json',
+          processResults: function (data) {
+            return {
+              results: data.products.map((d) => {
+                return { id: d.id, text: d.name }
+              })
+            }
+          }
         },
       },
       success: (response, newValue) => {

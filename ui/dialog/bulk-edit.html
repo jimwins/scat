@@ -140,8 +140,15 @@
 {% block script %}
   $('#product_id', form).select2({
     ajax: {
-      url: '/api/product-find.php',
-      datatype: 'json'
+      url: '/catalog/search?scope=products',
+      datatype: 'json',
+      processResults: function (data) {
+        return {
+          results: data.products.map((d) => {
+            return { id: d.id, text: d.name }
+          })
+        }
+      }
     }
   })
 
