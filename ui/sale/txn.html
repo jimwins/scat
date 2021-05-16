@@ -6,6 +6,12 @@
 {% endblock %}
 
 {% block content %}
+  <style>
+    [data-action~="editable"] {
+      border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+      cursor: pointer;
+    }
+  </style>
   <div class="row">
     <div class="col-sm-9">
       {{ block('search') }}
@@ -90,7 +96,8 @@
       </thead>
       <tbody>
         {% for line in txn.items.find_many %}
-          <tr data-id="{{ line.id }}">
+          <tr data-id="{{ line.id }}"
+              data-editable-base="/sale/{{ txn.id }}/item/{{ line.id }}">
             <td>
               {% if not line.kit_id %}
                 <a data-action="remove-item" class="btn btn-link btn-xs">
@@ -98,19 +105,27 @@
                 </a>
               {% endif %}
             </td>
-            <td>{{ (txn.type == 'vendor' ? 1 : -1) * line.ordered }}</td>
+            <td>
+              <div data-action="editable" data-name="quantity">
+                {{ (txn.type == 'vendor' ? 1 : -1) * line.ordered }}
+              </div>
+            </td>
             <td>
               <a data-action="show-item-info" data-code="{{ line.code }}">
                 {{ line.code }}
               </a>
             </td>
             <td>
-              {{ line.name }}<br>
+              <div data-action="editable" data-name="name">
+                {{- line.name -}}
+              </div>
               <small>{{ line.pricing_detail }}</small>
             </td>
-            <td style="text-align: right" data-action="edit-price">
+            <td style="text-align: right">
               {% if not line.kit_id %}
-                {{ scat.amount(line.sale_price) }}
+                <div data-action="editable" data-name="sale_price">
+                  {{- scat.amount(line.sale_price) -}}
+                </div>
               {% endif %}
             </td>
             <td style="text-align: right">
@@ -592,31 +607,75 @@
       })
       .then((res) => res.json())
       .then((item) => {
-        $(act).popover({
+        scat.popover(act, {
           title: item.name,
           content: "<b>Stock:</b> " + item.stock +
                    "<div class='pull-right'><a href='/catalog/item/" + item.code + "' target='_blank' class='btn btn-default btn-xs'>Details</a></div>",
           html: true
         })
-        .popover('show')
-        .on('shown.bs.popover', (ev) => {
-          let target= ev.target
-          let id= ev.target.getAttribute('aria-describedby')
-          let popover= document.getElementById(id)
-          target.dismisser= (ev) => {
-            if (!popover.contains(ev.target)) {
-              ev.stopPropagation(); ev.preventDefault();
-              (($(target).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
-            }
-          }
-          document.addEventListener('click', target.dismisser, true)
-        })
-        .on('hide.bs.popover', (ev) => {
-          if (ev.target.dismisser)
-            document.removeEventListener('click', ev.target.dismisser, true)
-            ev.target.dismisser= null
-        })
       })
+    })
+
+    function editableContent() {
+      let el= this
+      let name= el.getAttribute('data-name')
+      let value= el.getAttribute('data-value')
+      if (!value) {
+        value= this.innerText
+      }
+      let base_el= el.closest('[data-editable-base]')
+      let base= (base_el ?
+                  base_el.getAttribute('data-editable-base') :
+                  "/sale/{{ txn.id }}")
+      let reload_el= el.closest('[data-editable-reload]')
+      let html= scat.htmlToElement('<form><div class="form-group" style="margin-bottom: 0"><div class="input-group"><input type="text" name="" class="form-control" value=""><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-fw fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-fw fa-ban"></i></button></span></div><span class="help-block hidden" style="margin-bottom: 0"></span></div></form>')
+      html.querySelector('input').setAttribute('name', name)
+      html.querySelector('input').setAttribute('value', value)
+      html.addEventListener('submit', (ev) => {
+        ev.preventDefault()
+        let formData= new FormData(ev.target)
+
+        let btn= ev.target.querySelector('.fa-check')
+        btn.classList.remove('fa-check')
+        btn.classList.add('fa-spin','fa-spinner')
+        scat.patch(base, formData)
+            .then((res) => {
+              if (res.redirected) {
+                window.location.href= res.url
+                return
+              }
+              return res.json()
+            })
+            .then((data) => {
+              (($(el).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
+              return scat.reload('invoice', 'sidebar')
+            })
+            .catch((err) => {
+              let help= ev.target.querySelector('.help-block')
+              help.innerText= err.message
+              help.classList.remove('hidden')
+              ev.target
+                .querySelector('.form-group')
+                .classList.add('has-error')
+              btn.classList.remove('fa-spin','fa-spinner')
+              btn.classList.add('fa-check')
+            })
+      })
+      html.querySelector('.cancel').addEventListener('click', (ev) => {
+        (($(el).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
+      })
+      return html
+    }
+
+    scat.handleAction('click', 'editable', (act) => {
+      scat.popover(act, {
+        content: editableContent,
+        container: 'body',
+        html: true,
+        sanitize: false,
+        placement: 'auto right',
+      })
+      return Promise.resolve()
     })
   </script>
 

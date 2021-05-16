@@ -389,6 +389,30 @@ class ScatUtils {
       }
     })
   }
+
+  /* Uses jQuery for now. */
+  popover (el, options) {
+    options['trigger']= 'focus'
+    return $(el)
+      .popover(options)
+      .popover('show')
+      .on('shown.bs.popover', (ev) => {
+        let target= ev.target
+        let id= ev.target.getAttribute('aria-describedby')
+        if (!id) return
+        let popover= document.getElementById(id)
+        let input= popover.querySelector('input, select')
+        if (input) { if (input.select) input.select(); input.focus(); }
+      })
+      .on('hide.bs.popover', (ev) => {
+        let target= ev.target
+        let id= ev.target.getAttribute('aria-describedby')
+        let popover= document.getElementById(id)
+      })
+      .on('hidden.bs.popover', (ev) => {
+        $(this).popover('destroy')
+      })
+  }
 }
 
 let scat= new ScatUtils()
