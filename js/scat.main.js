@@ -79,25 +79,9 @@ class ScatUtils {
       })
   }
 
+  // TODO remove when done with /print/
   printDocument (name, options) {
-    let el= document.getElementById('scat-print')
-    if (el) {
-      el.remove()
-    }
-
-    let url= '/print/' + name + '.php?' + $.param(options)
-    let text= '<iframe id="scat-print" src="' + url + '"></iframe>'
-
-    let lpr= this.htmlToElement(text)
-    lpr.style.display= 'none'
-    lpr.addEventListener('load', (ev) => {
-      /* If we got JSON, we printed directly */
-      if (ev.target.contentDocument.contentType != 'application/json') {
-        setTimeout((() => ev.target.contentWindow.print()), 500)
-      }
-    })
-
-    document.body.insertAdjacentElement('beforeend', lpr)
+    return this.print('/print/' + name + '.php', options)
   }
 
   // format number as $3.00 or ($3.00)

@@ -1858,12 +1858,7 @@ viewModel.createGiftCard= function(item) {
 }
 
 viewModel.printGiftCard= function(item) {
-  Scat.api('giftcard-check-balance', { card: item.data.card() })
-      .done(function (data) {
-              Scat.print('gift-card', { card: data.card,
-                                        balance: data.balance,
-                                        issued: data.latest });
-            });
+  scat.print('/gift-card/' + item.data.card() + '/~print')
 }
 
 viewModel.emailGiftCard= function(item) {

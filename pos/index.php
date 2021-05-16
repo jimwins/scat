@@ -373,7 +373,7 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
 
   $app->post('', [ \Scat\Controller\Giftcards::class, 'create' ]);
   $app->get('/{card:[0-9]+}', [ \Scat\Controller\Giftcards::class, 'card' ]);
-  $app->get('/{card:[0-9]+}/print',
+  $app->post('/{card:[0-9]+}/~print',
             [ \Scat\Controller\Giftcards::class, 'printCard' ]);
   $app->get('/{card:[0-9]+}/email-form',
             [ \Scat\Controller\Giftcards::class, 'getEmailForm' ]);

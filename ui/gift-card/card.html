@@ -82,13 +82,7 @@
           let form= document.currentScript.parentNode
 
           form.querySelector('.print-card').addEventListener('click', (ev) => {
-            let lpr= document.createElement('iframe')
-            lpr.style.display= 'none'
-            lpr.addEventListener('load', (ev) => {
-              ev.target.contentWindow.print()
-            })
-            lpr.src= '/gift-card/{{ card.card }}/print'
-            document.body.appendChild(lpr)
+            scat.print('/gift-card/{{ card.card }}/~print')
           })
 
           form.querySelector('.email-card').addEventListener('click', (ev) => {
