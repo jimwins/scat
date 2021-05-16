@@ -5,6 +5,11 @@
   {{ txn.friendly_type }} {{ txn.formatted_number }}
 {% endblock %}
 
+{% block extra_head %}
+  <script src="/extern/mousetrap-1.6.2/mousetrap.min.js"></script>
+  <script src="/extern/mousetrap-1.6.2/plugins/global-bind/mousetrap-global-bind.min.js"></script>
+{% endblock %}
+
 {% block content %}
   <style>
     [data-action~="editable"] {
@@ -563,11 +568,14 @@
       return Promise.resolve()
     })
 
+    let printReceipt= (v) => {
+      return scat.print('/sale/{{ txn.id }}/~print-receipt', { variation: v })
+    }
+
     scat.handleAction('click', 'print-receipt', (act) => {
       let data= act.closest('[data-variation]')
       let variation= data ? data.getAttribute('data-variation') : undefined
-      scat.print( '/sale/{{ txn.id }}/~print-receipt', { variation: variation })
-      return Promise.resolve()
+      return printReceipt(variation)
     })
 
     scat.handleAction('click', 'print-packing-slip-and-process', (act) => {
@@ -729,6 +737,17 @@
         placement: 'auto right',
       })
       return Promise.resolve()
+    })
+
+    /* Bind some global keys */
+    Mousetrap.bindGlobal('mod+p', function (ev) {
+      printReceipt()
+      return false
+    })
+
+    Mousetrap.bindGlobal('mod+y', function (ev) {
+      payTransaction()
+      return false
     })
   </script>
 
