@@ -345,7 +345,7 @@ function printInvoice() {
     Scat.alert("No sale to print.");
     return false;
   }
-  return Scat.print('invoice', { id: txn });
+  scat.print('/sale/' + txn + '/~print-invoice')
 }
 
 function downloadInvoice() {
@@ -354,7 +354,7 @@ function downloadInvoice() {
     Scat.alert("No sale to print.");
     return false;
   }
-  return Scat.print('invoice', { id: txn, download: true });
+  scat.print('/sale/' + txn + '/~print-invoice', { download: true })
 }
 
 function printPackingSlip() {
@@ -363,7 +363,7 @@ function printPackingSlip() {
     Scat.alert("No sale to print.");
     return false;
   }
-  return Scat.print('invoice', { id: txn, variation: 'packing-slip' });
+  return scat.print('/sale/' + txn + '/~print-invoice', { variation: 'packing-slip' })
 }
 
 function emailInvoice() {

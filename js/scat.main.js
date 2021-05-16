@@ -206,6 +206,11 @@ class ScatUtils {
   }
 
   print (url, args) {
+    let el= document.getElementById('scat-print')
+    if (el) {
+      el.remove()
+    }
+
     const formData= args instanceof FormData ? args : new FormData()
 
     if (!(args instanceof FormData)) {
@@ -225,6 +230,7 @@ class ScatUtils {
            * event fires when it is visible. ¯\_(ツ)_/¯
            */
           let lpr= document.createElement('iframe')
+          lpr.id= 'scat-print'
           lpr.style.display= 'none'
           lpr.addEventListener('load', (ev) => {
             setTimeout((() => ev.target.contentWindow.print()), 500)
@@ -237,6 +243,7 @@ class ScatUtils {
       if (!res.headers.get('Content-type').includes("application/json")) {
         res.text().then((html) => {
           let lpr= document.createElement('iframe')
+          lpr.id= 'scat-print'
           lpr.style.display= 'none'
           lpr.addEventListener('load', (ev) => {
             ev.target.contentWindow.print()
