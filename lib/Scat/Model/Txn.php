@@ -568,6 +568,17 @@ class Txn extends \Scat\Model {
     return $this->has_many('Loyalty');
   }
 
+  public function points_earned() {
+    if ($this->no_rewards)
+      return 0;
+
+    $taxed= $this->taxed();
+    $points= (int)$taxed *
+              (defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1);
+    if ($points == 0 && $taxed > 0) $points= 1;
+    return $points;
+  }
+
   public function rewardLoyalty() {
     // No person? No loyalty.
     if (!$this->person_id)
@@ -606,10 +617,7 @@ class Txn extends \Scat\Model {
       return;
 
     // Award new points
-    $taxed= $this->taxed();
-    $points= (int)$taxed *
-              (defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1);
-    if ($points == 0 && $taxed > 0) $points= 1;
+    $points= $this->points_earned();
 
     $loyalty= $this->loyalty()->create();
     $loyalty->txn_id= $this->id;

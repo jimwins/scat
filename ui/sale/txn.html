@@ -311,8 +311,8 @@
         {% if txn.due > 0 %}
           {# subtract points being used #}
           {% if not txn.no_rewards %}
-            + <i class="fa fa-star"></i> {{ txn.taxed }}
-            = {{ person.points_available + person.points_pending + (txn.taxed) }}
+            + <i class="fa fa-star"></i> {{ txn.points_earned }}
+            = {{ person.points_available + person.points_pending + txn.points_earned }}
           {% endif %}
         {% endif %}
       {% endif %}

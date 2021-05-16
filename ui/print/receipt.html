@@ -154,10 +154,7 @@ tr.total td {border-top:6px solid #000; text-align:right; }
   {% if not person.suppress_loyalty %}
     <div id="loyalty">
       {% if person %}
-        {% set points= txn.subtotal|round(0, 'floor') %}
-        {% if points == 0 and txn.subtotal > 0 %}
-          {% set points= 1 %}
-        {% endif %}
+        {% set points= txn.points_earned %}
         You earned {{ "%d point%s"|format(points, points > 1 ? 's' : '') }}
         with this purchase.
         <br><br>
