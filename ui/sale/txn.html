@@ -14,6 +14,8 @@
   <style>
     [data-action~="editable"] {
       border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+    }
+    [data-action] {
       cursor: pointer;
     }
   </style>
@@ -121,10 +123,27 @@
               </a>
             </td>
             <td>
-              <div data-action="editable" data-name="override_name">
+              {% if line.item.code == 'ZZ-GIFTCARD' and txn.paid %}
+                {% if line.data().card %}
+                  <a data-action="print-gift-card"
+                     data-card="{{ line.data().card }}">
+                    <i class="fa fa-print"></i>
+                  </a>
+                  <a data-action="email-gift-card"
+                     data-card="{{ line.data().card }}">
+                    <i class="fa fa-envelope-o"></i>
+                  </a>
+                {% else %}
+                  <a data-action="create-gift-card"
+                     data-value="{{ item.retail_price }}">
+                    <i class="fa fa-barcode"></i>
+                  </a>
+                {% endif %}
+              {% endif %}
+              <span data-action="editable" data-name="override_name">
                 {{- line.name -}}
-              </div>
-              <small>{{ line.pricing_detail }}</small>
+              </span>
+              <div><small>{{ line.pricing_detail }}</small></div>
             </td>
             <td style="text-align: right">
               {% if not line.kit_id %}
@@ -737,6 +756,34 @@
         placement: 'auto right',
       })
       return Promise.resolve()
+    })
+
+    scat.handleAction('click', 'create-gift-card', (act) => {
+      let line_id= act.closest('[data-id]').getAttribute('data-id')
+      var value= act.closest('[data-value]').getAttribute('data-value')
+
+      return scat.call('/gift-card', {
+        balance: value,
+        txn_id: {{ txn.id }}
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        return
+          scat.patch('/sale/{{ txn.id }}/line/' + line_id, { data: data })
+            .then(() => {
+              scat.reload('invoice')
+            })
+      })
+    })
+
+    scat.handleAction('click', 'print-gift-card', (act) => {
+      var card= act.closest('[data-card]').getAttribute('data-card')
+      return scat.print('/gift-card/' + card + '/~print')
+    })
+
+    scat.handleAction('click', 'email-gift-card', (act) => {
+      var card= act.closest('[data-card]').getAttribute('data-card')
+      return scat.dialog('/gift-card/' + card + '/email-form')
     })
 
     /* Bind some global keys */

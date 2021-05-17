@@ -16,6 +16,14 @@ class TxnLine extends \Scat\Model {
     return preg_match('/^ZZ-/', $code) ? '' : $this->item()->code;
   }
 
+  public function data($update= null) {
+    if ($update) {
+      $this->data= json_encode($update);
+    }
+
+    return json_decode($this->data);
+  }
+
   public function name() {
     return $this->override_name ? $this->override_name :
            $this->item()->name;
