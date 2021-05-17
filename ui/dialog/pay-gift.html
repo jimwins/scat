@@ -1,0 +1,112 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Gift Card
+{% endblock %}
+
+{% block size 'modal-sm' %}
+
+{% block body %}
+  <div class="modal-body">
+    <div class="get-card">
+      <div class="form-group">
+        <input class="form-control" type="text" autofocus
+                name="card" placeholder="Scan or type card number">
+      </div>
+    </div>
+
+    <div class="payment hidden">
+      <p>
+        Balance: <span id="balance">$0.00</span>,
+        Last used: <span id="latest">never</span>.
+      </p>
+      <div class="form-group">
+        <input type="hidden" name="method" value="gift">
+        <input class="form-control input-lg text-center autofocus"
+                type="text" pattern="[$-.0-9]*"
+                name="amount"
+                value="{{ scat.amount(txn.due) }}">
+      </div>
+      <div id="change" class="alert alert-danger hidden">
+        Remaining balance would be less than $10, so they can get that as
+        change!
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <span class="get-card">
+    <button type="button" class="btn btn-default" name="old" value="1">Old Card</button>
+    <button type="submit" class="btn btn-primary" name="lookup" value="1">Check Card</button>
+  </span>
+  <span class="payment hidden">
+    <button type="submit" class="btn btn-primary" name="pay" value="1">Pay</button>
+  </span>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+
+    if (formData.get('old')) {
+      form.querySelectorAll('.get-card').forEach((el) => {
+        el.classList.add('hidden')
+      })
+      form.querySelectorAll('.payment').forEach((el) => {
+        el.classList.remove('hidden')
+      })
+    }
+
+    if (formData.get('lookup')) {
+      let card= formData.get('card')
+
+      scat.get('/gift-card/' + card, null, {
+        headers: {
+          'Accept' : 'application/json',
+          'Content-type' : 'application/json',
+        },
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        let due= {{ txn.due }}
+        let def= due
+        let balance= parseFloat(data.balance)
+
+        if (balance < due) {
+          def= balance
+        }
+        if (((balance - due) <= 10.00) && !data.expires) {
+          def= balance
+          form.querySelector('#change').classList.remove('hidden')
+        }
+
+        form.querySelector('[name="amount"]').value= scat.amount(def)
+        form.querySelector('#balance').textContent= scat.amount(balance)
+        form.querySelector('#latest').textContent= data.latest
+
+        form.querySelectorAll('.get-card').forEach((el) => {
+          el.classList.add('hidden')
+        })
+        form.querySelectorAll('.payment').forEach((el) => {
+          el.classList.remove('hidden')
+        })
+      })
+    }
+
+    if (formData.get('pay')) {
+      return scat.post("/sale/{{ txn.id }}/payment", formData)
+          .then((res) => res.json())
+          .then((data) => {
+            dialog.resolution= data
+            $(dialog).modal('hide')
+          })
+    }
+
+    return false
+  }
+{% endblock %}

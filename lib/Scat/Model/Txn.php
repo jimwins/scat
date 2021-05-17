@@ -38,6 +38,28 @@ class Txn extends \Scat\Model {
     return $this->has_many('Payment');
   }
 
+  public function canPay($method, $amount) {
+    // only 'gift' and 'cash' allow giving change
+    $change= (($method == 'cash' || $method == 'gift') ? true : false);
+
+    if ($method == 'discount') {
+      // assume it's good
+      return true;
+    }
+
+    if (!$change &&
+        (($this->total() >= 0 &&
+          bccomp(bcadd($amount, $this->total_paid()), $this->total()) > 0)
+         ||
+         ($this->total() < 0 &&
+          bccomp(bcadd($amount, $this->total_paid()), $this->total()) < 0)))
+    {
+      return false;
+    }
+
+    return true;
+  }
+
   public function person() {
     return $this->belongs_to('Person')->find_one();
   }
@@ -290,12 +312,16 @@ class Txn extends \Scat\Model {
 
     foreach ($this->payments() as $payment) {
       if ($payment->method == 'discount' && $payment->discount) {
-        // Force total() to be calculated
-        unset($txn->_totals);
         $payment->amount= $payment->discount / 100 * $txn->total();
         $payment->save();
+        // Force total() to be calculated
+        $this->flushTotals();
       }
     }
+  }
+
+  public function flushTotals() {
+    $this->_totals= null;
   }
 
   public function recalculateTaxOnReturns() {

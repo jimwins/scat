@@ -796,6 +796,7 @@ class Transactions {
       return $this->view->render($response, 'dialog/pay-' . $method . '.html', [
         'txn' => $txn,
         'payment' => $payment,
+        'other_method' => $request->getParam('other_method')
       ]);
     }
 
@@ -805,6 +806,7 @@ class Transactions {
 
   public function addPayment(Request $request, Response $response,
                               \Scat\Service\PayPal $paypal,
+                              \Scat\Service\Giftcard $gift,
                               \Scat\Service\Config $config, $id)
   {
     $txn= $this->txn->fetchById($id);
@@ -815,155 +817,213 @@ class Transactions {
 
     $method= $request->getParam('method');
     $amount= $request->getParam('amount');
+    $amount= ltrim($amount, '$'); # get rid of leading $
+
+    $change= (($method == 'cash' || $method == 'gift') ? true : false);
+    if (!$txn->canPay($method, $amount)) {
+      throw new \Exception("Amount is too much.");
+    }
+
+    $data= $discount= null;
 
     switch ($method) {
-    case 'amazon':
-      if ($amount <= 0) {
-        throw new \Exception("Can only handle refunds.");
-      }
-      if (!$txn->returned_from_id) {
-        throw new \Exception("Can't find original transaction to refund.");
-      }
+    case 'refund':
+      $other_method= $request->getParam('other_method');
 
-      $original= $txn->returned_from();
-      $original_payment= null;
-
-      foreach ($original->payments()->find_many() as $pay) {
-        if ($pay->method == 'amazon') {
-          $original_payment= $pay;
-          break;
+      switch ($other_method) {
+      case 'amazon':
+        if ($amount <= 0) {
+          throw new \Exception("Can only handle refunds.");
         }
+        if (!$txn->returned_from_id) {
+          throw new \Exception("Can't find original transaction to refund.");
+        }
+
+        $original= $txn->returned_from();
+        $original_payment= null;
+
+        foreach ($original->payments()->find_many() as $pay) {
+          if ($pay->method == 'amazon') {
+            $original_payment= $pay;
+            break;
+          }
+        }
+
+        if (!$original_payment) {
+          throw new \Exception("Unable to find Amazon payment on original transaction");
+        }
+
+        $charge= json_decode($original_payment->data);
+
+        $amazon= $this->getAmazonClient($config);
+
+        // we only have the authorization here
+        error_log("getting details for {$charge->AmazonAuthorizationId}\n");
+        $authorization= $amazon->getAuthorizationDetails([
+          'amazon_authorization_id' => $charge->AmazonAuthorizationId,
+        ]);
+        $details= $authorization->toArray();
+
+        if (!$amazon->success) {
+          error_log("Amazon FAIL: " . json_encode($details) . "\n");
+          throw new \Exception("An unexpected Amazon error occured.");
+        }
+
+        $refund= $amazon->refund([
+          // XXX We assume only one capture per authorization
+          'amazon_capture_id' => $details['GetAuthorizationDetailsResult']
+                                          ['AuthorizationDetails']
+                                          ['IdList']
+                                          ['member'],
+          'refund_reference_id' => uniqid(),
+          'refund_amount' => $amount,
+        ]);
+
+        $amount= -$amount;
+        $data= $refund->toArray();
+
+        if (!$amazon->success) {
+          error_log("Amazon FAIL: " . json_encode($data) . "\n");
+          throw new \Exception("An unexpected Amazon error occured.");
+        }
+
+        break;
+
+      case 'paypal':
+        if ($amount <= 0) {
+          throw new \Exception("Can only handle refunds.");
+        }
+        if (!$txn->returned_from_id) {
+          throw new \Exception("Can't find original transaction to refund.");
+        }
+
+        $original= $txn->returned_from();
+        $original_payment= null;
+
+        foreach ($original->payments()->find_many() as $pay) {
+          if ($pay->method == 'paypal') {
+            $original_payment= $pay;
+            break;
+          }
+        }
+
+        if (!$original_payment) {
+          throw new \Exception("Unable to find PayPal payment on original transaction");
+        }
+
+        $charge= json_decode($original_payment->data);
+
+        $capture_id= $charge->purchase_units[0]->payments->captures[0]->id;
+
+        $res= $paypal->refund($capture_id, $amount);
+
+        $data= $res->result;
+        $amount= -$amount;
+
+        break;
+
+      case 'stripe':
+        if ($amount <= 0) {
+          throw new \Exception("Can only handle refunds.");
+        }
+        if (!$txn->returned_from_id) {
+          throw new \Exception("Can't find original transaction to refund.");
+        }
+
+        $original= $txn->returned_from();
+        $original_payment= null;
+
+        foreach ($original->payments()->find_many() as $pay) {
+          if ($pay->method == 'stripe') {
+            $original_payment= $pay;
+            break;
+          }
+        }
+
+        if (!$original_payment) {
+          throw new \Exception("Unable to find Stripe payment on original transaction");
+        }
+
+        $charge= json_decode($original_payment->data);
+
+        $stripe= new \Stripe\StripeClient($config->get('stripe.secret_key'));
+
+        $data= $stripe->refunds->create([
+          'charge' => $charge->charge_id,
+          'amount' => (integer)(new \Decimal\Decimal(100) * $amount),
+        ]);
+
+        $amount= -$amount;
+        break;
       }
+      break; // end of refund handling
 
-      if (!$original_payment) {
-        throw new \Exception("Unable to find Amazon payment on original transaction");
+    case 'other':
+      $method= $request->getParam('other_method');
+      if (!$method) {
+        throw new \Exception("No other payment method supplied.");
       }
-
-      $charge= json_decode($original_payment->data);
-
-      $amazon= $this->getAmazonClient($config);
-
-      // we only have the authorization here
-      error_log("getting details for {$charge->AmazonAuthorizationId}\n");
-      $authorization= $amazon->getAuthorizationDetails([
-        'amazon_authorization_id' => $charge->AmazonAuthorizationId,
-      ]);
-      $details= $authorization->toArray();
-
-      if (!$amazon->success) {
-        error_log("Amazon FAIL: " . json_encode($details) . "\n");
-        throw new \Exception("An unexpected Amazon error occured.");
-      }
-
-      $refund= $amazon->refund([
-        // XXX We assume only one capture per authorization
-        'amazon_capture_id' => $details['GetAuthorizationDetailsResult']
-                                        ['AuthorizationDetails']
-                                        ['IdList']
-                                        ['member'],
-        'refund_reference_id' => uniqid(),
-        'refund_amount' => $amount,
-      ]);
-      $details= $refund->toArray();
-
-      if (!$amazon->success) {
-        error_log("Amazon FAIL: " . json_encode($details) . "\n");
-        throw new \Exception("An unexpected Amazon error occured.");
-      }
-
-      $payment= $txn->payments()->create();
-      $payment->method= 'amazon';
-      $payment->txn_id= $txn->id();
-      $payment->amount= -$amount;
-      $payment->data= json_encode($refund->toArray());
-      $payment->set_expr('processed', 'NOW()');
-      $payment->save();
-
+      /* Nothing else special to be done. */
       break;
 
-    case 'paypal':
-      if ($amount <= 0) {
-        throw new \Exception("Can only handle refunds.");
-      }
-      if (!$txn->returned_from_id) {
-        throw new \Exception("Can't find original transaction to refund.");
-      }
-
-      $original= $txn->returned_from();
-      $original_payment= null;
-
-      foreach ($original->payments()->find_many() as $pay) {
-        if ($pay->method == 'paypal') {
-          $original_payment= $pay;
-          break;
-        }
-      }
-
-      if (!$original_payment) {
-        throw new \Exception("Unable to find PayPal payment on original transaction");
-      }
-
-      $charge= json_decode($original_payment->data);
-
-      $capture_id= $charge->purchase_units[0]->payments->captures[0]->id;
-
-      $res= $paypal->refund($capture_id, $amount);
-
-      $payment= $txn->payments()->create();
-      $payment->method= 'paypal';
-      $payment->txn_id= $txn->id();
-      $payment->amount= -$amount;
-      $payment->data= json_encode($res->result);
-      $payment->set_expr('processed', 'NOW()');
-      $payment->save();
-
+    case 'cash':
+      /* Nothing special to be done. */
       break;
 
-    case 'stripe':
-      if ($amount <= 0) {
-        throw new \Exception("Can only handle refunds.");
+    case 'gift':
+      $data= [
+        'card' => $request->getParam('card')
+      ];
+      if ($data['card']) {
+        $gift->add_txn($data['card'], -$amount, $txn->id);
       }
-      if (!$txn->returned_from_id) {
-        throw new \Exception("Can't find original transaction to refund.");
-      }
+      break;
 
-      $original= $txn->returned_from();
-      $original_payment= null;
-
-      foreach ($original->payments()->find_many() as $pay) {
-        if ($pay->method == 'stripe') {
-          $original_payment= $pay;
-          break;
+    case 'discount':
+      if (preg_match('!^(/)?\s*(\d+)(%|/)?\s*$!', $amount, $m)) {
+        if ($m[1] || $m[3]) {
+          $amount= round($txn->total() * $m[2] / 100,
+                         2, PHP_ROUND_HALF_EVEN);
+          $discount= $m[2];
         }
       }
-
-      if (!$original_payment) {
-        throw new \Exception("Unable to find Stripe payment on original transaction");
-      }
-
-      $charge= json_decode($original_payment->data);
-
-      $stripe= new \Stripe\StripeClient($config->get('stripe.secret_key'));
-
-      $refund= $stripe->refunds->create([
-        'charge' => $charge->charge_id,
-        'amount' => (integer)(new \Decimal\Decimal(100) * $amount),
-      ]);
-
-      $payment= $txn->payments()->create();
-      $payment->method= 'stripe';
-      $payment->txn_id= $txn->id();
-      $payment->amount= -$amount;
-      $payment->data= json_encode($refund);
-      $payment->set_expr('processed', 'NOW()');
-      $payment->save();
-
       break;
 
     default:
       throw new \Exception("Don't know how to handle a '$method' payment");
     }
 
+    $payment= $txn->payments()->create();
+    $payment->method= $method;
+    $payment->txn_id= $txn->id();
+    $payment->amount= $amount;
+    if ($discount) {
+      $payment->discount= $discount;
+    }
+    if ($data) {
+      $payment->data= json_encode($data);
+    }
+    $payment->set_expr('processed', 'NOW()');
+    $payment->save();
+
+    $txn->flushTotals(); // Need to recalculate totals
+
+    // if total > 0 and amount + paid > total, add change record
+    $change_paid= 0.0;
+    if ($change && $txn->total() > 0 && $txn->total_paid() > $txn->total()) {
+      $change_paid= bcsub($txn->total(), $txn->total_paid());
+
+      $payment= $txn->payments()->create();
+      $payment->method= 'change';
+      $payment->txn_id= $txn->id();
+      $payment->amount= $change_paid;
+      $payment->set_expr('processed', 'NOW()');
+      $payment->save();
+    }
+
+    $txn->flushTotals(); // Need to recalculate totals
+
+    error_log("total {$txn->total()} == total_paid {$txn->total_paid()}\n");
     if ($txn->total() == $txn->total_paid()) {
       $txn->set_expr('paid', 'NOW()');
       if (in_array($txn->status, [ 'new', 'filled' ])) {
@@ -971,7 +1031,7 @@ class Transactions {
       }
     } else {
       $txn->paid= NULL;
-      $txn->status= 'new'; // not right, what about filled?
+      $txn->status= 'new'; // XXX not right, what about filled?
     }
     $txn->save();
 

@@ -8,14 +8,16 @@
 {% block size 'modal-sm' %}
 
 {% block body %}
-  <div style="text-align: center">
-    <button class="btn btn-primary btn-lg" data-value="cash">
+  <div class="modal-body">
+
+    <button type="button" class="btn btn-primary btn-lg btn-block"
+            data-action="choose-pay-method" data-method="cash">
       Cash
     </button>
 
     {% if txn.due > 0 %}
-      <button class="btn btn-default btn-lg"
-              data-value="credit">
+      <button type="button" class="btn btn-primary btn-lg btn-block"
+              data-action="choose-pay-method" data-method="credit">
         Credit Card
       </button>
     {% endif %}
@@ -30,44 +32,58 @@
     {% if txn.due < 0 and txn.returned_from_id %}
       {% for pay in txn.returned_from.payments.find_many %}
         {% if pay.method in return_methods|keys %}
-          <button class="btn btn-default btn-lg"
-                  data-id="{{ pay.id }}"
-                  data-value="{{ pay.method }}-refund">
+          <button type="button" class="btn btn-default btn-lg btn-block"
+                  data-action="choose-pay-method"
+                  data-other-method="{{ pay.method }}"
+                  data-method="refund">
             Refund {{ return_methods[pay.method] }}
           </button>
         {% endif %}
       {% endfor %}
     {% endif %}
 
-    <br><br>
+    <br>
 
-    <button class="btn btn-default" data-value="credit-manual">
-      Credit Card (Manual)
-    </button>
-
-    <br><br>
-
-    <button class="btn btn-default" data-value="gift">
+    <button type="button" class="btn btn-default btn-lg btn-block"
+            data-action="choose-pay-method"
+            data-method="gift">
       Gift Card
     </button>
-    <button class="btn btn-default" data-value="check">
-      Check
+    <button type="button" class="btn btn-default btn-lg btn-block"
+            data-action="choose-pay-method"
+            data-method="discount">
+      Discount
     </button>
-    <button class="btn btn-default" data-value="other">
+
+    <br>
+
+    <button type="button" class="btn btn-default btn-lg btn-block"
+            data-action="show-other-methods">
       Other
     </button>
 
-    <br><br>
+    {% set other= {
+      'bad' : 'Bad Debt',
+      'check' : 'Check',
+      'credit' : 'Credit',
+      'donation' : 'Donation',
+      'amazonpay' : 'Amazon Pay',
+      'paypal' : 'PayPal',
+      'square' : 'Square',
+      'stripe' : 'Stripe',
+      'venmo' : 'Venmo',
+    } %}
 
-    <button class="btn btn-default" data-value="discount">
-      Discount
-    </button>
-    <button class="btn btn-default" data-value="donation">
-      Donation
-    </button>
-    <button class="btn btn-default" data-value="bad-debt">
-      Bad Debt
-    </button>
+    <div class="other-methods hidden">
+      {% for method, name in other %}
+        <button type="button" class="btn btn-default btn-lg btn-block"
+                data-action="choose-pay-method"
+                data-method="other"
+                data-other-method="{{ method }}">
+          {{ name }}
+        </button>
+      {% endfor %}
+    </div>
   </div>
 {% endblock %}
 
@@ -79,19 +95,36 @@
     let choose= (ev) => {
       ev.preventDefault()
 
-      var method= ev.currentTarget.getAttribute('data-value')
-      $(dialog).modal('hide')
+      var method= ev.target.closest('[data-method]').getAttribute('data-method')
 
-      var id= "#pay-" + method;
-      var due= Txn.due();
-      $(".amount", id).val(due);
-      $.smodal($(id), { persist: true, overlayClose: false });
-      $(".amount", id).focus().select();
+      if ($.smodal) {
+        $(dialog).modal('hide')
+
+        // old payment handling
+        var id= "#pay-" + method;
+        var due= Txn.due();
+        $(".amount", id).val(due);
+        $.smodal($(id), { persist: true, overlayClose: false });
+        $(".amount", id).focus().select();
+      } else {
+        var other= ev.target.closest('[data-other-method]')
+        dialog.resolution= scat.dialog('/sale/{{ txn.id }}/payment', {
+          method: method,
+          other_method: other ? other.getAttribute('data-other-method') : null,
+        })
+        $(dialog).modal('hide')
+      }
     }
 
-    dialog.querySelectorAll('button').forEach((button) => {
-      if (!button.hasAttribute('data-dismiss'))
-        button.addEventListener('click', choose)
+    dialog.addEventListener('click', (ev) => {
+      let act= ev.target.closest('[data-action]')
+      if (act && act.getAttribute('data-action') === 'choose-pay-method') {
+        return choose(ev)
+      }
+      if (act && act.getAttribute('data-action') === 'show-other-methods') {
+        act.classList.add('hidden')
+        dialog.querySelector('.other-methods').classList.remove('hidden')
+      }
     })
   }
 {% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Other Payment
+{% endblock %}
+
+{% block size 'modal-sm' %}
+
+{% block body %}
+  <div class="modal-body">
+    <div class="form-group">
+      <input type="hidden" name="method" value="other">
+      <input type="hidden" name="other_method" value="{{ other_method }}">
+      <input class="form-control input-lg text-center autofocus"
+              type="text" pattern="[$-.0-9]*"
+              name="amount"
+              value="{{ scat.amount(txn.due) }}">
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button class="btn btn-primary">
+    Pay
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+
+    return scat.post("/sale/{{ txn.id }}/payment", formData)
+        .then((res) => res.json())
+        .then((data) => {
+          dialog.resolution= data
+          $(dialog).modal('hide')
+        })
+  }
+{% endblock %}

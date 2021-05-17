@@ -285,9 +285,15 @@
          </ul>
         </div>
 
-        <button class="btn btn-lg btn-default">
-          Pa<u>y</u>
-        </button>
+        {% if txn.paid %}
+          <button data-action="return-sale" class="btn btn-lg btn-default">
+            Return
+          </button>
+        {% else %}
+          <button data-action="pay-sale" class="btn btn-lg btn-default">
+            Pa<u>y</u>
+          </button>
+        {% endif %}
       </div>
 
       {% if txn.returned_from_id %}
@@ -784,6 +790,21 @@
     scat.handleAction('click', 'email-gift-card', (act) => {
       var card= act.closest('[data-card]').getAttribute('data-card')
       return scat.dialog('/gift-card/' + card + '/email-form')
+    })
+
+    let payTransaction= () => {
+      return scat.dialog('/sale/{{ txn.id }}/payment')
+        .then((res) => {
+          scat.reload('invoice', 'sidebar')
+        })
+    }
+
+    scat.handleAction('click', 'pay-sale', (act) => {
+      return payTransaction()
+    })
+
+    scat.handleAction('click', 'return-sale', (act) => {
+      scat.alert('danger', "Don't know how to do returns yet.")
     })
 
     /* Bind some global keys */
