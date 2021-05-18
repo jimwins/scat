@@ -107,7 +107,7 @@ tr.total td {border-top:6px solid #000; text-align:right; }
     {% set payments= txn.payments.find_many() %}
     {% for p in payments %}
       <tr>
-        <td class="right" colspan="2"
+        <td class="right" colspan="2">
           {{ p.pretty_method }}:
         </td>
         <td class="price">{{ scat.amount(p.amount * -1) }}</td>
