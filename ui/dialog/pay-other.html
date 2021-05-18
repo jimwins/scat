@@ -13,9 +13,9 @@
       <input type="hidden" name="method" value="other">
       <input type="hidden" name="other_method" value="{{ other_method }}">
       <input class="form-control input-lg text-center autofocus"
-              type="text" pattern="[$-.0-9]*"
+              type="text" pattern="[-.0-9]*"
               name="amount"
-              value="{{ scat.amount(txn.due) }}">
+              value="{{ txn.due }}">
     </div>
   </div>
 {% endblock %}

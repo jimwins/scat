@@ -24,9 +24,9 @@
       <div class="form-group">
         <input type="hidden" name="method" value="gift">
         <input class="form-control input-lg text-center autofocus"
-                type="text" pattern="[$-.0-9]*"
+                type="text" pattern="[-.0-9]*"
                 name="amount"
-                value="{{ scat.amount(txn.due) }}">
+                value="{{ txn.due }}">
       </div>
       <div id="change" class="alert alert-danger hidden">
         Remaining balance would be less than $10, so they can get that as
@@ -85,7 +85,7 @@
           form.querySelector('#change').classList.remove('hidden')
         }
 
-        form.querySelector('[name="amount"]').value= scat.amount(def)
+        form.querySelector('[name="amount"]').value= def
         form.querySelector('#balance').textContent= scat.amount(balance)
         form.querySelector('#latest').textContent= data.latest
 

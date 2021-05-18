@@ -807,6 +807,7 @@ class Transactions {
   public function addPayment(Request $request, Response $response,
                               \Scat\Service\PayPal $paypal,
                               \Scat\Service\Giftcard $gift,
+                              \Scat\Service\Dejavoo $dejavoo,
                               \Scat\Service\Config $config, $id)
   {
     $txn= $this->txn->fetchById($id);
@@ -889,6 +890,15 @@ class Transactions {
 
         break;
 
+      case 'credit':
+        // use -$amount because that's how refunds roll
+        $result= $dejavoo->runTransaction(-$amount, $txn->formatted_number);
+
+        $amount= $result['captured'];
+        $data= $result['data'];
+
+        break;
+
       case 'paypal':
         if ($amount <= 0) {
           throw new \Exception("Can only handle refunds.");
@@ -968,6 +978,14 @@ class Transactions {
 
     case 'cash':
       /* Nothing special to be done. */
+      break;
+
+    case 'credit':
+      $result= $dejavoo->runTransaction($amount, $txn->formatted_number);
+
+      $amount= $result['captured'];
+      $data= $result['data'];
+
       break;
 
     case 'gift':
