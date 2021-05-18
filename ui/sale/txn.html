@@ -804,7 +804,14 @@
     })
 
     scat.handleAction('click', 'return-sale', (act) => {
-      scat.alert('danger', "Don't know how to do returns yet.")
+      if (!confirm("Are you sure you want to create a return?")) {
+        return false;
+      }
+      return scat.post('/sale/{{ txn.id }}/~return')
+        .then((res) => res.json())
+        .then((data) => {
+          window.location.href= '/sale/' + data.id
+        })
     })
 
     /* Bind some global keys */

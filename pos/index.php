@@ -101,6 +101,8 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
       ->setName('sale');
   $app->patch('/{id:[0-9]+}',
               [ \Scat\Controller\Transactions::class, 'updateSale' ]);
+  $app->post('/{id:[0-9]+}/~return',
+              [ \Scat\Controller\Transactions::class, 'createReturn' ]);
   $app->post('/{id:[0-9]+}/~print-invoice',
               [ \Scat\Controller\Transactions::class, 'printSaleInvoice' ]);
   $app->post('/{id:[0-9]+}/~print-receipt',

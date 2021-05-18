@@ -161,6 +161,57 @@ class Transactions {
     return $response->withRedirect('/sale/' . $sale->id);
   }
 
+  public function createReturn(Request $request, Response $response, $id)
+  {
+    $orig= $this->txn->fetchById($id);
+    if (!$orig)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $this->data->beginTransaction();
+
+    $sale= $this->txn->create('customer', [
+      'tax_rate' => $this->tax->default_rate,
+    ]);
+
+    // Just copy a limited number of fields
+    foreach ([
+      'person_id', 'shipping_address_id', 'tax_rate', 'no_rewards'
+    ] as $field) {
+      $sale->set($field, $orig->$field);
+    }
+    $sale->returned_from_id= $orig->id;
+
+    $sale->save();
+
+    foreach ($orig->items()->find_many() as $line) {
+      $new= $sale->items()->create();
+      $data= $line->as_array();
+      unset($data['id']); // don't copy id!
+      unset($data['sale_price']); // can't copy calculated field
+      // flip some values
+      $data['ordered']= -$data['ordered'];
+      $data['allocated']= -$data['allocated'];
+      $data['tax']= -$data['tax'];
+      $new->set($data);
+      $new->txn_id= $sale->id;
+      $new->returned_from_id= $line->id;
+      $new->save();
+    }
+
+    /* We don't copy notes or payments. */
+
+    $this->data->commit();
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      $response= $response->withStatus(201)
+                          ->withHeader('Location', '/sale/' . $sale->id);
+      return $response->withJson($sale);
+    }
+
+    return $response->withRedirect('/sale/' . $sale->id);
+  }
+
   public function updateSale(Request $request, Response $response,
                               \Scat\Service\Ordure $ordure, $id)
   {
@@ -966,6 +1017,7 @@ class Transactions {
         $amount= -$amount;
         break;
       }
+      $method= $other_method;
       break; // end of refund handling
 
     case 'other':
