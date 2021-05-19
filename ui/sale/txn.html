@@ -645,17 +645,38 @@
     scat.handleAction('click', 'create-shipment', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/shipment')
         .then((res) => {
+          {% if txn.status in [ 'new', 'processing' ] %}
+            return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })
+              .then((res) => {
+                scat.reload('sidebar')
+              })
+          {% endif %}
           scat.reload('sidebar')
         })
     })
 
     scat.handleAction('click', 'create-dropship', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/dropship')
+        .then((res) => {
+          {% if txn.status in [ 'new', 'processing' ] %}
+            return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })
+              .then((res) => {
+                scat.reload('sidebar')
+              })
+          {% endif %}
+          scat.reload('sidebar')
+        })
     })
 
     scat.handleAction('click', 'add-tracker', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/shipment?tracker=1')
         .then((res) => {
+          {% if txn.status in [ 'new', 'processing' ] %}
+            return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })
+              .then((res) => {
+                scat.reload('sidebar')
+              })
+          {% endif %}
           scat.reload('sidebar')
         })
     })
