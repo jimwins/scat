@@ -154,8 +154,10 @@
     .then((data) => {
       scat.alert('info', 'Added shipment.')
       scat.print('/sale/' + {{ txn.id }} + '/shipment/' + data.id + '/~print-label')
-      viewModel.setStatus(null, null, 'shipping')
-      Txn.loadId({{ txn.id }})
+      if (viewModel) { /* XXX old-index.php */
+        viewModel.setStatus(null, null, 'shipping')
+        Txn.loadId({{ txn.id }})
+      }
       $(dialog).modal('hide')
     })
     .catch((err) => {
