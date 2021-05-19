@@ -84,13 +84,8 @@ $errorMiddleware->setErrorHandler(
 
 /* ROUTES */
 
-$app->get('/',
-          function (Request $request, Response $response) {
-            $q= ($request->getQueryParams() ?
-                  '?' . http_build_query($request->getQueryParams()) :
-                  '');
-            return $response->withRedirect("/sale/new" . $q);
-          })->setName('home');
+/* Home */
+$app->get('/', [ \Scat\Controller\Home::class, 'home' ])->setName('home');
 
 /* Sales */
 $app->group('/sale', function (RouteCollectorProxy $app) {

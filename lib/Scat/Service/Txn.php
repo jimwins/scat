@@ -34,7 +34,7 @@ class Txn
     return $this->data->factory('Txn')->find_one($id);
   }
 
-  public function find($type, $page, $limit= 25, $q= null) {
+  public function find($type, $page= 0, $limit= 25, $q= null) {
     $res= $this->data->factory('Txn')
                 ->select('*')
                 ->select_expr('COUNT(*) OVER()', 'records')

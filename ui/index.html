@@ -1,0 +1,101 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+{% import _self as s %}
+
+{% block title %}
+  Scat POS
+{% endblock %}
+
+{% block content %}
+  <style>
+    [data-action] {
+      cursor: pointer;
+    }
+    tr[data-action]:hover {
+      text-decoration: underline;
+      color: rgba(128, 0, 0, 0.8);
+    }
+  </style>
+  <form method="GET" action="/person/search">
+    <div class="input-group">
+      <input class="form-control autofocus" type="text" name="q" value="{{ q }}"
+             autocomplete="off" autocorrect="off" autocapitalize="off"
+             spellcheck="false"
+             placeholder="Enter name or other details or scan barcode">
+      <span class="input-group-btn">
+        <button class="btn btn-primary" type="submit">
+          Search
+        </button>
+      </span>
+    </div>
+  </form>
+
+  {% block results %}
+    <hr style="border-color: rgba(0,0,0,0.1)">
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h1 class="panel-title">Item blah blah</h1>
+      </div>
+    </div>
+  {% endblock %}
+
+  <hr style="border-color: rgba(0,0,0,0.1)">
+
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">
+            Open Invoices
+          </h2>
+        </div>
+        {{ s.sales(open_invoices) }}
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">
+            Orders to Process
+          </h2>
+        </div>
+        {{ s.sales(orders_to_process) }}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    scat.handleAction('click', 'view-sale', (act) => {
+      let id= act.closest('[data-id]').getAttribute('data-id')
+      window.location.href= "/sale/" + id
+    })
+  </script>
+{% endblock %}
+
+{% macro sales(sales) %}
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Created</th>
+        <th>Person</th>
+        <th style="text-align: right">Items</th>
+        <th style="text-align: right">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sale in sales %}
+        <tr data-action="view-sale" data-id="{{ sale.id }}">
+          <td>{{ sale.number }}</td>
+          <td>{{ sale.created }}</td>
+          <td>{{ sale.person.friendly_name }}</td>
+          <td style="text-align: right">{{ sale.items|length }}</td>
+          <td style="text-align: right">{{ scat.amount(sale.total) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
