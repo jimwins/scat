@@ -16,29 +16,34 @@
       color: rgba(128, 0, 0, 0.8);
     }
   </style>
-  <form method="GET" action="/person/search">
-    <div class="input-group">
-      <input class="form-control autofocus" type="text" name="q" value="{{ q }}"
-             autocomplete="off" autocorrect="off" autocapitalize="off"
-             spellcheck="false"
-             placeholder="Enter name or other details or scan barcode">
-      <span class="input-group-btn">
-        <button class="btn btn-primary" type="submit">
-          Search
-        </button>
-      </span>
-    </div>
-  </form>
 
-  {% block results %}
-    <hr style="border-color: rgba(0,0,0,0.1)">
-
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h1 class="panel-title">Item blah blah</h1>
-      </div>
+  <div class="row">
+    <div class="col-sm-10">
+      <form id="search" method="GET" action="/">
+        <div class="input-group">
+          <input class="form-control autofocus"
+                 type="text" name="q" value="{{ q }}"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false"
+                 placeholder="Enter name or other details or scan barcode">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">
+              Search
+            </button>
+          </span>
+        </div>
+      </form>
     </div>
-  {% endblock %}
+    <div class="col-sm-2">
+      <button type="button" class="btn btn-primary" data-action="create-sale">
+        New Sale
+      </button>
+    </div>
+  </div>
+
+  <div data-reload="results">
+    {{ block('results') }}
+  </div>
 
   <hr style="border-color: rgba(0,0,0,0.1)">
 
@@ -66,11 +71,181 @@
   </div>
 {% endblock %}
 
+{% block results %}
+  <div>
+    {% import 'macros.twig' as scat %}
+    {% if results %}
+      <hr style="border-color: rgba(0,0,0,0.1)">
+
+      {% if results.items|length == 1 %}
+        {% set item= results.items[0] %}
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h1 class="panel-title">
+              <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
+                {{ item.name }}
+                <small>{{ item.code }}</small>
+              </a>
+            </h1>
+          </div>
+          <div class="panel-body">
+            <div class="col-sm-2">
+              <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
+                {% set media= item.media %}
+                {% if media is not empty %}
+                  {{ include('carousel.twig', { images: media }) }}
+                {% endif %}
+              </a>
+            </div>
+            <div class="col-sm-10">
+              {% if item.product_id %}
+                <p>
+                  <a href="{{ url_for('catalog', { 'dept' : i.product.dept.parent.slug, 'subdept' : i.product.dept.slug, 'product' : i.product.slug }) }}">
+                    See all {{ item.product.name }}
+                    from {{ item.product.brand.name }}
+                    <i class="fa fa-arrow-right"></i>
+                  </a>
+                </p>
+              {% endif %}
+              <h3>
+                {{ scat.amount(item.sale_price) }}
+                {% if item.sale_price != item.retail_price %}
+                  <small style="white-space: nowrap;">List Price {{ scat.amount(item.retail_price) }}</small>
+                {% endif %}
+              </h3>
+              {% if item.sale_price != item.retail_price %}
+                <h4>Save {{ "%.0f"|format((item.retail_price - item.sale_price) / item.retail_price * 100) }}% off list</h4>
+              {% endif %}
+              <p>
+                {{ item.stock }} available,
+                {% if item.minimum_quantity %}
+                  minimum stock {{ item.minimum_quantity }}
+                {% else %}
+                  not stocked
+                {% endif %}
+              </p>
+            </div>
+          </div>
+          <div class="panel-footer">
+            <button type="button" class="btn btn-primary"
+                    id="single-match"
+                    data-action="create-sale" data-item-id="{{ item.id }}">
+              Start Sale
+            </button>
+          </div>
+        </div>
+      {% elseif not results.items|length %}
+        <h2>Nothing found.</h2>
+      {% else %}
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Brand</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in results.items %}
+              <tr data-action="view-item" data-code="{{ item.code }}">
+                <td>
+                  {{ item.code }}
+                </td>
+                <td>
+                  {{ item.name }}
+                </td>
+                <td>
+                  {% if item.product_id %}
+                    {{ item.product.brand.name }}
+                  {% endif %}
+                </td>
+                <td>
+                  {{ scat.amount(item.sale_price) }}
+                </td>
+                <td>
+                  {{ item.stock }}
+                </td>
+                <td>
+                  <button class="btn btn-xs btn-default"
+                          data-action="create-sale"
+                          data-item-id="{{ item.id }}">
+                    Start Sale
+                  </button>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if results.items|length < results.items[0].records %}
+          <p>
+            <a href="/catalog/search?q={{ q }}">
+              See all {{ results.items[0].records }} results
+              <i class="fa fa-arrow-right"></i>
+            </a>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  </div>
+{% endblock %}
+
+
 {% block script %}
   <script>
     scat.handleAction('click', 'view-sale', (act) => {
       let id= act.closest('[data-id]').getAttribute('data-id')
       window.location.href= "/sale/" + id
+      return Promise.resolve()
+    })
+
+    scat.handleAction('click', 'view-item', (act) => {
+      let code= act.closest('[data-code]').getAttribute('data-code')
+      window.location.href= "/catalog/item/" + code
+      return Promise.resolve()
+    })
+
+    scat.handleAction('click', 'create-sale', (act) => {
+      let data= act.closest('[data-item-id]')
+      let item_id= data ? data.getAttribute('data-item-id') : 0
+      return scat.post('/sale', { item_id: item_id })
+              .then((res) => res.json())
+              .then((data) => {
+                window.location.href= '/sale/' + data.id
+                return
+              })
+              .catch((err) => {
+                scat.alert('danger', err.message || "Failed!")
+              })
+    })
+
+    document.getElementById('search').addEventListener('submit', (ev) => {
+      ev.preventDefault()
+
+      let q= ev.target['q'].value
+
+      let url= new URL(window.location.href)
+
+      // when we're searching for the same thing again and there was
+      // one match, create a new sale with it
+      if (q == url.searchParams.get('q')) {
+        let match= document.getElementById('single-match')
+        if (match) {
+          match.click()
+          return
+        }
+      }
+
+      // update window.location and use scat.reload() to just reload results
+      url.searchParams.set('q', q)
+      window.history.replaceState(null, null, url)
+      scat.reload('results')
+
+      // focus and select so new typing/scan overwrites existing
+      ev.target['q'].focus()
+      ev.target['q'].select()
+      return false
     })
   </script>
 {% endblock %}

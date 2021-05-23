@@ -8,15 +8,19 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Transactions {
-  private $view, $txn, $data, $tax;
+  private $view, $txn, $data, $catalog, $pole, $tax;
 
   public function __construct(View $view, \Scat\Service\Txn $txn,
                               \Scat\Service\Data $data,
+                              \Scat\Service\Catalog $catalog,
+                              \Scat\Service\PoleDisplay $pole,
                               \Scat\Service\Tax $tax)
   {
     $this->view= $view;
     $this->txn= $txn;
     $this->data= $data;
+    $this->catalog= $catalog;
+    $this->pole= $pole;
     $this->tax= $tax;
   }
 
@@ -145,9 +149,13 @@ class Transactions {
         $new->txn_id= $sale->id;
         $new->save();
       }
+      /* We don't copy notes. */
     }
 
-    /* We don't copy notes. */
+    $with_item_id= $request->getParam('item_id');
+    if ($with_item_id) {
+      $this->doAddItem($request, $sale, $with_item_id);
+    }
 
     $this->data->commit();
 
@@ -279,32 +287,11 @@ class Transactions {
     return $print->printPDF($response, 'receipt', $pdf->Output('', 'S'));
   }
 
-  /* Items (aka lines) */
-  public function addItem(Request $request, Response $response,
-                          \Scat\Service\PoleDisplay $pole,
-                          \Scat\Service\Catalog $catalog, $id)
-  {
-    $txn= $this->txn->fetchById($id);
-    if (!$txn)
-      throw new \Slim\Exception\HttpNotFoundException($request);
-
-    if (!in_array($txn->status, [ 'new', 'filled', 'template' ])) {
-      throw new \Scat\Exception\HttpConflictException($request,
-        "Unable to add item to transaction because it is {$txn->status}."
-      );
-    }
-
-    if ($request->getUploadedFiles()) {
-      return $this->handleUploadedItems($request, $response, $txn);
-    }
-
-    $item_id= $request->getParam('item_id');
-    $item= $catalog->getItemById($item_id);
+  protected function doAddItem($request, $txn, $item_id) {
+    $item= $this->catalog->getItemById($item_id);
     if (!$item) {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
-
-    $this->data->beginTransaction();
 
     $unique= preg_match('/^ZZ-(frame|print|univ|canvas|stretch|float|panel|giftcard)/i', $item->code);
 
@@ -368,14 +355,40 @@ class Transactions {
       $txn->save();
     }
 
-    $txn->applyPriceOverrides($catalog);
+    $txn->applyPriceOverrides($this->catalog);
     $txn->recalculateTax($this->tax);
 
-    $pole->displayPrice($item->name, $item->sale_price());
-
-    $this->data->commit();
+    $this->pole->displayPrice($item->name, $item->sale_price());
 
     $line->reload();
+
+    return $line;
+  }
+
+  /* Items (aka lines) */
+  public function addItem(Request $request, Response $response, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if (!in_array($txn->status, [ 'new', 'filled', 'template' ])) {
+      throw new \Scat\Exception\HttpConflictException($request,
+        "Unable to add item to transaction because it is {$txn->status}."
+      );
+    }
+
+    if ($request->getUploadedFiles()) {
+      return $this->handleUploadedItems($request, $response, $txn);
+    }
+
+    $item_id= $request->getParam('item_id');
+
+    $this->data->beginTransaction();
+
+    $line= $this->doAddItem($request, $txn, $item_id);
+
+    $this->data->commit();
 
     return $response->withJson($line);
   }
@@ -713,7 +726,6 @@ class Transactions {
   }
 
   public function updateItem(Request $request, Response $response,
-                              \Scat\Service\Catalog $catalog,
                               $id, $line_id)
   {
     $txn= $this->txn->fetchById($id);
@@ -783,7 +795,7 @@ class Transactions {
     }
 
     if (in_array($txn->status, [ 'new', 'filled' ])) {
-      $txn->applyPriceOverrides($catalog);
+      $txn->applyPriceOverrides($this->catalog);
       $txn->recalculateTax($this->tax);
     }
 
@@ -793,7 +805,6 @@ class Transactions {
   }
 
   public function removeItem(Request $request, Response $response,
-                              \Scat\Service\Catalog $catalog,
                               $id, $line_id)
   {
     $txn= $this->txn->fetchById($id);
@@ -820,7 +831,7 @@ class Transactions {
     $line->delete();
 
     if (in_array($txn->status, [ 'new', 'filled' ])) {
-      $txn->applyPriceOverrides($catalog);
+      $txn->applyPriceOverrides($this->catalog);
       $txn->recalculateTax($this->tax);
     }
 
