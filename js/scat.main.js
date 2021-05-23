@@ -304,7 +304,9 @@ class ScatUtils {
     blocks.forEach((block) => {
       let reload= document.querySelector(`[data-reload=${block}]`)
       if (reload) {
-        return fetch(window.location.href + '?block=' + block)
+        let url= new URL(window.location.href)
+        url.searchParams.append('block', block)
+        return fetch(url)
         .then((res) => {
           return res.text()
         })
