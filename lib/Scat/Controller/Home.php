@@ -18,66 +18,59 @@ class Home {
   function home(Request $request, Response $response,
                 \Scat\Service\Search $search)
   {
-    if ($GLOBALS['DEBUG'] && !$request->getParam('id')) {
-      $open_invoices=
-        $this->txn->find('customer')
-          ->where_in('status', [ 'new', 'filled' ])
-          ->find_many();
-      $orders_to_process=
-        $this->txn->find('customer')
-          ->where_in('status', [ 'paid', 'processing' ])
-          ->find_many();
+    $open_invoices=
+      $this->txn->find('customer')
+        ->where_in('status', [ 'new', 'filled' ])
+        ->find_many();
+    $orders_to_process=
+      $this->txn->find('customer')
+        ->where_in('status', [ 'paid', 'processing' ])
+        ->find_many();
 
-      $q= trim($request->getParam('q'));
-      if ($q) {
-        if (preg_match('/^((%V|@)INV-)(\d+)/', $q, $m)) {
-          $match= $txn->fetchById($m[3]);
-          if ($match) {
-            return $response->withRedirect(
-              ($type == 'customer' ? '/sale/' : '/purchase/') . $match->id
-            );
-          }
+    $q= trim($request->getParam('q'));
+    if ($q) {
+      if (preg_match('/^((%V|@)INV-)(\d+)/', $q, $m)) {
+        $match= $txn->fetchById($m[3]);
+        if ($match) {
+          return $response->withRedirect(
+            ($type == 'customer' ? '/sale/' : '/purchase/') . $match->id
+          );
         }
-
-        $limit= 10;
-
-        $items= $search->searchItems($q, $limit);
-
-        /*
-          Fallback: if we found nothing and it looks like a barcode, try
-          searching for an exact match on the barcode to catch items
-          inadvertantly set inactive.
-        */
-        if (count($items) == 0 && preg_match('/^[-0-9x]+$/i', $q)) {
-          $items= $search->searchItems("barcode:\"$q\" active:0");
-        }
-
-        $results= [ 'items' => $items ];
       }
 
-      if (($block= $request->getParam('block'))) {
-        $html= $this->view->fetchBlock('index.html', $block, [
-          'q' => $q,
-          'results' => $results,
-          'open_invoices' => $open_invoices,
-          'orders_to_process' => $orders_to_process
-        ]);
+      $limit= 10;
 
-        $response->getBody()->write($html);
-        return $response;
+      $items= $search->searchItems($q, $limit);
+
+      /*
+        Fallback: if we found nothing and it looks like a barcode, try
+        searching for an exact match on the barcode to catch items
+        inadvertantly set inactive.
+      */
+      if (count($items) == 0 && preg_match('/^[-0-9x]+$/i', $q)) {
+        $items= $search->searchItems("barcode:\"$q\" active:0");
       }
 
-      return $this->view->render($response, 'index.html', [
+      $results= [ 'items' => $items ];
+    }
+
+    if (($block= $request->getParam('block'))) {
+      $html= $this->view->fetchBlock('index.html', $block, [
         'q' => $q,
         'results' => $results,
         'open_invoices' => $open_invoices,
         'orders_to_process' => $orders_to_process
       ]);
-    } else {
-      $q= ($request->getQueryParams() ?
-            '?' . http_build_query($request->getQueryParams()) :
-            '');
-      return $response->withRedirect("/sale/new" . $q);
+
+      $response->getBody()->write($html);
+      return $response;
     }
+
+    return $this->view->render($response, 'index.html', [
+      'q' => $q,
+      'results' => $results,
+      'open_invoices' => $open_invoices,
+      'orders_to_process' => $orders_to_process
+    ]);
   }
 }

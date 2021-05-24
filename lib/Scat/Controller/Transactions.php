@@ -99,7 +99,7 @@ class Transactions {
     }
 
     if (!$GLOBALS['DEBUG'] && !$request->getParam('force')) {
-      return $response->withRedirect("/?id=$id");
+      return $response->withRedirect("/sale/new?id=$id");
     }
 
     if (($block= $request->getParam('block'))) {
