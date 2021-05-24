@@ -1787,7 +1787,7 @@ class Transactions {
   }
 
   public function purchase(Response $response, $id) {
-    return $response->withRedirect("/?id=$id");
+    return $response->withRedirect("/sale/new?id=$id");
   }
 
 }
