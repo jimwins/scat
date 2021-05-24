@@ -291,7 +291,7 @@
             Return
           </button>
         {% else %}
-          {% if txn.items.find_many|length %}
+          {% if txn.items.count %}
             <button data-action="pay-sale" class="btn btn-lg btn-default">
               Pa<u>y</u>
             </button>
