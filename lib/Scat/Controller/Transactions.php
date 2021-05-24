@@ -259,6 +259,40 @@ class Transactions {
     return $response->withJson($txn);
   }
 
+  public function deleteSale(Request $request, Response $response, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if ($txn->payments()->count()) {
+      throw new \Exception("Can't delete sale with payments.");
+    }
+
+    $this->data->beginTransaction();
+
+    if (!$request->getParam('force')) {
+      if ($txn->online_sales_id) {
+        throw new \Exception("Can't delete online sales.");
+      }
+
+      if ($txn->items()->count()) {
+        throw new \Exception("Can't delete sale with items.");
+      }
+    }
+
+    // get rid of items (already bailed if we aren't forcing this)
+    $txn->items()->delete_many();
+    // and notes
+    $txn->notes()->delete_many();
+
+    $txn->delete();
+
+    $this->data->commit();
+
+    return $response->withJson($txn);
+  }
+
   public function printSaleInvoice(Request $request, Response $response,
                                     \Scat\Service\Printer $print, $id)
   {

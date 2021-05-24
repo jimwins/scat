@@ -291,9 +291,15 @@
             Return
           </button>
         {% else %}
-          <button data-action="pay-sale" class="btn btn-lg btn-default">
-            Pa<u>y</u>
-          </button>
+          {% if txn.items.find_many|length %}
+            <button data-action="pay-sale" class="btn btn-lg btn-default">
+              Pa<u>y</u>
+            </button>
+          {% else %}
+            <button data-action="delete-sale" class="btn btn-lg btn-default">
+              Delete
+            </button>
+          {% endif %}
         {% endif %}
       </div>
 
@@ -577,6 +583,9 @@
         .then((res) => {
           scat.reload('invoice', 'sidebar') // XXX reload less of sidebar?
         })
+        .catch((err) => {
+          scat.alert('danger', err.message)
+        })
     })
 
     scat.handleAction('click', 'set-status', (act) => {
@@ -833,6 +842,14 @@
         .then((res) => res.json())
         .then((data) => {
           window.location.href= '/sale/' + data.id
+        })
+    })
+
+    scat.handleAction('click', 'delete-sale', (act) => {
+      return scat.delete('/sale/{{ txn.id }}')
+        .then((res) => {
+          window.location.href= '/'
+          return
         })
     })
 
