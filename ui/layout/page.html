@@ -256,7 +256,12 @@
   })
 
   scat.handleAction('click', 'show-notes', (act) => {
-    return scat.dialog('/note')
+    let kind= act.closest('[data-kind]')
+    let attach= act.closest('[data-attach-id]')
+    return scat.dialog('/note', {
+      kind: kind ? kind.getAttribute('data-kind') : '',
+      attach_id: attach ? attach.getAttribute('data-attach-id') : '',
+    })
   })
   scat.handleAction('click', 'show-quick-report', (act) => {
     return scat.dialog('/report/quick')

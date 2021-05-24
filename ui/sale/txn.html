@@ -204,6 +204,14 @@
   {% import 'macros.twig' as scat %}
   <div class="panel panel-default">
     <div class="panel-heading">
+      <div class="pull-right">
+        <button class="btn btn-sm btn-default"
+                data-action="show-notes" data-kind="txn"
+                data-attach-id="{{ txn.id }}">
+          <i class="fa fa-sticky-note-o"></i>
+          <span class="badge">{{ txn.notes.count ?: '' }}</span>
+        </button>
+      </div>
       <a href="/sale/new?id={{ txn.id }}"
          class="btn btn-link btn-sm pull-right">
         <i class="fa fa-life-ring"></i>
