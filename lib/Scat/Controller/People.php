@@ -279,6 +279,29 @@ class People {
     return $response->withJson($activity);
   }
 
+  public function backorderReport(Request $request, Response $response, $id,
+                                  View $view, \Scat\Service\Data $data)
+  {
+    $person= $data->factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $backorders= [];
+
+    foreach ($person->txns()->where('status', 'new')->find_many() as $txn) {
+      $items= $txn->items()->where_raw('ordered != allocated')->find_many();
+      $backorders[]= [
+        'txn' => $txn,
+        'items' => $items,
+      ];
+    }
+
+    return $view->render($response, 'person/backorders.html', [
+     'person' => $person,
+     'backorders' => $backorders,
+    ]);
+  }
+
   public function remarketingList(Request $request, Response $response,
                                   \Scat\Service\Data $data)
   {

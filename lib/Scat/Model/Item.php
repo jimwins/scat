@@ -19,6 +19,14 @@ class Item extends \Scat\Model {
     return $this->has_many('VendorItem')->where_gte('active', $active);
   }
 
+  public function vendor_sku($person_id) {
+    $item= $this->has_many('VendorItem')
+                ->where_gte('active', $active)
+                ->where('vendor_id', $person_id)
+                ->find_one();
+    return $item ? $item->vendor_sku : null;
+  }
+
   public function most_recent_cost() {
     $q= "SELECT retail_price AS cost
            FROM txn_line

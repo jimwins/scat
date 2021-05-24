@@ -348,8 +348,10 @@ $app->group('/person', function (RouteCollectorProxy $app) {
              [ \Scat\Controller\People::class, 'uploadItems' ]);
   $app->get('/{id:[0-9]+}/loyalty',
             [ \Scat\Controller\People::class, 'loyalty' ]);
+  $app->get('/{id:[0-9]+}/backorders',
+            [ \Scat\Controller\People::class, 'backorderReport' ]);
   $app->post('/{id:[0-9]+}/~merge',
-            [ \Scat\Controller\People::class, 'mergePerson' ]);
+              [ \Scat\Controller\People::class, 'mergePerson' ]);
 
   $app->get('/{id:[0-9]+}/tax-exemption',
             [ \Scat\Controller\People::class, 'getTaxExemption' ]);

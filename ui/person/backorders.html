@@ -1,0 +1,40 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Backorders for {{ person.friendly_name }}
+{% endblock %}
+
+{% block content %}
+  {% if not backorders|length %}
+    <p class="lead">No backorders for this vendor.</p>
+  {% endif %}
+
+  {% for backorder in backorders %}
+    <h2>
+      {{ backorder.txn.friendly_type }}
+      {{ backorder.txn.formatted_number }}
+    </h2>
+
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th class="col-sm-2">SKU</th>
+          <th class="col-sm-2">Code</th>
+          <th class="col-sm-7">Name</th>
+          <th class="col-sm-1">Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in backorder.items %}
+          <tr>
+            <td>{{ item.vendor_sku(person.id) }}</td>
+            <td>{{ item.code }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.ordered - item.allocated }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endfor %}
+{% endblock %}
