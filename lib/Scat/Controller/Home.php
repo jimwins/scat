@@ -18,7 +18,7 @@ class Home {
   function home(Request $request, Response $response,
                 \Scat\Service\Search $search)
   {
-    if ($GLOBALS['DEBUG'] || $request->getParam('force')) {
+    if ($GLOBALS['DEBUG'] && !$request->getParam('id')) {
       $open_invoices=
         $this->txn->find('customer')
           ->where_in('status', [ 'new', 'filled' ])
