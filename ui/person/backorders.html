@@ -11,12 +11,13 @@
   {% endif %}
 
   {% for backorder in backorders %}
-    <h2>
-      {{ backorder.txn.friendly_type }}
-      {{ backorder.txn.formatted_number }}
-    </h2>
-
     <table class="table table-striped table-hover">
+      <caption>
+        <h3 style="color: #000">
+          {{ backorder.txn.friendly_type }}
+          {{ backorder.txn.formatted_number }}
+        </h3>
+      </caption>
       <thead>
         <tr>
           <th class="col-sm-2">SKU</th>
