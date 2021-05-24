@@ -7,6 +7,16 @@
 
 {% block body %}
   <div class="modal-body">
+    <style>
+      li[data-id] {
+        cursor: pointer;
+      }
+      li[data-id]:hover {
+        text-decoration: underline;
+        color: rgba(128, 0, 0, 0.8);
+      }
+    </style>
+
     <div class="form-group">
       <label for="search">Search</label>
       <input type="text" class="form-control" id="search" autofocus
@@ -15,15 +25,15 @@
 
     <div style="max-height: 30em; overflow: scroll; overflow-y: visible">
       <ul class="list-group">
-        <li class="list-group-item" data-bind="click: $parent.selectPerson">
-          <span data-bind="text: $data.friendly_name">
-            Sample Person / Sample Company
-          </span>
-          <span class="pull-right" data-bind="text: $data.pretty_phone">
-            (213) 627-7223
-          </span>
-          <div class="clearfix"></div>
-        </li>
+        {% for person in people %}
+          <li class="list-group-item" data-id="{{ person.id }}">
+            {{ person.friendly_name }}
+            <span class="pull-right">
+              {{ person.pretty_phone }}
+            </span>
+            <div class="clearfix"></div>
+          </li>
+        {% endfor %}
       </ul>
     </div>
 

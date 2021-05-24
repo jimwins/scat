@@ -16,15 +16,7 @@ class People {
     }
 
     $limit= $request->getParam('limit') ?: 20;
-    $people= $data->factory('Person')
-                  ->select('*')
-                  ->select_expr('(SELECT MAX(IFNULL(txn.paid, txn.created))
-                                    FROM txn WHERE txn.person_id = person.id)',
-                                'latest')
-                  ->where('active', 1)
-                  ->order_by_desc('latest')
-                  ->limit($limit)
-                  ->find_many();
+    $people= $this->getLatestPeople($data, $limit);
 
     $accept= $request->getHeaderLine('Accept');
     if ($select2 || strpos($accept, 'application/json') !== false) {
@@ -33,6 +25,18 @@ class People {
     return $view->render($response, 'person/index.html', [
       'people' => $people
     ]);
+  }
+
+  public function getLatestPeople($data, $limit) {
+    return $data->factory('Person')
+                ->select('*')
+                ->select_expr('(SELECT MAX(IFNULL(txn.paid, txn.created))
+                                  FROM txn WHERE txn.person_id = person.id)',
+                              'latest')
+                ->where('active', 1)
+                ->order_by_desc('latest')
+                ->limit($limit)
+                ->find_many();
   }
 
   public function search(Request $request, Response $response, View $view,
@@ -64,7 +68,12 @@ class People {
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
-      return $view->render($response, 'dialog/person-find.html', [ ]);
+      if (!$q && !$people) {
+        $people= $this->getLatestPeople($data, 10);
+      }
+      return $view->render($response, 'dialog/person-find.html', [
+        'people' => $people,
+      ]);
     }
 
     return $view->render($response, 'person/index.html', [
