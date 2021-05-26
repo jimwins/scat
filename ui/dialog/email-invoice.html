@@ -75,7 +75,7 @@
     .then((data) => {
       scat.alert('success', data.message)
       if (formData.get('new_status')) {
-        if (viewModel) {
+        if (typeof viewModel !== 'undefined') { /* XXX old-index.php */
           Txn.loadId(Txn.id())
         }
       }
