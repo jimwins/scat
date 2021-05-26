@@ -479,16 +479,18 @@
         </a>
       {% endif %}
 
-      {% for shipment in txn.shipments.find_many() %}
+      {% if txn.shipments.count %}
         <h4>Shipments</h4>
-        <ul class="list-group">
-          <a class="list-group-item"
-             data-action="shipment-action" data-id="{{ shipment.id }}">
-            {{ shipment.created|date("l, F j") }}
-            {{ shipment.status }}
-          </a>
-        </ul>
-      {% endfor %}
+        {% for shipment in txn.shipments.find_many() %}
+          <ul class="list-group">
+            <a class="list-group-item"
+               data-action="shipment-action" data-id="{{ shipment.id }}">
+              {{ shipment.created|date("D F j") }}
+              {{ shipment.status }}
+            </a>
+          </ul>
+        {% endfor %}
+      {% endif %}
 
     </div>
   </div>
