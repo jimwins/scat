@@ -16,6 +16,7 @@ class Home {
   }
 
   function home(Request $request, Response $response,
+                \Scat\Service\Txn $txn,
                 \Scat\Service\Search $search)
   {
     $open_invoices=

@@ -308,6 +308,9 @@ class ScatUtils {
         url.searchParams.append('block', block)
         return fetch(url)
         .then((res) => {
+          if (res.redirected) {
+            window.location.href= res.url
+          }
           return res.text()
         })
         .then ((text) => {
