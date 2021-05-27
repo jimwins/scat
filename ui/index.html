@@ -271,7 +271,9 @@
           <td>{{ sale.number }}</td>
           <td>{{ sale.created|date("M j g:ia") }}</td>
           <td>{{ sale.person.friendly_name }}</td>
-          <td style="text-align: right">{{ sale.items|length }}</td>
+          <td style="text-align: right">
+            {{ sale.items.sum('ordered') * -1 }}
+          </td>
           <td style="text-align: right">{{ scat.amount(sale.total) }}</td>
         </tr>
       {% endfor %}
