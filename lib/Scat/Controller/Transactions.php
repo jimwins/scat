@@ -986,7 +986,7 @@ class Transactions {
         // use -$amount because that's how refunds roll
         $result= $dejavoo->runTransaction(-$amount, $txn->formatted_number);
 
-        $amount= $result['captured'];
+        $amount= $result['amount'];
         $data= $result['data'];
 
         break;
@@ -1076,7 +1076,7 @@ class Transactions {
     case 'credit':
       $result= $dejavoo->runTransaction($amount, $txn->formatted_number);
 
-      $amount= $result['captured'];
+      $amount= $result['amount'];
       $data= $result['data'];
 
       break;
