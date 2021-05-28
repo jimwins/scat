@@ -1134,11 +1134,27 @@ class Transactions {
 
     $txn->flushTotals(); // Need to recalculate totals
 
-    error_log("total {$txn->total()} == total_paid {$txn->total_paid()}\n");
     if ($txn->total() == $txn->total_paid()) {
-      $txn->set_expr('paid', 'NOW()');
+      $txn->paid= date('Y-m-d H:i:s'); // not set_expr(), we need actual value
+      if (!$txn->filled) {
+        // TODO could do this all at once in a raw query
+        foreach ($txn->items()->find_many() as $item) {
+          $item->allocated= $item->ordered;
+          $item->save();
+        }
+        $txn->set_expr('filled', 'NOW()');
+      }
+
       if (in_array($txn->status, [ 'new', 'filled' ])) {
         $txn->status= 'complete';
+      }
+
+      if (!$txn->tax_captured) {
+        try {
+          $txn->captureTax($this->tax);
+        } catch (\Exception $e) {
+          error_log("Error capturing tax: " . $e->getMessage());
+        }
       }
     } else {
       $txn->paid= NULL;
