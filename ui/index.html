@@ -59,13 +59,8 @@
       </div>
     </div>
     <div class="col-sm-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">
-            Orders to Process
-          </h2>
-        </div>
-        {{ s.sales(orders_to_process) }}
+      <div data-reload="orders">
+        {{ block('orders') }}
       </div>
     </div>
   </div>
@@ -191,6 +186,36 @@
   </div>
 {% endblock %}
 
+{% block orders %}
+  {% import _self as s %}
+  <div>
+    {% if orders_to_print|length %}
+      <div class="panel panel-default orders-to-print">
+        <div class="panel-heading">
+          <div class="pull-right">
+            <button data-action="print-orders"
+                    class="btn btn-default btn-xs">
+              <i class="fa fa-print"></i> Print All
+            </button>
+          </div>
+          <h2 class="panel-title">
+            Orders to Print
+          </h2>
+          <div class="clearfix"></div>
+        </div>
+        {{ s.sales(orders_to_print) }}
+      </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2 class="panel-title">
+          Orders to Process
+        </h2>
+      </div>
+      {{ s.sales(orders_to_process) }}
+    </div>
+  </div>
+{% endblock %}
 
 {% block script %}
   <script>
@@ -218,6 +243,23 @@
               .catch((err) => {
                 scat.alert('danger', err.message || "Failed!")
               })
+    })
+
+    scat.handleAction('click', 'print-orders', (act) => {
+      let orders= document.querySelectorAll('.orders-to-print tr[data-id]')
+
+      return Promise.all(Array.from(orders).map((row) => {
+        let id= row.getAttribute('data-id')
+        return scat.print('/sale/' + id + '/~print-invoice', {
+          variation: 'packing-slip'
+        })
+        .then((res) => {
+          return scat.patch("/sale/" + id, { status: 'processing' })
+        })
+      }))
+      .then((res) => {
+        scat.reload('orders')
+      })
     })
 
     document.getElementById('search').addEventListener('submit', (ev) => {
@@ -255,6 +297,7 @@
 {% endblock %}
 
 {% macro sales(sales) %}
+  {% import 'macros.twig' as scat %}
   <table class="table table-striped table-hover">
     <thead>
       <tr>

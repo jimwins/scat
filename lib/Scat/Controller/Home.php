@@ -23,9 +23,13 @@ class Home {
       $this->txn->find('customer')
         ->where_in('status', [ 'new', 'filled' ])
         ->find_many();
+    $orders_to_print=
+      $this->txn->find('customer')
+        ->where_in('status', [ 'paid' ])
+        ->find_many();
     $orders_to_process=
       $this->txn->find('customer')
-        ->where_in('status', [ 'paid', 'processing' ])
+        ->where_in('status', [ 'processing' ])
         ->find_many();
 
     $q= trim($request->getParam('q'));
@@ -60,6 +64,7 @@ class Home {
         'q' => $q,
         'results' => $results,
         'open_invoices' => $open_invoices,
+        'orders_to_print' => $orders_to_print,
         'orders_to_process' => $orders_to_process
       ]);
 
@@ -71,6 +76,7 @@ class Home {
       'q' => $q,
       'results' => $results,
       'open_invoices' => $open_invoices,
+      'orders_to_print' => $orders_to_print,
       'orders_to_process' => $orders_to_process
     ]);
   }
