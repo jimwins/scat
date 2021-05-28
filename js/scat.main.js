@@ -408,6 +408,23 @@ class ScatUtils {
         let popover= document.getElementById(id)
         let input= popover.querySelector('input, select')
         if (input) { if (input.select) input.select(); input.focus(); }
+
+        let dismisser= (ev) => {
+          if (popover.contains(ev.target)) {
+            document.addEventListener('click', dismisser, {
+              capture: true,
+              once: true
+            })
+            return true
+          } else {
+            $(el).popover('hide')
+          }
+        }
+
+        document.addEventListener('click', dismisser, {
+          capture: true,
+          once: true
+        })
       })
       .on('hide.bs.popover', (ev) => {
         let target= ev.target
