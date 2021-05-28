@@ -98,10 +98,6 @@ class Transactions {
       return $response->withJson($txn);
     }
 
-    if (!$GLOBALS['DEBUG'] && !$request->getParam('force')) {
-      return $response->withRedirect("/sale/new?id=$id");
-    }
-
     if (($block= $request->getParam('block'))) {
       $html= $this->view->fetchBlock('sale/txn.html', $block, [
         'txn' => $txn,
