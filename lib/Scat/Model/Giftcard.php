@@ -144,10 +144,10 @@ class Giftcard extends \Scat\Model {
 
 class Giftcard_Txn extends \Scat\Model {
   public function card() {
-    return $this->belongs_to('Giftcard', 'card_id');
+    return $this->belongs_to('Giftcard', 'card_id')->find_one();
   }
 
   public function txn() {
-    return $this->belongs_to('Txn');
+    return $this->belongs_to('Txn')->find_one();
   }
 }

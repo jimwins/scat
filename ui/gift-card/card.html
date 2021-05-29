@@ -40,7 +40,7 @@
             <td>{{ txn.entered }}</td>
             <td>
               <a href="/sale/{{ txn.txn_id }}">
-                {{ txn.txn.find_one().formatted_number }}
+                {{ txn.txn.formatted_number }}
               </a>
             </td>
             <td>{{ scat.amount(txn.amount) }}</td>

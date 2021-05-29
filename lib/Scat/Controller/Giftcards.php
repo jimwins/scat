@@ -107,8 +107,21 @@ class Giftcards {
   }
 
   public function getEmailForm(Request $request, Response $response, $card) {
-    return $this->view->render($response, 'dialog/email-gift-card.html',
-                                [ "card" => $card ]);
+    $txn= $this->fetch($card)->txns()->order_by_asc('id')->find_one();
+
+    if ($txn && ($txn= $txn->txn())) {
+      $to= $txn->shipping_address();
+      $from= $txn->person();
+      $message= $txn->notes()->order_by_asc('id')->find_one();
+    }
+
+    return $this->view->render($response, 'dialog/email-gift-card.html', [
+      "card" => $card,
+      "to_name" => $to ? $to->name : '',
+      "to_email" => $to ? $to->email : '',
+      "from_name" => $from ? $from->name : '',
+      "message" => $message ? $message->content : '',
+    ]);
   }
 
   public function emailCard(Request $request, Response $response,
