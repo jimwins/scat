@@ -57,7 +57,9 @@
         <div class="form-group">
           <label class="control-label">Tracking Code</label>
           <p class="form-control-static">
-            {{ easypost.tracker.tracking_code }}
+            <a href="//rawm.us/track/{{ easypost.selected_rate.carrier|lower }}/{{ easypost.tracker.tracking_code }}" target="_blank">
+              {{ easypost.tracker.tracking_code }}
+            </a>
           </p>
         </div>
       {% endif %}
