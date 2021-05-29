@@ -53,6 +53,15 @@
         </p>
       </div>
 
+      {% if easypost.tracker %}
+        <div class="form-group">
+          <label class="control-label">Tracking Code</label>
+          <p class="form-control-static">
+            {{ easypost.tracker.tracking_code }}
+          </p>
+        </div>
+      {% endif %}
+
       <div class="form-group">
         <label class="control-label">Rate</label>
         <p class="form-control-static">
