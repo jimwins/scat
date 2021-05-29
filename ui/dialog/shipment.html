@@ -92,9 +92,11 @@
             <div style="padding-left: 0.5em; margin-bottom: 0.3em; border-left: 2px solid rgba(0,0,0,0.2)"">
               {{ scat.format_shipping_status(track.status) }}
               {{ track.datetime|date("g:ia") }}
-              {{ tack.message }}
+              <div>
+                {{ track.message }}
+              </div>
               <div class="text-muted">
-                {{ track.tracking_location.city }},
+                {{ track.tracking_location.city }}{% if track.tracking_location.city %},{% endif %}
                 {{ track.tracking_location.state }}
                 {{ track.tracking_location.zip }}
                 {{ track.tracking_location.country }}
