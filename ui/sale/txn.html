@@ -412,21 +412,23 @@
       {% elseif txn.shipping_address_id %}
         <h4>{{ txn.is_bike_delivery ? 'Deliver to' : 'Ship to' }}:</h4>
         {% set shipping_address= txn.shipping_address() %}
-        <div>{{ shipping_address.name }}</div>
-        <div>{{ shipping_address.company }}</div>
-        <div>{{ shipping_address.email }}</div>
-        {% if shipping_address.phone %}
-          <div>{{ shipping_address.phone | phone_number_format }}</div>
-        {% endif %}
-        <div>{{ shipping_address.street1 }}</div>
-        <div>{{ shipping_address.street2 }}</div>
-        <div>
-          {% if shipping_address.city %}
-            {{ shipping_address.city }},
+        <address>
+          <div>{{ shipping_address.name }}</div>
+          <div>{{ shipping_address.company }}</div>
+          <div>{{ shipping_address.email }}</div>
+          {% if shipping_address.phone %}
+            <div>{{ shipping_address.phone | phone_number_format }}</div>
           {% endif %}
-          {{ shipping_address.state }}
-          {{ shipping_address.zip }}
-        </div>
+          <div>{{ shipping_address.street1 }}</div>
+          <div>{{ shipping_address.street2 }}</div>
+          <div>
+            {% if shipping_address.city %}
+              {{ shipping_address.city }},
+            {% endif %}
+            {{ shipping_address.state }}
+            {{ shipping_address.zip }}
+          </div>
+        </address>
       {% endif %}
 
       {% if txn.status in [ 'paid' ] %}
