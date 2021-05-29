@@ -2,7 +2,7 @@
 {% import 'macros.twig' as scat %}
 
 {% set preferred_rates= {
-  'USPS': [ 'Priority', 'ParcelSelect', 'First' ],
+  'USPS': [ 'Priority', 'First' ],
   'GSO': [ 'CaliforniaParcelService' ],
   'FedEx': [ 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY' ],
   'UPS':  [ 'Ground' ],
@@ -17,6 +17,9 @@
   <div class="modal-body">
     {% if shipment %}
       {% if easypost %}
+        {% if txn.is_firstclass_shipment() %}
+          <h3>First Class</h3>
+        {% endif %}
         <ul class="list-group">
           {% for rate in easypost.rates %}
             <a href="#" data-rate="{{ rate.id }}" class="list-group-item {{ rate.service in preferred_rates[rate.carrier] ? 'preferred' : 'hidden' }}">
