@@ -6,6 +6,10 @@
 {% endblock %}
 
 {% block body %}
+  {% if easypost %}
+    {% set tracker= easypost.tracker %}
+  {% endif %}
+
   <div class="modal-body">
 
     <div class="form-group">
@@ -38,46 +42,46 @@
       </p>
     </div>
 
-    {% if easypost.selected_rate %}
+    {% if tracker %}
       <div class="form-group">
         <label class="control-label">Carrier</label>
         <p class="form-control-static">
-          {{ easypost.selected_rate.carrier }}
+          {{ tracker.carrier }}
         </p>
       </div>
 
       <div class="form-group">
         <label class="control-label">Service</label>
         <p class="form-control-static">
-          {{ easypost.selected_rate.service }}
+          {{ tracker.carrier_detail.service }}
         </p>
       </div>
 
-      {% if easypost.tracker %}
-        <div class="form-group">
-          <label class="control-label">Tracking Code</label>
-          <p class="form-control-static">
-            <a href="//rawm.us/track/{{ easypost.selected_rate.carrier|lower }}/{{ easypost.tracker.tracking_code }}" target="_blank">
-              {{ easypost.tracker.tracking_code }}
-            </a>
-          </p>
-        </div>
-      {% endif %}
+      <div class="form-group">
+        <label class="control-label">Tracking Code</label>
+        <p class="form-control-static">
+          <a href="//rawm.us/track/{{ tracker.carrier|lower }}/{{ tracker.tracking_code }}" target="_blank">
+            {{ tracker.tracking_code }}
+          </a>
+        </p>
+      </div>
 
+    {% endif %}
+
+    {% if easypost.selected_rate %}
       <div class="form-group">
         <label class="control-label">Rate</label>
         <p class="form-control-static">
           {{ scat.amount(easypost.selected_rate.rate) }}
         </p>
       </div>
-
     {% endif %}
 
   </div>
 {% endblock %}
 
 {% block submit %}
-  {% if easypost.tracker %}
+  {% if tracker %}
     <a class="btn btn-primary"
         href="/shipment/{{ shipment.id }}/track" target="_blank">
       Track

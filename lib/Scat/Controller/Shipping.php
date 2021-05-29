@@ -62,7 +62,8 @@ class Shipping {
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
       return $this->view->render($response, 'dialog/shipment.html', [
         'shipment' => $shipment,
-        'easypost' => $this->shipping->getShipment($shipment),
+        'easypost' => $shipment->method_id ? $this->shipping->getShipment($shipment) : null,
+        'tracker' => $shipment->tracker_id ? $this->shipping->getTracker($shipment) : null,
       ]);
     }
 

@@ -71,6 +71,10 @@ class Shipping
     return \EasyPost\Shipment::create($details);
   }
 
+  public function getTracker($shipment) {
+    return \EasyPost\Tracker::retrieve($shipment->tracker_id);
+  }
+
   public function getTrackerUrl($shipment) {
     $tracker= \EasyPost\Tracker::retrieve($shipment->tracker_id);
     return $tracker->public_url;
