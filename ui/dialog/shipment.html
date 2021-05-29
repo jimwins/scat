@@ -11,72 +11,100 @@
   {% endif %}
 
   <div class="modal-body">
+    <div class="row">
 
-    <div class="form-group">
-      <label class="control-label">Status</label>
-      <p class="form-control-static">
-        {{ scat.format_shipping_status(shipment.status) }}
-      </p>
-    </div>
+      <div class="col-sm-6">
 
-    <div class="form-group">
-      <label class="control-label">Dimensions</label>
-      <p class="form-control-static">
-        {% if shipment.length %}
-          {{ shipment.length }}" &times;
-          {{ shipment.width }}" &times;
-          {{ shipment.height }}"
-        {% else %}
-          Unknown
+        <div class="form-group">
+          <label class="control-label">Status</label>
+          <p class="form-control-static">
+            {{ scat.format_shipping_status(shipment.status) }}
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label">Dimensions</label>
+          <p class="form-control-static">
+            {% if shipment.length %}
+              {{ shipment.length }}" &times;
+              {{ shipment.width }}" &times;
+              {{ shipment.height }}"
+            {% else %}
+              Unknown
+            {% endif %}
+            {% if easypost.parcel.predefined_package %}
+              &bull; {{ easypost.parcel.predefined_package }}
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label">Weight</label>
+          <p class="form-control-static">
+            {{ "%.2f"|format((shipment.weight ?: tracker.weight) / 16) }} lbs.
+          </p>
+        </div>
+
+        {% if tracker %}
+          <div class="form-group">
+            <label class="control-label">Carrier</label>
+            <p class="form-control-static">
+              {{ tracker.carrier }}
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label">Service</label>
+            <p class="form-control-static">
+              {{ tracker.carrier_detail.service }}
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label">Tracking Code</label>
+            <p class="form-control-static">
+              <a href="//rawm.us/track/{{ tracker.carrier|lower }}/{{ tracker.tracking_code }}" target="_blank">
+                {{ tracker.tracking_code }}
+              </a>
+            </p>
+          </div>
+
         {% endif %}
-        {% if easypost.parcel.predefined_package %}
-          &bull; {{ easypost.parcel.predefined_package }}
+
+        {% if easypost.selected_rate %}
+          <div class="form-group">
+            <label class="control-label">Cost</label>
+            <p class="form-control-static">
+              {{ scat.amount(easypost.selected_rate.rate) }}
+            </p>
+          </div>
         {% endif %}
-      </p>
+      </div>
+
+      <div class="col-sm-6">
+        {% if tracker.tracking_details %}
+          {% set date= '' %}
+          {% for track in tracker.tracking_details|reverse %}
+            {% if date != track.datetime|date("Y-m-d") %}
+              {% set date= track.datetime|date("Y-m-d") %}
+              <h4>{{ track.datetime|date("F jS") }}</h4>
+            {% endif %}
+            <div style="padding-left: 0.5em; margin-bottom: 0.3em; border-left: 2px solid rgba(0,0,0,0.2)"">
+              {{ scat.format_shipping_status(track.status) }}
+              {{ track.datetime|date("g:ia") }}
+              {{ tack.message }}
+              <div class="text-muted">
+                {{ track.tracking_location.city }},
+                {{ track.tracking_location.state }}
+                {{ track.tracking_location.zip }}
+                {{ track.tracking_location.country }}
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
     </div>
-
-    <div class="form-group">
-      <label class="control-label">Weight</label>
-      <p class="form-control-static">
-        {{ "%.2f"|format((shipment.weight ?: tracker.weight) / 16) }} lbs.
-      </p>
-    </div>
-
-    {% if tracker %}
-      <div class="form-group">
-        <label class="control-label">Carrier</label>
-        <p class="form-control-static">
-          {{ tracker.carrier }}
-        </p>
-      </div>
-
-      <div class="form-group">
-        <label class="control-label">Service</label>
-        <p class="form-control-static">
-          {{ tracker.carrier_detail.service }}
-        </p>
-      </div>
-
-      <div class="form-group">
-        <label class="control-label">Tracking Code</label>
-        <p class="form-control-static">
-          <a href="//rawm.us/track/{{ tracker.carrier|lower }}/{{ tracker.tracking_code }}" target="_blank">
-            {{ tracker.tracking_code }}
-          </a>
-        </p>
-      </div>
-
-    {% endif %}
-
-    {% if easypost.selected_rate %}
-      <div class="form-group">
-        <label class="control-label">Rate</label>
-        <p class="form-control-static">
-          {{ scat.amount(easypost.selected_rate.rate) }}
-        </p>
-      </div>
-    {% endif %}
-
   </div>
 {% endblock %}
 
