@@ -1304,7 +1304,7 @@ class Transactions {
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
       $dialog= ($request->getParam('tracker') ?
                 'dialog/tracker.html' :
-                'dialog/shipment.html');
+                'dialog/create-shipment.html');
       return $this->view->render($response, $dialog, [
         'txn' => $txn,
         'shipment' => $shipment,
