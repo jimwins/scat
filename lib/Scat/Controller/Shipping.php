@@ -58,6 +58,14 @@ class Shipping {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/shipment.html', [
+        'shipment' => $shipment,
+        'easypost' => $this->shipping->getShipment($shipment),
+      ]);
+    }
+
     return $this->view->render($response, 'shipping/shipment.html', [
       'shipment' => $shipment
     ]);

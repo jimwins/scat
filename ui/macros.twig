@@ -44,6 +44,34 @@
   {%- endif -%}
 {% endmacro %}
 
+{% macro format_shipping_status(status) %}
+  {%- if status == 'pending' -%}
+    <span class="text-default">Pending</span>
+  {%- elseif status == 'unknown' -%}
+    <span class="text-default">Unknown</span>
+  {%- elseif status == 'pre_transit' -%}
+    <span class="text-danger">Pre-Transit</span>
+  {%- elseif status == 'in_transit' -%}
+    <span class="text-danger">In Transit</span>
+  {%- elseif status == 'out_for_delivery' -%}
+    <span class="text-danger">Out for Delivery</span>
+  {%- elseif status == 'delivered' -%}
+    <span class="text-success">Delivered</span>
+  {%- elseif status == 'available_for_pickup' -%}
+    <span class="text-success">Available for Pickup</span>
+  {%- elseif status == 'return_to_sender' -%}
+    <span class="text-danger">Return to Sender</span>
+  {%- elseif status == 'failure' -%}
+    <span class="text-danger">Failure</span>
+  {%- elseif status == 'cancelled' -%}
+    <span class="text-muted">Cancelled</span>
+  {%- elseif status == 'error' -%}
+    <span class="text-danger">Error</span>
+  {%- else -%}
+    <span class="text-danger">Unrecognized</span>
+  {%- endif -%}
+{% endmacro %}
+
 {% macro file_upload(dest, reload= true) %}
 <style>
 #droptarget {

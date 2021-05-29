@@ -485,11 +485,14 @@
         <h4>Shipments</h4>
         <ul class="list-group">
           {% for shipment in txn.shipments.find_many() %}
-            <a class="list-group-item"
-               data-action="shipment-action" data-id="{{ shipment.id }}">
+            <li class="list-group-item"
+                data-action="show-shipment" data-id="{{ shipment.id }}">
+              <span class="pull-right">
+                {{ scat.format_shipping_status(shipment.status) }}
+              </span>
               {{ shipment.created|date("D F j") }}
-              {{ shipment.status }}
-            </a>
+              <div class="clearfix"></div>
+            </li>
           {% endfor %}
         </ul>
       {% endif %}
@@ -699,6 +702,14 @@
                 scat.reload('sidebar')
               })
           {% endif %}
+          scat.reload('sidebar')
+        })
+    })
+
+    scat.handleAction('click', 'show-shipment', (act) => {
+      let id= act.closest('[data-id]').getAttribute('data-id')
+      return scat.dialog('/shipment/' + id)
+        .then((res) => {
           scat.reload('sidebar')
         })
     })
