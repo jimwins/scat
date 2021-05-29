@@ -509,7 +509,12 @@
       return scat.get('/catalog/search', formData, {
         headers: { 'Accept': 'application/json' }
       })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.redirected) {
+          window.location.href= res.url
+        }
+        return res.json()
+      })
       .then((data) => {
         if (data.items.length == 0) {
           // No items? Highlight the search field and add a note

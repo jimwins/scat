@@ -32,7 +32,7 @@ class Catalog {
       $match= $txn->fetchById($m[3]);
       if ($match) {
         return $response->withRedirect(
-          ($type == 'customer' ? '/sale/' : '/purchase/') . $match->id
+          ($match->type == 'customer' ? '/sale/' : '/purchase/') . $match->id
         );
       }
     }
