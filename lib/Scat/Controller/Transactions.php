@@ -917,7 +917,7 @@ class Transactions {
       throw new \Exception("Amount is too much.");
     }
 
-    $data= $discount= null;
+    $data= $cc_data= $discount= null;
 
     switch ($method) {
     case 'refund':
@@ -1077,7 +1077,7 @@ class Transactions {
       $result= $dejavoo->runTransaction($amount, $txn->formatted_number);
 
       $amount= $result['amount'];
-      $data= $result['data'];
+      $cc_data= $result['data'];
 
       break;
 
@@ -1110,6 +1110,11 @@ class Transactions {
     $payment->amount= $amount;
     if ($discount) {
       $payment->discount= $discount;
+    }
+    if ($cc_data) {
+      foreach ($cc_data as $key => $value) {
+        $payment->$key= $value;
+      }
     }
     if ($data) {
       $payment->data= json_encode($data);
