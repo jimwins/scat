@@ -74,6 +74,12 @@ class Txn extends \Scat\Model {
       $this->items()->where_in('item_id', [ 11405, 87072, 89017 ])->find_one();
   }
 
+  public function is_local_delivery() {
+    /* XXX Fix hardcoded list */
+    return $this->shipping_address_id > 1 &&
+      $this->items()->where_in('item_id', [ 93456 ])->find_one();
+  }
+
   public function has_hazmat_items() {
     return $this->items()->join('item', [ 'item.id', '=', 'txn_line.item_id' ])->where_gt('item.hazmat', 0)->count();
   }

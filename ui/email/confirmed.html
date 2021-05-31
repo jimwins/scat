@@ -27,7 +27,7 @@
     {% endif %}
     <p>
       We will send another email when your order is ready for pickup.
-      Pickup times are Tuesday – Saturday, noon to 3pm. Most orders
+      Pickup times are Monday – Saturday, 10am to 6pm. Most orders
       placed during our pickup times are ready within 30 minutes, and
       orders placed overnight or over the weekend are ready soon after
       we open. <b>Please wait for confirmation that your order is ready
@@ -40,8 +40,18 @@
     </p>
     <p>
       We will call you before your order leaves the store for delivery.
-      Delivery times are Tuesday – Saturday, noon to 3pm. Most orders
-      placed before 2pm on Tuesday - Saturday are delivered the same day,
+      Delivery times are Monday – Saturday, 10am to 6pm. Most orders
+      placed before 5pm on Monday - Saturday are delivered the same day,
+      and orders placed overnight or over the weekend will be delivered
+      when we are open next.
+    </p>
+  {% elseif txn.is_local_delivery() %}
+    <p>
+      Thank you for your local delivery order from Raw Materials Art Supplies!
+    </p>
+    <p>
+      Delivery times are Monday – Friday, 10am to 6pm. Most orders
+      placed before 3pm on Monday - Friday are delivered the same day,
       and orders placed overnight or over the weekend will be delivered
       when we are open next.
     </p>
@@ -52,7 +62,7 @@
     <p>
       We will send another email with tracking information after your order
       has shipped. Most orders are shipped out within two business days
-      (Tuesday - Saturday).
+      (Monday - Friday).
     </p>
   {% endif %}
 
