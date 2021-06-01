@@ -271,7 +271,8 @@
 
       // when we're searching for the same thing again and there was
       // one match, create a new sale with it
-      if (q == url.searchParams.get('q')) {
+      // TODO refine this before enabling
+      if (0 && q == url.searchParams.get('q')) {
         let match= document.getElementById('single-match')
         if (match) {
           match.click()
