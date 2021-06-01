@@ -454,6 +454,12 @@
             <i class="fa fa-truck"></i>
             Create Shipment
           </a>
+
+          <a data-action="send-canned-message" data-message="ship-delay"
+              class="btn btn-block btn-warning">
+            <i class="fa fa-envelope-o"></i>
+            Shipping Delay
+          </a>
         {% endif %}
 
         {% if txn.shipping_address_id == 1 %}
