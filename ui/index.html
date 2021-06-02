@@ -76,8 +76,8 @@
           <div class="panel-heading">
             <h1 class="panel-title">
               <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
+                <div class="text-info"><b>{{ item.code }}</b></div>
                 {{ item.name }}
-                <small>{{ item.code }}</small>
               </a>
             </h1>
           </div>
@@ -93,7 +93,7 @@
             <div class="col-sm-10">
               {% if item.product_id %}
                 <p>
-                  <a href="{{ url_for('catalog', { 'dept' : i.product.dept.parent.slug, 'subdept' : i.product.dept.slug, 'product' : i.product.slug }) }}">
+                  <a href="{{ url_for('catalog', { 'dept' : item.product.dept.parent.slug, 'subdept' : item.product.dept.slug, 'product' : item.product.slug }) }}">
                     See all {{ item.product.name }}
                     from {{ item.product.brand.name }}
                     <i class="fa fa-arrow-right"></i>
