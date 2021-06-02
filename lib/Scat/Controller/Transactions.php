@@ -52,7 +52,7 @@ class Transactions {
     }
 
     $page= (int)$request->getParam('page');
-    $limit= 25;
+    $limit= (int)$request->getParam('limit') ?: 25;
 
     $txns= $this->txn->find($type, $page, $limit, $q);
     if (($status= $request->getParam('status'))) {
@@ -73,7 +73,6 @@ class Transactions {
       'q' => $q,
     ]);
   }
-
   public function sales(Request $request, Response $response) {
     return $this->search($request, $response, 'customer');
   }

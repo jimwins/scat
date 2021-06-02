@@ -30,7 +30,7 @@
 
 {% block controls %}
   <nav aria-label="Controls for Activity List">
-    <ul class="pager">
+    <ul class="pager hidden-print">
       {% if page %}
         <li class="previous">
           <a href="?page={{ page - 1 }}&status={{ status }}&q={{ q }}">
@@ -66,7 +66,7 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-sm-2">
+    <div class="col-sm-2 hidden-print">
       <form method="GET"
             action="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}">
         <div class="input-group">
