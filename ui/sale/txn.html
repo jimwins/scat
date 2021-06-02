@@ -662,7 +662,9 @@
       return scat.dialog(
         '/sale/{{ txn.id }}/email-invoice-form',
         { canned: message }
-      )
+      ).then((res) => {
+        scat.reload('sidebar')
+      })
     })
 
     scat.handleAction('click', 'edit-shipping-address', (act) => {
@@ -687,8 +689,9 @@
               .then((res) => {
                 scat.reload('sidebar')
               })
+          {% else %}
+            scat.reload('sidebar')
           {% endif %}
-          scat.reload('sidebar')
         })
     })
 
@@ -700,8 +703,9 @@
               .then((res) => {
                 scat.reload('sidebar')
               })
+          {% else %}
+            scat.reload('sidebar')
           {% endif %}
-          scat.reload('sidebar')
         })
     })
 
@@ -713,8 +717,9 @@
               .then((res) => {
                 scat.reload('sidebar')
               })
+          {% else %}
+            scat.reload('sidebar')
           {% endif %}
-          scat.reload('sidebar')
         })
     })
 
