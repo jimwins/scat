@@ -74,8 +74,17 @@
       {{ addr.city }}, {{ addr.state }}
       {{ addr.zip }}<br>
       {% if addr.phone %} {{ addr.phone|phone_number_format }}<br>{% endif %}
-    {% elseif txn.type == 'vendor' and txn.shipping_address_id == 1 %}
-      <br><b>CURBSIDE PICKUP</b>
+    {% elseif txn.type != 'vendor' and txn.shipping_address_id == 1 %}
+      {% if txn.total > 100 %}
+        <div style="border:2px solid black; padding: 0.5em">
+          <b>Check ID</b>
+          {% for payment in txn.payments.find_many() %}
+            {% if payment.method in [ 'credit', 'stripe' ] %}
+              and card: {{ payment.cc_type }} *{{ payment.cc_lastfour }}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
     {% endif %}
   {% endif %}
   {% for note in txn.notes.find_many %}
