@@ -472,7 +472,8 @@
         {% endif %}
 
         {% if txn.shipping_address_id == 1 %}
-          <a data-action="send-canned-message" data-message="pickupmost"
+          <a data-action="send-canned-message"
+              data-message="{{ txn.total > 100 ? 'pickupmost-over100' : 'pickupmost' }}"
               class="btn btn-block btn-warning">
             <i class="fa fa-envelope-o"></i>
             Ready for Pickup (Most)
