@@ -463,7 +463,8 @@
         {% endif %}
 
         {% if txn.shipping_address_id == 1 %}
-          <a data-action="send-canned-message" data-message="pickup"
+          <a data-action="send-canned-message"
+              data-message="{{ txn.total > 100 ? 'pickup-over100' : pickup }}"
               class="btn btn-block btn-primary">
             <i class="fa fa-envelope-o"></i>
             Ready for Pickup
