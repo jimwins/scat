@@ -82,7 +82,7 @@
         {% for shipment in shipments %}
           <tr data-id="{{ shipment.id }}">
             <td class="num">
-              <a href="/shipment/{{ shipment.id }}">{{ loop.index }}</a>
+              <a data-action="show-shipment">{{ loop.index }}</a>
             </td>
             <td>
               <div class="pull-right">
@@ -108,7 +108,7 @@
                     </a>
                   {% endif %}
               </div>
-              <a href="/shipment/{{ shipment.id }}">
+              <a data-action="show-shipment">
                 {{ shipment.created | date('Y-m-d') }}
                 <br>
                 {{ shipment.modified | date('Y-m-d') }}
@@ -203,6 +203,15 @@
             scat.alert('danger', err.message)
           })
   })
+
+  scat.handleAction('click', 'show-shipment', (act) => {
+    let id= act.closest('[data-id]').getAttribute('data-id')
+    return scat.dialog('/shipment/' + id)
+      .then((res) => {
+        scat.reload('sidebar')
+      })
+  })
+
 </script>
 
 {% endblock %}
