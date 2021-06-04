@@ -15,8 +15,10 @@
     <div class="list-group">
       {% for person in people %}
         <a data-id="{{ person.id }}"
-           class="punch list-group-item
-                  {{ person.punched ? 'list-group-item-success' }}">
+            data-action="punch"
+            class="list-group-item
+                    {{ person.punched ? 'list-group-item-success' }}">
+          <i class="fa fa-clock-o"></i>
           {{ person.name }}
           <span class="badge">{{ person.punched }}</span>
         </a>
@@ -46,11 +48,9 @@
 
     window.addEventListener('focus', reload);
 
-    document.addEventListener('click', (ev) => {
-      if (!event.target.matches('.punch')) return;
-
+    scat.handleAction('click', 'punch', (act) => {
       let formData= new FormData()
-      formData.append('id', event.target.getAttribute('data-id'))
+      formData.append('id', act.getAttribute('data-id'))
       fetch('/clock/~punch', {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
