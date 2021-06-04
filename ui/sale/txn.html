@@ -628,8 +628,8 @@
       let data= act.closest('[data-variation]')
       let download= act.closest('[data-download]')
       scat.print( '/sale/{{ txn.id }}/~print-invoice', {
-        variation: data ? data.getAttribute('data-variation') : undefined,
-        download: download ? download.getAttribute('data-download') : undefined
+        variation: data ? data.getAttribute('data-variation') : '',
+        download: download ? download.getAttribute('data-download') : 0
       })
       return Promise.resolve()
     })
