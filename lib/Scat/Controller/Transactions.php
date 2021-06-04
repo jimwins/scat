@@ -299,6 +299,11 @@ class Transactions {
 
     $pdf= $txn->getInvoicePDF($var);
 
+    if ($request->getParam('download')) {
+      $response->getBody()->write($pdf->Output('', 'S'));
+      return $response->withHeader('Content-type', 'application/pdf');
+    }
+
     return $print->printPDF($response, 'letter', $pdf->Output('', 'S'));
   }
 

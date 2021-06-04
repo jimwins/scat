@@ -282,7 +282,7 @@
             </a>
           </li>
           <li>
-            <a data-action="print-invoice" data-variation="download">
+            <a data-action="print-invoice" data-download="1">
               Download
             </a>
           </li>
@@ -626,8 +626,11 @@
 
     scat.handleAction('click', 'print-invoice', (act) => {
       let data= act.closest('[data-variation]')
-      let variation= data ? data.getAttribute('data-variation') : undefined
-      scat.print( '/sale/{{ txn.id }}/~print-invoice', { variation: variation })
+      let download= act.closest('[data-download]')
+      scat.print( '/sale/{{ txn.id }}/~print-invoice', {
+        variation: data ? data.getAttribute('data-variation') : undefined,
+        download: download ? download.getAttribute('data-download') : undefined
+      })
       return Promise.resolve()
     })
 
