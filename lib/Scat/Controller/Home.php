@@ -38,7 +38,7 @@ class Home {
         $match= $txn->fetchById($m[3]);
         if ($match) {
           return $response->withRedirect(
-            ($txn->type == 'customer' ? '/sale/' : '/purchase/') . $match->id
+            ($match->type == 'customer' ? '/sale/' : '/purchase/') . $match->id
           );
         }
       }
