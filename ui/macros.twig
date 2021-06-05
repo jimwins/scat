@@ -156,6 +156,10 @@
 
     scat.dialog('/dialog/file-upload.html', null, (modal) => {
       return scat.post(url, formData)
+      .then((res) => {
+        // save for later resolution of modal
+        modal.resolution= res
+      })
       .finally((res) => {
         $(modal).modal('hide')
       })
