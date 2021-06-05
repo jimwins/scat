@@ -46,7 +46,7 @@ class Transactions {
       $txn= $this->txn->fetchById($m[3]);
       if ($txn) {
         return $response->withRedirect(
-          ($type == 'customer' ? '/sale/' : '/purchase/') . $txn->id
+          ($txn->type == 'customer' ? '/sale/' : '/purchase/') . $txn->id
         );
       }
     }
