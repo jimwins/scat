@@ -92,13 +92,8 @@
 
     (id ? scat.patch('/person/' + id, formData) : scat.post('/person', formData))
     .then((res) => {
-      if (res.status == 201) {
-        window.location.href= res.headers.get('Location')
-      } else if (res.redirected) {
-        window.location.href= res.url
-      } else {
-        window.location.reload()
-      }
+      dialog.resolution= res
+      $(dialog).modal('hide')
     })
   }
 

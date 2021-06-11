@@ -19,7 +19,7 @@
 
     <div class="form-group">
       <label for="search">Search</label>
-      <input type="text" class="form-control" id="search" autofocus
+      <input type="text" class="form-control" id="search" name="search" autofocus
              autocomplete="off" autocorrect="off" autocapitalize="off">
     </div>
 
@@ -101,6 +101,10 @@
   form.onsubmit= (event) => {
     event.preventDefault()
 
-    debugger
+    let formData= new FormData(form)
+
+    dialog.resolution= scat.dialog('/person', formData)
+
+    $(dialog).modal('hide')
   }
 {% endblock %}

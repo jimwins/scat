@@ -12,7 +12,15 @@ class People {
   {
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
-      return $view->render($response, 'dialog/person-edit.html', [ ]);
+      $search= $request->getParam('search');
+      $person= [
+        'name' => (preg_match('/[^-\d() ]/', $search) && strpos($search, '@') === false) ? $search : '',
+        'email' => (strpos($search, '@') !== false) ? $search : '',
+        'phone' => !preg_match('/[^-\d() ]/', $search) ? $search : '',
+      ];
+      return $view->render($response, 'dialog/person-edit.html', [
+        'person' => $person,
+      ]);
     }
 
     $limit= $request->getParam('limit') ?: 20;

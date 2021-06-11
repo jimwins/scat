@@ -736,14 +736,20 @@
     })
 
     let changePerson= () => {
-      return scat.dialog('/person/search').then((res) => {
-        if (res > 0) {
-          return scat.patch("/sale/{{ txn.id}}", { person_id: res })
-            .then((res) => {
-              scat.reload('sidebar')
+      return scat.dialog('/person/search')
+        .then((res) => {
+          if (res instanceof Response) {
+            res.json().then((data) => {
+              return scat.patch("/sale/{{ txn.id}}", { person_id: data.id })
             })
-        }
-      })
+          }
+          else if (res > 0) {
+            return scat.patch("/sale/{{ txn.id}}", { person_id: res })
+          }
+        })
+        .then((res) => {
+          scat.reload('sidebar')
+        })
     }
 
     scat.handleAction('click', 'change-person', (act) => {
