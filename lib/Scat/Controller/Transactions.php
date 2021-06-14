@@ -1104,6 +1104,12 @@ class Transactions {
       }
       break;
 
+    case 'loyalty':
+      $id= $request->getParam('reward_id');
+      $data= $this->data->factory('LoyaltyReward')->find_one($id);
+      $amount= -$data->item()->retail_price;
+      break;
+
     default:
       throw new \Exception("Don't know how to handle a '$method' payment");
     }
@@ -1154,6 +1160,8 @@ class Transactions {
         $txn->set_expr('filled', 'NOW()');
       }
 
+      $txn->rewardLoyalty();
+
       if (in_array($txn->status, [ 'new', 'filled' ])) {
         $txn->status= 'complete';
       }
@@ -1178,6 +1186,15 @@ class Transactions {
     return $response->withJson($txn);
   }
 
+  public function clearLoyaltyReward(Request $request, Response $response, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if ($txn->paid) {
+      throw new \Exception("Can't remove loyalty reward after all paid.");
+    }
+    $txn->payments()->where('method', 'loyalty')->delete_many();
+    return $response->withJson([ 'message' => 'Loyalty rewards cleared.' ]);
+  }
 
   public function emailForm(Request $request, Response $response, $id) {
     $txn= $this->txn->fetchById($id);

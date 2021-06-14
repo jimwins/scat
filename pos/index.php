@@ -118,6 +118,8 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
               [ \Scat\Controller\Transactions::class, 'addPayment' ]);
   $app->get('/{id:[0-9]+}/payment[/{payment_id:[0-9]+}]',
             [ \Scat\Controller\Transactions::class, 'payments' ]);
+  $app->post('/{id:[0-9]+}/~clear-loyalty-reward',
+              [ \Scat\Controller\Transactions::class, 'clearLoyaltyReward' ]);
 
   $app->get('/{id:[0-9]+}/email-invoice-form',
             [ \Scat\Controller\Transactions::class, 'emailForm' ]);

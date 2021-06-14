@@ -227,6 +227,39 @@
       </small>
     </div>
     <div class="panel-body">
+      <style>
+        .list-group-item.disabled {
+          opacity: 40%;
+        }
+      </style>
+      {% if txn.person_id %}
+        {% if not txn.paid %}
+          {% if txn.used_loyalty_reward %}
+            <button class="btn btn-default btn-block"
+                    data-action="clear-loyalty-reward">
+              Clear Loyalty Reward
+            </button>
+          {% else %}
+            <h4>Rewards</h4>
+            <ul class="list-group">
+              {% for reward in txn.person.available_loyalty_rewards.find_many() %}
+                <a class="list-group-item
+                        {{ (-reward.item.retail_price > txn.due) ? 'disabled' }}"
+                    data-reward="{{ reward.id }}"
+                    data-action="use-loyalty-reward">
+                  <span class="badge">{{ reward.cost }}</span>
+                  {{ reward.item.name }}
+                </a>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endif %}
+      {% else %}
+        <button class="btn btn-lg btn-block btn-primary"
+                data-action="change-person">
+          <i class="fa fa-user-o"></i> Rewards Check-In
+        </button>
+      {% endif %}
       <div class="btn-group btn-block">
         <button type="button"
                 class="btn btn-default btn-block dropdown-toggle"
@@ -871,6 +904,31 @@
     scat.handleAction('click', 'email-gift-card', (act) => {
       var card= act.closest('[data-card]').getAttribute('data-card')
       return scat.dialog('/gift-card/' + card + '/email-form')
+    })
+
+    scat.handleAction('click', 'show-loyalty', (act) => {
+      return scat.dialog('/person/{{ txn.person_id }}/loyalty')
+    })
+
+    scat.handleAction('click', 'use-loyalty-reward', (act) => {
+      if (act.classList.contains('disabled')) {
+        console.log("Action is disabled.")
+        return Promise.resolve()
+      }
+      var reward_id= act.closest('[data-reward]').getAttribute('data-reward')
+      return scat.post('/sale/{{ txn.id }}/payment', {
+        method: 'loyalty',
+        reward_id: reward_id,
+      }).then((res) => {
+        scat.reload('invoice', 'sidebar')
+      })
+    })
+
+    scat.handleAction('click', 'clear-loyalty-reward', (act) => {
+      return scat.post('/sale/{{ txn.id }}/~clear-loyalty-reward')
+        .then((res) => {
+          scat.reload('invoice', 'sidebar')
+        })
     })
 
     let payTransaction= () => {

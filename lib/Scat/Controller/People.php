@@ -284,6 +284,14 @@ class People {
 
     $activity= $person->loyalty()->order_by_desc('id')->find_many();
 
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $view->render($response, 'dialog/person-loyalty.html', [
+        'person' => $person,
+        'activity' => $activity,
+      ]);
+    }
+
     return $response->withJson($activity);
   }
 

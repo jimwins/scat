@@ -48,8 +48,14 @@ class Person extends \Scat\Model {
   public function points_pending() {
     if ($this->suppress_loyalty) return 0;
     return $this->loyalty()
-                ->where_raw("(points > 0 AND DATE(processed) > DATE(NOW()))")
+                ->where_raw("(points > 0 AND DATE(processed) >= DATE(NOW()))")
                 ->sum('points');
+  }
+
+  function available_loyalty_rewards() {
+    $points= $this->points_available();
+
+    return $this->factory('LoyaltyReward')->where_lt('cost', $points);
   }
 
   public function jsonSerialize() {

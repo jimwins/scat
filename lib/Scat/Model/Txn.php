@@ -60,6 +60,10 @@ class Txn extends \Scat\Model {
     return true;
   }
 
+  public function used_loyalty_reward() {
+    return $this->payments()->where('method', 'loyalty')->count();
+  }
+
   public function person() {
     return $this->belongs_to('Person')->find_one();
   }
@@ -641,8 +645,8 @@ class Txn extends \Scat\Model {
          SELECT {$this->id} txn_id,
                 {$this->person_id} person_id,
                 NOW() processed,
-                'Used online' note,
-                -1 * JSON_EXTRACT(CONVERT(data USING utf8mb4), '$.points')
+                'Used for purchase' note,
+                -1 * JSON_EXTRACT(CONVERT(data USING utf8mb4), '$.cost')
                   points
            FROM payment
           WHERE txn_id = {$this->id}
