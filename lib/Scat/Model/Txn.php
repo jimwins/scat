@@ -60,6 +60,10 @@ class Txn extends \Scat\Model {
     return true;
   }
 
+  public function used_cash() {
+    return $this->payments()->where_in('method', [ 'cash', 'change' ])->count();
+  }
+
   public function used_loyalty_reward() {
     return $this->payments()->where('method', 'loyalty')->count();
   }

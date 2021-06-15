@@ -318,7 +318,10 @@ class Transactions {
 
     $pdf= $txn->getReceiptPDF($var);
 
-    return $print->printPDF($response, 'receipt', $pdf->Output('', 'S'));
+    $open= $txn->used_cash() ? ':open' : '';
+    if ($open) error_log("Opening cash drawer");
+
+    return $print->printPDF($response, "receipt$open", $pdf->Output('', 'S'));
   }
 
   protected function doAddItem($request, $txn, $item_id) {
