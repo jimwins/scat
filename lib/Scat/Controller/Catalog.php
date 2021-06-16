@@ -69,6 +69,12 @@ class Catalog {
     $data['depts']= $this->catalog->getDepartments();
     $data['q']= $q;
 
+    if (!count($data['products']) && count($data['items']) == 1) {
+      return $response->withRedirect(
+        '/catalog/item/' . $data['items'][0]->code . '?q=' . rawurlencode($q)
+      );
+    }
+
     return $this->view->render($response, 'catalog/searchresults.html', $data);
   }
 
@@ -351,6 +357,7 @@ class Catalog {
 
     return $this->view->render($response, 'catalog/item.html', [
       'item' => $item,
+      'q' => $request->getParam('q'),
     ]);
   }
 
