@@ -61,6 +61,9 @@
     {% if person.email %}
       {{ person.email }}<br>
     {% endif %}
+    {% if person.address %}
+      {{ person.address|nl2br }}<br>
+    {% endif %}
     {% if txn.type == 'customer' and txn.shipping_address_id > 1 %}
       <br>
       {% set addr= txn.shipping_address %}
