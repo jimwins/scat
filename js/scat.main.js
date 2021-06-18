@@ -157,14 +157,8 @@ class ScatUtils {
   }
 
   patch (url, args, opts) {
-    const formData= args instanceof FormData ? args : new FormData()
-
-    // XXX should verify that url is not remove since we trust content
-
-    if (!(args instanceof FormData)) {
-      for (let prop in args) {
-        formData.append(prop, args[prop])
-      }
+    if (args instanceof FormData) {
+      args= Object.fromEntries(formData)
     }
 
     return fetch(url, {
@@ -173,7 +167,7 @@ class ScatUtils {
         'Content-type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(Object.fromEntries(formData))
+      body: JSON.stringify(args)
     })
     .then((response) => this._handleResponse(response))
   }

@@ -135,7 +135,7 @@
                   </a>
                 {% else %}
                   <a data-action="create-gift-card"
-                     data-value="{{ item.retail_price }}">
+                     data-value="{{ line.sale_price }}">
                     <i class="fa fa-barcode"></i>
                   </a>
                 {% endif %}
@@ -882,17 +882,20 @@
       let line_id= act.closest('[data-id]').getAttribute('data-id')
       var value= act.closest('[data-value]').getAttribute('data-value')
 
-      return scat.call('/gift-card', {
+      return scat.post('/gift-card', {
         balance: value,
         txn_id: {{ txn.id }}
       })
       .then((res) => res.json())
       .then((data) => {
-        return
-          scat.patch('/sale/{{ txn.id }}/line/' + line_id, { data: data })
-            .then(() => {
-              scat.reload('invoice')
-            })
+        // have to force this, because txn is otherwise closed
+        return scat.patch('/sale/{{ txn.id }}/item/' + line_id, {
+          force: 1,
+          data: data
+        })
+        .then(() => {
+          scat.reload('invoice')
+        })
       })
     })
 
