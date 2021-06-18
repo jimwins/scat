@@ -14,7 +14,7 @@
       <input class="form-control input-lg text-center autofocus"
               type="text" pattern="[-.0-9]*"
               name="amount"
-              value="{{ txn.due }}">
+              value="{{ "%.02f"|format(txn.due) }}">
     </div>
 
     <div class="waiting hidden">
