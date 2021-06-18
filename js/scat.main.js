@@ -158,7 +158,7 @@ class ScatUtils {
 
   patch (url, args, opts) {
     if (args instanceof FormData) {
-      args= Object.fromEntries(formData)
+      args= Object.fromEntries(args)
     }
 
     return fetch(url, {
