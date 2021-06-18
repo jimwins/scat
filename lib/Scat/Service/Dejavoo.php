@@ -25,8 +25,10 @@ class Dejavoo {
 
     $label= $txn->formatted_number;
 
+    $abs_amt= sprintf('%.02f', abs($amount));
+
     list($captured, $extra)=
-      $cc->transaction($amount < 0 ? 'Return' : 'Sale', abs($amount), $label);
+      $cc->transaction($amount < 0 ? 'Return' : 'Sale', $abs_amt, $label);
 
     if ($amount < 0) {
       $captured= bcmul($captured, -1);
