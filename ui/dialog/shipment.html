@@ -41,7 +41,7 @@
         <div class="form-group">
           <label class="control-label">Weight</label>
           <p class="form-control-static">
-            {{ "%.2f"|format((shipment.weight ?: tracker.weight) / 16) }} lbs.
+            {{ "%.2f"|format((shipment.weight ?: (tracker.weight/16)) ) }} lbs.
           </p>
         </div>
 
