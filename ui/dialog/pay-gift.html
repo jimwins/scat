@@ -63,7 +63,8 @@
     }
 
     if (formData.get('lookup')) {
-      let card= formData.get('card')
+      // trim leading RAW-
+      let card= formData.get('card').replace('RAW-', '')
 
       scat.get('/gift-card/' + card, null, {
         headers: {
