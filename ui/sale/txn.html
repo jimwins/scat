@@ -283,11 +283,10 @@
             style="margin: 0px; padding: 0px">
           {{ scat.amount(txn.due) }}
         </h1>
-        {% if 0 and txn.change %}
-          <h4 class="text-center text-success"
-              style="margin: 0px; padding: 0px">
-            Change: {{ scat.amount(txn.change) }}
-          </h4>
+        {% if txn.change %}
+          <div class="alert alert-success" style="font-size: larger; font-weight: bold; text-align: center; margin-top: 0.75em">
+            Change: {{ scat.amount(-txn.change) }}
+          </div>
         {% endif %}
       </div>
 

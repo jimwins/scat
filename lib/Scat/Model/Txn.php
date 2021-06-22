@@ -68,6 +68,10 @@ class Txn extends \Scat\Model {
     return $this->payments()->where('method', 'loyalty')->count();
   }
 
+  public function change() {
+    return $this->payments()->where_in('method', [ 'change' ])->sum('amount');
+  }
+
   public function person() {
     return $this->belongs_to('Person')->find_one();
   }
