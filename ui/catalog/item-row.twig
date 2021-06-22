@@ -12,6 +12,7 @@
 {% endmacro %}
 
 <tr data-id="{{ i.id }}"
+    data-stocked="{{ (i.stock or i.minimum_quantity) ? 1 : 0 }}"
     data-code="{{ i.code }}"
     class="{{ (item and item.id == i.id) ? 'info' }}
            {{ not i.active ? 'inactive' }}">

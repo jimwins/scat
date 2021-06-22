@@ -57,7 +57,12 @@
         <ul class="dropdown-menu">
           <li>
             <a class="inventory-print" href="#">
-              <i class="fa fa-print"></i> Print
+              <i class="fa fa-print"></i> Print Stocked
+            </a>
+          </li>
+          <li>
+            <a class="inventory-print-all" href="#">
+              <i class="fa fa-print"></i> Print All
             </a>
           </li>
           <li>
@@ -85,11 +90,12 @@
     let form= document.currentScript.parentNode
 
     {% if items %}
-      let collectItems= (list) => {
+      let collectItems= (list, all= 1) => {
         let items= list.querySelectorAll('.item-list tr[data-id]')
         return Array.from(items)
                     .filter((el) => {
-                      return !!el.querySelector(':checked')
+                      return !!el.querySelector(':checked') &&
+                              (all || el.attributes['data-stocked'].value != 0)
                     })
                     .map((el) => { return el.attributes['data-id'].value })
                     .join(',')
@@ -123,6 +129,10 @@
       })
 
       form.querySelector('.inventory-print').addEventListener('click', (ev) => {
+        let items= collectItems(list, 0)
+        scat.printDocument('inventory', { items: items })
+      })
+      form.querySelector('.inventory-print-all').addEventListener('click', (ev) => {
         let items= collectItems(list)
         scat.printDocument('inventory', { items: items })
       })
