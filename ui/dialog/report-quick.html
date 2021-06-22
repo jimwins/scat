@@ -14,6 +14,8 @@
       <th>Day</th>
       <th>Sales</th>
       <th>Average</th>
+      <th>In Person</th>
+      <th>Online</th>
       <th>Total</th>
     </tr>
   </thead>
@@ -23,6 +25,8 @@
         <td>{{ day.raw_date | date("l, F j") }}</td>
         <td>{{ day.transactions }}</td>
         <td>{{ scat.amount(day.total / day.transactions) }}</td>
+        <td>{{ scat.amount(day.online) }}</td>
+        <td>{{ scat.amount(day.in_person) }}</td>
         <td>{{ scat.amount(day.total) }}</td>
       </tr>
     {% endfor %}

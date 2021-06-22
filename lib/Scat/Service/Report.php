@@ -49,6 +49,8 @@ class Report
     $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
                 SUM(taxed + untaxed) AS total,
                 SUM(IF(tax_rate OR uuid, 0, taxed + untaxed)) AS resale,
+                SUM(IF(online_sale_id, taxed + untaxed, 0)) AS in_person,
+                SUM(IF(online_sale_id, 0, taxed + untaxed)) AS online,
                 SUM(IF(uuid, tax,
                        ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)))
                   AS tax,
@@ -60,6 +62,7 @@ class Report
                 COUNT(*) AS transactions
            FROM (SELECT 
                         txn.uuid,
+                        txn.online_sale_id,
                         filled,
                         CAST(ROUND_TO_EVEN(
                           SUM(IF(txn_line.taxfree, 1, 0) *
