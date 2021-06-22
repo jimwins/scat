@@ -147,6 +147,14 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->patch('/{id:[0-9]+}/shipment/{shipment_id:[0-9]+}',
               [ \Scat\Controller\Transactions::class, 'updateShipment' ]);
 
+  /* Deliveries */
+  $app->get('/{id:[0-9]+}/delivery[/{delivery_id:[0-9]+}]',
+            [ \Scat\Controller\Transactions::class, 'saleDeliveries' ]);
+  $app->post('/{id:[0-9]+}/delivery',
+              [ \Scat\Controller\Transactions::class, 'updateDelivery' ]);
+  $app->patch('/{id:[0-9]+}/delivery/{delivery_id:[0-9]+}',
+              [ \Scat\Controller\Transactions::class, 'updateDelivery' ]);
+
   /* Tax */
   $app->post('/{id:[0-9]+}/~capture-tax',
               [ \Scat\Controller\Transactions::class, 'captureTax' ]);

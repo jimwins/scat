@@ -1512,6 +1512,35 @@ class Transactions {
     return $response->withJson($shipment);
   }
 
+  /* Deliveries */
+  public function saleDeliveries(Request $request, Response $response,
+                                  $id, $delivery_id= null)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/delivery.html', [
+        'txn' => $txn,
+      ]);
+    }
+
+    // TODO return delivery info
+    return $response->withJson($txn);
+  }
+
+  public function updateDelivery(Request $request, Response $response,
+                                  $id, $delivery_id= null)
+  {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    return $response->withJson($txn);
+  }
+
   /* Drop-ships */
   public function saleDropShips(Request $request, Response $response,
                                 $id, $dropship_id= null)

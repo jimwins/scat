@@ -429,8 +429,12 @@
                 Set for In-Store Pickup
               </a>
             {% endif %}
-            <a data-action="create-dropship">Create Drop Shipment</a>
-            <a data-action="create-shipment">Create Shipment</a>
+            {% if txn.is_local_delivery %}
+              <a data-action="create-delivery">Create Delivery</a>
+            {% else %}
+              <a data-action="create-dropship">Create Drop Shipment</a>
+              <a data-action="create-shipment">Create Shipment</a>
+            {% endif %}
             <a data-action="add-tracker">Add Tracker</a>
           </li>
          </ul>
@@ -481,11 +485,19 @@
 
       {% if txn.status in [ 'paid', 'processing', 'waitingforitems' ] %}
         {% if txn.shipping_address_id > 1 %}
-          <a data-action="create-shipment"
-              class="btn btn-block btn-primary">
-            <i class="fa fa-truck"></i>
-            Create Shipment
-          </a>
+          {% if txn.is_local_delivery %}
+            <a data-action="create-shipment"
+                class="btn btn-block btn-primary">
+              <i class="fa fa-truck"></i>
+              Create Shipment
+            </a>
+          {% else %}
+            <a data-action="create-delivery"
+                class="btn btn-block btn-primary">
+              <i class="fa fa-truck"></i>
+              Create Delivery
+            </a>
+          {% endif %}
 
           <a data-action="send-canned-message" data-message="ship-delay"
               class="btn btn-block btn-warning">
@@ -719,6 +731,20 @@
 
     scat.handleAction('click', 'create-shipment', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/shipment')
+        .then((res) => {
+          {% if txn.status in [ 'new', 'processing' ] %}
+            return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })
+              .then((res) => {
+                scat.reload('sidebar')
+              })
+          {% else %}
+            scat.reload('sidebar')
+          {% endif %}
+        })
+    })
+
+    scat.handleAction('click', 'create-delivery', (act) => {
+      return scat.dialog('/sale/{{ txn.id }}/delivery')
         .then((res) => {
           {% if txn.status in [ 'new', 'processing' ] %}
             return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })

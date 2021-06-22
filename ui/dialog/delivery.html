@@ -1,0 +1,98 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% set vehicle_sizes= {
+  'sm': 'Small',
+  'md': 'Medium',
+  'lg': 'Large',
+  'xl': 'XL',
+  'xxl': 'XXL',
+}%}
+
+{% block title %}
+  Add Delivery
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    {% if delivery %}
+      <p>Nothing here yet.</p>
+    {% else %}
+      <div class="form-group">
+        <label for="vehicle">Vehicle Size</label>
+        <select class="form-control" name="vehicle_size">
+          <option value=""></option>
+          {% for size, name in vehicle_sizes %}
+            <option value="{{ size }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="weight">Weight</label>
+        <input type="text" class="form-control autofocus"
+               name="weight" placeholder="3 lbs">
+      </div>
+
+      <div class="form-group">
+        <label for="dimensions">Cost</label>
+        <input type="text" class="form-control"
+               name="cost" placeholder="$5.99">
+      </div>
+
+      <div class="form-group">
+        <label for="dimensions">Instructions</label>
+        <textarea class="form-control" name="delivery_instructions">
+        </textarea>
+      </div>
+
+    {% endif %}
+
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    {{ delivery ? 'Update' : 'Create' }}
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+
+    if (form.disabled) return;
+
+    form.disabled= true
+    form.style.filter= 'brightness(80%)'
+
+    // TODO do stuff.
+/*
+    let formData= new FormData(form)
+    fetch("/sale/{{ txn.id }}/shipment{{ shipment.id ? '/' ~ shipment.id }}", {
+      method: '{{ shipment ? 'PATCH' : 'POST' }}',
+      headers: {
+        'Accept' : 'application/json',
+        'Content-type' : 'application/json',
+      },
+      body: JSON.stringify(Object.fromEntries(formData))
+    })
+    .then((res) => scat._handleResponse(res))
+    .then((res) => res.json())
+    .then((data) => {
+      $(dialog).modal('hide')
+      scat.dialog('/sale/{{ txn.id }}/shipment/' + data.id)
+    })
+    .catch((err) => {
+      scat.alert('danger', err.message)
+    })
+    .finally(() => {
+      form.disabled= false
+      form.style.filter= ''
+    })
+*/
+  }
+{% endblock %}
+
