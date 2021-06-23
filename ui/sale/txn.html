@@ -486,16 +486,16 @@
       {% if txn.status in [ 'paid', 'processing', 'waitingforitems' ] %}
         {% if txn.shipping_address_id > 1 %}
           {% if txn.is_local_delivery %}
-            <a data-action="create-shipment"
-                class="btn btn-block btn-primary">
-              <i class="fa fa-truck"></i>
-              Create Shipment
-            </a>
-          {% else %}
             <a data-action="create-delivery"
                 class="btn btn-block btn-primary">
               <i class="fa fa-truck"></i>
               Create Delivery
+            </a>
+          {% else %}
+            <a data-action="create-shipment"
+                class="btn btn-block btn-primary">
+              <i class="fa fa-truck"></i>
+              Create Shipment
             </a>
           {% endif %}
 
