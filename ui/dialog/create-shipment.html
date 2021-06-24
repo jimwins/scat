@@ -58,7 +58,7 @@
                value="{{ label_date ?: "now"|date("Y-m-d") }}">
       </div>
 
-      {% if not txn.is_firstclass_shipment() %}
+      {% if not txn.is_firstclass_shipment() and not txn.has_hazmat_items() %}
         <div class="form-group">
           <label for="predefined_package">Package Type</label>
           <select class="form-control" name="predefined_package">
