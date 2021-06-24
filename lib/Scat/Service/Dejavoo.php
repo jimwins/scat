@@ -41,9 +41,9 @@ class Dejavoo {
     try {
       $trace= $this->data->factory('CcTrace')->create();
       $trace->txn_id= $txn->id;
-      $trace->raw_request= $cc->raw_request;
-      $trace->raw_response= $cc->raw_response;
-      $trace->raw_curlinfo= $cc->raw_curlinfo;
+      $trace->request= $cc->raw_request;
+      $trace->response= $cc->raw_response;
+      $trace->info= $cc->raw_curlinfo;
       $trace->save();
     } catch (\Exception $e) {
       error_log("Failed to capture trace: " . $e->getMessage());
