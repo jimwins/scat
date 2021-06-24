@@ -733,7 +733,12 @@ class Shipping {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
-    return $response->withJson($this->shipping->refundShipment($shipment));
+    $res= $this->shipping->refundShipment($shipment);
+
+    $shipment->status= 'refunding';
+    $shipment->save();
+
+    return $response->withJson($res);
   }
 
 }
