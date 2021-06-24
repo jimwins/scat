@@ -36,7 +36,7 @@
           <h3>First Class</h3>
         {% endif %}
         <ul class="list-group">
-          {% for rate in easypost.rates %}
+          {% for rate in easypost.rates|sort((a,b) => a.rate <=> b.rate) %}
             <a href="#" data-rate="{{ rate.id }}" class="list-group-item {{ rate.service in preferred_rates[rate.carrier] ? 'preferred' : 'hidden' }}">
               <span class="badge">{{ scat.amount(rate.rate) }}</span>
               {{ rate.carrier }}: {{ rate.service }}
