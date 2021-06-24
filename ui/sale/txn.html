@@ -732,7 +732,7 @@
     scat.handleAction('click', 'create-shipment', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/shipment')
         .then((res) => {
-          {% if txn.status in [ 'new', 'processing' ] %}
+          {% if txn.status in [ 'new', 'processing', 'waitingforitems' ] %}
             return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })
               .then((res) => {
                 scat.reload('sidebar')
@@ -746,7 +746,7 @@
     scat.handleAction('click', 'create-delivery', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/delivery')
         .then((res) => {
-          {% if txn.status in [ 'new', 'processing' ] %}
+          {% if txn.status in [ 'new', 'processing', 'waitingforitems' ] %}
             return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })
               .then((res) => {
                 scat.reload('sidebar')
