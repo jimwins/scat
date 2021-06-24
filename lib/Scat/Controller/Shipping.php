@@ -735,7 +735,7 @@ class Shipping {
 
     $res= $this->shipping->refundShipment($shipment);
 
-    $shipment->status= 'refunding';
+    $shipment->status= 'cancelling';
     $shipment->save();
 
     return $response->withJson($res);
