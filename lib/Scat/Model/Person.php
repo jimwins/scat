@@ -339,7 +339,7 @@ class Person extends \Scat\Model {
       error_log("Importing '$fn' as Masterpiece price list\n");
       $sep= preg_match("/\t/", $line) ? "\t" : ",";
 
-#,SN,PK Sort,SKU Sort,,SKU,Golden Ratio,Size,Item Description,,,,,,,,,2020 Retail,Under $500 Net Order,Net $500 Order,Units Per Pkg,Pkgs Per Box,Weight,UPC,Freight Status,DIM. Weight,Est. Freight EACH,Est. Freight CASE,Item length,Item Width,Item Height,Carton Length,Carton Width,Carton Height,HTS,Origin,
+#,SN,PK Sort,SKU Sort,,SKU,NEW SKU,Golden Ratio,Size,Item Description,,,,,,,,,2020 Retail,Under $500 Net Order,Net $500 Order,Units Per Pkg,Pkgs Per Box,Weight,UPC,Freight Status,DIM. Weight,Est. Freight EACH,Est. Freight CASE,Item length,Item Width,Item Height,Carton Length,Carton Width,Carton Height,HTS,Origin,
 
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
                 INTO TABLE vendor_upload
@@ -347,7 +347,7 @@ class Person extends \Scat\Model {
               OPTIONALLY ENCLOSED BY '\"'
               IGNORE 3 LINES
               (@x, @sn, @pk_sort, @sku_sort, @y,
-               vendor_sku, @gr, @size, @description,
+               vendor_sku, @new_sku, @gr, @size, @description,
                @x1, @x2, @x3, @x4, @x5, @x6, @x7, @x8,
                @retail_price, @net_price, @promo_price,
                @units, purchase_quantity,
