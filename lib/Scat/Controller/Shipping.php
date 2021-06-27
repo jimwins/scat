@@ -726,6 +726,47 @@ class Shipping {
     return $response->withJson([]);
   }
 
+  public function printShipmentLabel(Request $request, Response $response,
+                                      \Scat\Service\Printer $print, $id)
+  {
+    $shipment= $this->data->factory('Shipment')->find_one($id);
+    if (!$shipment) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    if (!$shipment->method_id)
+      throw new \Slim\Exception\HttpNotFoundException($request,
+        "No details found for that shipment.");
+
+    $details= $this->shipping->getShipment($shipment);
+
+    $PNG= 1;
+
+    if ($PNG) {
+      $png= file_get_contents($details->postage_label->label_url);
+
+      return $print->printPNG($response, 'shipping-label', $png);
+    }
+
+    if ($ZPL) {
+      if (!$details->postage_label->label_zpl_url) {
+        $details->label([ 'file_format' => 'zpl' ]);
+      }
+
+      $zpl= file_get_contents($details->postage_label->label_zpl_url);
+
+      return $print->printZPL($response, 'shipping-label', $zpl);
+    }
+
+    if (!$details->postage_label->label_pdf_url) {
+      $details->label([ 'file_format' => 'pdf' ]);
+    }
+
+    $pdf= file_get_contents($details->postage_label->label_pdf_url);
+
+    return $print->printPDF($response, 'shipping-label', $pdf);
+  }
+
   public function refundShipment(Request $request, Response $response, $id)
   {
     $shipment= $this->data->factory('Shipment')->find_one($id);

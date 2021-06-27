@@ -117,6 +117,12 @@
       Track
     </a>
   {% endif %}
+  {% if easypost.postage_label %}
+    <button role="button" data-action="print-shipping-label"
+            class="btn btn-primary">
+      <i class="fa fa-print fa-fw"></i> Print Label
+    </button>
+  {% endif %}
 {% endblock %}
 
 {% block script %}
@@ -125,4 +131,11 @@
 
     $(dialog).modal('hide')
   }
+
+  form.addEventListener('click', (ev) => {
+    let act= ev.target.closest('[data-action]')
+    if (act && act.getAttribute('data-action') == 'print-shipping-label') {
+      scat.print('/shipment/{{ shipment.id }}/~print-label')
+    }
+  })
 {% endblock %}

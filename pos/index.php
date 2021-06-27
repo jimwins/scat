@@ -187,6 +187,8 @@ $app->group('/shipment', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Shipping::class, 'trackShipment' ]);
   $app->post('/{id:[0-9]+}/~create-return',
               [ \Scat\Controller\Shipping::class, 'createShipmentReturn' ]);
+  $app->post('/{id:[0-9]+}/~print-label',
+              [ \Scat\Controller\Shipping::class, 'printShipmentLabel' ]);
   $app->post('/{id:[0-9]+}/~refund',
               [ \Scat\Controller\Shipping::class, 'refundShipment' ]);
 });
