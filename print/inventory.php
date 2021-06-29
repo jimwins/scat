@@ -3,18 +3,18 @@ require '../scat.php';
 require '../lib/item.php';
 
 $q= $_REQUEST['q'];
-if ($q) {
-  if (!preg_match('/stocked:/i', $q)) {
-    $q= $q . " stocked:1";
-  }
-
-  $items= item_find($db, $q, 0);
-} elseif ($item_list= $_REQUEST['items']) {
+if (($item_list= $_REQUEST['items'])) {
   $items= [];
   $item_ids= explode(',', $item_list);
   foreach ($item_ids as $id) {
     $items[]= item_load($db, $id);
   }
+} elseif ($q) {
+  if (!preg_match('/stocked:/i', $q)) {
+    $q= $q . " stocked:1";
+  }
+
+  $items= item_find($db, $q, 0);
 }
 
 if (!$items) die_json("No items found.");
