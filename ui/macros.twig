@@ -63,6 +63,8 @@
     <span class="text-danger">Return to Sender</span>
   {%- elseif status == 'failure' -%}
     <span class="text-danger">Failure</span>
+  {%- elseif status == 'cancelling' -%}
+    <span class="text-muted">Cancelling</span>
   {%- elseif status == 'cancelled' -%}
     <span class="text-muted">Cancelled</span>
   {%- elseif status == 'error' -%}
