@@ -557,7 +557,7 @@
   <script>
     $('[data-toggle="tooltip"]').tooltip();
 
-    let findAndAddItem= (formData) => {
+    let findAndAddItem= (formData, form= null) => {
       return scat.get('/catalog/search', formData, {
         headers: { 'Accept': 'application/json' }
       })
@@ -617,7 +617,7 @@
       q.focus()
       q.select()
 
-      return findAndAddItem(formData)
+      return findAndAddItem(formData, form)
 
     }
 
