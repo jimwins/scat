@@ -60,6 +60,7 @@ class Quickbooks {
     [ 'Store Supplies', 'Expense', 'SuppliesMaterials' ],
     [ 'Art Supplies', 'Other Current Asset', 'Inventory' ],
     [ 'Sales Tax Payable', 'Other Current Liability', 'SalesTaxPayable' ],
+    [ 'Sales of Custom Products', 'Income', 'SalesOfProductIncome' ],
     [ 'Sales of Art Supplies', 'Income', 'SalesOfProductIncome' ],
     [ 'Sales of Art', 'Income', 'SalesOfProductIncome' ],
     [ 'Class Fees', 'Income', 'ServiceFeeIncome' ],
@@ -254,6 +255,7 @@ class Quickbooks {
       // sales
       'art'        => 'Sales of Art',
       'supplies'   => 'Sales of Art Supplies',
+      'framing'    => 'Sales of Custom Products',
       'class'      => 'Class Fees',
       'freight'    => 'Delivery/Shipping & Handling',
       // cost of sales
@@ -353,7 +355,7 @@ class Quickbooks {
         foreach ($sales as $category => $amount) {
           // sale
           if (!$account[$category]) {
-            error_log("Unable to find account for '$category'\n");
+            threw new \Exception("Unable to find account for '$category'");
           }
           $data['Line'][]= $this->generateLine($memo, $account[$category], $amount);
         }
