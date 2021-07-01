@@ -111,7 +111,7 @@ class TxnLine extends \Scat\Model {
       if (preg_match('/^([\d.]*)(\/|%)$/', $value, $m)) {
         $discount= $m[1];
         $discount_type= 'percentage';
-        $retail_price= $item->retail_price ?: $this->retail_price;
+        $retail_price= ($item->retail_price > 0) ? $item->retail_price : $this->retail_price;
         $discount_manual= 1;
       } elseif (preg_match('/^(-)?\$?(-?\d*\.?\d*)$/', $value, $m)) {
         $value= "$m[1]$m[2]";
@@ -120,9 +120,9 @@ class TxnLine extends \Scat\Model {
           $discount= null;
           $retail_price= $value;
         } else {
-          $discount= $item->retail_price ? $value : null;
-          $discount_type= $item->retail_price ? 'fixed' : null;
-          $retail_price= $item->retail_price ?: $value;
+          $discount= ($item->retail_price > 0) ? $value : null;
+          $discount_type= ($item->retail_price > 0) ? 'fixed' : null;
+          $retail_price= ($item->retail_price > 0) ? $item->retail_price : $value;
         }
         $discount_manual= 1;
       } elseif (preg_match('/^(cost)$/', $value)) {
