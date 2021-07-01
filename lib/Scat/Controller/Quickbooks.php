@@ -355,7 +355,7 @@ class Quickbooks {
         foreach ($sales as $category => $amount) {
           // sale
           if (!$account[$category]) {
-            threw new \Exception("Unable to find account for '$category'");
+            throw new \Exception("Unable to find account for '$category'");
           }
           $data['Line'][]= $this->generateLine($memo, $account[$category], $amount);
         }
