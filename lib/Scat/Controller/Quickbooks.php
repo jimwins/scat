@@ -352,6 +352,9 @@ class Quickbooks {
 
         foreach ($sales as $category => $amount) {
           // sale
+          if (!$account[$category]) {
+            error_log("Unable to find account for '$category'\n");
+          }
           $data['Line'][]= $this->generateLine($memo, $account[$category], $amount);
         }
 
@@ -431,7 +434,7 @@ class Quickbooks {
 
       list($debit, $credit)= $accts[$txn->type][$method];
 
-      if (!$debit) {
+      if (!$debit || !$credit) {
         throw new \Exception("ERROR: Can't handle '$method' for '{$txn->type}' payment");
       }
 
