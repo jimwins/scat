@@ -330,7 +330,7 @@ class Transactions {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
-    $unique= preg_match('/^ZZ-(frame|print|univ|canvas|stretch|float|panel|giftcard)/i', $item->code);
+    $unique= preg_match('/^ZZ-(frame|print|univ|canvas|stretch|float|panel|giftcard|ship)/i', $item->code);
 
     if (!$unique) {
       $line=
