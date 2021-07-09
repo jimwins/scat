@@ -47,22 +47,24 @@
     {% endif %}
   </div>
   <div id="client_info">
-  {% if txn.person_id %}
+  {% if txn.person_id or txn.shipping_address.id > 1 %}
     <small>{{ txn.type == 'vendor' ? 'From' : 'To' }}:</small><br>
-    {% set person= txn.person %}
-    <b>
-      {{ person.company }}
-      {% if person.company and person.name %}<br>{% endif %}
-      {{ person.name }}
-    </b><br>
-    {% if person.phone %}
-      {{ person.phone|phone_number_format }}<br>
-    {% endif %}
-    {% if person.email %}
-      {{ person.email }}<br>
-    {% endif %}
-    {% if person.address %}
-      {{ person.address|nl2br }}<br>
+    {% if txn.person_id %}
+      {% set person= txn.person %}
+      <b>
+        {{ person.company }}
+        {% if person.company and person.name %}<br>{% endif %}
+        {{ person.name }}
+      </b><br>
+      {% if person.phone %}
+        {{ person.phone|phone_number_format }}<br>
+      {% endif %}
+      {% if person.email %}
+        {{ person.email }}<br>
+      {% endif %}
+      {% if person.address %}
+        {{ person.address|nl2br }}<br>
+      {% endif %}
     {% endif %}
     {% if txn.type == 'customer' and txn.shipping_address_id > 1 %}
       <br>
@@ -78,7 +80,7 @@
       {{ addr.zip }}<br>
       {% if addr.phone %} {{ addr.phone|phone_number_format }}<br>{% endif %}
       {% if txn.is_firstclass_shipment() %}
-        FIRST CLASS<br>
+        <b>FIRST CLASS</b><br>
       {% endif %}
       {% if txn.has_hazmat_items() %}
         <img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"> Hazardous Materials<br>
