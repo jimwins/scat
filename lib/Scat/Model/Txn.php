@@ -571,7 +571,7 @@ class Txn extends \Scat\Model {
 
           $index_map= []; $n= 1;
 
-          foreach ($this->items()->where_null('returned_from_id')->find_many()
+          foreach ($this->items()->where_null('returned_from_id')->where_null('kit_id')->find_many()
                     as $i)
           {
             $tic= $i->item->tic;
