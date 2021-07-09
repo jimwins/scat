@@ -529,15 +529,16 @@ class Txn extends \Scat\Model {
           $data['cartItems'][]= $item;
         }
 
-        if (!count($data['cartItems'])) {
-          throw new \Exception("No items to be returned.");
+        if (count($data['cartItems'])) {
+          $response= $tax->returned($data);
+
+          if ($response->ResponseType < 2) {
+            throw new \Exception($response->Messages[0]->Message);
+          }
+        } else {
+          error_log("No items to be returned for transaciton {$this->id}\n");
         }
 
-        $response= $tax->returned($data);
-
-        if ($response->ResponseType < 2) {
-          throw new \Exception($response->Messages[0]->Message);
-        }
       }
 
       // If we have new items, have to report it as new sale
