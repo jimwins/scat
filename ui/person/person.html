@@ -240,8 +240,7 @@
             <h2 class="panel-title">Vendor Details</h2>
           </div>
           <div class="panel-body form-horizontal">
-            <a class="btn btn-default"
-               id="create-order">
+            <a class="btn btn-default" data-action="create-order">
               Create Order
             </a>
             <a class="btn btn-default"
@@ -438,8 +437,8 @@
       })
     })
 
-    document.getElementById('create-order')?.addEventListener('click', (ev) => {
-      scat.call("/purchase?vendor_id={{ person.id }}")
+    scat.handleAction('click', 'create-order', (act) => {
+      return scat.call("/purchase?vendor_id={{ person.id }}")
           .then((res) => {
             if (res.redirected) {
               window.location.href= res.url
