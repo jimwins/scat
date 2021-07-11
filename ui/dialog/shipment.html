@@ -22,6 +22,15 @@
           </p>
         </div>
 
+        {% if tracker.est_delivery_date %}
+          <div class="form-group">
+            <label class="control-label">Estimated Delivery Date</label>
+            <p class="form-control-static">
+              {{ tracker.est_delivery_date|date('l, F j') }}
+            </p>
+          </div>
+        {% endif %}
+
         <div class="form-group">
           <label class="control-label">Dimensions</label>
           <p class="form-control-static">
