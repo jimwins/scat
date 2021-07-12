@@ -232,7 +232,7 @@
     })
   }
 
-  scat.handleAction('click', 'show-all', (act) => {
+  scat.handleActionOn(form, 'click', 'show-all', (act) => {
     act.parentElement.querySelectorAll('.hidden').forEach((el) => {
       el.classList.remove('hidden')
     })
@@ -240,7 +240,7 @@
     return Promise.resolve()
   })
 
-  scat.handleAction('click', 'read-scale', (act) => {
+  scat.handleActionOn(form, 'click', 'read-scale', (act) => {
     return fetch('/scale').then((res) => {
       return res.text()
     })
