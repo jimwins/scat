@@ -35,6 +35,12 @@ class Product extends \Scat\Model {
                 ->count();
   }
 
+  public function last_inventoried() {
+    return $this->has_many('Item')
+                ->where_gte('item.active', 1)
+                ->max('inventoried');
+  }
+
   public function jsonSerialize() {
     return array_merge($this->asArray(), [
       'full_slug' => $this->full_slug()
