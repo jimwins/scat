@@ -34,7 +34,12 @@
           </label>
           <div>
             <p class="form-control-static">
-              {{- product.last_inventoried|date("F j, Y") -}}
+              {%- set last= product.last_inventoried -%}
+              {%- if last -%}
+                {{- product.last_inventoried|date("F j, Y") -}}
+              {%- else -%}
+                Never
+              {%- endif -%}
             </p>
           </div>
         </div>
