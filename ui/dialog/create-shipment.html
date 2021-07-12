@@ -106,8 +106,17 @@
 
       <div class="form-group">
         <label for="weight">Weight</label>
-        <input type="text" class="form-control autofocus"
-               name="weight" placeholder="3 lbs">
+        <div class="input-group">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="button"
+                    data-action="read-scale">
+              <i class="fa fa-balance-scale fa-fw"></i>
+              <span class="sr-only">Read Scale</span>
+            </button>
+          </span>
+          <input type="text" class="form-control autofocus"
+                 name="weight" placeholder="3 lbs">
+        </div>
       </div>
 
       <div class="form-group">
@@ -229,5 +238,15 @@
     })
     act.remove()
     return Promise.resolve()
+  })
+
+  scat.handleAction('click', 'read-scale', (act) => {
+    return fetch('/scale').then((res) => {
+      return res.text()
+    })
+    .then((text) => {
+      form.elements['weight'].value= text
+      return Promise.resolve()
+    })
   })
 {% endblock %}

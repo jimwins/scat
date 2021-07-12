@@ -547,6 +547,9 @@ $app->group('/quickbooks', function (RouteCollectorProxy $app) {
   $app->post('/~sync', [ \Scat\Controller\Quickbooks::class, 'sync' ]);
 });
 
+/* Scale */
+$app->get('/scale', [ \Scat\Controller\Scale::class, 'home' ]);
+
 /* Settings */
 $app->group('/settings', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Controller\Settings::class, 'home' ])
