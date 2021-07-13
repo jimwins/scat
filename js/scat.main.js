@@ -318,8 +318,8 @@ class ScatUtils {
     })
   }
 
-  handleAction (eventName, action, func) {
-    document.addEventListener(eventName, (ev) => {
+  handleActionOn (eventTarget, eventName, action, func) {
+    eventTarget.addEventListener(eventName, (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === action) {
         ev.stopPropagation(); ev.preventDefault();
@@ -346,6 +346,10 @@ class ScatUtils {
         })
       }
     })
+  }
+
+  handleAction (eventName, action, func) {
+    return this.handleActionOn(document, eventName, action, func)
   }
 
   // from https://advancedweb.hu/how-to-serialize-calls-to-an-async-function/

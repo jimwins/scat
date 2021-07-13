@@ -97,7 +97,7 @@
         })
   }
 
-  scat.handleAction('click', 'generate-slug', (event) => {
+  scat.handleActionOn(form, 'click', 'generate-slug', (event) => {
     return scat.generateSlug(
       form.brand_id.options[form.brand_id.selectedIndex].text,
       form.name.value
