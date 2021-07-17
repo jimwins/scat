@@ -284,6 +284,24 @@ class Item extends \Scat\Model {
             ->order_by_asc('minimum_quantity');
   }
 
+  public function override_price() {
+    $override= $this->price_overrides()->having('minimum_quantity', 1)->find_one();
+    if ($override && $override->discount_type == 'additional_percentage') {
+      return $this->calcSalePrice(
+        $this->sale_price(),
+        'percentage',
+        $override->discount
+      );
+    } elseif ($override) {
+      return $this->calcSalePrice(
+        $this->retail_price,
+        $override->discount_type,
+        $override->discount
+      );
+    }
+
+  }
+
   public function txns() {
     return self::factory('Txn')
             ->join('txn_line', [ 'txn.id', '=', 'txn_line.txn_id' ])

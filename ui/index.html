@@ -101,7 +101,15 @@
                 </p>
               {% endif %}
               <h3>
+                {% set override= item.override_price %}
+                {% if override %}
+                  <span class="text-danger">{{ scat.amount(override) }}</span>
+                  <s>
+                {% endif %}
                 {{ scat.amount(item.sale_price) }}
+                {% if override %}
+                  </s>
+                {% endif %}
                 {% if item.sale_price != item.retail_price %}
                   <small style="white-space: nowrap;">List Price {{ scat.amount(item.retail_price) }}</small>
                 {% endif %}
@@ -155,8 +163,9 @@
                     {{ item.product.brand.name }}
                   {% endif %}
                 </td>
-                <td>
-                  {{ scat.amount(item.sale_price) }}
+                {% set override= item.override_price %}
+                <td class="{{ override ? 'text-danger' }}">
+                  {{ scat.amount(override ?: item.sale_price) }}
                 </td>
                 <td>
                   {{ item.stock }}

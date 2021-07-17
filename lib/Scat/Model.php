@@ -72,7 +72,7 @@ class Model extends \Titi\Model implements \JsonSerializable {
     case null:
       return $retail_price;
     default:
-      throw new \Exception('Did not understand discount for item.');
+      throw new \Exception("Did not understand discount type ('$discount_type') for item.");
     }
   }
 }

@@ -78,7 +78,15 @@
                 <span class="editable" data-reload="pricing"
                       data-name="discount"
                       data-value="{{ scat.format_discount(item) }}">
+                  {% set override= item.override_price %}
+                  {% if override %}
+                    <span class="text-danger">{{ scat.amount(override) }}</span>
+                    <s>
+                  {% endif %}
                   {{ scat.amount(item.sale_price) }}
+                  {% if override %}
+                    </s>
+                  {% endif %}
                   {% if item.discount_type in [ 'percentage', 'relative' ] %}
                     <br>
                     <small>{{ scat.format_discount(item) }}</small>

@@ -67,16 +67,28 @@
     </span>
   </td>
   <td class="text-right" nowrap>
-    <span class="editable"
-          data-pk="{{ i.code }}"
-          data-name="discount" data-value="{{ i.discount }}">
-      {{ scat.amount(i.sale_price) }}
-      {% if i.discount_type in [ 'percentage', 'relative' ] %}
+    {% set override= i.override_price %}
+    {% if override %}
+      <span class="text-danger">
+        {{ scat.amount(override) }}
         <div>
-          <small>{{ scat.format_discount(i) }}</small>
+          <small>
+            Override
+          </small>
         </div>
-      {% endif %}
-    </span>
+      </span>
+    {% else %}
+      <span class="editable"
+            data-pk="{{ i.code }}"
+            data-name="discount" data-value="{{ i.discount }}">
+        {{ scat.amount(i.sale_price) }}
+        {% if i.discount_type in [ 'percentage', 'relative' ] %}
+          <div>
+            <small>{{ scat.format_discount(i) }}</small>
+          </div>
+        {% endif %}
+      </span>
+    {% endif %}
   </td>
   <td class="text-center">
     <span class="editable"
