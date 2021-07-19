@@ -535,7 +535,7 @@
 
       {% if txn.shipments.count %}
         <h4>Shipments</h4>
-        <ul class="list-group">
+        <ul id="shipments" class="list-group">
           {% for shipment in txn.shipments.find_many() %}
             <li class="list-group-item"
                 data-action="show-shipment" data-id="{{ shipment.id }}">
@@ -730,6 +730,12 @@
     })
 
     scat.handleAction('click', 'create-shipment', (act) => {
+      if (document.getElementById('shipments')) {
+        if (!confirm("Shipment already exists, create another?")) {
+          return Promise.reject()
+        }
+      }
+
       return scat.dialog('/sale/{{ txn.id }}/shipment')
         .then((res) => {
           {% if txn.status in [ 'new', 'processing', 'waitingforitems' ] %}
