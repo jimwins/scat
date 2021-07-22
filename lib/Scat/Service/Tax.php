@@ -17,7 +17,10 @@ class Tax
   /* Very simple wrapper that builds the URL, merges in the API credentials,
    * and turns errors into exceptions. */
   protected function callApi($method, $params= []) {
-    $client= new \GuzzleHttp\Client();
+    $client= new \GuzzleHttp\Client([
+      'timeout' => 5,
+      'connect_timeout' => 5,
+    ]);
 
     $uri= 'https://api.taxcloud.net/1.0/TaxCloud/' . $method;
     $cred= [ 'apiKey' => $this->apiKey, 'apiLoginID' => $this->apiLoginID ];
