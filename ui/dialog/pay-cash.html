@@ -32,11 +32,18 @@
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
 
+    if (form.disabled) return;
+    form.disabled= true
+
     return scat.post("/sale/{{ txn.id }}/payment", formData)
         .then((res) => res.json())
         .then((data) => {
           dialog.resolution= data
           $(dialog).modal('hide')
+        })
+        .catch((err) => {
+          form.disabled= false
+          scat.alert('danger', err.message)
         })
   }
 {% endblock %}
