@@ -1430,8 +1430,8 @@ class Transactions {
     if (($weight= $request->getParam('weight'))) {
       list($length, $width, $height)=
         preg_split('/[^\d.]+/', trim($request->getParam('dimensions')));
-      if (preg_match('/([0-9.]+\s+)?([0-9.]+) *oz/', $weight, $m)) {
-        $weight= (int)$m[1] + ($m[2] / 16);
+      if (preg_match('/(([0-9.]+)( +lbs)?)? +(([0-9.]+) *oz)?/', $weight, $m)) {
+        $weight= (int)$m[2] + ($m[5] / 16);
       }
 
       $parcel= [
