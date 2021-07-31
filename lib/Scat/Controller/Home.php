@@ -34,7 +34,7 @@ class Home {
 
     $q= trim($request->getParam('q'));
     if ($q) {
-      if (preg_match('/^((%V|@)INV-)(\d+)/', $q, $m)) {
+      if (preg_match('/^((%V|@)INV-)(\d+)/i', $q, $m)) {
         $match= $txn->fetchById($m[3]);
         if ($match) {
           return $response->withRedirect(
