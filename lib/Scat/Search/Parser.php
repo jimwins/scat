@@ -12,7 +12,7 @@ class Parser {
     '-|!|not\b'             => 'T_NOT',
     '&|and\b'               => 'T_AND',
     '\||or\b'               => 'T_OR',
-    '\w[/\w]+'              => 'T_TERM',
+    '[.\w][./\w]*'          => 'T_TERM',
     '"(?:[^"\\\\]|\\\\.)*"' => 'T_QUOTED_TERM',
     '[=:]'                  => 'T_EQUAL',
     '<'                     => 'T_LESS_THAN',
@@ -199,7 +199,9 @@ class OrTerm {
 class ParserException extends \Exception {
 }
 
+/*
 $parser= new Parser();
 print_r($parser->parse('foo bar "bop" baz:"12\"" not (this that)'));
 
 print_r($parser->parse('foo = baz AND (bar bop)'));
+*/
