@@ -36,26 +36,33 @@ class Txn
 
   public function find($type, $page= 0, $limit= 25, $q= null) {
     $res= $this->data->factory('Txn')
-                ->select('*')
+                ->select('txn.*')
                 ->select_expr('COUNT(*) OVER()', 'records')
-                ->order_by_desc('created')
+                ->order_by_desc('txn.created')
                 ->where('type', $type)
+                ->left_outer_join('person',
+                                  array('person.id', '=', 'txn.person_id'))
                 ->limit($limit)->offset($page * $limit);
 
-    if (preg_match('/^online:(\d+)/', $q, $m)) {
-      $res= $res->where('online_sale_id', $m[1]);
-    }
+    if ($q) {
+      $parser= new \Scat\Search\Parser();
 
-    if (preg_match('/^uuid:([a-z0-9]+)/', $q, $m)) {
-      $res= $res->where('uuid', $m[1]);
-    }
+      $terms= $parser->parse($q);
 
-    if (preg_match('/^tax_captured:0/', $q, $m)) {
-      $res= $res->where_null('tax_captured');
-    }
-
-    if (preg_match('/^\d{4}-(\d+)/', $q, $m)) {
-      $res= $res->where('number', $m[1]);
+      foreach ($terms as $term) {
+        if ($term instanceof \Scat\Search\Comparison) {
+          $name= $term->name;
+          if ($name == 'online') $name= 'online_sale_id';
+          if ($name == 'tax_captured' && $term->value == 0) {
+            $res= $res->where_null('tax_captured');
+          } else {
+            $res= $res->where($name, $term->value);
+          }
+        } elseif ($term instanceof \Scat\Search\Term) {
+          $res= $res->where_raw("(txn.number = ? OR txn.uuid = ? OR txn.id = ? OR CONCAT_WS(' ',person.name, person.email, person.phone, person.company) RLIKE ?)",
+            [ $term->value, $term->value, $term->value, $term->value ]);
+        }
+      }
     }
 
     return $res;
