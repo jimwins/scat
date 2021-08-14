@@ -27,7 +27,7 @@ class Person extends \Scat\Model {
         $num= $phoneUtil->parse($this->phone, 'US');
         return $phoneUtil->format($num,
                                   \libphonenumber\PhoneNumberFormat::NATIONAL);
-      } catch (Exception $e) {
+      } catch (\Exception $e) {
         // Punt!
         return $this->phone;
       }
