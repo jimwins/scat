@@ -33,7 +33,7 @@
     <ul class="pager hidden-print">
       {% if page %}
         <li class="previous">
-          <a href="?page={{ page - 1 }}&status={{ status }}&q={{ q }}">
+          <a href="?page={{ page - 1 }}&status={{ status }}&q={{ q }}&limit={{ limit }}">
             <span aria-hidden="true">&larr;</span> Previous
           </a>
         </li>
@@ -43,13 +43,23 @@
         </li>
       {% endif %}
       <li>
-        {{ page * limit + 1 }} -
-        {{ min((page + 1) * limit, txns[0].records) }}
-        of {{ txns[0].records }}
+        <span style="display: inline-block; padding: 6px 14px;">
+          {{ page * limit + 1 }} -
+          {{ min((page + 1) * limit, txns[0].records) }}
+          of {{ txns[0].records }}
+        </span>
+        <select class="form-control" style="width: auto; display: inline-block" name="limit">
+          <option value="{{ limit }}">Limit</option>
+          <option>10</option>
+          <option>25</option>
+          <option>50</option>
+          <option>100</option>
+          <option>250</option>
+        </select>
       </li>
       {% if ((page + 1) * limit) < txns[0].records %}
         <li class="next">
-          <a href="?page={{ page + 1 }}&status={{ status }}&q={{ q }}">
+          <a href="?page={{ page + 1 }}&status={{ status }}&q={{ q }}&limit={{ limit }}">
             Next <span aria-hidden="true">&rarr;</span>
           </a>
         </li>
@@ -88,7 +98,7 @@
         </li>
         {% for s,label in variations %}
           <li {{ s == status ? 'class="active"' }}>
-            <a href="?status={{ s }}&q={{ q }}">{{ label }}</a>
+            <a href="?status={{ s }}&q={{ q }}&limit={{ limit }}">{{ label }}</a>
           </li>
         {% endfor %}
       </ul>
@@ -159,4 +169,26 @@
       {{ block('controls') }}
     </div>
   </div>
+{% endblock %}
+
+{% block script %}
+<script>
+  let limitChanged= (ev) => {
+    let params= {
+      page: {{ page }},
+      status: '{{ status }}',
+      q: '{{ q }}',
+      limit: ev.target.value
+    }
+
+    let url= new URL(window.location.href)
+    url.search= (new URLSearchParams(params)).toString()
+
+    window.location.href= url.toString()
+  }
+
+  document.querySelectorAll('select[name="limit"]').forEach((el) => {
+    el.addEventListener('change', limitChanged)
+  })
+</script>
 {% endblock %}
