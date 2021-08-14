@@ -141,3 +141,13 @@ input[type=search]::-webkit-search-cancel-button {
 .responsive-thumbnail .caption:empty {
   display: none;
 }
+
+@media print {
+  a[href]:after {
+    content: none !important;
+  }
+
+  footer {
+    display: none;
+  }
+}
