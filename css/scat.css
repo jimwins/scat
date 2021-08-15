@@ -142,6 +142,10 @@ input[type=search]::-webkit-search-cancel-button {
   display: none;
 }
 
+.page-header {
+  border-bottom: 1px solid rgba(0,0,0,0.1)
+}
+
 @media print {
   a[href]:after {
     content: none !important;
