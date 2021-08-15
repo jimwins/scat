@@ -1,7 +1,17 @@
 {# Product details #}
 <div class="row">
-  <div class="col-sm-8">
-    <h2>
+
+  <div class="col-sm-12">
+    <h1 style="margin-top: 0">
+      <span class="pull-right">
+        <small>
+          <a class=""
+             href="{{ PUBLIC_CATALOG ~ '/' ~ product.full_slug }}"
+             target="_blank">
+            <i class="fa fa-external-link"></i>
+          </a>
+        </small>
+      </span>
       {{ product.name }}
       <small>
         {% set brand = product.brand %}
@@ -9,49 +19,25 @@
           {{ brand.name }}
         </a>
       </small>
-    </h2>
+    </h1>
+
+    <div class="input-group">
+      <span class="input-group-addon">Inventoried</span>
+      {%- set last= product.last_inventoried -%}
+      <input type="text" class="form-control" disabled style="color: #000" value="{{ last ? last|date("F, j Y") : 'Never' }}" aria-describedby="basic-addon1">
+    </div>
+    <hr style="border-color: rgba(0,0,0,0.1)">
+  </div>
+
+  <div class="col-sm-4">
+    {% set media = product.media %}
+    {% if media is not empty %}
+      {{ include('carousel.twig', { images: product.media, edit: 'edit-media' }) }}
+    {% endif %}
+  </div>
+  <div class="col-sm-8">
     <div class="content">
       {{ product.description | replace({'{{ @STATIC }}' : STATIC}) | markdown }}
     </div>
-  </div>
-  <div class="col-sm-4">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <div class="pull-right">
-          <a class="btn btn-default btn-xs"
-             href="{{ PUBLIC_CATALOG ~ '/' ~ product.full_slug }}"
-             target="_blank">
-            <i class="fa fa-external-link"></i>
-            Website
-          </a>
-        </div>
-        <h2 class="panel-title">Details</h2>
-      </div>
-      <div class="panel-body">
-        <div class="form-group">
-          <label for="inventoried" class="control-label">
-            Inventoried
-          </label>
-          <div>
-            <p class="form-control-static">
-              {%- set last= product.last_inventoried -%}
-              {%- if last -%}
-                {{- last|date("F j, Y") -}}
-              {%- else -%}
-                Never
-              {%- endif -%}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {% set media = product.media %}
-    {% if media is not empty %}
-      {{ include('carousel.twig', { images: product.media }) }}
-      {% for i in media %}
-        <a href="/media/{{ i.id }}/"><i class="fa fa-file-image-o"></i></a>
-      {% endfor %}
-    {% endif %}
   </div>
 </div>
