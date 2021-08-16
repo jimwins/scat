@@ -41,3 +41,9 @@
     </div>
   </div>
 </div>
+
+<script>
+  scat.handleAction('click', 'edit-media', (act) => {
+    return scat.dialog('/catalog/product/{{ product.id }}/media')
+  })
+</script>

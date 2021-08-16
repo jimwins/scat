@@ -47,6 +47,10 @@ class Product extends \Scat\Model {
     ]);
   }
 
+  public function media_link() {
+    return $this->has_many('ProductToImage');
+  }
+
   public function media() {
     $media= $this->has_many_through('Image')->find_many();
     if (!$media[0]->id) {
@@ -90,5 +94,12 @@ class Product extends \Scat\Model {
       }
     }
     parent::save();
+  }
+}
+
+class ProductToImage extends \Scat\Model {
+  function delete() {
+    $this->orm->use_id_column([ 'product_id', 'image_id' ]);
+    return parent::delete();
   }
 }

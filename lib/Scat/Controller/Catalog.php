@@ -288,6 +288,24 @@ class Catalog {
     }
   }
 
+  public function productEditMedia(Request $request, Response $response,
+                                    \Scat\Service\Media $media, $id)
+  {
+    $product= $id ? $this->catalog->getProductById($id) : null;
+    if ($id && !$product)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/media.html', [
+        'product' => $product,
+        'media' => $product->media(),
+      ]);
+    }
+
+    return $response->withJson($product->media->find_many());
+  }
+
   public function productAddMedia(Request $request, Response $response,
                                   \Scat\Service\Media $media, $id)
   {
@@ -312,6 +330,25 @@ class Catalog {
     }
 
     return $response->withJson($product);
+  }
+
+  public function productUnlinkMedia(Request $request, Response $response,
+                                      \Scat\Service\Media $media,
+                                      $id, $image_id)
+  {
+    $product= $id ? $this->catalog->getProductById($id) : null;
+    if ($id && !$product)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $link= $product->media_link()->where('image_id', $image_id)->find_one();
+
+    if (!$link) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    $link->delete();
+
+    return $response->withJson([]);
   }
 
   public function item(Request $request, Response $response, $code= null) {

@@ -221,8 +221,12 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->post('/product[/{id:[0-9]+}]',
             [ \Scat\Controller\Catalog::class, 'productUpdate' ]);
 
+  $app->get('/product/{id:[0-9]+}/media',
+            [ \Scat\Controller\Catalog::class, 'productEditMedia' ]);
   $app->post('/product/{id:[0-9]+}/media',
             [ \Scat\Controller\Catalog::class, 'productAddMedia' ]);
+  $app->delete('/product/{id:[0-9]+}/media/{image_id:[0-9]+}',
+            [ \Scat\Controller\Catalog::class, 'productUnlinkMedia' ]);
 
   $app->post('/item',
               [ \Scat\Controller\Catalog::class, 'updateItem' ]);

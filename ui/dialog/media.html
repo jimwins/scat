@@ -1,0 +1,52 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Media for {{ product ? product.name : item.name }}
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+
+    {% for i in media %}
+      <div class="media" data-id="{{ i.id }}">
+        <div class="media-left">
+          <img src="{{ i.thumbnail }}" alt="{{ i.alt_text }}">
+        </div>
+        <div class="media-body">
+          <h4 class="media-heading">{{ i.name }}</h4>
+          {{ i.caption }}
+        </div>
+        <div class="media-right">
+          <button class="btn btn-sm btn-default" data-action="disconnect-media">
+            <i class="fa fa-fw fa-unlink"></i>
+            Disconnect
+          </button>
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+{% endblock %}
+
+{% block submit %}
+{% endblock %}
+
+{% block script %}
+  scat.handleActionOn(form, 'click', 'disconnect-media', (act) => {
+    let id= act.closest('[data-id]').getAttribute('data-id')
+
+    return scat.delete('/catalog/product/{{ product.id }}/media/' + id)
+      .then((res) => {
+        act.closest('[data-id]').remove();
+      })
+
+    return Promise.resolve()
+  })
+
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    return
+  }
+{% endblock %}

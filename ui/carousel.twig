@@ -88,6 +88,11 @@
     <button class="prev btn btn-default btn-xs">
        ◀ <span class="sr-only">Previous</span>
     </button>
+    {% if edit %}
+      <button class="edit btn btn-default btn-xs" data-action="{{ edit }}">
+        <span class="sr-only">Edit</span> <i class="fa fa-edit"></i>
+      </button>
+    {% endif %}
     <button class="next btn btn-default btn-xs">
       <span class="sr-only">Next</span> ▶ 
     </button>
@@ -98,6 +103,7 @@
 
     let next= box.querySelector('.next')
     let prev= box.querySelector('.prev')
+    let edit= box.querySelector('.edit')
     // Define the global counter, the items and the current item 
     let counter= 0
     let items= box.querySelectorAll('.carousel-content li')
