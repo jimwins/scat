@@ -95,7 +95,9 @@ class Shipping {
   }
 
   function handleUpdate($shipment, $tracker) {
-    if ($shipment->status != $tracker->status) {
+    if ($shipment->status == 'pre_transit' ||
+        $shipment->status != $tracker->status)
+    {
       $status= $tracker->status;
       $shipped= null;
 
@@ -109,7 +111,10 @@ class Shipping {
             break;
           }
         }
-        if (!$shipped) break;
+        if (!$shipped) {
+          error_log("still pre_transit, skipping.\n");
+          break;
+        }
         /* FALLTHROUGH */
       case 'in_transit':
         // send order shipped email
