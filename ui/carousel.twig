@@ -58,13 +58,13 @@
     opacity: 1;
     transition: 1s;
   }
-  .carousel button {
+  .carousel button:not(.edit) {
     visibility: hidden;
   }
-  .carousel.active button {
+  .carousel.active button:not(.edit) {
     visibility: visible;
   } 
-  .carousel.active .buttons {
+  .carousel .buttons {
     text-align: center;
     z-index: 10;
     position: absolute;
