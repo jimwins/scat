@@ -106,7 +106,7 @@ class Shipping {
         /* We treat pre_transit/arrived_at_facility as in_transit */
         foreach ($tracker->tracking_details as $details) {
           if ($details->status_detail == 'arrived_at_facility') {
-            $shipped= $details;
+            $shipped= $details->datetime;
             $status= 'in_transit';
             break;
           }
