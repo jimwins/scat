@@ -153,7 +153,7 @@ class Report
     return [ "shipments" => $this->data->factory('Shipment')
                              ->select('*')
                              ->where_gt('weight', 0)
-                             ->where_raw('created > NOW() - INTERVAL 90 DAY')
+                             ->where_raw('created > NOW() - INTERVAL 30 DAY')
                              ->order_by_desc('created')
                              ->find_many() ];
   }

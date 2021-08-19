@@ -1,4 +1,5 @@
 {% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
 
 {% block title %}
   Shipments
@@ -10,12 +11,11 @@
     <tr>
       <th>#</th>
       <th>Created</th>
-      <th>Dimensions</th>
-      <th>Weight</th>
+      <th>Dimensions (")</th>
+      <th>Weight (oz)</th>
       <th>Destination</th>
       <th>Carrier / Service</th>
       <th>Rate</th>
-      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -28,10 +28,13 @@
         {{ shipment.created | date('Y-m-d') }}
       </td>
       <td>
-        {{ shipment.width }} x {{ shipment.length }} x {{ shipment.height }}
+        {% if shipment.width %}
+          {{ shipment.width }} x {{ shipment.length }} x {{ shipment.height }}
+        {% else %}
+        {% endif %}
       </td>
       <td>
-        {{ "%.2f"|format(shipment.weight / 16) }}
+        {{ shipment.weight }}
       </td>
       <td>
         {{ shipment.txn.shipping_address.city }},
