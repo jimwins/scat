@@ -1,0 +1,52 @@
+{% extends 'layout/page.html' %}
+
+{% block title %}
+  Shipments
+{% endblock %}
+
+{% block content %}
+<table id="shipments" class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Created</th>
+      <th>Dimensions</th>
+      <th>Weight</th>
+      <th>Destination</th>
+      <th>Carrier / Service</th>
+      <th>Rate</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for shipment in shipments %}
+    <tr data-id="{{ shipment.id }}">
+      <td class="num">
+        {{ loop.index }}
+      </td>
+      <td>
+        {{ shipment.created | date('Y-m-d') }}
+      </td>
+      <td>
+        {{ shipment.width }} x {{ shipment.length }} x {{ shipment.height }}
+      </td>
+      <td>
+        {{ "%.2f"|format(shipment.weight / 16) }}
+      </td>
+      <td>
+        {{ shipment.txn.shipping_address.city }},
+        {{ shipment.txn.shipping_address.state }}
+        {{ shipment.txn.shipping_address.zip }}
+      </td>
+      <td>
+        {{ shipment.carrier }} /
+        {{ shipment.service }}
+      </td>
+      <td>
+        {{ scat.amount(shipment.rate) }}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
