@@ -43,6 +43,11 @@ class Reports {
     return $this->view->render($response, 'report/kit-items.html', $data);
   }
 
+  public function shipments(Request $request, Response $response) {
+    $data= $this->report->shipments();
+    return $this->view->render($response, 'report/shipments.html', $data);
+  }
+
   public function oldReport(Request $request, Response $response, $name) {
     ob_start();
     include "../old-report/report-$name.php";

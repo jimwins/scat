@@ -149,4 +149,12 @@ class Report
                              ->find_many() ];
   }
 
+  public function shipments() {
+    return [ "shipments" => $this->data->factory('Shipment')
+                             ->select('*')
+                             ->where_gt('weight', 0)
+                             ->where_raw('created > NOW() - INTERVAL 90 DAY')
+                             ->order_by_desc('created')
+                             ->find_many() ];
+  }
 }
