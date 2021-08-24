@@ -3,7 +3,7 @@ namespace Scat\Model;
 
 class Image extends \Scat\Model {
   public function original() {
-    return PUBLITIO_BASE . '/' . $this->uuid . '.' . $this->ext;
+    return PUBLITIO_BASE . '/file/' . $this->uuid . '.' . $this->ext;
   }
 
   public function thumbnail() {
