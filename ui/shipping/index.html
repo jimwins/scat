@@ -72,7 +72,7 @@
             <th>Created / Last</th>
             <th>Status</th>
             <th>Transaction</th>
-            <th>Recipient</th>
+            <th>Recipient / Sender</th>
             <th>Carrier / Service</th>
             <th>Rate (Insurance)</th>
             <th></th>
@@ -124,9 +124,13 @@
               </a>
             </td>
             <td>
-              {{ shipment.txn.shipping_address.name }}<br>
-              {{ shipment.txn.shipping_address.city }},
-              {{ shipment.txn.shipping_address.state }}
+              {% if shipment.txn.shipping_address %}
+                {{ shipment.txn.shipping_address.name }}<br>
+                {{ shipment.txn.shipping_address.city }},
+                {{ shipment.txn.shipping_address.state }}
+              {% else %}
+                {{ shipment.txn.person.friendly_name }}
+              {% endif %}
             </td>
             <td>
               {{ shipment.carrier }}
