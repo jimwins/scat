@@ -104,6 +104,11 @@
         </div>
       {% endif %}
 
+      {# Gift card is always letter #}
+      {% if txn.items.where('item_id', 11212).find_one %}
+        <input type="hidden" name="predefined_package" value="Letter">
+      {% endif %}
+
       <div class="form-group">
         <label for="weight">Weight</label>
         <div class="input-group">
