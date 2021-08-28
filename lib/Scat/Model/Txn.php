@@ -92,6 +92,10 @@ class Txn extends \Scat\Model {
            $this->items()->join('item', [ 'item.id', '=', 'txn_line.item_id' ])->where('item.code', 'ZZ-DELIVERY-VEHICLE')->count();
   }
 
+  public function delivery_details() {
+    return $this->items()->join('item', [ 'item.id', '=', 'txn_line.item_id' ])->where('item.code', 'ZZ-DELIVERY-VEHICLE')->find_one();
+  }
+
   public function has_hazmat_items() {
     return $this->items()->join('item', [ 'item.id', '=', 'txn_line.item_id' ])->where_gt('item.hazmat', 0)->count();
   }

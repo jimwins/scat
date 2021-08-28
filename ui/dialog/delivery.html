@@ -18,12 +18,16 @@
     {% if delivery %}
       <p>Nothing here yet.</p>
     {% else %}
+      {% set method= txn.delivery_details.data().method %}
       <div class="form-group">
         <label for="vehicle">Vehicle Size</label>
         <select class="form-control" name="vehicle_size">
           <option value=""></option>
           {% for size, name in vehicle_sizes %}
-            <option value="{{ size }}">{{ name }}</option>
+            <option value="{{ size }}"
+                    {{ (method == ('local_' ~ size)) ? 'selected' }}>
+              {{ name }}
+            </option>
           {% endfor %}
         </select>
       </div>
