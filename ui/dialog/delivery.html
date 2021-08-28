@@ -41,7 +41,8 @@
       <div class="form-group">
         <label for="dimensions">Cost</label>
         <input type="text" class="form-control"
-               name="cost" placeholder="$5.99">
+               name="cost" placeholder="$5.99"
+               value="{{ scat.amount(txn.delivery_details.retail_price) }}">
       </div>
 
       <div class="form-group">
