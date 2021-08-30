@@ -99,6 +99,14 @@ class Item extends \Scat\Model {
                 ->sum('allocated') ?: 0;
   }
 
+  public function on_order() {
+    return $this->has_many('TxnLine')
+                ->join('txn', [ 'txn.id', '=', 'txn_line.txn_id' ])
+                ->where_equal('txn.type', 'vendor')
+                ->where_not_equal('ordered', 'allocated')
+                ->sum('ordered') ?: 0;
+  }
+
   public function prop65_warning() {
     return $this->belongs_to('Prop65_Warning', 'prop65')->find_one();
   }
@@ -188,6 +196,7 @@ class Item extends \Scat\Model {
     $data= parent::as_array();
     $data['dimensions']= $this->dimensions();
     $data['stock']= $this->stock();
+    $data['on_order']= $this->on_order();
     $data['sale_price']= $this->sale_price();
     return $data;
   }

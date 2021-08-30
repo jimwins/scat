@@ -840,8 +840,9 @@
       .then((item) => {
         scat.popover(act, {
           title: item.name,
-          content: "<b>Stock:</b> " + item.stock +
-                   "<div class='pull-right'><a href='/catalog/item/" + item.code + "' target='_blank' class='btn btn-default btn-xs'>Details</a></div>",
+          content: "<b>Stock:</b> " + item.stock + '<br>' +
+                   "<b>On Order:</b> " + item.on_order + '<br>' +
+                   "<a href='/catalog/item/" + item.code + "' target='_blank' class='btn btn-default btn-block btn-xs'>Details</a>",
           html: true
         })
       })
