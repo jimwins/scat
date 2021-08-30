@@ -103,7 +103,7 @@ class Item extends \Scat\Model {
     return $this->has_many('TxnLine')
                 ->join('txn', [ 'txn.id', '=', 'txn_line.txn_id' ])
                 ->where_equal('txn.type', 'vendor')
-                ->where_not_equal('ordered', 'allocated')
+                ->where_raw('ordered != allocated')
                 ->sum('ordered') ?: 0;
   }
 
