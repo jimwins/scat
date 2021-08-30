@@ -994,7 +994,7 @@ class Transactions {
         $result= $dejavoo->runTransaction($txn, -$amount);
 
         $amount= $result['amount'];
-        $data= $result['data'];
+        $cc_data= $result['data'];
 
         break;
 
