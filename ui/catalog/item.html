@@ -174,9 +174,9 @@
           <button id="new-barcode" class="btn btn-default">
             <i class="fa fa-barcode"></i> New
           </button>
-          <div class="btn-group">
-            <button type="button" class="btn btn-default print-barcode">
-              <i class="fa fa-print"></i> Print
+          <div class="btn-group hidden-print">
+            <button type="button" class="btn btn-default" data-action="print-labels">
+              <i class="fa fa-print"></i> Print Label
             </button>
             <button type="button" class="btn btn-default dropdown-toggle"
                     data-toggle="dropdown" aria-haspopup="true"
@@ -186,18 +186,33 @@
             </button>
             <ul class="dropdown-menu">
               <li>
-                <a class="print-barcode" data-multiple="1">
-                  Multiple
+                <a data-action="print-labels" data-size="half" data-trim="ask">
+                  Half-size price label
                 </a>
               </li>
               <li>
-                <a class="print-barcode" data-noprice="1">
+                <a data-action="print-labels" data-noprice="1">
                   No price
                 </a>
               </li>
               <li>
-                <a class="print-barcode" data-multiple="1" data-noprice="1">
-                  Multiple, no price
+                <a data-action="print-labels" data-trim="ask">
+                  Trim name
+                </a>
+              </li>
+              <li>
+                <a data-action="print-labels" data-trim="ask" data-noprice="1">
+                  Trim name, no price
+                </a>
+              </li>
+              <li>
+                <a data-action="print-labels" data-short="1">
+                  Short name
+                </a>
+              </li>
+              <li>
+                <a data-action="print-labels" data-short="1" data-noprice="1">
+                  Short name, no price
                 </a>
               </li>
             </ul>
@@ -903,25 +918,6 @@
       })
     })
 
-    let printBarcode= (ev) => {
-      let copies= 1
-      if (ev.target.getAttribute('data-multiple')) {
-        copies= window.prompt("How many?", copies)
-        if (!copies) return
-      }
-      //scat.print('/catalog/item/{{ item.code }}/~print-label',
-      scat.print('/print/labels-price.php?id={{ item.id }}',
-                 {
-                   //copies: copies,
-                   quantity: copies,
-                   noprice: ev.target.getAttribute('data-noprice')
-                 })
-    }
-
-    document.querySelectorAll('.print-barcode').forEach((el) => {
-      el.addEventListener('click', printBarcode)
-    })
-
     document.addEventListener('click', (ev) => {
       let act= ev.target.closest('[data-action]')
       if (act && act.getAttribute('data-action') === 'find-vendor-items') {
@@ -1068,6 +1064,26 @@
               return reloadBlock(document.getElementById('kit'), "")
             })
       }
+    })
+
+    scat.handleAction('click', 'print-labels', (act) => {
+      // Get selected items and other options
+      let doc= (act.getAttribute('data-size') == 'half' ?
+                'labels-price-brush' : 'labels-price')
+      let items= [ {{ item.id }} ]
+      let noprice= act.getAttribute('data-noprice')
+      let short= act.getAttribute('data-short')
+      let trim= act.getAttribute('data-trim')
+      if (trim == 'ask') {
+        trim= window.prompt("Please enter the part of the name to trim from the labels", "");
+      }
+      // trim, noprice, size
+      return scat.printDocument(doc, {
+        items: items,
+        noprice: noprice,
+        short: short,
+        trim: trim
+      })
     })
   }
   </script>
