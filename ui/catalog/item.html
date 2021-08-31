@@ -918,89 +918,44 @@
       })
     })
 
-    document.addEventListener('click', (ev) => {
-      let act= ev.target.closest('[data-action]')
-      if (act && act.getAttribute('data-action') === 'find-vendor-items') {
-        scat.call('/catalog/item/{{ item.code }}/vendor-item', {})
+    scat.handleAction('click', 'find-vendor-items', (act) => {
+      return scat.call('/catalog/item/{{ item.code }}/vendor-item', {})
         .then((res) => {
           reloadBlock(act)
         })
-      }
     })
 
-    document.addEventListener('click', (ev) => {
-      let act= ev.target.closest('[data-action]')
-      if (act && act.getAttribute('data-action') === 'edit-vendor-item') {
-        let vi= ev.target.closest('[data-id]')
+    scat.handleAction('click', 'edit-vendor-item', (act) => {
+        let vi= act.closest('[data-id]')
         let id= vi ? vi.getAttribute('data-id') : 0
-        scat.dialog('/catalog/vendor-item' + (id ? '/' + id : ''), {
+        return scat.dialog('/catalog/vendor-item' + (id ? '/' + id : ''), {
           item_id: {{ item.id }}
         })
-      }
     })
 
-    document.addEventListener('click', (ev) => {
-      let act= ev.target.closest('[data-action]')
-      if (act && act.getAttribute('data-action') === 'unlink-vendor-item') {
-        let id= ev.target.closest('[data-id]').getAttribute('data-id')
-        return scat.delete("/catalog/item/{{ item.code }}/vendor-item/" + id)
-                    .then((res) => {
-                      reloadBlock(act)
-                    })
-      }
+    scat.handleAction('click', 'unlink-vendor-item', (act) => {
+      let id= act.closest('[data-id]').getAttribute('data-id')
+      return scat.delete("/catalog/item/{{ item.code }}/vendor-item/" + id)
+                  .then((res) => {
+                    reloadBlock(act)
+                  })
     })
 
-    document.addEventListener('click', (ev) => {
-      let act= ev.target.closest('[data-action]')
-      if (act && act.getAttribute('data-action') === 'check-vendor-stock') {
-        let id= ev.target.closest('[data-id]').getAttribute('data-id')
-        let icon= act.querySelector('i')
-        icon.classList.remove('fa-search')
-        icon.classList.add('fa-spin','fa-spinner')
-        return scat.get('/catalog/vendor-item/' + id + '/stock')
-        .then((res) => res.json())
-        .then((data) => {
-          message= "";
-          for (const [key, value] of Object.entries(data)) {
-            message+= `${value} in ${key}` + "<br>";
-          }
-          $(act).popover({
-            title: 'Stock',
-            content: message,
-            html: true,
-          }).popover('show')
-          .on('shown.bs.popover', (ev, x, y) => {
-            let target= ev.target
-            ev.target.dismisser= (ev) => {
-              let id= target.getAttribute('aria-describedby')
-              if (id) {
-                let popover= document.getElementById(id)
-                if (!popover.contains(ev.target)) {
-                  ev.stopPropagation(); ev.preventDefault();
-                  (($(target).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
-                }
-              }
-            }
-            document.addEventListener('click', ev.target.dismisser, true)
-          })
-          .on('hide.bs.popover', (ev) => {
-            let target= ev.target
-            if (ev.target.dismisser) {
-              document.removeEventListener('click', ev.target.dismisser, true)
-              ev.target.dismisser= null
-            }
-          })
-          .on('hidden.bs.popover', (ev) => {
-            // actually calls hide() so this gets called again, but
-            // just spits out console errors and does what we want
-            $(act).popover('destroy')
-          })
+    scat.handleAction('click', 'check-vendor-stock', (act) => {
+      let id= act.closest('[data-id]').getAttribute('data-id')
+      return scat.get('/catalog/vendor-item/' + id + '/stock')
+      .then((res) => res.json())
+      .then((data) => {
+        message= "";
+        for (const [key, value] of Object.entries(data)) {
+          message+= `${value} in ${key}` + "<br>";
+        }
+        return scat.popover(act, {
+          title: 'Stock',
+          content: message,
+          html: true,
         })
-        .finally(() => {
-          icon.classList.remove('fa-spin','fa-spinner')
-          icon.classList.add('fa-search')
-        })
-      }
+      })
     })
 
     document.getElementById('merge-item').addEventListener('click', (ev) => {
