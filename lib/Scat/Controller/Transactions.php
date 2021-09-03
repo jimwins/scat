@@ -232,6 +232,9 @@ class Transactions {
       if ($field == 'tax_rate' && $value == 'def') {
         $value= $this->tax->default_rate;
       }
+      if ($field == 'person_id' && $txn->person_id != $value) {
+        $txn->clearLoyalty();
+      }
       if ($value !== null && $value != $txn->get($field)) {
         $changed[$field]++;
         $txn->set($field, $value);
@@ -240,6 +243,9 @@ class Transactions {
 
     if ($changed['tax_rate']) {
       $txn->recalculateTax($this->tax);
+    }
+    if ($changed['person_id']) {
+      $txn->rewardLoyalty();
     }
 
     // Pass along status change to Ordure when shipping
