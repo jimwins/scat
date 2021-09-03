@@ -77,6 +77,12 @@
 {% endblock %}
 
 {% block submit %}
+  <div class="pull-left">
+    <a target="_blank" href="{{ url_for('person', { id: person.id }) }}"
+       class="btn btn-default">
+      View
+    </a>
+  </div>
   <input type="hidden" name="id" value="{{ person.id }}">
   <button type="submit" class="btn btn-primary">
     {{ person.id ? 'Update' : 'Add' }}
