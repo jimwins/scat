@@ -229,10 +229,11 @@ class Transactions {
     foreach ($txn->getFields() as $field) {
       if ($field == 'id') continue;
       $value= $request->getParam($field);
-      if ($field == 'tax_rate' && $value == 'def') {
+      if ($field == 'tax_rate' && $value === 'def') {
         $value= $this->tax->default_rate;
       }
-      if ($field == 'person_id' && $txn->person_id != $value) {
+      if ($field == 'person_id' && $value !== null && $txn->person_id != $value)
+      {
         $txn->clearLoyalty();
       }
       if ($value !== null && $value != $txn->get($field)) {

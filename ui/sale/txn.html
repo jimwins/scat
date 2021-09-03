@@ -407,6 +407,23 @@
             = {{ person.points_available + person.points_pending + txn.points_earned }}
           {% endif %}
         {% endif %}
+
+        {% if person.exemption_certificate_id %}
+          <br><br>
+          {% if txn.tax_rate > 0 %}
+            <button class="btn btn-primary btn-block"
+                    data-action="tax-exempt" data-value="1">
+              <i class="fa fa-certificate fa-fw"></i>
+              Apply Tax Exemption
+            </button>
+          {% else %}
+            <button class="btn btn-danger btn-block"
+                    data-action="tax-exempt" data-value="0">
+              <i class="fa fa-certificate fa-fw"></i>
+              Remove Tax Exemption
+            </button>
+          {% endif %}
+        {% endif %}
       {% endif %}
 
       <div class="clearfix"></div>
@@ -994,6 +1011,15 @@
           window.location.href= '/'
           return
         })
+    })
+
+    scat.handleAction('click', 'tax-exempt', (act) => {
+      let apply= act.closest('[data-value]').getAttribute('data-value')
+      return scat.patch('/sale/{{ txn.id}}', {
+        'tax_rate': apply > 0 ? 0 : 'def',
+      }).then((res) => {
+        scat.reload('invoice', 'sidebar')
+      })
     })
 
     /* Bind some global keys */
