@@ -177,8 +177,10 @@ class Transactions {
     ]);
 
     // Just copy a limited number of fields
+    // Not 'tax_rate' since an in-person exchange of an online pick-up order
+    // needs to calculate tax on new items correctly
     foreach ([
-      'person_id', 'shipping_address_id', 'tax_rate', 'no_rewards'
+      'person_id', 'shipping_address_id', 'no_rewards'
     ] as $field) {
       $sale->set($field, $orig->$field);
     }
