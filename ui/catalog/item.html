@@ -186,13 +186,18 @@
             </button>
             <ul class="dropdown-menu">
               <li>
-                <a data-action="print-labels" data-size="half" data-trim="ask">
-                  Half-size price label
+                <a data-action="print-labels" data-quantity="ask">
+                  Multiple
                 </a>
               </li>
               <li>
                 <a data-action="print-labels" data-noprice="1">
                   No price
+                </a>
+              </li>
+              <li>
+                <a data-action="print-labels" data-noprice="1" data-quantity="ask">
+                  No price, multiple
                 </a>
               </li>
               <li>
@@ -213,6 +218,11 @@
               <li>
                 <a data-action="print-labels" data-short="1" data-noprice="1">
                   Short name, no price
+                </a>
+              </li>
+              <li>
+                <a data-action="print-labels" data-size="half" data-trim="ask">
+                  Half-size price label
                 </a>
               </li>
             </ul>
@@ -1029,15 +1039,26 @@
       let noprice= act.getAttribute('data-noprice')
       let short= act.getAttribute('data-short')
       let trim= act.getAttribute('data-trim')
-      if (trim == 'ask') {
+      if (trim === 'ask') {
         trim= window.prompt("Please enter the part of the name to trim from the labels", "");
+      }
+      let quantity= act.getAttribute('data-quantity')
+      if (quantity === 'ask') {
+        quantity= window.prompt("How many labels do you want to print?", "");
+        if (quantity === null) {
+          return
+        }
+      }
+      if (!quantity) {
+        quantity= 1
       }
       // trim, noprice, size
       return scat.printDocument(doc, {
         items: items,
         noprice: noprice,
         short: short,
-        trim: trim
+        trim: trim,
+        quantity: quantity
       })
     })
   }
