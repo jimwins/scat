@@ -13,6 +13,9 @@ use Smalot\Cups\Model\Job;
 use Smalot\Cups\Transport\Client;
 use Smalot\Cups\Transport\ResponseParser;
 
+$qty= (int)$_REQUEST['quantity'];
+if (!$qty) $qty= 1;
+
 if ($q= $_REQUEST['q']) {
   $items= item_find($db, $q, 0);
 
@@ -21,7 +24,8 @@ if ($q= $_REQUEST['q']) {
   $items= [];
   $item_ids= explode(',', $item_list);
   foreach ($item_ids as $id) {
-    $items[]= item_load($db, $id);
+    $item= item_load($db, $id);
+    $items= array_merge($items, array_fill(0, $qty, $item));
   }
 } else {
   $id= (int)$_REQUEST['id'];
@@ -29,8 +33,7 @@ if ($q= $_REQUEST['q']) {
 
   if (!$items[0]) die_json("No such item.");
 
-  $qty= (int)$_REQUEST['quantity'];
-  if ($qty) {
+  if ($qty > 1) {
     $items= array_pad($items, $qty, $items[0]);
   }
 }
