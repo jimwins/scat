@@ -14,8 +14,10 @@
     <table class="table table-striped table-hover">
       <caption>
         <h3 style="color: #000">
-          {{ backorder.txn.friendly_type }}
-          {{ backorder.txn.formatted_number }}
+          <a href="{{ url_for('purchase', { id: backorder.txn.id }) }}">
+            {{ backorder.txn.friendly_type }}
+            {{ backorder.txn.formatted_number }}
+          </a>
         </h3>
       </caption>
       <thead>
@@ -30,7 +32,11 @@
         {% for item in backorder.items %}
           <tr>
             <td>{{ item.vendor_sku(person.id) }}</td>
-            <td>{{ item.code }}</td>
+            <td>
+              <a href="{{ url_for('catalog-item', { code: item.code }) }}">
+                {{ item.code }}
+              </a>
+            </td>
             <td>{{ item.name }}</td>
             <td>{{ item.ordered - item.allocated }}</td>
           </tr>
