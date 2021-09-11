@@ -9,18 +9,18 @@
   {% if txn.has_hazmat_items() %}
     {% set preferred_rates= {
       'GSO': [ 'CaliforniaParcelService' ],
-      'FedEx': [ 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY' ],
       'UPS':  [ 'Ground' ],
       'UPSDAP':  [ 'Ground' ],
     } %}
+    {#  'FedEx': [ 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY' ], #}
   {% else %}
     {% set preferred_rates= {
       'USPS': [ 'Priority' ],
-      'GSO': [ 'CaliforniaParcelService' ],
-      'FedEx': [ 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY' ],
       'UPS':  [ 'Ground' ],
       'UPSDAP':  [ 'Ground' ],
     } %}
+    {#  'GSO': [ 'CaliforniaParcelService' ], #}
+    {#  'FedEx': [ 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY' ], #}
   {% endif %}
 {% endif %}
 
