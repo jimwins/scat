@@ -5,10 +5,16 @@
     <h1 style="margin-top: 0">
       <span class="pull-right">
         <small>
-          <a class=""
+          <a class="btn btn-link"
+             href="/report/performance?product={{ product.id }}">
+            <i class="fa fa-fw fa-line-chart"></i>
+            <span class="sr-only">Product performance chart</span>
+          </a>
+          <a class="btn btn-link"
              href="{{ PUBLIC_CATALOG ~ '/' ~ product.full_slug }}"
              target="_blank">
             <i class="fa fa-external-link"></i>
+            <span class="sr-only">Product on public website</span>
           </a>
         </small>
       </span>
