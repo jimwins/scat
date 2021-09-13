@@ -103,7 +103,7 @@ $q= "SELECT SUM(ordered * -1 *
 
 $sold= $db->get_one($q);
 
-$q= "SELECT SUM((SELECT SUM(allocated) FROM txn_line WHERE item = item.id) *
+$q= "SELECT SUM((SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id) *
                 sale_price(item.retail_price, item.discount_type,
                            item.discount))
        FROM item
