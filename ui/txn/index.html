@@ -148,7 +148,9 @@
               </td>
               <td>
                 {{ txn.created | date('n/j/y G:i') }}<br>
-                {{ txn.filled | date('n/j/y G:i') }}
+                {% if txn.filled %}
+                  {{ txn.filled | date('n/j/y G:i') }}
+                {% endif %}
               </td>
               <td>
                 {% if txn.person_id %}
