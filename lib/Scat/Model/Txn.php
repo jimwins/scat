@@ -639,6 +639,10 @@ class Txn extends \Scat\Model {
     if (!$this->person_id)
       return;
 
+    // Not paid yet? No loyalty yet.
+    if (!$this->paid)
+      return;
+
     // Use rewards (added as items, old style)
     $q= "INSERT INTO loyalty (txn_id, person_id, processed, note, points)
          SELECT {$this->id} txn_id,
