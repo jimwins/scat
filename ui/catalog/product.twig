@@ -30,7 +30,7 @@
     <div class="input-group">
       <span class="input-group-addon">Inventoried</span>
       {%- set last= product.last_inventoried -%}
-      <input type="text" class="form-control" disabled style="color: #000" value="{{ last ? last|date("F, j Y") : 'Never' }}" aria-describedby="basic-addon1">
+      <input type="text" class="form-control" disabled style="color: #000" value="{{ last ? last|date("F j, Y") : 'Never' }}" aria-describedby="basic-addon1">
     </div>
     <hr style="border-color: rgba(0,0,0,0.1)">
   </div>
