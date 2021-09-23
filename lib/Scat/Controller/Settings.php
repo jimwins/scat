@@ -121,4 +121,13 @@ class Settings {
 
     return $response->withJson($message);
   }
+
+  public function address(Request $request, Response $response, View $view)
+  {
+    $address=
+      $this->data->factory('Address')->find_one(1);
+    return $view->render($response, 'settings/address.html', [
+      'address' => $address,
+    ]);
+  }
 }

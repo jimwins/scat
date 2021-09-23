@@ -126,6 +126,7 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->post('/{id:[0-9]+}/email-invoice',
               [ \Scat\Controller\Transactions::class, 'email' ]);
 
+  /* Shipping address */
   $app->get('/{id:[0-9]+}/shipping-address',
             [ \Scat\Controller\Transactions::class, 'shippingAddress' ]);
   $app->post('/{id:[0-9]+}/shipping-address',
@@ -191,6 +192,13 @@ $app->group('/shipment', function (RouteCollectorProxy $app) {
               [ \Scat\Controller\Shipping::class, 'printShipmentLabel' ]);
   $app->post('/{id:[0-9]+}/~refund',
               [ \Scat\Controller\Shipping::class, 'refundShipment' ]);
+});
+
+/* Address */
+$app->group('/address', function (RouteCollectorProxy $app) {
+  $app->get('/{id}', [ \Scat\Controller\Address::class, 'show' ])
+      ->setName('address');
+  $app->patch('/{id}', [ \Scat\Controller\Address::class, 'update' ]);
 });
 
 /* Catalog */
@@ -571,6 +579,9 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Settings::class, 'message' ]);
   $app->post('/message[/{message_id}]',
               [ \Scat\Controller\Settings::class, 'messageUpdate' ]);
+
+  $app->get('/address',
+            [ \Scat\Controller\Settings::class, 'address' ]);
 });
 
 /* Webhooks */

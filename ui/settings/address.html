@@ -1,0 +1,49 @@
+{% extends 'layout/page.html' %}
+
+{% block title %}
+  Shipping Address
+{% endblock %}
+
+{% block content %}
+
+  <h1 class="page-header">Shipping Address</h1>
+
+  <ul class="nav nav-pills">
+    <li role="presentation"><a href="/settings">Advanced</a></li>
+    <li role="presentation"><a href="/settings/message">Canned Messages</a></li>
+    <li role="presentation" class="active"><a href="/settings/address">Shipping Address</a></li>
+  </ul>
+
+  <address>
+    <div>{{ address.name }}</div>
+    <div>{{ address.company }}</div>
+    <div>{{ address.email }}</div>
+    {% if address.phone %}
+      <div>{{ address.phone | phone_number_format }}</div>
+    {% endif %}
+    <div>{{ address.street1 }}</div>
+    <div>{{ address.street2 }}</div>
+    <div>
+      {% if address.city %}
+        {{ address.city }},
+      {% endif %}
+      {{ address.state }}
+      {{ address.zip }}
+    </div>
+  </address>
+
+  <button class="btn btn-primary" data-action="update-address">
+    Update Address
+  </button>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    scat.handleAction('click', 'update-address', (act) => {
+      return scat.dialog('/address/1').then((res) => {
+        window.location.reload()
+      })
+    })
+  </script>
+{% endblock %}
