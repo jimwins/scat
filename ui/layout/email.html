@@ -337,7 +337,7 @@
                         {% if sale %}
                           {% include 'email/invoice.twig' %}
                         {% endif %}
-                        {% if txn %}
+                        {% if txn and not no_details %}
                           <hr>
                           {% include 'email/txn.twig' %}
                         {% endif %}

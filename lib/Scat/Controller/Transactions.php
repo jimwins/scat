@@ -11,6 +11,7 @@ class Transactions {
   private $view, $txn, $data, $catalog, $pole, $tax;
 
   public function __construct(View $view, \Scat\Service\Txn $txn,
+                              \Scat\Service\Config $config,
                               \Scat\Service\Data $data,
                               \Scat\Service\Catalog $catalog,
                               \Scat\Service\PoleDisplay $pole,
@@ -18,6 +19,7 @@ class Transactions {
   {
     $this->view= $view;
     $this->txn= $txn;
+    $this->config= $config;
     $this->data= $data;
     $this->catalog= $catalog;
     $this->pole= $pole;
@@ -1541,13 +1543,54 @@ class Transactions {
   }
 
   public function updateDelivery(Request $request, Response $response,
+                                  \Scat\Service\Email $email,
                                   $id, $delivery_id= null)
   {
     $txn= $this->txn->fetchById($id);
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    return $response->withJson($txn);
+    $shipment= $delivery_id ? $txn->shipments()->find_one($delivery_id) : null;
+    if ($delivery_id && !$shipment)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if (!$shipment) {
+      $shipment= $txn->shipments()->create();
+      $shipment->txn_id= $txn->id;
+      $shipment->method= 'shipdistrict';
+    }
+
+    foreach ($shipment->getFields() as $field) {
+      if ($field == 'id') continue;
+      $value= $request->getParam($field);
+      if ($value !== null) {
+        if ($value === '') $value= null;
+        if ($field == 'rate')
+          $value= preg_replace('/^\\$/', '', $value);
+        $shipment->set($field, $value);
+      }
+    }
+
+    $to_name= $this->config->get('delivery.name');
+    $to_email= $this->config->get('delivery.email');
+    $subject= sprintf("%s delivery (%s)",
+                      $shipment->is_new() ? 'New' : 'Updated',
+                      $txn->formatted_number());
+
+    $body= $this->view->fetch('email/delivery.html', [
+      'txn' => $txn,
+      'delivery' => $shipment,
+      'subject' => $subject
+    ]);
+
+    $attachments= [];
+
+    $res= $email->send([ $to_email => $to_name ],
+                       $subject, $body, $attachments);
+
+    $shipment->save();
+
+    return $response->withJson($shipment);
   }
 
   /* Drop-ships */

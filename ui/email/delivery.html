@@ -1,0 +1,57 @@
+{% extends 'layout/email.html' %}
+{% import 'macros.twig' as scat %}
+
+{% set no_details=1 %}
+
+{% set vehicle_sizes= {
+  'sm': 'Small',
+  'md': 'Medium',
+  'lg': 'Large',
+  'xl': 'XL',
+  'xxl': 'XXL',
+}%}
+
+{% block title -%}
+  {{ subject }}
+{%- endblock %}
+
+{% block content_top %}
+  {% set address= txn.shipping_address() %}
+  <p>
+    <div>{{ address.name }}</div>
+    <div>{{ address.company }}</div>
+    <div>{{ address.email }}</div>
+    {% if address.phone %}
+      <div>{{ address.phone | phone_number_format }}</div>
+    {% endif %}
+    <div>{{ address.street1 }}</div>
+    <div>{{ address.street2 }}</div>
+    <div>
+      {% if address.city %}
+        {{ address.city }},
+      {% endif %}
+      {{ address.state }}
+      {{ address.zip }}
+    </div>
+  </p>
+
+  <p>
+    <div>Rate: {{ scat.amount(delivery.rate) }}</div>
+    <div>Vehicle: {{ vehicle_sizes[delivery.service] }}</div>
+  </p>
+
+  <p>
+    {{ delivery.handling_instructions }}
+  </p>
+
+  <p>
+    Ready to go now.
+  </p>
+
+  <p>
+    Thanks!
+  </p>
+{% endblock %}
+
+{% block content_bottom %}
+{% endblock %}

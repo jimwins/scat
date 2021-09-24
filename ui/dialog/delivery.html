@@ -21,7 +21,7 @@
       {% set method= txn.delivery_details.data().method %}
       <div class="form-group">
         <label for="vehicle">Vehicle Size</label>
-        <select class="form-control" name="vehicle_size">
+        <select class="form-control" name="service">
           <option value=""></option>
           {% for size, name in vehicle_sizes %}
             <option value="{{ size }}"
@@ -41,14 +41,13 @@
       <div class="form-group">
         <label for="dimensions">Cost</label>
         <input type="text" class="form-control"
-               name="cost" placeholder="$5.99"
+               name="rate" placeholder="$5.99"
                value="{{ scat.amount(txn.delivery_details.retail_price) }}">
       </div>
 
       <div class="form-group">
         <label for="dimensions">Instructions</label>
-        <textarea class="form-control" name="delivery_instructions">
-        </textarea>
+        <textarea class="form-control" name="handling_instructions">{{ delivery.instructions }}</textarea>
       </div>
 
     {% endif %}
@@ -73,11 +72,9 @@
     form.disabled= true
     form.style.filter= 'brightness(80%)'
 
-    // TODO do stuff.
-/*
     let formData= new FormData(form)
-    fetch("/sale/{{ txn.id }}/shipment{{ shipment.id ? '/' ~ shipment.id }}", {
-      method: '{{ shipment ? 'PATCH' : 'POST' }}',
+    fetch("/sale/{{ txn.id }}/delivery{{ delivery.id ? '/' ~ delivery.id }}", {
+      method: '{{ delivery ? 'PATCH' : 'POST' }}',
       headers: {
         'Accept' : 'application/json',
         'Content-type' : 'application/json',
@@ -87,8 +84,8 @@
     .then((res) => scat._handleResponse(res))
     .then((res) => res.json())
     .then((data) => {
+      dialog.resolution= data
       $(dialog).modal('hide')
-      scat.dialog('/sale/{{ txn.id }}/shipment/' + data.id)
     })
     .catch((err) => {
       scat.alert('danger', err.message)
@@ -97,7 +94,5 @@
       form.disabled= false
       form.style.filter= ''
     })
-*/
   }
 {% endblock %}
-
