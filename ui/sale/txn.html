@@ -840,7 +840,9 @@
     scat.handleAction('click', 'edit-person', (act) => {
       var id= act.closest('[data-id]').getAttribute('data-id')
       if (id) {
-        return scat.dialog('/person/' + id)
+        return scat.dialog('/person/' + id).then((res) => {
+          scat.reload('sidebar')
+        })
       } else {
         return changePerson()
       }
