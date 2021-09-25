@@ -1083,18 +1083,16 @@ class Transactions {
 
         $person= $txn->person();
 
-        $giftcard= $person->store_credit();
+        $card= $person->store_credit();
 
-        if (!$giftcard) {
-          $giftcard= $person->factory('Giftcard')->create();
-          $giftcard->txn_id= $txn->id;
-          $giftcard->save();
+        if (!$card) {
+          $card= $gift->create();
 
-          $person->giftcard_id= $giftcard->id;
+          $person->giftcard_id= $card->id;
           $person->save();
         }
 
-        $giftcard->add_txn($amount, $txn->id);
+        $card->add_txn($amount, $txn->id);
 
         $amount= -$amount;
         break;

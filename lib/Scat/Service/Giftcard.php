@@ -9,6 +9,20 @@ class Giftcard
     $this->data= $data;
   }
 
+  public function create($expires= null) {
+    $card= $this->data->factory('Giftcard')->create();
+
+    $card->set_expr('pin', 'SUBSTR(RAND(), 5, 4)');
+    if ($expires) {
+      $card->expires= $expires . ' 23:59:59';
+    }
+    $card->active= 1;
+
+    $card->save();
+
+    return $card;
+  }
+
   public function check_balance($card) {
     $card= preg_replace('/^RAW-/', '', $card);
 
