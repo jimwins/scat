@@ -23,6 +23,9 @@
         Last used: <span id="latest">never</span>.
       </p>
       <div class="form-group">
+        {% if other_method|length %}
+          <input type="hidden" name="no_change" value="1">
+        {% endif %}
         <input type="hidden" name="method" value="gift">
         <input class="form-control input-lg text-center autofocus"
                 type="text" pattern="[-.0-9]*"
@@ -67,7 +70,7 @@
       if (balance < due) {
         def= balance
       }
-      if (((balance - due) <= 10.00) && !data.expires) {
+      if (((balance - due) <= 10.00) && !data.expires && !form.elements['no_change']) {
         def= balance
         form.querySelector('#change').classList.remove('hidden')
       }

@@ -931,6 +931,10 @@ class Transactions {
     $amount= ltrim($amount, '$'); # get rid of leading $
 
     $change= (($method == 'cash' || $method == 'gift') ? true : false);
+    if ($request->getParam('no_change')) {
+      $change= false;
+    }
+
     if (!$txn->canPay($method, $amount)) {
       throw new \Exception("Amount is too much.");
     }
