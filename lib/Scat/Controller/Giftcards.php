@@ -8,10 +8,11 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Giftcards {
-  private $data, $view;
+  private $data, $gift, $view;
 
-  public function __construct(\Scat\Service\Data $data, View $view) {
+  public function __construct(\Scat\Service\Data $data, \Scat\Service\Giftcard $gift, View $view) {
     $this->data= $data;
+    $this->gift= $gift;
     $this->view= $view;
   }
 
@@ -59,15 +60,7 @@ class Giftcards {
 
     $this->data->beginTransaction();
 
-    $card= $this->data->factory('Giftcard')->create();
-
-    $card->set_expr('pin', 'SUBSTR(RAND(), 5, 4)');
-    if ($expires) {
-      $card->expires= $expires . ' 23:59:59';
-    }
-    $card->active= 1;
-
-    $card->save();
+    $card= $this->gift->create($expires);
 
     /* Reload the card to make sure we have calculated values */
     $card= $this->data->factory('Giftcard')->find_one($card->id);
