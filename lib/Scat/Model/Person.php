@@ -609,4 +609,9 @@ class Person extends \Scat\Model {
     $this->subscriptions($groups);
 
   }
+
+  public function store_credit() {
+    return $this->belongs_to('Giftcard')->find_one();
+  }
+
 }

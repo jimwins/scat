@@ -181,20 +181,27 @@
               Tax ID
             </label>
             <div class="col-sm-10">
-              <button id="tax-exemption-certificate" class="btn btn-xs btn-default">
-                <i class="fa fa-certificate"></i>
-              </button>
-              {% if person.exemption_certificate_id %}
-                <p class="form-control-static">
+              <p class="form-control-static">
+                <button id="tax-exemption-certificate" class="btn btn-xs btn-default">
+                  <i class="fa fa-fw fa-certificate"></i>
+                </button>
+                {% if person.exemption_certificate_id %}
                   Exemption on file
-                </p>
-              {% else %}
-                <p class="form-control-static editable"
-                   data-pk="{{ person.id }}"
-                   data-name="tax_id" data-value="{{ person.tax_id }}">
+                {% else %}
                   {{ person.tax_id }}
-                </p>
-              {% endif %}
+                {% endif %}
+              </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tax_id" class="col-sm-2 control-label">
+              Store Credit
+            </label>
+            <div class="col-sm-10">
+              <p class="form-control-static">
+                {{ scat.amount(person.store_credit.balance) }}
+              </p>
             </div>
           </div>
 
