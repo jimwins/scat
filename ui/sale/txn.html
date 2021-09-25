@@ -385,6 +385,11 @@
 
       <a data-action="edit-person" data-id="{{ txn.person_id }}">
         {{ txn.person.friendly_name ?: 'Anonymous' }}
+        {% if txn.person and txn.person.store_credit.balance > 0 %}
+          <span class="label label-success">
+            {{ scat.amount(txn.person.store_credit.balance) }}
+          </span>
+        {% endif %}
       </a>
 
       {% set person= txn.person %}

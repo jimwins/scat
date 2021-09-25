@@ -59,16 +59,12 @@
 #}
 
       <div class="form-group col-sm-12">
-        <label for="tax_id">Tax ID</label>
+        <label for="store_credit">Store Credit</label>
         <div class="input-group">
           <span class="input-group-addon hidden"></span>
-          <input type="text" class="form-control" name="tax_id"
-                 value="{{ person.tax_id }}">
-          <span class="input-group-btn">
-            <button class="btn btn-default" type="button" id="verify-tax-id">
-              Verify
-            </button>
-          </span>
+          <p class="form-control-static">
+            {{ scat.amount(person.store_credit.balance) }}
+          </p>
         </div>
       </div>
 
