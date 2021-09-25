@@ -20,6 +20,15 @@
               data-action="choose-pay-method" data-method="credit">
         Credit Card
       </button>
+
+      {% if txn.person_id and txn.person.giftcard_id and
+            txn.person.store_credit.balance > 0 %}
+        <button type="button" class="btn btn-primary btn-lg btn-block"
+                data-action="choose-pay-method" data-method="gift"
+                data-other-method="{{ txn.person.store_credit.card }}">
+          Store Credit
+        </button>
+      {% endif %}
     {% endif %}
 
     {% if txn.due < 0 and txn.person_id %}

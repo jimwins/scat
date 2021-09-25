@@ -12,7 +12,8 @@
     <div class="get-card">
       <div class="form-group">
         <input class="form-control" type="text" autofocus
-                name="card" placeholder="Scan or type card number">
+                name="card" placeholder="Scan or type card number"
+                value="{{ other_method }}">
       </div>
     </div>
 
@@ -47,6 +48,47 @@
 {% endblock %}
 
 {% block script %}
+  let lookupCard= (card) => {
+    // trim leading RAW-
+    card= card.replace('RAW-', '')
+
+    scat.get('/gift-card/' + card, null, {
+      headers: {
+        'Accept' : 'application/json',
+        'Content-type' : 'application/json',
+      },
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      let due= {{ txn.due }}
+      let def= due
+      let balance= parseFloat(data.balance)
+
+      if (balance < due) {
+        def= balance
+      }
+      if (((balance - due) <= 10.00) && !data.expires) {
+        def= balance
+        form.querySelector('#change').classList.remove('hidden')
+      }
+
+      form.querySelector('[name="amount"]').value= def
+      form.querySelector('#balance').textContent= scat.amount(balance)
+      form.querySelector('#latest').textContent= data.latest
+
+      form.querySelectorAll('.get-card').forEach((el) => {
+        el.classList.add('hidden')
+      })
+      form.querySelectorAll('.payment').forEach((el) => {
+        el.classList.remove('hidden')
+      })
+    })
+  }
+
+  if ("{{ other_method }}".length) {
+    lookupCard("{{ other_method }}")
+  }
+
   form.onsubmit= (event) => {
     event.preventDefault()
 
@@ -63,40 +105,7 @@
     }
 
     if (formData.get('lookup')) {
-      // trim leading RAW-
-      let card= formData.get('card').replace('RAW-', '')
-
-      scat.get('/gift-card/' + card, null, {
-        headers: {
-          'Accept' : 'application/json',
-          'Content-type' : 'application/json',
-        },
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        let due= {{ txn.due }}
-        let def= due
-        let balance= parseFloat(data.balance)
-
-        if (balance < due) {
-          def= balance
-        }
-        if (((balance - due) <= 10.00) && !data.expires) {
-          def= balance
-          form.querySelector('#change').classList.remove('hidden')
-        }
-
-        form.querySelector('[name="amount"]').value= def
-        form.querySelector('#balance').textContent= scat.amount(balance)
-        form.querySelector('#latest').textContent= data.latest
-
-        form.querySelectorAll('.get-card').forEach((el) => {
-          el.classList.add('hidden')
-        })
-        form.querySelectorAll('.payment').forEach((el) => {
-          el.classList.remove('hidden')
-        })
-      })
+      lookupCard(formData.get('card'))
     }
 
     if (formData.get('pay')) {
