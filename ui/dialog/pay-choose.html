@@ -22,6 +22,14 @@
       </button>
     {% endif %}
 
+    {% if txn.due < 0 and txn.person_id %}
+      <button type="button" class="btn btn-primary btn-lg btn-block"
+              data-action="choose-pay-method" data-method="refund"
+              data-other-method="gift">
+        Store Credit
+      </button>
+    {% endif %}
+
     {% set return_methods= {
           'amazon' : 'Amazon Pay',
           'credit' : 'Credit Card',

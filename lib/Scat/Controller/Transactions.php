@@ -1075,7 +1075,31 @@ class Transactions {
 
         $amount= -$amount;
         break;
+
+      case 'gift':
+        if (!$txn->person_id) {
+          throw new \Exception("Must be a person associated with the sale.");
+        }
+
+        $person= $txn->person();
+
+        $giftcard= $person->store_credit();
+
+        if (!$giftcard) {
+          $giftcard= $person->factory('Giftcard')->create();
+          $giftcard->txn_id= $txn->id;
+          $giftcard->save();
+
+          $person->giftcard_id= $giftcard->id;
+          $person->save();
+        }
+
+        $giftcard->add_txn($amount, $txn->id);
+
+        $amount= -$amount;
+        break;
       }
+
       $method= $other_method;
       break; // end of refund handling
 
