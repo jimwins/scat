@@ -64,7 +64,8 @@
         "amzn/amazon-pay-sdk-php": "^3.6",
         "paypal/paypal-checkout-sdk": "^1.0",
         "amzn/amazon-pay-api-sdk-php": "^2.2",
-        "cloudstek/php-laff": "dev-master"
+        "cloudstek/php-laff": "dev-master",
+        "twig/html-extra": "^3.3"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"

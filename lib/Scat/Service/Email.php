@@ -47,14 +47,7 @@ class Email {
       $bcc= $this->from_name . " " . $this->from_email;
     }
 
-    $logo= \Postmark\Models\PostmarkAttachment::fromFile(
-      '../ui/logo.png',
-      'logo.png',
-      'image/png',
-      'cid:logo.png',
-    );
-
-    $attach= [ $logo ];
+    $attach= [ ];
 
     if ($attachments) {
       foreach ($attachments as $part) {

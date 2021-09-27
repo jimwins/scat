@@ -42,6 +42,9 @@ $container->set('view', function() {
   $engine= new \Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine();
   $view->addExtension(new \Aptoma\Twig\Extension\MarkdownExtension($engine));
 
+  // Add the HTML extension
+  $view->addExtension(new \Twig\Extra\Html\HtmlExtension());
+
   // Add our Twig extensions
   $view->addExtension(new \Scat\TwigExtension());
 

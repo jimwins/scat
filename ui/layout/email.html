@@ -309,7 +309,7 @@
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <a href="https://rawmaterialsla.com/"><img class="img-responsive" src="cid:logo.png"></a>
+                        <a href="https://rawmaterialsla.com/"><img class="img-responsive" src="{{ source('logo.png')|data_uri }}"></a>
                         {% block content_top "" %}
                         {% if call_to_action_url %}
                           <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
