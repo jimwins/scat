@@ -61,7 +61,7 @@
           {% if note.full_content %}
             <details style="padding-left: 1em">
               <summary>{{ note.content }}</summary>
-              <iframe srcdoc="{{ note.full_content }}" width="100%" sandbox></iframe>
+              <iframe srcdoc="{{ note.full_content }}" width="100%" height="300" sandbox></iframe>
             </details>
           {% else %}
             <p style="padding-left: 1em">{{ note.content }}</p>
