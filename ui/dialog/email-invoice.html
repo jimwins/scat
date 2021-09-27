@@ -33,6 +33,14 @@
     </div>
 
     <div class="form-group">
+      {% if txn.type != 'vendor' %}
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="1" name="full_invoice">
+            Include Prices
+          </label>
+        </div>
+      {% endif %}
       <div class="checkbox">
         <label>
           <input type="checkbox" value="1" name="include_details" {{ txn.type == 'vendor' ? 'checked' }}>

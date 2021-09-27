@@ -416,7 +416,7 @@ class Ordure {
 
         $this->data->commit();
 
-        $data= [ 'txn' => $txn ];
+        $data= [ 'txn' => $txn, 'full_invoice' => true ];
 
         $template= $view->getEnvironment()->load('email/confirmed.html');
 

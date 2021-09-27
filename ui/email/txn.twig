@@ -22,8 +22,10 @@
         {% endif %}
         <th>Code</th>
         <th>Name</th>
-        <th class="text-right">Price</th>
-        <th class="text-right">Ext</th>
+        {% if txn.type == 'vendor' or full_invoice %}
+          <th class="text-right">Price</th>
+          <th class="text-right">Ext</th>
+        {% endif %}
       </tr>
     </thead>
     <tbody>
@@ -41,53 +43,57 @@
               <span>{{ data.name }}</span>
               <div class="small">{{ data.pricing_detail }}</div>
             </td>
-            <td class="text-right">
-              {% if not data.kit_id %}
-                {{ scat.amount(data.sale_price) }}</td>
-              {% endif %}
-            <td class="text-right">
-              {% if not data.kit_id %}
-                {{ scat.amount(data.sale_price * (txn.type == 'vendor' ? data.ordered : -data.ordered)) }}
-              {% endif %}
-            </td>
+            {% if txn.type == 'vendor' or full_invoice %}
+              <td class="text-right">
+                {% if not data.kit_id %}
+                  {{ scat.amount(data.sale_price) }}</td>
+                {% endif %}
+              <td class="text-right">
+                {% if not data.kit_id %}
+                  {{ scat.amount(data.sale_price * (txn.type == 'vendor' ? data.ordered : -data.ordered)) }}
+                {% endif %}
+              </td>
+            {% endif %}
           </tr>
         {% endif %}
       {% endfor %}
     </tbody>
-    <tfoot>
-      {% set span= txn.type == 'vendor' ? 6 : 5 %}
-      <tr>
-        <th colspan="{{ span }}" class="text-right">Subtotal:</th>
-        <td class="text-right">{{ scat.amount(txn.subtotal) }}</td>
-      </tr>
-      <tr>
-        <th colspan="{{ span }}" class="text-right">
-          Tax:
-        </th>
-        <td class="text-right" id="tax">
-          {{ scat.amount(txn.tax) }}
-        </td>
-      </tr>
-      <tr>
-        <th colspan="{{ span }}" class="text-right">Total:</th>
-        <td class="text-right" id="total">
-          {{ scat.amount(txn.total) }}
-        </td>
-      </tr>
-      {% for data in txn.payments.find_many %}
+    {% if txn.type == 'vendor' or full_invoice %}
+      <tfoot>
+        {% set span= txn.type == 'vendor' ? 6 : 5 %}
+        <tr>
+          <th colspan="{{ span }}" class="text-right">Subtotal:</th>
+          <td class="text-right">{{ scat.amount(txn.subtotal) }}</td>
+        </tr>
         <tr>
           <th colspan="{{ span }}" class="text-right">
-            {{ data.pretty_method }}
-            ({{ data.processed }}):
+            Tax:
           </th>
-          <td class="text-right">{{ scat.amount(data.amount) }}</td>
+          <td class="text-right" id="tax">
+            {{ scat.amount(txn.tax) }}
+          </td>
         </tr>
-      {% endfor %}
-      <tr>
-        <th colspan="{{ span }}" class="text-right">Due:</th>
-        <td class="text-right">{{ scat.amount(txn.due) }}</td>
-      </tr>
-    </tfoot>
+        <tr>
+          <th colspan="{{ span }}" class="text-right">Total:</th>
+          <td class="text-right" id="total">
+            {{ scat.amount(txn.total) }}
+          </td>
+        </tr>
+        {% for data in txn.payments.find_many %}
+          <tr>
+            <th colspan="{{ span }}" class="text-right">
+              {{ data.pretty_method }}
+              ({{ data.processed }}):
+            </th>
+            <td class="text-right">{{ scat.amount(data.amount) }}</td>
+          </tr>
+        {% endfor %}
+        <tr>
+          <th colspan="{{ span }}" class="text-right">Due:</th>
+          <td class="text-right">{{ scat.amount(txn.due) }}</td>
+        </tr>
+      </tfoot>
+    {% endif %}
   </table>
   {% if txn.shipping_address_id > 1 %}
     <div class="panel panel-default">

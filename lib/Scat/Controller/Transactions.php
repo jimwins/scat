@@ -1264,8 +1264,8 @@ class Transactions {
     $body= $this->view->fetch('email/invoice.html', [
       'txn' => $txn,
       'subject' => $subject,
-      'content' =>
-        $request->getParam('content'),
+      'content' => $request->getParam('content'),
+      'full_invoice' => $request->getParam('full_invoice'),
     ]);
 
     $attachments= [];
