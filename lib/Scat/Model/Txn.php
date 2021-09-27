@@ -34,6 +34,14 @@ class Txn extends \Scat\Model {
     return $this->has_many('Note', 'attach_id');
   }
 
+  public function createNote() {
+    $note= $this->factory('Note')->create();
+    $note->kind= 'txn';
+    $note->attach_id= $this->id;
+
+    return $note;
+  }
+
   public function payments() {
     return $this->has_many('Payment');
   }

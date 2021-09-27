@@ -1283,6 +1283,13 @@ class Transactions {
     $res= $email->send([ $to_email => $to_name ],
                        $subject, $body, $attachments);
 
+    /* Attach email as a note */
+    $note= $txn->createNote();
+    $note->source= 'email';
+    $note->content= $subject;
+    $note->full_content= $body;
+    $note->save();
+
     if (($status= $request->getParam('new_status'))) {
       $txn->set('status', $status);
       $txn->save();

@@ -173,6 +173,13 @@ class Shipping {
           $subject, $body
         );
 
+        /* Attach email as a note */
+        $note= $txn->createNote();
+        $note->source= 'email';
+        $note->content= $subject;
+        $note->full_content= $body;
+        $note->save();
+
         foreach ($txn->payments()->find_many() as $payment) {
           if ($payment->method == 'paypal') {
             $this->paypal->addTracker($payment, $tracker);
@@ -221,6 +228,13 @@ class Shipping {
           $subject, $body
         );
 
+        /* Attach email as a note */
+        $note= $txn->createNote();
+        $note->source= 'email';
+        $note->content= $subject;
+        $note->full_content= $body;
+        $note->save();
+
         break;
 
       case 'available_for_pickup':
@@ -257,6 +271,13 @@ class Shipping {
           [ $txn->person()->email => $txn->person()->name ],
           $subject, $body
         );
+
+        /* Attach email as a note */
+        $note= $txn->createNote();
+        $note->source= 'email';
+        $note->content= $subject;
+        $note->full_content= $body;
+        $note->save();
 
         break;
 
