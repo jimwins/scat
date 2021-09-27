@@ -420,9 +420,17 @@ class Ordure {
 
         $template= $view->getEnvironment()->load('email/confirmed.html');
 
-        $this->email->send([ $person->email => $person->name],
-                            $template->renderBlock('title', $data),
-                            $template->render($data));
+        $subject= $template->renderBlock('title', $data);
+        $body= $template->render($data);
+
+        $this->email->send([ $person->email => $person->name], $subject, $body);
+
+        /* Attach email as a note */
+        $note= $txn->createNote();
+        $note->source= 'email';
+        $note->content= $subject;
+        $note->full_content= $body;
+        $note->save();
       }
       catch (Exception $e) {
         $this->data->rollBack();
