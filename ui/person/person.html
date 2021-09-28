@@ -43,6 +43,10 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <div class="pull-right">
+            <button data-action="merge-person" class="btn btn-xs btn-default">
+              <i class="fa fa-fw fa-compress"></i>
+              Merge Person
+            </button>
             <button class="btn btn-default btn-xs toggle"
                     data-name="active" data-value="{{ person.active }}">
               <i class="fa fa-fw {{ person.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
@@ -380,9 +384,6 @@
     </div><!-- .row -->
   {% endif %}
 
-  <button id="merge-person" class="btn btn-default">
-    Merge Person
-  </button>
 {% endblock %}
 
 {% block script %}
@@ -453,19 +454,23 @@
           })
     })
 
-    document.getElementById('merge-person').addEventListener('click', (ev) => {
-      let to= window.prompt("What person should we merge this into?", "")
-      if (to) {
-        scat.post('/person/' + to + '/~merge',
-                  { from: '{{ person.id }}' })
-            .then((res) => res.json())
-            .then((data) => {
-              window.location.href= data.id
-            })
-            .catch((err) => {
-              scat.alert('danger', err.message)
-            })
-      }
+    scat.handleAction('click', 'merge-person', (act) => {
+      return scat.dialog('/person/{{ person.id }}/~merge').then((res) => {
+        debugger
+	if (res) {
+	  return scat.post('/person/' + res + '/~merge', {
+            from: '{{ person.id }}'
+          })
+          .then((res) => res.json())
+	  .then((data) => {
+	    window.location.href= data.id
+	  })
+	  .catch((err) => {
+	    scat.alert('danger', err.message)
+	  })
+	}
+        return Promise.resolve()
+      })
     })
 
     document.getElementById('tax-exemption-certificate').addEventListener('click', (ev) => {

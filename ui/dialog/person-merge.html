@@ -1,0 +1,101 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Person
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    <style>
+      li[data-id] {
+        cursor: pointer;
+      }
+      li[data-id]:hover {
+        text-decoration: underline;
+        color: rgba(128, 0, 0, 0.8);
+      }
+    </style>
+
+    <div class="form-group">
+      <label for="search">Search</label>
+      <input type="text" class="form-control" id="search" name="search" autofocus
+             autocomplete="off" autocorrect="off" autocapitalize="off">
+    </div>
+
+    <div style="max-height: 30em; overflow: scroll; overflow-y: visible">
+      <ul class="list-group">
+        {% for person in people %}
+          <li class="list-group-item" data-id="{{ person.id }}">
+            {{ person.friendly_name }}
+            <span class="pull-right">
+              {{ person.pretty_phone }}
+            </span>
+            <div class="clearfix"></div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+
+  <template id="person-item">
+    <li class="list-group-item" data-id="">
+      <span data-value="friendly_name">
+        Sample Person / Sample Company
+      </span>
+      <span class="pull-right" data-value="pretty_phone">
+        (213) 627-7223
+      </span>
+      <div class="clearfix"></div>
+    </li>
+  </template>
+
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    Create
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.querySelector('#search').addEventListener('keyup', (ev) => {
+    let q= ev.currentTarget.value
+    if (q.length > 2) {
+      return scat.get('/person/search', { q: q, limit: 20 }, {
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        let results= data.map((person) => {
+          let item= form.querySelector('#person-item').content.cloneNode(true);
+          item.children[0].setAttribute('data-id', person.id)
+          item.querySelectorAll('[data-value]').forEach((val) => {
+            val.innerText= person[val.getAttribute('data-value')]
+          })
+
+          return item
+        })
+
+        let list= form.querySelector('.list-group')
+        list.replaceChildren(...results)
+
+        return Promise.resolve()
+      })
+    }
+  })
+
+  form.addEventListener('click', (ev) => {
+    let selected= ev.target.closest('[data-id]')
+    if (selected) {
+      console.log("selected person " + selected.getAttribute('data-id'))
+      dialog.resolution= selected.getAttribute('data-id')
+      $(dialog).modal('hide')
+    }
+  })
+
+{% endblock %}

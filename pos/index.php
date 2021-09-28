@@ -377,6 +377,8 @@ $app->group('/person', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\People::class, 'loyalty' ]);
   $app->get('/{id:[0-9]+}/backorders',
             [ \Scat\Controller\People::class, 'backorderReport' ]);
+  $app->get('/{id:[0-9]+}/~merge',
+            [ \Scat\Controller\People::class, 'mergePerson' ]);
   $app->post('/{id:[0-9]+}/~merge',
               [ \Scat\Controller\People::class, 'mergePerson' ]);
 

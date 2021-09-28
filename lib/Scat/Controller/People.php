@@ -175,12 +175,19 @@ class People {
     return $this->processPerson($request, $response, $data, $person);
   }
 
-  public function mergePerson(Request $request, Response $response,
+  public function mergePerson(Request $request, Response $response, View $view,
                               \Scat\Service\Data $data, $id)
   {
     $person= $data->factory('Person')->find_one($id);
     if (!$person)
       throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $view->render($response, 'dialog/person-merge.html', [
+        'person' => $person,
+      ]);
+    }
 
     $from= $data->factory('Person')->find_one($request->getParam('from'));
     if (!$from)
@@ -190,6 +197,16 @@ class People {
       throw new \Exception("Can't merge a person into themself");
 
     $data->beginTransaction();
+
+    /* Copy over data that we don't have */
+    foreach ($person->getFields() as $field) {
+      if (in_array($field, [ 'id', 'created', 'modified' ])) continue;
+      $value= $from->get($field);
+      if (!$person->get($field) && $value !== null) {
+        $person->setProperty($field, $value);
+        $dirty= true;
+      }
+    }
 
     /* Move over devices */
     $q= "UPDATE IGNORE device
@@ -236,6 +253,11 @@ class People {
     $data->execute($q);
 
     $from->delete();
+
+    /* Do this after $from is deleted to avoid key collisions. */
+    if ($dirty) {
+      $person->save();
+    }
 
     $data->commit();
 
