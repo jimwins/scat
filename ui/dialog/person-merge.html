@@ -71,7 +71,9 @@
       })
       .then((res) => res.json())
       .then((data) => {
-        let results= data.map((person) => {
+        let results= data.filter((person) => {
+          return person.id != {{ person.id }}
+        }).map((person) => {
           let item= form.querySelector('#person-item').content.cloneNode(true);
           item.children[0].setAttribute('data-id', person.id)
           item.querySelectorAll('[data-value]').forEach((val) => {
