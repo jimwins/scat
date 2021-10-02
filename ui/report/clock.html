@@ -6,9 +6,7 @@
 {% endblock %}
 
 {% block content %}
-  <form id="report-params" class="form-horizontal" role="form"
-        action="<?=str_replace('?'.$_SERVER['QUERY_STRING'], '',
-                               $_SERVER['REQUEST_URI'])?>">
+  <form id="report-params" class="form-horizontal" role="form" action="clock">
     <div class="form-group">
       <label for="datepicker" class="col-sm-2 control-label">
         Dates
