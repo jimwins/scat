@@ -41,7 +41,13 @@
         <tr data-id="{{ punch.id }}">
           <td>&nbsp; &nbsp; {{ punch.start|date('l, F j') }}</td>
           <td>{{ punch.start|date("H:i:s") }}</td>
-          <td>{{ punch.end|date("H:i:s") }}</td>
+          <td>
+            {% if punch.end %}
+              {{ punch.end|date("H:i:s") }}
+            {% else %}
+              &mdash;
+            {% endif %}
+          </td>
           <td>{{ "%.3f"|format(punch.regular) }}</td>
           <td>{{ "%.3f"|format(punch.overtime) }}</td>
         </tr>
