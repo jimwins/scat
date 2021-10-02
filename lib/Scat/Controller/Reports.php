@@ -48,6 +48,15 @@ class Reports {
     return $this->view->render($response, 'report/shipments.html', $data);
   }
 
+  public function clock(Request $request, Response $response) {
+    $begin= $request->getParam('begin');
+    $end= $request->getParam('end');
+    $data= $this->report->clock($begin, $end);
+    $data['begin']= $begin;
+    $data['end']= $end;
+    return $this->view->render($response, 'report/clock.html', $data);
+  }
+
   public function oldReport(Request $request, Response $response, $name) {
     ob_start();
     include "../old-report/report-$name.php";

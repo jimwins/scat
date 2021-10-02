@@ -157,4 +157,89 @@ class Report
                              ->order_by_desc('created')
                              ->find_many() ];
   }
+
+  public function clock($begin, $end) {
+    if (!$begin) {
+      $begin= date('Y-m-d', strtotime('Sunday -2 weeks'));
+    }
+
+    if (!$end) {
+      $end= date('Y-m-d', strtotime('last Saturday'));
+    }
+
+    $punches= $this->data->factory('Timeclock')
+                ->select('*')
+                ->select_expr('TIMESTAMPDIFF(SECOND, start, end) / 3600', 'hours')
+                ->where_raw('start BETWEEN ? and ? + INTERVAL 1 DAY',
+                            [ $begin, $end ])
+                ->order_by_expr('person_id, start')
+                ->find_many();
+
+    $data= $person= [];
+    $day= null;
+    $day_reg= $day_ot= $week_reg= $week_ot= $total_reg= $total_ot= 0;
+
+    foreach ($punches as $punch) {
+      if ($punch->person_id != $person['details']->id) {
+        if ($person) {
+          $person['regular']= $total_reg;
+          $person['overtime']= $total_ot;
+          $data['people'][]= $person;
+        }
+
+        $day= null;
+        $day_reg= $day_ot= $week_reg= $week_ot= $total_reg= $total_ot= 0;
+
+        $person= ['details' => $punch->person() ];
+      }
+
+      $start= strtotime($punch->start);
+      $punch_day= date("Y-m-d", $start);
+      // Need to adjust so week starts on Sunday, not Monday
+      $punch_week= date("W", $start) + (date("w", $start) ? 0 : 1);
+
+      // reset day and week as necessary
+      if ($day != $punch_day) {
+        $day= $punch_day;
+        $day_reg= $day_ot= 0;
+      }
+      if ($week != $punch_week) {
+        $week= $punch_week;
+        $week_reg= $week_ot= 0;
+      }
+
+
+      $ot= 0;
+      $reg= $punch->hours;
+
+      /* Anything over 8 hours in a day shifts to overtime */
+      $day_reg+= $reg;
+      if ($day_reg > 8.0) {
+        $ot= $day_reg - 8.0;
+        $reg= $reg - $ot;
+        $day_ot+= $ot;
+        $day_reg= 8.0;
+      }
+
+      /* Any regular time over 40 hours in a week also becomes overtime */
+      $week_reg+= $reg;
+      if ($week_reg > 40.0) {
+        $new_ot= $week_reg - 40.0;
+        $reg= $reg - $new_ot;
+        $ot+= $new_ot;
+        $week_ot+= $new_ot;
+        $week_reg= 40.0;
+      }
+
+      $punch->regular= $reg;
+      $punch->overtime= $ot;
+
+      $person['punches'][]= $punch;
+
+      $total_reg+= $reg;
+      $total_ot+= $ot;
+    }
+
+    return $data;
+  }
 }
