@@ -1,0 +1,58 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Clock Punch
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-sm-12">
+        <label for="person_id">Person</label>
+        <select name="person_id" class="form-control">
+          {% for p in people %}
+            <option value="{{ p.id }}" {{ p.id == punch.person_id ? 'selected' }}>
+              {{ p.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="start">Start</label>
+        <input type="text" class="form-control initial-focus" name="start"
+               value="{{ punch.start }}">
+      </div>
+
+      <div class="form-group col-sm-12">
+        <label for="end">End</label>
+        <input type="text" class="form-control initial-focus" name="end"
+               value="{{ punch.end }}">
+      </div>
+
+    </div><!-- /.row -->
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    Update
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+
+    return scat.patch('/clock/{{ punch.id }}', formData)
+      .then((res) => res.json())
+      .then((data) => {
+        dialog.resolution= data;
+        $(dialog).modal('hide')
+      })
+  }
+{% endblock %}

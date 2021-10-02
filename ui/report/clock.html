@@ -6,7 +6,8 @@
 {% endblock %}
 
 {% block content %}
-  <form id="report-params" class="form-horizontal" role="form" action="clock">
+  <form id="report-params" class="form-horizontal" role="form"
+        action="clock" method="get">
     <div class="form-group">
       <label for="datepicker" class="col-sm-2 control-label">
         Dates
@@ -33,13 +34,23 @@
       <th>Out</th>
       <th>Regular</th>
       <th>OT</th>
+      <th>&nbsp;</th>
     </tr>
 
     {% for person in people %}
-      <tr><th colspan="5"> {{ person.details.name }}</th></tr>
+      <tr><th colspan="6"> {{ person.details.name }}</th></tr>
       {% for punch in person.punches %}
         <tr data-id="{{ punch.id }}">
-          <td>&nbsp; &nbsp; {{ punch.start|date('l, F j') }}</td>
+          <td>
+            &nbsp; &nbsp;
+            {{ punch.start|date('l, F j') }}
+            {% if punch.changes|length %}
+              <span class="text-danger">
+                <i class="fa fa-fw fa-asterisk"></i>
+                <span class="sr-only">Changed</span>
+              </span>
+            {% endif %}
+          </td>
           <td>{{ punch.start|date("H:i:s") }}</td>
           <td>
             {% if punch.end %}
@@ -50,6 +61,12 @@
           </td>
           <td>{{ "%.3f"|format(punch.regular) }}</td>
           <td>{{ "%.3f"|format(punch.overtime) }}</td>
+          <td>
+            <button class="btn btn-default btn-xs" data-action="edit-punch">
+              <i class="fa fa-fw fa-edit"></i>
+              <span class="sr-only">Edit</span>
+            </button>
+          </td>
         </tr>
       {% endfor %}
 
@@ -57,6 +74,7 @@
         <td colspan="3"></td>
         <td>{{ "%.3f"|format(person.regular) }}</td>
         <td>{{ "%.3f"|format(person.overtime) }}</td>
+        <td>&nbsp;</td>
       </tr>
     {% endfor %}
 
@@ -69,5 +87,12 @@
       format: "yyyy-mm-dd",
       todayHighlight: true
   });
+
+  scat.handleAction('click', 'edit-punch', (act) => {
+    let id= act.closest('[data-id]').getAttribute('data-id')
+    return scat.dialog('/clock/' + id).then((res) => {
+      window.location.reload()
+    })
+  })
 </script>
 {% endblock %}

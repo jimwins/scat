@@ -6,4 +6,7 @@ class Timeclock extends \Scat\Model {
     return $this->belongs_to('Person')->find_one();
   }
 
+  public function changes() {
+    return $this->has_many('TimeclockAudit')->find_many();
+  }
 }

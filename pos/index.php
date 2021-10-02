@@ -396,6 +396,8 @@ $app->group('/person', function (RouteCollectorProxy $app) {
 $app->group('/clock', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Controller\Timeclock::class, 'home' ]);
   $app->post('/~punch', [ \Scat\Controller\Timeclock::class, 'punch' ]);
+  $app->get('/{id:[0-9]+}', [ \Scat\Controller\Timeclock::class, 'getPunch' ]);
+  $app->patch('/{id:[0-9]+}', [ \Scat\Controller\Timeclock::class, 'updatePunch' ]);
 });
 
 /* Gift Cards */
