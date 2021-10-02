@@ -159,14 +159,6 @@ class Report
   }
 
   public function clock($begin, $end) {
-    if (!$begin) {
-      $begin= date('Y-m-d', strtotime('Sunday -2 weeks'));
-    }
-
-    if (!$end) {
-      $end= date('Y-m-d', strtotime('last Saturday'));
-    }
-
     $punches= $this->data->factory('Timeclock')
                 ->select('*')
                 ->select_expr('TIMESTAMPDIFF(SECOND, start, end) / 3600', 'hours')
@@ -238,6 +230,12 @@ class Report
 
       $total_reg+= $reg;
       $total_ot+= $ot;
+    }
+
+    if ($person) {
+      $person['regular']= $total_reg;
+      $person['overtime']= $total_ot;
+      $data['people'][]= $person;
     }
 
     return $data;

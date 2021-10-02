@@ -50,10 +50,19 @@ class Reports {
 
   public function clock(Request $request, Response $response) {
     $begin= $request->getParam('begin');
+    if (!$begin) {
+      $begin= date('Y-m-d', strtotime('Sunday -2 weeks'));
+    }
+
     $end= $request->getParam('end');
+    if (!$end) {
+      $end= date('Y-m-d', strtotime('last Saturday'));
+    }
+
     $data= $this->report->clock($begin, $end);
     $data['begin']= $begin;
     $data['end']= $end;
+
     return $this->view->render($response, 'report/clock.html', $data);
   }
 
