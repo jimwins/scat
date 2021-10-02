@@ -58,3 +58,12 @@
 
   </table>
 {% endblock %}
+
+{% block script %}
+<script>
+  $('#report-params .input-daterange').datepicker({
+      format: "yyyy-mm-dd",
+      todayHighlight: true
+  });
+</script>
+{% endblock %}
