@@ -1945,4 +1945,12 @@ class Transactions {
     return $response->withRedirect("/sale/new?id=$id");
   }
 
+  public function corrections(Request $request, Response $response) {
+    return $this->search($request, $response, 'correction');
+  }
+
+  public function correction(Response $response, $id) {
+    return $response->withRedirect("/sale/new?id=$id");
+  }
+
 }

@@ -176,6 +176,13 @@ $app->group('/purchase', function (RouteCollectorProxy $app) {
               [ \Scat\Controller\Transactions::class, 'addToPurchase' ]);
 });
 
+/* Corrections */
+$app->group('/correction', function (RouteCollectorProxy $app) {
+  $app->get('', [ \Scat\Controller\Transactions::class, 'corrections' ]);
+  $app->get('/{id}', [ \Scat\Controller\Transactions::class, 'correction' ])
+      ->setName('correction');
+});
+
 /* Shipping */
 $app->group('/shipment', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Controller\Shipping::class, 'index' ]);
