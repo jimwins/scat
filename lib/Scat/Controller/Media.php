@@ -165,4 +165,33 @@ class Media {
 
     return $response->withJson($image);
   }
+
+  public function copyPublitio(Request $request, Response $response,
+                                \Scat\Service\Ordure $ordure)
+  {
+    $images= $this->data->factory('Image')
+                ->where('b2_file_id', '')
+                ->where_not_equal('publitio_id', '')
+                ->limit(100)
+                ->find_many();
+
+    $done= [];
+
+    foreach ($images as $image) {
+      $url= PUBLITIO_BASE . '/file/' . $image->uuid . '.' . $image->ext;
+      $upload= $ordure->grabImage($url);
+
+      $done[]= [
+        'original_uuid' => $image->uuid,
+        'new_uuid' => $upload->uuid
+      ];
+
+      $image->uuid= $upload->uuid;
+      $image->b2_file_id= $upload->id;
+
+      $image->save();
+    }
+
+    return $response->withJson($done, 200, JSON_PRETTY_PRINT);
+  }
 }
