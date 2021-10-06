@@ -172,6 +172,7 @@ class Media {
     $images= $this->data->factory('Image')
                 ->where('b2_file_id', '')
                 ->where_not_equal('publitio_id', '')
+                ->where_not_like('uuid', '5%')
                 ->limit(100)
                 ->find_many();
 
