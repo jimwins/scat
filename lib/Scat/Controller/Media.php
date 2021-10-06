@@ -179,7 +179,7 @@ class Media {
     $done= [];
 
     foreach ($images as $image) {
-      $url= PUBLITIO_BASE . '/file/' . $image->uuid . '.' . $image->ext;
+      $url= PUBLITIO_BASE . '/file/' . $image->uuid . '.jpg';
       $upload= $ordure->grabImage($url);
 
       $done[]= [
@@ -189,6 +189,7 @@ class Media {
 
       $image->uuid= $upload->uuid;
       $image->b2_file_id= $upload->id;
+      $image->ext= 'jpg';
 
       $image->save();
     }
