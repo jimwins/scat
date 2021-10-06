@@ -47,7 +47,7 @@ class Media
     $image->publitio_id= $res->id;
     $image->width= $res->width;
     $image->height= $res->height;
-    $image->ext= $res->extension;
+    $image->ext= $upload->ext;
     $image->name= $res->title;
     $image->save();
 
@@ -102,7 +102,7 @@ class Media
     $image->publitio_id= $res->id;
     $image->width= $res->width;
     $image->height= $res->height;
-    $image->ext= $res->extension;
+    $image->ext= $ext;
     $image->name= $res->title;
     $image->save();
 
