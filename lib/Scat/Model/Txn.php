@@ -556,7 +556,7 @@ class Txn extends \Scat\Model {
       // If we have new items, have to report it as new sale
       if ($this->items()->where_null('returned_from_id')->count()) {
         // Was this a local transaction or return? If so, lookup the tax
-        if (!$this->shipping_address_id || $this->returned_from_id) {
+        if (!$this->online_sale_id || $this->returned_from_id) {
           // Look up all non-returned items
           $data= [
             'customerId' => $this->person_id ?: 0,
