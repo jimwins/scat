@@ -182,7 +182,7 @@ class Media {
       $pathinfo= pathinfo($file->getName());
 
       $uuid= $pathinfo['filename'];
-      $ext= $pathinfo['ext'];
+      $ext= $pathinfo['extension'];
 
       if ($GLOBALS['DEBUG']) {
         $uuid= preg_replace('/^DEBUG/', '', $uuid);
