@@ -166,45 +166,30 @@ class Media {
     return $response->withJson($image);
   }
 
-  public function fix(Request $request, Response $response)
+  public function fix(Request $request, Response $response,
+                      \Scat\Service\Config $config)
   {
-    $b2= $this->media->getB2Client();
-    $bucket= $this->media->getB2Bucket();
+    $publitio= new \Publitio\API(
+      $config->get('publitio.key'),
+      $config->get('publitio.secret')
+    );
 
-    $files= $b2->listFiles([
-      'BucketName' => $bucket,
-      'prefix' => 'i/o/' . ($GLOBALS['DEBUG'] ? 'DEBUG' : ''),
-    ]);
+    $images= $this->data->factory('Image')->where('width', 0)->find_many();
 
     $out= [];
 
-    foreach ($files as $file) {
-      $pathinfo= pathinfo($file->getName());
+    foreach ($images as $image) {
+      $res= $publitio->call('/files/show' . $image->publitio_id, 'GET');
 
-      $uuid= $pathinfo['filename'];
-      $ext= $pathinfo['extension'];
+      $image->width= $res->width;
+      $image->height= $res->height;
 
-      if ($GLOBALS['DEBUG']) {
-        $uuid= preg_replace('/^DEBUG/', '', $uuid);
-      }
+      $image->save();
 
-      $image= $this->data->factory('Image')->where('uuid', $uuid)->find_one();
-
-      if (!$image) {
-        $out[]= [
-          'not_found' => $uuid,
-        ];
-      } elseif ($image->ext != $ext) {
-        $out[]= [
-          'ext_wrong' => $uuid,
-          'old_ext' => $image->ext,
-          'new_ext' => $ext,
-        ];
-        $image->ext= $ext;
-        $image->save();
-      } else {
-        // do nothing
-      }
+      $out[]= [
+        'fixed_id' => $image->id,
+        'fixed_uuid' => $image->uuid,
+      ];
     }
 
     return $response->withJson($out, 200, JSON_PRETTY_PRINT);
