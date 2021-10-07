@@ -450,7 +450,7 @@ $app->group('/media', function (RouteCollectorProxy $app) {
   $app->post('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'repair' ]);
   $app->patch('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'update' ]);
   $app->delete('/{id:[0-9]+}', [ \Scat\Controller\Media::class, 'delete' ]);
-  $app->get('/~copy-publitio', [ \Scat\Controller\Media::class, 'copyPublitio' ]);
+  $app->get('/~fix', [ \Scat\Controller\Media::class, 'fix' ]);
 });
 
 /* Ads */

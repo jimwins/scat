@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc1c422d055aa574c3efe60ef5459200",
+    "content-hash": "3bb9264e7fe6e13ee9b2eb52f9cf8b7e",
     "packages": [
         {
             "name": "amzn/amazon-pay-api-sdk-php",
@@ -6097,16 +6097,16 @@
         },
         {
             "name": "tarikozket/backblaze-b2-sdk-php",
-            "version": "v1.3.2",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/tarikozket/backblaze-b2-sdk-php.git",
-                "reference": "05b07d5c78c244b80c5207e9b3990e70411d0b09"
+                "url": "https://github.com/jimwins/backblaze-b2-sdk-php.git",
+                "reference": "adffbf231a90a3284ebb7043d06881aa0f024873"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tarikozket/backblaze-b2-sdk-php/zipball/05b07d5c78c244b80c5207e9b3990e70411d0b09",
-                "reference": "05b07d5c78c244b80c5207e9b3990e70411d0b09",
+                "url": "https://api.github.com/repos/jimwins/backblaze-b2-sdk-php/zipball/adffbf231a90a3284ebb7043d06881aa0f024873",
+                "reference": "adffbf231a90a3284ebb7043d06881aa0f024873",
                 "shasum": ""
             },
             "require": {
@@ -6116,13 +6116,18 @@
             "require-dev": {
                 "phpunit/phpunit": "4.8.*"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
                     "ChrisWhite\\B2\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "ChrisWhite\\B2\\Tests\\": "tests/"
+                }
+            },
             "license": [
                 "MIT"
             ],
@@ -6144,9 +6149,9 @@
                 "storage"
             ],
             "support": {
-                "source": "https://github.com/tarikozket/backblaze-b2-sdk-php/tree/master"
+                "source": "https://github.com/jimwins/backblaze-b2-sdk-php/tree/master"
             },
-            "time": "2018-12-29T02:27:30+00:00"
+            "time": "2021-10-07T00:22:28+00:00"
         },
         {
             "name": "twig/html-extra",
@@ -6404,6 +6409,7 @@
     "stability-flags": {
         "oe/lukas": 20,
         "smalot/cups-ipp": 20,
+        "tarikozket/backblaze-b2-sdk-php": 20,
         "publitio/publitio": 20,
         "cloudstek/php-laff": 20
     },

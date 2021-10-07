@@ -11,10 +11,14 @@ class Media
     $this->ordure= $ordure;
   }
 
-  protected function getB2Client() {
+  public function getB2Client() {
     $id= $this->config->get('b2.keyID');
     $key= $this->config->get('b2.applicationKey');
     return new \ChrisWhite\B2\Client($id, $key);
+  }
+
+  public function getB2Bucket() {
+    return $this->config->get('b2.bucketName');
   }
 
   public function createFromUrl($url) {

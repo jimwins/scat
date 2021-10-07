@@ -166,34 +166,47 @@ class Media {
     return $response->withJson($image);
   }
 
-  public function copyPublitio(Request $request, Response $response,
-                                \Scat\Service\Ordure $ordure)
+  public function fix(Request $request, Response $response)
   {
-    $images= $this->data->factory('Image')
-                ->where('b2_file_id', '')
-                ->where_not_equal('publitio_id', '')
-                ->where_not_like('uuid', '5%')
-                ->limit(100)
-                ->find_many();
+    $b2= $this->media->getB2Client();
+    $bucket= $this->media->getB2Bucket();
 
-    $done= [];
+    $files= $b2->listFiles([
+      'BucketName' => $bucket,
+      'prefix' => 'i/o/' . ($GLOBALS['DEBUG'] ? 'DEBUG' : ''),
+    ]);
 
-    foreach ($images as $image) {
-      $url= PUBLITIO_BASE . '/file/' . $image->uuid . '.jpg';
-      $upload= $ordure->grabImage($url);
+    $out= [];
 
-      $done[]= [
-        'original_uuid' => $image->uuid,
-        'new_uuid' => $upload->uuid
-      ];
+    foreach ($files as $file) {
+      $pathinfo= pathinfo($file->getName());
 
-      $image->uuid= $upload->uuid;
-      $image->b2_file_id= $upload->id;
-      $image->ext= 'jpg';
+      $uuid= $pathinfo['filename'];
+      $ext= $pathinfo['ext'];
 
-      $image->save();
+      if ($GLOBALS['DEBUG']) {
+        $uuid= preg_replace('/^DEBUG/', '', $uuid);
+      }
+
+      $image= $this->data->factory('Image')->where('uuid', $uuid)->find_one();
+
+      if (!$image) {
+        $out[]= [
+          'not_found' => $uuid,
+        ];
+      } elseif ($image->ext != $ext) {
+        $out[]= [
+          'ext_wrong' => $uuid,
+          'old_ext' => $image->ext,
+          'new_ext' => $ext,
+        ];
+        $image->ext= $ext;
+        $image->save();
+      } else {
+        // do nothing
+      }
     }
 
-    return $response->withJson($done, 200, JSON_PRETTY_PRINT);
+    return $response->withJson($out, 200, JSON_PRETTY_PRINT);
   }
 }

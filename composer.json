@@ -16,6 +16,10 @@
     "repositories": [
         {
             "type": "vcs",
+            "url": "https://github.com/jimwins/backblaze-b2-sdk-php"
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/jimwins/Lukas"
         },
         {
@@ -42,7 +46,7 @@
         "smalot/cups-ipp": "dev-dev-local",
         "monolog/monolog": "^1.24",
         "php-http/logger-plugin": "^1.0",
-        "tarikozket/backblaze-b2-sdk-php": "^1.3",
+        "tarikozket/backblaze-b2-sdk-php": "dev-master",
         "slim/slim": "4.*",
         "twig/twig": "^2.6",
         "slim/twig-view": "^3.0",
