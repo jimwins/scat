@@ -179,7 +179,7 @@ class Media {
     $out= [];
 
     foreach ($images as $image) {
-      $res= $publitio->call('/files/show' . $image->publitio_id, 'GET');
+      $res= $publitio->call('/files/show/' . $image->publitio_id, 'GET');
 
       $image->width= $res->width;
       $image->height= $res->height;
