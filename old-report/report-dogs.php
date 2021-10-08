@@ -28,6 +28,7 @@ $r= $db->query($q)
 
 head("Dogs @ Scat", true);
 ?>
+<p>These are in-stock items that have not moved in more than a year.</p>
 <div id="results">
   <table class="table table-striped table-hover sortable">
     <thead>
