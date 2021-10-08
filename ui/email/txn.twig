@@ -41,7 +41,9 @@
             <td><small>{{ data.code }}</small></td>
             <td>
               <span>{{ data.name }}</span>
-              <div class="small">{{ data.pricing_detail }}</div>
+              {% if full_invoice %}
+                <div class="small">{{ data.pricing_detail }}</div>
+              {% endif %}
             </td>
             {% if txn.type == 'vendor' or full_invoice %}
               <td class="text-right">
