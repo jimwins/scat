@@ -26,7 +26,29 @@
       </div>
     </div>
   </form>
-{{ num_shipments }} shipments<br>
-{{ scat.amount(shipment_cost) }} total cost</br>
-{{ scat.amount(shipment_collected) }} collected</br>
+
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>Week</th>
+        <th>Shipments</th>
+        <th>Collected</th>
+        <th>Spent</th>
+        <th>AOV</th>
+        <th>Average Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for week in shipments %}
+        <tr>
+          <td>{{ week.week }}</td>
+          <td>{{ week.shipments }}</td>
+          <td>{{ scat.amount(week.collected) }}</td>
+          <td>{{ scat.amount(week.spent) }}</td>
+          <td>{{ scat.amount(week.average_order_value) }}</td>
+          <td>{{ scat.amount(week.spent / week.shipments) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}

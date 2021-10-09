@@ -160,31 +160,35 @@ class Report
 
   public function shippingCosts($begin= null, $end= null) {
     if (!$begin) {
-      $begin= date('Y-m-d', strtotime('90 days ago'));
+      $begin= date('Y-m-d', strtotime('30 days ago'));
     }
     if (!$end) {
       $end= date('Y-m-d', strtotime('today'));
     }
 
-    // number of shipments
-    // $ collected for shipments
-    // $ spent on shipments
+    // by week, we want to know:
+    // - the number of shipments
+    // - the total spent on shipping
+    // - the total collected for shipping
+    // - the average order value of orders to be shipped
+    // - the average shipping costs
+    // we base this on the date of shipments
 
     $shipments= $this->data->Factory('Shipment')
-                  ->where_raw('created BETWEEN ? and ? + INTERVAL 1 DAY',
-                              [ $begin, $end ]);
-
-    $collected= $this->data->Factory('Txn')
+                  ->select_expr(
+                    'DATE_FORMAT(shipment.created, "%X-W%v")', 'week'
+                  )
+                  ->select_expr('COUNT(*)', 'shipments')
+                  ->select_expr('SUM((SELECT SUM(retail_price) FROM txn JOIN txn_line ON txn.id = txn_line.txn_id WHERE txn.id = shipment.txn_id AND item_id IN (31064, 93460)))', 'collected')
+                  ->select_expr('SUM(rate)', 'spent')
+                  ->select_expr('SUM((SELECT SUM(sale_price(retail_price, discount_type, discount) * -allocated) FROM txn JOIN txn_line ON txn.id = txn_line.txn_id WHERE txn.id = shipment.txn_id AND item_id NOT IN (31064, 93460)))', 'average_order_value')
                   ->where_raw('created BETWEEN ? and ? + INTERVAL 1 DAY',
                               [ $begin, $end ])
-                  ->join('txn_line', [ 'txn.id', '=', 'txn_line.txn_id' ])
-                  ->where_in('item_id', [ 31064, 93460 ])
-                  ->sum('retail_price');
+                  ->group_by('week')
+                  ->find_many();
 
     return [
-      'num_shipments' => $shipments->count(),
-      'shipment_cost' => $shipments->sum('rate'),
-      'shipment_collected' => $collected,
+      'shipments' => $shipments,
       'begin' => $begin,
       'end' => $end,
     ];
