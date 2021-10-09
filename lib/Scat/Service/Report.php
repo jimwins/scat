@@ -184,6 +184,7 @@ class Report
                   ->select_expr('SUM((SELECT SUM(sale_price(retail_price, discount_type, discount) * allocated) FROM txn JOIN txn_line ON txn.id = txn_line.txn_id WHERE txn.id = shipment.txn_id AND item_id NOT IN (31064, 93460)))', 'average_order_value')
                   ->where_raw('created BETWEEN ? and ? + INTERVAL 1 DAY',
                               [ $begin, $end ])
+                  ->where_raw("(SELECT type FROM txn WHERE txn.id = shipment.txn_id) = 'customer'")
                   ->group_by('week')
                   ->find_many();
 
