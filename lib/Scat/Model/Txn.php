@@ -71,7 +71,7 @@ class Txn extends \Scat\Model {
         if ($data->purchase_units) {
           foreach ($data->purchase_units as $unit) {
             foreach ($unit->payments->captures as $capture) {
-              $cost+ $capture->seller_receivable_breakdown->paypal_fee->value;
+              $cost+= $capture->seller_receivable_breakdown->paypal_fee->value;
             }
           }
         }
