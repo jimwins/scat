@@ -68,9 +68,11 @@ class Txn extends \Scat\Model {
         break;
       case 'paypal':
         $data= json_decode($line->data);
-        foreach ($data->purhcase_units as $unit) {
-          foreach ($unit->payments->captures as $capture) {
-            $cost+ $capture->seller_receivable_breakdown->paypal_fee->value;
+        if ($data->purchase_units) {
+          foreach ($data->purchase_units as $unit) {
+            foreach ($unit->payments->captures as $capture) {
+              $cost+ $capture->seller_receivable_breakdown->paypal_fee->value;
+            }
           }
         }
         break;
