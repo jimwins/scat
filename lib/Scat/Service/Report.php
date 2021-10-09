@@ -158,6 +158,38 @@ class Report
                              ->find_many() ];
   }
 
+  public function shippingCosts($begin= null, $end= null) {
+    if (!$begin) {
+      $begin= date('Y-m-d', strtotime('90 days ago'));
+    }
+    if (!$end) {
+      $end= date('Y-m-d', strtotime('today'));
+    }
+
+    // number of shipments
+    // $ collected for shipments
+    // $ spent on shipments
+
+    $shipments= $this->data->Factory('Shipment')
+                  ->where_raw('created BETWEEN ? and ? + INTERVAL 1 DAY',
+                              [ $begin, $end ]);
+
+    $collected= $this->data->Factory('Txn')
+                  ->where_raw('created BETWEEN ? and ? + INTERVAL 1 DAY',
+                              [ $begin, $end ])
+                  ->join('txn_line', [ 'txn.id', '=', 'txn_line.txn_id' ])
+                  ->where_in('item_id', [ 31064, 93460 ])
+                  ->sum('retail_price');
+
+    return [
+      'num_shipments' => $shipments->count(),
+      'shipment_cost' => $shipments->sum('rate'),
+      'shipment_collected' => $collected,
+      'begin' => $begin,
+      'end' => $end,
+    ];
+  }
+
   public function clock($begin, $end) {
     $punches= $this->data->factory('Timeclock')
                 ->select('*')

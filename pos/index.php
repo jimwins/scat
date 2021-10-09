@@ -436,6 +436,8 @@ $app->group('/report', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Reports::class, 'kitItems' ]);
   $app->get('/shipments',
             [ \Scat\Controller\Reports::class, 'shipments' ]);
+  $app->get('/shipping-costs',
+            [ \Scat\Controller\Reports::class, 'shippingCosts' ]);
   $app->get('/clock',
             [ \Scat\Controller\Reports::class, 'clock' ]);
   $app->get('/{name}', [ \Scat\Controller\Reports::class, 'oldReport' ]);

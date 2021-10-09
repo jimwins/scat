@@ -48,6 +48,15 @@ class Reports {
     return $this->view->render($response, 'report/shipments.html', $data);
   }
 
+  public function shippingCosts(Request $request, Response $response) {
+    $begin= $request->getParam('begin');
+    $end= $request->getParam('end');
+
+    $data= $this->report->shippingCosts($begin, $end);
+
+    return $this->view->render($response, 'report/shipping-costs.html', $data);
+  }
+
   public function clock(Request $request, Response $response) {
     $begin= $request->getParam('begin');
     if (!$begin) {
