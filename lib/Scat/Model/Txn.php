@@ -56,6 +56,7 @@ class Txn extends \Scat\Model {
 
   public function cost_of_processing() {
     $cost= 0;
+    // TODO this should be in the Payment model
     foreach ($this->payments()->find_many() as $line) {
       switch ($line->method) {
       case 'credit':
@@ -67,7 +68,11 @@ class Txn extends \Scat\Model {
         break;
       case 'paypal':
         $data= json_decode($line->data);
-        $cost+= $data->paypal_fee->value;
+        foreach ($data->purhcase_units as $unit) {
+          foreach ($unit->payments->captures as $capture) {
+            $cost+ $capture->seller_receivable_breakdown->paypal_fee->value;
+          }
+        }
         break;
       case 'bad':
         $cost+= $line->amount;
