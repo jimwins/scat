@@ -1,0 +1,43 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Report for {{ txn.formatted_number }}
+{% endblock %}
+
+{% block body %}
+  {% set total= txn.subtotal %}
+  {% set cogs= -txn.cost_of_goods %}
+  {% set shipping= -txn.cost_of_shipping %}
+  {% set processing= -txn.cost_of_processing %}
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <th>Total</th>
+        <td>{{ scat.amount(total) }}</td>
+      </tr>
+      <tr>
+        <th>Cost of Goods</th>
+        <td>{{ scat.amount(cogs) }}</td>
+      </tr>
+      <tr>
+        <th>Shipping Cost</th>
+        <td>{{ scat.amount(shipping) }}</td>
+      </tr>
+      <tr>
+        <th>Processing Cost</th>
+        <td>{{ scat.amount(processing) }}</td>
+      </tr>
+      <tr style="border-top: 2px double white">
+        <th>Profit</th>
+        <td>{{ scat.amount(total + cogs + shipping + processing) }}</td>
+      </tr>
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block submit %}
+{% endblock %}
+
+{% block script %}
+{% endblock %}

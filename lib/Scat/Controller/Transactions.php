@@ -1732,6 +1732,21 @@ class Transactions {
     return $response->withJson($txn);
   }
 
+  public function report(Request $request, Response $response, $id) {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/txn-report.html', [
+        'txn' => $txn,
+      ]);
+    }
+
+    return $response->withJson($txn);
+  }
+
   /* PURCHASES */
 
   public function purchases(Request $request, Response $response) {

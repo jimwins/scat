@@ -162,6 +162,10 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   /* Tax */
   $app->post('/{id:[0-9]+}/~capture-tax',
               [ \Scat\Controller\Transactions::class, 'captureTax' ]);
+
+  /* Report */
+  $app->get('/{id:[0-9]+}/report',
+            [ \Scat\Controller\Transactions::class, 'report' ]);
 });
 
 /* Purchases */

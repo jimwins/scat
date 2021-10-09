@@ -208,15 +208,18 @@
         <button class="btn btn-sm btn-default"
                 data-action="show-notes" data-kind="txn"
                 data-attach-id="{{ txn.id }}">
-          <i class="fa fa-sticky-note-o"></i>
+          <i class="fa fa-fw fa-sticky-note-o"></i>
           <span class="label label-{{ txn.notes.where('todo',1).count ? 'danger' : 'default' }}">
             {{- txn.notes.count ?: '' -}}
           </span>
         </button>
       </div>
+      <button class="btn btn-link btn-sm pull-right" data-action="report">
+        <i class="fa fa-fw fa-line-chart"></i>
+      </button>
       <a href="/sale/new?id={{ txn.id }}"
          class="btn btn-link btn-sm pull-right">
-        <i class="fa fa-life-ring"></i>
+        <i class="fa fa-fw fa-life-ring"></i>
       </a>
       <h1 class="panel-title">
         {{ block('title') }}
@@ -1031,6 +1034,10 @@
       })
     })
 
+    scat.handleAction('click', 'report', (act) => {
+      return scat.dialog('/sale/{{ txn.id }}/report')
+    })
+
     /* Bind some global keys */
     Mousetrap.bindGlobal('mod+p', function (ev) {
       printReceipt()
@@ -1041,6 +1048,7 @@
       payTransaction()
       return false
     })
+
   </script>
 
   <template id="item-not-found">

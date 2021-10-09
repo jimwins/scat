@@ -30,6 +30,14 @@ class Txn extends \Scat\Model {
     return $this->has_many('TxnLine');
   }
 
+  public function cost_of_goods() {
+    $cogs= 0;
+    foreach ($this->items()->find_many() as $line) {
+      $cogs+= $line->cost_of_goods();
+    }
+    return -$cogs;
+  }
+
   public function notes() {
     return $this->has_many('Note', 'attach_id');
   }
@@ -45,6 +53,31 @@ class Txn extends \Scat\Model {
   public function payments() {
     return $this->has_many('Payment');
   }
+
+  public function cost_of_processing() {
+    $cost= 0;
+    foreach ($this->payments()->find_many() as $line) {
+      switch ($line->method) {
+      case 'credit':
+        $cost+= $line->amount * 0.02;
+        break;
+      case 'amazon':
+      case 'stripe':
+        $cost+= ($line->amount * 0.029) + 0.30;
+        break;
+      case 'paypal':
+        $data= json_decode($line->data);
+        $cost+= $data->paypal_fee->value;
+        break;
+      case 'bad':
+        $cost+= $line->amount;
+      default:
+        /* nothing */
+      }
+    }
+    return $cost;
+  }
+
 
   public function canPay($method, $amount) {
     // only 'gift' and 'cash' allow giving change
@@ -271,6 +304,14 @@ class Txn extends \Scat\Model {
 
   public function shipments() {
     return $this->has_many('Shipment');
+  }
+
+  public function cost_of_shipping() {
+    $cost= 0;
+    foreach ($this->shipments()->find_many() as $line) {
+      $cost+= $line->rate;
+    }
+    return $cost;
   }
 
   public function applyPriceOverrides(\Scat\Service\Catalog $catalog) {
