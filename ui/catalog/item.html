@@ -659,6 +659,7 @@
           <th class="num">#</th>
           <th>Date</th>
           <th>Transaction</th>
+          <th>Person</th>
           <th class="text-right">Avg. Price</th>
           <th class="text-right">Quantity</th> 
           <th class="text-right">Running Total</th>
@@ -674,6 +675,13 @@
                   {{ txn.friendly_type }}
                   {{ txn.formatted_number }}
                 </a>
+              </td>
+              <td>
+                {% if txn.person_id %}
+                  <a href="/person/{{ txn.person_id }}">
+                    {{ txn.person.friendly_name }}
+                  </a>
+                {% endif %}
               </td>
               <td class="text-right">
                 {{ scat.amount(txn.sale_price) }}
