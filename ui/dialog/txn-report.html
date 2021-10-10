@@ -12,7 +12,7 @@
   {% set processing= -txn.cost_of_processing %}
   {% set discount= 0 %}
   {% set rewards= 0 %}
-  {% for payment in txn.payments %}
+  {% for payment in txn.payments.find_many %}
     {% if payment.method == 'discount' %}
       {% set discount= discount - payment.amount %}
     {% else %}
