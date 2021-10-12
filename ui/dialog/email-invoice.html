@@ -36,7 +36,7 @@
       {% if txn.type != 'vendor' %}
         <div class="checkbox">
           <label>
-            <input type="checkbox" value="1" name="full_invoice">
+            <input type="checkbox" value="1" name="full_invoice" {{ full_invoice ? 'checked' }}>
             Include Prices
           </label>
         </div>

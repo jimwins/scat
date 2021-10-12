@@ -1246,6 +1246,9 @@ class Transactions {
         ->find_one();
       $data= $data->as_array();
     }
+    if (($full_invoice= $request->getParam('full_invoice'))) {
+      $data['full_invoice']= true;
+    }
 
     $data['txn']= $txn;
 

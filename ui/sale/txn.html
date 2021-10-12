@@ -729,7 +729,7 @@
     })
 
     scat.handleAction('click', 'email-invoice', (act) => {
-      return scat.dialog('/sale/{{ txn.id }}/email-invoice-form')
+      return scat.dialog('/sale/{{ txn.id }}/email-invoice-form?full_invoice=1')
     })
 
     scat.handleAction('click', 'send-canned-message', (act) => {
