@@ -101,6 +101,11 @@ class Shipping {
       $status= $tracker->status;
       $shipped= null;
 
+      /* XXX We don't do anything with returns right now. */
+      if ($tracker->is_return) {
+        return;
+      }
+
       switch ($tracker->status) {
       case 'pre_transit':
         /* We treat pre_transit/arrived_at_facility as in_transit */
