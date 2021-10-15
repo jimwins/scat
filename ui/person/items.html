@@ -65,8 +65,10 @@
       <tr data-id="{{ i.id }}" data-item="{{ i.item_id }}">
         <td>
           {% if i.item_id %}
-            <a href="{{ url_for('catalog-item', { 'code' : i.item.code}) }}">
-              {{- i.item.code -}}
+            {% set item= i.item() %}
+            <a href="{{ url_for('catalog-item', { 'code' : item.code}) }}"
+               style="{{ not item.active ? 'text-decoration: line-through' }}">
+              {{- item.code -}}
             </a>
           {% else %}
             {{ i.code }}
