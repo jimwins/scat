@@ -71,7 +71,7 @@ while ($row= $r->fetch_assoc()) {
 
 $total= 0;
 ?>
-<table class="table table-striped sortable" style="width: auto">
+<table class="table table-striped table-sort" style="width: auto">
 <thead>
  <tr>
    <th>Date</th>

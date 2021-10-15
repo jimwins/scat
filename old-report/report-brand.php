@@ -147,7 +147,7 @@ $r= $db->query($q) or die($db->error);
 $cat= "";
 $parent= 0;
 ?>
-<table class="table table-striped sortable">
+<table class="table table-striped table-sort">
  <thead>
   <tr>
    <th>Brand</th>

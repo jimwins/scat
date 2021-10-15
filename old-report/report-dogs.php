@@ -30,7 +30,7 @@ head("Dogs @ Scat", true);
 ?>
 <p>These are in-stock items that have not moved in more than a year.</p>
 <div id="results">
-  <table class="table table-striped table-hover sortable">
+  <table class="table table-striped table-hover table-sort">
     <thead>
       <tr>
         <th class="num">#</th>
