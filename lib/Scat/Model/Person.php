@@ -488,9 +488,9 @@ class Person extends \Scat\Model {
                 special_order
            FROM vendor_upload
          ON DUPLICATE KEY UPDATE
-           code = IF(VALUES(code), VALUES(code), vendor_item.code),
+           code = IF(VALUES(code) != '', VALUES(code), vendor_item.code),
            vendor_sku = VALUES(vendor_sku),
-           name = IF(VALUES(name), VALUES(NAME), vendor_item.name),
+           name = IF(VALUES(name) != '', VALUES(NAME), vendor_item.name),
            retail_price = IF(VALUES(retail_price),
                              VALUES(retail_price), vendor_item.retail_price),
            net_price = IF(VALUES(net_price),
