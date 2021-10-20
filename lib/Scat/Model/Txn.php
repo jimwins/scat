@@ -316,7 +316,9 @@ class Txn extends \Scat\Model {
   public function cost_of_shipping() {
     $cost= 0;
     foreach ($this->shipments()->find_many() as $line) {
-      $cost+= $line->rate;
+      if ($line->status != 'cancelled') {
+        $cost+= $line->rate;
+      }
     }
     return $cost;
   }
