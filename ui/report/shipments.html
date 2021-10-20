@@ -43,7 +43,7 @@
         {{ shipment.txn.shipping_address.zip }}
       </td>
       <td>
-        {{ shipment.carrier }} /
+        {{ scat.format_shipping_carrier(shipment.carrier) }} /
         {{ shipment.service }}
       </td>
       <td>

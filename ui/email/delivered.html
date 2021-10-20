@@ -1,4 +1,5 @@
 {% extends 'layout/email.html' %}
+{% import 'macros.twig' as scat %}
 
 {% block title -%}
   Your order has been delivered!
@@ -18,7 +19,7 @@
   </p>
   <p>
     We wanted to let you know that your order ({{ txn.formatted_number }}) was
-    reported to be delivered by {{ tracker.carrier }} on
+    reported to be delivered by {{ scat.format_shipping_carrier(tracker.carrier) }} on
     {{ (delivered ?: tracker.updated_at) | date("c", "UTC") | date("l, F j", txn.shipping_address.timezone) }}.
     {% if delivered and delivered|date("Y-m-d") != tracker.updated_at|date("Y-m-d") %}
       (Sorry for the slow update, we just got the news!)

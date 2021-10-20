@@ -74,6 +74,14 @@
   {%- endif -%}
 {% endmacro %}
 
+{% macro format_shipping_carrier(carrier) %}
+  {%- if carrier == 'UPSDAP' -%}
+    UPS
+  {%- else -%}
+    {{ carrier }}
+  {%- endif -%}
+{% endmacro %}
+
 {% macro file_upload(dest, reload= true) %}
 <style>
 #droptarget {

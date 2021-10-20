@@ -30,7 +30,7 @@
           <tr>
             <td>{{ rate.parcel }}</td>
             <td>{{ rate.address }}</td>
-            <td>{{ rate.carrier }}</td>
+            <td>{{ scat.format_shipping_carrier(rate.carrier) }}</td>
             <td>{{ rate.service }}</td>
             <td>{{ scat.amount(rate.rate) }}</td>
           </tr>

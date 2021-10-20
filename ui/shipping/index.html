@@ -133,7 +133,7 @@
               {% endif %}
             </td>
             <td>
-              {{ shipment.carrier }}
+              {{ scat.format_shipping_carrier(shipment.carrier) }}
               <br>
               {{ shipment.service }}
             </td>

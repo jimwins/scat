@@ -39,7 +39,7 @@
           {% for rate in easypost.rates|sort((a,b) => a.rate <=> b.rate) %}
             <a href="#" data-rate="{{ rate.id }}" class="list-group-item {{ rate.service in preferred_rates[rate.carrier] ? 'preferred' : 'hidden' }}">
               <span class="badge">{{ scat.amount(rate.rate) }}</span>
-              {{ rate.carrier }}: {{ rate.service }}
+              {{ scat.format_shipping_carrier(rate.carrier) }}: {{ rate.service }}
               {% if rate.delivery_days %}
                 ({{ rate.delivery_days}} day{{ rate.delivery_days > 0 ? 's' }})
               {% endif %}
