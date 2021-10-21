@@ -141,7 +141,10 @@
                 <small>
                   {% if txn.shipping_address.id > 1 %}
                     {% for shipment in txn.shipments().find_many() %}
-                      <a href="/shipment/{{ shipment.id }}/track" target="_blank"><i class="fa fa-truck"></i></a>
+                      <a data-id="{{ shipment.id }}"
+                         data-action="get-shipment-info">
+                        <i class="fa fa-truck"></i>
+                      </button>
                     {% endfor %}
                   {% endif %}
                 </small>
@@ -191,6 +194,11 @@
 
   document.querySelectorAll('select[name="limit"]').forEach((el) => {
     el.addEventListener('change', limitChanged)
+  })
+
+  scat.handleAction('click', 'get-shipment-info', (act) => {
+    let id= act.closest('[data-id]').getAttribute('data-id')
+    return scat.dialog('/shipment/' + id)
   })
 </script>
 {% endblock %}
