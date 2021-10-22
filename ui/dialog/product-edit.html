@@ -22,6 +22,18 @@
     </div>
 
     <div class="form-group">
+      <label for="importance">Importance</label>
+      <select class="form-control" name="importance">
+        {% for i in 0..5 %}
+          <option value="{{ i }}"
+                  {{ product.importance == i ? 'selected' }}>
+            {{ i }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
       <label for="name">Name</label>
       <input type="text" class="form-control" autofocus
              name="name" value="{{ product.name }}">
