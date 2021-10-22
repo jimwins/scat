@@ -238,6 +238,11 @@
         }
       </style>
       {% if txn.person_id %}
+        {% if txn.person.notes %}
+          <div class="alert alert-danger">
+            {{- txn.person.notes -}}
+          </div>
+        {% endif %}
         {% if not txn.paid %}
           {% if txn.used_loyalty_reward %}
             <button class="btn btn-default btn-block"
