@@ -63,6 +63,10 @@ class Item extends \Scat\Model {
       ->find_many();
   }
 
+  public function media_link() {
+    return $this->has_many('ItemToImage');
+  }
+
   public function addImage($image) {
     $rel= self::factory('ImageItem')->create();
     $rel->image_id= $image->id;
@@ -382,4 +386,11 @@ class Barcode extends \Scat\Model {
 }
 
 class Prop65_Warning extends \Scat\Model {
+}
+
+class ItemToImage extends \Scat\Model {
+  function delete() {
+    $this->orm->use_id_column([ 'item_id', 'image_id' ]);
+    return parent::delete();
+  }
 }

@@ -699,6 +699,14 @@ class Catalog {
     if ($code && !$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/media.html', [
+        'item' => $item,
+        'media' => $item->media(),
+      ]);
+    }
+
     return $response->withJson($item->media());
   }
 
@@ -726,6 +734,25 @@ class Catalog {
     }
 
     return $response->withJson($item);
+  }
+
+  public function itemUnlinkMedia(Request $request, Response $response,
+                                  \Scat\Service\Media $media,
+                                  $code, $image_id)
+  {
+    $item= $code ? $this->catalog->getItemByCode($code) : null;
+    if ($code && !$item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $link= $item->media_link()->where('image_id', $image_id)->find_one();
+
+    if (!$link) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    $link->delete();
+
+    return $response->withJson([]);
   }
 
   function bulkItemUpdate(Request $request, Response $response) {

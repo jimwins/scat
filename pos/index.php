@@ -279,6 +279,8 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Catalog::class, 'itemGetMedia' ]);
   $app->post('/item/{code:.+}/media',
             [ \Scat\Controller\Catalog::class, 'itemAddMedia' ]);
+  $app->delete('/item/{code:.+}/media/{image_id:[0-9]+}',
+            [ \Scat\Controller\Catalog::class, 'itemUnlinkMedia' ]);
 
   $app->post('/item/{code:.*}/vendor-item',
               [ \Scat\Controller\Catalog::class, 'findVendorItems' ]);

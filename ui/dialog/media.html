@@ -42,7 +42,7 @@
   scat.handleActionOn(form, 'click', 'disconnect-media', (act) => {
     let id= act.closest('[data-id]').getAttribute('data-id')
 
-    return scat.delete('/catalog/product/{{ product.id }}/media/' + id)
+    return scat.delete('/catalog/{{ product ? 'product/' ~ product.id : 'item/' ~ item.code }}/media/' + id)
       .then((res) => {
         act.closest('[data-id]').remove();
       })

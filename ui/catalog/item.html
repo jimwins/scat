@@ -436,7 +436,7 @@
         <div class="panel-body form-horizontal">
           {% set media= item.media %}
           {% if media is not empty %}
-            {{ include('carousel.twig', { images: media }) }}
+            {{ include('carousel.twig', { images: media, edit: 'edit-media' }) }}
           {% endif %}
           {% for i in media %}
             <a href="/media/{{ i.id }}/"><i class="fa fa-file-image-o"></i></a>
@@ -1070,6 +1070,10 @@
       })
     })
   }
+
+  scat.handleAction('click', 'edit-media', (act) => {
+    return scat.dialog('/catalog/item/{{ item.code }}/media')
+  })
   </script>
 
   {{ scat.file_upload('/catalog/item/' ~ item.code ~ '/media') }}
