@@ -65,6 +65,7 @@ head("Sales Report @ Scat", true);
    <thead>
     <tr>
       <th>When</th>
+      <th>Date</th>
       <th class="text-right">Subtotal</th>
       <th class="text-right">Transactions</th>
       <th class="text-right">Average</th>
@@ -102,6 +103,7 @@ $("#report-params").on('submit', function(ev) {
         var gdata= [];
         $.each(data.sales, function(i, sales) {
           t.append($('<tr><td>' + sales.span +
+                     '<td>' + sales.raw_date + '</td>' +
                      '<td align="right">' + amount(sales.total) +
                      '<td align="right">' + sales.transactions +
                      '<td align="right">' + amount(sales.total / sales.transactions) +
