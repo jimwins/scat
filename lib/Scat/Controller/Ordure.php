@@ -495,7 +495,7 @@ class Ordure {
         }
       }
 
-      $data['call_to_action_url']= ORDURE . '/cart?uuid=' . $data['sale']['uuid'];
+      $data['call_to_action_url']= ORDURE . '/cart?uuid=' . $data['sale']['uuid'] . '&utm_source=internal&utm_medium=email&utm_id=abandoned-cart';
 
       $template= $view->getEnvironment()->load('email/abandoned-cart.html');
 
