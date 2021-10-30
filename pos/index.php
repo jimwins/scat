@@ -607,6 +607,12 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
 
   $app->get('/address',
             [ \Scat\Controller\Settings::class, 'address' ]);
+
+  $app->get('/wordform[/{wordform_id}]',
+            [ \Scat\Controller\Settings::class, 'wordform' ]);
+  $app->post('/wordform[/{wordform_id}]',
+              [ \Scat\Controller\Settings::class, 'wordformUpdate' ]);
+
 });
 
 /* Webhooks */

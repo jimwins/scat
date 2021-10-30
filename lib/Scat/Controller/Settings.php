@@ -130,4 +130,56 @@ class Settings {
       'address' => $address,
     ]);
   }
+
+  public function wordform(Request $request, Response $response, View $view,
+                          $wordform_id= null)
+  {
+    if ($wordform_id) {
+      $wordform= $this->data->factory('Wordform')->find_one($wordform_id);
+    }
+
+    if ($wordform_id && !$wordform)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($wordform);
+    }
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $view->render($response, 'dialog/wordform.html', [
+        'wordform' => $wordform
+      ]);
+    }
+
+    $wordforms=
+      $this->data->factory('Wordform')
+           ->order_by_asc('source')->find_many();
+    return $view->render($response, 'settings/wordforms.html', [
+      'wordforms' => $wordforms,
+    ]);
+  }
+
+  public function wordformUpdate(Request $request, Response $response,
+                                $wordform_id= null)
+  {
+    if ($wordform_id) {
+      $wordform= $this->data->factory('Wordform')->find_one($wordform_id);
+    } else {
+      $wordform= $this->data->factory('Wordform')->create();
+    }
+
+    if ($wordform_id && !$wordform)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    foreach ($wordform->getFields() as $field) {
+      $value= $request->getParam($field);
+      if (isset($value)) {
+        $wordform->set($field, $value);
+      }
+    }
+
+    $wordform->save();
+
+    return $response->withJson($wordform);
+  }
 }
