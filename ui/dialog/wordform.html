@@ -1,0 +1,49 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Wordform
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    {% if wordform.id %}
+      <input type="hidden" name="id" value="{{ wordform.id }}">
+    {% endif %}
+
+    <div class="form-group">
+      <label for="source">Source</label>
+      <input type="text" class="form-control" autofocus
+             name="source" value="{{ wordform.source }}">
+    </div>
+
+    <div class="form-group">
+      <label for="dest">Destination</label>
+      <input type="text" class="form-control"
+             name="dest" value="{{ wordform.dest }}">
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-default">
+    {{- wordform.id ? 'Update' : 'Add' -}}
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    scat.post("/settings/wordform{{ wordform.id ? '/' ~ wordform.id }}", formData)
+        .then((res) => {
+          if (res.redirected) {
+            window.location.href= res.url
+          } else {
+            window.location.reload()
+          }
+        })
+  }
+{% endblock %}
