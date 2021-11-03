@@ -120,7 +120,8 @@
               </div>
             </td>
             <td>
-              <div data-action="editable" data-name="allocated">
+              <div data-action="editable" data-name="allocated"
+                   class="{{ (line.allocated < line.ordered) ? 'text-danger' }}">
                 {{ (txn.type == 'vendor' ? 1 : -1) * line.allocated }}
               </div>
             </td>
