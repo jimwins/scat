@@ -69,12 +69,6 @@ head("Purchases Report @ Scat", true);
       <th class="text-right">Subtotal</th>
       <th class="text-right">Transactions</th>
       <th class="text-right">Average</th>
-      <th class="text-right">Resale</th>
-      <th class="text-right">Online</th>
-      <th class="text-right">Pickup</th>
-      <th class="text-right">Shipped</th>
-      <th class="text-right">Tax</th>
-      <th class="text-right">Total</th>
     </tr>
    </thead>
    <tbody>
@@ -107,12 +101,6 @@ $("#report-params").on('submit', function(ev) {
                      '<td align="right">' + amount(sales.total) +
                      '<td align="right">' + sales.transactions +
                      '<td align="right">' + amount(sales.total / sales.transactions) +
-                     '<td align="right">' + amount(sales.resale) +
-                     '<td align="right">' + amount(sales.online) +
-                     '<td align="right">' + amount(sales.pickup) +
-                     '<td align="right">' + amount(sales.shipped) +
-                     '<td align="right">' + amount(sales.tax) +
-                     '<td align="right">' + amount(sales.total_taxed) +
                      '</tr>'));
           gdata.unshift({ x: sales.raw_date, y: sales.total });
         });

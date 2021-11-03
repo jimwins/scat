@@ -49,44 +49,18 @@ default:
 }
 
 $q= "SELECT DATE_FORMAT(created, '$format') AS span,
-            SUM(taxed + untaxed) AS total,
-            SUM(IF(tax_rate OR uuid, 0, taxed + untaxed)) AS resale,
-            SUM(IF(uuid, tax,
-                   ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)))
-              AS tax,
-            SUM(IF(uuid, untaxed + taxed + tax,
-                   ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed))
-              AS total_taxed,
-            SUM(IF(online_sale_id, untaxed + taxed + tax, 0))
-              AS online,
-            SUM(IF(shipping_address_id = 1, untaxed + taxed + tax, 0))
-              AS pickup,
-            SUM(IF(shipping_address_id > 1, untaxed + taxed + tax, 0))
-              AS shipped,
             MIN(DATE(created)) AS raw_date,
+            SUM(total) AS total,
             COUNT(*) AS transactions
        FROM (SELECT 
-                    txn.uuid,
-                    txn.online_sale_id, txn.shipping_address_id,
                     created,
                     CAST(ROUND_TO_EVEN(
-                      SUM(IF(txn_line.taxfree, 1, 0) *
-                        IF(type = 'customer', -1, 1) * ordered *
+                      SUM(IF(type = 'customer', -1, 1) * ordered *
                         sale_price(txn_line.retail_price,
                                    txn_line.discount_type,
                                    txn_line.discount)),
                       2) AS DECIMAL(9,2))
-                    AS untaxed,
-                    CAST(ROUND_TO_EVEN(
-                      SUM(IF(txn_line.taxfree, 0, 1) *
-                        IF(type = 'customer', -1, 1) * ordered *
-                        sale_price(txn_line.retail_price,
-                                   txn_line.discount_type,
-                                   txn_line.discount)),
-                      2) AS DECIMAL(9,2))
-                    AS taxed,
-                    tax_rate,
-                    SUM(tax) AS tax
+                    AS total
                FROM txn
                LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
                     JOIN item ON (txn_line.item_id = item.id)
@@ -106,12 +80,6 @@ $r= $db->query($q)
 $sales= array();
 while ($row= $r->fetch_assoc()) {
   $row['total']= (float)$row['total'];
-  $row['resale']= (float)$row['resale'];
-  $row['tax']= (float)$row['tax'];
-  $row['total_taxed']= (float)$row['total_taxed'];
-  $row['online']= (float)$row['online'];
-  $row['pickup']= (float)$row['pickup'];
-  $row['shipped']= (float)$row['shipped'];
   $sales[]= $row;
 }
 
