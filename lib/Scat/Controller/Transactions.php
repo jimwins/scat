@@ -1959,8 +1959,28 @@ class Transactions {
     return $response->withRedirect($path);
   }
 
-  public function purchase(Response $response, $id) {
-    return $response->withRedirect("/sale/new?id=$id");
+  public function purchase(Request $request, Response $response, $id) {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($txn);
+    }
+
+    if (($block= $request->getParam('block'))) {
+      $html= $this->view->fetchBlock('purchase/txn.html', $block, [
+        'txn' => $txn,
+      ]);
+
+      $response->getBody()->write($html);
+      return $response;
+    }
+
+    return $this->view->render($response, 'purchase/txn.html', [
+      'txn' => $txn,
+    ]);
   }
 
   public function corrections(Request $request, Response $response) {

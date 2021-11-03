@@ -1,0 +1,707 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  {{ txn.friendly_type }} {{ txn.formatted_number }}
+{% endblock %}
+
+{% block extra_head %}
+  <script src="/extern/mousetrap-1.6.2/mousetrap.min.js"></script>
+  <script src="/extern/mousetrap-1.6.2/plugins/global-bind/mousetrap-global-bind.min.js"></script>
+{% endblock %}
+
+{% block content %}
+  <style>
+    [data-action~="editable"] {
+      border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+    }
+    [data-action] {
+      cursor: pointer;
+    }
+  </style>
+  <div class="row">
+    <div class="col-sm-9">
+      {{ block('search') }}
+      <br>
+      <div id="search-results"></div>
+      <div data-reload="invoice">
+        {{ block('invoice') }}
+      </div>
+    </div>
+    <div data-reload="sidebar" id="sidebar" class="col-md-3">
+      {{ block('sidebar') }}
+    </div>
+  </div>
+{% endblock %}
+
+{% block search %}
+  <form class="form form-inline" data-action="search">
+    <div class="input-group">
+      <span class="input-group-addon"><i class="fa fa-fw fa-barcode"></i></span>
+      <input type="hidden" name="scope" value="items">
+      <input type="text" class="form-control autofocus"
+             name="q"
+             autocomplete="off" autocorrect="off" autocapitalize="off"
+             spellcheck="false"
+             placeholder="Scan item or enter search terms"
+             value="" size="200">
+      <span class="input-group-btn">
+        <input type="submit" class="btn btn-default" value="Find Items">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle"
+                  data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false">
+            Custom <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a data-action="add-item-by-code" data-code="ZZ-GIFT">
+                Gift Card
+              </a>
+            </li>
+            <li role="separator" class="divider"></li>
+            <li>
+              <a data-action="add-item-by-code" data-code="ZZ-FLOAT">
+                Floater Frame
+              </a>
+            </li>
+            <li>
+              <a data-action="add-item-by-code" data-code="ZZ-CANVAS">
+                Canvas
+              </a>
+            </li>
+            <li>
+              <a data-action="add-item-by-code" data-code="ZZ-PANEL">
+                Panel
+              </a>
+            </li>
+          </ul>
+        </div>
+      </span>
+    </div>
+  </form>
+{% endblock %}
+
+{% block invoice %}
+  {% import 'macros.twig' as scat %}
+  <div class="panel panel-default">
+    <style>
+      #txn th:last-child, #txn td:last-child {
+        padding-right: 1rem;
+      }
+    </style>
+    <table id="txn" class="table table-striped table-condensed table-hover">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Qty</th>
+          <th>Rec</th>
+          <th>Code</th>
+          <th>SKU</th>
+          <th width="50%">Name</th>
+          <th style="text-align: right">Price</th>
+          <th style="text-align: right">Ext</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in txn.items.find_many %}
+          <tr data-id="{{ line.id }}"
+              data-editable-base="/sale/{{ txn.id }}/item/{{ line.id }}">
+            <td>
+              {% if not line.kit_id %}
+                <a data-action="remove-item" class="btn btn-link btn-xs">
+                  <i class="fa fa-fw fa-trash-o"></i>
+                </a>
+              {% endif %}
+            </td>
+            <td>
+              <div data-action="editable" data-name="ordered">
+                {{ (txn.type == 'vendor' ? 1 : -1) * line.ordered }}
+              </div>
+            </td>
+            <td>
+              <div data-action="editable" data-name="allocated">
+                {{ (txn.type == 'vendor' ? 1 : -1) * line.allocated }}
+              </div>
+            </td>
+            <td>
+              <a data-action="show-item-info" data-code="{{ line.code }}">
+                {{ line.code }}
+              </a>
+            </td>
+            <td>
+              {{ line.vendor_sku }}
+            </td>
+            <td>
+              <span data-action="editable" data-name="override_name">
+                {{- line.name -}}
+              </span>
+              <div><small>{{ line.pricing_detail }}</small></div>
+            </td>
+            <td style="text-align: right">
+              {% if not line.kit_id %}
+                <div data-action="editable" data-name="sale_price">
+                  {{- scat.amount(line.sale_price) -}}
+                </div>
+              {% endif %}
+            </td>
+            <td style="text-align: right">
+              {% if not line.kit_id %}
+                {{ scat.amount((txn.type == 'vendor' ? 1 : -1) * line.ext_price) }}
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="7" style="text-align: right">
+            Total:
+          </th>
+          <td style="text-align: right">{{ scat.amount(txn.total) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+{% endblock %}
+
+{% block sidebar %}
+  {% import 'macros.twig' as scat %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="pull-right">
+        <button class="btn btn-sm btn-default"
+                data-action="show-notes" data-kind="txn"
+                data-attach-id="{{ txn.id }}">
+          <i class="fa fa-fw fa-sticky-note-o"></i>
+          <span class="label label-{{ txn.notes.where('todo',1).count ? 'danger' : 'default' }}">
+            {{- txn.notes.count ?: '' -}}
+          </span>
+        </button>
+      </div>
+      <a href="/sale/new?id={{ txn.id }}"
+         class="btn btn-link btn-sm pull-right">
+        <i class="fa fa-fw fa-life-ring"></i>
+      </a>
+      <h1 class="panel-title">
+        {{ block('title') }}
+      </h1>
+      <small data-toggle="tooltip" title="{{ (txn.filled ? ('Filled: ' ~ txn.filled|date("F j Y g:ia"))) ~ "\n" ~ (txn.paid ? ('Paid: ' ~ txn.paid|date("F j Y g:ia"))) }}">
+        {{ txn.created|date("l, F j Y g:ia") }}
+      </small>
+    </div>
+    <div class="panel-body">
+      <style>
+        .list-group-item.disabled {
+          opacity: 40%;
+        }
+      </style>
+      {% if txn.person_id %}
+        {% if txn.person.notes %}
+          <div class="alert alert-danger" style="max-height: 8em; overflow: scroll">
+            {{- txn.person.notes|nl2br -}}
+          </div>
+        {% endif %}
+      {% endif %}
+      <div class="btn-group btn-block">
+        <button type="button"
+                class="btn btn-default btn-block dropdown-toggle"
+                data-toggle="dropdown" aria-expanded="false">
+          {{ scat.format_txn_status(txn.status) }}
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+          <li>
+            {% set options= ['new','filled','paid','processing','waitingforitems','readyforpickup','shipping','shipped','complete','template'] %}
+            {% for opt in options %}
+              <a data-action="set-status" data-status="{{ opt }}">
+                {{ scat.format_txn_status(opt) }}
+              </a>
+            {% endfor %}
+          </li>
+        </ul>
+      </div>
+      <div class="well">
+        <h1 class="text-center {{ txn.due < 0 ? 'text-danger' }}"
+            style="margin: 0px; padding: 0px">
+          {{ scat.amount(txn.due) }}
+        </h1>
+      </div>
+
+      <div class="text-center">
+        <div class="btn-group btn-group-lg">
+         <button type="button" class="btn btn-default" data-action="print-invoice">
+           <u>P</u>rint
+         </button>
+         <button type="button" class="btn btn-default dropdown-toggle"
+                 data-toggle="dropdown" aria-expanded="false">
+          <span class="caret"></span>
+           <span class="sr-only">Toggle Dropdown</span>
+          </button>
+         <ul class="dropdown-menu" role="menu">
+          <li><a data-action="print-invoice">Invoice</a></li>
+          <li><a data-action="print-receipt">Receipt</a></li>
+          <li>
+            <a data-action="print-invoice" data-download="1">
+              Download
+            </a>
+          </li>
+          <li>
+            <a data-action="email-invoice">
+              Email
+            </a>
+          </li>
+         </ul>
+        </div>
+      </div>
+
+      {% if txn.returned_from_id %}
+        <h4>Ordered For</h4>
+        <ul class="list-group">
+          <a class="list-group-item" href="/sale/{{ txn.returned_from_id }}">
+            {{ txn.returned_from.friendly_type }}
+            {{ txn.returned_from.formatted_number }}
+          </a>
+        </ul>
+      {% endif %}
+
+      <h3>
+        <a data-action="change-person"
+           class="btn btn-default btn-sm pull-right">
+          <i class="fa fa-user-o"></i>
+        </a>
+        {{ txn.type == 'customer' ? 'Customer' : 'Vendor' }}
+      </h3>
+
+      <a data-action="edit-person" data-id="{{ txn.person_id }}">
+        {{ txn.person.friendly_name ?: 'Anonymous' }}
+        {% if txn.person and txn.person.store_credit.balance > 0 %}
+          <span class="label label-success">
+            {{ scat.amount(txn.person.store_credit.balance) }}
+          </span>
+        {% endif %}
+      </a>
+
+      {% set person= txn.person %}
+
+      <div class="clearfix"></div>
+
+      <h3>
+        <div class="btn-group pull-right">
+         <button type="button" class="btn btn-default btn-sm dropdown-toggle"
+                 data-toggle="dropdown" aria-expanded="false">
+          <i class="fa fa-truck"></i>
+          <span class="caret"></span>
+         </button>
+         <ul class="dropdown-menu" role="menu">
+          <li>
+            <a data-action="edit-shipping-address">
+              {{ txn.shipping_address_id > 1 ? 'Edit' : 'Add' }}
+              Shipping Address
+            </a>
+            {% if txn.shipping_address_id != 1 %}
+              <a data-action="set-in-store-pickup">
+                Set for In-Store Pickup
+              </a>
+            {% endif %}
+            {% if txn.is_local_delivery %}
+              <a data-action="create-delivery">Create Delivery</a>
+            {% else %}
+              <a data-action="create-dropship">Create Drop Shipment</a>
+              <a data-action="create-shipment">Create Shipment</a>
+            {% endif %}
+            <a data-action="add-tracker">Add Tracker</a>
+          </li>
+         </ul>
+        </div>
+
+        Shipping
+      </h3>
+
+      {% if txn.shipping_address_id == 1 %}
+        <h4>Curbside Pickup</h4>
+      {% elseif txn.shipping_address_id %}
+        <h4>{{ txn.is_bike_delivery ? 'Deliver to' : 'Ship to' }}:</h4>
+        {% set shipping_address= txn.shipping_address() %}
+        <address>
+          <div>{{ shipping_address.name }}</div>
+          <div>{{ shipping_address.company }}</div>
+          <div>{{ shipping_address.email }}</div>
+          {% if shipping_address.phone %}
+            <div>{{ shipping_address.phone | phone_number_format }}</div>
+          {% endif %}
+          <div>{{ shipping_address.street1 }}</div>
+          <div>{{ shipping_address.street2 }}</div>
+          <div>
+            {% if shipping_address.city %}
+              {{ shipping_address.city }},
+            {% endif %}
+            {{ shipping_address.state }}
+            {{ shipping_address.zip }}
+          </div>
+        </address>
+      {% endif %}
+
+      {% if txn.shipments.count %}
+        <h4>Shipments</h4>
+        <ul id="shipments" class="list-group">
+          {% for shipment in txn.shipments.find_many() %}
+            <li class="list-group-item"
+                data-action="show-shipment" data-id="{{ shipment.id }}">
+              <span class="pull-right">
+                {{ scat.format_shipping_status(shipment.status) }}
+              </span>
+              {{ shipment.created|date("D F j") }}
+              <div class="clearfix"></div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    $('[data-toggle="tooltip"]').tooltip();
+
+    let findAndAddItem= (formData, form= null) => {
+      return scat.get('/catalog/search', formData, {
+        headers: { 'Accept': 'application/json' }
+      })
+      .then((res) => {
+        if (res.redirected) {
+          window.location.href= res.url
+        }
+        return res.json()
+      })
+      .then((data) => {
+        if (data.items.length == 0) {
+          // No items? Highlight the search field and add a note
+          form.elements['q'].parentNode.classList.add('has-error');
+          let msg=
+            document.getElementById('item-not-found').content.cloneNode(true);
+          msg.querySelector('.message').innerText=
+            "Didn't find anything for '" + formData.get('q') + "'.";
+          document.getElementById('search-results').append(msg)
+        } else if (data.items.length > 1) {
+          // Multiple items? Show the choices
+          let msg=
+            document.getElementById('multiple-items').content.cloneNode(true);
+          let tbody= msg.querySelector('tbody');
+          let row= tbody.removeChild(tbody.children[0]);
+
+          data.items.forEach((item) => {
+            row.setAttribute('data-id', item.id);
+            if (item.stock > 0) {
+              row.classList.add('stocked')
+            } else {
+              row.classList.remove('stocked')
+            }
+            row.children[0].innerText= item.name
+            row.children[1].innerText= item.brand_name ? item.brand_name : ''
+            row.children[2].innerText= scat.amount(item.retail_price)
+            row.children[2].style.innerTextDecorationLine=
+              (item.sale_price ? 'line-through' : 'inherit')
+            row.children[3].innerText= scat.amount(item.sale_price)
+            tbody.append(row.cloneNode(true))
+          })
+
+          document.getElementById('search-results').append(msg)
+        } else {
+          return addItemById(data.items[0].id)
+        }
+      })
+    }
+
+    let handleFindAndAddItem= (form) => {
+      let formData= new FormData(form)
+      let q= form.elements['q']
+
+      // clear error
+      q.parentNode.classList.remove('has-error');
+
+      // focus and select so more typing will overwrite the query
+      q.focus()
+      q.select()
+
+      return findAndAddItem(formData, form)
+
+    }
+
+    let addItemById= (item_id) => {
+      return scat.post('/sale/{{ txn.id }}/item', { item_id: item_id })
+        .then((res) => res.json())
+        .then((data) => {
+          scat.reload('invoice','sidebar')
+          // set active row to data.id
+        })
+    }
+
+    scat.handleAction('click', 'add-item', (act) => {
+      let item_id= act.closest('[data-id]').getAttribute('data-id')
+
+      return addItemById(item_id).then((res) => {
+        let choices= act.closest('.choices')
+        if (choices) choices.parentElement.removeChild(choices)
+      })
+    })
+
+    scat.handleAction('click', 'add-item-by-code', (act) => {
+      let code= act.closest('[data-code]').getAttribute('data-code')
+
+      let formData= new FormData()
+      formData.append('q', 'code:' + code)
+
+      return findAndAddItem(formData)
+    })
+
+    scat.handleAction('click', 'remove-item', (act) => {
+      let line_id= act.closest('[data-id]').getAttribute('data-id')
+
+      return scat.delete('/sale/{{ txn.id }}/item/' + line_id)
+        .then((res) => {
+          scat.reload('invoice', 'sidebar') // XXX reload less of sidebar?
+        })
+        .catch((err) => {
+          scat.alert('danger', err.message)
+        })
+    })
+
+    scat.handleAction('click', 'set-status', (act) => {
+      let status= act.closest('[data-status]').getAttribute('data-status')
+      return scat.patch("/sale/{{ txn.id}}", { status: status })
+        .then((res) => {
+          scat.reload('sidebar')
+        })
+    })
+
+    scat.handleAction('click', 'print-invoice', (act) => {
+      let data= act.closest('[data-variation]')
+      let download= act.closest('[data-download]')
+      scat.print( '/sale/{{ txn.id }}/~print-invoice', {
+        variation: data ? data.getAttribute('data-variation') : '',
+        download: download ? download.getAttribute('data-download') : 0
+      })
+      return Promise.resolve()
+    })
+
+    let printReceipt= (v) => {
+      return scat.print('/sale/{{ txn.id }}/~print-receipt', { variation: v })
+    }
+
+    scat.handleAction('click', 'print-receipt', (act) => {
+      let data= act.closest('[data-variation]')
+      let variation= data ? data.getAttribute('data-variation') : undefined
+      return printReceipt(variation)
+    })
+
+    scat.handleAction('click', 'email-invoice', (act) => {
+      return scat.dialog('/sale/{{ txn.id }}/email-invoice-form?full_invoice=1')
+    })
+
+    scat.handleAction('click', 'edit-shipping-address', (act) => {
+      return scat.dialog('/sale/{{ txn.id }}/shipping-address').then(() => {
+        scat.reload('sidebar')
+      })
+    })
+
+    scat.handleAction('click', 'set-in-store-pickup', (act) => {
+      return scat
+        .patch('/sale/{{ txn.id }}', { shipping_address_id: 1 })
+        .then((res) => {
+          scat.reload('sidebar')
+        })
+    })
+
+    scat.handleAction('click', 'add-tracker', (act) => {
+      return scat.dialog('/sale/{{ txn.id }}/shipment?tracker=1')
+        .then((res) => {
+          {% if txn.status in [ 'new', 'processing' ] %}
+            return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })
+              .then((res) => {
+                scat.reload('sidebar')
+              })
+          {% else %}
+            scat.reload('sidebar')
+          {% endif %}
+        })
+    })
+
+    scat.handleAction('click', 'show-shipment', (act) => {
+      let id= act.closest('[data-id]').getAttribute('data-id')
+      return scat.dialog('/shipment/' + id)
+        .then((res) => {
+          scat.reload('sidebar')
+        })
+    })
+
+    let changePerson= () => {
+      return scat.dialog('/person/search')
+        .then((res) => {
+          if (res instanceof Response) {
+            res.json().then((data) => {
+              return scat.patch("/sale/{{ txn.id}}", { person_id: data.id })
+            })
+          }
+          else if (res > 0) {
+            return scat.patch("/sale/{{ txn.id}}", { person_id: res })
+          }
+        })
+        .then((res) => {
+          scat.reload('sidebar')
+        })
+    }
+
+    scat.handleAction('click', 'change-person', (act) => {
+      return changePerson()
+    })
+
+    scat.handleAction('click', 'edit-person', (act) => {
+      var id= act.closest('[data-id]').getAttribute('data-id')
+      if (id) {
+        return scat.dialog('/person/' + id).then((res) => {
+          scat.reload('sidebar')
+        })
+      } else {
+        return changePerson()
+      }
+    })
+
+    scat.handleQueuedAction('submit', 'search', handleFindAndAddItem)
+
+    scat.handleAction('click', 'show-item-info', (act) => {
+      var code= act.closest('[data-code]').getAttribute('data-code')
+      return scat.get('/catalog/item/' + code, null, {
+        headers: { 'Accept': 'application/json' },
+      })
+      .then((res) => res.json())
+      .then((item) => {
+        scat.popover(act, {
+          title: item.name,
+          content: "<b>Stock:</b> " + item.stock + '<br>' +
+                   "<b>On Order:</b> " + item.on_order + '<br>' +
+                   "<a href='/catalog/item/" + item.code + "' target='_blank' class='btn btn-default btn-block btn-xs'>Details</a>",
+          html: true
+        })
+      })
+    })
+
+    function editableContent() {
+      let el= this
+      let name= el.getAttribute('data-name')
+      let value= el.getAttribute('data-value')
+      if (!value) {
+        value= this.innerText
+      }
+      let base_el= el.closest('[data-editable-base]')
+      let base= (base_el ?
+                  base_el.getAttribute('data-editable-base') :
+                  "/sale/{{ txn.id }}")
+      let reload_el= el.closest('[data-editable-reload]')
+      let html= scat.htmlToElement('<form><div class="form-group" style="margin-bottom: 0"><div class="input-group"><input type="text" name="" class="form-control" value=""><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-fw fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-fw fa-ban"></i></button></span></div><span class="help-block hidden" style="margin-bottom: 0"></span></div></form>')
+      html.querySelector('input').setAttribute('name', name)
+      html.querySelector('input').setAttribute('value', value)
+      html.addEventListener('submit', (ev) => {
+        ev.preventDefault()
+        let formData= new FormData(ev.target)
+
+        let btn= ev.target.querySelector('.fa-check')
+        btn.classList.remove('fa-check')
+        btn.classList.add('fa-spin','fa-spinner')
+        scat.patch(base, formData)
+            .then((res) => {
+              if (res.redirected) {
+                window.location.href= res.url
+                return
+              }
+              return res.json()
+            })
+            .then((data) => {
+              (($(el).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
+              return scat.reload('invoice', 'sidebar')
+            })
+            .catch((err) => {
+              let help= ev.target.querySelector('.help-block')
+              help.innerText= err.message
+              help.classList.remove('hidden')
+              ev.target
+                .querySelector('.form-group')
+                .classList.add('has-error')
+              btn.classList.remove('fa-spin','fa-spinner')
+              btn.classList.add('fa-check')
+            })
+      })
+      html.querySelector('.cancel').addEventListener('click', (ev) => {
+        (($(el).popover('hide').data('bs.popover')||{}).inState||{}).click= false;
+      })
+      return html
+    }
+
+    scat.handleAction('click', 'editable', (act) => {
+      scat.popover(act, {
+        content: editableContent,
+        container: 'body',
+        html: true,
+        sanitize: false,
+        placement: 'auto right',
+      })
+      return Promise.resolve()
+    })
+
+    /* Bind some global keys */
+    Mousetrap.bindGlobal('mod+p', function (ev) {
+      printReceipt()
+      return false
+    })
+
+  </script>
+
+  <template id="item-not-found">
+    <div class="alert alert-danger alert-dismissable" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <span class="message"></span>
+    </div>
+  </template>
+
+  <style>
+    #sidebar h3 {
+      margin-top: 1em;
+      color: rgb(0,0,0,0.3);
+      border-bottom: 1px solid rgb(0,0,0,0.1);
+    }
+
+    .choices {
+      max-height: 300px;
+      overflow: scroll;
+      position: relative;
+    }
+
+    .choices tr.stocked {
+      color: #339;
+    }
+
+    .choices tr {
+      cursor:pointer;
+    }
+    .choices tr:hover {
+      text-decoration: underline;
+    }
+
+  <template id="multiple-items">
+    <div class="choices alert alert-warning alert-dismissable" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <table class="table table-condensed">
+        <tbody>
+          <tr data-action="add-item">
+            <td><!-- name --></td>
+            <td><!-- brand --></td>
+            <td><!-- retail_price --></td>
+            <td><!-- sale_price --></td>
+          <tr>
+        </tbody>
+      </table>
+    </div>
+  </template>
+{% endblock %}
