@@ -326,7 +326,7 @@ class People {
 
     $backorders= [];
 
-    foreach ($person->txns()->where('status', 'new')->find_many() as $txn) {
+    foreach ($person->txns()->where_in('status', [ 'new', 'waitingforitems' ])->find_many() as $txn) {
       $items= $txn->items()->where_raw('ordered != allocated')->find_many();
       $backorders[]= [
         'txn' => $txn,
