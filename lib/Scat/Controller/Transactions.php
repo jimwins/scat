@@ -420,7 +420,7 @@ class Transactions {
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    if (!in_array($txn->status, [ 'new', 'filled', 'template' ])) {
+    if (!$txn->allow_item_changes()) {
       throw new \Scat\Exception\HttpConflictException($request,
         "Unable to add item to transaction because it is {$txn->status}."
       );
@@ -780,8 +780,7 @@ class Transactions {
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    if (!$request->getParam('force') &&
-        !in_array($txn->status, [ 'new', 'filled' ])) {
+    if (!$request->getParam('force') && !$txn->allow_item_changes()) {
       throw new \Scat\Exception\HttpConflictException($request,
         "Unable to modify item because transaction is {$txn->status}."
       );
@@ -859,8 +858,7 @@ class Transactions {
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    if (!$request->getParam('force') &&
-        !in_array($txn->status, [ 'new', 'filled' ])) {
+    if (!$request->getParam('force') && !$txn->allow_item_changes()) {
       throw new \Scat\Exception\HttpConflictException($request,
         "Unable to remove item because transaction is {$txn->status}."
       );

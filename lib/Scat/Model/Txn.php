@@ -30,6 +30,16 @@ class Txn extends \Scat\Model {
     return $this->has_many('TxnLine');
   }
 
+  public function allow_item_changes() {
+    if ($this->type == 'vendor') {
+      $allowed= [ 'new', 'waitingforitems' ];
+    } else {
+      $allowed= [ 'new', 'filled', 'template' ];
+    }
+
+    return in_array($this->status, $allowed);
+  }
+
   public function cost_of_goods() {
     $cogs= 0;
     foreach ($this->items()->find_many() as $line) {

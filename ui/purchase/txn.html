@@ -84,7 +84,8 @@
 
 {% block invoice %}
   {% import 'macros.twig' as scat %}
-  <div class="panel panel-default">
+  <div class="panel panel-default"
+        data-txn-id="{{ txn.id }}" data-status="{{ txn.status }}">
     <style>
       #txn th:last-child, #txn td:last-child {
         padding-right: 1rem;
@@ -105,7 +106,7 @@
       </thead>
       <tbody>
         {% for line in txn.items.find_many %}
-          <tr data-id="{{ line.id }}"
+          <tr data-id="{{ line.id }}" data-item-id="{{ line.item_id }}"
               data-editable-base="/sale/{{ txn.id }}/item/{{ line.id }}">
             <td>
               {% if not line.kit_id %}
@@ -116,13 +117,13 @@
             </td>
             <td>
               <div data-action="editable" data-name="ordered">
-                {{ (txn.type == 'vendor' ? 1 : -1) * line.ordered }}
+                {{- (txn.type == 'vendor' ? 1 : -1) * line.ordered -}}
               </div>
             </td>
             <td>
               <div data-action="editable" data-name="allocated"
                    class="{{ (line.allocated < line.ordered) ? 'text-danger' }}">
-                {{ (txn.type == 'vendor' ? 1 : -1) * line.allocated }}
+                {{- (txn.type == 'vendor' ? 1 : -1) * line.allocated -}}
               </div>
             </td>
             <td>
@@ -428,16 +429,44 @@
       q.select()
 
       return findAndAddItem(formData, form)
-
     }
 
     let addItemById= (item_id) => {
-      return scat.post('/sale/{{ txn.id }}/item', { item_id: item_id })
-        .then((res) => res.json())
-        .then((data) => {
-          scat.reload('invoice','sidebar')
-          // set active row to data.id
+      let status= document.querySelector('[data-txn-id]').getAttribute('data-status')
+      // add or allocate?
+      if (status == 'waitingforitems') {
+        let line= document.querySelector('[data-item-id="' + item_id + '"]')
+        if (!line) {
+          scat.alert('danger', 'No such item found.')
+          return
+        }
+
+        let line_id= line.getAttribute('data-id')
+        let ordered= parseInt(line.querySelector('[data-name="ordered"]').textContent)
+        let allocated= parseInt(line.querySelector('[data-name="allocated"]').textContent)
+
+        if (allocated >= ordered) {
+          scat.alert('danger', "Wasn't expecting any more of those!")
+          return
+        }
+
+        return scat.patch('/sale/{{ txn.id }}/item/' + line_id, {
+          allocated: allocated + 1
         })
+          .then((res) => res.json())
+          .then((data) => {
+            scat.reload('invoice','sidebar')
+            // set active row to data.id
+          })
+
+      } else {
+        return scat.post('/sale/{{ txn.id }}/item', { item_id: item_id })
+          .then((res) => res.json())
+          .then((data) => {
+            scat.reload('invoice','sidebar')
+            // set active row to data.id
+          })
+      }
     }
 
     scat.handleAction('click', 'add-item', (act) => {
@@ -689,6 +718,7 @@
     .choices tr:hover {
       text-decoration: underline;
     }
+  </style>
 
   <template id="multiple-items">
     <div class="choices alert alert-warning alert-dismissable" role="alert">
