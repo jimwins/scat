@@ -41,7 +41,6 @@
 
 {% block script %}
   let preventUnload= (ev) => {
-    debugger
     ev.preventDefault();
     ev.returnValue= '';
   }
@@ -49,7 +48,6 @@
   window.addEventListener('beforeunload', preventUnload);
 
   $(dialog).on('hidden.bs.modal', function(e) {
-    debugger
     window.removeEventListener('beforeunload', preventUnload)
   });
 
