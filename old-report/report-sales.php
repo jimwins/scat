@@ -49,7 +49,7 @@ head("Sales Report @ Scat", true);
 </form>
 <br>
 <div id="results-template" class="panel panel-default"
-     style="display: none; width: auto">
+     style="display: none; width: auto; padding-bottom: 2em">
   <div class="panel-heading">
     <button type="button" class="close" data-dismiss="panel"
             onclick="$(this).closest('.panel').remove(); return false"
