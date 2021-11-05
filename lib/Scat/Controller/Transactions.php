@@ -1981,6 +1981,27 @@ class Transactions {
     ]);
   }
 
+  public function markAllReceived(Request $request, Response $response, $id) {
+    $purchase= $this->txn->fetchById($id);
+    if (!$purchase) {
+      throw new \Exception("Unable to find transaction.");
+    }
+
+    $this->data->beginTransaction();
+
+    foreach ($purchase->items()->find_many() as $line) {
+      $line->allocated= $line->ordered;
+      $line->save();
+    }
+
+    $purchase->status= 'filled';
+    $purchase->save();
+
+    $this->data->commit();
+
+    return $response->withJson($txn);
+  }
+
   public function corrections(Request $request, Response $response) {
     return $this->search($request, $response, 'correction');
   }

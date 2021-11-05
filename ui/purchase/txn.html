@@ -267,6 +267,13 @@
         </ul>
       {% endif %}
 
+      {% if txn.status in ['new', 'waitingforitems' ] %}
+        <button class="btn btn-primary btn-block"
+                data-action="mark-all-received">
+          Mark All Received
+        </button>
+      {% endif %}
+
       <h3>
         <a data-action="change-person"
            class="btn btn-default btn-sm pull-right">
@@ -284,9 +291,9 @@
         {% endif %}
       </a>
 
-      {% set person= txn.person %}
-
       <div class="clearfix"></div>
+
+      {% set person= txn.person %}
 
       <h3>
         <div class="btn-group pull-right">
@@ -565,6 +572,12 @@
         .then((res) => {
           scat.reload('sidebar')
         })
+    })
+
+    scat.handleAction('click', 'mark-all-received', (act) => {
+      return scat.post('/purchase/{{ txn.id }}/~mark-all-received').then(() => {
+        scat.reload('invoice', 'sidebar')
+      })
     })
 
     let changePerson= () => {

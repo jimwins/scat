@@ -178,6 +178,8 @@ $app->group('/purchase', function (RouteCollectorProxy $app) {
       ->setName('purchase');
   $app->post('/{id}',
               [ \Scat\Controller\Transactions::class, 'addToPurchase' ]);
+  $app->post('/{id}/~mark-all-received',
+              [ \Scat\Controller\Transactions::class, 'markAllReceived' ]);
 });
 
 /* Corrections */
