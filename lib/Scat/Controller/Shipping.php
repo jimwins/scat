@@ -385,6 +385,15 @@ class Shipping {
           'zip' => '27834',
           'residential' => true,
         ],
+        [
+          'name' => 'Richard Q. Jonnes',
+          'company' => 'WIBSTR',
+          'street1' => '364 S King St',
+          'city' => 'Honolulu',
+          'state' => 'HI',
+          'zip' => '96813',
+          'residential' => true,
+        ],
       ];
 
       $addresses= array_map(function($address) {
