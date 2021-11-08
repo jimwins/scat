@@ -182,7 +182,13 @@
         {% for payment in txn.payments.find_many %}
           <tr>
             <th colspan="5" style="text-align: right">
-              {{ payment.pretty_method }}:
+            {%- if payment.method == 'gift' -%}
+              <a href="/gift-card/{{ payment.data().card }}">
+            {%- endif -%}
+              {{- payment.pretty_method -}}:
+            {%- if payment.method == 'gift' -%}
+              </a>
+            {%- endif -%}
             </th>
             <td style="text-align: right">
               {{ scat.amount(-1 * payment.amount) }}

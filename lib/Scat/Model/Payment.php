@@ -50,4 +50,8 @@ class Payment extends \Scat\Model {
   public function txn() {
     return $this->belongs_to('Txn')->find_one();
   }
+
+  public function data() {
+    return json_decode($this->data);
+  }
 }
