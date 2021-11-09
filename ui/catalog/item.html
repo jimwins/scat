@@ -108,6 +108,19 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <label for="dropship_fee" class="col-sm-4 control-label">
+                Dropship Fee
+              </label>
+              <div class="col-sm-8">
+                <p class="form-control-static editable"
+                   data-reload="pricing"
+                   data-name="dropship_fee">
+                  {{ scat.amount(item.dropship_fee) }}
+                </p>
+              </div>
+            </div>
+
             {% set overrides= item.price_overrides.find_many %}
             {% if overrides %}
               <div class="form-group">
