@@ -15,7 +15,7 @@
     {#  'FedEx': [ 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY' ], #}
   {% else %}
     {% set preferred_rates= {
-      'USPS': [ 'Priority' ],
+      'USPS': [ 'First', 'Priority' ],
       'UPS':  [ 'Ground' ],
       'UPSDAP':  [ 'Ground' ],
     } %}
