@@ -576,7 +576,7 @@
         <ul id="shipments" class="list-group">
           {% for shipment in txn.shipments.find_many() %}
             <li class="list-group-item"
-                data-action="show-shipment" data-id="{{ shipment.id }}">
+                data-action="{{ shipment.status == 'pending' ? 'finalize-shipment' : 'show-shipment' }}" data-id="{{ shipment.id }}">
               <span class="pull-right">
                 {{ scat.format_shipping_status(shipment.status) }}
               </span>
@@ -832,6 +832,14 @@
     scat.handleAction('click', 'show-shipment', (act) => {
       let id= act.closest('[data-id]').getAttribute('data-id')
       return scat.dialog('/shipment/' + id)
+        .then((res) => {
+          scat.reload('sidebar')
+        })
+    })
+
+    scat.handleAction('click', 'finalize-shipment', (act) => {
+      let id= act.closest('[data-id]').getAttribute('data-id')
+      return scat.dialog('/sale/{{ txn.id }}/shipment/' + id)
         .then((res) => {
           scat.reload('sidebar')
         })
