@@ -319,6 +319,10 @@ class Txn extends \Scat\Model {
     return $mpdf;
   }
 
+  public function shipping() {
+    return $this->items()->where('tic', '11000')->sum('retail_price');
+  }
+
   public function shipments() {
     return $this->has_many('Shipment');
   }

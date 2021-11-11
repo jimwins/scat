@@ -32,10 +32,11 @@
   <div class="modal-body">
     {% if shipment %}
       {% if easypost %}
-        {% if txn.is_firstclass_shipment() %}
-          <h3>First Class</h3>
-        {% endif %}
         <ul class="list-group">
+          <li class="list-group-item list-group-item-success">
+            <span class="badge">{{ scat.amount(txn.shipping) }}</span>
+            Paid
+          </li>
           {% for rate in easypost.rates|sort((a,b) => a.rate <=> b.rate) %}
             <a href="#" data-rate="{{ rate.id }}" class="list-group-item {{ rate.service in preferred_rates[rate.carrier] ? 'preferred' : 'hidden' }}">
               <span class="badge">{{ scat.amount(rate.rate) }}</span>
