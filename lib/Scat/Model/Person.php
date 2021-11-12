@@ -611,7 +611,7 @@ class Person extends \Scat\Model {
   }
 
   public function store_credit() {
-    return $this->belongs_to('Giftcard')->find_one();
+    return $this->giftcard_id ? $this->belongs_to('Giftcard')->find_one() : null;
   }
 
 }
