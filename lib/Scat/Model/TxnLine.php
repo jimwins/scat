@@ -10,6 +10,10 @@ class TxnLine extends \Scat\Model {
     return $this->belongs_to('Item')->find_one();
   }
 
+  public function returned_from() {
+    return $this->belongs_to('TxnLine', 'returned_from_id')->find_one();
+  }
+
   // We don't show codes starting with ZZ-, they're special
   public function code() {
     $code= $this->item()->code;

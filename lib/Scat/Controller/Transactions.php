@@ -806,6 +806,12 @@ class Transactions {
     if (strlen($quantity)) {
       /* special case: #/# lets us split line with two quantities */
       if (preg_match('!^(\d+)/(\d+)$!', $quantity, $m)) {
+        if ($line->returned_from_id) {
+          throw new \Scat\Exception\HttpConflictException($request,
+            "Unable to split an item that is being returned."
+          );
+        }
+
         $quantity= (int)$m[2] * ($txn->type == 'customer' ? -1 : 1);
 
         $new= $txn->items()->create();
@@ -824,8 +830,23 @@ class Transactions {
         $quantity= (int)$quantity;
       }
 
-      $mul= ($txn->type == 'customer' ? -1 : 1);
-      $line->ordered= $mul * $quantity;
+      $quantity= $quantity * ($txn->type == 'customer' ? -1 : 1);
+
+      if ($line->returned_from_id) {
+        if ($quantity < 0) {
+          throw new \Scat\Exception\HttpConflictException($request,
+            "Quantity must be negative."
+          );
+        }
+        $returned_from= $line->returned_from();
+        if ($quantity > -$returned_from->allocated) {
+          throw new \Scat\Exception\HttpConflictException($request,
+            "Can't return more than originally purchased."
+          );
+        }
+      }
+
+      $line->ordered= $quantity;
 
       $item= $line->item();
       if ($item->is_kit) {
