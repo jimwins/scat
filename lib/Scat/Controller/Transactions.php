@@ -348,6 +348,7 @@ class Transactions {
         $txn->items()
             ->where('item_id', $item->id)
             ->where_null('kit_id') /* Don't include kit items */
+            ->where_null('returned_from_id') /* Don't include returned items */
             ->find_one();
     }
 
