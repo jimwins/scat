@@ -15,6 +15,11 @@ class Item extends \Scat\Model {
     return $this->has_many('Barcode');
   }
 
+  public function in_kits() {
+    return $this->has_many_through('Item', 'KitItem', null, 'kit_id', null, 'id')
+      ->find_many();
+  }
+
   public function vendor_items($active= 1) {
     return $this->has_many('VendorItem')->where_gte('active', $active);
   }

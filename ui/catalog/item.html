@@ -442,6 +442,7 @@
 
     <div class="col-sm-3">
 
+      <!-- Media -->
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Media</h3>
@@ -457,6 +458,7 @@
         </div>
       </div>
 
+      <!-- Sales -->
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Sales</h3>
@@ -492,6 +494,26 @@
         </div>
       </div>
     </div>
+
+    {% set kits= item.in_kits %}
+    {% if kits|length %}
+      <div class="col-sm-3">
+        <!-- Kits -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">In Kits</h3>
+          </div>
+          <ul class="list-group">
+            {% for kit in kits %}
+              <a class="list-group-item"
+                  href="{{ url_for('catalog-item', { 'code' : kit.code }) }}">
+                {{ kit.name }}
+              </a>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
 
   </div><!-- .row -->
 
@@ -537,7 +559,11 @@
                 {% set ext_quantity= ext_quantity + k.quantity %}
                 <tr data-id="{{ k.id }}" data-editable-base="/catalog/item/{{ item.code }}/kit/{{ k.id}}" data-editable-reload="kit">
                   <td class="num">{{ loop.index }}</td>
-                  <td>{{ i.code }}</td>
+                  <td>
+                    <a href="{{ url_for('catalog-item', { 'code' : i.code }) }}">
+                      {{- i.code -}}
+                    </a>
+                  </td>
                   <td>{{ i.name }}</td>
                   <td class="text-right">
                     {{ scat.amount(i.retail_price) }}
