@@ -212,15 +212,23 @@ class Txn extends \Scat\Model {
                 SUM(ordered) * IF(txn.type = 'customer', -1, 1) AS ordered,
                 SUM(allocated) * IF(txn.type = 'customer', -1, 1) AS allocated,
                 CAST(ROUND_TO_EVEN(
-                  SUM(IF(txn_line.taxfree, 1, 0) *
-                    IF(type = 'customer', -1, 1) * ordered *
-                    sale_price(retail_price, discount_type, discount)),
+                  SUM(IF(IF(uuid IS NOT NULL,
+                            txn_line.tax > 0,
+                            txn_line.taxfree),
+                          0,
+                          1) *
+                      IF(type = 'customer', -1, 1) * ordered *
+                      sale_price(retail_price, discount_type, discount)),
                   2) AS DECIMAL(9,2))
                 untaxed,
                 CAST(ROUND_TO_EVEN(
-                  SUM(IF(txn_line.taxfree, 0, 1) *
-                    IF(type = 'customer', -1, 1) * ordered *
-                    sale_price(retail_price, discount_type, discount)),
+                  SUM(IF(IF(uuid IS NOT NULL,
+                            txn_line.tax > 0,
+                            txn_line.taxfree),
+                          1,
+                          0) *
+                      IF(type = 'customer', -1, 1) * ordered *
+                      sale_price(retail_price, discount_type, discount)),
                   2) AS DECIMAL(9,2))
                 taxed,
                 tax_rate,
@@ -237,7 +245,11 @@ class Txn extends \Scat\Model {
 
     $this->orm->configure('logging', true);
 
-    return ($this->_totals= $st->fetch(\PDO::FETCH_ASSOC));
+    $this->_totals= $st->fetch(\PDO::FETCH_ASSOC);
+
+    error_log("totals: " . json_encode($this->_totals) . "\n");
+
+    return $this->_totals;
   }
 
   public function taxed() {
@@ -702,7 +714,9 @@ class Txn extends \Scat\Model {
     $taxed= $this->taxed();
     $points= (int)$taxed *
               (defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1);
-    if ($points == 0 && $taxed > 0) $points= 1;
+    // subtract amount paid with loyalty points
+    $points-= $this->payments()->where('method', 'loyalty')->sum('amount');
+    if ($points <= 0 && $taxed > 0) $points= 1;
     return $points;
   }
 
