@@ -44,9 +44,19 @@ class Item extends \Scat\Model {
     return $res ? $res->cost : null;
   }
 
-  public function expected_cost() {
+  public function best_cost() {
     $q= "SELECT MIN(IF(promo_price && promo_price < net_price,
                         promo_price, net_price)) AS cost
+           FROM vendor_item
+          WHERE item_id = {$this->id}
+            AND active";
+    $res= $this->orm->for_table('vendor_item')->raw_query($q)->find_one();
+
+    return $res ? $res->cost : null;
+  }
+
+  public function usual_cost() {
+    $q= "SELECT MIN(net_price) AS cost
            FROM vendor_item
           WHERE item_id = {$this->id}
             AND active";
