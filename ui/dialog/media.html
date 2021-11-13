@@ -10,8 +10,8 @@
 
     {% for i in media %}
       <div class="media" data-id="{{ i.id }}">
-        <div class="media-left">
-          <img src="{{ i.thumbnail }}" alt="{{ i.alt_text }}">
+        <div class="media-left" style="min-width: 128px; min-height: 128px">
+          {{ include('carousel.twig', { images: [ i ], thumb: true }) }}
         </div>
         <div class="media-body">
           <h4 class="media-heading">{{ i.name }}</h4>

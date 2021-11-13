@@ -79,7 +79,7 @@
     {% for image in images %}
       <li>
         <img class=""
-             src="{{ image.medium ?: image.thumbnail }}"
+             src="{{ (image.medium and not thumb) ? image.medium : image.thumbnail }}"
              alt="{{ image.alt_text }}">
       </li>
     {% endfor %}
@@ -99,6 +99,7 @@
   </div>
   {# critical that <script> be inside div so currentScript.parentNode works #}
   <script>
+  {
     let box= document.currentScript.parentNode
 
     let next= box.querySelector('.next')
@@ -145,5 +146,6 @@
       // show the first element 
       navigate(0)
     }
+  }
   </script>
 </figure>
