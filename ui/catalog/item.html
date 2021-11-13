@@ -101,7 +101,9 @@
             <tbody>
               {% for barcode in item.barcodes.find_many %}
                 <tr>
-                  <td>{{ barcode.code }}</td>
+                  <td>
+                    {{ barcode.code }}
+                  </td>
                   <td class="edit-barcode-quantity"
                       data-pk="{{ barcode.code }}"
                       data-name="quantity">
