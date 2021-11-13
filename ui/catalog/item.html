@@ -43,115 +43,52 @@
 
 {% block catalog_content %}
 
-  <h2 class="page-header" style="margin-top: 0.5em">
-    <span class="editable pull-right text-muted" data-name="code">
-      {{- item.code -}}
-    </span>
-    <span class="editable" data-name="name">
-      {{- item.name -}}
-    </span>
-    <small>
-      {{ item.brand.name }}
-    </small>
-  </h2>
+  {% block header %}
+    <div id="header">
+      <h2 class="page-header" style="margin-top: 0.5em">
+        <span class="pull-right">
+          <button type="button" class="btn btn-link toggle"
+                  data-name="active" data-value="{{ item.active }}" data-reload="header">
+            <i class="fa fa-fw {{ item.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+            Active
+          </button>
+          <a class="btn btn-link"
+             href="{{ PUBLIC ~ '/' ~ item.code }}"
+             target="_blank">
+            <i class="fa fa-external-link"></i>
+            <span class="sr-only">Item on public website</span>
+          </a>
+          <span class="editable text-muted" data-name="code">
+            {{- item.code -}}
+          </span>
+        </span>
+        <span class="editable" data-name="name" style="{{ item.active ?: 'text-decoration: line-through' }}">
+          {{- item.name -}}
+        </span>
+      </h2>
+    </div>
+  {% endblock %}
+
+  <div class="row">
+    <div class="col-sm-3">
+      {{ block('media') }}
+    </div>
+    <div class="col-sm-9">
+      <div class="col-sm-4">
+        {{ block('pricing') }}
+      </div>
+      <div class="col-sm-4">
+        {{ block('stock') }}
+      </div>
+      <div class="col-sm-4">
+        {{ block('details') }}
+      </div>
+    </div>
+  </div>
 
   <div class="row">
 
     <div class="col-md-3">
-      {% block pricing %}
-        {% import 'macros.twig' as scat %}
-        <div class="panel panel-default" id="pricing">
-          <div class="panel-heading">
-            <div class="pull-right">
-              <button class="btn btn-default btn-xs toggle"
-                      data-name="active" data-value="{{ item.active }}">
-                <i class="fa fa-fw {{ item.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
-                Active
-              </button>
-            </div>
-            <h3 class="panel-title">Pricing</h3>
-            <div class="clearfix"></div>
-          </div>
-          <div class="panel-body form-horizontal">
-            <div class="well">
-              <h3 class="text-center" style="margin: 0px; padding: 0px">
-                <span class="editable" data-reload="pricing"
-                      data-name="discount"
-                      data-value="{{ scat.format_discount(item) }}">
-                  {% set override= item.override_price %}
-                  {% if override %}
-                    <span class="text-danger">{{ scat.amount(override) }}</span>
-                    <s>
-                  {% endif %}
-                  {{ scat.amount(item.sale_price) }}
-                  {% if override %}
-                    </s>
-                  {% endif %}
-                  {% if item.discount_type in [ 'percentage', 'relative' ] %}
-                    <br>
-                    <small>{{ scat.format_discount(item) }}</small>
-                  {% endif %}
-                </span>
-              </h3>
-            </div>
-
-            <div class="form-group">
-              <label for="retail_price" class="col-sm-4 control-label">
-                List
-              </label>
-              <div class="col-sm-8">
-                <p class="form-control-static editable"
-                   data-reload="pricing"
-                   data-name="retail_price">
-                  {{ scat.amount(item.retail_price) }}
-                </p>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="dropship_fee" class="col-sm-4 control-label">
-                Dropship Fee
-              </label>
-              <div class="col-sm-8">
-                <p class="form-control-static editable"
-                   data-reload="pricing"
-                   data-name="dropship_fee">
-                  {{ scat.amount(item.dropship_fee) }}
-                </p>
-              </div>
-            </div>
-
-            {% set overrides= item.price_overrides.find_many %}
-            {% if overrides %}
-              <div class="form-group">
-                <label class="col-sm-4 control-label">Overrides</label>
-                <div class="col-sm-8">
-                  {% for over in overrides %}
-                    <p class="form-control-static">
-                      {{ scat.format_discount(over) }}
-                      for
-                      {{ over.minimum_quantity }}
-                    </p>
-                  {% endfor %}
-                </div>
-              </div>
-            {% endif %}
-
-            {% set cost= item.expected_cost %}
-            {% if cost %}
-              <div class="form-group">
-                <label class="col-sm-4 control-label">Margin</label>
-                <div class="col-sm-8">
-                  <p class="form-control-static">
-                    {{ "%.1f"|format((item.sale_price - cost) / item.sale_price * 100) }}%
-                  </p>
-                </div>
-              </div>
-            {% endif %}
-          </div>
-        </div>
-
-      {% endblock %}
 
       <!-- Barcodes -->
       <div class="panel panel-default">
@@ -245,218 +182,7 @@
 
     </div>
 
-    <!-- Catalog -->
-    <div class="col-md-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <div class="pull-right">
-            <a class="btn btn-default btn-xs"
-               href="{{ PUBLIC ~ '/' ~ item.code }}"
-               target="_blank">
-              <i class="fa fa-external-link"></i>
-              Website
-            </a>
-          </div>
-          <h3 class="panel-title">Catalog</h3>
-          <div class="clearfix"></div>
-        </div>
-
-        <div class="panel-body form-horizontal">
-          <div class="form-group">
-            <label for="short_name" class="col-sm-4 control-label">
-              Short Name
-            </label>
-            <div class="col-sm-8">
-              <p class="form-control-static editable"
-                 data-name="short_name">
-                {{- item.short_name -}}
-              </p>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="variation" class="col-sm-4 control-label">
-              Variation
-            </label>
-            <div class="col-sm-8">
-              <p class="form-control-static editable"
-                 data-name="variation">
-                {{- item.variation -}}
-              </p>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="tic" class="col-sm-4 control-label">
-              <abbr class="initialism"
-                    title="Taxability Information Code">TIC</abbr>
-            </label>
-            <div class="col-sm-8">
-              <p class="form-control-static editable"
-                 data-name="tic">
-                {{- item.tic -}}
-              </p>
-            </div>
-          </div>
-
-          {% block color %}
-            <div class="form-group" id="color">
-              <label for="color" class="col-sm-4 control-label">
-                Color
-                <span style="{{ item.color ? "background: #" ~ item.color }}">
-                  &nbsp; &nbsp; &nbsp;
-                </span>
-              </label>
-              <div class="col-sm-8">
-                <p class="form-control-static editable"
-                   data-name="color" data-reload="color">
-                  {{- item.color -}}
-                </p>
-              </div>
-            </div>
-          {% endblock %}
-
-          <div class="form-group">
-            <label for="weight" class="col-sm-4 control-label">
-              Weight (lbs)
-            </label>
-            <div class="col-sm-8">
-              <p class="form-control-static editable"
-                 data-name="weight">
-                {{- item.weight -}}
-              </p>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="dimensions" class="col-sm-4 control-label">
-              Dimensions
-            </label>
-            <div class="col-sm-8">
-              <p class="form-control-static editable"
-                 data-name="dimensions">
-                {{- item.dimensions -}}
-              </p>
-            </div>
-          </div>
-
-          <button type="button" class="btn btn-default toggle"
-                  data-name="prop65" data-value="{{ item.prop65 }}">
-            <i class="fa fa-fw {{ item.prop65 ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
-            Prop. 65
-          </button>
-          <button type="button" class="btn btn-default toggle"
-                  data-name="hazmat" data-value="{{ item.hazmat }}">
-            <i class="fa fa-fw {{ item.hazmat ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
-            Hazardous Material
-          </button>
-          <button type="button" class="btn btn-default toggle"
-                  data-name="oversized" data-value="{{ item.oversized }}">
-            <i class="fa fa-fw {{ item.oversized ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
-            Oversized
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Inventory -->
-    <div class="col-md-3">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <div class="pull-right">
-            <button class="btn btn-default btn-xs">
-              <i class="fa fa-sticky-note-o"></i> Notes
-              <span id="item-notes" class="badge"></span>
-            </button>
-          </div>
-          <h3 class="panel-title">Inventory</h3>
-          <div class="clearfix"></div>
-        </div>
-        <div class="panel-body form-horizontal">
-
-          <div class="form-group">
-            <label for="stock" class="col-sm-8 control-label">Currently in Stock</label>
-            <div class="col-sm-4">
-              <p class="form-control-static editable"
-                 data-name="stock">
-                {{ item.stock }}
-              </p>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="on_order" class="col-sm-8 control-label">Currently on Order</label>
-            <div class="col-sm-4">
-              <p class="form-control-static">
-                {{ item.on_order }}
-              </p>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="minimum_quantity" class="col-sm-8 control-label">
-              Minimum Quantity
-            </label>
-            <div class="col-sm-4">
-              <p class="form-control-static editable"
-                  data-name="minimum_quantity">
-                {{ item.minimum_quantity }}
-              </p>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="purchase_quantity" class="col-sm-8 control-label">
-              Purchase Quantity
-            </label>
-            <div class="col-sm-4">
-              <p class="form-control-static editable"
-                  data-name="purchase_quantity">
-                {{ item.purchase_quantity }}
-              </p>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="inventoried" class="col-sm-8 control-label">
-              Inventoried
-            </label>
-            <div class="col-sm-4">
-              <p class="form-control-static">
-                {{ item.inventoried ?: 'Not yet' }}
-            </div>
-          </div>
-
-          <button type="button" class="btn btn-default toggle"
-                  data-name="is_kit" data-value="{{ item.is_kit }}">
-            <i class="fa fa-fw {{ item.is_kit ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
-            Kit?
-          </button>
-
-          <button type="button" class="btn btn-default toggle"
-                  data-name="no_backorder" data-value="{{ item.no_backorder }}">
-            <i class="fa fa-fw {{ item.no_backorder ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
-            No backorders?
-          </button>
-
-        </div>
-      </div>
-    </div>
-
     <div class="col-sm-3">
-
-      <!-- Media -->
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">Media</h3>
-        </div>
-        <div class="panel-body form-horizontal">
-          {% set media= item.media %}
-          {% if media is not empty %}
-            {{ include('carousel.twig', { images: media, edit: 'edit-media' }) }}
-          {% endif %}
-          {% for i in media %}
-            <a href="/media/{{ i.id }}/"><i class="fa fa-file-image-o"></i></a>
-          {% endfor %}
-        </div>
-      </div>
 
       <!-- Sales -->
       <div class="panel panel-default">
@@ -517,86 +243,87 @@
 
   </div><!-- .row -->
 
-  <!-- Kit Contents -->
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="kitHeader">
-      <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" href="#kit" aria-expanded="false" aria-controls="kit">
-        <h4 class="panel-title">Kit Contents</h4>
-      </a>
-    </div>
-    {% block kit %}
-      {% import 'macros.twig' as scat %}
-      <div id="kit" data-reload="kit"
-           class="panel-collapse collapse collapsed"
-           role="tabpanel" aria-labelledby="kitHeader">
-        {% if item.is_kit %}
-          <form id="add-kit-item" style="padding: 1em">
-            <input type="hidden" name="scope" value="items">
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
-              <input type="text" class="form-control"
-                     name="q" placeholder="Enter code or search terms">
-              <span class="input-group-btn">
-                <button class="btn btn-default" type="button">Find Items</button>
-              </span>
-            </div>
-          </form>
-          <table class="table table-striped table-header">
-            <thead>
-              <th class="num">#</th>
-              <th>Code</th>
-              <th>Name</th>
-              <th class="text-right">Retail</th>
-              <th class="text-right">Sale</th>
-              <th class="text-right">Quantity</th>
-            </thead>
-            {% set ext_sale, ext_retail, ext_quantity= 0, 0, 0 %}
-            <tbody>
-              {% for k in item.kit_items.find_many() %}
-                {% set i = k.item %}
-                {% set ext_retail= ext_retail + (k.quantity * i.retail_price) %}
-                {% set ext_sale= ext_sale + (k.quantity * i.sale_price) %}
-                {% set ext_quantity= ext_quantity + k.quantity %}
-                <tr data-id="{{ k.id }}" data-editable-base="/catalog/item/{{ item.code }}/kit/{{ k.id}}" data-editable-reload="kit">
-                  <td class="num">{{ loop.index }}</td>
-                  <td>
-                    <a href="{{ url_for('catalog-item', { 'code' : i.code }) }}">
-                      {{- i.code -}}
-                    </a>
-                  </td>
-                  <td>{{ i.name }}</td>
-                  <td class="text-right">
-                    {{ scat.amount(i.retail_price) }}
-                  </td>
-                  <td class="text-right">
-                    {{ scat.amount(i.sale_price) }}
-                  </td>
-                  <td class="text-right">
-                    <span class="editable" data-name="quantity">
-                      {{- k.quantity -}}
-                    </span>
-                    <button class="btn btn-default btn-xs remove-kit-item">
-                      <i class="fa fa-trash-o">
-                        <span class="sr-only">Remove</span>
-                      </i>
-                    </button>
-                  </td>
+  {% block kit %}
+    {% import 'macros.twig' as scat %}
+    <div id="kit" data-reload="kit">
+      {% if item.is_kit %}
+        <!-- Kit Contents -->
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="kitHeader">
+            <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" href="#kitPanel" aria-expanded="false" aria-controls="kitPanel">
+              <h4 class="panel-title">Kit Contents</h4>
+            </a>
+          </div>
+          <div id="kitPanel" class="panel-collapse collapse collapsed"
+               role="tabpanel" aria-labelledby="kitHeader">
+            <form id="add-kit-item" style="padding: 1em">
+              <input type="hidden" name="scope" value="items">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-barcode"></i></span>
+                <input type="text" class="form-control"
+                       name="q" placeholder="Enter code or search terms">
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="button">Find Items</button>
+                </span>
+              </div>
+            </form>
+            <table class="table table-striped table-header">
+              <thead>
+                <th class="num">#</th>
+                <th>Code</th>
+                <th>Name</th>
+                <th class="text-right">Retail</th>
+                <th class="text-right">Sale</th>
+                <th class="text-right">Quantity</th>
+              </thead>
+              {% set ext_sale, ext_retail, ext_quantity= 0, 0, 0 %}
+              <tbody>
+                {% for k in item.kit_items.find_many() %}
+                  {% set i = k.item %}
+                  {% set ext_retail= ext_retail + (k.quantity * i.retail_price) %}
+                  {% set ext_sale= ext_sale + (k.quantity * i.sale_price) %}
+                  {% set ext_quantity= ext_quantity + k.quantity %}
+                  <tr data-id="{{ k.id }}" data-editable-base="/catalog/item/{{ item.code }}/kit/{{ k.id}}" data-editable-reload="kit">
+                    <td class="num">{{ loop.index }}</td>
+                    <td>
+                      <a href="{{ url_for('catalog-item', { 'code' : i.code }) }}">
+                        {{- i.code -}}
+                      </a>
+                    </td>
+                    <td>{{ i.name }}</td>
+                    <td class="text-right">
+                      {{ scat.amount(i.retail_price) }}
+                    </td>
+                    <td class="text-right">
+                      {{ scat.amount(i.sale_price) }}
+                    </td>
+                    <td class="text-right">
+                      <span class="editable" data-name="quantity">
+                        {{- k.quantity -}}
+                      </span>
+                      <button class="btn btn-default btn-xs remove-kit-item">
+                        <i class="fa fa-trash-o">
+                          <span class="sr-only">Remove</span>
+                        </i>
+                      </button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr style="border-top: 6px double #dbcbb1">
+                  <td colspan="3"></td>
+                  <td class="text-right">{{ scat.amount(ext_retail) }}</td>
+                  <td class="text-right">{{ scat.amount(ext_sale) }}</td>
+                  <td class="text-right">{{ ext_quantity }}</td>
                 </tr>
-              {% endfor %}
-            </tbody>
-            <tfoot>
-              <tr style="border-top: 6px double #dbcbb1">
-                <td colspan="3"></td>
-                <td class="text-right">{{ scat.amount(ext_retail) }}</td>
-                <td class="text-right">{{ scat.amount(ext_sale) }}</td>
-                <td class="text-right">{{ ext_quantity }}</td>
-              </tr>
-            </tfoot>
-          </table>
-        {% endif %}
-      </div>
-    {% endblock %}
-  </div>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endblock %}
 
   <!-- Vendor Items -->
   <div class="panel-group" id="accordion"
@@ -745,6 +472,190 @@
 
 {% endblock %}
 
+{% block media %}
+  {% set media= item.media %}
+  {% if media is not empty %}
+    {{ include('carousel.twig', { images: media, edit: 'edit-media' }) }}
+  {% endif %}
+{% endblock %}
+
+{% block pricing %}
+  {% import 'macros.twig' as scat %}
+  <div id="pricing">
+    <h3 style="margin-top: 0">
+      {% set override= item.override_price %}
+      {% if override %}
+        <span class="text-danger">{{ scat.amount(override) }}</span>
+        <s>
+      {% endif %}
+        <span class="editable"
+              data-name="discount"
+              data-reload="pricing"
+              data-value="{{ scat.format_discount(item) }}">
+          {{- scat.amount(item.sale_price) -}}
+        </span>
+      {% if override %}
+        </s>
+      {% endif %}
+      &nbsp;
+      <small style="white-space: nowrap;">
+        List Price
+        <span class="editable"
+              data-name="retail_price"
+              data-reload="pricing">
+          {{ scat.amount(item.retail_price) }}
+        </span>
+      </small>
+    </h3>
+    {% if item.sale_price != item.retail_price %}
+      <h4>
+        Save {{ "%.0f"|format((item.retail_price - item.sale_price) / item.retail_price * 100) }}% off list
+      </h4>
+    {% endif %}
+
+    <p>
+      <span class="editable" data-name="dropship_fee" data-reload="pricing">
+        {{ scat.amount(item.dropship_fee) }}
+      </span>
+      dropship fee
+    </p>
+
+    {% set overrides= item.price_overrides.find_many %}
+    {% if overrides|length %}
+      <!-- TODO allow editing/removal from here -->
+      <h4>Overrides</h4>
+      <ul>
+        {% for over in overrides %}
+          <li>
+            {{ scat.format_discount(over) }}
+            for
+            {{ over.minimum_quantity }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <button type="button" class="btn btn-link toggle"
+            data-name="is_kit" data-value="{{ item.is_kit }}" data-reload="kit">
+      <i class="fa fa-fw {{ item.is_kit ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+      Kit?
+    </button>
+  </div><!-- /.pricing -->
+{% endblock %}
+
+{% block stock %}
+  <div class="form-horizontal">
+    <p>
+      <span class="editable text-center" data-name="stock">
+        {{- item.stock -}}
+      </span> in stock.
+    </p>
+
+    <p>
+      <span class="fake-editable text-center">
+        {{- item.on_order -}}
+      </span> on order.
+    </p>
+
+    <p>
+      <span class="editable text-center" data-name="minimum_quantity">
+        {{- item.minimum_quantity -}}
+      </span> minimum stock.
+    </p>
+
+    <p>
+      <span class="editable text-center" data-name="purchase_quantity">
+        {{- item.purchase_quantity -}}
+      </span> purchase quantity.
+    </p>
+
+    <p>
+      {% if item.inventoried %}
+        Inventoried {{ item.inventoried|date('l, M j, Y') }}
+      {% else %}
+        Never inventoried.
+      {% endif %}
+    </p>
+
+    <button type="button" class="btn btn-link toggle"
+            data-name="no_backorder" data-value="{{ item.no_backorder }}">
+      <i class="fa fa-fw {{ item.no_backorder ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+      No backorders?
+    </button>
+
+  </div>
+{% endblock %}
+
+{% block details %}
+  <div id="details">
+    <p>
+      <b>Short name</b> &nbsp;
+      <span class="editable" data-name="short_name">
+        {{- item.short_name -}}
+      </span>
+    </p>
+
+    <p>
+      <b>Variation</b> &nbsp;
+      <span class="editable" data-name="variation">
+        {{- item.variation -}}
+      </span>
+    </p>
+
+    <p>
+      <b><abbr class="initialism" title="Taxability Information Code">TIC</abbr></b> &nbsp;
+      <span class="editable" data-name="tic">
+        {{- item.tic -}}
+      </span>
+    </p>
+
+    {% block color %}
+      <div id="color">
+        <p>
+          <b>Color</b>
+          <span style="{{ item.color ? "background: #" ~ item.color }}">
+            &nbsp; &nbsp; &nbsp;
+          </span>
+          &nbsp;
+          <span class="editable" data-name="color" data-reload="color">
+            {{- item.color -}}
+          </span>
+        </p>
+      </div>
+    {% endblock %}
+
+    <p>
+      <b>Weight (lbs)</b> &nbsp;
+      <span class="editable" data-name="weight">
+        {{- item.weight -}}
+      </span>
+    </p>
+
+    <p>
+      <b>Dimensions</b> &nbsp;
+      <span class="editable" data-name="dimensions">
+        {{- item.dimensions -}}
+      </span>
+    </p>
+
+    <button type="button" class="btn btn-link toggle"
+            data-name="prop65" data-value="{{ item.prop65 }}">
+      <i class="fa fa-fw {{ item.prop65 ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+      Prop. 65
+    </button>
+    <button type="button" class="btn btn-link toggle"
+            data-name="hazmat" data-value="{{ item.hazmat }}">
+      <i class="fa fa-fw {{ item.hazmat ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+      Hazardous Material
+    </button>
+    <button type="button" class="btn btn-link toggle"
+            data-name="oversized" data-value="{{ item.oversized }}">
+      <i class="fa fa-fw {{ item.oversized ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+      Oversized
+    </button>
+  </div>
+{% endblock %}
+
 {% block script %}
   <style>
     /* Have to force select2 higher than x-editable popup */
@@ -752,8 +663,15 @@
       z-index: 1080;
     }
     .editable {
-      min-width: 10%;
+      display: inline-block;
+      min-width: 2em;
       border-bottom: 1px dashed #900;
+    }
+    .fake-editable {
+      display: inline-block;
+      padding-top: 5px;
+      min-width: 2em;
+      border-bottom: 1px dashed rgba(0,0,0,0.3);
     }
   </style>
   <script>
@@ -911,7 +829,7 @@
       icon.classList.remove('fa-square-o','fa-check-square-o')
       icon.classList.add('fa-spin','fa-spinner')
 
-      fetch("/catalog/item/{{ item.code }}", {
+      return fetch("/catalog/item/{{ item.code }}", {
         method: 'PATCH',
         headers: {
           'Content-type': 'application/json',
@@ -925,6 +843,23 @@
         icon.classList.add(data[name] !== 0 ?
                            'fa-check-square-o' : 'fa-square-o')
         toggle.setAttribute('data-value', data[name])
+
+        let reload= toggle.closest('[data-reload]')
+        if (reload) {
+          reload= reload.getAttribute('data-reload')
+          return fetch('/catalog/item/{{ item.code }}/?block=' + reload)
+          .then((res) => {
+            return res.text()
+          })
+          .then ((text) => {
+            let html= scat.htmlToElement(text)
+            // force panels open
+            if (html.classList.contains('collapse'))
+              html.classList.add('in')
+            let div= document.getElementById(reload)
+            div.replaceWith(html)
+          })
+        }
       })
     }
 
