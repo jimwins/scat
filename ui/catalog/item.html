@@ -198,8 +198,12 @@
             <div class="col-sm-6">
               <p class="form-control-static" id="quarter">
                 {% set sales= item.recent_sales(90) %}
-                {{ scat.amount(sales.gross) }}
-                ({{ sales.units }})
+                {% if sales.units %}
+                  {{ scat.amount(sales.gross) }}
+                  ({{ sales.units }})
+                {% else %}
+                  None
+                {% endif %}
               </p>
             </div>
           </div>
@@ -211,8 +215,12 @@
             <div class="col-sm-6">
               <p class="form-control-static" id="year">
                 {% set sales= item.recent_sales(365) %}
-                {{ scat.amount(sales.gross) }}
-                ({{ sales.units }})
+                {% if sales.units %}
+                  {{ scat.amount(sales.gross) }}
+                  ({{ sales.units }})
+                {% else %}
+                  None
+                {% endif %}
               </p>
             </div>
           </div>
