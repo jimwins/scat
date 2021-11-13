@@ -18,16 +18,22 @@
           {{ i.caption }}
         </div>
         <div class="media-right">
-          <a class="btn btn-sm btn-default btn-block" target="_blank"
-             href="{{ url_for('media', { id: i.id }) }}">
-            <i class="fa fa-fw fa-file-image-o"></i>
-            Details
-          </a>
-          <button class="btn btn-sm btn-default btn-block"o
-                  data-action="disconnect-media">
-            <i class="fa fa-fw fa-unlink"></i>
-            Disconnect
-          </button>
+          {% if i.id %}
+            <a class="btn btn-sm btn-default btn-block" target="_blank"
+               href="{{ url_for('media', { id: i.id }) }}">
+              <i class="fa fa-fw fa-file-image-o"></i>
+              Details
+            </a>
+            <button class="btn btn-sm btn-default btn-block"
+                    data-action="disconnect-media">
+              <i class="fa fa-fw fa-unlink"></i>
+              Disconnect
+            </button>
+          {% else %}
+            <button class="btn btn-sm btn-default btn-block" disabled>
+              Old Image
+            </button>
+          {% endif %}
         </div>
       </div>
     {% endfor %}
