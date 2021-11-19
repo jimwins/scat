@@ -844,6 +844,12 @@ class Transactions {
             "Can't return more than originally purchased."
           );
         }
+      } else {
+        if ($txn->type == 'customer' && $quantity >= 0) {
+          throw new \Scat\Exception\HttpConflictException($request,
+            "Quantity must be greater than 0."
+          );
+        }
       }
 
       $line->ordered= $quantity;
