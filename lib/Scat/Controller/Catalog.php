@@ -976,7 +976,10 @@ class Catalog {
       'product_type',
       'inventory',
       'shipping_label',
-      'product_weight'
+      'shipping_length',
+      'shipping_width',
+      'shipping_height',
+      'shipping_weight'
     ];
 
     //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
@@ -1022,17 +1025,20 @@ class Catalog {
          ORDURE . '/art-supplies/' . $product->full_slug()),
         $image,
         '',#'additional_image_link',
-        $item->brand() ? $item->brand()->name : $product->brand()->name,
+        $product->brand()->name,
         $item->barcodes()->find_many()[0]->code,
         $item->code,
         $item->short_name,
         $item->variation,
-        $item->product_id,
+        'P' . $item->product_id,
         #'google_product_category',
         $product->dept()->parent()->name . ' > ' .  $product->dept()->name,
         max($item->stock(), 0),
         $item->shipping_rate(),
-        $item->weight . " lb"
+        $item->length ? $item->length . " in" : '',
+        $item->width  ? $item->width  . " in" : '',
+        $item->height ? $item->height . " in" : '',
+        $item->weight ? $item->weight . " lb" : '',
       ];
 
       fputcsv($output, $record);
