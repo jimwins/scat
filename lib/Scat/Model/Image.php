@@ -20,9 +20,10 @@ class Image extends \Scat\Model {
   }
 
   public function large_square() {
+    $fm= in_array($this->ext, [ 'TIF', 'tiff' ]) ? 'jpeg' : 'auto';
     return GUMLET_BASE .
            $this->uuid . '.' . $this->ext .
-           '?w=1024&h=1024&mode=fill&fm=auto';
+           '?w=1024&h=1024&mode=fill&fm=' . $fm;
   }
 
   public function productsUsedBy() {
