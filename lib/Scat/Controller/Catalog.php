@@ -975,7 +975,8 @@ class Catalog {
       #'google_product_category',
       'product_type',
       'inventory',
-      'shipping_label'
+      'shipping_label',
+      'product_weight'
     ];
 
     //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
@@ -1030,7 +1031,8 @@ class Catalog {
         #'google_product_category',
         $product->dept()->parent()->name . ' > ' .  $product->dept()->name,
         max($item->stock(), 0),
-        $item->shipping_rate()
+        $item->shipping_rate(),
+        $item->weight . " lb"
       ];
 
       fputcsv($output, $record);
