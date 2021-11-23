@@ -59,8 +59,8 @@ class Txn
             $res= $res->where($name, $term->value);
           }
         } elseif ($term instanceof \Scat\Search\Term) {
-          $res= $res->where_raw("(txn.number = ? OR txn.uuid = ? OR txn.id = ? OR CONCAT_WS(' ',person.name, person.email, person.phone, person.company) RLIKE ?)",
-            [ $term->value, $term->value, $term->value, $term->value ]);
+          $res= $res->where_raw("(txn.number = ? OR txn.uuid = ? OR txn.id = ? OR txn.online_sale_id = ? OR CONCAT_WS(' ',person.name, person.email, person.phone, person.company) RLIKE ?)",
+            [ $term->value, $term->value, $term->value, $term->value, $term->value ]);
         }
       }
     }
