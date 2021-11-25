@@ -214,7 +214,7 @@ class Txn extends \Scat\Model {
                 CAST(ROUND_TO_EVEN(
                   SUM(IF(IF(uuid IS NOT NULL,
                             txn_line.tax > 0,
-                            txn_line.taxfree),
+                            !txn_line.taxfree),
                           0,
                           1) *
                       IF(type = 'customer', -1, 1) * ordered *
@@ -224,7 +224,7 @@ class Txn extends \Scat\Model {
                 CAST(ROUND_TO_EVEN(
                   SUM(IF(IF(uuid IS NOT NULL,
                             txn_line.tax > 0,
-                            txn_line.taxfree),
+                            !txn_line.taxfree),
                           1,
                           0) *
                       IF(type = 'customer', -1, 1) * ordered *
