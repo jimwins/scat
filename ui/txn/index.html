@@ -79,7 +79,7 @@
   <div class="row">
     <div class="col-sm-2 hidden-print">
       <form method="GET"
-            action="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}">
+            action="/{{ type == 'vendor' ? 'purchase' : 'sale' }}">
         <div class="input-group">
           <input type="hidden" name="status" value="{{ status }}">
           <input type="text" class="form-control autofocus"
@@ -130,7 +130,7 @@
                 {% endif %}
               </td>
               <td>
-                <a href="/{{ txn.type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
+                <a href="/{{ type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
                   {{ txn.formatted_number }}
                   {% if txn.online_sale_id %}
                     <br><small>({{ "%07d"|format(txn.online_sale_id) }})</small>
