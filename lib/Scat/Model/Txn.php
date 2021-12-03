@@ -247,8 +247,6 @@ class Txn extends \Scat\Model {
 
     $this->_totals= $st->fetch(\PDO::FETCH_ASSOC);
 
-    error_log("totals: " . json_encode($this->_totals) . "\n");
-
     return $this->_totals;
   }
 
@@ -624,7 +622,7 @@ class Txn extends \Scat\Model {
             throw new \Exception($response->Messages[0]->Message);
           }
         } else {
-          error_log("No items to be returned for transaciton {$this->id}\n");
+          error_log("No items to be returned for transaction {$this->id}\n");
         }
 
       }
