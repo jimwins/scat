@@ -84,68 +84,70 @@
       </li>
     {% endfor %}
   </ol>
-  <div class="buttons">
-    <button class="prev btn btn-default btn-xs">
-       ◀ <span class="sr-only">Previous</span>
-    </button>
-    {% if edit %}
-      <button class="edit btn btn-default btn-xs" data-action="{{ edit }}">
-        <span class="sr-only">Edit</span> <i class="fa fa-edit"></i>
+  {% if edit or images|length > 1 %}
+    <div class="buttons">
+      <button class="prev btn btn-default btn-xs">
+         ◀ <span class="sr-only">Previous</span>
       </button>
-    {% endif %}
-    <button class="next btn btn-default btn-xs">
-      <span class="sr-only">Next</span> ▶ 
-    </button>
-  </div>
-  {# critical that <script> be inside div so currentScript.parentNode works #}
-  <script>
-  {
-    let box= document.currentScript.parentNode
+      {% if edit %}
+        <button class="edit btn btn-default btn-xs" data-action="{{ edit }}">
+          <span class="sr-only">Edit</span> <i class="fa fa-edit"></i>
+        </button>
+      {% endif %}
+      <button class="next btn btn-default btn-xs">
+        <span class="sr-only">Next</span> ▶
+      </button>
+    </div>
+    {# critical that <script> be inside div so currentScript.parentNode works #}
+    <script>
+    {
+      let box= document.currentScript.parentNode
 
-    let next= box.querySelector('.next')
-    let prev= box.querySelector('.prev')
-    let edit= box.querySelector('.edit')
-    // Define the global counter, the items and the current item 
-    let counter= 0
-    let items= box.querySelectorAll('.carousel-content li')
-    let amount= items.length
-    // If we only have one slide, don't bother showing controls
-    if (amount > 1) {
-      box.classList.add('active')
+      let next= box.querySelector('.next')
+      let prev= box.querySelector('.prev')
+      let edit= box.querySelector('.edit')
+      // Define the global counter, the items and the current item
+      let counter= 0
+      let items= box.querySelectorAll('.carousel-content li')
+      let amount= items.length
+      // If we only have one slide, don't bother showing controls
+      if (amount > 1) {
+        box.classList.add('active')
 
-      // navigate through the carousel
-      let navigate= (direction= 1) => {
-        // hide the current slide
-        items[counter].classList.remove('current')
-        
-        // calculate the new position
-        counter= (counter + direction) % amount
-        counter= counter < 0 ? amount - 1 : counter
+        // navigate through the carousel
+        let navigate= (direction= 1) => {
+          // hide the current slide
+          items[counter].classList.remove('current')
 
-        // show the new slide
-        items[counter].classList.add('current')
+          // calculate the new position
+          counter= (counter + direction) % amount
+          counter= counter < 0 ? amount - 1 : counter
+
+          // show the new slide
+          items[counter].classList.add('current')
+        }
+
+        let interval= setInterval(navigate, 5000)
+
+        // add event handlers to box to pause/resume
+        box.addEventListener('mouseenter', (ev) => {
+          clearInterval(interval)
+        })
+        box.addEventListener('mouseleave', (ev) => {
+          interval= setInterval(navigate, 5000)
+        })
+
+        // add event handlers to buttons
+        next.addEventListener('click', (ev) => {
+          navigate(1)
+        })
+        prev.addEventListener('click', (ev) => {
+          navigate(-1)
+        })
+        // show the first element
+        navigate(0)
       }
-
-      let interval= setInterval(navigate, 5000)
-
-      // add event handlers to box to pause/resume
-      box.addEventListener('mouseenter', (ev) => {
-        clearInterval(interval)
-      })
-      box.addEventListener('mouseleave', (ev) => {
-        interval= setInterval(navigate, 5000)
-      })
-
-      // add event handlers to buttons
-      next.addEventListener('click', (ev) => {
-        navigate(1)
-      })
-      prev.addEventListener('click', (ev) => {
-        navigate(-1)
-      })
-      // show the first element 
-      navigate(0)
     }
-  }
-  </script>
+    </script>
+  {% endif %}
 </figure>

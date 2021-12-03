@@ -24,7 +24,7 @@
               <i class="fa fa-fw fa-file-image-o"></i>
               Details
             </a>
-            <button class="btn btn-sm btn-default btn-block"
+            <button role="button" class="btn btn-sm btn-default btn-block"
                     data-action="disconnect-media">
               <i class="fa fa-fw fa-unlink"></i>
               Disconnect
@@ -52,8 +52,6 @@
       .then((res) => {
         act.closest('[data-id]').remove();
       })
-
-    return Promise.resolve()
   })
 
   form.onsubmit= (event) => {
