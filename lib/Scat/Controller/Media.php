@@ -169,28 +169,7 @@ class Media {
   public function fix(Request $request, Response $response,
                       \Scat\Service\Config $config)
   {
-    $publitio= new \Publitio\API(
-      $config->get('publitio.key'),
-      $config->get('publitio.secret')
-    );
-
-    $images= $this->data->factory('Image')->where('width', 0)->find_many();
-
     $out= [];
-
-    foreach ($images as $image) {
-      $res= $publitio->call('/files/show/' . $image->publitio_id, 'GET');
-
-      $image->width= $res->width;
-      $image->height= $res->height;
-
-      $image->save();
-
-      $out[]= [
-        'fixed_id' => $image->id,
-        'fixed_uuid' => $image->uuid,
-      ];
-    }
 
     return $response->withJson($out, 200, JSON_PRETTY_PRINT);
   }
