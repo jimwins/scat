@@ -56,4 +56,28 @@ class Tax {
 
     return $response->withJson($this->tax->lookup($data));
   }
+
+  function captureMissing(Request $request, Response $response,
+                          \Scat\Service\Txn $txn)
+  {
+    $missed= $txn->find('customer', 0, 100, 'tax_captured:0')->find_many();
+
+    foreach ($missed as $sale) {
+      error_log("found {$sale->id}\n");
+      if ($sale->paid) {
+        try {
+          $sale->captureTax($this->tax);
+        } catch (\Exception $e) {
+          $message= $e->getMessage();
+          if (preg_match('/^This transaction has already been captured/', $message)) {
+            $sale->set_expr('tax_captured', 'NOW()');
+            $sale->save();
+          }
+          $errors[]= $sale->id . ": " . $e->getMessage();
+        }
+      }
+    }
+
+    return $errors ? $response->withJson($errors) : $response;
+  }
 }
