@@ -24,35 +24,20 @@ class Media
   public function createFromUrl($url) {
     $upload= $this->ordure->grabImage($url);
 
-    $publitio= new \Publitio\API(
-      $this->config->get('publitio.key'),
-      $this->config->get('publitio.secret')
-    );
-
-    $res= $publitio->call('/files/create', 'POST', [
-      'file_url' => $upload->path,
-      'public_id' => $upload->uuid,
-      'title' => $upload->name,
-      'privacy' => 1,
-      'option_ad' => 0,
-      'tags' => $GLOBALS['DEBUG'] ? 'debug' : '',
-    ]);
-
-    if (!$res->success) {
-      error_log(json_encode($res));
-      throw new \Exception($res->error->message ? $res->error->message :
-                           $res->message);
-    }
+    $url= 'https:' . GUMLET_BASE .
+           $upload->uuid . '.' . $upload->ext .
+           '?fm=json';
+    $body= file_get_contents($url);
+    $details= json_decode($body);
 
     // Save the details
     $image= $this->data->factory('Image')->create();
-    $image->uuid= $res->public_id;
+    $image->uuid= $upload->uuid;
     $image->b2_file_id= $upload->id;
-    $image->publitio_id= $res->id;
-    $image->width= $res->width;
-    $image->height= $res->height;
+    $image->width= $details->width;
+    $image->height= $details->height;
     $image->ext= $upload->ext;
-    $image->name= $res->title;
+    $image->name= $upload->name;
     $image->save();
 
     return $image;
@@ -74,40 +59,20 @@ class Media
       'Body' => $file,
     ]);
 
-    $publitio= new \Publitio\API(
-      $this->config->get('publitio.key'),
-      $this->config->get('publitio.secret')
-    );
-
-    $url= sprintf('%s/file/%s/%s',
-                  $b2->getAuthorization()['downloadUrl'],
-                  $bucket,
-                  $b2_file->getName());
-
-    $res= $publitio->call('/files/create', 'POST', [
-      'file_url' => $url,
-      'public_id' => $uuid,
-      'title' => $name,
-      'privacy' => 1,
-      'option_ad' => 0,
-      'tags' => $GLOBALS['DEBUG'] ? 'debug' : '',
-    ]);
-
-    if (!$res->success) {
-      error_log(json_encode($res));
-      throw new \Exception($res->error->message ? $res->error->message :
-                           $res->message);
-    }
+    $url= 'https:' . GUMLET_BASE .
+           $uuid . '.' . $ext .
+           '?fm=json';
+    $body= file_get_contents($url);
+    $details= json_decode($body);
 
     // Save the details
     $image= $this->data->factory('Image')->create();
-    $image->uuid= $res->public_id;
+    $image->uuid= $uuid;
     $image->b2_file_id= $b2_file->getId();
-    $image->publitio_id= $res->id;
-    $image->width= $res->width;
-    $image->height= $res->height;
+    $image->width= $details->width;
+    $image->height= $details->height;
     $image->ext= $ext;
-    $image->name= $res->title;
+    $image->name= $name;
     $image->save();
 
     return $image;
