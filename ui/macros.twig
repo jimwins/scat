@@ -148,7 +148,6 @@
 
     document.getElementById('droptarget').style.display= 'none'
 
-    const url= '{{ dest }}'
     const formData= new FormData()
 
     let fileUrl= dt.getData('text/uri-list')
@@ -164,31 +163,7 @@
       return Promise.reject(new Error("No file dropped."))
     }
 
-    return scat.dialog('/dialog/file-upload.html', null, (modal) => {
-      return scat.post(url, formData)
-      .then((res) => {
-        // save for later resolution of modal
-        modal.resolution= res
-      })
-      .catch((res) => {
-        modal.rejection= res
-      })
-      .finally((res) => {
-        $(modal).modal('hide')
-      })
-    })
-    .then((res) => {
-      {% if reload %}
-        window.location.reload()
-      {% else %}
-        return res.json().then((data) => {
-          scat.alert('info', data.message)
-        })
-      {% endif %}
-    })
-    .catch((res) => {
-      scat.alert('danger', res.message)
-    })
+    scat.handleFileUpload('{{ dest }}', formData, true)
   })
 </script>
 {% endmacro %}

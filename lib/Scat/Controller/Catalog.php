@@ -699,10 +699,28 @@ class Catalog {
     if ($code && !$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    if ($request->getParam('grab')) {
+      // XXX hardcoded
+      $vi= $item->vendor_items()->where('vendor_id', 7)->find_one();
+      if ($vi) {
+        $search_url= 'https://app.salsify.com/catalogs/api/catalogs/b8653f65-460b-4194-b823-fc08f1913b15/products?filter=%3D&page=1&per_page=36&product_identifier_collection_id=&query=' . rawurlencode($vi->vendor_sku);
+
+        $results= json_decode(file_get_contents($search_url));
+
+        foreach ($results->products as $product) {
+          $product_url= 'https://app.salsify.com/catalogs/api/catalogs/b8653f65-460b-4194-b823-fc08f1913b15/products/' . $product->id;
+          $details= json_decode(file_get_contents($product_url));
+
+          $grabs= array_merge($grabs ?: [], $details->asset_properties);
+        }
+      }
+    }
+
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
       return $this->view->render($response, 'dialog/media.html', [
         'item' => $item,
+        'grabs' => $grabs,
         'media' => $item->media(),
       ]);
     }

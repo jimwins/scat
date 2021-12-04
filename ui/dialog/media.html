@@ -38,6 +38,24 @@
       </div>
     {% endfor %}
 
+    {% for grab in grabs %}
+      <div class="media" data-url="{{ grab.values[0].download_url }}">
+        <div class="media-left" style="min-width: 128px; min-height: 128px">
+          <img src="{{ grab.values[0].thumbnail_url }}">
+        </div>
+        <div class="media-body">
+          <h4 class="media-heading">{{ grab.name }}</h4>
+        </div>
+        <div class="media-right">
+          <button role="button" class="btn btn-sm btn-default btn-block"
+                  data-action="grab-media">
+            <i class="fa fa-fw fa-hand-grab-o"></i>
+            Grab
+          </button>
+        </div>
+      </div>
+    {% endfor %}
+
   </div>
 {% endblock %}
 
@@ -52,6 +70,15 @@
       .then((res) => {
         act.closest('[data-id]').remove();
       })
+  })
+
+  scat.handleActionOn(form, 'click', 'grab-media', (act) => {
+    let url= act.closest('[data-url]').getAttribute('data-url')
+
+    let formData= new FormData()
+    formData.append('url', url)
+
+    scat.handleFileUpload('/catalog/{{ product ? 'product/' ~ product.id : 'item/' ~ item.code }}/media', formData, true)
   })
 
   form.onsubmit= (event) => {

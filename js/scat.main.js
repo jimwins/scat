@@ -435,6 +435,34 @@ class ScatUtils {
         $(this).popover('destroy')
       })
   }
+
+  handleFileUpload (url, formData, reload) {
+    return scat.dialog('/dialog/file-upload.html', null, (modal) => {
+      return scat.post(url, formData)
+      .then((res) => {
+        // save for later resolution of modal
+        modal.resolution= res
+      })
+      .catch((res) => {
+        modal.rejection= res
+      })
+      .finally((res) => {
+        $(modal).modal('hide')
+      })
+    })
+    .then((res) => {
+      if (reload) {
+        window.location.reload()
+      } else {
+        return res.json().then((data) => {
+          scat.alert('info', data.message)
+        })
+      }
+    })
+    .catch((res) => {
+      scat.alert('danger', res.message)
+    })
+  }
 }
 
 let scat= new ScatUtils()

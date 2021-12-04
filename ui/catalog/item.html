@@ -506,6 +506,14 @@
   {% set media= item.media %}
   {% if media is not empty %}
     {{ include('carousel.twig', { images: media, edit: 'edit-media' }) }}
+  {% else %}
+    {% set vi= item.vendor_items.where('vendor_id', 7).find_many() %}
+    {% if vi %}
+      <button class="btn btn-default btn-block" data-action="grab-media">
+        <i class="fa fa-file-image-o fa-fw"></i>
+        Grab from Salsify
+      </button>
+    {% endif %}
   {% endif %}
 {% endblock %}
 
@@ -1082,6 +1090,10 @@
 
   scat.handleAction('click', 'edit-media', (act) => {
     return scat.dialog('/catalog/item/{{ item.code }}/media')
+  })
+
+  scat.handleAction('click', 'grab-media', (act) => {
+    return scat.dialog('/catalog/item/{{ item.code }}/media?grab=1')
   })
   </script>
 
