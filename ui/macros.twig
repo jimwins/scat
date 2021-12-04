@@ -164,11 +164,14 @@
       return Promise.reject(new Error("No file dropped."))
     }
 
-    scat.dialog('/dialog/file-upload.html', null, (modal) => {
+    return scat.dialog('/dialog/file-upload.html', null, (modal) => {
       return scat.post(url, formData)
       .then((res) => {
         // save for later resolution of modal
         modal.resolution= res
+      })
+      .catch((res) => {
+        modal.rejection= res
       })
       .finally((res) => {
         $(modal).modal('hide')
@@ -184,7 +187,7 @@
       {% endif %}
     })
     .catch((res) => {
-      alert("Sorry, there was a problem with the upload.")
+      scat.alert('danger', res.message)
     })
   })
 </script>

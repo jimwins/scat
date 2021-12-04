@@ -35,6 +35,7 @@ class ScatUtils {
       return new Promise((resolve, reject) => {
         let modal= this.htmlToElement(text)
         modal.resolution= null
+        modal.rejection= null
         document.body.insertAdjacentElement('beforeend', modal)
         $(modal).on('show.bs.modal', function(e) {
           // Re-inject the script to get it to execute
@@ -53,16 +54,17 @@ class ScatUtils {
         $(modal).on('hidden.bs.modal', function(e) {
           $(this.script).remove()
           $(this).remove()
-          resolve(modal.resolution)
+          if (modal.rejection) {
+            reject(modal.rejection)
+          } else {
+            resolve(modal.resolution)
+          }
         });
         $(modal).modal()
         if (action) {
           action(modal);
         }
       })
-    })
-    .catch((err) => {
-      scat.alert('danger', err.message)
     })
   }
 
