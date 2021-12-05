@@ -179,10 +179,23 @@
 
     </div><!-- .col-sm-6 -->
 
+
     <div class="col-sm-6">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h2 class="panel-title">Details</h2>
+          <div class="pull-right">
+            <button class="btn btn-xs btn-default"
+                    data-action="show-notes" data-kind="person"
+                    data-attach-id="{{ person.id }}">
+              <i class="fa fa-fw fa-sticky-note-o"></i>
+              <span class="label {{ person.xnotes.where('todo',1).count() ? 'label-danger' : 'label-default' }}">
+                {{- person.xnotes.count ?: '' -}}
+              </span>
+            </button>
+          </div>
+          <h2 class="panel-title">
+            Details
+          </h2>
         </div>
         <div class="panel-body form-horizontal">
 

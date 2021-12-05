@@ -641,4 +641,11 @@ class Person extends \Scat\Model {
     return $this->giftcard_id ? $this->belongs_to('Giftcard')->find_one() : null;
   }
 
+  public function xnotes() {
+    return
+      $this->has_many('Note', 'attach_id')
+        ->where('parent_id', 0)
+        ->where('kind', 'person');
+  }
+
 }

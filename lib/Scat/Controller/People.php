@@ -402,8 +402,17 @@ class People {
       throw new \Slim\Exception\HttpNotFoundException($request);
 
     error_log("Sending message to {$person->phone}");
-    $data= $phone->sendSMS($person->phone,
-                                 $request->getParam('content'));
+    $sent= $phone->sendSMS($person->phone, $request->getParam('content'));
+
+    /* Save this as a note. */
+    $note= $data->factory('Note')->create();
+    $note->source= 'sms';
+    $note->kind= 'person';
+    $note->attach_id= $person->id;
+    $note->content= $request->getParam('content');
+    $note->todo= 0;
+    $note->public= 1;
+    $note->save();
 
     return $response;
   }

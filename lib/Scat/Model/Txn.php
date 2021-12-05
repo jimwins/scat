@@ -49,7 +49,10 @@ class Txn extends \Scat\Model {
   }
 
   public function notes() {
-    return $this->has_many('Note', 'attach_id');
+    return
+      $this->has_many('Note', 'attach_id')
+        ->where('parent_id', 0)
+        ->where('kind', 'txn');
   }
 
   public function createNote() {
