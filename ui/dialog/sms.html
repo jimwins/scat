@@ -1,0 +1,50 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Send SMS
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    <label for="content">Message</label>
+    <div class="label label-default" id="content-length">0 / 139</div>
+    <textarea name="content" id="content"
+              rows="4"
+              class="form-control"></textarea>
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-default">
+    Send
+  </button>
+{% endblock %}
+
+{% block script %}
+  let text= document.getElementById('content')
+  let label= document.getElementById('content-length')
+
+  text.addEventListener('keyup', (ev) => {
+    // Want the length in bytes
+    let len= (new TextEncoder().encode(text.value)).length
+    if (len > 140) {
+      label.classList.add('label-danger')
+    } else {
+      label.classList.remove('label-danger')
+    }
+    label.textContent= len + ' / 140'
+  })
+
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    return scat.post("/person/{{ person.id }}/sms", formData)
+          .then((res) => {
+            scat.alert('info', 'Message sent.')
+            $(dialog).modal('hide')
+          })
+  }
+{% endblock %}

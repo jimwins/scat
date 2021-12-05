@@ -100,12 +100,18 @@
             <label for="phone" class="col-sm-2 control-label">
               Phone
             </label>
-            <div class="col-sm-10">
+            <div class="col-sm-7">
               <p class="form-control-static editable"
                  data-pk="{{ person.id }}"
                  data-name="phone" data-value="{{ person.phone }}">
                 {{ person.pretty_phone }}
               </p>
+            </div>
+            <div class="col-sm-3">
+              <button class="btn btn-xs btn-default" data-action="send-sms">
+                <i class="fa fa-mobile fa-fw"></i>
+                Send SMS
+              </button>
             </div>
           </div>
 
@@ -502,6 +508,9 @@
       if (toggle) handleToggle(toggle)
     })
 
+    scat.handleAction('click', 'send-sms', (act) => {
+      return scat.dialog("/person/{{ person.id }}/sms")
+    })
   </script>
 
   {{ scat.file_upload('/person/' ~ person.id ~ '/items', false) }}

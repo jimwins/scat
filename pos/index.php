@@ -397,6 +397,11 @@ $app->group('/person', function (RouteCollectorProxy $app) {
   $app->post('/{id:[0-9]+}/~merge',
               [ \Scat\Controller\People::class, 'mergePerson' ]);
 
+  $app->get('/{id:[0-9]+}/sms',
+            [ \Scat\Controller\People::class, 'startSms' ]);
+  $app->post('/{id:[0-9]+}/sms',
+            [ \Scat\Controller\People::class, 'sendSms' ]);
+
   $app->get('/{id:[0-9]+}/tax-exemption',
             [ \Scat\Controller\People::class, 'getTaxExemption' ]);
   $app->post('/{id:[0-9]+}/tax-exemption',

@@ -377,6 +377,37 @@ class People {
     return $response->withHeader("Content-type", "text/csv");
   }
 
+  public function startSms(Request $request, Response $response, $id,
+                            View $view, \Scat\Service\Data $data)
+  {
+    $person= $data->factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $view->render($response, 'dialog/sms.html', [
+        'person' => $person,
+      ]);
+    }
+
+    throw new \Exception("This has to be a dialog.");
+  }
+
+  public function sendSms(Request $request, Response $response, $id,
+                          \Scat\Service\Data $data, \Scat\Service\Phone $phone)
+  {
+    $person= $data->factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    error_log("Sending message to {$person->phone}");
+    $data= $phone->sendSMS($person->phone,
+                                 $request->getParam('content'));
+
+    return $response;
+  }
+
   public function getTaxExemption(Request $request, Response $response, $id,
                                   \Scat\Service\Data $data,
                                   \Scat\Service\Tax $tax,
