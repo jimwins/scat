@@ -153,7 +153,7 @@ $('body').on('submit', '.price-change-form', function(ev) {
   .then((res) => res.json())
   .then((data) => {
     if ($('input[name="print"]:checked', form).length) {
-      Scat.printDirect('labels-price', { id: formData.get('id') });
+      Scat.printDirect('labels-price', { id: data.id });
     }
     $(form).parent().parent()
            .siblings('.price-change')
