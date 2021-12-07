@@ -296,22 +296,34 @@ class Person extends \Scat\Model {
         throw new \Exception("Unable to delete assortments from SLS data");
 
     } elseif (preg_match('/^ColArt/', $line, $m)) {
+      $sep= preg_match("/\t/", $line) ? "\t" : ",";
       // ColArt
-#,Order,Product Code,Description,Health Label,Series,Bar Code,MOQ,Inner Pack,Case Pack,Trade Discount,,Promo Discount,2020 MSRP,Net,Extended Net,USA MAP Pricing,Country of Origin,Harmonized Tariff Codes,Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),,,,,,,,,,,,,,
+#,Order,Brand,Category,Range,Size/Format,Product Code,Description,Health Label,Series,Bar Code,MOQ,Inner Pack,Case Pack,Trade Discount,,Promo Discount,2020 MSRP,Net,Extended Net,USA MAP Pricing,Country of Origin,Harmonized Tariff Codes,Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),,,,,,,,,,,,,,
       error_log("Importing '$fn' as ColArt price list\n");
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
                 INTO TABLE vendor_upload
-              FIELDS TERMINATED BY ','
+              FIELDS TERMINATED BY '$sep'
               OPTIONALLY ENCLOSED BY '\"'
                LINES TERMINATED BY '\r\n'
               IGNORE 1 LINES
-              (@a, @order, vendor_sku, name, @health_label, @series,
-               barcode, purchase_quantity,
-               @inner_pack, @case_pack, @trade_discount, @a, @promo_discount,
+              (@a, @order, @brand, @category, @range, @size,
+               vendor_sku, name, @notes, @health_label, @series,
+               barcode, @inner_pack_upc, @case_pack_upc,
+               purchase_quantity, @inner_pack, @case_pack,
+               @trade_discount, @promo_discount,
                retail_price, net_price, @extended_net, @map_price,
                @country_of_origin,
                @tariff, height, width, length, @cubic, weight)
-              SET code = CONCAT('COL-', vendor_sku),
+              SET code = CONCAT(CASE @brand
+                                WHEN 'WINSOR & NEWTON' THEN 'WN'
+                                WHEN 'CONTE A PARIS' THEN 'CO'
+                                WHEN 'LIQUITEX' THEN 'LQ'
+                                WHEN 'LEFRANC & BOURGEOIS' THEN 'LB'
+                                WHEN 'SCULPTURE BLOCK' THEN 'SL'
+                                WHEN 'SNAZAROO' THEN 'SN'
+                                WHEN 'VIVIVA' THEN 'VV'
+                                WHEN 'WINSOR & NEWTON' THEN 'WN'
+                                ELSE 'COL-' END, vendor_sku),
                   weight = weight / 16,
                   prop65 = IF(@health_label = '65', 1, 0)
               ";
@@ -324,15 +336,6 @@ class Person extends \Scat\Model {
 
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load ColArt data file");
-
-      /* ColArt files are just a chunk of the updates, by prefix */
-      $action= 'special';
-      $q= "UPDATE vendor_item
-              SET active = 0
-            WHERE vendor_id = {$this->id}
-              AND code LIKE '$prefix%'";
-      if (!$this->orm->raw_execute($q))
-        throw new \Exception("Unable to deactive old items");
 
     } elseif (preg_match('/^colart-promo/', $line, $m)) {
       // ColArt Update
