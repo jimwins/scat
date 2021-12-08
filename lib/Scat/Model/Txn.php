@@ -348,7 +348,7 @@ class Txn extends \Scat\Model {
         $line->vendor_sku(),
         $line->code(),
         $line->name(),
-        $line->item()->barcode(),
+        $line->vendor_item()->barcode,
         $line->retail_price,
         $line->ordered,
         (new \Decimal\Decimal($line->retail_price)) * $line->ordered,

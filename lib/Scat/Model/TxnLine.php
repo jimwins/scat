@@ -58,7 +58,7 @@ class TxnLine extends \Scat\Model {
     return (string)$price->round(2);
   }
 
-  public function vendor_sku() {
+  public function vendor_item() {
     $vendor_id= $this->txn()->person_id;
     if (!$vendor_id) return '';
     $vendor_items= $this->has_many('VendorItem', 'item_id', 'item_id')
@@ -66,17 +66,22 @@ class TxnLine extends \Scat\Model {
                         ->order_by_asc('purchase_quantity')
                         ->find_many();
     if (!$vendor_items) return '';
-    $sku= '';
+    $vendor_item= '';
     foreach ($vendor_items as $item) {
       if ($item->purchase_quantity <= abs($this->ordered)) {
-        $sku= $item->vendor_sku;
+        $vendor_item= $item;
       }
     }
     /* Just use the first one if the quantity < all of the purchase_quantity */
-    if (!$sku) {
-      $sku= $vendor_items[0]->vendor_sku;
+    if (!$vendor_item) {
+      $vendor_item= $vendor_items[0];
     }
-    return $sku;
+    return $vendor_item;
+  }
+
+  public function vendor_sku() {
+    $vendor_item= $this->vendor_item();
+    return $vendor_item ? $vendor_item->vendor_sku : '';
   }
 
   public function cost_of_goods() {

@@ -56,11 +56,16 @@ class Item extends \Scat\Model {
     return $this->has_many('VendorItem')->where_gte('active', $active);
   }
 
-  public function vendor_sku($person_id) {
+  public function vendor_item($person_id) {
     $item= $this->has_many('VendorItem')
                 ->where_gte('active', $active)
                 ->where('vendor_id', $person_id)
                 ->find_one();
+    return $item;
+  }
+
+  public function vendor_sku($person_id) {
+    $item= $this->vendor_item($person_id);
     return $item ? $item->vendor_sku : null;
   }
 
