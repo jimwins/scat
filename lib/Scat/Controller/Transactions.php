@@ -1307,6 +1307,16 @@ class Transactions {
           $txn->formatted_number() . '.pdf',
         'attachment'
       ];
+      if ($txn->type == 'vendor') {
+        $tsv= $txn->getInvoiceTsv();
+        $attachments[]= [
+          base64_encode($tsv),
+          'text/tab-separated-values',
+          (($txn->type == 'vendor') ? 'PO' : 'I') .
+            $txn->formatted_number() . '.tsv',
+          'attachment'
+        ];
+      }
     }
 
     $res= $email->send([ $to_email => $to_name ],

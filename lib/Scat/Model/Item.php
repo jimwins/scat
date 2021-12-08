@@ -15,6 +15,38 @@ class Item extends \Scat\Model {
     return $this->has_many('Barcode');
   }
 
+  public function barcode() {
+    $barcodes= $this->barcodes()->find_many();
+    if (!$barcodes) {
+      return $this->fake_barcode();
+    }
+
+    foreach ($barcodes as $barcode) {
+      if ($barcode->quantity == 1) {
+        return $barcode->code;
+      }
+    }
+
+    return $barcodes[0]->code;
+  }
+
+  private function generate_upc($code) {
+    assert(strlen($code) == 11);
+    $check= 0;
+    foreach (range(0,10) as $digit) {
+      $check+= $code[$digit] * (($digit % 2) ? 1 : 3);
+    }
+
+    $cd= 10 - ($check % 10);
+    if ($cd == 10) $cd= 0;
+
+    return $code.$cd;
+  }
+
+  public function fake_barcode() {
+    return $this->generate_upc(sprintf("4004%07d", $this->id));
+  }
+
   public function in_kits() {
     return $this->has_many_through('Item', 'KitItem', null, 'kit_id', null, 'id')
       ->find_many();

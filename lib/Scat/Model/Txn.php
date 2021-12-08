@@ -332,6 +332,32 @@ class Txn extends \Scat\Model {
     return $mpdf;
   }
 
+  public function getInvoiceTsv() {
+    $lines[]= join("\t", [
+      'SKU',
+      'Code',
+      'Name',
+      'UPC',
+      'Net',
+      'Quantity',
+      'Ext',
+    ]);
+
+    foreach ($this->items()->find_many() as $line) {
+      $lines[]= join("\t", [
+        $line->vendor_sku(),
+        $line->code(),
+        $line->name(),
+        $line->item()->barcode(),
+        $line->retail_price,
+        $line->ordered,
+        (new \Decimal\Decimal($line->retail_price)) * $line->ordered,
+      ]);
+    }
+
+    return join("\r\n", $lines);
+  }
+
   public function shipping() {
     return $this->items()->where('tic', '11000')->sum('retail_price');
   }
