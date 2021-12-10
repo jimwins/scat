@@ -2032,7 +2032,7 @@ class Transactions {
       $line->save();
     }
 
-    $purchase->status= 'filled';
+    $purchase->status= 'complete';
     $purchase->save();
 
     $this->data->commit();
