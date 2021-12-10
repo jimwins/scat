@@ -429,7 +429,7 @@
           {% endif %}
         {% endif %}
 
-        {% if person.exemption_certificate_id %}
+        {% if person.exemption_certificate_id and not txn.paid %}
           <br><br>
           {% if txn.tax_rate > 0 %}
             <button class="btn btn-primary btn-block"
