@@ -3,9 +3,11 @@
 {% if type == 'vendor' %}
   {% set variations= {
       'new': 'New',
+      'processing': 'Processing',
       'waitingforitems': 'Waiting for Items',
-      'filled': 'Filled',
-      'template': 'Template'
+      'shipping': 'Shipping',
+      'shipped': 'Shipped',
+      'complete': 'Complete',
    } %}
 {% else %}
   {% set variations= {
