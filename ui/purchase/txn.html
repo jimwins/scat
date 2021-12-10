@@ -267,9 +267,28 @@
         </ul>
       {% endif %}
 
-      {% if txn.status in ['new', 'waitingforitems' ] %}
+      <hr style="border-color: rgba(0,0,0,0.1)">
+
+      {% if txn.status in ['new'] %}
+        <button class="btn btn-primary btn-block"
+                data-action="email-invoice"
+                data-new-status="processing">
+          <i class="fa fa-fw fa-envelope-o"></i> Email Purchase Order
+        </button>
+      {% endif %}
+
+      {% if txn.status in ['new','processing','waitingforitems'] %}
+        <button class="btn btn-primary btn-block"
+                data-action="add-tracker">
+          <i class="fa fa-fw fa-truck"></i>
+          Add Tracker
+        </button>
+      {% endif %}
+
+      {% if txn.status in ['new','processing','waitingforitems','shipping','shipped' ] %}
         <button class="btn btn-primary btn-block"
                 data-action="mark-all-received">
+          <i class="fa fa-fw fa-check-circle-o"></i>
           Mark All Received
         </button>
       {% endif %}
@@ -535,7 +554,13 @@
     })
 
     scat.handleAction('click', 'email-invoice', (act) => {
-      return scat.dialog('/sale/{{ txn.id }}/email-invoice-form?full_invoice=1')
+      return scat.dialog('/sale/{{ txn.id }}/email-invoice-form?full_invoice=1').then(() => {
+        let status= act.closest('[data-new-status]').getAttribute('data-new-status')
+        return scat.patch("/sale/{{ txn.id}}", { status: status })
+          .then((res) => {
+            scat.reload('sidebar')
+          })
+      })
     })
 
     scat.handleAction('click', 'edit-shipping-address', (act) => {
@@ -555,7 +580,7 @@
     scat.handleAction('click', 'add-tracker', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/shipment?tracker=1')
         .then((res) => {
-          {% if txn.status in [ 'new', 'processing' ] %}
+          {% if txn.status in [ 'new', 'processing', 'waitingforitems' ] %}
             return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })
               .then((res) => {
                 scat.reload('sidebar')
