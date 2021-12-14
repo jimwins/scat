@@ -1117,4 +1117,51 @@ class Catalog {
 
     return $response->withHeader("Content-type", "text/csv");
   }
+
+  public function itemCostFeed(Request $request, Response $response,
+                                \Scat\Service\Config $config)
+  {
+    $store_code= $config->get('google.store_code') ?: 'dummy';
+
+    $items= $this->catalog->getItems()
+      ->select('*')
+      ->select_expr('COUNT(*) OVER (PARTITION BY product_id)', 'siblings')
+      ->where_gt('product_id', 0)
+      ->find_many();
+
+    $fields= [
+      'id', 'cost',
+    ];
+
+    //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
+    $output= fopen("php://memory", 'r+');
+    fputcsv($output, $fields);
+
+    foreach ($items as $item) {
+      // only include items for which we have an image
+      if ($item->siblings > 1) {
+        $media= $item->media();
+        if (!$media) {
+          continue;
+        }
+      } else {
+        $media= $item->product()->media();
+      }
+
+      $cost= $item->best_cost() ?: $item->most_recent_cost();
+
+      if (!$cost) continue;
+
+      $record= [
+        $item->code,
+        $cost
+      ];
+
+      fputcsv($output, $record);
+    }
+
+    $response= $response->withBody(\GuzzleHttp\Psr7\stream_for($output));
+
+    return $response->withHeader("Content-type", "text/csv");
+  }
 }
