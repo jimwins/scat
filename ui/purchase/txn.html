@@ -255,10 +255,11 @@
           </li>
          </ul>
         </div>
-        <button class="btn btn-lg btn-default" data-action="export">
+        <a class="btn btn-lg btn-default"
+            href="/export/txn.php?dl=1&id={{ txn.id }}">
           <i class="fa fa-fw fa-download"></i>
           Export
-        </button>
+        </a>
       </div>
 
       {% if txn.returned_from_id %}
@@ -720,10 +721,6 @@
         placement: 'auto right',
       })
       return Promise.resolve()
-    })
-
-    scat.handleAction('click', 'export', (act) => {
-      window.location.href= '/export/txn.php?dl=1&id={{ txn.id }}'
     })
 
     /* Bind some global keys */
