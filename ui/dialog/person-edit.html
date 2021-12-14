@@ -97,9 +97,8 @@
       dialog.resolution= res
       $(dialog).modal('hide')
     })
+    .catch((err) => {
+      scat.alert('danger', err.message)
+    })
   }
-
-  document.getElementById('verify-tax-id').addEventListener('click', (ev) => {
-    alert("Not yet.")
-  })
 {% endblock %}

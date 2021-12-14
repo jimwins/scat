@@ -283,7 +283,7 @@ class People {
         $person->save();
       } catch (\PDOException $e) {
         if ($e->getCode() == '23000') {
-          throw new \Scat\Exception\HttpConflictException($request);
+          throw new \Scat\Exception\HttpConflictException($request, "Unable to save, phone number is already registered to another user.");
         } else {
           throw $e;
         }
