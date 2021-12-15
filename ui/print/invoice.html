@@ -201,9 +201,7 @@
 
 <div id="store_footer">
   {% if txn.type != 'vendor' %}
-    Items purchased from stock may be returned in original condition and
-    packaging within 30 days with receipt. All easels are subject to a 50%
-    restocking fee. No returns without original receipt.
+    {{ include('print/return-policy.html') }}
   {% endif %}
 </div>
 
