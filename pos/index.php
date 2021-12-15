@@ -180,6 +180,8 @@ $app->group('/purchase', function (RouteCollectorProxy $app) {
               [ \Scat\Controller\Transactions::class, 'addToPurchase' ]);
   $app->post('/{id}/~mark-all-received',
               [ \Scat\Controller\Transactions::class, 'markAllReceived' ]);
+  $app->post('/{id}/~clear-all',
+              [ \Scat\Controller\Transactions::class, 'clearAll' ]);
 });
 
 /* Corrections */

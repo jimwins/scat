@@ -2037,7 +2037,22 @@ class Transactions {
 
     $this->data->commit();
 
-    return $response->withJson($txn);
+    return $response->withJson($purchase);
+  }
+
+  public function clearAll(Request $request, Response $response, $id) {
+    $purchase= $this->txn->fetchById($id);
+    if (!$purchase) {
+      throw new \Exception("Unable to find transaction.");
+    }
+
+    if ($purchase->status != 'new') {
+      throw new \Exception("Purchase must be in 'new' status to clear.");
+    }
+
+    $purchase->clearItems();
+
+    return $response->withJson($purchase);
   }
 
   public function corrections(Request $request, Response $response) {

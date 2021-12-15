@@ -275,6 +275,13 @@
       <hr style="border-color: rgba(0,0,0,0.1)">
 
       {% if txn.status in ['new'] %}
+        <button class="btn btn-danger btn-block"
+                data-action="clear-items">
+          <i class="fa fa-fw fa-trash-o"></i> Clear Items
+        </button>
+      {% endif %}
+
+      {% if txn.status in ['new'] %}
         <button class="btn btn-primary btn-block"
                 data-action="email-invoice"
                 data-new-status="processing">
@@ -604,6 +611,15 @@
         })
     })
 
+    scat.handleAction('click', 'clear-items', (act) => {
+      if (window.confirm("Are you sure you want to delete all items?")) {
+        return scat.post('/purchase/{{ txn.id }}/~clear-all').then(() => {
+          scat.reload('invoice', 'sidebar')
+        })
+      }
+      return Promise.resolve()
+    })
+
     scat.handleAction('click', 'mark-all-received', (act) => {
       return scat.post('/purchase/{{ txn.id }}/~mark-all-received').then(() => {
         scat.reload('invoice', 'sidebar')
@@ -730,6 +746,8 @@
     })
 
   </script>
+
+  {{ scat.file_upload('/sale/' ~ txn.id ~ '/item') }}
 
   <template id="item-not-found">
     <div class="alert alert-danger alert-dismissable" role="alert">
