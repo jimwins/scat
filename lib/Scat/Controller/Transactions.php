@@ -628,11 +628,16 @@ class Transactions {
              FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
              IGNORE 1 LINES
              (line, status, item_no, sku, cust_item, description, ordered,
-              shipped, backordered, msrp, discount, net, unit, ext, barcode,
-              account_no, po_no, order_no, bo_no, invoice_no, box_no)";
+              @shipped, backordered, msrp, discount, net, unit, ext, barcode,
+              account_no, po_no, order_no, bo_no, invoice_no, box_no)
+             SET
+                shipped = 0,
+                ordered = IF(@shipped > 0, @shipped, ordered),
+                backordered = IF(@shipped > 0, @shipped + backordered, backordered)
+             ";
         $this->data->execute($q);
 
-        /* Fix quantities on backorders */
+        /* Fix quantities on full backorder */
         $q= "SELECT SUM(shipped + backordered) AS ordered
                FROM vendor_order
               WHERE IFNULL(unit,'') != 'AS'";
