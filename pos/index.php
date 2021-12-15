@@ -176,6 +176,8 @@ $app->group('/purchase', function (RouteCollectorProxy $app) {
   $app->post('', [ \Scat\Controller\Transactions::class, 'createPurchase' ]);
   $app->get('/{id}', [ \Scat\Controller\Transactions::class, 'purchase' ])
       ->setName('purchase');
+  $app->delete('/{id:[0-9]+}',
+              [ \Scat\Controller\Transactions::class, 'deleteSale' ]);
   $app->post('/{id}',
               [ \Scat\Controller\Transactions::class, 'addToPurchase' ]);
   $app->post('/{id}/~mark-all-received',

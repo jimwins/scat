@@ -255,11 +255,17 @@
           </li>
          </ul>
         </div>
-        <a class="btn btn-lg btn-default"
-            href="/export/txn.php?dl=1&id={{ txn.id }}">
-          <i class="fa fa-fw fa-download"></i>
-          Export
-        </a>
+          {% if txn.items.count %}
+            <a class="btn btn-lg btn-default"
+                href="/export/txn.php?dl=1&id={{ txn.id }}">
+              <i class="fa fa-fw fa-download"></i>
+              Export
+            </a>
+          {% else %}
+            <button data-action="delete-purchase" class="btn btn-lg btn-default">
+              Delete
+            </button>
+          {% endif %}
       </div>
 
       {% if txn.returned_from_id %}
@@ -737,6 +743,14 @@
         placement: 'auto right',
       })
       return Promise.resolve()
+    })
+
+    scat.handleAction('click', 'delete-purchase', (act) => {
+      return scat.delete('/purchase/{{ txn.id }}')
+        .then((res) => {
+          window.location.href= '/purchase'
+          return
+        })
     })
 
     /* Bind some global keys */
