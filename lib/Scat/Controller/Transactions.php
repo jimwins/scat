@@ -486,6 +486,8 @@ class Transactions {
         $temporary= "";
       }
 
+      error_log("Loading order data from '$fn'\n");
+
       $q= "CREATE $temporary TABLE vendor_order (
              line int,
              status varchar(255),
@@ -515,6 +517,7 @@ class Transactions {
 
       // SLS order?
       if (preg_match('/^"?linenum"?[,\t]"?qty/', $line)) {
+        error_log("Loading SLS text data\n");
         // linenum,qty_shipped,sls_sku,cust_item_numb,description,upc,msrp,net_cost,pkg_id,extended_cost
         $sep= preg_match("/,/", $line) ? "," : "\t";
         $q= "LOAD DATA LOCAL INFILE '$tmpfn'
@@ -529,7 +532,8 @@ class Transactions {
         $this->data->execute($q);
 
       // SLS order (XLS)
-      } elseif (preg_match('/K.*\\.xls/i', $_FILES['src']['name'])) {
+      } elseif (preg_match('/K.*\\.xls/i', $fn)) {
+        error_log("Loading SLS Excel data\n");
         $reader= new \PhpOffice\PhpSpreadsheet\Reader\Xls();
         $reader->setReadDataOnly(true);
 
@@ -554,6 +558,7 @@ class Transactions {
         $this->data->execute($q);
 
       } elseif (preg_match('/^Vendor Name	Assortment Item Number/', $line)) {
+        error_log("Loading Mac assortment data\n");
         // MacPherson assortment
         $q= "LOAD DATA LOCAL INFILE '$tmpfn'
              INTO TABLE vendor_order
@@ -569,6 +574,7 @@ class Transactions {
         $this->data->execute($q);
 
       } elseif (preg_match('/^"?sls_sku.*asst_qty/', $line)) {
+        error_log("Loading SLS assortment data\n");
         // SLS assortment
         # sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date,asst_qty,
         $sep= preg_match("/,/", $line) ? "," : "\t";
@@ -587,6 +593,7 @@ class Transactions {
         $this->data->execute($q);
 
       } elseif (preg_match('/^,Name,MSRP/', $line)) {
+        error_log("Loading CSV data\n");
         // CSV
         $q= "LOAD DATA LOCAL INFILE '$tmpfn'
              INTO TABLE vendor_order
@@ -598,7 +605,7 @@ class Transactions {
         $this->data->execute($q);
 
       } elseif (preg_match('/^code\tqty/', $line)) {
-        // Order file
+        error_log("Loading order file\n");
         $q= "LOAD DATA LOCAL INFILE '$tmpfn'
              INTO TABLE vendor_order
              FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\"'
@@ -608,7 +615,7 @@ class Transactions {
         $this->data->execute($q);
 
       } elseif (($json= json_decode(file_get_contents($tmpfn)))) {
-        // JSON
+        error_log("Loading JSON order\n");
         foreach ($json->items as $item) {
           $q= "INSERT INTO vendor_order
                   SET item_no = '" . $this->data->escape($item->code) . "',
@@ -621,6 +628,7 @@ class Transactions {
         }
 
       } else {
+        error_log("Loading Mac text data\n");
         // MacPherson's order
         $q= "LOAD DATA LOCAL INFILE '$tmpfn'
              INTO TABLE vendor_order
@@ -648,8 +656,6 @@ class Transactions {
           $this->data->execute("UPDATE vendor_order SET backordered = ordered");
         }
       }
-
-      $this->data->beginTransaction();
 
       // Identify vendor items by SKU
       $q= "UPDATE vendor_order, vendor_item
@@ -709,6 +715,9 @@ class Transactions {
           throw new \Exception("Not all items available for order!");
         }
       }
+
+      /* Start a transaction now that we're working with live data */
+      $this->data->beginTransaction();
 
       // Make sure we have all the items
       $q= "INSERT IGNORE INTO item (code, brand_id, name, retail_price, active)
