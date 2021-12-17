@@ -32,7 +32,9 @@ class Txn extends \Scat\Model {
 
   public function allow_item_changes() {
     if ($this->type == 'vendor') {
-      $allowed= [ 'new', 'waitingforitems' ];
+      $allowed= [
+        'new', 'processing', 'waitingforitems', 'shipping', 'shipped'
+      ];
     } else {
       $allowed= [ 'new', 'filled', 'template' ];
     }
