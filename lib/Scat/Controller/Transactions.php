@@ -44,7 +44,7 @@ class Transactions {
   public function search(Request $request, Response $response, $type) {
     $q= trim($request->getParam('q'));
 
-    if (preg_match('/^((%V|@)INV-)?(\d+)/i', $q, $m)) {
+    if (preg_match('/^((%V|@)INV-)(\d+)/i', $q, $m)) {
       $txn= $this->txn->fetchById($m[3]);
       if ($txn) {
         return $response->withRedirect(
