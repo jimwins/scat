@@ -583,6 +583,12 @@ class Catalog {
     if (!$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $code= trim($request->getParam('barcode'));
+
+    if (preg_match('/^(000000|400400)/', $code)) {
+      throw new \Exception("Invalid barcode.");
+    }
+
     $barcode= $item->barcodes()->create();
     $barcode->item_id= $item->id;
     $barcode->code= trim($request->getParam('barcode'));

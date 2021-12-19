@@ -29,7 +29,7 @@ if ($GLOBALS['DEBUG'] || ($options & FIND_NEW_METHOD)) {
     $term= $db->real_escape_string($term);
     if (preg_match('/^code:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.code LIKE '{$dbt[1]}%')";
-    } elseif (preg_match('/^400400(\d+)\d$/i', $term, $dbt)) {
+    } elseif (preg_match('/^(400400|000000)(\d+)\d$/i', $term, $dbt)) {
       $andor[]= "(item.id = '{$dbt[1]}')";
     } elseif (preg_match('/^item:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.id = '{$dbt[1]}')";
@@ -199,7 +199,7 @@ function item_find($db, $q, $options) {
       $item['barcode_list'][]= array('code' => $code, 'quantity' => $quantity);
     }
 
-    $item['fake_barcode']= generate_upc(sprintf("4004%07d", $item['id']));
+    $item['fake_barcode']= generate_upc(sprintf("000000%05d", $item['id']));
 
     $items[]= $item;
   }

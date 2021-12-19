@@ -146,7 +146,7 @@ function txn_load_items($db, $id) {
     $row['quantity']= (int)$row['quantity'];
     $row['stock']= (int)$row['stock'];
 
-    $row['fake_barcode']= generate_upc(sprintf("4004%07d", $row['item_id']));
+    $row['fake_barcode']= generate_upc(sprintf("000000%05d", $row['item_id']));
 
     if ($row['data']) {
       $row['data']= json_decode($row['data']);

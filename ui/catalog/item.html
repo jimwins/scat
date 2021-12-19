@@ -947,9 +947,12 @@
       let barcode= window.prompt("What's the new barcode?", "")
       if (!barcode) { return }
 
-      scat.call('/catalog/item/{{ item.code }}/barcode', { barcode: barcode })
+      return scat.call('/catalog/item/{{ item.code }}/barcode', { barcode: barcode })
       .then((res) => {
         reloadBlock(document.getElementById('barcodes'), '')
+      })
+      .catch((err) => {
+        scat.alert('danger', err.message)
       })
     })
 

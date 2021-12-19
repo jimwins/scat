@@ -44,7 +44,7 @@ class Item extends \Scat\Model {
   }
 
   public function fake_barcode() {
-    return $this->generate_upc(sprintf("4004%07d", $this->id));
+    return $this->generate_upc(sprintf("000000%05d", $this->id));
   }
 
   public function in_kits() {

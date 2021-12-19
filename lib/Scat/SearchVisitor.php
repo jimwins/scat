@@ -31,7 +31,7 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
       $term= addslashes($word->getWord());
 
       /* Special case: generated UPC codes */
-      if (preg_match('/^400400(\d+)\d$/i', $term, $dbt)) {
+      if (preg_match('/^(400400|000000)(\d+)\d$/i', $term, $dbt)) {
         $this->current[]= "(item.id = '{$dbt[1]}')";
         return;
       }
