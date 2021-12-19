@@ -586,7 +586,7 @@ class Catalog {
     $code= trim($request->getParam('barcode'));
 
     if (preg_match('/^(000000|400400)/', $code)) {
-      throw new \Exception("Invalid barcode.");
+      throw new \Exception("That barcode is for internal use only.");
     }
 
     $barcode= $item->barcodes()->create();
