@@ -30,7 +30,7 @@ if ($GLOBALS['DEBUG'] || ($options & FIND_NEW_METHOD)) {
     if (preg_match('/^code:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.code LIKE '{$dbt[1]}%')";
     } elseif (preg_match('/^(400400|000000)(\d+)\d$/i', $term, $dbt)) {
-      $andor[]= "(item.id = '{$dbt[1]}')";
+      $andor[]= "(item.id = '{$dbt[2]}')";
     } elseif (preg_match('/^item:(.+)/i', $term, $dbt)) {
       $andor[]= "(item.id = '{$dbt[1]}')";
     } elseif (preg_match('/^barcode:(.+)/i', $term, $dbt)) {
