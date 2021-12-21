@@ -430,6 +430,16 @@ class Item extends \Scat\Model {
     return $rate . "small";
   }
 
+  public function variations() {
+    return $this->factory('Item')
+      ->where('product_id', $this->product_id)
+      ->where('short_name', $this->short_name)
+      ->where_not_equal('variation', $this->variation)
+      ->where('active', 1)
+      ->order_by_asc('code')
+      ->find_many();
+  }
+
 }
 
 class Barcode extends \Scat\Model {

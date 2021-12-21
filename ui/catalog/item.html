@@ -271,6 +271,50 @@
       </div>
     {% endif %}
 
+    {% if item.variation != '' %}
+      {% set variations= item.variations() %}
+      {% if variations|length %}
+        <div class="col-sm-6">
+          <!-- Variations -->
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Variations</h3>
+            </div>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Variation</th>
+                  <th>Quantity</th>
+                  <th>Sale Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in variations %}
+                  <tr class="{{ i.minimum_quantity == 0 ? 'text-muted' }}">
+                    <td>
+                      <a href="{{ url_for('catalog-item', { 'code' : i.code }) }}">
+                        {{- i.code -}}
+                      </a>
+                    </td>
+                    <td>
+                      {{ i.variation }}
+                    </td>
+                    <td>
+                      {{ i.stock }}
+                    </td>
+                    <td>
+                      {{ scat.amount(i.sale_price) }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+
   </div><!-- .row -->
 
   {% block kit %}
