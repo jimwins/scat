@@ -94,6 +94,13 @@ class Transactions {
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    if ($txn->type == 'vendor') {
+      return $response->withRedirect('/purchase/' . $txn->id);
+    }
+    if ($txn->type == 'correction') {
+      return $response->withRedirect('/correction/' . $txn->id);
+    }
+
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
       return $response->withJson($txn);
