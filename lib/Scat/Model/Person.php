@@ -264,7 +264,8 @@ class Person extends \Scat\Model {
 
     } elseif (preg_match('/^"?sls_sku"?(,|\t)/', $line, $m)) {
       // SLS
-#sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date,ormd,prop65,no_calif,no_canada,
+#sls_sku,cust_sku,description,vendor_name,msrp,reg_price,reg_discount,promo_price,promo_discount,upc1,upc2,upc2_qty,upc3,upc3_qty,min_ord_qty,level1,level2,level3,level4,level5,ltl_only,add_date,ormd,prop65,no_calif,no_canada,stand_map,st_map_sel,promo_map,pr_map_sel,country,qoh_no,qoh_vegas
+
       error_log("Importing '$fn' as SLS price list\n");
 
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
@@ -280,6 +281,7 @@ class Person extends \Scat\Model {
                @level1, @level2, @level3, @level4, @level5,
                @ltl_only, @add_date, @ormd, @prop65)
             SET vendor_sku = code,
+                barcode = IF(barcode != '', barcode, @upc2),
                 prop65 = IF(@prop65 = 'Y', 1, NULL),
                 hazmat = IF(@ormd = 'Y', 1, NULL),
                 oversized = IF(@ltl_only = 'Y', 1, NULL),
