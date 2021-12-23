@@ -774,8 +774,9 @@
         .then ((text) => {
           let html= scat.htmlToElement(text)
           // force panels open
-          if (html.classList.contains('collapse'))
-            html.classList.add('in')
+          let panel= html.querySelector('.panel-collapse')
+          if (panel)
+            panel.classList.add('in')
           let div= document.getElementById(reload)
           div.replaceWith(html)
         })
