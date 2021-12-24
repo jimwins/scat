@@ -120,7 +120,7 @@ class Person extends \Scat\Model {
 
   public function open_orders() {
     return $this->has_many('Txn')
-                ->where_null('filled')
+                ->where_in('status', [ 'new' ])
                 ->find_many();
   }
 
