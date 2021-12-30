@@ -43,6 +43,18 @@ class Reports {
     return $this->view->render($response, 'report/kit-items.html', $data);
   }
 
+  public function purchasesByVendor(Request $request, Response $response) {
+    $begin= $request->getParam('begin');
+    $end= $request->getParam('end');
+
+    $data= $this->report->purchasesByVendor($begin, $end);
+    return $this->view->render(
+      $response,
+      'report/purchases-by-vendor.html',
+      $data
+    );
+  }
+
   public function shipments(Request $request, Response $response) {
     $data= $this->report->shipments();
     return $this->view->render($response, 'report/shipments.html', $data);

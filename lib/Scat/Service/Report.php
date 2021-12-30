@@ -149,6 +149,47 @@ class Report
                              ->find_many() ];
   }
 
+  public function purchasesByVendor($begin, $end) {
+    if (!$begin) {
+      $begin= date('Y-m-d', strtotime('30 days ago'));
+    }
+    if (!$end) {
+      $end= date('Y-m-d', strtotime('today'));
+    }
+
+    $res= $this->data->factory('Txn')
+                ->select('txn.*')
+                ->order_by_desc('txn.person_id')
+                ->where('type', 'vendor')
+                ->left_outer_join('person',
+                                  array('person.id', '=', 'txn.person_id'))
+                ->where_raw('txn.created BETWEEN ? AND ?', [ $begin, $end ])
+                ->find_many();
+
+    $vendors= [];
+
+    foreach ($res as $row) {
+      if ($vendors[$row->person_id]) {
+        $vendor= $vendors[$row->person_id];
+      } else {
+        $vendor= $row->person();
+        $vendors[$row->person_id]= $vendor;
+      }
+
+      $vendor->orders+= 1;
+      $vendor->total+= $row->total();
+    }
+
+    usort($vendors, function ($a, $b) { return $a->company <=> $b->company; });
+
+    return [
+      'vendors' => $vendors,
+      'begin' => $begin,
+      'end' => $end,
+    ];
+  }
+
+
   public function shipments() {
     return [ "shipments" => $this->data->factory('Shipment')
                              ->select('*')
