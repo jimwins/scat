@@ -167,6 +167,7 @@ class Report
                 ->find_many();
 
     $vendors= [];
+    $grand_total= 0;
 
     foreach ($res as $row) {
       if ($vendors[$row->person_id]) {
@@ -178,12 +179,15 @@ class Report
 
       $vendor->orders+= 1;
       $vendor->total+= $row->total();
+
+      $grand_total+= $row->total();
     }
 
     usort($vendors, function ($a, $b) { return $a->company <=> $b->company; });
 
     return [
       'vendors' => $vendors,
+      'grand_total' => $grand_total,
       'begin' => $begin,
       'end' => $end,
     ];

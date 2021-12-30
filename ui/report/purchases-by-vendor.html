@@ -33,6 +33,7 @@
         <th>Vendor</th>
         <th>Orders</th>
         <th>Total</th>
+        <th>% of Total</th>
       </tr>
     </thead>
     <tbody>
@@ -45,6 +46,7 @@
           </td>
           <td>{{ vendor.orders }}</td>
           <td>{{ scat.amount(vendor.total) }}</td>
+          <td>{{ "%.2f%%"|format(vendor.total / grand_total * 100) }}</td>
         </tr>
       {% endfor %}
     </tbody>
