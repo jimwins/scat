@@ -256,13 +256,15 @@
               Clear Loyalty Reward
             </button>
           {% else %}
-            <div class="pull-right">
-              <button class="btn btn-xs btn-default" data-no-rewards="{{ txn.no_rewards }}" data-action="toggle-no-rewards">
-                <i class="fa fa-fw {{ txn.no_rewards ? 'fa-square-o' : 'fa-check-square-o' }}"></i>
-                Eligible
-              </button>
-            </div>
-            <h4>Rewards</h4>
+            <h4>
+              <div class="pull-right">
+                <button class="btn btn-xs btn-default" data-no-rewards="{{ txn.no_rewards }}" data-action="toggle-no-rewards">
+                  <i class="fa fa-fw {{ txn.no_rewards ? 'fa-square-o' : 'fa-check-square-o' }}"></i>
+                  Eligible
+                </button>
+              </div>
+              Rewards
+            </h4>
             <ul class="list-group">
               {% for reward in txn.person.available_loyalty_rewards.find_many() %}
                 <a class="list-group-item
