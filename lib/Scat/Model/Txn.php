@@ -451,9 +451,9 @@ class Txn extends \Scat\Model {
       }
     }
 
-    foreach ($this->payments() as $payment) {
+    foreach ($this->payments()->find_many() as $payment) {
       if ($payment->method == 'discount' && $payment->discount) {
-        $payment->amount= $payment->discount / 100 * $txn->total();
+        $payment->amount= $payment->discount / 100 * $this->total();
         $payment->save();
         // Force total() to be calculated
         $this->flushTotals();
