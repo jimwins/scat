@@ -256,6 +256,12 @@
               Clear Loyalty Reward
             </button>
           {% else %}
+            <div class="pull-right">
+              <button class="btn btn-xs btn-default" data-no-rewards="{{ txn.no_rewards }}" data-action="toggle-no-rewards">
+                <i class="fa fa-fw {{ txn.no_rewards ? 'fa-square-o' : 'fa-check-square-o' }}"></i>
+                Eligible
+              </button>
+            </div>
             <h4>Rewards</h4>
             <ul class="list-group">
               {% for reward in txn.person.available_loyalty_rewards.find_many() %}
@@ -703,6 +709,14 @@
         })
         .catch((err) => {
           scat.alert('danger', err.message)
+        })
+    })
+
+    scat.handleAction('click', 'toggle-no-rewards', (act) => {
+      let no_rewards= act.closest('[data-no-rewards]').getAttribute('data-no-rewards')
+      return scat.patch("/sale/{{ txn.id}}", { no_rewards: no_rewards != "0" ? 0 : 1 })
+        .then((res) => {
+          scat.reload('sidebar')
         })
     })
 
