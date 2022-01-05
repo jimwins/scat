@@ -278,11 +278,14 @@ class Transactions {
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $this->data->beginTransaction();
+
+    // delete any discounts
+    $txn->payments()->where('method', 'discount')->delete_many();
+
     if ($txn->payments()->count()) {
       throw new \Exception("Can't delete sale with payments.");
     }
-
-    $this->data->beginTransaction();
 
     if (!$request->getParam('force')) {
       if ($txn->online_sales_id) {
