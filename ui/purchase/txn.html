@@ -280,7 +280,7 @@
 
       <hr style="border-color: rgba(0,0,0,0.1)">
 
-      {% if txn.status in ['new'] %}
+      {% if txn.status in ['new', 'processing'] %}
         <button class="btn btn-danger btn-block"
                 data-action="clear-items">
           <i class="fa fa-fw fa-trash-o"></i> Clear Items
