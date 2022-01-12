@@ -51,6 +51,13 @@ class ScatUtils {
             }
           })
         })
+        $(modal).on('shown.bs.modal', function(e) {
+          /* Automatically focus on the right element */
+          let initial= this.querySelector('.initial-focus')
+          if (initial) {
+            initial.focus()
+          }
+        })
         $(modal).on('hidden.bs.modal', function(e) {
           $(this.script).remove()
           $(this).remove()
@@ -309,6 +316,7 @@ class ScatUtils {
         reload.appendChild(overlay)
         let url= new URL(window.location.href)
         url.searchParams.append('block', block)
+        console.log("loading block from " + url)
         return fetch(url)
         .then((res) => {
           if (res.redirected) {
