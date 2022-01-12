@@ -300,6 +300,13 @@ class ScatUtils {
     blocks.forEach((block) => {
       let reload= document.querySelector(`[data-reload=${block}]`)
       if (reload) {
+        reload.position= 'relative'
+        let overlay= document.createElement('div')
+        overlay.style.opacity= '30%'
+        overlay.style.backgroundColor= '#000'
+        overlay.style.position= 'absolute'
+        overlay.style.inset= 0
+        reload.appendChild(overlay)
         let url= new URL(window.location.href)
         url.searchParams.append('block', block)
         return fetch(url)
@@ -315,6 +322,9 @@ class ScatUtils {
           if (html.classList.contains('collapse'))
             html.classList.add('in')
           reload.children[0].replaceWith(html)
+        })
+        .finally(() => {
+          reload.removeChild(overlay)
         })
       }
     })
