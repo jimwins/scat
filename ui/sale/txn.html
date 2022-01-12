@@ -873,7 +873,7 @@
       return scat.dialog('/person/search')
         .then((res) => {
           if (res instanceof Response) {
-            res.json().then((data) => {
+            return res.json().then((data) => {
               return scat.patch("/sale/{{ txn.id}}", { person_id: data.id })
             })
           }
