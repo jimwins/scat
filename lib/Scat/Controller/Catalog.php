@@ -705,19 +705,27 @@ class Catalog {
     if ($code && !$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $grabs= [];
+
     if ($request->getParam('grab')) {
-      // XXX hardcoded
-      $vi= $item->vendor_items()->where('vendor_id', 7)->find_one();
-      if ($vi) {
-        $search_url= 'https://app.salsify.com/catalogs/api/catalogs/b8653f65-460b-4194-b823-fc08f1913b15/products?filter=%3D&page=1&per_page=36&product_identifier_collection_id=&query=' . rawurlencode($vi->vendor_sku);
+      foreach ($item->vendor_items()->find_many() as $vi) {
+        $vendor= $vi->vendor();
+        if ($vendor->salsify_url) {
+          $search_url= $vendor->salsify_url . '?filter=%3D&page=1&per_page=36&product_identifier_collection_id=&query=' . rawurlencode($vi->vendor_sku);
 
-        $results= json_decode(file_get_contents($search_url));
+          error_log("checking $search_url for images from {$vendor->company}\n");
 
-        foreach ($results->products as $product) {
-          $product_url= 'https://app.salsify.com/catalogs/api/catalogs/b8653f65-460b-4194-b823-fc08f1913b15/products/' . $product->id;
-          $details= json_decode(file_get_contents($product_url));
+          $results= json_decode(file_get_contents($search_url));
 
-          $grabs= array_merge($grabs ?: [], $details->asset_properties);
+          if ($results->products) {
+            foreach ($results->products as $product) {
+              $product_url= $vendor->salsify_url . '/' . $product->id;
+              error_log("checking $product_url for images\n");
+              $details= json_decode(file_get_contents($product_url));
+
+              $grabs= array_merge($grabs, $details->asset_properties);
+            }
+          }
         }
       }
     }

@@ -53,7 +53,8 @@ class Item extends \Scat\Model {
   }
 
   public function vendor_items($active= 1) {
-    return $this->has_many('VendorItem')->where_gte('active', $active);
+    return $this->has_many('VendorItem')
+                ->where_gte('vendor_item.active', $active);
   }
 
   public function vendor_item($person_id) {
@@ -438,6 +439,13 @@ class Item extends \Scat\Model {
       ->where('active', 1)
       ->order_by_asc('code')
       ->find_many();
+  }
+
+  public function has_vendor_with_salsify() {
+    return $this->vendor_items()
+                ->join('person', [ 'vendor_id', '=', 'person.id' ])
+                ->where_raw('LENGTH(salsify_url)')
+                ->count();
   }
 
 }

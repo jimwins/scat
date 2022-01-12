@@ -552,7 +552,7 @@
     {{ include('carousel.twig', { images: media, edit: 'edit-media' }) }}
   {% else %}
     {% set vi= item.vendor_items.where('vendor_id', 7).find_many() %}
-    {% if vi %}
+    {% if item.has_vendor_with_salsify() %}
       <button class="btn btn-default btn-block" data-action="grab-media">
         <i class="fa fa-file-image-o fa-fw"></i>
         Grab from Salsify
