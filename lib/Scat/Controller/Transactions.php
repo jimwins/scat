@@ -2070,8 +2070,8 @@ class Transactions {
       throw new \Exception("Unable to find transaction.");
     }
 
-    if ($purchase->status != 'new') {
-      throw new \Exception("Purchase must be in 'new' status to clear.");
+    if (!in_array($purchase->status, [ 'new', 'processing' ])) {
+      throw new \Exception("Purchase must be in 'new' or 'processing' status to clear.");
     }
 
     $purchase->clearItems();
