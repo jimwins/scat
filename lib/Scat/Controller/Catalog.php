@@ -711,7 +711,7 @@ class Catalog {
       foreach ($item->vendor_items()->find_many() as $vi) {
         $vendor= $vi->vendor();
         if ($vendor->salsify_url) {
-          $search_url= $vendor->salsify_url . '?filter=%3D&page=1&per_page=36&product_identifier_collection_id=&query=' . rawurlencode($vi->vendor_sku);
+          $search_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products?filter=%3D&page=1&per_page=36&product_identifier_collection_id=&query=' . rawurlencode($vi->vendor_sku);
 
           error_log("checking $search_url for images from {$vendor->company}\n");
 
@@ -719,7 +719,7 @@ class Catalog {
 
           if ($results->products) {
             foreach ($results->products as $product) {
-              $product_url= $vendor->salsify_url . '/' . $product->id;
+              $product_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products/' . $product->id;
               error_log("checking $product_url for images\n");
               $details= json_decode(file_get_contents($product_url));
 
