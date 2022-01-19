@@ -407,7 +407,7 @@ class Person extends \Scat\Model {
 
     } elseif (preg_match('/CustomerPrice/', $line)) {
       /* PA Dist */
-#Item    Description     Min     CustomerPrice   Retail  UPC     ISBN    MAP     Not 4 Retail Websitew`  ORMD    Weight  Height  Width   Depth
+#Item    Description     UM	Min     CustomerPrice   Retail  UPC     ISBN    MAP     Not 4 Retail Websitew`  ORMD    Weight  Height  Width   Depth
       error_log("Importing '$fn' as PA Distribution price list\n");
       $sep= preg_match("/\t/", $line) ? "\t" : ",";
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
@@ -416,7 +416,8 @@ class Person extends \Scat\Model {
               OPTIONALLY ENCLOSED BY '\"'
                LINES TERMINATED BY '\r\n'
               IGNORE 1 LINES
-              (vendor_sku, name, purchase_quantity, @net_price, @retail_price,
+              (vendor_sku, name, @uom, purchase_quantity,
+              @net_price, @retail_price,
               @upc, @isbn, @map_price, @not_4_retail, hazmat, weight,
               length, width, height)
               SET code = vendor_sku,
@@ -428,13 +429,13 @@ class Person extends \Scat\Model {
               ";
 
       if (!$this->orm->raw_execute($q))
-        throw new \Exception("Unable to load ColArt data file");
+        throw new \Exception("Unable to load PA Dist data file");
 
       // toss junk from header lines
       $q= "DELETE FROM vendor_upload WHERE purchase_quantity = 0";
 
       if (!$this->orm->raw_execute($q))
-        throw new \Exception("Unable to load ColArt data file");
+        throw new \Exception("Unable to load PA Dist data file");
     } else {
       // Generic
       if (preg_match("/\\t/", $line)) {
