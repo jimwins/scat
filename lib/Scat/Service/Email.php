@@ -41,6 +41,15 @@ class Email {
     }
     $to_list= join(', ', $addr);
 
+    $cc= NULL;
+    if ($options['cc']) {
+      $cc= $options['cc'];
+      if ($GLOBALS['DEBUG']) {
+        $cc= $this->from_email;
+      }
+      error_log("Sending email cc: to <$cc>\n");
+    }
+
     /* Always Bcc ourselves (for now) */
     $bcc= NULL;
     if (!$GLOBALS['DEBUG']) {
@@ -59,7 +68,7 @@ class Email {
 
     return $postmark->sendEmail(
       $from, $to_list, $subject, $body, NULL, NULL, NULL,
-      NULL, NULL, $bcc, NULL, $attach, NULL, NULL, $options['stream']
+      NULL, $cc, $bcc, NULL, $attach, NULL, NULL, $options['stream']
     );
   }
 

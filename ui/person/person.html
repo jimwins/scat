@@ -288,6 +288,20 @@
             </a>
 
             <div class="form-group">
+              <label for="cc_email" class="col-sm-2 control-label">
+                Copy Invoices To
+              </label>
+              <div class="col-sm-10">
+                <p class="form-control-static editable"
+                   data-pk="{{ person.id }}"
+                   data-name="cc_email" data-value="{{ person.cc_email}}">
+                  {{ person.cc_email }}
+                </p>
+              </div>
+            </div>
+
+
+            <div class="form-group">
               <label for="salsify_url" class="col-sm-2 control-label">
                 Salsify URL
               </label>

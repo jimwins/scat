@@ -1343,8 +1343,14 @@ class Transactions {
       }
     }
 
+    /* Pick up cc: */
+    $options= [];
+    if (($cc= $request->getParam('cc_email'))) {
+      $options['cc']= $cc;
+    }
+
     $res= $email->send([ $to_email => $to_name ],
-                       $subject, $body, $attachments);
+                       $subject, $body, $attachments, $options);
 
     /* Attach email as a note */
     $note= $txn->createNote();
