@@ -24,10 +24,15 @@
       {{- i.code -}}
     </a><br>
     {% if i.width == 0 or i.weight == 0 %}
-      <small class="text-danger"><i class="fa fa-cube"></i>
+      <small class="text-danger"><i class="fa fa-cube"></i></small>
     {% endif %}
     {% if not i.media|length %}
-      <small class="text-danger"><i class="fa fa-file-image-o"></i>
+      <small class="text-danger"><i class="fa fa-file-image-o"></i></small>
+    {% endif %}
+    {% if i.no_backorder %}
+      <small class="text-danger" title="No backorders">
+        <i class="fa fa-exclamation-circle"></i>
+      </small>
     {% endif %}
   </td>
   <td class="item-name" style="{{ s.style_item_color(i.color) }}">
