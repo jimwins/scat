@@ -122,6 +122,10 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
       $this->current[]= (bool)$value ? "(item.minimum_quantity)" :
                                        "(NOT item.minimum_quantity)";
       break;
+    case 'is_kit':
+      $this->current[]= (bool)$value ? "(item.is_kit)" :
+                                       "(NOT item.is_kit)";
+      break;
     case 're':
       $this->current[]= "(item.code RLIKE '$value')";
       break;
