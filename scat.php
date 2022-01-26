@@ -51,7 +51,7 @@ function dump_table($r, $calc = false) {
   if (!strncmp($r->fetch_field_direct($meta)->name, "#", 1)) {
     $line= 1;
   }
-  echo '<table class="table table-striped table-condensed sortable">';
+  echo '<table class="table table-striped table-condensed table-sort">';
   echo '<thead><tr>';
   if (!$line)
     echo '<th>#</th>';
