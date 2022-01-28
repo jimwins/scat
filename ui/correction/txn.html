@@ -251,13 +251,7 @@
           </li>
          </ul>
         </div>
-          {% if txn.items.count %}
-            <a class="btn btn-lg btn-default"
-                href="/export/txn.php?dl=1&id={{ txn.id }}">
-              <i class="fa fa-fw fa-download"></i>
-              Export
-            </a>
-          {% else %}
+          {% if not txn.items.count %}
             <button data-action="delete-correction" class="btn btn-lg btn-default">
               Delete
             </button>
