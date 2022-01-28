@@ -253,7 +253,7 @@
         </div>
           {% if txn.items.count %}
             <a class="btn btn-lg btn-default"
-                href="/export/txn.php?dl=1&id={{ txn.id }}">
+                href="/purchase/{{ txn.id }}/export">
               <i class="fa fa-fw fa-download"></i>
               Export
             </a>

@@ -2075,6 +2075,74 @@ class Transactions {
     return $response->withJson($purchase);
   }
 
+  public function exportPurchase(Request $request, Response $response, $id) {
+    $purchase= $this->txn->fetchById($id);
+    if (!$purchase) {
+      throw new \Exception("Unable to find transaction.");
+    }
+
+    $content_type= 'text/tsv';
+    $ext= 'tsv';
+
+    if ($purchase->person_id == 3757) { // XXX hardcoded
+      $content_type= 'application/vnd.ms-excel';
+      $ext= 'xls';
+    }
+
+    $name= 'PO' . $purchase->formatted_number() . '.' . $ext;
+
+    $response= $response
+      ->withHeader('Content-type', $content_type)
+      ->withHeader('Content-disposition',
+                    'attachment; filename="' . $name . '"')
+      ->withHeader('Cache-control', 'max-age=0');
+
+    if ($ext == 'xls') {
+      $xls= new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+      $xls->setActiveSheetIndex(0);
+      $row= 1;
+
+      $xls->getActiveSheet()->setCellValueByColumnAndRow(1, $row, "code")
+                            ->setCellValueByColumnAndRow(2, $row, "")
+                            ->setCellValueByColumnAndRow(3, $row, "qty");
+      $row+=1;
+
+      foreach ($purchase->items()->find_many() as $item) {
+        $code= $item->vendor_sku() ?: $item->code();
+        $xls->getActiveSheet()->setCellValueByColumnAndRow(1, $row, $code)
+                              ->setCellValueByColumnAndRow(2, $row, "")
+                              ->setCellValueByColumnAndRow(3, $row,
+                                                           $item->ordered);
+        $row+=1;
+      }
+
+      $file= tempnam(sys_get_temp_dir(), 'export');
+
+      $objWriter= \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($xls, 'Xls');
+      $objWriter->save($file);
+
+      $newStream= new \GuzzleHttp\Psr7\LazyOpenStream($file, 'r');
+      return $response->withBody($newStream);
+
+      // XXX leaves behind the temp file, should probably unlink() it
+
+    } else {
+      $body= $response->getBody();
+
+      $body->write("code\tqty\r\n");
+
+      foreach ($purchase->items()->find_many() as $item) {
+        $body->write(
+          ($item->vendor_sku() ?: $item->code()) . "\t" .
+          $item->ordered . "\r\n"
+        );
+      }
+
+      return $response->withBody($body);
+    }
+  }
+
   public function corrections(Request $request, Response $response) {
     return $this->search($request, $response, 'correction');
   }
