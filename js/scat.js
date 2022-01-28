@@ -36,13 +36,6 @@ Scat.api= function (func, args, opts) {
   });
 }
 
-Scat.dialog= function (name) {
-  var url= '/ui/' + name + '.html';
-
-  // XXX handle error
-  return $.ajax({ url: url, cache: false });
-}
-
 Scat.printDirect= function(name, options) {
   $.getJSON("/print/" + name + ".php?callback=?",
             options,
@@ -104,32 +97,5 @@ Scat.alert= function (data) {
 
   alert(data.error);
 }
-
-Scat.getFocusedElement= function() {
-  var elem = document.activeElement;
-  return $( elem &&
-            ( elem.type || elem.href ||
-              elem.className.includes("select2-selection") ) ? elem : [] );
-};
-
-ko.bindingHandlers.cleave= {
-  init: function(element, valueAccessor, allBindingsAccessor) {
-    var options= allBindingsAccessor().cleaveOptions || {};
-
-    options.onValueChanged= function (e) {
-      var value= valueAccessor();
-      value(e.target.rawValue);
-    }
-
-    var cleave= new Cleave(element, options);
-    element.cleave= cleave;
-
-    cleave.setRawValue(ko.unwrap(valueAccessor()));
-  },
-  update: function(element, valueAccessor, allBindingsAccessor) {
-    var value= valueAccessor();
-    element.cleave.setRawValue(ko.unwrap(value));
-  }
-};
 
 $.fn.select2.defaults.set( "theme", "bootstrap" );
