@@ -11,7 +11,6 @@ class TwigExtension
       'PUBLIC' => ORDURE,
       'PUBLIC_CATALOG' => ORDURE . '/art-supplies',
       'STATIC' => ORDURE_STATIC,
-      'MEDIA' => PUBLITIO_BASE,
     ];
   }
 
