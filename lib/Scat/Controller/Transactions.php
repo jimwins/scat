@@ -79,16 +79,6 @@ class Transactions {
     return $this->search($request, $response, 'customer');
   }
 
-  public function newSale(Response $response) {
-    ob_start();
-    include "../old-index.php";
-    $content= ob_get_clean();
-    return $this->view->render($response, 'sale/old-new.html', [
-      'title' => $GLOBALS['title'],
-      'content' => $content,
-    ]);
-  }
-
   public function sale(Request $request, Response $response, $id) {
     $txn= $this->txn->fetchById($id);
     if (!$txn)
@@ -2089,8 +2079,27 @@ class Transactions {
     return $this->search($request, $response, 'correction');
   }
 
-  public function correction(Response $response, $id) {
-    return $response->withRedirect("/sale/new?id=$id");
-  }
+  public function correction(Request $request, Response $response, $id) {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($txn);
+    }
+
+    if (($block= $request->getParam('block'))) {
+      $html= $this->view->fetchBlock('correction/txn.html', $block, [
+        'txn' => $txn,
+      ]);
+
+      $response->getBody()->write($html);
+      return $response;
+    }
+
+    return $this->view->render($response, 'correction/txn.html', [
+      'txn' => $txn,
+    ]);
+  }
 }

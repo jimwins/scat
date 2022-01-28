@@ -258,147 +258,11 @@
               Export
             </a>
           {% else %}
-            <button data-action="delete-purchase" class="btn btn-lg btn-default">
+            <button data-action="delete-correction" class="btn btn-lg btn-default">
               Delete
             </button>
           {% endif %}
       </div>
-
-      {% if txn.returned_from_id %}
-        <h4>Ordered For</h4>
-        <ul class="list-group">
-          <a class="list-group-item" href="/sale/{{ txn.returned_from_id }}">
-            {{ txn.returned_from.friendly_type }}
-            {{ txn.returned_from.formatted_number }}
-          </a>
-        </ul>
-      {% endif %}
-
-      <hr style="border-color: rgba(0,0,0,0.1)">
-
-      {% if txn.status in ['new', 'processing'] %}
-        <button class="btn btn-danger btn-block"
-                data-action="clear-items">
-          <i class="fa fa-fw fa-trash-o"></i> Clear Items
-        </button>
-      {% endif %}
-
-      {% if txn.status in ['new'] %}
-        <button class="btn btn-primary btn-block"
-                data-action="email-invoice"
-                data-new-status="processing">
-          <i class="fa fa-fw fa-envelope-o"></i> Email Purchase Order
-        </button>
-      {% endif %}
-
-      {% if txn.status in ['new','processing','waitingforitems'] %}
-        <button class="btn btn-primary btn-block"
-                data-action="add-tracker">
-          <i class="fa fa-fw fa-truck"></i>
-          Add Tracker
-        </button>
-      {% endif %}
-
-      {% if txn.status in ['new','processing','waitingforitems','shipping','shipped' ] %}
-        <button class="btn btn-primary btn-block"
-                data-action="mark-all-received">
-          <i class="fa fa-fw fa-check-circle-o"></i>
-          Mark All Received
-        </button>
-      {% endif %}
-
-      <h3>
-        <a data-action="change-person"
-           class="btn btn-default btn-sm pull-right">
-          <i class="fa fa-user-o"></i>
-        </a>
-        {{ txn.type == 'customer' ? 'Customer' : 'Vendor' }}
-      </h3>
-
-      <a data-action="edit-person" data-id="{{ txn.person_id }}">
-        {{ txn.person.friendly_name ?: 'Anonymous' }}
-        {% if txn.person and txn.person.store_credit.balance > 0 %}
-          <span class="label label-success">
-            {{ scat.amount(txn.person.store_credit.balance) }}
-          </span>
-        {% endif %}
-      </a>
-
-      <div class="clearfix"></div>
-
-      {% set person= txn.person %}
-
-      <h3>
-        <div class="btn-group pull-right">
-         <button type="button" class="btn btn-default btn-sm dropdown-toggle"
-                 data-toggle="dropdown" aria-expanded="false">
-          <i class="fa fa-truck"></i>
-          <span class="caret"></span>
-         </button>
-         <ul class="dropdown-menu" role="menu">
-          <li>
-            <a data-action="edit-shipping-address">
-              {{ txn.shipping_address_id > 1 ? 'Edit' : 'Add' }}
-              Shipping Address
-            </a>
-            {% if txn.shipping_address_id != 1 %}
-              <a data-action="set-in-store-pickup">
-                Set for In-Store Pickup
-              </a>
-            {% endif %}
-            {% if txn.is_local_delivery %}
-              <a data-action="create-delivery">Create Delivery</a>
-            {% else %}
-              <a data-action="create-dropship">Create Drop Shipment</a>
-              <a data-action="create-shipment">Create Shipment</a>
-            {% endif %}
-            <a data-action="add-tracker">Add Tracker</a>
-          </li>
-         </ul>
-        </div>
-
-        Shipping
-      </h3>
-
-      {% if txn.shipping_address_id == 1 %}
-        <h4>Curbside Pickup</h4>
-      {% elseif txn.shipping_address_id %}
-        <h4>{{ txn.is_bike_delivery ? 'Deliver to' : 'Ship to' }}:</h4>
-        {% set shipping_address= txn.shipping_address() %}
-        <address>
-          <div>{{ shipping_address.name }}</div>
-          <div>{{ shipping_address.company }}</div>
-          <div>{{ shipping_address.email }}</div>
-          {% if shipping_address.phone %}
-            <div>{{ shipping_address.phone | phone_number_format }}</div>
-          {% endif %}
-          <div>{{ shipping_address.street1 }}</div>
-          <div>{{ shipping_address.street2 }}</div>
-          <div>
-            {% if shipping_address.city %}
-              {{ shipping_address.city }},
-            {% endif %}
-            {{ shipping_address.state }}
-            {{ shipping_address.zip }}
-          </div>
-        </address>
-      {% endif %}
-
-      {% if txn.shipments.count %}
-        <h4>Shipments</h4>
-        <ul id="shipments" class="list-group">
-          {% for shipment in txn.shipments.find_many() %}
-            <li class="list-group-item"
-                data-action="show-shipment" data-id="{{ shipment.id }}">
-              <span class="pull-right">
-                {{ scat.format_shipping_status(shipment.status) }}
-              </span>
-              {{ shipment.created|date("D F j") }}
-              <div class="clearfix"></div>
-            </li>
-          {% endfor %}
-        </ul>
-      {% endif %}
 
     </div>
   </div>
@@ -577,87 +441,13 @@
       })
     })
 
-    scat.handleAction('click', 'edit-shipping-address', (act) => {
-      return scat.dialog('/sale/{{ txn.id }}/shipping-address').then(() => {
-        scat.reload('sidebar')
-      })
-    })
-
-    scat.handleAction('click', 'set-in-store-pickup', (act) => {
-      return scat
-        .patch('/sale/{{ txn.id }}', { shipping_address_id: 1 })
-        .then((res) => {
-          scat.reload('sidebar')
-        })
-    })
-
-    scat.handleAction('click', 'add-tracker', (act) => {
-      return scat.dialog('/sale/{{ txn.id }}/shipment?tracker=1')
-        .then((res) => {
-          {% if txn.status in [ 'new', 'processing', 'waitingforitems' ] %}
-            return scat.patch("/sale/{{ txn.id}}", { status: 'shipping' })
-              .then((res) => {
-                scat.reload('sidebar')
-              })
-          {% else %}
-            scat.reload('sidebar')
-          {% endif %}
-        })
-    })
-
-    scat.handleAction('click', 'show-shipment', (act) => {
-      let id= act.closest('[data-id]').getAttribute('data-id')
-      return scat.dialog('/shipment/' + id)
-        .then((res) => {
-          scat.reload('sidebar')
-        })
-    })
-
     scat.handleAction('click', 'clear-items', (act) => {
       if (window.confirm("Are you sure you want to delete all items?")) {
-        return scat.post('/purchase/{{ txn.id }}/~clear-all').then(() => {
+        return scat.post('/correction/{{ txn.id }}/~clear-all').then(() => {
           scat.reload('invoice', 'sidebar')
         })
       }
       return Promise.resolve()
-    })
-
-    scat.handleAction('click', 'mark-all-received', (act) => {
-      return scat.post('/purchase/{{ txn.id }}/~mark-all-received').then(() => {
-        scat.reload('invoice', 'sidebar')
-      })
-    })
-
-    let changePerson= () => {
-      return scat.dialog('/person/search')
-        .then((res) => {
-          if (res instanceof Response) {
-            res.json().then((data) => {
-              return scat.patch("/sale/{{ txn.id}}", { person_id: data.id })
-            })
-          }
-          else if (res > 0) {
-            return scat.patch("/sale/{{ txn.id}}", { person_id: res })
-          }
-        })
-        .then((res) => {
-          scat.reload('sidebar')
-        })
-    }
-
-    scat.handleAction('click', 'change-person', (act) => {
-      return changePerson()
-    })
-
-    scat.handleAction('click', 'edit-person', (act) => {
-      var id= act.closest('[data-id]').getAttribute('data-id')
-      if (id) {
-        return scat.dialog('/person/' + id).then((res) => {
-          scat.reload('sidebar')
-        })
-      } else {
-        return changePerson()
-      }
     })
 
     scat.handleQueuedAction('submit', 'search', handleFindAndAddItem)
@@ -741,23 +531,15 @@
       return Promise.resolve()
     })
 
-    scat.handleAction('click', 'delete-purchase', (act) => {
-      return scat.delete('/purchase/{{ txn.id }}')
+    scat.handleAction('click', 'delete-correction', (act) => {
+      return scat.delete('/correction/{{ txn.id }}')
         .then((res) => {
-          window.location.href= '/purchase'
+          window.location.href= '/correction'
           return
         })
     })
 
-    /* Bind some global keys */
-    Mousetrap.bindGlobal('mod+p', function (ev) {
-      printReceipt()
-      return false
-    })
-
   </script>
-
-  {{ scat.file_upload('/sale/' ~ txn.id ~ '/item') }}
 
   <template id="item-not-found">
     <div class="alert alert-danger alert-dismissable" role="alert">
