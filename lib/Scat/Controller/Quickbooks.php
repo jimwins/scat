@@ -239,9 +239,7 @@ class Quickbooks {
       break;
     }
 
-    $latest= (new \DateTime($latest))->format('Y-m-d');
-
-    return $response->withJson([ 'latest' => $latest ]);
+    return $response;
   }
 
   function syncSales($date) {
