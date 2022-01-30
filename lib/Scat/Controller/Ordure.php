@@ -495,6 +495,19 @@ class Ordure {
         }
       }
 
+      $url= ORDURE . '/sale/' . $summary->uuid . '/set-abandoned-level';
+      $res= $client->request('POST', $url,
+                             [
+                               'debug' => $DEBUG,
+                               'headers' => [
+                                 'X-Requested-With' => 'XMLHttpRequest',
+                               ],
+                               'form_params' => [
+                                 'key' => ORDURE_KEY,
+                                 'abandoned_level' => 2
+                               ]
+                             ]);
+
       $data['call_to_action_url']= ORDURE . '/cart?uuid=' . $data['sale']['uuid'] . '&utm_source=internal&utm_medium=email&utm_id=abandoned-cart';
 
       $template= $view->getEnvironment()->load('email/abandoned-cart.html');
