@@ -324,6 +324,7 @@ class Shipping {
     {
       $form= $data->result->form_url;
       $pdf= file_get_contents($form);
+      error_log("Printing SCAN form from {$form}\n");
       return $printer->printPDF($response, 'letter', $pdf);
     }
 
