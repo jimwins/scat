@@ -1432,6 +1432,16 @@ class Transactions {
     if ($shipment_id && !$shipment)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $label_date= $request->getParam('label_date');
+    if (!$label_date) {
+      if (date('H') >= 12) {
+        $day= (date('w') == 5) ? 'saturday' : 'weekday';
+        $label_date= date("Y-m-d", strtotime("next $day"));
+      } else {
+        $label_date= date("Y-m-d");
+      }
+    }
+
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
       $dialog= ($request->getParam('tracker') ?
@@ -1440,6 +1450,7 @@ class Transactions {
       return $this->view->render($response, $dialog, [
         'txn' => $txn,
         'shipment' => $shipment,
+        'label_date' => $label_date,
         'easypost' =>
           $shipment ? $shipping->getShipment($shipment) : null,
       ]);
