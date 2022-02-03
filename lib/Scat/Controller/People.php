@@ -159,6 +159,22 @@ class People {
     return $response->withJson($details[0]);
   }
 
+  function clearPromos(Request $request, Response $response, $id,
+                        \Scat\Service\Data $data)
+  {
+    $person= $data->factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $q= "UPDATE vendor_item
+            SET promo_price = NULL, promo_quantity = NULL
+          WHERE vendor_id = ? AND active";
+
+    $data->execute($q, [ $person->id ]);
+
+    return $response;
+  }
+
   public function createPerson(Request $request, Response $response,
                                 \Scat\Service\Data $data) {
     $person= $data->factory('Person')->create();

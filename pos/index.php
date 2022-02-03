@@ -395,6 +395,8 @@ $app->group('/person', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\People::class, 'items' ]);
   $app->post('/{id:[0-9]+}/items',
              [ \Scat\Controller\People::class, 'uploadItems' ]);
+  $app->post('/{id:[0-9]+}/items/~clear-promos',
+             [ \Scat\Controller\People::class, 'clearPromos' ]);
   $app->get('/{id:[0-9]+}/loyalty',
             [ \Scat\Controller\People::class, 'loyalty' ]);
   $app->get('/{id:[0-9]+}/backorders',

@@ -3,14 +3,14 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-5">
       <h2 style="margin-top: 0.05em">{{ person.friendly_name() }}</h2>
     </div>
 
-    <div class="col-sm-5">
+    <div class="col-sm-4">
       <form action="" class="form">
         <div class="input-group">
-          <input type="search" class="form-control"
+          <input type="search" class="form-control autofocus"
                  name="q" value="{{ q }}">
           <span class="input-group-btn">
             <input type="submit" class="btn btn-default" value="Search">
@@ -19,9 +19,13 @@
       </form>
     </div>
 
-    <div class="col-sm-1">
+    <div class="col-sm-3">
       <button type="button" class="btn btn-default bulk-add">
         Bulk Add
+      </button>
+
+      <button type="button" class="btn btn-default" data-action="clear-promos">
+        Clear Promos
       </button>
     </div>
   </div>
@@ -123,6 +127,12 @@
       .then((res) => {
         scat.alert('info', "Added items.")
       })
+    })
+
+    scat.handleAction('click', 'clear-promos', (act) => {
+      return scat.post('/person/{{ person.id }}/items/~clear-promos').then((res) => {
+          window.location.reload()
+        })
     })
   }
   </script>
