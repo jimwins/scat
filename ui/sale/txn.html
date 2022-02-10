@@ -471,12 +471,9 @@
                 Set for In-Store Pickup
               </a>
             {% endif %}
-            {% if txn.is_local_delivery %}
-              <a data-action="create-delivery">Create Delivery</a>
-            {% else %}
-              <a data-action="create-dropship">Create Drop Shipment</a>
-              <a data-action="create-shipment">Create Shipment</a>
-            {% endif %}
+            <a data-action="create-delivery">Create Delivery</a>
+            <a data-action="create-dropship">Create Drop Shipment</a>
+            <a data-action="create-shipment">Create Shipment</a>
             <a data-action="add-tracker">Add Tracker</a>
           </li>
          </ul>
