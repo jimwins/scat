@@ -174,6 +174,7 @@ class Report
         $vendor= $vendors[$row->person_id];
       } else {
         $vendor= $row->person();
+        $vendor->orders= 0;
         $vendors[$row->person_id]= $vendor;
       }
 
