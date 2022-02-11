@@ -563,7 +563,8 @@ class Person extends \Scat\Model {
     // Find by code/item_no
     $q= "UPDATE vendor_item
             SET item_id = IFNULL((SELECT id FROM item
-                                WHERE vendor_item.code = item.code),
+                                   WHERE vendor_item.code = item.code
+                                     AND item.active),
                               0)
          WHERE vendor_id = {$this->id}
            AND (item_id IS NULL OR item_id = 0)";
@@ -572,9 +573,12 @@ class Person extends \Scat\Model {
 
     // Find by barcode
     $q= "UPDATE vendor_item
-            SET item_id = IFNULL((SELECT item_id FROM barcode
-                                WHERE barcode.code = barcode
-                                LIMIT 1),
+            SET item_id = IFNULL((SELECT item_id
+                                    FROM barcode
+                                    JOIN item ON item.id = barcode.item_id
+                                   WHERE barcode.code = barcode
+                                     AND item.active
+                                   LIMIT 1),
                               0)
          WHERE vendor_id = {$this->id}
            AND (item_id IS NULL OR item_id = 0)
