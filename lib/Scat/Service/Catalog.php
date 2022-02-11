@@ -136,6 +136,9 @@ class Catalog
       ->select_expr('GROUP_CONCAT(`discount` ORDER BY `minimum_quantity`
                                   SEPARATOR ",")',
                     'discounts')
+      ->select_expr('GROUP_CONCAT(`in_stock` ORDER BY `minimum_quantity`
+                                  SEPARATOR ",")',
+                    'in_stocks')
       ->group_by('pattern')
       ->find_many();
   }
