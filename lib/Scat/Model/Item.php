@@ -344,15 +344,16 @@ class Item extends \Scat\Model {
 
   public function price_overrides() {
     return self::factory('PriceOverride')
-            ->where_raw("(pattern_type = 'product' AND pattern = ?) OR
+            ->where_raw("((pattern_type = 'product' AND pattern = ?) OR
                          (pattern_type = 'like'  AND ? LIKE pattern) OR
-                         (pattern_type = 'rlike' AND ? RLIKE pattern)",
+                         (pattern_type = 'rlike' AND ? RLIKE pattern))",
                          [ $this->product_id, $this->code, $this->code ])
             ->order_by_asc('minimum_quantity');
   }
 
   public function override_price() {
-    $override= $this->price_overrides()->having('minimum_quantity', 1)->find_one();
+    $stock= $this->stock();
+    $override= $this->price_overrides()->where_raw("(? > `in_stock`)", [ $stock ])->having('minimum_quantity', 1)->find_one();
     if ($override && $override->discount_type == 'additional_percentage') {
       return $this->calcSalePrice(
         $this->sale_price(),
