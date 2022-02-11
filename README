@@ -26,9 +26,6 @@ Scat includes FPDF for PDF generation:
 Scat includes BarCode Coder Library for barcode generation:
   http://barcode-coder.com/
 
-Scat includes the Knockout JavaScript MVVM library:
-  http://knockoutjs.com/
-
 Scat uses PhpSpreadSheet for writing Excel spreadsheets:
   https://phpspreadsheet.readthedocs.io/
 
