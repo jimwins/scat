@@ -268,8 +268,7 @@
     var el= document.activeElement
 
     if (!el.type && !el.href && !el.className.includes("select2-selection")) {
-      var doc= document.getElementById('simplemodal-overlay')
-      if (!doc) doc= document.querySelector('.modal-dialog')
+      var doc= document.querySelector('.modal-dialog')
       if (!doc) doc= document
       var inp= doc.querySelector('.autofocus')
       if (inp) {

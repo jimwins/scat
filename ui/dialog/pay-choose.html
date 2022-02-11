@@ -116,23 +116,12 @@
 
       var method= ev.target.closest('[data-method]').getAttribute('data-method')
 
-      if ($.smodal) {
-        $(dialog).modal('hide')
-
-        // old payment handling
-        var id= "#pay-" + method;
-        var due= Txn.due();
-        $(".amount", id).val(due);
-        $.smodal($(id), { persist: true, overlayClose: false });
-        $(".amount", id).focus().select();
-      } else {
-        var other= ev.target.closest('[data-other-method]')
-        dialog.resolution= scat.dialog('/sale/{{ txn.id }}/payment', {
-          method: method,
-          other_method: other ? other.getAttribute('data-other-method') : null,
-        })
-        $(dialog).modal('hide')
-      }
+      var other= ev.target.closest('[data-other-method]')
+      dialog.resolution= scat.dialog('/sale/{{ txn.id }}/payment', {
+        method: method,
+        other_method: other ? other.getAttribute('data-other-method') : null,
+      })
+      $(dialog).modal('hide')
     }
 
     dialog.addEventListener('click', (ev) => {

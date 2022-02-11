@@ -14,9 +14,6 @@ Scat uses Fork Awesome, a fork of the iconic font and CSS toolkit:
 Scat includes bootstrap-datepicker.js:
   https://github.com/eternicode/bootstrap-datepicker/
 
-Scat includes the SimpleModal plugin for jQuery:
-  http://www.ericmmartin.com/projects/simplemodal/
-
 Scat includes Mousetrap for handling keyboard shortcuts:
   https://craig.is/killing/mice
 
