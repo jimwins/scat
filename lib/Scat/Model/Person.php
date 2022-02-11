@@ -379,7 +379,7 @@ class Person extends \Scat\Model {
               OPTIONALLY ENCLOSED BY '\"'
               IGNORE 3 LINES
               (@x, @sn, @pk_sort, @sku_sort, @y,
-               vendor_sku, @new_sku, @gr, @size, @description,
+               @sku, @new_sku, @gr, @size, @description,
                @x1, @x2, @x3, @x4, @x5, @x6, @x7, @x8,
                @retail_price, @net_price, @promo_price,
                @units, purchase_quantity,
@@ -387,7 +387,8 @@ class Person extends \Scat\Model {
                @est_freight, @est_freight_case,
                length, width, height,
                @carton_length, @carton_width, @carton_height, @hts, @origin)
-            SET code = CONCAT('MA', vendor_sku),
+            SET vendor_sku = IF(@new_sku != '', @new_sku, @sku),
+                code = CONCAT('MA', vendor_sku),
                 weight = @weight / purchase_quantity,
                 oversized = IF(@freight = 'OS' OR @freight = 'LTL', 1, 0),
                 retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
