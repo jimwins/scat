@@ -353,7 +353,7 @@ class Item extends \Scat\Model {
 
   public function override_price() {
     $stock= $this->stock();
-    $override= $this->price_overrides()->where_raw("(? > `in_stock`)", [ $stock ])->having('minimum_quantity', 1)->find_one();
+    $override= $this->price_overrides()->where_raw("(? >= `in_stock`)", [ $stock ])->having('minimum_quantity', 1)->find_one();
     if ($override && $override->discount_type == 'additional_percentage') {
       return $this->calcSalePrice(
         $this->sale_price(),
