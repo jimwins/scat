@@ -611,7 +611,7 @@
       <h4>Overrides</h4>
       <ul>
         {% for over in overrides %}
-          <li>
+          <li style="{{ (over.in_stock and not item.stock()) ? 'text-decoration: line-through' }}">
             {{ scat.format_discount(over) }}
             for
             {{ over.minimum_quantity }}
