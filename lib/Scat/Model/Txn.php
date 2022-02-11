@@ -416,20 +416,28 @@ class Txn extends \Scat\Model {
 
       $new_discount= 0;
       $new_discount_type= '';
+      $new_in_stock= 0;
 
       $breaks= explode(',', $d->breaks);
       $discount_types= explode(',', $d->discount_types);
       $discounts= explode(',', $d->discounts);
+      $in_stocks= explode(',', $d->in_stocks);
 
       foreach ($breaks as $i => $qty) {
         if ($count >= $qty) {
           $new_discount_type= $discount_types[$i];
           $new_discount= $discounts[$i];
+          $new_in_stock= $in_stocks[$i];
         }
       }
 
       foreach ($items->find_many() as $item) {
         if ($new_discount) {
+          /* Verify we meet the in_stock criteria */
+          if ($new_in_stock && $item->item()->stock() == 0) {
+            error_log("skipping discount, not in stock!\n");
+            continue;
+          }
           if ($new_discount_type != 'additional_percentage') {
             $item->discount= $new_discount;
             $item->discount_type= $new_discount_type;
