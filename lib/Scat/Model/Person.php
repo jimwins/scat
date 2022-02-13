@@ -133,6 +133,7 @@ class Person extends \Scat\Model {
   }
 
   public function setProperty($name, $value) {
+    $value= trim($value);
     if ($name == 'phone') {
       v::optional(v::phone())->assert($value);
       $this->phone= $value ?: null;
