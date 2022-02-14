@@ -480,6 +480,11 @@ class Ordure {
         continue;
       }
 
+      if ($data['sale']['abandoned_level'] >= 1) {
+        error_log("Skipping abandoned cart email: already sent\n");
+        continue;
+      }
+
       if ($seen[$email]++) {
         error_log("Skipping abandoned cart email: already today to $email\n");
         continue;
