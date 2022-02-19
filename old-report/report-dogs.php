@@ -21,7 +21,8 @@ $q= "SELECT id, code, name,
         AND minimum_quantity
      HAVING (first_seen < NOW() - INTERVAL 1 YEAR)
         AND (last_sale IS NULL OR last_sale < NOW() - INTERVAL 1 YEAR)
-      ORDER BY 2";
+        AND (stocked > 0)
+      ORDER BY code";
 
 $r= $db->query($q)
   or die_query($db, $q);
