@@ -409,27 +409,29 @@ class Item extends \Scat\Model {
     $this->orm->raw_execute($q);
   }
 
+  function can_ship_free() {
+    $boxes= [ [ 33, 19, 4 ], [ 20, 13, 10 ], [ 54, 4, 4 ] ];
+
+    return ($this->weight < 10 &&
+            \Scat\Service\Shipping::fits_in_box($boxes, [
+              [ $this->width, $this->height, $this->length ]
+            ]));
+  }
+
   public function shipping_rate() {
-    $rate= $this->hazmat ? 'hazmat-' : '';
-
     if ($this->oversized) {
-      return $rate . "truck";
+      return "truck";
     }
 
-    if ($this->weight == 0 || $this->length == 0) {
-      return $rate . "unknown";
+    if ($this->weight == 0 || $this->length == 0 || $this->width == 0 || $this->height == 0) {
+      return "unknown";
     }
 
-    $size= [$this->height, $this->length, $this->width ];
-    sort($size, SORT_NUMERIC);
-
-    if ($size[0] > 8 || $size[1] > 19 || $size[2] > 25) {
-      return $rate . "large";
-    } else if ($size[0] > 8 || $size[1] > 15 || $size[2] > 18) {
-      return $rate . "medium";
+    if ($this->can_ship_free()) {
+      return "possiblyfree";
     }
 
-    return $rate . "small";
+    return "standard";
   }
 
   public function variations() {

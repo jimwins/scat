@@ -89,4 +89,26 @@ class Shipping
 
     return $ep->refund();
   }
+
+  static function fits_in_box($boxes, $items) {
+    $laff= new \Cloudstek\PhpLaff\Packer();
+
+    foreach ($boxes as $size) {
+      $laff->pack($items, [
+            'length' => $size[0],
+            'width' => $size[1],
+            'height' => $size[2],
+      ]);
+
+      $container= $laff->get_container_dimensions();
+
+      if ($container['height'] <= $size[2] &&
+          !count($laff->get_remaining_boxes()))
+      {
+        return $size;
+      }
+    }
+
+    return false;
+  }
 }

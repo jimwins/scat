@@ -1038,6 +1038,7 @@ class Catalog {
       if (is_array($media[0])) {
         $image= 'https:' . ORDURE_STATIC . $media[0]['src'];
       } else {
+        if (!$media[0]) continue;
         $image= 'https:' . $media[0]->large_square();
       }
 
