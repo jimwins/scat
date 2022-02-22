@@ -1,0 +1,55 @@
+version: '3.4'
+
+services:
+
+  php-fpm:
+    build: .
+    links:
+      - db
+      - search
+    env_file:
+      - sample.env
+    volumes:
+      - .:/app
+      - ./php-fpm-extra.conf:/usr/local/etc/php-fpm.d/php-fpm-extra.conf
+    restart: always
+
+  db:
+    image: mysql:8.0.16
+    env_file:
+      - sample.env
+    # old password auth so sphinx can access it
+    command: [ mysqld, --local-infile=1, --default_authentication_plugin=mysql_native_password ]
+    expose:
+      - "3306"
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d
+      - data:/var/lib/mysql
+    restart: always
+
+  search:
+    image: macbre/sphinxsearch:3.2.1
+    links:
+      - db
+    expose:
+      - "9306"
+    env_file:
+      - sample.env
+    volumes:
+      - ./search:/opt/sphinx/conf
+      - searchdata:/var/data
+    restart: always
+
+  nginx:
+    image: joshuawalsh/nginx-for-php-fpm
+    restart: always
+    depends_on:
+      - php-fpm
+    ports:
+      - 5080:80
+    volumes:
+      - ./pos:/var/www/html/
+
+volumes:
+  data:
+  searchdata:
