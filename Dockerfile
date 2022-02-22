@@ -1,4 +1,4 @@
-FROM php:7.4.5-fpm-alpine
+FROM php:8.0.16-fpm-alpine
 
 LABEL maintainer="Jim Winstead <jimw@trainedmonkey.com>"
 
@@ -11,7 +11,7 @@ RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         libpng-dev \
         libzip-dev \
         optipng \
-        mpdecimal \
+        mpdecimal-dev \
         pngquant \
         mysql-client \
         tzdata \
@@ -40,5 +40,5 @@ RUN curl -sS https://getcomposer.org/installer | php \
         && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
 
 RUN composer install \
-        --no-dev --no-interaction --no-progress --no-suggest \
+        --no-dev --no-interaction --no-progress \
         --optimize-autoloader --classmap-authoritative

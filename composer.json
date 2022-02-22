@@ -47,10 +47,10 @@
         "php-http/logger-plugin": "^1.0",
         "tarikozket/backblaze-b2-sdk-php": "dev-master",
         "slim/slim": "4.*",
-        "twig/twig": "^2.6",
-        "slim/twig-view": "^3.0",
+        "twig/twig": "^3.3",
+        "slim/twig-view": "^3.3",
         "aptoma/twig-markdown": "^3.0",
-        "robmorgan/phinx": "^0.10.7",
+        "robmorgan/phinx": "^0.12.10",
         "publitio/publitio": "dev-master",
         "easypost/easypost-php": "^3.4",
         "quickbooks/v3-php-sdk": "^5.3",
@@ -68,9 +68,26 @@
         "paypal/paypal-checkout-sdk": "^1.0",
         "amzn/amazon-pay-api-sdk-php": "^2.2",
         "cloudstek/php-laff": "dev-master",
-        "twig/html-extra": "^3.3"
+        "twig/html-extra": "^3.3",
+        "google/apiclient": "^2.12.1"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"
+    },
+    "scripts": {
+      "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "Analytics",
+            "AnalyticsData",
+            "ShoppingContent"
+        ]
+    },
+    "config": {
+      "allow-plugins": {
+        "composer/installers": true,
+        "oomphinc/composer-installers-extender": true
+      }
     }
 }

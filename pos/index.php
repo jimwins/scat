@@ -35,7 +35,7 @@ $container->set('view', function() {
   /* Set timezone for date functions */
   $tz= @$_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ'];
   $view->getEnvironment()
-    ->getExtension('Twig_Extension_Core')
+    ->getExtension(\Twig\Extension\CoreExtension::class)
     ->setTimezone($tz);
 
   // Add the Markdown extension
@@ -631,7 +631,6 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Settings::class, 'wordform' ]);
   $app->post('/wordform[/{wordform_id}]',
               [ \Scat\Controller\Settings::class, 'wordformUpdate' ]);
-
 });
 
 /* Webhooks */

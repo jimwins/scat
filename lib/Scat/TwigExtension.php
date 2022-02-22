@@ -5,7 +5,7 @@ class TwigExtension
   extends \Twig\Extension\AbstractExtension
   implements \Twig\Extension\GlobalsInterface
 {
-  public function getGlobals() {
+  public function getGlobals() : array {
     return [
       'DEBUG' => $GLOBALS['DEBUG'],
       'PUBLIC' => ORDURE,
@@ -14,17 +14,17 @@ class TwigExtension
     ];
   }
 
-  public function getFunctions() {
+  public function getFunctions() : array {
     return [
       new \Twig\TwigFunction('notes', [ $this, 'getNotes' ]),
     ];
   }
 
-  public function getFilters() {
+  public function getFilters() : array {
     return [
-      new \Twig_SimpleFilter('hexdec', 'hexdec'),
-      new \Twig_SimpleFilter('phone_number_format',
-                             [ $this, 'phone_number_format' ])
+      new \Twig\TwigFilter('hexdec', 'hexdec'),
+      new \Twig\TwigFilter('phone_number_format',
+                           [ $this, 'phone_number_format' ])
     ];
   }
 
