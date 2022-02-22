@@ -9,11 +9,26 @@ use \Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
 
 /* Some defaults */
 error_reporting(E_ALL & ~E_NOTICE);
-date_default_timezone_set(@$_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ']);
+$tz= @$_ENV['PHP_TIMEZONE'] ?: @$_ENV['TZ'];
+if ($tz) date_default_timezone_set($tz);
 bcscale(2);
 
 $DEBUG= $ORM_DEBUG= false;
-$config= require @$_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/../config.php';
+$config_file= @$_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/../config.php';
+if (file_exists($config_file)) {
+  $config= require $config_file;
+} else {
+  $config= [
+    'data' => [
+      'dsn' => 'mysql:host=db;dbname=scat;charset=utf8mb4',
+      'options' => [
+        'return_result_sets' => true,
+        'username' => $_ENV['MYSQL_USER'],
+        'password' => $_ENV['MYSQL_PASSWORD'],
+      ],
+    ],
+  ];
+}
 
 $builder= new \DI\ContainerBuilder();
 /* Need to set up definitions for services that require manual setup */
@@ -33,10 +48,12 @@ $container->set('view', function() {
   $view= \Slim\Views\Twig::create('../ui', [ 'cache' => false ]);
 
   /* Set timezone for date functions */
-  $tz= @$_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ'];
-  $view->getEnvironment()
-    ->getExtension(\Twig\Extension\CoreExtension::class)
-    ->setTimezone($tz);
+  $tz= @$_ENV['PHP_TIMEZONE'] ?: @$_ENV['TZ'];
+  if ($tz) {
+    $view->getEnvironment()
+      ->getExtension(\Twig\Extension\CoreExtension::class)
+      ->setTimezone($tz);
+  }
 
   // Add the Markdown extension
   $engine= new \Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine();
