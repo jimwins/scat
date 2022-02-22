@@ -33,7 +33,7 @@ class Config extends \Scat\Model {
 
     $row->save();
 
-    unset($cache[$name]);
+    unset(@self::$cache[$name]);
   }
 
   static public function forgetValue($name) {
@@ -41,11 +41,11 @@ class Config extends \Scat\Model {
     if ($row) {
       $row->delete();
     }
-    unset($cache[$name]);
+    unset(@self::$cache[$name]);
 
 
     if ($row) {
-      return ($cache[$name]= $row->value);
+      return (self::$cache[$name]= $row->value);
     }
 
     return null;
