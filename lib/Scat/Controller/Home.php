@@ -33,6 +33,7 @@ class Home {
         ->find_many();
 
     $q= trim($request->getParam('q'));
+    $results= null;
     if ($q) {
       if (preg_match('/^((%V|@)INV-)(\d+)/i', $q, $m)) {
         $match= $txn->fetchById($m[3]);
