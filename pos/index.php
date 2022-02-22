@@ -9,11 +9,11 @@ use \Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
 
 /* Some defaults */
 error_reporting(E_ALL & ~E_NOTICE);
-date_default_timezone_set($_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ']);
+date_default_timezone_set(@$_ENV['PHP_TIMEZONE'] ?: $_ENV['TZ']);
 bcscale(2);
 
 $DEBUG= $ORM_DEBUG= false;
-$config= require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/../config.php';
+$config= require @$_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/../config.php';
 
 $builder= new \DI\ContainerBuilder();
 /* Need to set up definitions for services that require manual setup */
