@@ -5,14 +5,14 @@ class Config extends \Scat\Model {
   static protected $cache= [];
 
   static public function getValue($name) {
-    if (defined($cache[$name])) {
-      return $cache[$name];
+    if (array_key_exists($name, self::$cache)) {
+      return self::$cache[$name];
     }
 
     $row= self::factory('Config')->where('name', $name)->find_one();
 
     if ($row) {
-      return ($cache[$name]= $row->value);
+      return (self::$cache[$name]= $row->value);
     }
 
     return null;
