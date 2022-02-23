@@ -25,6 +25,11 @@ class Reports {
 
   public function quick(Request $request, Response $response) {
     $data= $this->report->sales();
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false)
+    {
+      return $response->withJson($data['sales']);
+    }
     return $this->view->render($response, 'dialog/report-quick.html', $data);
   }
 
