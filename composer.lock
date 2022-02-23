@@ -1595,16 +1595,16 @@
         },
         {
             "name": "jimwins/titi",
-            "version": "v0.0.3",
+            "version": "v0.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jimwins/titi.git",
-                "reference": "0e24cc102a16e197206e90078e98affe99345613"
+                "reference": "3adb19d22e2a5b1ae221060c428a092a3c08b018"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jimwins/titi/zipball/0e24cc102a16e197206e90078e98affe99345613",
-                "reference": "0e24cc102a16e197206e90078e98affe99345613",
+                "url": "https://api.github.com/repos/jimwins/titi/zipball/3adb19d22e2a5b1ae221060c428a092a3c08b018",
+                "reference": "3adb19d22e2a5b1ae221060c428a092a3c08b018",
                 "shasum": ""
             },
             "require": {
@@ -1647,7 +1647,7 @@
                 "issues": "https://github.com/jimwins/titi/issues",
                 "source": "https://github.com/jimwins/titi"
             },
-            "time": "2020-06-22T17:46:38+00:00"
+            "time": "2022-02-23T20:01:37+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
