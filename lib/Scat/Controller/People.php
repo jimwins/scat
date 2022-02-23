@@ -26,6 +26,7 @@ class People {
     $limit= $request->getParam('limit') ?: 20;
     $people= $this->getLatestPeople($data, $limit);
 
+    $select2= $request->getParam('_type') == 'query';
     $accept= $request->getHeaderLine('Accept');
     if ($select2 || strpos($accept, 'application/json') !== false) {
       return $response->withJson($people);
