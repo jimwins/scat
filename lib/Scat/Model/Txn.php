@@ -700,7 +700,7 @@ class Txn extends \Scat\Model {
           foreach ($this->items()->where_null('returned_from_id')->where_null('kit_id')->find_many()
                     as $i)
           {
-            $tic= $i->item->tic;
+            $tic= $i->item()->tic;
             $index= ($tic == '11000') ? 0 : $n++;
             $index_map[$index]= $i->id;
             $data['cartItems'][]= [
