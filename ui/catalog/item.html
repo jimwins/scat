@@ -247,6 +247,17 @@
             </div>
           </div>
 
+          <div class="form-group">
+            <label for="margin" class="col-sm-6 control-label">
+             Google
+            </label>
+            <div class="col-sm-6">
+              <button class="btn btn-default" data-action="google-history">
+                View Activity
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1132,6 +1143,10 @@
 
   scat.handleAction('click', 'grab-media', (act) => {
     return scat.dialog('/catalog/item/{{ item.code }}/media?grab=1')
+  })
+
+  scat.handleAction('click', 'google-history', (act) => {
+    return scat.dialog('/catalog/item/{{ item.code }}/googleHistory')
   })
   </script>
 

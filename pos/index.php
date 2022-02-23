@@ -311,6 +311,9 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->delete('/item/{code:.*}/vendor-item/{id:[0-9]+}',
             [ \Scat\Controller\Catalog::class, 'unlinkVendorItem' ]);
 
+  $app->get('/item/{code:.+}/googleHistory',
+            [ \Scat\Controller\Catalog::class, 'itemGetGoogleHistory' ]);
+
   $app->post('/item/~bulk-update',
             [ \Scat\Controller\Catalog::class, 'bulkItemUpdate' ]);
 
@@ -648,6 +651,9 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Settings::class, 'wordform' ]);
   $app->post('/wordform[/{wordform_id}]',
               [ \Scat\Controller\Settings::class, 'wordformUpdate' ]);
+
+  $app->map(['GET', 'POST'], '/google',
+            [ \Scat\Controller\Settings::class, 'connectGoogle' ]);
 });
 
 /* Webhooks */

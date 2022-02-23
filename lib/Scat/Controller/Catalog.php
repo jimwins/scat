@@ -355,6 +355,7 @@ class Catalog {
     $item= $code ? $this->catalog->getItemByCode($code) : null;
     if ($code && !$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
+    $id= null;
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
@@ -787,6 +788,26 @@ class Catalog {
     return $response->withJson([]);
   }
 
+  public function itemGetGoogleHistory(Request $request, Response $response,
+                                        \Scat\Service\Google $google, $code)
+  {
+    $item= $code ? $this->catalog->getItemByCode($code) : null;
+    if ($code && !$item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $data= $google->getItemShoppingHistory($item->code);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/item-google-history.html', [
+        'item' => $item,
+        'history' => $data,
+      ]);
+    }
+
+    return $response->withJson($data);
+  }
+
   function bulkItemUpdate(Request $request, Response $response) {
     $items= $request->getParam('items');
 
@@ -956,6 +977,7 @@ class Catalog {
           ->order_by_asc('code')
           ->find_many():null;
 
+      $variations= null;
       if ($items) {
         $variations= array_unique(
           array_map(function ($i) {

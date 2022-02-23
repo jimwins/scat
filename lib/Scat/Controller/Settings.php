@@ -7,10 +7,14 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Settings {
-  private $data;
+  private $data, $config;
 
-  public function __construct(\Scat\Service\Data $data) {
+  public function __construct(
+    \Scat\Service\Data $data,
+    \Scat\Service\Config $config
+  ) {
     $this->data= $data;
+    $this->config= $config;
   }
 
   public function home(Response $response, View $view) {
@@ -181,5 +185,59 @@ class Settings {
     $wordform->save();
 
     return $response->withJson($wordform);
+  }
+
+  public function connectGoogle(Request $request, Response $response,
+                                View $view)
+  {
+    $client_id= $this->config->get('google.client_id');
+    $client_secret= $this->config->get('google.client_secret');
+    $token= $this->config->get('google.oauth_access_token');
+    if ($token) {
+      $token= json_decode($token, true);
+    }
+
+    if ($request->getParam('reauthorize') && $token) {
+      $this->config->forget('google.oauth_access_token');
+      $token= null;
+    }
+
+    if ($request->getParam('client_id')) {
+      $client_id= $request->getParam('client_id');
+      $this->config->set('google.client_id', $client_id);
+    }
+
+    if ($request->getParam('client_secret')) {
+      $client_secret= $request->getParam('client_secret');
+      $this->config->set('google.client_secret', $client_secret, 'password');
+    }
+
+    if ($client_id && $client_secret) {
+      $client= new \Google\Client();
+      $client->setApplicationName('Scat POS');
+      $client->setClientId($client_id);
+      $client->setClientSecret($client_secret);
+      $client->setRedirectUri($request->getUri()->withQuery(""));
+      $client->setAccessType('offline');
+      $client->setIncludeGrantedScopes(true);
+      $client->setScopes('https://www.googleapis.com/auth/content');
+
+      if ($token) {
+        $client->setAccessToken($token);
+      } elseif (($code= $request->getParam('code'))) {
+        $token= $client->authenticate($code);
+        if (array_key_exists('error', $token)) {
+          throw new \Exception($token['error']);
+        }
+        $this->config->set('google.oauth_access_token', json_encode($token), 'password');
+      } else {
+        return $response->withRedirect($client->createAuthUrl());
+      }
+    }
+
+    return $view->render($response, 'settings/google.html', [
+      'client_id' => $client_id,
+      'token' => $token,
+    ]);
   }
 }

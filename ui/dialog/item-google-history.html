@@ -1,0 +1,68 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Google History for {{ product ? product.name : item.name }}
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    <div>
+      <canvas id="my-chart"></canvas>
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit %}
+{% endblock %}
+
+{% block script %}
+  {
+    import('/extern/chart.js-3.7.1/dist/chart.min.js')
+      .then((module) => {
+  const labels = [
+    {% for date in history %}
+      '{{ date.segments.date.year ~ '-' ~ date.segments.date.month ~ '-' ~ date.segments.date.day }}',
+    {% endfor %}
+  ];
+
+  const data = {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Impressions',
+        backgroundColor: 'rgb(132, 99, 132)',
+        borderColor: 'rgb(132, 99, 132)',
+        data: [
+          {% for date in history %}
+            {{ date.metrics.impressions }},
+          {% endfor %}
+        ],
+      },
+      {
+        label: 'Clicks',
+        backgroundColor: 'rgb(99, 132, 132)',
+        borderColor: 'rgb(99, 132, 132)',
+        data: [
+          {% for date in history %}
+            {{ date.metrics.clicks }},
+          {% endfor %}
+        ],
+      }
+    ]
+  };
+
+  const config = {
+    type: 'line',
+    data: data,
+    options: {}
+  };
+
+  const myChart = new Chart(
+    document.getElementById('my-chart'),
+    config
+  );
+
+      })
+  }
+{% endblock %}
