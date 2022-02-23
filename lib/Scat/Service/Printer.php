@@ -56,7 +56,10 @@ class Printer
   public function printPDF(Response $response, $pageType, $pdf) {
     $printerManager= $this->getPrinterManager();
 
-    list ($pageType, $modifier)= explode(':', $pageType);
+    $details= explode(':', $pageType);
+    $pageType= $details[0];
+    $modifier= (count($details) > 1) ? $details[1] : '';
+
     $printer_name= $this->config->get('printer.' . $pageType);
 
     if ($GLOBALS['DEBUG'] || !$printerManager || !$printer_name) {
@@ -90,7 +93,10 @@ class Printer
   public function printPNG(Response $response, $pageType, $png) {
     $printerManager= $this->getPrinterManager();
 
-    list ($pageType, $modifier)= explode(':', $pageType);
+    $details= explode(':', $pageType);
+    $pageType= $details[0];
+    $modifier= (count($details) > 1) ? $details[1] : '';
+
     $printer_name= $this->config->get('printer.' . $pageType);
 
     if (!$printerManager || !$printer_name) {
@@ -134,7 +140,10 @@ class Printer
   public function printZPL(Response $response, $pageType, $zpl) {
     $printerManager= $this->getPrinterManager();
 
-    list ($pageType, $modifier)= explode(':', $pageType);
+    $details= explode(':', $pageType);
+    $pageType= $details[0];
+    $modifier= (count($details) > 1) ? $details[1] : '';
+
     $printer_name= $this->config->get('printer.' . $pageType);
 
     if (!$printerManager || !$printer_name) {
