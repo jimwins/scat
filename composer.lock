@@ -5036,12 +5036,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jimwins/cups-ipp.git",
-                "reference": "b9e67dfd566ed1daa15c7fb5fdc6866008a59041"
+                "reference": "63a0a1ed3d955b9023b82bd8799ca2a7c0e6fcae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jimwins/cups-ipp/zipball/b9e67dfd566ed1daa15c7fb5fdc6866008a59041",
-                "reference": "b9e67dfd566ed1daa15c7fb5fdc6866008a59041",
+                "url": "https://api.github.com/repos/jimwins/cups-ipp/zipball/63a0a1ed3d955b9023b82bd8799ca2a7c0e6fcae",
+                "reference": "63a0a1ed3d955b9023b82bd8799ca2a7c0e6fcae",
                 "shasum": ""
             },
             "require": {
@@ -5083,7 +5083,7 @@
             "support": {
                 "source": "https://github.com/jimwins/cups-ipp/tree/dev-local"
             },
-            "time": "2022-02-22T00:14:55+00:00"
+            "time": "2022-02-24T19:27:49+00:00"
         },
         {
             "name": "stripe/stripe-php",
