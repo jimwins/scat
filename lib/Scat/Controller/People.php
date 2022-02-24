@@ -142,7 +142,6 @@ class People {
      'q' => $q,
      'page' => $page,
      'limit' => $limit,
-     'page_size' => $page_size,
     ]);
   }
 
