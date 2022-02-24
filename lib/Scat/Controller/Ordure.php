@@ -95,7 +95,7 @@ class Ordure {
     $url= ORDURE . '/get-pending-rewards';
     $res= $client->request('GET', $url,
                            [
-                             'debug' => $DEBUG,
+                             'debug' => $GLOBALS['DEBUG'],
                              'query' => [ 'key' => ORDURE_KEY ]
                            ]);
 
@@ -175,7 +175,7 @@ class Ordure {
       $url= ORDURE . '/mark-rewards-processed';
       $res= $client->request('GET', $url,
                              [
-                               'debug' => $DEBUG,
+                               'debug' => $GLOBALS['DEBUG'],
                                'query' => [ 'key' => ORDURE_KEY,
                                             'id' => $update->id ]
                              ]);
@@ -197,7 +197,7 @@ class Ordure {
     $url= ORDURE . '/sale/list';
     $res= $client->request('GET', $url,
                            [
-                             'debug' => $DEBUG,
+                             'debug' => $GLOBALS['DEBUG'],
                              'query' => [ 'key' => ORDURE_KEY,
                                           'json' => 1 ]
                            ]);
@@ -214,7 +214,7 @@ class Ordure {
         $url= ORDURE . '/sale/' . $summary->uuid . '/json';
         $res= $client->request('GET', $url,
                                [
-                                 'debug' => $DEBUG,
+                                 'debug' => $GLOBALS['DEBUG'],
                                  'query' => [ 'key' => ORDURE_KEY ]
                                ]);
 
@@ -404,7 +404,7 @@ class Ordure {
         $url= ORDURE . '/sale/' . $summary->uuid . '/set-status';
         $res= $client->request('POST', $url,
                                [
-                                 'debug' => $DEBUG,
+                                 'debug' => $GLOBALS['DEBUG'],
                                  'headers' => [
                                    'X-Requested-With' => 'XMLHttpRequest',
                                  ],
@@ -451,7 +451,7 @@ class Ordure {
     $url= ORDURE . '/sale/list';
     $res= $client->request('GET', $url,
                            [
-                             'debug' => $DEBUG,
+                             'debug' => $GLOBALS['DEBUG'],
                              'query' => [ 'key' => ORDURE_KEY,
                                           'carts' => 1,
                                           'yesterday' => 1,
@@ -468,7 +468,7 @@ class Ordure {
       $url= ORDURE . '/sale/' . $summary->uuid . '/json';
       $res= $client->request('GET', $url,
                              [
-                               'debug' => $DEBUG,
+                               'debug' => $GLOBALS['DEBUG'],
                                'query' => [ 'key' => ORDURE_KEY ]
                              ]);
 
@@ -503,7 +503,7 @@ class Ordure {
       $url= ORDURE . '/sale/' . $summary->uuid . '/set-abandoned-level';
       $res= $client->request('POST', $url,
                              [
-                               'debug' => $DEBUG,
+                               'debug' => $GLOBALS['DEBUG'],
                                'headers' => [
                                  'X-Requested-With' => 'XMLHttpRequest',
                                ],
