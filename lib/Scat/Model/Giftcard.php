@@ -24,6 +24,10 @@ class Giftcard extends \Scat\Model {
     return $this->txns()->sum('amount');
   }
 
+  public function owner() {
+    return $this->has_one('Person')->find_one();
+  }
+
   public function jsonSerialize() {
     $history= array();
     $balance= new \Decimal\Decimal(0);

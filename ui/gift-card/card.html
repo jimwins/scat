@@ -49,7 +49,7 @@
       </tbody>
     </table>
     <div class="panel-footer">
-      <form>
+      <form class="row">
         <div class="col-sm-4">
           <button type="button"
                   class="print-card btn btn-primary
@@ -62,21 +62,41 @@
             Email
           </button>
         </div>
-        <div class="input-group col-sm-4">
-          <input type="text" class="form-control"
-                 name="amount"
-                 placeholder="$0.00">
-          <div class="input-group-btn">
-            <button class="btn btn-default"
-                    type="submit" name="action" value="add">
-              Add
-            </button>
-            <button class="btn btn-default"
-                    type="submit" name="action" value="spend">
-              Spend
-            </button>
+
+        <div class="col-sm-4">
+          <div class="input-group">
+            <input type="text" class="form-control"
+                   name="amount"
+                   placeholder="$0.00">
+            <div class="input-group-btn">
+              <button class="btn btn-default"
+                      type="submit" name="action" value="add">
+                Add
+              </button>
+              <button class="btn btn-default"
+                      type="submit" name="action" value="spend">
+                Spend
+              </button>
+            </div>
           </div>
         </div>
+
+        <div class="col-sm-4">
+          {% set owner = card.owner() %}
+          {% if owner %}
+            <p class="form-control-static">
+              Store credit for
+                <a href="{{ url_for('person', { id: owner.id }) }}">
+                  {{ owner.friendly_name }}
+                </a>
+            </p>
+          {% else %}
+            <a class="btn btn-default" data-action="attach-to-person">
+              Attach to Person
+            </a>
+          {% endif %}
+        </div>
+
         <script>
         {
           let form= document.currentScript.parentNode
@@ -99,6 +119,23 @@
                 .then((data) => {
                   window.location.reload()
                 })
+          })
+
+          scat.handleActionOn(form, 'click', 'attach-to-person', (act) => {
+            return scat.dialog('/person/search')
+              .then((res) => {
+                if (res instanceof Response) {
+                  return res.json().then((data) => {
+                    return scat.patch("/person/" + data.id, { giftcard_id: {{ card.id }} })
+                  })
+                }
+                else if (res > 0) {
+                  return scat.patch("/person/" + res, { giftcard_id: {{ card.id }} })
+                }
+              })
+              .then((res) => {
+                window.location.reload()
+              })
           })
         }
         </script>
