@@ -452,7 +452,7 @@ class Catalog {
 
     $item->save();
 
-    if ($vendor_item) {
+    if (isset($vendor_item)) {
       if ($vendor_item->barcode) {
         $barcode= $item->barcodes()->create();
         $barcode->code= $vendor_item->barcode;
