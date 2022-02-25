@@ -164,6 +164,24 @@ class Person extends \Scat\Model {
       }
       $this->$name= $value;
     }
+    /* If we already have a giftcard attached, attaching a new one will
+     * transfer the balance. */
+    else if ($name == 'giftcard_id' && $this->giftcard_id) {
+      $giftcard= $this->factory('Giftcard')->find_one($value);
+      if (!$giftcard) {
+        throw new \Exception("Unable to find giftcard '$giftcard_id'.");
+      }
+
+      $store_credit= $this->factory('Giftcard')->find_one($this->giftcard_id);
+      if (!$store_credit) {
+        throw new \Exception("Unable to find store credit '{$this->giftcard_id}'.");
+      }
+
+      $amount= $giftcard->balance();
+
+      $giftcard->add_txn(-$amount);
+      $store_credit->add_txn($amount);
+    }
     elseif (isset($this, $name)) {
       $this->$name= ($value !== '') ? $value : null;
     } else {
