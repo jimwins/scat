@@ -53,7 +53,7 @@ class Product extends \Scat\Model {
 
   public function media() {
     $media= $this->has_many_through('Image')->find_many();
-    if (!$media[0]->id) {
+    if (!count($media)) {
       return $this->image ?
         [
           [
