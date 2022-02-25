@@ -17,6 +17,7 @@ class Giftcards {
   }
 
   public function home(Request $request, Response $response) {
+    $page= (int)$request->getParam('page');
     $page_size= 25;
 
     $cards= $this->data->factory('Giftcard')
