@@ -16,7 +16,7 @@ class Email {
   {
     $postmark= new \Postmark\PostmarkClient($this->postmark_token);
 
-    if ($options['from']) {
+    if (isset($options['from'])) {
       $from= $options['from']['name'] . " " . $options['from']['email'];
     } else {
       $from= $this->from_name . " " . $this->from_email;
@@ -42,7 +42,7 @@ class Email {
     $to_list= join(', ', $addr);
 
     $cc= NULL;
-    if ($options['cc']) {
+    if (isset($options['cc'])) {
       $cc= $options['cc'];
       if ($GLOBALS['DEBUG']) {
         $cc= $this->from_email;
@@ -68,7 +68,7 @@ class Email {
 
     return $postmark->sendEmail(
       $from, $to_list, $subject, $body, NULL, NULL, NULL,
-      NULL, $cc, $bcc, NULL, $attach, NULL, NULL, $options['stream']
+      NULL, $cc, $bcc, NULL, $attach, NULL, NULL, @$options['stream']
     );
   }
 

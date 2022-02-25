@@ -236,20 +236,20 @@ class Transactions {
         $txn->clearLoyalty();
       }
       if ($value !== null && $value != $txn->get($field)) {
-        $changed[$field]++;
+        @$changed[$field]++;
         $txn->set($field, $value);
       }
     }
 
-    if ($changed['tax_rate']) {
+    if (isset($changed['tax_rate'])) {
       $txn->recalculateTax($this->tax);
     }
-    if ($changed['person_id']) {
+    if (isset($changed['person_id'])) {
       $txn->rewardLoyalty();
     }
 
     // Pass along status change to Ordure when shipping
-    if ($changed['status'] && $txn->online_sale_id) {
+    if (isset($changed['status']) && $txn->online_sale_id) {
       if (in_array($txn->status,
                     [ 'readyforpickup', 'shipping', 'shipped', 'complete']))
       {
