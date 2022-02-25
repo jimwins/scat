@@ -298,7 +298,7 @@ class Catalog {
     $grabs= [];
     if ($request->getParam('grab')) {
       foreach($product->items()->find_many() as $item) {
-        $grabs= array_merge($item->media()->as_array(), $grabs);
+        $grabs= array_merge($item->media(), $grabs);
       }
     }
 
