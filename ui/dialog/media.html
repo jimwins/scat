@@ -38,6 +38,29 @@
       </div>
     {% endfor %}
 
+    {% for i in related %}
+      <div class="media" data-id="{{ i.id }}">
+        <div class="media-left" style="min-width: 128px; min-height: 128px">
+          {{ include('carousel.twig', { images: [ i ], thumb: true }) }}
+        </div>
+        <div class="media-body">
+          <h4 class="media-heading">{{ i.name }}</h4>
+          {{ i.caption }}
+        </div>
+        <div class="media-right">
+          <a class="btn btn-sm btn-default btn-block" target="_blank"
+             href="{{ url_for('media', { id: i.id }) }}">
+            <i class="fa fa-fw fa-file-image-o"></i>
+            Details
+          </a>
+          <button role="button" class="btn btn-sm btn-default btn-block"
+                  data-action="connect-media">
+            <i class="fa fa-fw fa-link"></i>
+            Connect
+          </button>
+        </div>
+      </div>
+    {% endfor %}
     {% for grab in grabs %}
       <div class="media" data-url="{{ grab.values[0].download_url }}">
         <div class="media-left" style="min-width: 128px; min-height: 128px">
@@ -69,6 +92,15 @@
     return scat.delete('/catalog/{{ product ? 'product/' ~ product.id : 'item/' ~ item.code }}/media/' + id)
       .then((res) => {
         act.closest('[data-id]').remove();
+      })
+  })
+
+  scat.handleActionOn(form, 'click', 'connect-media', (act) => {
+    let id= act.closest('[data-id]').getAttribute('data-id')
+
+    return scat.post('/catalog/{{ product ? 'product/' ~ product.id : 'item/' ~ item.code }}/media', { media_id: id })
+      .then((res) => {
+        window.location.reload()
       })
   })
 

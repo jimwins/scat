@@ -11,6 +11,10 @@ class Media
     $this->ordure= $ordure;
   }
 
+  public function findById($id) {
+    return $this->data->factory('Image')->find_one($id);
+  }
+
   public function getB2Client() {
     $id= $this->config->get('b2.keyID');
     $key= $this->config->get('b2.applicationKey');

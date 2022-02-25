@@ -295,11 +295,19 @@ class Catalog {
     if ($id && !$product)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $grabs= [];
+    if ($request->getParam('grab')) {
+      foreach($product->items()->find_many() as $item) {
+        $grabs= array_merge($item->media()->as_array(), $grabs);
+      }
+    }
+
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
       return $this->view->render($response, 'dialog/media.html', [
         'product' => $product,
         'media' => $product->media(),
+        'related' => $grabs,
       ]);
     }
 
@@ -313,9 +321,15 @@ class Catalog {
     if ($id && !$product)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    // TODO should be a Media service for this
     $url= $request->getParam('url');
-    if ($url) {
+    $media_id= $request->getParam('media_id');
+
+    if ($media_id) {
+      $image= $media->findById($media_id);
+      if (!$image)
+        throw new \Slim\Exception\HttpNotFoundException($request);
+      $product->addImage($image);
+    } elseif ($url) {
       $image= $media->createFromUrl($url);
       $product->addImage($image);
     } else {

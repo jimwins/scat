@@ -39,6 +39,11 @@
     {% set media = product.media %}
     {% if media is not empty %}
       {{ include('carousel.twig', { images: product.media, edit: 'edit-media' }) }}
+    {% else %}
+      <button class="btn btn-default btn-block" data-action="grab-media">
+        <i class="fa fa-file-image-o fa-fw"></i>
+        Grab from Item Images
+      </button>
     {% endif %}
   </div>
   <div class="col-sm-8">
@@ -51,5 +56,8 @@
 <script>
   scat.handleAction('click', 'edit-media', (act) => {
     return scat.dialog('/catalog/product/{{ product.id }}/media')
+  })
+  scat.handleAction('click', 'grab-media', (act) => {
+    return scat.dialog('/catalog/product/{{ product.id }}/media?grab=1')
   })
 </script>
