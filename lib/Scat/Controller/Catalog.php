@@ -996,7 +996,7 @@ class Catalog {
         $variations= array_unique(
           array_map(function ($i) {
             return $i->variation;
-          }, $items->as_array()));
+          }, $items));
       }
 
       $brands= $deptO ? null : $this->catalog->getBrands();
