@@ -154,7 +154,7 @@ $parent= 0;
  <tbody id="results">
 <?
 while ($row= $r->fetch_assoc()) {
-  if ($row['parent'] && !$row['previous_amount'] && !$row['current_amount']) {
+  if (@$row['parent'] && !$row['previous_amount'] && !$row['current_amount']) {
     continue;
   }
 
