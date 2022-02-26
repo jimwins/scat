@@ -412,6 +412,11 @@ class Item extends \Scat\Model {
   function can_ship_free() {
     $boxes= [ [ 33, 19, 4 ], [ 20, 13, 10 ], [ 54, 4, 4 ] ];
 
+    // Don't know?
+    if (!$this->weight || !$this->width || !$this->length || !$this->height) {
+      return null;
+    }
+
     return ($this->weight < 10 &&
             \Scat\Service\Shipping::fits_in_box($boxes, [
               [ $this->width, $this->height, $this->length ]
