@@ -734,6 +734,14 @@
       </span>
     </p>
 
+    <p>
+      {% if item.can_ship_free %}
+        <b class="text-success">Can ship for free.</b>
+      {% else %}
+        <b class="text-danger">Cannot ship free.</b>
+      {% endif %}
+    </p>
+
     <button type="button" class="btn btn-link toggle"
             data-name="prop65" data-value="{{ item.prop65 }}">
       <i class="fa fa-fw {{ item.prop65 ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
