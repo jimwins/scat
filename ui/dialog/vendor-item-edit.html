@@ -66,12 +66,6 @@
     </div>
 
     <div class="form-group">
-      <label for="promo_price">Promo Price</label>
-      <input type="text" class="form-control"
-             name="promo_price" value="{{ vendor_item.promo_price }}">
-    </div>
-
-    <div class="form-group">
       <label for="purchase_quantity">Purchase Quantity</label>
       <input type="text" class="form-control"
              name="purchase_quantity"
@@ -79,9 +73,34 @@
     </div>
 
     <div class="form-group">
+      <label for="promo_price">Promo Price</label>
+      <input type="text" class="form-control"
+             name="promo_price" value="{{ vendor_item.promo_price }}">
+    </div>
+
+    <div class="form-group">
+      <label for="promo_quantity">Promo Quantity</label>
+      <input type="text" class="form-control"
+             name="promo_quantity"
+             value="{{ vendor_item.promo_quantity }}">
+    </div>
+
+    <div class="form-group">
       <label for="barcode">Barcode</label>
       <input type="text" class="form-control"
              name="barcode" value="{{ vendor_item.barcode }}">
+    </div>
+
+    <div class="form-group">
+      <label for="dimensions">Dimensions</label>
+      <input type="text" class="form-control"
+             name="dimensions" value="{{ vendor_item.dimensions }}">
+    </div>
+
+    <div class="form-group">
+      <label for="weight">Weight</label>
+      <input type="text" class="form-control"
+             name="weight" value="{{ vendor_item.weight }}">
     </div>
 
   </div>

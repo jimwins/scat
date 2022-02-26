@@ -73,8 +73,33 @@ class VendorItem extends \Scat\Model {
     if ($name == 'promo_price') {
       if (!strlen($value)) $value= null;
     }
+    if ($name == 'dimensions') {
+      return $this->setDimensions($value);
+    }
 
     return parent::set($name, $value);
+  }
+
+  public function dimensions() {
+    if ($this->length && $this->width && $this->height)
+      return $this->length . 'x' .
+             $this->width . 'x' .
+             $this->height;
+  }
+
+  public function setDimensions($dimensions) {
+    error_log("setting dimensions to $dimensions");
+    list($l, $w, $h)= preg_split('/[^\d.]+/', trim($dimensions));
+    $this->length= $l;
+    $this->width= $w;
+    $this->height= $h;
+    return $this;
+  }
+
+  public function getFields() {
+    $fields= parent::getFields();
+    $fields[]= 'dimensions';
+    return $fields;
   }
 }
 
