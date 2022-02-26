@@ -6,6 +6,6 @@ It is currently a very rough work-in-progress and not suitable for use by anyone
 
 ### Current Status
 
-I am working on making it possible to start and run this using the provided docker-compose.yml. Once that is done, work will continue on cleaning up the systems, removing dependencies on services that can be made optional, and otherwise making it possible that someone else could use it.
+I am working on making it possible to start and run this using the provided `docker-compose.yml`. Once that is done, work will continue on cleaning up the systems, removing dependencies on services that can be made optional, and otherwise making it possible that someone else could use it.
 
 You can [read various blog posts about its development](https://trainedmonkey.com/tag/scat).
