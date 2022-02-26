@@ -450,6 +450,24 @@
             </button>
           {% endif %}
         {% endif %}
+
+        {% if person.vendor_rebate > 0 and not txn.paid %}
+          <br><br>
+          {% if not txn.used_discount %}
+            <button class="btn btn-primary btn-block"
+                    data-action="apply-discount"
+                    data-discount="{{ person.vendor_rebate }}%">
+              <i class="fa fa-percent fa-fw"></i>
+              Apply {{ '%g'|format(person.vendor_rebate ) }}% Discount
+            </button>
+          {% else %}
+            <button class="btn btn-primary btn-block"
+                    data-action="remove-discount">
+              <i class="fa fa-percent fa-fw"></i>
+              Remove Discount
+            </button>
+          {% endif %}
+        {% endif %}
       {% endif %}
 
       <div class="clearfix"></div>
@@ -1027,6 +1045,27 @@
 
     scat.handleAction('click', 'clear-loyalty-reward', (act) => {
       return scat.post('/sale/{{ txn.id }}/~clear-loyalty-reward')
+        .then((res) => {
+          scat.reload('invoice', 'sidebar')
+        })
+    })
+
+    scat.handleAction('click', 'apply-discount', (act) => {
+      if (act.classList.contains('disabled')) {
+        console.log("Action is disabled.")
+        return Promise.resolve()
+      }
+      var pct= act.closest('[data-discount]').getAttribute('data-discount')
+      return scat.post('/sale/{{ txn.id }}/payment', {
+        method: 'discount',
+        amount: pct,
+      }).then((res) => {
+        scat.reload('invoice', 'sidebar')
+      })
+    })
+
+    scat.handleAction('click', 'remove-discount', (act) => {
+      return scat.post('/sale/{{ txn.id }}/~remove-discount')
         .then((res) => {
           scat.reload('invoice', 'sidebar')
         })

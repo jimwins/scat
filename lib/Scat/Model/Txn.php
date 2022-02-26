@@ -131,6 +131,10 @@ class Txn extends \Scat\Model {
     return $this->payments()->where('method', 'loyalty')->count();
   }
 
+  public function used_discount() {
+    return $this->payments()->where('method', 'discount')->count();
+  }
+
   public function change() {
     return $this->payments()->where_in('method', [ 'change' ])->sum('amount');
   }

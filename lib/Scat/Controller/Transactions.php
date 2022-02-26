@@ -1175,7 +1175,7 @@ class Transactions {
       break;
 
     case 'discount':
-      if (preg_match('!^(/)?\s*(\d+)(%|/)?\s*$!', $amount, $m)) {
+      if (preg_match('!^(/)?\s*([0-9.]+)(%|/)?\s*$!', $amount, $m)) {
         if ($m[1] || $m[3]) {
           $amount= round($txn->total() * $m[2] / 100,
                          2, PHP_ROUND_HALF_EVEN);
@@ -1274,6 +1274,16 @@ class Transactions {
     }
     $txn->payments()->where('method', 'loyalty')->delete_many();
     return $response->withJson([ 'message' => 'Loyalty rewards cleared.' ]);
+  }
+
+  public function removeDiscount(Request $request, Response $response, $id)
+  {
+    $txn= $this->txn->fetchById($id);
+    if ($txn->paid) {
+      throw new \Exception("Can't remove discount reward after all paid.");
+    }
+    $txn->payments()->where('method', 'discount')->delete_many();
+    return $response->withJson([ 'message' => 'Discount removed.' ]);
   }
 
   public function emailForm(Request $request, Response $response, $id) {

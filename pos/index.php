@@ -139,6 +139,8 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Transactions::class, 'payments' ]);
   $app->post('/{id:[0-9]+}/~clear-loyalty-reward',
               [ \Scat\Controller\Transactions::class, 'clearLoyaltyReward' ]);
+  $app->post('/{id:[0-9]+}/~remove-discount',
+              [ \Scat\Controller\Transactions::class, 'removeDiscount' ]);
 
   $app->get('/{id:[0-9]+}/email-invoice-form',
             [ \Scat\Controller\Transactions::class, 'emailForm' ]);

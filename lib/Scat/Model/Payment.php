@@ -36,7 +36,7 @@ class Payment extends \Scat\Model {
              ($this->cc_lastfour ? ' ending in ' . $this->cc_lastfour : '');
     case 'discount':
       if ($this->discount) {
-        return sprintf("Discount (%d%%)", $this->discount);
+        return sprintf("Discount (%g%%)", $this->discount);
       } else {
         return 'Discount';
       }
