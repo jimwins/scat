@@ -62,6 +62,7 @@
       <th style="text-align: right">Net</th>
       <th style="text-align: right">Promo</th>
       <th>Barcode</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -95,6 +96,12 @@
           {% endif %}
         </td>
         <td>{{ i.barcode }}</td>
+        <td>
+          <button class="btn btn-xs btn-default" data-action="edit-vendor-item">
+            <i class="fa fa-edit"></i>
+            <span class="sr-only">Edit details</span>
+          </button>
+        </td>
       </tr>
     {% endfor %}
   </tbody>
@@ -134,6 +141,13 @@
           window.location.reload()
         })
     })
+
+    scat.handleAction('click', 'edit-vendor-item', (act) => {
+        let vi= act.closest('[data-id]')
+        let id= vi ? vi.getAttribute('data-id') : 0
+        return scat.dialog('/catalog/vendor-item' + (id ? '/' + id : ''))
+    })
+
   }
   </script>
 {% endblock %}
