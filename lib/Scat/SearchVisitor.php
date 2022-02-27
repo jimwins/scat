@@ -126,6 +126,10 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
       $this->current[]= $value ? "(item.weight AND item.width AND item.length AND item.height)" :
                                  "NOT IFNULL(item.weight AND item.width AND item.length AND item.height, 0)";
       break;
+    case 'stock':
+      $this->current[]= (bool)$value ? "((SELECT SUM(allocated) FROM txn_line WHERE txn_line.item_id = item.id) > 0)" :
+                                       "(!IFNULL((SELECT SUM(allocated) FROM txn_line WHERE txn_line.item_id = item.id), 0))";
+      break;
     case 'stocked':
       $this->current[]= (bool)$value ? "(item.minimum_quantity)" :
                                        "(NOT item.minimum_quantity)";
