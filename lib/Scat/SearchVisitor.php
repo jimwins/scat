@@ -115,6 +115,10 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     case 'height':
     case 'length':
     case 'weight':
+    case 'prop65':
+    case 'hazmat':
+    case 'oversized':
+    case 'no_backorder':
       $this->current[]= $value ? "(item.$name = '$value')" :
                                  "(NOT item.$name OR item.$name IS NULL)";
       break;
@@ -149,10 +153,6 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     case 'variation':
     case 'purchase_quantity':
     case 'reviewed':
-    case 'prop65':
-    case 'hazmat':
-    case 'oversized':
-    case 'no_backorder':
       $this->current[]= "(item.$name = '$value')";
       break;
     case 'margin':
