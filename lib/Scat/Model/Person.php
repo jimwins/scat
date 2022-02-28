@@ -615,7 +615,7 @@ class Person extends \Scat\Model {
 
   public function punched() {
     $punch= $this->punches()->where_null('end')->find_one();
-    return $punch->start;
+    return $punch ? $punch->start : null;
   }
 
   public function punch() {
