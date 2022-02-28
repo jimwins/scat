@@ -49,6 +49,10 @@
           <a data-action="show-all" class="list-group-item">
             Show All
           </a>
+          <label class="list-group-item">
+            <input type="checkbox" value="1" name="no_insurance">
+            No Insurance
+          </lable>
         </ul>
       {% endif %}
     {% else %}
@@ -171,6 +175,7 @@
     form.disabled= true
     form.style.filter= 'brightness(80%)'
     let rate_id= rate.getAttribute('data-rate')
+    let no_insurance= form.elements['no_insurance'].checked ? 1 : 0
 
     fetch("/sale/{{ txn.id }}/shipment/{{ shipment.id }}", {
       method: '{{ shipment ? 'PATCH' : 'POST' }}',
@@ -178,7 +183,10 @@
         'Accept' : 'application/json',
         'Content-type' : 'application/json',
       },
-      body: JSON.stringify({ rate_id: rate_id })
+      body: JSON.stringify({
+        rate_id: rate_id,
+        no_insurance: no_insurance
+      })
     })
     .then((res) => {
       if (!res.ok) {

@@ -1612,7 +1612,8 @@ class Transactions {
       $ep= $shipping->getShipment($shipment);
       $details= [ 'rate' => [ 'id' => $rate_id ] ];
       $insurance= $txn->subtotal();
-      if ($insurance > 100.00) {
+      $no_insurance= (int)$request->getParam('no_insurance');
+      if ($insurance > 100.00 && !$no_insurance) {
         $details['insurance']= $insurance;
       }
 
