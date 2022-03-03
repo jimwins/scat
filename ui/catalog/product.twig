@@ -55,7 +55,7 @@
 
 <script>
   scat.handleAction('click', 'edit-media', (act) => {
-    return scat.dialog('/catalog/product/{{ product.id }}/media')
+    return scat.dialog('/catalog/product/{{ product.id }}/media?grab=1')
   })
   scat.handleAction('click', 'grab-media', (act) => {
     return scat.dialog('/catalog/product/{{ product.id }}/media?grab=1')
