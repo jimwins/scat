@@ -142,10 +142,16 @@
       .then((res) => {
         window.location.reload()
       })
+      .catch((err) => {
+        scat.alert('danger', err.message)
+      })
     } else {
       scat.post("/catalog/vendor-item", formData)
       .then((res) => {
         window.location.reload()
+      })
+      .catch((err) => {
+        scat.alert('danger', err.message)
       })
     }
   }
