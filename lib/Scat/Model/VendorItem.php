@@ -76,6 +76,9 @@ class VendorItem extends \Scat\Model {
     if ($name == 'dimensions') {
       return $this->setDimensions($value);
     }
+    if ($name == 'promo_quantity' || $name == 'weight') {
+      if ($value == '') $value= null;
+    }
 
     return parent::set($name, $value);
   }
@@ -88,8 +91,11 @@ class VendorItem extends \Scat\Model {
   }
 
   public function setDimensions($dimensions) {
-    error_log("setting dimensions to $dimensions");
-    list($l, $w, $h)= preg_split('/[^\d.]+/', trim($dimensions));
+    if ($dimensions == '') {
+      list($l, $w, $h)= [ null, null, null ];
+    } else {
+      list($l, $w, $h)= preg_split('/[^\d.]+/', trim($dimensions));
+    }
     $this->length= $l;
     $this->width= $w;
     $this->height= $h;
