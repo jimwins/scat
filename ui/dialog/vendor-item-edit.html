@@ -88,7 +88,7 @@
     <div class="form-group">
       <label for="barcode">Barcode</label>
       <input type="text" class="form-control"
-             name="barcode" value="{{ vendor_item.barcode }}">
+             name="barcode" value="{{ vendor_item.barcode ?: item.barcode }}">
     </div>
 
     <div class="form-group">
