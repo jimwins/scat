@@ -653,9 +653,6 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Settings::class, 'wordform' ]);
   $app->post('/wordform[/{wordform_id}]',
               [ \Scat\Controller\Settings::class, 'wordformUpdate' ]);
-
-  $app->map(['GET', 'POST'], '/google',
-            [ \Scat\Controller\Settings::class, 'connectGoogle' ]);
 });
 
 /* Webhooks */

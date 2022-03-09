@@ -3,33 +3,24 @@ namespace Scat\Service;
 
 class Google
 {
-  private $client_id;
-  private $client_secret;
-  private $token;
+  private $service_key, $merchant_center_id;
 
   public function __construct(Config $config) {
-    $this->client_id= $config->get('google.client_id');
-    $this->client_secret= $config->get('google.client_secret');
-    $this->token= $config->get('google.oauth_access_token');
+    $this->service_key= $config->get('google.service_key');
+    $this->merchant_center_id= $config->get('google.merchant_center_id');
 
-    if ($this->token) {
-      $this->token= json_decode($this->token, true);
+    if ($this->service_key) {
+      $this->service_key= json_decode($this->service_key, true);
     }
   }
 
   public function getClient() {
     $client= new \Google\Client();
     $client->setApplicationName('Scat POS');
-    $client->setClientId($this->client_id);
-    $client->setClientSecret($this->client_secret);
-    //$client->setRedirectUri($request->getUri()->withQuery(""));
+    $client->setAuthConfig($this->service_key);
     $client->setAccessType('offline');
     $client->setIncludeGrantedScopes(true);
     $client->setScopes('https://www.googleapis.com/auth/content');
-
-    if ($this->token) {
-      $client->setAccessToken($this->token);
-    }
 
     return $client;
   }
