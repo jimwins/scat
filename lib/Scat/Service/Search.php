@@ -69,6 +69,7 @@ class Search
 
     $items= $this->data->factory('Item')->select('item.*')
                                    ->select_expr('COUNT(*) OVER()', 'records')
+                                   // TODO calculate stock for kits
                                    ->select_expr('IFNULL((SELECT SUM(allocated)
                                                      FROM txn_line
                                                     WHERE txn_line.item_id =

@@ -154,6 +154,7 @@ class Item extends \Scat\Model {
   public function stock() {
     if ($this->is_kit) {
       $items= $this->has_many('KitItem', 'kit_id')->find_many();
+      if (!$items) return 0;
       $qtys= array_map(function ($item) {
         return $item->item()->stock();
       }, $items);
