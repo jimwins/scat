@@ -152,8 +152,16 @@ class Item extends \Scat\Model {
   }
 
   public function stock() {
-    return $this->has_many('TxnLine')
-                ->sum('allocated') ?: 0;
+    if ($this->is_kit) {
+      $items= $this->has_many('KitItem', 'kit_id')->find_many();
+      $qtys= array_map(function ($item) {
+        return $item->item()->stock();
+      }, $items);
+      return min($qtys);
+    } else {
+      return $this->has_many('TxnLine')
+                  ->sum('allocated') ?: 0;
+    }
   }
 
   public function on_order() {
