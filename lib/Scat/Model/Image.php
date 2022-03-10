@@ -23,7 +23,7 @@ class Image extends \Scat\Model {
     $fm= in_array(strtolower($this->ext), [ 'tif', 'tiff' ]) ? 'jpeg' : 'auto';
     return GUMLET_BASE .
            $this->uuid . '.' . $this->ext .
-           '?w=1024&h=1024&mode=fill&fm=' . $fm;
+           '?w=1024&h=1024&mode=fill&fill=solid&fm=' . $fm;
   }
 
   public function productsUsedBy() {
