@@ -48,7 +48,7 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
 
   public function visitExplicitTerm(ExplicitTerm $term)
   {
-    $name= $term->getNominator()->getWord();
+    $name= strtolower($term->getNominator()->getWord());
     $value= $term->getTerm()->getToken();
     /* TODO handle different terms here */
     switch ($name) {
