@@ -1027,6 +1027,9 @@ class Catalog {
   }
 
   public function itemFeed(Request $request, Response $response) {
+    /* turn off logging here, it's just too much */
+    $this->data->configure('logging', false);
+
     $items= $this->catalog->getItems()
       ->select('*')
       ->select_expr('COUNT(*) OVER (PARTITION BY product_id)', 'siblings')
@@ -1060,6 +1063,8 @@ class Catalog {
       $html= preg_replace('/{{ *@STATIC *}}/', 'https:' . ORDURE_STATIC, $html);
       $text= strip_tags($html);
 
+      $product= $item->product();
+
       // only include items for which we have an image
       if ($item->siblings > 1) {
         $media= $item->media();
@@ -1067,18 +1072,14 @@ class Catalog {
           continue;
         }
       } else {
-        $media= $item->product()->media();
+        $media= $product->media();
       }
 
-      if (!$media) continue;
-      if (is_array($media[0])) {
-        $image= 'https:' . ORDURE_STATIC . $media[0]['src'];
-      } else {
-        if (!$media[0]) continue;
-        $image= 'https:' . $media[0]->large_square();
-      }
+      if (!$media || !$media[0]) continue;
+      $image= 'https:' . $media[0]->large_square();
 
-      $product= $item->product();
+      $barcodes= $item->barcodes()->find_many();
+      $barcode= $barcodes ? $barcodes[0]->code : null;
 
       $record= [
         $item->code,
@@ -1095,7 +1096,7 @@ class Catalog {
         $image,
         '',#'additional_image_link',
         $product->brand()->name,
-        $item->barcodes()->find_many()[0]->code,
+        $barcode,
         $item->code,
         $item->short_name,
         $item->variation,
@@ -1112,6 +1113,8 @@ class Catalog {
 
       fputcsv($output, $record);
     }
+
+    $this->data->configure('logging', true);
 
     $response= $response->withBody(\GuzzleHttp\Psr7\stream_for($output));
 

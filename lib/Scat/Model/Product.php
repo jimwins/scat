@@ -51,17 +51,15 @@ class Product extends \Scat\Model {
     return $this->has_many('ProductToImage');
   }
 
+  public function has_media() {
+    return $this->has_many_through('Image')->count();
+  }
+
   public function media() {
     $media= $this->has_many_through('Image')->find_many();
-    if (!count($media)) {
-      return $this->image ?
-        [
-          [
-            'src' => $this->image,
-            'thumbnail' => ORDURE_STATIC . $this->image,
-            'alt_text' => $this->name
-          ]
-        ] : null;
+    if (!count($media) && $this->image) {
+      $dummy= new DummyMedia($this->image, $this->name);
+      return [ $dummy ];
     }
     return $media;
   }
@@ -101,5 +99,33 @@ class ProductToImage extends \Scat\Model {
   function delete() {
     $this->orm->use_id_column([ 'product_id', 'image_id' ]);
     return parent::delete();
+  }
+}
+
+/*
+ * TODO: remove this
+ * Artifact of our old product catalog data
+ */
+class DummyMedia {
+  private $image;
+
+  function __construct($image) {
+    $this->image= $image;
+  }
+
+  function original() {
+    return ORDURE_STATIC . $this->image;
+  }
+
+  function medium() {
+    return ORDURE_STATIC . $this->image;
+  }
+
+  function thumbnail() {
+    return ORDURE_STATIC . $this->image;
+  }
+
+  function large_square() {
+    return ORDURE_STATIC . $this->image;
   }
 }
