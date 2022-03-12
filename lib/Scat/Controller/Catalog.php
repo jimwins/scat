@@ -1066,12 +1066,11 @@ class Catalog {
       $product= $item->product();
 
       // only include items for which we have an image
-      if ($item->siblings > 1) {
-        $media= $item->media();
-        if (!$media) {
+      $media= $item->media();
+      if (!$media) {
+        if ($item->siblings > 1) {
           continue;
         }
-      } else {
         $media= $product->media();
       }
 
