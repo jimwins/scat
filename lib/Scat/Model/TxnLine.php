@@ -95,7 +95,7 @@ class TxnLine extends \Scat\Model {
            JOIN txn_line tl ON txn.id = tl.txn_id
           WHERE type = 'vendor'
             AND item_id = {$this->item_id}
-            AND filled < '{$txn->created}'";
+            AND created < '{$txn->created}'";
 
     $cost= $this->orm->for_table('txn')->raw_query($q)->find_one();
     return $cost->cost;
