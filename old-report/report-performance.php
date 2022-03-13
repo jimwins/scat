@@ -2,12 +2,12 @@
 require '../scat.php';
 require '../lib/item.php';
 
-$items= $_REQUEST['items'];
+$items= @$_REQUEST['items'];
 if (!$items && ($product= (int)$_REQUEST['product'])) {
   $items= "product:$product";
 }
 
-if (($saved= (int)$_GET['saved']) && !$items) {
+if (($saved= (int)@$_REQUEST['saved']) && !$items) {
   $items= $db->get_one("SELECT search FROM saved_search WHERE id = $saved");
 }
 
@@ -17,8 +17,8 @@ if ($items) {
                                              FIND_ALL|FIND_LIMITED);
 }
 
-$begin= $_REQUEST['begin'];
-$end= $_REQUEST['end'];
+$begin= @$_REQUEST['begin'];
+$end= @$_REQUEST['end'];
 
 if (!$begin) {
   $begin= date('Y-m-d', time() - 365.25*24*3600);
@@ -113,6 +113,20 @@ $q= "SELECT SUM((SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id) *
 
 $stock= $db->get_one($q);
 
+$q= "SELECT SUM((SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id) *
+                IFNULL((SELECT AVG(retail_price)
+                          FROM txn_line
+                          JOIN txn ON txn.id = txn_line.txn_id
+                         WHERE item_id = item.id
+                           AND type = 'vendor'),
+                       0))
+       FROM item
+       LEFT JOIN product ON item.product_id = product.id
+       LEFT JOIN brand ON product.brand_id = brand.id
+      WHERE ($sql_criteria)";
+
+$stock_net= $db->get_one($q);
+
 $q= "SELECT SUM(minimum_quantity *
                 sale_price(item.retail_price, item.discount_type,
                            item.discount))
@@ -157,6 +171,8 @@ $ideal= $db->get_one($q);
       <div class="panel-body text-center">
         <span style="font-size: 300%">
           <?=amount($stock)?>
+          <br>
+          (<?=amount($stock_net)?>)
         </span>
       </div>
     </div>
@@ -187,7 +203,7 @@ $ideal= $db->get_one($q);
   </div>
 </div>
 <?
-$span= $_REQUEST['span'];
+$span= @$_REQUEST['span'];
 if (!$span) $span= 'month';
 switch ($span) {
 case 'all':
