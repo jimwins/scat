@@ -2074,6 +2074,7 @@ class Transactions {
       $line->save();
     }
 
+    $purchase->set_expr('filled', 'NOW()');
     $purchase->status= 'complete';
     $purchase->save();
 
