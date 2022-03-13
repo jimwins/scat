@@ -197,7 +197,9 @@ class Shipping {
         // send order delivered email
         $txn= $shipment->txn();
 
-        if (in_array($txn->status, [ 'paid', 'processing', 'shipping', 'shipped' ])) {
+        if ($txn->type != 'vendor' &&
+            in_array($txn->status, [ 'paid', 'processing', 'shipping', 'shipped' ]))
+        {
           $txn->status= 'complete';
           $txn->save();
         }
