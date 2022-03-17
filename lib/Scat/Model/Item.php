@@ -418,6 +418,34 @@ class Item extends \Scat\Model {
     $this->orm->raw_execute($q);
   }
 
+  function can_ship_first_class_package() {
+    $boxes= [
+      [  5,     5,     3.5,  0.13, 0.39 ],
+      [  9,     5,     3,    0.21, 0.53 ],
+      [  9,     8,     8,    0.48, 0.86 ],
+      [ 12.25,  3,     3,    0.19, 1.03 ],
+      [ 10,     7,     5,    0.32, 0.82 ],
+      [ 12,     9.5,   4,    0.44, 1.01 ],
+      [ 12,     9,     9,    0.65, 0.98 ],
+    ];
+
+    // Don't know?
+    if (!$this->weight || !$this->width || !$this->length || !$this->height) {
+      return null;
+    }
+
+    $box= \Scat\Service\Shipping::fits_in_box($boxes, [
+            [ $this->width, $this->height, $this->length ]
+          ]);
+
+    if ($box && $this->weight + $box[3] < 1)
+    {
+      return true;
+    }
+
+    return false;
+  }
+
   function can_ship_free() {
     $boxes= [ [ 33, 19, 4 ], [ 20, 13, 10 ], [ 54, 4, 4 ] ];
 
@@ -439,6 +467,10 @@ class Item extends \Scat\Model {
 
     if ($this->weight == 0 || $this->length == 0 || $this->width == 0 || $this->height == 0) {
       return "unknown";
+    }
+
+    if ($this->can_ship_first_class_package()) {
+      return "firstclass";
     }
 
     if ($this->can_ship_free()) {
