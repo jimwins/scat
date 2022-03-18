@@ -419,6 +419,10 @@ class Item extends \Scat\Model {
   }
 
   function can_ship_first_class_package() {
+    if ($this->hazmat || $this->oversized) {
+      return false;
+    }
+
     $boxes= [
       [  5,     5,     3.5,  0.13, 0.39 ],
       [  9,     5,     3,    0.21, 0.53 ],
