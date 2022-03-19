@@ -1026,7 +1026,9 @@ class Catalog {
     }
   }
 
-  public function itemFeed(Request $request, Response $response) {
+  public function itemFeed(Request $request, Response $response,
+                            \Scat\Service\Shipping $shipping)
+  {
     /* turn off logging here, it's just too much */
     $this->data->configure('logging', false);
 
@@ -1080,6 +1082,19 @@ class Catalog {
       $barcodes= $item->barcodes()->find_many();
       $barcode= $barcodes ? $barcodes[0]->code : null;
 
+      if ($item->length && $item->width && $item->height) {
+        $box= $shipping->get_shipping_box([ [
+          'length' => $item->length,
+          'width' => $item->width,
+          'height' => $item->height,
+        ]]);
+        if (!$box) {
+          error_log("unable to box {$item->code}");
+        }
+      } else {
+        $box= null;
+      }
+
       $record= [
         $item->code,
         $item->name,
@@ -1104,10 +1119,10 @@ class Catalog {
         $product->dept()->parent()->name . ' > ' .  $product->dept()->name,
         max($item->stock(), 0),
         $item->shipping_rate(),
-        $item->length ? $item->length . " in" : '',
-        $item->width  ? $item->width  . " in" : '',
-        $item->height ? $item->height . " in" : '',
-        $item->weight ? $item->weight . " lb" : '',
+        $box ? "{$box[0]} in" : '',
+        $box ? "{$box[1]} in" : '',
+        $box ? "{$box[2]} in" : '',
+        ($box && $item->weight) ? ($box[3] + $item->weight) . " lb" : '',
       ];
 
       fputcsv($output, $record);

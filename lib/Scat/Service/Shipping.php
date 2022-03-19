@@ -6,6 +6,28 @@ class Shipping
   private $webhook_url;
   private $data;
 
+  # TODO put this in a database table
+  # width, height, depth, weight (lb), cost
+  private $all_boxes= [
+    [  5,     5,     3.5,  0.13, 0.39 ],
+    [  9,     5,     3,    0.21, 0.53 ],
+    [  9,     8,     8,    0.48, 0.86 ],
+    [ 12.25,  3,     3,    0.19, 1.03 ],
+    [ 10,     7,     5,    0.32, 0.82 ],
+    [ 12,     9.5,   4,    0.44, 1.01 ],
+    [ 12,     9,     9,    0.65, 0.98 ],
+    [ 15,    12,     4,    0.81, 1.28 ],
+    [ 15,    12,     8,    0.91, 1.59 ],
+    [ 18,    16,     4,    1.16, 1.77 ],
+    [ 18.75,  3,     3,    0.24, 1.24 ],
+    [ 20.25, 13.25, 10.25, 1.21, 2.17 ],
+    [ 22,    18,     6,    1.54, 2.32 ],
+    [ 33,    19,     4.5,  2.09, 4.08 ],
+    [ 34,    23,     5,    2.09, 2.50 ],
+    [ 54,     4,     4,    0.88, 0.00 ],
+    [ 87,     4,     4,    1.28, 0.00 ],
+  ];
+
   public function __construct(Config $config, Data $data) {
     $this->data= $data;
     \EasyPost\EasyPost::setApiKey($config->get('shipping.key'));
@@ -110,5 +132,9 @@ class Shipping
     }
 
     return false;
+  }
+
+  function get_shipping_box($items) {
+    return self::fits_in_box($this->all_boxes, $items);
   }
 }
