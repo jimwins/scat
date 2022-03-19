@@ -1088,9 +1088,6 @@ class Catalog {
           'width' => $item->width,
           'height' => $item->height,
         ]]);
-        if (!$box) {
-          error_log("unable to box {$item->code}");
-        }
       } else {
         $box= null;
       }
