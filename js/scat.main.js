@@ -21,15 +21,10 @@ class ScatUtils {
 
     return fetch(url, {
       headers: {
-        'Accept': 'application/vnd.scat.dialog+html'
+        'Accept': 'application/vnd.scat.dialog+html, application/vnd.scat.dialog+json'
       }
     })
-    .then((response) => {
-      if (response.status >= 200 && response.status < 300) {
-        return Promise.resolve(response)
-      }
-      return Promise.reject(new Error(response.statusText))
-    })
+    .then((response) => this._handleResponse(response))
     .then((res) => { return res.text() })
     .then((text) => {
       return new Promise((resolve, reject) => {
