@@ -35,15 +35,18 @@ $builder= new \DI\ContainerBuilder();
 $builder->addDefinitions([
   'Slim\Views\Twig' => \DI\get('view'),
   'Scat\Service\Data' => \DI\get('data'),
+  'Scat\Service\Config' => \DI\get('config'),
 ]);
 $container= $builder->build();
+
+$container->set('config', new \Scat\Service\Config());
 
 $app= \DI\Bridge\Slim\Bridge::create($container);
 
 $app->addRoutingMiddleware();
 
 /* Twig for templating */
-$container->set('view', function() {
+$container->set('view', function($container) {
   /* No cache for now */
   $view= \Slim\Views\Twig::create('../ui', [ 'cache' => false ]);
 
@@ -63,7 +66,7 @@ $container->set('view', function() {
   $view->addExtension(new \Twig\Extra\Html\HtmlExtension());
 
   // Add our Twig extensions
-  $view->addExtension(new \Scat\TwigExtension());
+  $view->addExtension(new \Scat\TwigExtension($container->get('config')));
 
   return $view;
 });

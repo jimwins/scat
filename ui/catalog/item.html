@@ -249,7 +249,11 @@
 
           <div class="form-group">
             <label for="margin" class="col-sm-6 control-label">
-             Google
+              Google
+              <a target="_blink"
+                href="https://merchants.google.com/mc/items/details?a={{ config('google.merchant_center_id') }}&offerId={{ item.code }}&language=en&channel=0&country=US&pli=1">
+                <i class="fa fa-google fa-fw"></i>
+              </a>
             </label>
             <div class="col-sm-6">
               <button class="btn btn-default" data-action="google-history">

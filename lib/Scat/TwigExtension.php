@@ -5,6 +5,12 @@ class TwigExtension
   extends \Twig\Extension\AbstractExtension
   implements \Twig\Extension\GlobalsInterface
 {
+  private $config;
+
+  public function __construct(\Scat\Service\Config $config) {
+    $this->config= $config;
+  }
+
   public function getGlobals() : array {
     return [
       'DEBUG' => $GLOBALS['DEBUG'],
@@ -17,6 +23,7 @@ class TwigExtension
   public function getFunctions() : array {
     return [
       new \Twig\TwigFunction('notes', [ $this, 'getNotes' ]),
+      new \Twig\TwigFunction('config', [ $this, 'getConfig' ]),
     ];
   }
 
@@ -34,6 +41,10 @@ class TwigExtension
              ->where('todo', 1)
              ->order_by_asc('id')
              ->find_many();
+  }
+
+  public function getConfig($name) {
+    return $this->config->get($name);
   }
 
   public function phone_number_format($phone, $country_code= 'US') {
