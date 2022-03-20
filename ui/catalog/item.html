@@ -256,8 +256,9 @@
               </a>
             </label>
             <div class="col-sm-6">
-              <button class="btn btn-default" data-action="google-history">
-                View Activity
+              <button class="btn btn-sm btn-default"
+                      data-action="google-history">
+                <i class="fa fa-fw fa-line-chart"></i> Activity
               </button>
             </div>
           </div>
@@ -1159,6 +1160,9 @@
 
   scat.handleAction('click', 'google-history', (act) => {
     return scat.dialog('/catalog/item/{{ item.code }}/googleHistory')
+        .catch((err) => {
+          scat.alert('danger', err.message)
+        })
   })
   </script>
 
