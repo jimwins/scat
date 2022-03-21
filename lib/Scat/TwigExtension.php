@@ -7,7 +7,7 @@ class TwigExtension
 {
   private $config;
 
-  public function __construct(\Scat\Service\Config $config) {
+  public function __construct(\Scat\Service\Config $config= null) {
     $this->config= $config;
   }
 
@@ -44,6 +44,9 @@ class TwigExtension
   }
 
   public function getConfig($name) {
+    if (!$this->config) {
+      throw new \Exception("Unable to access configuration.");
+    }
     return $this->config->get($name);
   }
 
