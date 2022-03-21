@@ -427,7 +427,7 @@ class Person extends \Scat\Model {
 
     } elseif (preg_match('/CustomerPrice/', $line)) {
       /* PA Dist */
-#Item    Description     UM	Min     CustomerPrice   Retail  UPC     ISBN    MAP     Not 4 Retail Websitew`  ORMD    Weight  Height  Width   Depth
+#Item    Description     UM	Min     CustomerPrice   Retail  UPC     ISBN    MAP     Not 4 Retail Website  ORMD    Weight  Height  Width   Depth
       error_log("Importing '$fn' as PA Distribution price list\n");
       $sep= preg_match("/\t/", $line) ? "\t" : ",";
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
@@ -443,7 +443,7 @@ class Person extends \Scat\Model {
               SET code = vendor_sku,
                   retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
                   net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
-                  weight = weight / 16,
+                  weight = weight,
                   barcode = IF(@upc = 'N/A', @isbn, @upc),
                   prop65 = IF(@health_label = '65', 1, 0)
               ";
