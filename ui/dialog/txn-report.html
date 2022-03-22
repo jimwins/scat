@@ -7,6 +7,7 @@
 
 {% block body %}
   {% set total= txn.subtotal %}
+  {% set shipping_paid= txn.shipping %}
   {% set cogs= -txn.cost_of_goods %}
   {% set shipping= -txn.cost_of_shipping %}
   {% set processing= -txn.cost_of_processing %}
@@ -23,41 +24,65 @@
   {% endfor %}
   <table class="table table-striped">
     <tbody>
+      {% if shipping_paid %}
+        <tr>
+          <th>Products</th>
+          <td>{{ scat.amount(total - shipping_paid) }}</td>
+          <td>{{ "%.2f%%"|format((((total - shipping_paid) / total) * 100) | abs) }}</td>
+        </tr>
+        <tr>
+          <th>Shipping</th>
+          <td>{{ scat.amount(shipping_paid) }}</td>
+          <td>{{ "%.2f%%"|format(((shipping_paid / total) * 100) | abs) }}</td>
+        </tr>
+      {% endif %}
       <tr>
         <th>Total</th>
         <td>{{ scat.amount(total) }}</td>
+        <td>&nbsp;</td>
       </tr>
-      <tr>
+      <tr style="border-top: 2px double rgba(0,0,0,0.3)">
         <th>Cost of Goods</th>
         <td>{{ scat.amount(cogs) }}</td>
+        <td>
+          {{ "%.2f%%"|format(((cogs / total) * 100) | abs) }}
+          {% if shipping_paid %}
+            <br>({{ "%.2f%%"|format(((cogs / (total - shipping_paid)) * 100) | abs) }})
+          {% endif %}
+        </td>
       </tr>
       {% if shipping %}
         <tr>
           <th>Shipping Cost</th>
           <td>{{ scat.amount(shipping) }}</td>
+          <td>{{ "%.2f%%"|format(((shipping / total) * 100) | abs) }}</td>
         </tr>
       {% endif %}
       {% if rewards %}
         <tr>
           <th>Loyalty Rewards</th>
           <td>{{ scat.amount(rewards) }}</td>
+          <td>{{ "%.2f%%"|format(((rewards / total) * 100) | abs) }}</td>
         </tr>
       {% endif %}
       {% if discount %}
         <tr>
           <th>Discount</th>
           <td>{{ scat.amount(discount) }}</td>
+          <td>{{ "%.2f%%"|format(((discount / total) * 100) | abs) }}</td>
         </tr>
       {% endif %}
       {% if processing %}
         <tr>
           <th>Processing Cost</th>
           <td>{{ scat.amount(processing) }}</td>
+          <td>{{ "%.2f%%"|format(((processing / total) * 100) | abs) }}</td>
         </tr>
       {% endif %}
-      <tr style="border-top: 2px double white">
+      <tr style="border-top: 2px double rgba(0,0,0,0.3)">
         <th>Profit</th>
         <td>{{ scat.amount(total + cogs + shipping + rewards + discount + processing) }}</td>
+        <td>{{ "%.2f%%"|format((((total + cogs + shipping + rewards + discount + processing) / total) * 100) | abs) }}</td>
       </tr>
     </tbody>
   </table>
