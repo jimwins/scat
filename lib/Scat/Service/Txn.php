@@ -34,6 +34,10 @@ class Txn
     return $this->data->factory('Txn')->find_one($id);
   }
 
+  public function fetchByNumber($number) {
+    return $this->data->factory('Txn')->where('type', 'customer')->where('number', $number)->find_one();
+  }
+
   public function find($type, $page= 0, $limit= 25, $q= null) {
     $res= $this->data->factory('Txn')
                 ->select('txn.*')

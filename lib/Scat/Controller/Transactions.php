@@ -53,6 +53,15 @@ class Transactions {
       }
     }
 
+    if (preg_match('/^\d\d\d\d-(\d+)/i', $q, $m)) {
+      $txn= $this->txn->fetchByNumber($m[1]);
+      if ($txn) {
+        return $response->withRedirect(
+          ($txn->type == 'customer' ? '/sale/' : '/purchase/') . $txn->id
+        );
+      }
+    }
+
     $page= (int)$request->getParam('page');
     $limit= (int)$request->getParam('limit') ?: 25;
 
