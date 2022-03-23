@@ -137,4 +137,128 @@ class Shipping
   function get_shipping_box($items) {
     return self::fits_in_box($this->all_boxes, $items);
   }
+
+  function get_shipping_estimate($box, $weight, $hazmat, $dest) {
+    $from= $this->getDefaultFromAddress();
+    $to= $this->createAddress($dest);
+
+    $options= [];
+    if ($hazmat) {
+      $options['hazmat']= 'LIMITED_QUANTITY';
+    }
+
+    $details= [
+      'from_address' => $from,
+      'to_address' => $to,
+      'parcel' => [
+        'length' => $box[0],
+        'width' => $box[1],
+        'height' => $box[2],
+        'weight' => ceil(($weight + $box[3]) * 16),
+      ],
+      'options' => $options,
+    ];
+
+    error_log(json_encode($details));
+
+    $shipment= $this->createShipment($details);
+
+    $best_rate= null;
+
+    foreach ($shipment->rates as $rate) {
+      error_log("rate: {$rate->carrier} / {$rate->service}: {$rate->rate}\n");
+      if ($hazmat) {
+        if (in_array($rate->carrier, [ 'USPS' ]) &&
+            $rate->service == 'ParcelSelect' &&
+            self::state_in_continental_us($address->state) &&
+            self::address_is_po_box($address))
+        {
+          if (!$best_rate || $rate->rate < $best_rate) {
+            $method= "{$rate->carrier} / {$rate->service }";
+            $best_rate= $rate->rate;
+          }
+        }
+      } else {
+        if (in_array($rate->carrier, [ 'USPS' ]) &&
+            in_array($rate->service, [ 'First', 'Priority' ]))
+        {
+          if (!$best_rate || $rate->rate < $best_rate) {
+            $method= "{$rate->carrier} / {$rate->service }";
+            $best_rate= $rate->rate;
+          }
+        }
+      }
+
+      if (in_array($rate->carrier, [ 'UPSDAP', 'UPS' ]) &&
+          $rate->service == 'Ground')
+      {
+        if (!$best_rate || $rate->rate < $best_rate) {
+          $method= "{$rate->carrier} / {$rate->service }";
+          $best_rate= $rate->rate;
+        }
+      }
+    }
+
+    return [ $best_rate + $box[4], $method ];
+  }
+
+  static function address_is_po_box($address) {
+    return preg_match('/po box/i', $address->address1 . $address->address2);
+  }
+
+  static function state_in_continental_us($state) {
+    return in_array($state, [
+      // 'AK',
+      'AL',
+      'AZ',
+      'AR',
+      'CA',
+      'CO',
+      'CT',
+      'DE',
+      'FL',
+      'GA',
+      // 'HI',
+      'ID',
+      'IL',
+      'IN',
+      'IA',
+      'KS',
+      'KY',
+      'LA',
+      'ME',
+      'MD',
+      'MA',
+      'MI',
+      'MN',
+      'MS',
+      'MO',
+      'MT',
+      'NE',
+      'NV',
+      'NH',
+      'NJ',
+      'NM',
+      'NY',
+      'NC',
+      'ND',
+      'OH',
+      'OK',
+      'OR',
+      'PA',
+      // 'PR',
+      'RI',
+      'SC',
+      'SD',
+      'TN',
+      'TX',
+      'UT',
+      'VT',
+      'VA',
+      'WA',
+      'WV',
+      'WI',
+      'WY',
+    ]);
+  }
 }

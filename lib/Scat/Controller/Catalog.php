@@ -822,6 +822,122 @@ class Catalog {
     return $response->withJson($data);
   }
 
+  public function itemGetShippingEstimate(Request $request, Response $response,
+                                          \Scat\Service\Shipping $shipping,
+                                          $code)
+  {
+    $item= $code ? $this->catalog->getItemByCode($code) : null;
+    if ($code && !$item)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    // TODO store these somewhere else
+    $addresses= [
+      [
+        'name' => 'Test Address',
+        'street1' => '76 9TH AVE',
+        'city' => 'NEW YORK',
+        'state' => 'NY',
+        'zip' => '10011',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '401 N TRYON ST',
+        'city' => 'CHARLOTTE',
+        'state' => 'NC',
+        'zip' => '28202',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '2332 GALIANO ST',
+        'city' => 'CORAL GABLES',
+        'state' => 'FL',
+        'zip' => '33134',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '2590 PEARL ST',
+        'city' => 'BOULDER',
+        'state' => 'CO',
+        'zip' => '80302',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '1600 AMPHITHEATRE PKWY',
+        'city' => 'MOUNTAIN VIEW',
+        'state' => 'CA',
+        'zip' => '94043',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '4021 VERNON AVE S',
+        'city' => 'MINNEAPOLIS',
+        'state' => 'MN',
+        'zip' => '55416',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '201 COLORADO ST',
+        'city' => 'AUSTIN',
+        'state' => 'TX',
+        'zip' => '78701',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '651 N 34TH ST',
+        'city' => 'SEATTLE',
+        'state' => 'WA',
+        'zip' => '98103',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '4581 WEBB ST',
+        'city' => 'PRYOR',
+        'state' => 'OK',
+        'zip' => '74361',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '201 S DIVISION ST',
+        'city' => 'ANN ARBOR',
+        'state' => 'MI',
+        'zip' => '48104',
+      ],
+      [
+        'name' => 'Test Address',
+        'street1' => '364 S KING ST',
+        'city' => 'HONOLULU',
+        'state' => 'HI',
+        'zip' => '96813',
+      ],
+    ];
+
+    $box= $shipping->get_shipping_box([ [
+      'length' => $item->length,
+      'width' => $item->width,
+      'height' => $item->height,
+    ]]);
+
+    $data= [];
+    foreach ($addresses as $address) {
+      $data[]= [
+        'address' =>
+          "{$address['city']}, {$address['state']} {$address['zip']}",
+        'rate' => $shipping->get_shipping_estimate($box, $item->weight, $item->hazmat, $address)
+      ];
+    }
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response,
+                                  'dialog/item-shipping-estimates.html', [
+        'item' => $item,
+        'data' => $data,
+      ]);
+    }
+
+    return $response->withJson($data);
+  }
+
   function bulkItemUpdate(Request $request, Response $response) {
     $items= $request->getParam('items');
 

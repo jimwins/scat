@@ -745,6 +745,10 @@
       {% else %}
         <b class="text-danger">Cannot ship free.</b>
       {% endif %}
+      <button class="btn btn-xs btn-default"
+              data-action="shipping-estimate">
+        <i class="fa fa-fw fa-plane"></i> Estimate
+      </button>
     </p>
 
     <button type="button" class="btn btn-link toggle"
@@ -1160,6 +1164,13 @@
 
   scat.handleAction('click', 'google-history', (act) => {
     return scat.dialog('/catalog/item/{{ item.code }}/googleHistory')
+        .catch((err) => {
+          scat.alert('danger', err.message)
+        })
+  })
+
+  scat.handleAction('click', 'shipping-estimate', (act) => {
+    return scat.dialog('/catalog/item/{{ item.code }}/shippingEstimate')
         .catch((err) => {
           scat.alert('danger', err.message)
         })

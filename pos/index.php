@@ -319,6 +319,9 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->get('/item/{code:.+}/googleHistory',
             [ \Scat\Controller\Catalog::class, 'itemGetGoogleHistory' ]);
 
+  $app->get('/item/{code:.+}/shippingEstimate',
+            [ \Scat\Controller\Catalog::class, 'itemGetShippingEstimate' ]);
+
   $app->post('/item/~bulk-update',
             [ \Scat\Controller\Catalog::class, 'bulkItemUpdate' ]);
 

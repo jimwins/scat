@@ -1,0 +1,33 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Shipping Estimates for {{ item.name }}
+{% endblock %}
+
+{% block body %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Destination</th>
+        <th>Rate</th>
+        <th>Service</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for estimate in data %}
+        <tr>
+          <td>{{ estimate.address }}</td>
+          <td>{{ scat.amount(estimate.rate[0]) }}</td>
+          <td>{{ estimate.rate[1] }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block submit %}
+{% endblock %}
+
+{% block script %}
+{% endblock %}
