@@ -909,6 +909,13 @@ class Catalog {
         'state' => 'HI',
         'zip' => '96813',
       ],
+      [
+        'name' => 'Test Address',
+        'street1' => '631 E INTERNATIONAL AIRPORT RD',
+        'city' => 'ANCHORAGE',
+        'state' => 'AK',
+        'zip' => '99518',
+      ],
     ];
 
     $box= $shipping->get_shipping_box([ [
