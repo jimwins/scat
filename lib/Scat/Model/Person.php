@@ -406,7 +406,7 @@ class Person extends \Scat\Model {
                @est_freight, @est_freight_case,
                length, width, height,
                @carton_length, @carton_width, @carton_height, @hts, @origin)
-            SET vendor_sku = IF(@new_sku != '', @new_sku, @sku),
+            SET vendor_sku = IF(@new_sku != '' AND @new_sku != '0', @new_sku, @sku),
                 code = CONCAT('MA', vendor_sku),
                 weight = @weight / purchase_quantity,
                 oversized = IF(@freight = 'OS' OR @freight = 'LTL', 1, 0),
@@ -418,7 +418,6 @@ class Person extends \Scat\Model {
 
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load Masterpiece data file");
-
       // toss junk from header lines
       $q= "DELETE FROM vendor_upload WHERE purchase_quantity = 0";
 
