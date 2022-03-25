@@ -56,7 +56,7 @@ class TwigExtension
       $num= $phoneUtil->parse($phone, $country_code);
       return $phoneUtil->format($num,
                                 \libphonenumber\PhoneNumberFormat::NATIONAL);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       // Punt!
       return $phone;
     }
