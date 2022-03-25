@@ -55,7 +55,7 @@ class Person extends \Scat\Model {
   function available_loyalty_rewards() {
     $points= $this->points_available();
 
-    return $this->factory('LoyaltyReward')->where_lt('cost', $points);
+    return $this->factory('LoyaltyReward')->where_lte('cost', $points);
   }
 
   public function jsonSerialize() {
