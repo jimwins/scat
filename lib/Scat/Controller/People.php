@@ -359,12 +359,14 @@ class People {
   public function remarketingList(Request $request, Response $response,
                                   \Scat\Service\Data $data)
   {
+    $nohash= $request->getParam('nohash');
+
     $people= $data->factory('Person')
       ->where('role', 'customer')
       ->where('active', 1)
       ->find_many();
 
-    $fields= [ 'Email', 'Phone' ];
+    $fields= [ 'Email', 'Phone', 'Uid' ];
 
     //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
     $output= fopen("php://memory", 'r+');
@@ -382,10 +384,19 @@ class People {
         $phone= '';
       }
       if (!$phone && !$email) continue;
-      fputcsv($output, [
-        $email ? hash('sha256', $email) : '',
-        $phone ? hash('sha256', $phone) : ''
-      ]);
+      if ($nohash) {
+        fputcsv($output, [
+          $email,
+          $phone,
+          $person->id
+        ]);
+      } else {
+        fputcsv($output, [
+          $email ? hash('sha256', $email) : '',
+          $phone ? hash('sha256', $phone) : '',
+          $person->id
+        ]);
+      }
     }
 
     $response= $response->withBody(\GuzzleHttp\Psr7\stream_for($output));
