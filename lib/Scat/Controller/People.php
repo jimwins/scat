@@ -366,7 +366,7 @@ class People {
       ->where('active', 1)
       ->find_many();
 
-    $fields= [ 'Email', 'Phone', 'Uid' ];
+    $fields= [ 'Email', 'Phone' ];
 
     //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
     $output= fopen("php://memory", 'r+');
@@ -388,13 +388,11 @@ class People {
         fputcsv($output, [
           $email,
           $phone,
-          $person->id
         ]);
       } else {
         fputcsv($output, [
           $email ? hash('sha256', $email) : '',
           $phone ? hash('sha256', $phone) : '',
-          $person->id
         ]);
       }
     }
