@@ -98,6 +98,13 @@ class TxnLine extends \Scat\Model {
             AND created < '{$txn->created}'";
 
     $cost= $this->orm->for_table('txn')->raw_query($q)->find_one();
+
+    // No cost from that? Use best replacement cost
+    // Useful when there is a sale before a purchase
+    if (!$cost || $cost->cost == '0.00') {
+      return $this->item()->best_cost() * $this->ordered;
+    }
+
     return $cost->cost;
   }
 
