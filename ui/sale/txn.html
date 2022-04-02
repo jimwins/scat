@@ -683,10 +683,13 @@
               row.classList.remove('stocked')
             }
             row.children[0].innerText= item.name
+            if (item.no_backorder) {
+              row.children[0].innerHTML= row.children[0].innerHTML + ' <i class="fa fa-fw fa-exclamation-circle"></i>'
+            }
             row.children[1].innerText= item.brand_name ? item.brand_name : ''
             row.children[2].innerText= scat.amount(item.retail_price)
-            row.children[2].style.innerTextDecorationLine=
-              (item.sale_price ? 'line-through' : 'inherit')
+            row.children[2].style.textDecorationLine=
+              (item.sale_price != item.retail_price ? 'line-through' : 'inherit')
             row.children[3].innerText= scat.amount(item.sale_price)
             tbody.append(row.cloneNode(true))
           })
