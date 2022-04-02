@@ -163,7 +163,7 @@ class Item extends \Scat\Model {
       if ($when) {
         return $this->has_many('TxnLine')
                     ->join('txn', [ 'txn_line.txn_id', '=', 'txn.id' ])
-                    ->where_lte('txn.created', $when)
+                    ->where_lt('txn.created', $when)
                     ->sum('allocated') ?: 0;
       } else {
         return $this->has_many('TxnLine')
