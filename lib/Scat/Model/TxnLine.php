@@ -2,12 +2,16 @@
 namespace Scat\Model;
 
 class TxnLine extends \Scat\Model {
+  protected $_item;
+
   public function txn() {
     return $this->belongs_to('Txn')->find_one();
   }
 
   public function item() {
-    return $this->belongs_to('Item')->find_one();
+    // Simple memoization
+    if (isset($_item)) return $_item;
+    return ($_item= $this->belongs_to('Item')->find_one());
   }
 
   public function returned_from() {

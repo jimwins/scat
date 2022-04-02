@@ -90,7 +90,17 @@
       #txn th:last-child, #txn td:last-child {
         padding-right: 1rem;
       }
+      .no-backorder {
+        color: #500;
+      }
     </style>
+    {% if not txn.stocked() %}
+      <div class="panel-header">
+        <div class="alert alert-danger">
+          This order includes items that are not in stock (<i class="fa fa-fw fa-exclamation-triangle"></i>).
+        </div>
+      </div>
+    {% endif %}
     <table id="txn" class="table table-striped table-condensed table-hover">
       <thead>
         <tr>
@@ -105,7 +115,9 @@
       <tbody>
         {% for line in txn.items.find_many %}
           <tr data-id="{{ line.id }}"
-              data-editable-base="/sale/{{ txn.id }}/item/{{ line.id }}">
+              data-editable-base="/sale/{{ txn.id }}/item/{{ line.id }}"
+              class="{{ line.item().no_backorder ? 'no-backorder' }}"
+              >
             <td>
               {% if not line.kit_id %}
                 <a data-action="remove-item" class="btn btn-link btn-xs">
@@ -140,6 +152,20 @@
                     <i class="fa fa-barcode"></i>
                   </a>
                 {% endif %}
+              {% endif %}
+              {% if line.item.no_backorder %}
+                <span class="pull-right"
+                      data-toggle="tooltip"
+                      title="This item is not available for backorder!">
+                  <i class="fa fa-fw fa-exclamation-circle"></i>
+                </span>
+              {% endif %}
+              {% if line.item.tic == '00000' and line.item.stock(txn.created) < -line.ordered %}
+                <span class="pull-right"
+                      data-toggle="tooltip"
+                      title="There is not enough stock!">
+                  <i class="fa fa-fw fa-exclamation-triangle"></i>
+                </span>
               {% endif %}
               <span data-action="editable" data-name="override_name">
                 {{- line.name -}}

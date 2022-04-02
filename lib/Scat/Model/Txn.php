@@ -50,6 +50,19 @@ class Txn extends \Scat\Model {
     return -$cogs;
   }
 
+  public function stocked() {
+    $stock= 1;
+    foreach ($this->items()->find_many() as $line) {
+      $item= $line->item();
+      if ($item->tic != '00000') continue;
+      $item_stock= $item->stock($this->created);
+      if ($item_stock < -($line->ordered)) {
+        $stock= 0;
+      }
+    }
+    return $stock;
+  }
+
   public function notes() {
     return
       $this->has_many('Note', 'attach_id')

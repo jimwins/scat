@@ -151,17 +151,24 @@ class Item extends \Scat\Model {
     );
   }
 
-  public function stock() {
+  public function stock($when= null) {
     if ($this->is_kit) {
       $items= $this->has_many('KitItem', 'kit_id')->find_many();
       if (!$items) return 0;
-      $qtys= array_map(function ($item) {
-        return $item->item()->stock();
+      $qtys= array_map(function ($item) use ($when) {
+        return $item->item()->stock($when);
       }, $items);
       return min($qtys);
     } else {
-      return $this->has_many('TxnLine')
-                  ->sum('allocated') ?: 0;
+      if ($when) {
+        return $this->has_many('TxnLine')
+                    ->join('txn', [ 'txn_line.txn_id', '=', 'txn.id' ])
+                    ->where_lte('txn.created', $when)
+                    ->sum('allocated') ?: 0;
+      } else {
+        return $this->has_many('TxnLine')
+                    ->sum('allocated') ?: 0;
+      }
     }
   }
 
