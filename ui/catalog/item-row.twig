@@ -120,7 +120,7 @@
     {% if i.oversized %}
       <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="fa fa-truck"></i></span>
     {% endif %}
-    <i class="active fa {{ i.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+    <i class="active fa fa-fw {{ i.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
   </td>
 {# critical that <script> be inside tr so currentScript.parentNode works #}
 <script>
