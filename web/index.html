@@ -99,22 +99,21 @@
 }
 .hero .hero__content {
   margin: 1rem 0 1rem 5%;
-  max-width: 35%;
+  max-width: 50%;
   min-width: 30ch;
   z-index: 1;
-  background-color: rgba(238,238,238,0.7);
+  background-color: rgba(238,238,238,0.8);
   border-radius: var(--border-radius);
   padding: 1rem 2rem 2rem 2rem;
+  box-shadow: none;
 }
 .hero .hero__content h1 {
   font-size: 3rem;
-  color: var(--primary-color);
   font-weight: 500;
   margin: 0 0 1rem;
 }
 .hero .hero__content p {
   font-size: 1.75rem;
-  color: var(--primary-color);
 }
   </style>
 
@@ -124,12 +123,12 @@
     {% endif %}
 
     <div class="hero">
-      <div class="hero__content">
-        <h1>Product</h1>
-        <p>You really need this product, so hurry and buy it today!</p>
-        <button>Buy Now</button>
+      <div class="card hero__content">
+        <h1>Itoya ProFolios</h1>
+        <p>Boring binders begone with ITOYA! Psst, it's not magic🦄 Corral the chaos. Organize, store, and present your art with ITOYA.</p>
+        <a class="button" href="/art-supplies/storage-and-portfolios/portfolios-and-presentation-cases/itoya-the-original-art-profolio">Shop Sizes</a>
       </div>
-      <img src="http://placecorgi.com/600" alt="" />
+      <img src="//rawmats.gumlet.io/i/o/623e053b01ab573a1117d2423b.jpg?w=600&h=600&mode=fit&fm=auto" alt="" />
     </div>
 
 <style>
@@ -145,6 +144,9 @@
   /* min() with 100% prevents overflow in extra narrow spaces */
   grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min)), 1fr));
 
+  margin: var(--gap) 0;
+
+  /* ul.smol-grid gets wonky padding otherwise */
   padding: 0;
 }
 
@@ -153,8 +155,11 @@
 
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.35);
+  box-shadow: 0.25em 0.25em 1em rgba(0, 0, 0, 0.35);
   border-radius: var(--border-radius);
+}
+.card.hot {
+  cursor: pointer;
 }
 
 /* Soon we can replace this with: gap: 1rem; */
@@ -206,29 +211,37 @@ but as a fallback you can chain `:not()` instead */
   font-size: 0.9rem;
 }
 
-.card > a {
-  align-self: start;
+.card > button {
+  align-self: center;
+}
+
+.card.hot:hover h3 {
+  text-decoration: underline;
+  color: var(--primary-color);
+}
+.card.hot:hover {
+  box-shadow: 0.25em 0.25em 1em rgba(var(--primary-color-r), var(--primary-color-g), var(--primary-color-b), 0.8);
 }
 </style>
 
     <ul class="smol-grid">
-      <li data-component="" class="card">
-        <img src="https://images.unsplash.com/photo-1607274227313-08146c819e6f?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MXwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHw&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=400" alt="">
-        <h3>Card Headline 1</h3>
-        <p>Chocolate cake macaroon tootsie roll pastry gummies.</p>
-        <p>Apple pie jujubes cheesecake ice cream gummies sweet roll lollipop.</p>
-        <a href="https://moderncss.dev">Visit ModernCSS.dev</a>
+      <li class="card">
+        <h3>Fabriano EcoQua Notebooks</h3>
+        <img src="//rawmats.gumlet.io/i/o/62449bc40160db7eb14617466e.jpg?w=400&h=400&mode=fit&fm=auto" alt="">
+        <p>🌈🌺Is it a Spring Thing? Fabriano EcoQua Notebooks 💥ON SALE at 25% OFF💥 EcoQua Notebooks have wonderfully colorful covers and are ideal for writing, sketching, and/or drawing in pen, pencil, and marker. Made in 🇮🇹 Italy w/environmentally friendly FSC certified 57 lb. (85gsm) paper that is chlorine-free, acid-free, and completely recyclable. Available Staple- and/or Spiral-Bound with Lined, Blank, Standard Grid, and Dot Grid sheets. So is it a Spring Thing, or do you always color-code your projects to stay better organized? 🤔 🛒</p>
+        <a class="button" href="/art-supplies/paper-board-and-films/sketch-books-and-journals/fabriano-ecoqua-notebooks">Shop Colors &amp; Sizes</a>
       </li>
-      <li data-component="" class="card">
-        <h3>Card Headline 2</h3>
-        <img src="https://images.unsplash.com/photo-1607274227313-08146c819e6f?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MXwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHw&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=400" alt="">
-        <p>Chocolate cake macaroon tootsie roll pastry gummies.</p>
+      <li class="card">
+        <h3>40% off M. Graham Gouache</h3>
+        <img src="//rawmats.gumlet.io/i/o/62339c0d012c2430c7da3d8b07.jpg?w=400&h=400&mode=fit&fm=auto" alt="">
+        <p>M. Graham Artists’ Gouache 💥ON SALE at 40% OFF💥 Buy 3 get 1 FREE 15ml tube 🎉 M. Graham Artists’ Gouache contains no added chalk or adulterants that would degrade the appearance of the color when dry. By mixing white when, where, and how you want it, you’re in control of the colors🎨 and the base of Northwest blackberry honey🍯 protects the color’s brilliance and offers direct, smooth application. (Free tube available at checkout. While supplies last!)</p>
+        <a class="button" href="/art-supplies/paints-and-mediums/gouache-colors-and-sets/m-graham-artists-gouache">Shop Colors &amp; Sizes</a>
       </li>
-      <li data-component="" class="card">
-        <h3>Card Headline 3</h3>
-        <p>Apple pie jujubes cheesecake ice cream gummies sweet roll lollipop.</p>
-        <p>Chocolate cake macaroon tootsie roll pastry gummies.</p>
-        <img src="https://images.unsplash.com/photo-1607274227313-08146c819e6f?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MXwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHw&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=400" alt="">
+      <li class="card">
+        <h3>New: Zig Clean Color Dot Markers</h3>
+        <img src="//rawmats.gumlet.io/i/o/623a0c760123c6f0e262bfec7d.jpg?w=400&h=400&mode=fit&fm=auto" alt="">
+        <p>🌱Spring into… ✨NEW✨ Kuretake Zig Clean Color Dot Marker Sets 🔴🔵🟣🟢⚫️ Clean Color Dot Markers are dual tip markers with a 0.5mm fine tip on one end and a flexible, rounded dot tip on the other. Dots of various sizes can be drawn by adjusting the pressure applied to the pen during use. Whether you make like Seurat on Sundays and sketch with a set in the park, or prefer to punctuate pumpkins like Yayoi, a 6-Color or 12-Color Clean Color Dot Marker Set is a great way refresh your routine marker array.</p>
+        <a class="button" href="/art-supplies/pens-inks-and-markers/art-markers/kuretake-zig-clean-color-dot-marker-sets">Shop Sets</a>
       </li>
     </ul>
   </main>
@@ -322,6 +335,19 @@ but as a fallback you can chain `:not()` instead */
         // don't care
       }
     }
+
+    /* Progressive enhancement: make whole .card clickable */
+    function handleCardClick(ev) {
+      const isTextSelected = window.getSelection().toString();
+      if (!isTextSelected) {
+        ev.currentTarget.querySelector('a').click()
+      }
+    }
+
+    document.querySelectorAll('.card').forEach((card) => {
+      card.addEventListener("click", handleCardClick)
+      card.classList.add('hot')
+    })
   </script>
 
 </body>
