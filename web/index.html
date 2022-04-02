@@ -1,0 +1,328 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Raw Materials Art Supplies - Downtown Los Angeles</title>
+
+  <link rel="stylesheet" type="text/css" href="/css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="/css/lineicons.css">
+  <link rel="stylesheet" type="text/css" href="/css/web.css">
+</head>
+
+<body>
+
+  <header>
+    <nav aria-labelledby="site-name">
+      <div id="site-name">
+        <a href="/">
+          <img src="https://rawmats.gumlet.io/i/o/619408b8005c11013ca45b7b75.png?w=622&h=69&mode=fit&fm=auto" alt="Raw Materials Art Supplies">
+        </a>
+      </div>
+
+      <form id="search-form">
+          <input class="input" type="search" name="q">
+          <button type="submit">
+            Search
+          </button>
+      </form>
+
+      <div id="info-and-cart">
+        <details id="info">
+          <summary class="outline">
+            <i class="lni lni-map-marker lni-lg"></i> Store
+          </summary>
+          <div class="popup">
+            <a href="https://www.google.com/maps?cid=10837226433205632471&amp;hl=en" title="Find our location">645 South Los Angeles Street<br>
+            Los Angeles, CA 90014</a><br>
+            <strong><a href="tel:+18007297060">(800) 729-7060</a></strong><br>
+            <a href="/contact">info@rawmaterialsla.com</a><br>
+            Monday - Saturday, 10am to 6pm <br>
+            Closed Sundays
+            <ul>
+              <li><a href="http://twitter.com/RawMaterials" title="Follow us on Twitter"><i class="lni lni-lg lni-twitter"></i></a></li>
+              <li><a href="http://facebook.com/RawMaterialsLA" title="Like us on Facebook"><i class="lni lni-lg lni-facebook"></i></a></li>
+              <li><a href="http://instagram.com/rawmaterialsartsupplies" title="Follow us on Instagram"><i class="lni lni-lg lni-instagram"></i></a></li>
+              <li><a href="https://www.pinterest.com/rawmaterialsla/" title="Follow us on Pinterest"><i class="lni lni-lg lni-pinterest"></i></a></li> 
+              <li><a href="https://www.youtube.com/channel/UC8QdVII0oYUnrO5RLAcivSQ" title="Subscribe to our YouTube channel"><i class="lni lni-lg lni-youtube"></i></a></li>
+            </ul>
+          </div>
+        </details>
+        <details id="cart">
+          <summary>
+            <i class="lni lni-cart"></i>
+            Cart
+            <span class="badge"></span>
+          </summary>
+          <div class="popup">
+            <a href="/login">Log in</a> or <a href="/rewards">Sign up</a>
+            <br>
+            There is nothing in your shopping cart.
+          </div>
+        </details>
+      </div>
+    </nav>
+  </header>
+
+  <style>
+/* Based on
+ * https://moderncss.dev/3-popular-website-heroes-created-with-css-grid-layout/
+ * */
+.hero {
+  display: grid;
+  grid-template-areas: "hero";
+  align-items: center;
+  height: fit-content(65vh);
+  max-height: 600px;
+  background: #eee;
+  border-radius: var(--border-radius);
+}
+.hero > * {
+  grid-area: hero;
+}
+.hero img {
+  -o-object-fit: cover;
+     object-fit: cover;
+  height: min(65vh, 600px);
+  width: 80%;
+  transition: 180ms width ease-in;
+  justify-self: end;
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+@media (min-width: 60rem) {
+  .hero img {
+    width: 60%;
+  }
+}
+.hero .hero__content {
+  margin: 1rem 0 1rem 5%;
+  max-width: 35%;
+  min-width: 30ch;
+  z-index: 1;
+  background-color: rgba(238,238,238,0.7);
+  border-radius: var(--border-radius);
+  padding: 1rem 2rem 2rem 2rem;
+}
+.hero .hero__content h1 {
+  font-size: 3rem;
+  color: var(--primary-color);
+  font-weight: 500;
+  margin: 0 0 1rem;
+}
+.hero .hero__content p {
+  font-size: 1.75rem;
+  color: var(--primary-color);
+}
+  </style>
+
+  <main>
+    {% if param %}
+      <p>param: <code>{{ param | json_encode }}</code>
+    {% endif %}
+
+    <div class="hero">
+      <div class="hero__content">
+        <h1>Product</h1>
+        <p>You really need this product, so hurry and buy it today!</p>
+        <button>Buy Now</button>
+      </div>
+      <img src="http://placecorgi.com/600" alt="" />
+    </div>
+
+<style>
+/*
+ * Based on https://smolcss.dev/#card
+ */
+.smol-grid {
+  --min: 15ch;
+  --gap: 1rem;
+
+  display: grid;
+  grid-gap: var(--gap);
+  /* min() with 100% prevents overflow in extra narrow spaces */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min)), 1fr));
+
+  padding: 0;
+}
+
+.card {
+  --img-ratio: 3/2;
+
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.35);
+  border-radius: var(--border-radius);
+}
+
+/* Soon we can replace this with: gap: 1rem; */
+.card > * + * {
+  margin-top: 1rem;
+}
+
+.card > img {
+  /* Fallback for `aspect-ratio` of defining
+  a height */
+  height: max(18vh, 12rem);
+  object-fit: cover;
+  width: 100%;
+}
+
+/* When supported, use `aspect-ratio` */
+@supports (aspect-ratio: 1) {
+  .card > img {
+    aspect-ratio: var(--img-ratio);
+    height: auto;
+  }
+}
+
+.card > img:first-child {
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.card > img:last-child {
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  margin-top: auto;
+}
+
+.card > :not(img) {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.card > :not(img):first-child {
+  margin-top: 1rem;
+}
+
+/* Enhanced `:not()` accepts a selector list,
+but as a fallback you can chain `:not()` instead */
+.card > :last-of-type:not(img, h2, h3, h4) {
+  margin-bottom: 1rem;
+}
+
+.card > :not(h2, h3, h4) {
+  font-size: 0.9rem;
+}
+
+.card > a {
+  align-self: start;
+}
+</style>
+
+    <ul class="smol-grid">
+      <li data-component="" class="card">
+        <img src="https://images.unsplash.com/photo-1607274227313-08146c819e6f?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MXwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHw&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=400" alt="">
+        <h3>Card Headline 1</h3>
+        <p>Chocolate cake macaroon tootsie roll pastry gummies.</p>
+        <p>Apple pie jujubes cheesecake ice cream gummies sweet roll lollipop.</p>
+        <a href="https://moderncss.dev">Visit ModernCSS.dev</a>
+      </li>
+      <li data-component="" class="card">
+        <h3>Card Headline 2</h3>
+        <img src="https://images.unsplash.com/photo-1607274227313-08146c819e6f?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MXwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHw&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=400" alt="">
+        <p>Chocolate cake macaroon tootsie roll pastry gummies.</p>
+      </li>
+      <li data-component="" class="card">
+        <h3>Card Headline 3</h3>
+        <p>Apple pie jujubes cheesecake ice cream gummies sweet roll lollipop.</p>
+        <p>Chocolate cake macaroon tootsie roll pastry gummies.</p>
+        <img src="https://images.unsplash.com/photo-1607274227313-08146c819e6f?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MXwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHw&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=400" alt="">
+      </li>
+    </ul>
+  </main>
+
+  <footer>
+    <div id="links-and-address">
+      <div>
+        <ul id="links">
+          <li><a href="/">Home</a>
+          <li><a href="/art-supplies">Art Supplies</a>
+          <li><a href="/workshops">Workshops, Classes &amp; Events</a>
+          <li><a href="/blog/">Blog</a>
+          <li><a href="/jobs">Jobs</a>
+          <li><a href="/newsletter">Newsletter</a>
+          <li><a href="/buy-gift-card">Buy a Gift Card</a>
+        </ul>
+      </div>
+      <div id="address">
+        <address>
+          645 South Los Angeles Street &bull;
+          Los Angeles, CA 90014 &bull;
+          <strong><a href="tel:+18007297060">(800) 729-7060</a></strong> &bull;
+          <a href="/contact">info@rawmaterialsla.com</a> &bull;
+          Monday - Saturday, 10am to 6pm &bull;
+          Closed Sundays
+        </address>
+      </div>
+    </div>
+
+    <div id="fine-print">
+      <ul id="policies">
+        <li><a href="/terms">Terms of Use</a>
+        <li><a href="/privacy-policy">Privacy Policy</a>
+        <li><a href="/shipping">Shipping</a>
+        <li><a href="/return-policy">Return Policy</a>
+        <li><a href="/sales-tax-policy">Sales Tax Policy</a>
+        <li><a href="/accessibility">Accessibility Statement</a>
+      </ul>
+      <ul id="payment-marks">
+        <li><i class="lni lni-amazon-pay lni-lg"></i>
+        <li><i class="lni lni-amex lni-lg"></i>
+        <li><i class="lni lni-discover lni-lg"></i>
+        <li><i class="lni lni-mastercard lni-lg"></i>
+        <li><i class="lni lni-paypal lni-lg"></i>
+        <li><i class="lni lni-visa lni-lg"></i>
+      </ul>
+      <div id="copyright">
+        Copyright &copy; 2022 Imperial Dog, Inc.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* Make <details> close when we click outside or on its <summary> */
+    document.querySelectorAll('details').forEach((details) => {
+      let closeDetailsOnClick= (ev) => {
+        let in_summary= details.contains(ev.target.closest('summary'))
+        if (!details.contains(ev.target) || in_summary) {
+          if (in_summary) {
+            ev.preventDefault(); ev.stopPropagation()
+          }
+          details.removeAttribute('open')
+          document.removeEventListener('click', closeDetailsOnClick)
+        }
+      }
+      details.addEventListener("toggle", (ev) => {
+        if (details.open) {
+          document.addEventListener('click', closeDetailsOnClick)
+        }
+      })
+    })
+
+    window.getCookie= function(name) {
+      var match= document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      if (match) return decodeURIComponent(match[2]);
+    }
+
+    /* Fill in cart details */
+    var details= getCookie('cartDetails');
+    if (details) {
+      try {
+        details= JSON.parse(details)
+        if (details.items > 0) {
+          var icon= document.querySelector('#cart .lni-cart')
+          icon.classList.remove('lni-cart')
+          icon.classList.add('lni-cart-full')
+          var badge= document.querySelector('#cart .badge')
+          badge.innerText= details.items
+        }
+      } catch (err) {
+        // don't care
+      }
+    }
+  </script>
+
+</body>
+</html>
