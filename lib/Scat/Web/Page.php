@@ -14,10 +14,12 @@ class Page {
     $this->view= $view;
   }
 
-  function page(Request $request, Response $response, $param)
+  function page(Request $request, Response $response, $param,
+                \Scat\Service\Catalog $catalog)
   {
     return $this->view->render($response, 'index.html', [
       'param' => $param,
+      'departments' => $catalog->getDepartments(),
     ]);
   }
 }

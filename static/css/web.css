@@ -38,7 +38,7 @@ nav form {
 nav form input {
   width: 100%;
 }
-nav #info-and-cart {
+nav #info-and-cart, nav #site-name {
   display: grid;
   grid-template-columns: auto auto;
 }
@@ -132,6 +132,21 @@ body {
   font-size: 16px;
   line-height: 1.6;
   color: var(--text-color);
+}
+
+/* https://stackoverflow.com/a/62109988 */
+.visually-hidden {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px 1px 1px 1px); /* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
+  clip: rect(1px, 1px, 1px, 1px); /*maybe deprecated but we need to support legacy browsers */
+  clip-path: inset(50%); /*modern browsers, clip-path works inwards from each corner*/
+  white-space: nowrap; /* added line to stop words getting smushed together (as they go onto seperate lines and some screen readers do not understand line feeds as a space */
 }
 
 body > * {
@@ -272,6 +287,11 @@ summary {
   line-height: 1.1;
   transition: 220ms all ease-in-out;
 }
+a.button.min,
+button.min,
+summary.min {
+  min-width: inherit;
+}
 a.button:hover, a.button:active,
 .card.hot:hover a.button,
 button:hover,
@@ -354,7 +374,7 @@ a:hover, a:focus {
 .list-horizontal li {
   display: inline-block;
 }
-.list-horizontal li:after {
+.list-horizontal:not(.no-separator) li:after {
   content: '\00a0\00a0\2022\00a0\00a0';
 }
 .list-horizontal li:last-child:after {
@@ -379,6 +399,8 @@ details > div {
   right: 0;
   width: max-content;
 
+  z-index: 100;
+
   background-color: #fff;
 
   border: var(--border-width) solid var(--primary-color);
@@ -398,12 +420,10 @@ details > div {
     animation: dissolve;
   }
 }
-details > div ul {
-  padding: 0;
-  list-style: none;
-}
-details > div li {
-  display: inline-flex;
+details.left > div {
+  left: 0;
+  right: auto;
+  transform-origin: 0% 0%;
 }
 
 @keyframes scale {
@@ -413,4 +433,12 @@ details > div li {
   100% {
     transform: scale(1);
   }
+}
+
+#department-nav summary {
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  margin-right: 0.5em;
+  background: #fff;
+  box-shadow: none;
 }

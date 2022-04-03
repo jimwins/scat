@@ -17,6 +17,28 @@
   <header>
     <nav aria-labelledby="site-name">
       <div id="site-name">
+        <details id="department-nav" class="left">
+          <summary class="min">
+            <i class="lni lni-menu"></i>
+            <span class="visually-hidden">Show list of departments</span>
+          </summary>
+          <div>
+            <ul id="departments">
+              {% for dept in departments %}
+                <li>
+                  <a href="{{ url_for('catalog', { dept: dept.slug }) }}">
+                    {{ dept.name }}
+                  </a>
+                </li>
+              {% endfor %}
+              <li>
+                <a href="{{ url_for('catalog-brand') }}">
+                  Brands
+                </a>
+              </li>
+            </ul>
+          </div>
+        </details>
         <a href="/">
           <img src="https://rawmats.gumlet.io/i/o/619408b8005c11013ca45b7b75.png?w=622&h=69&mode=fit&fm=auto" alt="Raw Materials Art Supplies">
         </a>
@@ -41,7 +63,7 @@
             <a href="/contact">info@rawmaterialsla.com</a><br>
             Monday - Saturday, 10am to 6pm <br>
             Closed Sundays
-            <ul>
+            <ul class="list-horizontal no-separator">
               <li><a href="http://twitter.com/RawMaterials" title="Follow us on Twitter"><i class="lni lni-lg lni-twitter"></i></a></li>
               <li><a href="http://facebook.com/RawMaterialsLA" title="Like us on Facebook"><i class="lni lni-lg lni-facebook"></i></a></li>
               <li><a href="http://instagram.com/rawmaterialsartsupplies" title="Follow us on Instagram"><i class="lni lni-lg lni-instagram"></i></a></li>
