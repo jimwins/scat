@@ -63,52 +63,6 @@
                value="{{ label_date ?: "now"|date("Y-m-d") }}">
       </div>
 
-      {% if not txn.is_firstclass_shipment() and not txn.has_hazmat_items() %}
-        <div class="form-group">
-          <label for="predefined_package">Package Type</label>
-          <select class="form-control" name="predefined_package">
-            <option value=""></option>
-            <optgroup label="USPS">
-              <option value="Card">Card</option>
-              <option value="Letter">Letter</option>
-              <option value="Flat">Flat</option>
-              <option value="FlatRateEnvelope">Flat-Rate Envelope</option>
-              <option value="FlatRateLegalEnvelope">Flat-Rate Legal Envelope</option>
-              <option value="FlatRatePaddedEnvelope">Flat-Rate Padded Envelope</option>
-              <option value="SmallFlatRateBox">Small Flat-Rate Box</option>
-              <option value="MediumFlatRateBox">Medium Flat-Rate Box</option>
-              <option value="LargeFlatRateBox">Large Flat-Rate Box</option>
-              <option value="LargeFlatRateBoxAPOFPO">Large Flat-Rate Box (APO/FPO)</option>
-              <option value="RegionalRateBoxA">Regional Rate Box A</option>
-              <option value="RegionalRateBoxB">Regional Rate Box B</option>
-            </optgroup>
-            <optgroup label="FedEx">
-              <option value="FedExEnvelope">Envelope</option>
-              <option value="FedExBox">Box</option>
-              <option value="FedExPak">Pak</option>
-              <option value="FedExTube">Tube</option>
-              <option value="FedEx10kgBox">10kg Box</option>
-              <option value="FedEx25kgBox">25kg Box</option>
-              <option value="FedExSmallBox">Small Box</option>
-              <option value="FedExMediumBox">Medium Box</option>
-              <option value="FedExLargeBox">Large Box</option>
-              <option value="FedExExtraLargeBox">Extra-Large Box</option>
-            </optgroup>
-            <optgroup label="UPS">
-              <option value="UPSLetter">Letter</option>
-              <option value="UPSExpressBox">Express Box</option>
-              <option value="UPS25kgBox">25kg Box</option>
-              <option value="UPS10kgBox">10kg Box</option>
-              <option value="Tube">Tube</option>
-              <option value="Pak">Pak</option>
-              <option value="SmallExpressBox">Small Express Box</option>
-              <option value="MediumExpressBox">Medium Express Box</option>
-              <option value="LargeExpressBox">Large Express Box</option>
-            </optgroup>
-          </select>
-        </div>
-      {% endif %}
-
       {# Gift card is always letter #}
       {% if txn.items.where('item_id', 11212).find_one %}
         <input type="hidden" name="predefined_package" value="Letter">
