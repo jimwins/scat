@@ -167,6 +167,13 @@
                   <i class="fa fa-fw fa-exclamation-triangle"></i>
                 </span>
               {% endif %}
+              {% if (-line.ordered % line.item.purchase_quantity) != 0 %}
+                <span class="pull-right text-danger"
+                      data-toggle="tooltip"
+                      title="Not ordering purchase quantity!">
+                  <i class="fa fa-fw fa-warning"></i>
+                </span>
+              {% endif %}
               <span data-action="editable" data-name="override_name">
                 {{- line.name -}}
               </span>
@@ -955,6 +962,7 @@
           title: item.name,
           content: "<b>Stock:</b> " + item.stock + '<br>' +
                    "<b>On Order:</b> " + item.on_order + '<br>' +
+                   "<b>Purchase Quantity:</b> " + item.purchase_quantity + '<br>' +
                    "<a href='/catalog/item/" + item.code + "' target='_blank' class='btn btn-default btn-block btn-xs'>Details</a>",
           html: true
         })
