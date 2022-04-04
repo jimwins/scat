@@ -167,7 +167,7 @@
                   <i class="fa fa-fw fa-exclamation-triangle"></i>
                 </span>
               {% endif %}
-              {% if (-line.ordered % line.item.purchase_quantity) != 0 %}
+              {% if (-line.ordered % max(1,line.item.purchase_quantity)) != 0 %}
                 <span class="pull-right text-danger"
                       data-toggle="tooltip"
                       title="Not ordering purchase quantity!">
