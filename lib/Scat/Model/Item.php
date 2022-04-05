@@ -7,6 +7,13 @@ class Item extends \Scat\Model {
     return $this->belongs_to('Brand', 'brand')->find_one();
   }
 
+  /* Turn name into a more user-friendly title (for feeds) */
+  public function title() {
+    $title= $this->name;
+    $title= preg_replace('/^(\d+)x(\d+) /', '\1" x \2" ', $title);
+    return $title;
+  }
+
   public function product() {
     return $this->belongs_to('Product')->find_one();
   }

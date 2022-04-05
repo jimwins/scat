@@ -1158,8 +1158,13 @@ class Catalog {
     $items= $this->catalog->getItems()
       ->select('*')
       ->select_expr('COUNT(*) OVER (PARTITION BY product_id)', 'siblings')
-      ->where_gt('product_id', 0)
-      ->find_many();
+      ->where_gt('product_id', 0);
+
+    if (($code= $request->getParam('code'))) {
+      $items= $items->where_like('code', "{$code}%");
+    }
+
+    $items= $items->find_many();
 
     $fields= [
       'id', 'title', 'description', 'rich_text_description',
@@ -1217,7 +1222,7 @@ class Catalog {
 
       $record= [
         $item->code,
-        $item->name,
+        $item->title(),
         $text,
         $html,
         ($item->stock() > 0 ? 'in stock' : 'out of stock'),
