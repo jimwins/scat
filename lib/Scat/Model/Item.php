@@ -7,10 +7,61 @@ class Item extends \Scat\Model {
     return $this->belongs_to('Brand', 'brand')->find_one();
   }
 
-  /* Turn name into a more user-friendly title (for feeds) */
+  private static function expand_pad_details($m) {
+    $ret= [];
+    // m[1] = sheets
+    $ret[]= "{$m[1]} sheets";
+    // m[2] = binding
+    switch ($m[2]) {
+      case 'PB':
+        $ret[]= "Perfect Bound"; break;
+      case 'TB':
+        $ret[]= "Tape Bound"; break;
+      case 'WB':
+        $ret[]= "Wire Bound"; break;
+      case 'HB':
+        $ret[]= "Hard Bound"; break;
+      case 'SB':
+        $ret[]= "Staple Bound"; break;
+      case 'SH':
+        $ret[]= "Unbound"; break;
+      default:
+        error_log("Can't explain binding {$m[2]}");
+    }
+    // m[3] = weight
+    // m[4] = weight units (# or gsm)
+    $ret[]= $m[3] . " " . ($m[4] == '#' ? ' lbs.' : 'gsm');
+    // m[5] = CP, HP, R
+    if (isset($m[5])) {
+      switch ($m[5]) {
+        case 'CP':
+          $ret[]= "Cold Press"; break;
+        case 'HP':
+          $ret[]= "Hot Press"; break;
+        case 'R':
+          $ret[]= "Rough"; break;
+        default:
+          error_log("Can't explain paper finish {$m[5]}");
+      }
+    }
+
+    return "(" . join(", ", $ret) . ")";
+  }
+
+  /* Turn name into a more user-friendly title (for feeds, website) */
   public function title() {
     $title= $this->name;
+    // 3in Ruler -> 3" Ruler
+    $title= preg_replace('/^(\d+)in /', '\1" ', $title);
+    // 9x12 Cavnas -> 9" x 12" Canvas
     $title= preg_replace('/^(\d+)x(\d+) /', '\1" x \2" ', $title);
+    // 9x12 Sketch 80/WB/90# -> 9" x 12" Sketch (80 sheets, Wirebound, 90 lbs.)
+    $title= preg_replace_callback('!(\d+)/(\w\w)/(\d+)(gsm|#)(\w\w?)?$!',
+                                  "self::expand_pad_details",
+                                  $title);
+    // 5oz Titanium White Acrylic
+    $title= preg_replace('/^(\d+)oz /', '\1 oz. ', $title);
+
     return $title;
   }
 
