@@ -2,7 +2,7 @@
 {% import 'macros.twig' as scat %}
 
 {% block title %}
-  Item: {{ item.name }}
+  Item: {{ item.title }}
 {% endblock %}
 
 {% block catalog_crumb_button %}
@@ -62,8 +62,9 @@
             {{- item.code -}}
           </span>
         </span>
-        <span class="editable" data-name="name" style="{{ item.active ?: 'text-decoration: line-through' }}">
-          {{- item.name -}}
+        {# we edit item.name, but display item.title #}
+        <span class="editable" data-name="name" data-value="{{ item.name }}" style="{{ item.active ?: 'text-decoration: line-through' }}">
+          {{- item.title -}}
         </span>
       </h2>
     </div>
