@@ -52,15 +52,15 @@ class Item extends \Scat\Model {
   public function title() {
     $title= $this->name;
     // 3in Ruler -> 3" Ruler
-    $title= preg_replace('/^(\d+)in /', '\1" ', $title);
+    $title= preg_replace('/^([\d.]+)in /', '\1" ', $title);
     // 9x12 Cavnas -> 9" x 12" Canvas
-    $title= preg_replace('/^(\d+)x(\d+) /', '\1" x \2" ', $title);
+    $title= preg_replace('/^([\d.]+)x([\d.]+) /', '\1" x \2" ', $title);
     // 9x12 Sketch 80/WB/90# -> 9" x 12" Sketch (80 sheets, Wirebound, 90 lbs.)
     $title= preg_replace_callback('!(\d+)/(\w\w)/([\d.]+)(gsm|#)(\w\w?)?$!',
                                   "self::expand_pad_details",
                                   $title);
     // 5oz Titanium White Acrylic
-    $title= preg_replace('/^(\d+)oz /', '\1 oz. ', $title);
+    $title= preg_replace('/^([\d.]+)oz /', '\1 oz. ', $title);
 
     return $title;
   }
