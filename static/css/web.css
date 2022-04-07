@@ -442,3 +442,9 @@ details.left > div {
   background: #fff;
   box-shadow: none;
 }
+#department-nav h2 {
+  margin-top: 0;
+}
+#department-nav li::marker {
+  color: var(--primary-color);
+}
