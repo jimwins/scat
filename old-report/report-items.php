@@ -89,11 +89,6 @@ dump_query($q);
 ?>
   <button id="download" class="btn btn-default">Download</button>
 </div>
-<form id="post-csv" style="display: none"
-      method="post" action="/api/encode-tsv.php">
-  <input type="hidden" name="fn" value="item-sales.txt">
-  <textarea id="file" name="file"></textarea>
-</form>
 <?
 foot();
 ?>

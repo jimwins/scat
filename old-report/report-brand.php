@@ -174,11 +174,6 @@ while ($row= $r->fetch_assoc()) {
  </tbody>
 </table>
 <button id="download" class="btn btn-default">Download</button>
-<form id="post-csv" style="display: none"
-      method="post" action="/api/encode-tsv.php">
-  <input type="hidden" name="fn" value="brand-sales.txt">
-  <textarea id="file" name="file"></textarea>
-</form>
 <?
 foot();
 ?>
