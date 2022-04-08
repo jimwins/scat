@@ -308,7 +308,7 @@ class Txn extends \Scat\Model {
   }
 
   public function getInvoicePDF($variation= '') {
-    $loader= new \Twig\Loader\FilesystemLoader('../ui/');
+    $loader= new \Twig\Loader\FilesystemLoader([ '../ui/pos/','../ui/shared' ]);
     $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
     $twig->addExtension(new \Scat\TwigExtension());
 
@@ -329,7 +329,7 @@ class Txn extends \Scat\Model {
   }
 
   public function getReceiptPDF($variation= '') {
-    $loader= new \Twig\Loader\FilesystemLoader('../ui/');
+    $loader= new \Twig\Loader\FilesystemLoader([ '../ui/pos/','../ui/shared' ]);
     $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
     $twig->addExtension(new \Scat\TwigExtension());
 

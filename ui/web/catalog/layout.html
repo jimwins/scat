@@ -1,0 +1,127 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  {% if product %}
+    {{ product.name }}
+  {% elseif subdept %}
+    {{ subdept.name }}
+  {% elseif dept %}
+    {{ dept.name }}
+  {% else %}
+    Art Supplies
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+  <style>
+    nav.breadcrumb {
+      padding: 0 1em;
+      border: 2px solid var(--primary-color);
+      border-radius: var(--border-radius);
+    }
+    nav.breadcrumb ol {
+      padding: 0;
+    }
+    nav.breadcrumb li {
+      display: inline-block;
+    }
+    nav.breadcrumb li:after {
+      content: ' / ';
+    }
+    nav.breadcrumb li:last-child:after {
+      content: '';
+    }
+    nav.breadcrumb .active > a {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+
+  <nav class="breadcrumb">
+    <ol>
+      <li><a href="{{ url_for('catalog') }}">Art Supplies</a></li>
+      <li class="{{ not subdept ? 'active' }}">
+        <a href="{{ url_for('catalog', { 'dept' : dept.slug }) }}">
+          {{ dept.name }}
+        </a>
+      </li>
+      {% if subdept %}
+        <li class="{{ not product ? 'active' }}">
+          <a style="{{ not subdept.active ? 'text-decoration: line-through' }}"
+             href="{{ url_for('catalog', {'dept': dept.slug,
+                                           'subdept': subdept.slug }) }}">
+            {{ subdept.name }}
+          </a>
+        </li>
+      {% endif %}
+      {% if product %}
+        <li class="{{ not item ? 'active' }}">
+          <a href="{{ url_for('catalog', { 'dept': dept.slug,
+                                            'subdept': subdept.slug,
+                                            'product': product.slug}) }}">
+            {{ product.name }}
+          </a>
+        </li>
+      {% endif %}
+    </ol>
+  </nav>
+
+<div class="row">
+  <div class="col-md-{% block catalog_width "9 col-md-push-3" %}">
+
+    {% block catalog_content %}
+      {% if dept and not subdept  %}
+        <p>
+          {{ dept.description | markdown }}
+        </p>
+      {% endif %}
+      {% if products and not product %}
+        {% include 'catalog/products.twig' %}
+      {% endif %}
+
+      {% if product %}
+        <!-- don't show product link on items, we're already there -->
+        <style>a.product-link { display: none; }</style>
+        {% include 'catalog/product.twig' %}
+        {% if product.brand.warning %}
+          <div class="alert alert-danger">
+            {{ product.brand.warning }}
+          </div>
+        {% endif %}
+      {% endif %}
+
+      {# Item(s) #}
+      {% if items|length %}
+        {% include 'catalog/item-list.twig' %}
+      {% endif %}
+
+      {% if item %}
+        {% include 'catalog/item-modal.twig' %}
+      {% endif %}
+
+      {% if brands|length %}
+        <div style="column-count: 3" class="list-group">
+          <a class="list-group-item active" style="break-inside: avoid-column"
+             href="{{ url_for('catalog-whats-new') }}">
+            What's New
+          </a>
+          {% for b in brands %}
+            <a class="list-group-item" style="break-inside: avoid-column"
+               href="{{ url_for('catalog-brand', { 'brand' : b.slug }) }}">
+              {{ b.name }}
+              {# <span class="badge">{{ b.products.count }}</span> #}
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+    {% endblock %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}

@@ -1,0 +1,186 @@
+{% import 'macros.twig' as scat %}
+{% import _self as s %}
+
+{% macro style_item_color(color) %}
+  {% if color %}
+    {% set r= color[:2]|hexdec %}
+    {% set g= color[2:2]|hexdec %}
+    {% set b= color[4:2]|hexdec %}
+    background: #{{ color }};
+    color: #{{ ((r * 0.2126 + g * 0.7152 + b * 0.0722) > 179) ? '000' : 'fff' }}
+  {% endif %}
+{% endmacro %}
+
+<tr data-id="{{ i.id }}"
+    data-stocked="{{ (i.stock or i.minimum_quantity) ? 1 : 0 }}"
+    data-code="{{ i.code }}"
+    class="{{ (item and item.id == i.id) ? 'info' }}
+           {{ not i.active ? 'inactive' }}">
+  <td class="item-select">
+    <input type="checkbox" checked>
+  </td>
+  <td>
+    <a href="{{ url_for('catalog-item', { 'code' : i.code }) }}">
+      {{- i.code -}}
+    </a><br>
+    {% if i.width == 0 or i.length == 0 or i.height == 0 or i.weight == 0 %}
+      <small class="text-danger"><i class="fa fa-cube"></i></small>
+    {% endif %}
+    {% if not i.media|length %}
+      <small class="text-danger"><i class="fa fa-file-image-o"></i></small>
+    {% endif %}
+    {% if i.no_backorder %}
+      <small class="text-danger" title="No backorders">
+        <i class="fa fa-exclamation-circle"></i>
+      </small>
+    {% endif %}
+  </td>
+  <td class="item-name" style="{{ s.style_item_color(i.color) }}">
+    <span class="editable"
+          data-pk="{{ i.code }}"
+          data-name="name">
+      {{- i.name -}}
+    </span>
+    {% if i.product_id %}
+      <br>
+      <small class="product-link text-muted ">
+        <a href="{{ url_for('catalog', { 'dept' : i.product.dept.parent.slug }) }}">
+          {{ i.product.dept.parent.name }}
+        </a>
+        /
+        <a href="{{ url_for('catalog', { 'dept' : i.product.dept.parent.slug, 'subdept' : i.product.dept.slug }) }}">
+          {{ i.product.dept.name }}
+        </a>
+        /
+        <a href="{{ url_for('catalog', { 'dept' : i.product.dept.parent.slug, 'subdept' : i.product.dept.slug, 'product' : i.product.slug }) }}">
+          {{ i.product.name }}
+        </a>
+      </small>
+    {% endif %}
+  </td>
+  <td class="item-short-name" style="{{ s.style_item_color(i.color) }}">
+    <span class="editable"
+          data-pk="{{ i.code }}"
+          data-name="short_name">
+    {{- i.short_name -}}
+  </td>
+  <td class="text-right" nowrap>
+    <span class="editable"
+          data-pk="{{ i.code }}"
+          data-name="retail_price" data-value="{{ i.retail_price }}">
+      {{ scat.amount(i.retail_price) }}
+    </span>
+  </td>
+  <td class="text-right" nowrap>
+    {% set override= i.override_price %}
+    {% if override %}
+      <span class="text-danger">
+        {{ scat.amount(override) }}
+        <div>
+          <small>
+            Override
+          </small>
+        </div>
+      </span>
+    {% else %}
+      <span class="editable"
+            data-pk="{{ i.code }}"
+            data-name="discount" data-value="{{ i.discount }}">
+        {{ scat.amount(i.sale_price) }}
+        {% if i.discount_type in [ 'percentage', 'relative' ] %}
+          <div>
+            <small>{{ scat.format_discount(i) }}</small>
+          </div>
+        {% endif %}
+      </span>
+    {% endif %}
+  </td>
+  <td class="text-center">
+    <span class="editable"
+          data-pk="{{ i.code }}"
+          data-name="stock" data-value="{{ i.stock }}">
+      {{ i.stock }}
+    </span>
+  </td>
+  <td class="text-center">
+    <span class="editable"
+          data-pk="{{ i.code }}"
+          data-name="minimum_quantity" data-value="{{ i.minimum_quantity }}">
+      {{ i.minimum_quantity }}
+    </span>
+  </td>
+  <td class="text-center">{{ i.recent_sales.units }}</td>
+  <td class="text-right" nowrap>
+    {% if i.prop65 %}
+      <span title="{{ i.prop65_warning.warning }}"><img src="{{ STATIC }}/msds/warning.svg" width="16" alt="WARNING"></span>
+    {% endif %}
+    {% if i.hazmat %}
+      <span title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"></span>
+    {% endif %}
+    {% if i.oversized %}
+      <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="fa fa-truck"></i></span>
+    {% endif %}
+    <i class="active fa fa-fw {{ i.active ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+  </td>
+{# critical that <script> be inside tr so currentScript.parentNode works #}
+<script>
+{
+  let row= document.currentScript.parentNode
+  $('.editable', document.currentScript.parentNode).editable({
+    url: (params) => {
+      return fetch("/catalog/item/" + params.pk, {
+        method: 'PATCH',
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ [params.name] : params.value })
+      })
+      .then((res) => res.json())
+    },
+    success: (response, newValue) => {
+      if (response.exception && response.exception.length) {
+        return response.exception[0].message
+      }
+      scat.get('/catalog/item/' + response.code + '?row=1')
+      .then((res) => res.text())
+      .then((text) => {
+        let replace= scat.htmlToElement(text)
+        row.replaceWith(replace)
+        // Re-inject the script to get it to execute
+        let code= replace.getElementsByTagName('script')[0].innerHTML
+        let script= document.createElement('script')
+        script.appendChild(document.createTextNode(code))
+        replace.appendChild(script).parentNode.removeChild(script)
+      })
+      .catch((err) => {
+        scat.alert('danger', err.message)
+      })
+    }
+  }).on('shown', function (e, editable) {
+    // Can't just do this directly because $input isn't focused yet
+    setTimeout(function() {
+      editable.input.$input.select()
+    }, 1)
+  })
+
+  row.querySelector('.active').addEventListener('click', (ev) => {
+    let code= ev.target.closest('[data-id]').getAttribute('data-code')
+    let active= ev.target.classList.contains('fa-check-square-o')
+    ev.target.classList.remove('fa-check-square-o', 'fa-square-o')
+    ev.target.classList.add('fa-spin', 'fa-spinner')
+    scat.patch('/catalog/item/' + code, { active: active ? 0 : 1 })
+        .then((res) => res.json())
+        .then((data) => {
+          ev.target.classList.add(data.active != '0' ? 'fa-check-square-o' : 'fa-square-o')
+        })
+        .catch((err) => {
+          ev.target.classList.add(active ? 'fa-check-square-o' : 'fa-square-o')
+        })
+        .finally((data) => {
+          ev.target.classList.remove('fa-spin', 'fa-spinner')
+        })
+  })
+}
+</script>
+</tr>

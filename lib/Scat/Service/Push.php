@@ -35,7 +35,7 @@ class Push
     $manifest= [];
 
     foreach ($raw_files as $file) {
-      copy("../ui/$file", "$tmp/$file");
+      copy("../static/$file", "$tmp/$file");
       $manifest[$file]= [
         'hashType' => 'sha512',
         'hashValue' => hash('sha512', file_get_contents("$tmp/$file"))

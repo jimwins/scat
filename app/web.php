@@ -48,7 +48,10 @@ $app->addRoutingMiddleware();
 /* Twig for templating */
 $container->set('view', function($container) {
   /* No cache for now */
-  $view= \Slim\Views\Twig::create('../web', [ 'cache' => false ]);
+  $view= \Slim\Views\Twig::create(
+    [ '../ui/web', '../ui/shared' ],
+    [ 'cache' => false ]
+  );
 
   /* Set timezone for date functions */
   $tz= @$_ENV['PHP_TIMEZONE'] ?: @$_ENV['TZ'];

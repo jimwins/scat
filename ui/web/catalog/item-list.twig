@@ -1,0 +1,83 @@
+{% import 'macros.twig' as scat %}
+{% import _self as s %}
+
+{% macro begin_table() %}
+  <table class="table table-striped table-hover table-condensed">
+    <thead>
+      <th class="item-select" width="1%"><input type="checkbox" checked></th>
+      <th width="15%">Item No.</th>
+      <th>Description</th>
+      <th class="text-right" width="5%">List</th>
+      <th class="text-right" width="5%">Sale</th>
+      <th class="text-center" width="5%">Stock</th>
+      <th class="text-center" width="5%">Minimum</th>
+      <th class="text-center" width="5%">Recent</th>
+      <th width="5%">&nbsp;</th>
+    </thead>
+    <tbody>
+{% endmacro %}
+{% macro end_table() %}
+    </tbody>
+  </table>
+{% endmacro %}
+
+<div class="item-list">
+  <style>
+    .item-list .inactive a {
+      color: #933;
+    }
+    /* Hidden by default */
+    .item-list .item-select {
+      display:none;
+    }
+    /* Show short name if we have variations, otherwise name */
+    {% if variations|length %}
+      .item-list .item-name { display: none; }
+    {% else %}
+      .item-list .item-short-name { display: none; }
+    {% endif %}
+    .item-list .item-select.visible {
+      display:table-cell;
+    }
+  </style>
+
+{# A little convoluted because we chunk by variation sometimes #}
+
+{% set last_variation= -1 %}
+
+{% if not variations|length %}
+  {{ s.begin_table() }}
+{% endif %}
+
+{% for i in items %}
+  {% if variations|length and i.variation is not same as (last_variation) %}
+    {% if last_variation != -1 %}
+      {{ s.end_table() }}
+    {% endif %}
+    {% set last_variation = i.variation %}
+    {% if i.variation %}
+      <h3>{{ i.variation }}</h3>
+    {% endif %}
+    {{ s.begin_table() }}
+  {% endif %}
+  {% include 'catalog/item-row.twig' %}
+{% endfor %}
+{{ s.end_table() }}
+
+{# critical that <script> be inside div so currentScript.parentNode works #}
+<script>
+  let list= document.currentScript.parentNode
+
+  list.querySelectorAll('th.item-select input').forEach((toggle) => {
+    toggle.addEventListener('change', (ev) => {
+      // find containing table
+      let table= ev.target.closest('table')
+      let items= table.querySelectorAll('td.item-select input')
+      items.forEach((item) => {
+        item.checked= toggle.checked
+      })
+    })
+  })
+</script>
+
+</div><!-- .item-list -->

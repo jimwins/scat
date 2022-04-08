@@ -1,0 +1,46 @@
+{# Product details #}
+<h1>
+  {{ product.name }}
+  <small>
+    {% set brand = product.brand %}
+    <a href="{{ url_for('catalog-brand', { 'brand' : brand.slug }) }}">
+      {{ brand.name }}
+    </a>
+  </small>
+</h1>
+
+<hr>
+
+<style>
+/*
+ * Based on https://smolcss.dev/#card
+ */
+.smol-grid {
+  --min: 20ch;
+  --gap: 1rem;
+
+  display: grid;
+  grid-gap: var(--gap);
+  /* min() with 100% prevents overflow in extra narrow spaces */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min)), 1fr));
+
+  margin: var(--gap) 0;
+
+  /* ul.smol-grid gets wonky padding otherwise */
+  padding: 0;
+}
+</style>
+
+<div class="smol-grid">
+  <div class="content">
+    {{ product.description | replace({'{{ @STATIC }}' : STATIC}) | markdown }}
+
+    Jump to:
+  </div>
+  <div class="col-sm-4">
+    {% set media = product.media %}
+    {% if media is not empty %}
+      {{ include('carousel.twig', { images: product.media, edit: 'edit-media' }) }}
+    {% endif %}
+  </div>
+</div>
