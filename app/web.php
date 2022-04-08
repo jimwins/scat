@@ -112,7 +112,9 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
       ->setName('catalog-search');
   $app->get('/brand[/{brand}]', [ \Scat\Controller\Catalog::class, 'brand' ])
       ->setName('catalog-brand');
-  $app->get('[/{dept}[/{subdept}[/{product}]]]',
+  $app->get('/item[/{code:.*}]', [ \Scat\Controller\Catalog::class, 'item' ])
+      ->setName('catalog-item');
+  $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]',
             [ \Scat\Controller\Catalog::class, 'catalogPage' ])
       ->setName('catalog');
 });
