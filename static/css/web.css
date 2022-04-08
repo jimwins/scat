@@ -448,3 +448,11 @@ details.left > div {
 #department-nav li::marker {
   color: var(--primary-color);
 }
+
+hr {
+  width: 100%;
+  border-color: rgba(var(--primary-color-r),
+                      var(--primary-color-g),
+                      var(--primary-color-b),
+                      0.2);
+}
