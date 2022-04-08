@@ -1124,7 +1124,7 @@ class Catalog {
 
       $brands= $deptO ? null : $this->catalog->getBrands();
 
-      return $this->view->render($response, 'catalog/layout.html',
+      return $this->view->render($response, 'catalog/page.html',
                                  [ 'brands' => $brands,
                                    'dept' => $deptO,
                                    'depts' => $depts,
