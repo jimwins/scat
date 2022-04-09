@@ -24,6 +24,7 @@ class TwigExtension
     return [
       new \Twig\TwigFunction('notes', [ $this, 'getNotes' ]),
       new \Twig\TwigFunction('config', [ $this, 'getConfig' ]),
+      new \Twig\TwigFunction('topDepartments', [ $this, 'topDepartments' ]),
     ];
   }
 
@@ -48,6 +49,13 @@ class TwigExtension
       throw new \Exception("Unable to access configuration.");
     }
     return $this->config->get($name);
+  }
+
+  public function topDepartments() {
+    return \Titi\Model::factory('Department')
+             ->where('parent_id', 0)
+             ->order_by_asc('name')
+             ->find_many();
   }
 
   public function phone_number_format($phone, $country_code= 'US') {

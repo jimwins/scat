@@ -19,7 +19,6 @@ class Page {
   {
     return $this->view->render($response, 'index.html', [
       'param' => $param,
-      'departments' => $catalog->getDepartments(),
     ]);
   }
 }

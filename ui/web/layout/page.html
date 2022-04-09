@@ -32,7 +32,7 @@
           <div>
             <h2>Departments</h2>
             <ul id="departments">
-              {% for dept in departments %}
+              {% for dept in topDepartments() %}
                 <li>
                   <a href="{{ url_for('catalog', { dept: dept.slug }) }}">
                     {{ dept.name }}
