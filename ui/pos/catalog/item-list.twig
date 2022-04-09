@@ -30,8 +30,8 @@
     .item-list .item-select {
       display:none;
     }
-    /* Show short name if we have variations, otherwise name */
-    {% if variations|length %}
+    /* Show short name if we have variations or product, otherwise name */
+    {% if product or variations|length %}
       .item-list .item-name { display: none; }
     {% else %}
       .item-list .item-short-name { display: none; }

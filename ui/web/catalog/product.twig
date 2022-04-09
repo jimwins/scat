@@ -15,7 +15,8 @@
 .product-info {
   display: grid;
   grid-template-columns: 67% 33%;
-  max-width: 1070px;
+  grid-gap: 2em;
+  max-width: calc(1070px - 2em);
 }
 figure {
   margin: 0;
@@ -27,13 +28,27 @@ figure {
 figure img {
   border-radius: var(--border-radius);
 }
+
+@media (max-width: 599.98px) {
+  /* https://www.freecodecamp.org/news/https-medium-com-nakayama-shingo-creating-responsive-tables-with-pure-css-using-the-grid-layout-module-8e0ea8f03e83/ */
+}
 </style>
 
 <div class="product-info">
   <div class="content">
     {{ product.description | replace({'{{ @STATIC }}' : STATIC}) | markdown }}
 
-    Jump to:
+    {% if variations|length %}
+      <h2>Jump to:</h2>
+      <ul>
+        {% for variation in variations %}
+          <li>
+            <a href="#v{{ loop.index }}">
+              {{ variation }}
+            </a>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </div>
   <div class="col-sm-4">
     {% set media = product.media %}

@@ -74,6 +74,7 @@
 {# A little convoluted because we chunk by variation sometimes #}
 
 {% set last_variation= -1 %}
+{% set variation_count= 1 %}
 
 {% if not variations|length %}
   {{ s.begin_table() }}
@@ -86,7 +87,8 @@
     {% endif %}
     {% set last_variation = i.variation %}
     {% if i.variation %}
-      <h3>{{ i.variation }}</h3>
+      <h3><a name="v{{ variation_count }}">{{ i.variation }}</a></h3>
+      {% set variation_count= variation_count + 1 %}
     {% endif %}
     {{ s.begin_table() }}
   {% endif %}

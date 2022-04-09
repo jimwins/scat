@@ -1129,6 +1129,11 @@ class Catalog {
           array_map(function ($i) {
             return $i->variation;
           }, $items));
+
+        /* If the only variation is '', we don't really have any */
+        if (count($variations) == 1 && $variations[0] == '') {
+          $variations= null;
+        }
       }
 
       $brands= $deptO ? null : $this->catalog->getBrands();
