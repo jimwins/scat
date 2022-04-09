@@ -161,6 +161,9 @@ body > * {
 img {
   width: 100%;
 }
+img.icon {
+  width: 16px;
+}
 
 #site-name img {
   max-width: 324px;
@@ -315,14 +318,14 @@ summary:focus {
 a.button:link, a.button:visited {
   color: #fff;
 }
-a.button--small,
-button--small,
-summary--small {
-  font-size: 1.15rem;
+a.button.small,
+button.small,
+summary.small {
+  font-size: 0.85rem;
 }
-a.button--block,
-button--block,
-summary--block {
+a.button.block,
+.button.block,
+.summary.block {
   width: 100%;
 }
 
@@ -458,3 +461,26 @@ hr {
                       var(--primary-color-b),
                       0.2);
 }
+
+.pull-right {
+  float: right;
+}
+
+/* from clrs.cc */
+.text-navy { color: #001F3F; }
+.text-blue { color: #0074D9; }
+.text-aqua { color: #7FDBFF; }
+.text-teal { color: #39CCCC; }
+.text-olive { color: #3D9970; }
+.text-green { color: #2ECC40; }
+.text-lime { color: #01FF70; }
+.text-yellow { color: #FFDC00; }
+.text-orange { color: #FF851B; }
+.text-red { color: #FF4136; }
+.text-fuchsia { color: #F012BE; }
+.text-purple { color: #B10DC9; }
+.text-maroon { color: #85144B; }
+.text-white { color: #FFFFFF; }
+.text-silver { color: #DDDDDD; }
+.text-gray { color: #AAAAAA; }
+.text-black { color: #111111; }

@@ -2,17 +2,15 @@
 {% import _self as s %}
 
 {% macro begin_table() %}
-  <table class="table table-striped table-hover table-condensed">
+  <table>
     <thead>
-      <th class="item-select" width="1%"><input type="checkbox" checked></th>
-      <th width="15%">Item No.</th>
+      <th width="10%">Item No.</th>
       <th>Description</th>
-      <th class="text-right" width="5%">List</th>
-      <th class="text-right" width="5%">Sale</th>
-      <th class="text-center" width="5%">Stock</th>
-      <th class="text-center" width="5%">Minimum</th>
-      <th class="text-center" width="5%">Recent</th>
-      <th width="5%">&nbsp;</th>
+      <th width="10%">List</th>
+      <th width="10%">Sale</th>
+      <th width="10%">In Stock</th>
+      <th width="16">&nbsp;</th>
+      <th width="130">&nbsp;</th>
     </thead>
     <tbody>
 {% endmacro %}
@@ -39,6 +37,38 @@
     .item-list .item-select.visible {
       display:table-cell;
     }
+
+    .item-list table {
+      empty-cells: show;
+      border-collapse: collapse;
+      width: 100%;
+      margin: 2em 0;
+      table-layout: fixed;
+      text-overflow: ellipsis;
+    }
+    .item-list thead {
+      border-bottom: var(--border-width) solid #ddd;
+    }
+    .item-list td, .item-list th {
+      padding: 0.5rem;
+      vertical-align: top;
+    }
+    .item-list .avail {
+      font-size: 80%;
+      text-align: center;
+    }
+    .item-list th {
+      text-align: left;
+    }
+    .item-list .sale-price {
+      color: #0074D9;
+    }
+    .item-list table tbody tr:nth-child(odd) {
+      background: #f9f9f9;
+    }
+    .item-list table tbody tr {
+      border-bottom: calc(var(--border-width) / 2) solid #ddd;
+    }
   </style>
 
 {# A little convoluted because we chunk by variation sometimes #}
@@ -63,21 +93,4 @@
   {% include 'catalog/item-row.twig' %}
 {% endfor %}
 {{ s.end_table() }}
-
-{# critical that <script> be inside div so currentScript.parentNode works #}
-<script>
-  let list= document.currentScript.parentNode
-
-  list.querySelectorAll('th.item-select input').forEach((toggle) => {
-    toggle.addEventListener('change', (ev) => {
-      // find containing table
-      let table= ev.target.closest('table')
-      let items= table.querySelectorAll('td.item-select input')
-      items.forEach((item) => {
-        item.checked= toggle.checked
-      })
-    })
-  })
-</script>
-
 </div><!-- .item-list -->
