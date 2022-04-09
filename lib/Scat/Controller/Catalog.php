@@ -119,6 +119,7 @@ class Catalog {
     if ($brand && !$brandO)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $products= null;
     if ($brandO)
       $products= $brandO->products()
                        ->order_by_asc('name')
