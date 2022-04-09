@@ -1066,7 +1066,8 @@ class Catalog {
   }
 
   public function catalogPage(Request $request, Response $response,
-                              $dept= null, $subdept= null, $product= null)
+                              $dept= null, $subdept= null, $product= null,
+                              $item= null)
   {
     try {
       $depts= $this->catalog->getDepartments();
@@ -1102,7 +1103,14 @@ class Catalog {
       if ($product && !$productO)
         throw new \Slim\Exception\HttpNotFoundException($request);
 
-      $items= $productO ?
+      $itemO= $item ?
+        $productO->items()
+                 ->where('code', $item)
+                 ->find_one() : null;
+      if ($item && !$itemO)
+        throw new \Slim\Exception\HttpNotFoundException($request);
+
+      $items= ($productO && !$item) ?
         $productO->items()
           # A crude implementation of a numsort
           ->order_by_expr('IF(CONVERT(variation, SIGNED),
@@ -1133,6 +1141,7 @@ class Catalog {
                                    'subdepts' => $subdepts,
                                    'product' => $productO,
                                    'products' => $products,
+                                   'item' => $itemO,
                                    'variations' => $variations,
                                    'items' => $items ]);
     }

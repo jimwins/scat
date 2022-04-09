@@ -201,6 +201,11 @@ class Item extends \Scat\Model {
       $this->code;
   }
 
+  public function url_params() {
+    $params= $this->product_id ? $this->product()->url_params() : [];
+    return array_merge($params, [ 'item' => $this->code ]);
+  }
+
   public function sale_price() {
     return $this->calcSalePrice(
       $this->retail_price,

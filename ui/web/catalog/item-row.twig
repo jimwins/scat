@@ -17,7 +17,7 @@
     class="{{ (item and item.id == i.id) ? 'info' }}
            {{ not i.active ? 'inactive' }}">
   <td>
-    <a href="{{ url_for('catalog-item', { 'code' : i.code }) }}">
+    <a href="{{ url_for('catalog', i.url_params) }}">
       {{- i.code -}}
     </a><br>
   </td>
