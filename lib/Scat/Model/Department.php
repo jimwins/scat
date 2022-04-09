@@ -10,6 +10,17 @@ class Department extends \Scat\Model {
       $this->slug;
   }
 
+  public function url_params() {
+    if ($this->parent_id) {
+      return [
+        'dept' => $this->parent()->slug,
+        'subdept' => $this->slug,
+      ];
+    } else {
+      return [ 'dept' => $this->slug ];
+    }
+  }
+
   public function parent() {
     return $this->belongs_to('Department', 'parent_id')->find_one();
   }
