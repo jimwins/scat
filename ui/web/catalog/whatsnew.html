@@ -1,0 +1,26 @@
+{% extends 'catalog/page.html' %}
+
+{% block title %}
+  New Products
+{% endblock %}
+
+{% block catalog_crumb %}
+  <nav class="breadcrumb">
+    <ol>
+      <li><a href="{{ url_for('catalog') }}">Art Supplies</a></li>
+      <li class="active">
+        <a href="{{ url_for('catalog-whats-new') }}">What's New</a>
+      </li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block catalog_content %}
+
+<h1 class="title">What's New</h1>
+
+{% if products %}
+  {% include 'catalog/products.twig' %}
+{% endif %}
+
+{% endblock %}

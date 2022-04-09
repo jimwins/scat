@@ -1,0 +1,68 @@
+{% extends 'catalog/page.html' %}
+
+{% block title %}
+  {{ brand ? brand.name : 'Brands' }}
+{% endblock %}
+
+{% block catalog_crumb %}
+  <nav class="breadcrumb">
+    <ol>
+      <li><a href="{{ url_for('catalog') }}">Art Supplies</a></li>
+      <li class="{{ not brand ? 'active' }}">
+        <a href="{{ url_for('catalog-brand') }}">Brands</a>
+      </li>
+      {% if brand %}
+        <li class="active">
+          <a href="{{ url_for('catalog-brand', { 'brand' : brand.slug }) }}">
+            {{ brand.name }}
+          </a>
+        </li>
+      {% endif %}
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block catalog_content %}
+
+{% if brands|length %}
+  <ul style="column-count: 3" class="list-group">
+    {% for b in brands %}
+      <li class="list-group-item" style="break-inside: avoid-column">
+        <a href="{{ url_for('catalog-brand', { 'brand' : b.slug }) }}">
+          {{ b.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if brand %}
+  <h1 class="title"
+      style="{{ not brand.active ? 'text-decoration: line-through' }}">
+    {{ brand.name }}
+  </h1>
+  {% if brand.warning %}
+    <div class="alert alert-danger">
+      {{ brand.warning }}
+    </div>
+  {% endif %}
+  {% if brand.description %}
+    <p>{{ brand.description|markdown }}</p>
+    <div class="clearfix"></div>
+    <hr>
+  {% endif %}
+{% endif %}
+
+{% if products %}
+  {% include 'catalog/products.twig' %}
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    scat.handleAction('click', 'edit-brand', (ev) => {
+      return scat.dialog('/catalog/brand/{{ brand.slug }}')
+    })
+  </script>
+{% endblock %}

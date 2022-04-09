@@ -12,26 +12,24 @@
 <hr>
 
 <style>
-/*
- * Based on https://smolcss.dev/#card
- */
-.smol-grid {
-  --min: 20ch;
-  --gap: 1rem;
-
+.product-info {
   display: grid;
-  grid-gap: var(--gap);
-  /* min() with 100% prevents overflow in extra narrow spaces */
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min)), 1fr));
-
-  margin: var(--gap) 0;
-
-  /* ul.smol-grid gets wonky padding otherwise */
-  padding: 0;
+  grid-template-columns: 67% 33%;
+  max-width: 1070px;
+}
+figure {
+  margin: 0;
+  padding: 1em 0;
+  border: var(--border-width) solid #ddd;
+  border-radius: var(--border-radius);
+}
+/* avoid spilling over border on corners */
+figure img {
+  border-radius: var(--border-radius);
 }
 </style>
 
-<div class="smol-grid">
+<div class="product-info">
   <div class="content">
     {{ product.description | replace({'{{ @STATIC }}' : STATIC}) | markdown }}
 
@@ -40,7 +38,7 @@
   <div class="col-sm-4">
     {% set media = product.media %}
     {% if media is not empty %}
-      {{ include('carousel.twig', { images: product.media, edit: 'edit-media' }) }}
+      {{ include('carousel.twig', { images: product.media }) }}
     {% endif %}
   </div>
 </div>

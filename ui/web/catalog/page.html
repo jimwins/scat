@@ -39,34 +39,38 @@
     }
   </style>
 
-  <nav class="breadcrumb">
-    <ol>
-      <li><a href="{{ url_for('catalog') }}">Art Supplies</a></li>
-      <li class="{{ not subdept ? 'active' }}">
-        <a href="{{ url_for('catalog', { 'dept' : dept.slug }) }}">
-          {{ dept.name }}
-        </a>
-      </li>
-      {% if subdept %}
-        <li class="{{ not product ? 'active' }}">
-          <a style="{{ not subdept.active ? 'text-decoration: line-through' }}"
-             href="{{ url_for('catalog', {'dept': dept.slug,
-                                           'subdept': subdept.slug }) }}">
-            {{ subdept.name }}
-          </a>
-        </li>
-      {% endif %}
-      {% if product %}
-        <li class="{{ not item ? 'active' }}">
-          <a href="{{ url_for('catalog', { 'dept': dept.slug,
-                                            'subdept': subdept.slug,
-                                            'product': product.slug}) }}">
-            {{ product.name }}
-          </a>
-        </li>
-      {% endif %}
-    </ol>
-  </nav>
+  {% block catalog_crumb %}
+    {% if dept %}
+      <nav class="breadcrumb">
+        <ol>
+          <li><a href="{{ url_for('catalog') }}">Art Supplies</a></li>
+          <li class="{{ not subdept ? 'active' }}">
+            <a href="{{ url_for('catalog', { 'dept' : dept.slug }) }}">
+              {{ dept.name }}
+            </a>
+          </li>
+          {% if subdept %}
+            <li class="{{ not product ? 'active' }}">
+              <a style="{{ not subdept.active ? 'text-decoration: line-through' }}"
+                 href="{{ url_for('catalog', {'dept': dept.slug,
+                                               'subdept': subdept.slug }) }}">
+                {{ subdept.name }}
+              </a>
+            </li>
+          {% endif %}
+          {% if product %}
+            <li class="{{ not item ? 'active' }}">
+              <a href="{{ url_for('catalog', { 'dept': dept.slug,
+                                                'subdept': subdept.slug,
+                                                'product': product.slug}) }}">
+                {{ product.name }}
+              </a>
+            </li>
+          {% endif %}
+        </ol>
+      </nav>
+    {% endif %}
+  {% endblock %}
 
 <div class="row">
   <div class="col-md-{% block catalog_width "9 col-md-push-3" %}">
@@ -76,8 +80,18 @@
         <p>
           {{ dept.description | markdown }}
         </p>
+        <ul>
+          {% for subdept in subdepts %}
+            <li>
+              <a href="{{ url_for('catalog', subdept.url_params ) }}">
+                {{ subdept.name }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
       {% endif %}
       {% if products and not product %}
+        <h1>{{ subdept ? subdept.name : dept.name }}</h1>
         {% include 'catalog/products.twig' %}
       {% endif %}
 
@@ -98,23 +112,29 @@
       {% endif %}
 
       {% if item %}
-        {% include 'catalog/item-modal.twig' %}
+        {% include 'catalog/item.twig' %}
       {% endif %}
 
-      {% if brands|length %}
-        <div style="column-count: 3" class="list-group">
-          <a class="list-group-item active" style="break-inside: avoid-column"
-             href="{{ url_for('catalog-whats-new') }}">
-            What's New
-          </a>
-          {% for b in brands %}
-            <a class="list-group-item" style="break-inside: avoid-column"
-               href="{{ url_for('catalog-brand', { 'brand' : b.slug }) }}">
-              {{ b.name }}
-              {# <span class="badge">{{ b.products.count }}</span> #}
+      {% if not dept %}
+        <ol>
+          <li>
+            <a href="{{ url_for('catalog-whats-new') }}">
+              What's New
             </a>
+          </li>
+          {% for dept in depts %}
+            <li>
+              <a href="{{ url_for('catalog', { dept: dept.slug }) }}">
+                {{ dept.name }}
+              </a>
+            </li>
           {% endfor %}
-        </div>
+          <li>
+            <a href="{{ url_for('catalog-brand') }}">
+              Brands
+            </a>
+          </li>
+        </ol>
       {% endif %}
 
     {% endblock %}
