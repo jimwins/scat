@@ -22,6 +22,14 @@ class Product extends \Scat\Model {
                 ->where_gte('item.active', (int)$only_active);
   }
 
+  public function url_params() {
+    return [
+      'dept' => $this->dept()->parent()->slug,
+      'subdept' => $this->dept()->slug,
+      'product' => $this->slug
+    ];
+  }
+
   public function full_slug() {
     return
       $this->dept()->parent()->slug . '/' .
