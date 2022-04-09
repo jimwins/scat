@@ -87,15 +87,15 @@
   {% if edit or images|length > 1 %}
     <div class="buttons">
       <button class="prev btn btn-default btn-xs">
-         ◀ <span class="sr-only">Previous</span>
+         ◀ <span class="visually-hidden sr-only">Previous</span>
       </button>
       {% if edit %}
         <button class="edit btn btn-default btn-xs" data-action="{{ edit }}">
-          <span class="sr-only">Edit</span> <i class="fa fa-edit"></i>
+          <span class="visually-hidden sr-only">Edit</span> <i class="fa fa-edit"></i>
         </button>
       {% endif %}
       <button class="next btn btn-default btn-xs">
-        <span class="sr-only">Next</span> ▶
+        <span class="visually-hidden sr-only">Next</span> ▶
       </button>
     </div>
     {# critical that <script> be inside div so currentScript.parentNode works #}
