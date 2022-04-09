@@ -113,6 +113,8 @@ $errorMiddleware->setErrorHandler(
 $app->group('/art-supplies', function (RouteCollectorProxy $app) {
   $app->get('/search', [ \Scat\Controller\Catalog::class, 'search' ])
       ->setName('catalog-search');
+  $app->get('/whats-new', [ \Scat\Controller\Catalog::class, 'whatsNew' ])
+      ->setName('catalog-whats-new');
   $app->get('/brand[/{brand}]', [ \Scat\Controller\Catalog::class, 'brand' ])
       ->setName('catalog-brand');
   $app->get('/item[/{code:.*}]', [ \Scat\Controller\Catalog::class, 'item' ])
