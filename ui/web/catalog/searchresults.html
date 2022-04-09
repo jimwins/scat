@@ -1,0 +1,43 @@
+{% extends 'catalog/page.html' %}
+
+{% block title %}
+  Search results for '{{ q }}'
+{% endblock %}
+
+{% block catalog_crumb %}
+  <nav class="breadcrumb">
+    <ol>
+      <li><a href="{{ url_for('catalog') }}">Art Supplies</a></li>
+      <li>
+        Search Results
+      </li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block catalog_content %}
+  <h1 class="title">
+    Search results for '{{ q }}'
+  </h1>
+
+  {% if original_q %}
+    <p>
+      <strong>No results were found for your search terms.</strong>
+      We changed it to <code>{{ q }}</code> and got these results.
+    </p>
+  {% endif %}
+
+  {% if products %}
+    {% include 'catalog/products.twig' %}
+  {% else %}
+    {% if error %}
+      <p>Sorry, there was an error handling your query.</p>
+      {% if DEBUG %}
+        <code><pre>{{ error }}</pre></code>
+      {% endif %}
+    {% else %}
+      <p>Sorry, we didn't find anything for that search.</p>
+    {% endif %}
+  {% endif %}
+
+{% endblock %}

@@ -156,4 +156,12 @@ class Search
 
     return $this->insert->rowCount();
   }
+
+  public function suggestTerm($term) {
+    $q= "CALL SUGGEST(?,?)";
+    $stmt= $this->pdo->prepare($q);
+    $stmt->execute([ $term, 'scat']);
+    $res= $stmt->fetchAll(\PDO::FETCH_COLUMN, 0);
+    return $res ? $res[0] : null;
+  }
 }

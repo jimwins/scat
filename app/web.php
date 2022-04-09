@@ -111,7 +111,8 @@ $errorMiddleware->setErrorHandler(
 
 /* Catalog */
 $app->group('/art-supplies', function (RouteCollectorProxy $app) {
-  $app->get('/search', [ \Scat\Controller\Catalog::class, 'search' ])
+  /* web has it's own search implementation */
+  $app->get('/search', [ \Scat\Web\Catalog::class, 'search' ])
       ->setName('catalog-search');
   $app->get('/whats-new', [ \Scat\Controller\Catalog::class, 'whatsNew' ])
       ->setName('catalog-whats-new');

@@ -52,8 +52,10 @@
         </a>
       </div>
 
-      <form id="search-form">
-          <input class="input" type="search" name="q">
+      <form id="search-form" action="/art-supplies/search">
+          <input class="input" type="search" name="q"
+                  placeholder="Search our online catalog"
+                  value="{{ q }}">
           <button type="submit">
             Search
           </button>
