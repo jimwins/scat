@@ -7,6 +7,8 @@
   --primary-color-b: 37;
   --link-color: #2c679b;
 
+  --light-primary-color: rgba(var(--primary-color-r), var(--primary-color-g), var(--primary-color-b), 0.2);
+
   --input-border: #e66a25;
   --input-focus-h: 21;
   --input-focus-s: 79%;
