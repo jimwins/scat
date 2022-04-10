@@ -64,7 +64,6 @@ $q= "SELECT DATE_FORMAT(created, '$format') AS span,
                FROM txn
                LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
                     JOIN item ON (txn_line.item_id = item.id)
-                    JOIN brand ON (item.brand_id = brand.id)
               WHERE
                     created BETWEEN $begin AND $end
                 AND type = 'vendor'

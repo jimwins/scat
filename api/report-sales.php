@@ -90,7 +90,6 @@ $q= "SELECT DATE_FORMAT(paid, '$format') AS span,
                FROM txn
                LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
                     JOIN item ON (txn_line.item_id = item.id)
-                    JOIN brand ON (item.brand_id = brand.id)
               WHERE paid IS NOT NULL
                 AND paid BETWEEN $begin AND $end
                 AND type = 'customer'
