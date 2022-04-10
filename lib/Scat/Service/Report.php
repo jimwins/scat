@@ -10,8 +10,6 @@ class Report
   }
 
   public function sales($span= '', $begin= null, $end= null) {
-    $items= "1=1";
-
     if (!$begin) {
       $begin= "DATE(NOW() - INTERVAL 10 DAY)";
     } else {
@@ -89,7 +87,6 @@ class Report
                     AND filled BETWEEN $begin AND $end
                     AND type = 'customer'
                     AND code NOT LIKE 'ZZ-gift%'
-                    AND ($items)
                   GROUP BY txn.id
                 ) t
           GROUP BY 1
