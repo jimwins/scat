@@ -29,7 +29,7 @@
     </span>
     {% if i.product_id %}
       <br>
-      <small class="product-link text-muted ">
+      <small class="product-link text-muted">
         <a href="{{ url_for('catalog', { 'dept' : i.product.dept.parent.slug }) }}">
           {{ i.product.dept.parent.name }}
         </a>
@@ -65,7 +65,7 @@
         </div>
       </span>
     {% else %}
-      <strong class="sale-price">{{ scat.amount(i.sale_price) }}</strong>
+      <strong class="text-important">{{ scat.amount(i.sale_price) }}</strong>
       {% if i.discount_type in [ 'percentage', 'relative' ] %}
         <div>
           <small>{{ scat.format_discount(i) }}</small>
@@ -75,12 +75,12 @@
   </td>
   <td class="avail">
     {% if i.stock %}
-      <span class="text-blue">In stock</span>
+      <span class="text-important">In stock</span>
     {% else %}
       {% if i.minimum_quantity %}
-        <span class="text-olive">Out of stock</span>
+        <span class="text-warning">Out of stock</span>
       {% else %}
-        <span class="text-gray">Out of stock, special order</span>
+        <span class="text-danger">Out of stock, special order</span>
       {% endif %}
     {% endif %}
   </td>

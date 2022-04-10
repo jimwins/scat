@@ -28,8 +28,8 @@
     .item-list .item-select {
       display:none;
     }
-    /* Show short name if we have variations, otherwise name */
-    {% if variations|length %}
+    /* Show short name if we have variations or product, otherwise name */
+    {% if variations|length or product %}
       .item-list .item-name { display: none; }
     {% else %}
       .item-list .item-short-name { display: none; }
@@ -59,9 +59,6 @@
     }
     .item-list th {
       text-align: left;
-    }
-    .item-list .sale-price {
-      color: #0074D9;
     }
     .item-list table tbody tr:nth-child(odd) {
       background: #f9f9f9;
