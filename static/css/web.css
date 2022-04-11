@@ -471,3 +471,25 @@ hr {
 .text-danger { color: #800000; /* maroon */  }
 .text-warning { color: #001f3f; /* navy */ }
 .highlight { background-color: yellow }
+
+.alert {
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid transparent; /* will re-color */
+  border-radius: var(--border-radius);
+}
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.alert-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+.alert-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
