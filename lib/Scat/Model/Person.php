@@ -455,6 +455,35 @@ class Person extends \Scat\Model {
 
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load PA Dist data file");
+    } elseif (preg_match('/^golden/', $line)) {
+      /* Golden */
+      error_log("Importing '$fn' as Golden price list\n");
+      $sep= preg_match("/\t/", $line) ? "\t" : ",";
+      $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+                INTO TABLE vendor_upload
+              FIELDS TERMINATED BY '$sep'
+              OPTIONALLY ENCLOSED BY '\"'
+               LINES TERMINATED BY '\n'
+              IGNORE 1 LINES
+              (vendor_sku, @description, @size, @series, purchase_quantity,
+               barcode, @retail_price)
+              SET code = IF(vendor_sku LIKE '0000%',
+                            CONCAT('GD', MID(vendor_sku, 4, 100)),
+                            IF(vendor_sku LIKE '6%',
+                                CONCAT('WB', vendor_sku),
+                                CONCAT('QR', vendor_sku))),
+                  retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
+                  net_price = retail_price * 0.41
+              ";
+
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to load PA Dist data file");
+
+      // toss junk from header lines
+      $q= "DELETE FROM vendor_upload WHERE purchase_quantity = 0";
+
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to load PA Dist data file");
     } else {
       // Generic
       if (preg_match("/\\t/", $line)) {
