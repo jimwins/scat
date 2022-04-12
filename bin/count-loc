@@ -1,7 +1,10 @@
 #!/bin/sh
-find api app css db js lib old-report print scat.php ui \
+find api app css db js lib old-report print scat.php static ui \
   -type f \
   -not -name '*.png' \
   -not -name '*.svg' \
+  -not -name 'LineIcons*' \
+  -not -name 'lineicons*' \
+  -not -name 'normalize.css' \
   -not -name 'jquery*' \
   | xargs wc -l
