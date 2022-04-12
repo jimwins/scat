@@ -101,6 +101,7 @@ $("#report-params").on('submit', function(ev) {
         table.removeAttr('id');
         var t= $("tbody", table);
         var gdata= [];
+        var odata= [];
         $.each(data.sales, function(i, sales) {
           t.append($('<tr><td>' + sales.span +
                      '<td>' + sales.raw_date + '</td>' +
@@ -115,6 +116,7 @@ $("#report-params").on('submit', function(ev) {
                      '<td align="right">' + amount(sales.total_taxed) +
                      '</tr>'));
           gdata.unshift({ x: sales.raw_date, y: sales.total });
+          odata.unshift({ x: sales.raw_date, y: sales.online });
         });
         var cap= $('#items').val();
         if (cap) {
@@ -126,10 +128,16 @@ $("#report-params").on('submit', function(ev) {
         // Only show chart when we have multiple data points
         if (gdata.length > 1) {
           var data= {
-            datasets: [{
-              label: 'Sales',
-              data: gdata
-            }]
+            datasets: [
+              {
+                label: 'Sales',
+                data: gdata
+              },
+              {
+                label: 'Online',
+                data: odata
+              },
+            ]
           };
 
           var options= {

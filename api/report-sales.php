@@ -17,6 +17,7 @@ if (!$begin) {
   $begin= "DATE(NOW() - INTERVAL 10 DAY)";
 } else {
   $begin= "'" . $db->escape($begin) . "'";
+  $days= 0;
 }
 
 if (!$end) {
