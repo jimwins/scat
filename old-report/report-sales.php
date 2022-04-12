@@ -102,6 +102,8 @@ $("#report-params").on('submit', function(ev) {
         var t= $("tbody", table);
         var gdata= [];
         var odata= [];
+        var pdata= [];
+        var sdata= [];
         $.each(data.sales, function(i, sales) {
           t.append($('<tr><td>' + sales.span +
                      '<td>' + sales.raw_date + '</td>' +
@@ -117,6 +119,8 @@ $("#report-params").on('submit', function(ev) {
                      '</tr>'));
           gdata.unshift({ x: sales.raw_date, y: sales.total });
           odata.unshift({ x: sales.raw_date, y: sales.online });
+          pdata.unshift({ x: sales.raw_date, y: sales.pickup });
+          sdata.unshift({ x: sales.raw_date, y: sales.shipped });
         });
         var cap= $('#items').val();
         if (cap) {
@@ -136,6 +140,14 @@ $("#report-params").on('submit', function(ev) {
               {
                 label: 'Online',
                 data: odata
+              },
+              {
+                label: 'Pickup',
+                data: pdata
+              },
+              {
+                label: 'Shipped',
+                data: sdata
               },
             ]
           };
