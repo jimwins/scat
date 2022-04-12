@@ -1,8 +1,8 @@
 <?
 require dirname(__FILE__).'/lib/db.php';
 
-if (!$GLOBALS['app']) {
-  $config= require $_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
+if (!isset($GLOBALS['app'])) {
+  $config= require @$_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/config.php';
 
   require dirname(__FILE__).'/vendor/autoload.php';
 

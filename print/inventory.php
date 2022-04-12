@@ -40,7 +40,7 @@ if ($product && !$q) {
   $q= "product:{$product->id} stocked:1";
 }
 
-$loader= new \Twig\Loader\FilesystemLoader([ '../ui/pos', '../ui/shared');
+$loader= new \Twig\Loader\FilesystemLoader([ '../ui/pos', '../ui/shared' ]);
 $twig= new \Twig\Environment($loader, [ 'cache' => false ]);
 
 $template= $twig->load('print/inventory.html');
