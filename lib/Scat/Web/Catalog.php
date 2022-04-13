@@ -24,6 +24,7 @@ class Catalog {
                           \Scat\Service\Search $search)
   {
     $q= trim($request->getParam('q'));
+    $original_q= null;
 
     /* Check for a direct match to a item code */
     if ($q && preg_match('!^[-A-Z0-9/.]+$!i', $q)) {
