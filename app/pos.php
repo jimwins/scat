@@ -480,7 +480,6 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
 
 /* Reports */
 $app->group('/report', function (RouteCollectorProxy $app) {
-  $app->get('/quick', [ \Scat\Controller\Reports::class, 'quick' ]);
   $app->get('/empty-products',
             [ \Scat\Controller\Reports::class, 'emptyProducts' ]);
   $app->get('/backordered-items',
@@ -495,6 +494,8 @@ $app->group('/report', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Reports::class, 'shippingCosts' ]);
   $app->get('/clock',
             [ \Scat\Controller\Reports::class, 'clock' ]);
+  $app->get('/sales',
+            [ \Scat\Controller\Reports::class, 'sales' ]);
   $app->get('/{name}', [ \Scat\Controller\Reports::class, 'oldReport' ]);
 });
 

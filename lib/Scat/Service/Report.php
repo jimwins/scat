@@ -44,7 +44,7 @@ class Report
       break;
     }
 
-    $q= "SELECT DATE_FORMAT(filled, '$format') AS span,
+    $q= "SELECT DATE_FORMAT(paid, '$format') AS span,
                 SUM(taxed + untaxed) AS total,
                 SUM(IF(tax_rate OR uuid, 0, taxed + untaxed)) AS resale,
                 SUM(IF(online_sale_id, taxed + untaxed, 0)) AS in_person,
@@ -56,12 +56,12 @@ class Report
                        ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2)
                          + untaxed))
                   AS total_taxed,
-                MIN(DATE(filled)) AS raw_date,
+                MIN(DATE(paid)) AS raw_date,
                 COUNT(*) AS transactions
            FROM (SELECT 
                         txn.uuid,
                         txn.online_sale_id,
-                        filled,
+                        paid,
                         CAST(ROUND_TO_EVEN(
                           SUM(IF(txn_line.taxfree, 1, 0) *
                             IF(type = 'customer', -1, 1) * ordered *
@@ -83,8 +83,8 @@ class Report
                    FROM txn
                    LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
                         JOIN item ON (txn_line.item_id = item.id)
-                  WHERE filled IS NOT NULL
-                    AND filled BETWEEN $begin AND $end
+                  WHERE paid IS NOT NULL
+                    AND paid BETWEEN $begin AND $end
                     AND type = 'customer'
                     AND code NOT LIKE 'ZZ-gift%'
                   GROUP BY txn.id

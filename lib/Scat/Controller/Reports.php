@@ -23,14 +23,27 @@ class Reports {
     $this->view= $view;
   }
 
-  public function quick(Request $request, Response $response) {
-    $data= $this->report->sales();
+  public function sales(Request $request, Response $response) {
+    $span= $request->getParam('span');
+    $begin= $request->getParam('begin');
+    $end= $request->getParam('end');
+
+    error_log("reporting sales from '$begin' to '$end' by '$span'\n");
+
+    $data= $this->report->sales($span, $begin, $end);
+
     $accept= $request->getHeaderLine('Accept');
+
     if (strpos($accept, 'application/json') !== false)
     {
       return $response->withJson($data['sales']);
     }
-    return $this->view->render($response, 'dialog/report-quick.html', $data);
+
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/report-quick.html', $data);
+    }
+
+    return $this->view->render($response, 'report/sales.html', $data);
   }
 
   public function emptyProducts(Request $request, Response $response) {
