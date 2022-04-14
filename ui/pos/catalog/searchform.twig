@@ -141,12 +141,10 @@
       form.querySelector('.inventory-done').addEventListener('click', (ev) => {
         let items= collectItems(list)
 
-        scat.api('item-mark-inventoried', { items: items })
-            .then((res) => {
-              return res.json()
-            })
+        scat.post('/catalog/~mark-inventoried', { items: items })
+            .then((res) => res.json())
             .then((data) => {
-              alert("Marked " + data.count + " item(s) inventoried.")
+              scat.alert('info', "Marked " + data.count + " item(s) inventoried.")
             })
       })
     {% endif %}

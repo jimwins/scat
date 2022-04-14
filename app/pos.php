@@ -253,6 +253,9 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
       ->setName('catalog-search');
   $app->get('/~reindex', [ \Scat\Controller\Catalog::class, 'reindex' ]);
 
+  $app->post('/~mark-inventoried',
+              [ \Scat\Controller\Catalog::class, 'markInventoried' ]);
+
   $app->get('/custom', [ \Scat\Controller\Catalog::class, 'custom' ]);
 
   $app->get('/whats-new', [ \Scat\Controller\Catalog::class, 'whatsNew' ])

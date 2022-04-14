@@ -92,6 +92,23 @@ class Catalog {
     return $response;
   }
 
+  public function markInventoried(Request $request, Response $response)
+  {
+    $items= $request->getParam('items');
+
+    // Validate input
+    if (!preg_match('/(\d+)(\d+,)*/', $items)) {
+      throw new \Exception("Invalid list of items.");
+    }
+
+    $q= "UPDATE item SET inventoried = NOW() WHERE id IN ($items)";
+    $this->data->execute($q);
+
+    $last= $this->data->get_last_statement();
+
+    return $response->withJson([ 'count' => $last->rowCount() ]);
+  }
+
   public function custom(Request $request, Response $response) {
     $depts= $this->catalog->getDepartments();
     return $this->view->render($response, 'catalog/custom.html', [
