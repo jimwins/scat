@@ -97,6 +97,70 @@ class Report
     return [ "sales" => $sales ];
   }
 
+  public function purchases($span= '', $begin= null, $end= null) {
+    if (!$begin) {
+      $begin= "DATE(NOW() - INTERVAL 10 DAY)";
+    } else {
+      $begin= "'{$begin}'";
+    }
+
+    if (!$end) {
+      $end= "DATE(NOW() + INTERVAL 1 DAY)";
+    } else {
+      $end= "'{$end}'";
+    }
+
+    switch ($span) {
+    case 'all':
+      $format= 'All';
+      break;
+    case 'year':
+      $format= '%Y';
+      break;
+    case 'month':
+      $format= '%Y-%m';
+      break;
+    case 'week':
+      $format= '%X-W%v';
+      break;
+    case 'hour':
+      $format= '%w (%a) %H:00';
+      break;
+    case 'day':
+    default:
+      $format= '%Y-%m-%d %a';
+      break;
+    }
+
+    $q= "SELECT DATE_FORMAT(created, '$format') AS span,
+                MIN(DATE(created)) AS raw_date,
+                SUM(total) AS total,
+                COUNT(*) AS transactions
+           FROM (SELECT
+                        created,
+                        CAST(ROUND_TO_EVEN(
+                          SUM(IF(type = 'customer', -1, 1) * ordered *
+                            sale_price(txn_line.retail_price,
+                                       txn_line.discount_type,
+                                       txn_line.discount)),
+                          2) AS DECIMAL(9,2))
+                        AS total
+                   FROM txn
+                   LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                        JOIN item ON (txn_line.item_id = item.id)
+                  WHERE
+                        created BETWEEN $begin AND $end
+                    AND type = 'vendor'
+                  GROUP BY txn.id
+                ) t
+          GROUP BY 1
+          ORDER BY 1 DESC";
+
+    $purchases= $this->data->for_table('item')->raw_query($q)->find_many();
+
+    return [ "purchases" => $purchases ];
+  }
+
   public function emptyProducts() {
     return [ "products" => $this->data->factory('Product')
                              ->select('*')

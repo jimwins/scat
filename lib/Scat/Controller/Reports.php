@@ -46,6 +46,25 @@ class Reports {
     return $this->view->render($response, 'report/sales.html', $data);
   }
 
+  public function purchases(Request $request, Response $response) {
+    $span= $request->getParam('span');
+    $begin= $request->getParam('begin');
+    $end= $request->getParam('end');
+
+    error_log("reporting purchases from '$begin' to '$end' by '$span'\n");
+
+    $data= $this->report->purchases($span, $begin, $end);
+
+    $accept= $request->getHeaderLine('Accept');
+
+    if (strpos($accept, 'application/json') !== false)
+    {
+      return $response->withJson($data['purchases']);
+    }
+
+    return $this->view->render($response, 'report/purchases.html', $data);
+  }
+
   public function emptyProducts(Request $request, Response $response) {
     $data= $this->report->emptyProducts();
     return $this->view->render($response, 'report/empty-products.html', $data);

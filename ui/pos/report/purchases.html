@@ -1,0 +1,193 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Purchases Report
+{% endblock %}
+
+{% block extra_head %}
+  <script src="/extern/jquery.event.ue.js"></script>
+  <script src="/extern/jquery.udraggable.js"></script>
+  <script src="/vendor/moment/moment/min/moment.min.js"></script>
+  <script src="/extern/chartjs-2.7.2/Chart.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Default Chart text color
+      Chart.defaults.global.defaultFontColor= '#000';
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <form id="report-params" class="form-horizontal" role="form"
+        action="purchases" method="get">
+    <div class="form-group">
+      <label for="datepicker" class="col-sm-2 control-label">
+        Dates
+      </label>
+      <div class="col-sm-10">
+        <div class="input-daterange input-group" id="datepicker">
+          <input type="text" class="form-control" name="begin" value="{{ begin }}" />
+          <span class="input-group-addon">to</span>
+          <input type="text" class="form-control" name="end" value="{{ end }}" />
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="span" class="col-sm-2 control-label">
+        Grouped by
+      </label>
+      <div class="col-sm-10">
+        <select name="span" class="form-control" style="width: auto">
+          <option value="day">Day</span>
+          <option value="week">Week</span>
+          <option value="month">Month</span>
+          <option value="year">Year</span>
+          <option value="hour">Day/Hour</span>
+          <option value="all">All</span>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="items" class="col-sm-2 control-label">
+        Items
+      </label>
+      <div class="col-sm-10">
+        <input id="items" name="items" type="text" class="form-control" style="width: 20em">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <input type="submit" class="btn btn-primary" value="Show">
+      </div>
+    </div>
+  </form>
+
+  <div id="results-template" class="panel panel-default"
+       style="display: none; width: auto; padding-bottom: 2em">
+    <div class="panel-heading">
+      <button type="button" class="close" data-dismiss="panel"
+              onclick="$(this).closest('.panel').remove(); return false"
+              title="Close">&times;</button>
+      <h3 class="panel-title">All Purchases</h3>
+    </div>
+    <div class="panel-body">
+      <div class="chart-container" style="position: relative">
+        <canvas class="graph"></canvas>
+      </div>
+    </div>
+    <table class="table">
+     <thead>
+      <tr>
+        <th>When</th>
+        <th>Date</th>
+        <th class="text-right">Subtotal</th>
+        <th class="text-right">Transactions</th>
+        <th class="text-right">Average</th>
+        <th class="text-right">Resale</th>
+        <th class="text-right">Online</th>
+        <th class="text-right">Pickup</th>
+        <th class="text-right">Shipped</th>
+        <th class="text-right">Tax</th>
+        <th class="text-right">Total</th>
+      </tr>
+     </thead>
+     <tbody>
+     </tbody>
+    </table>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    $('#report-params .input-daterange').datepicker({
+        format: "yyyy-mm-dd",
+        todayHighlight: true
+    });
+
+    let form= document.getElementById('report-params')
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      let formData= new FormData(form)
+
+      scat.get('/report/purchases', formData, {
+        headers: {
+          'Accept': 'application/json',
+        },
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        var table= $("#results-template").clone();
+        table.removeAttr('id');
+        var t= $("tbody", table);
+        var gdata= [];
+        $.each(data, function(i, purchases) {
+          t.append($('<tr><td>' + purchases.span +
+                     '<td>' + purchases.raw_date + '</td>' +
+                     '<td align="right">' + scat.amount(purchases.total) +
+                     '<td align="right">' + purchases.transactions +
+                     '<td align="right">' + scat.amount(purchases.total / purchases.transactions) +
+                     '</tr>'));
+          gdata.unshift({ x: purchases.raw_date, y: purchases.total });
+        });
+        var cap= $('#items').val();
+        if (cap) {
+          $(".panel-title", table).text(cap);
+        }
+        table.appendTo($("body"));
+        table.show();
+
+        // Only show chart when we have multiple data points
+        if (gdata.length > 1) {
+          var data= {
+            datasets: [
+              {
+                label: 'Purchases',
+                data: gdata
+              },
+            ]
+          };
+
+          var options= {
+            legend: {
+              display: false,
+            },
+            scales: {
+              xAxes: [{
+                type: 'time',
+                time: {
+                  unit: 'day'
+                }
+              }],
+              yAxes: [{
+                ticks: {
+                  callback: function(value, index, values) {
+                    return scat.amount(value);
+                  }
+                }
+              }]
+            },
+            tooltips: {
+              callbacks: {
+                label: function (tooltipItem, data) {
+                  return scat.amount(tooltipItem.yLabel);
+                }
+              }
+            }
+          };
+
+          var chart= new Chart($('.graph', table)[0],
+                               {
+                                 type: 'line',
+                                 data: data,
+                                 options: options
+                               });
+        } else {
+          $('.graph', table).hide();
+        }
+
+        table.udraggable({ handle: '.panel-heading' });
+      });
+    });
+  </script>
+{% endblock %}
