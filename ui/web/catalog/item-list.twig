@@ -4,11 +4,11 @@
 {% macro begin_table() %}
   <table>
     <thead>
-      <th width="10%">Item No.</th>
+      <th width="15%">Item No.</th>
       <th>Description</th>
-      <th width="10%">List</th>
-      <th width="10%">Sale</th>
-      <th width="10%">In Stock</th>
+      <th width="8%">List</th>
+      <th width="8%">Sale</th>
+      <th width="10%" class="avail">In Stock</th>
       <th width="16">&nbsp;</th>
       <th width="130">&nbsp;</th>
     </thead>
@@ -53,9 +53,11 @@
       padding: 0.5rem;
       vertical-align: top;
     }
-    .item-list .avail {
-      font-size: 80%;
+    .item-list td.avail, .item-list th.avail {
       text-align: center;
+    }
+    .item-list td.avail {
+      font-size: 80%;
     }
     .item-list th {
       text-align: left;
