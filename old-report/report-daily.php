@@ -1,6 +1,5 @@
 <?
 require '../scat.php';
-require '../lib/txn.php';
 
 head("Daily Flow @ Scat", true);
 
@@ -61,12 +60,12 @@ while ($row= $r->fetch_assoc()) {
   /* Treat change as cash */
   if ($method == 'change') $method= 'cash';
   $data[$row['date']][$method]=
-    bcadd($data[$row['date']][$method], $row['amount']);
-  $seen[$method]++; /* Track methods we've seen */
+    bcadd(@$data[$row['date']][$method], $row['amount']);
+  @$seen[$method]++; /* Track methods we've seen */
   /* Don't add withdrawals to total */
   if ($method != 'withdrawal')
     $data[$row['date']]['total']=
-      bcadd($data[$row['date']]['total'], $row['amount']);
+      bcadd(@$data[$row['date']]['total'], $row['amount']);
 }
 
 $total= 0;
@@ -77,7 +76,7 @@ $total= 0;
    <th>Date</th>
 <?
 foreach (\Scat\Model\Payment::$methods as $method => $name) {
-  if ($seen[$method])
+  if (isset($seen[$method]))
     echo '<th>', $name, '</th>';
 }
 ?>
@@ -89,8 +88,8 @@ foreach (\Scat\Model\Payment::$methods as $method => $name) {
 foreach ($data as $date => $data) {
   echo '<tr><td>', $date, '</td>';
   foreach (\Scat\Model\Payment::$methods as $method => $name) {
-    if ($seen[$method])
-      echo '<td>', $data[$method] ? amount($data[$method]) : '', '</td>';
+    if (array_key_exists($method, $seen))
+      echo '<td>', @$data[$method] ? amount($data[$method]) : '', '</td>';
   }
   echo '<td>', amount($data['total']), '</td></tr>';
   $total= bcadd($total, $data['total']);

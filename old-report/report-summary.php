@@ -3,7 +3,7 @@ require '../scat.php';
 
 head("Daily Summary @ Scat", true);
 
-$date= $_REQUEST['date'];
+$date= @$_REQUEST['date'];
 if (!$date) {
   $date= (new \Datetime())->format('Y-m-d');
 }
