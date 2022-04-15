@@ -2,7 +2,7 @@ Scat is a web-based Point-of-Sale (POS) system.
 
 Scat requires PHP 7.2 or later and MySQL 8.0 or later.
 
-Scat uses the jQuery and jQueryUI Javascript libraries.
+Scat uses the jQuery Javascript library.
   http://jquery.com/
 
 Scat uses the Bootstrap front-end framework:
