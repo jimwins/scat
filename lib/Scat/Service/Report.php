@@ -231,7 +231,7 @@ class Report
     $grand_total= 0;
 
     foreach ($res as $row) {
-      if ($vendors[$row->person_id]) {
+      if (array_key_exists($row->person_id, $vendors)) {
         $vendor= $vendors[$row->person_id];
       } else {
         $vendor= $row->person();
