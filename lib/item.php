@@ -167,7 +167,8 @@ function item_find($db, $q, $options) {
               item.prop65, item.oversized, item.hazmat,
               item.active, item.reviewed
          FROM item
-    LEFT JOIN brand ON (item.brand_id = brand.id)
+    LEFT JOIN product ON (item.product_id = product.id)
+    LEFT JOIN brand ON (product.brand_id = brand.id)
     LEFT JOIN barcode ON (item.id = barcode.item_id)
         WHERE $sql_criteria
      GROUP BY item.id

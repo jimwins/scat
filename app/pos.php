@@ -255,6 +255,8 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
 
   $app->post('/~mark-inventoried',
               [ \Scat\Controller\Catalog::class, 'markInventoried' ]);
+  $app->post('/~print-count-sheet',
+              [ \Scat\Controller\Catalog::class, 'printCountSheet' ]);
 
   $app->get('/custom', [ \Scat\Controller\Catalog::class, 'custom' ]);
 

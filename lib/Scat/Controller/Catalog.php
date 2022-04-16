@@ -109,6 +109,60 @@ class Catalog {
     return $response->withJson([ 'count' => $last->rowCount() ]);
   }
 
+  public function printCountSheet(Request $request, Response $response,
+                                  \Scat\Service\Printer $print)
+  {
+    $id_list= $request->getParam('items');
+    $q= $request->getParam('q');
+
+    // Validate input
+    if (!preg_match('/(\d+)(\d+,)*/', $id_list)) {
+      throw new \Exception("Invalid list of items.");
+    }
+
+    $ids= preg_split('/,/', $id_list);
+
+    $items= $this->catalog->getItems()
+                          ->where_in('id', $ids)
+                          ->order_by_asc('code')
+                          ->find_many();
+
+    $product_id= $items[0]->product_id;
+    $variation= $items[0]->variation;
+    $use_short_name= true;
+    $use_variation= false;
+
+    foreach ($items as $item) {
+      if ($item->product_id != $product_id) {
+        $use_short_name= false;
+      }
+      if ($item->variation != $variation) {
+        $use_variation= true;
+      }
+    }
+
+    $product= ($use_short_name ? $items[0]->product() : null);
+
+    if ($product && !$q) {
+      $q= "product:{$product->id} stocked:1";
+    }
+
+    $pdf= $print->generateFromTemplate('print/inventory.html', [
+      'items' => $items,
+      'product' => $product,
+      'use_short_name' => $use_short_name,
+      'use_variation' => $use_variation,
+      'q' => $q,
+    ]);
+
+    if ($request->getParam('download')) {
+      $response->getBody()->write($pdf);
+      return $response->withHeader('Content-type', 'application/pdf');
+    }
+
+    return $print->printPDF($response, 'letter', $pdf);
+  }
+
   public function custom(Request $request, Response $response) {
     $depts= $this->catalog->getDepartments();
     return $this->view->render($response, 'catalog/custom.html', [

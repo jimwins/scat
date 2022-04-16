@@ -131,12 +131,12 @@
       form.querySelector('.inventory-print').addEventListener('click', (ev) => {
         let items= collectItems(list, 0)
         let q= form.elements['q'].value
-        scat.printDocument('inventory', { items: items, q: q })
+        scat.print('/catalog/~print-count-sheet', { items: items, q: q })
       })
       form.querySelector('.inventory-print-all').addEventListener('click', (ev) => {
         let items= collectItems(list)
         let q= form.elements['q'].value
-        scat.printDocument('inventory', { items: items, q: q })
+        scat.print('/catalog/~print-count-sheet', { items: items, q: q })
       })
       form.querySelector('.inventory-done').addEventListener('click', (ev) => {
         let items= collectItems(list)
