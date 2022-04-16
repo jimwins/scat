@@ -45,7 +45,9 @@
             </a>
           </td>
           <td>{{ vendor.orders }}</td>
-          <td>{{ scat.amount(vendor.total) }}</td>
+          <td data-sort="{{ vendor.total }}">
+            {{ scat.amount(vendor.total) }}
+          </td>
           <td>{{ "%.2f%%"|format(vendor.total / grand_total * 100) }}</td>
         </tr>
       {% endfor %}
