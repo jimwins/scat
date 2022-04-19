@@ -157,9 +157,9 @@ $parent= 0;
  <thead>
   <tr>
    <th>Category</th>
-   <th align="right">Current</th>
-   <th align="right">Previous</th>
-   <th align="right">Change</th>
+   <th style="text-align: right">Current</th>
+   <th style="text-align: right">Previous</th>
+   <th style="text-align: right">Change</th>
  </thead>
  <tbody>
 <?
