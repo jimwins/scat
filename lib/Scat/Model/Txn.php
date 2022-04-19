@@ -63,11 +63,15 @@ class Txn extends \Scat\Model {
     return $stock;
   }
 
-  public function notes() {
-    return
+  public function notes($only_todo= false) {
+    $notes=
       $this->has_many('Note', 'attach_id')
         ->where('parent_id', 0)
         ->where('kind', 'txn');
+    if ($only_todo) {
+      $notes= $notes->where('todo', 1);
+    }
+    return $notes;
   }
 
   public function createNote() {

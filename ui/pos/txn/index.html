@@ -130,6 +130,13 @@
                 {% if txn.shipping_address_id %}
                   <br><i class="fa {{ txn.shipping_address_id == 1 ? 'fa-building': 'fa-truck' }}"></i>
                 {% endif %}
+                {% if txn.notes(true).find_many | length %}
+                  <br>
+                  <a data-action="show-notes"
+                      data-kind="txn" data-attach-id="{{ txn.id }}">
+                    <i class="fa fa-sticky-note-o fa-fw"></i>
+                  </a>
+                {% endif %}
               </td>
               <td>
                 <a href="/{{ type == 'vendor' ? 'purchase' : 'sale' }}/{{ txn.id }}">
