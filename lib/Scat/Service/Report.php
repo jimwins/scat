@@ -190,6 +190,53 @@ class Report
                              ->find_many() ];
   }
 
+  public function cashflow($begin= null, $end= null) {
+    if (!$begin) {
+      $begin= date('Y-m-d', strtotime('30 days ago'));
+    }
+    if (!$end) {
+      $end= date('Y-m-d', strtotime('today'));
+    }
+
+    $q= "SELECT DATE_FORMAT(processed, '%Y-%m-%d %a') AS date,
+                method, cc_type, SUM(amount) amount
+           FROM payment
+          WHERE processed BETWEEN '$begin 00:00:00' AND '$end 23:59:59'
+          GROUP BY date, method, cc_type
+          ORDER BY date DESC";
+
+    $rows= $this->data->for_table('payment')->raw_query($q)->find_many();
+
+    $data= $seen= [];
+    $total= new \Decimal\Decimal(0);
+
+    foreach ($rows as $row) {
+      $method= $row->method;
+      /* Treat change as cash */
+      if ($method == 'change') $method= 'cash';
+      $date= $row->date;
+      $amount= new \Decimal\Decimal($row->amount);
+      $data[$date][$method]= $amount + ($data[$date][$method] ?? 0);
+      @$seen[$method]++; /* Track methods we've seen */
+      /* Don't add withdrawals to total */
+      if ($method != 'withdrawal') {
+        $data[$date]['total']= $amount + ($data[$date]['total'] ?? 0);
+        $total+= $row->amount;
+      }
+    }
+
+    return [
+      'begin' => $begin,
+      'end' => $end,
+      'methods' => array_filter(\Scat\Model\Payment::$methods,
+                                fn($key) => array_key_exists($key, $seen),
+                                ARRAY_FILTER_USE_KEY),
+      'data' => $data,
+      'total' => (string)$total,
+    ];
+
+  }
+
   public function kitItems() {
     return [ "items" => $this->data->factory('Item')
                              ->select('*')

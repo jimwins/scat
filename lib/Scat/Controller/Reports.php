@@ -75,6 +75,13 @@ class Reports {
     return $this->view->render($response, 'report/backordered-items.html', $data);
   }
 
+  public function cashflow(Request $request, Response $response) {
+    $begin= $request->getParam('begin');
+    $end= $request->getParam('end');
+    $data= $this->report->cashflow($begin, $end);
+    return $this->view->render($response, 'report/cashflow.html', $data);
+  }
+
   public function kitItems(Request $request, Response $response) {
     $data= $this->report->kitItems();
     return $this->view->render($response, 'report/kit-items.html', $data);
