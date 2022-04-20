@@ -23,6 +23,8 @@ class Item extends \Scat\Model {
         $ret[]= "Hard Bound"; break;
       case 'SB':
         $ret[]= "Staple Bound"; break;
+      case 'SMB':
+        $ret[]= "Sewn Binding"; break;
       case 'SH':
         $ret[]= "Unbound"; break;
       default:
