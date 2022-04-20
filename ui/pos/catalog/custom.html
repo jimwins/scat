@@ -36,7 +36,9 @@
               </label>
               <div class="col-sm-6">
                 <p class="form-control-static"
-                   data-calc="scat.amount(ui * 0.70)"></p>
+                   data-calc="(Math.max(w, h) > 48)
+                               ? 'Too big!'
+                               : scat.amount(ui * 0.70)"></p>
               </div>
             </div>
             <div class="form-group">
