@@ -89,10 +89,19 @@
             <span class="badge"></span>
           </summary>
           <div class="popup">
-            <a href="/login">Log in</a> or <a href="/rewards">Sign up</a>
-            <br>
-            There is nothing in your shopping cart.
+            <noscript>
+              <a href="/login">Log in</a> or <a href="/rewards">Sign up</a>
+              <br>
+              Sorry, this button won't work because JavaScript is disabled.
+            </noscript>
           </div>
+          <template id="cart-loading">
+            <div class="contents">
+              <div class="cart">
+                <progress>
+              </div>
+            </div>
+          </template>
         </details>
       </div>
     </nav>
@@ -243,6 +252,39 @@
         // don't care
       }
     }
+
+    let cart= document.getElementById('cart')
+    cart.addEventListener('toggle', (ev) => {
+      if (ev.currentTarget.open) {
+        let loading= document.getElementById('cart-loading').content.firstElementChild.cloneNode(true);
+        cart.appendChild(loading);
+
+        fetch('/cart', {
+          headers: {
+            'Accept': 'application/vnd.scat.cart+html'
+          }
+        })
+        .then((res) => {
+          if (res.status >= 200 && res.status < 300) {
+            return Promise.resolve(res)
+          }
+          return Promise.reject(new Error(res.statusText))
+        })
+        .then((res) => { return res.text() })
+        .then((text) => {
+          return new Promise((resolve, reject) => {
+            let template= document.createElement('template')
+            template.innerHTML= text.trim()
+            let contents= template.content.firstChild
+            cart.removeChild(loading)
+            cart.appendChild(contents)
+          })
+        })
+      } else {
+        let contents= cart.querySelector('.contents')
+        cart.removeChild(contents);
+      }
+    })
 
     /* Progressive enhancement: make whole .card clickable */
     function handleCardClick(ev) {

@@ -225,6 +225,8 @@ class Item extends \Scat\Model {
       }, $items);
       return min($qtys);
     } else {
+      // Web uses a view that has stock set already, so we use that here
+      if (isset($this->stock)) return $this->stock;
       if ($when) {
         return $this->has_many('TxnLine')
                     ->join('txn', [ 'txn_line.txn_id', '=', 'txn.id' ])

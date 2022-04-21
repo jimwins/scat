@@ -76,7 +76,7 @@ $container->set('view', function($container) {
 $app->add(\Slim\Views\TwigMiddleware::createFromContainer($app));
 
 /* Hook up the data service, but not lazily because we rely on side-effects */
-$container->set('data', new \Scat\Service\Data($config['data']));
+$container->set('data', new \Scat\Service\Data($config['webdata']));
 
 $app->add(new \Middlewares\TrailingSlash());
 
@@ -127,7 +127,10 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
 // TODO
 
 /* Cart */
-// TODO
+$app->group('/cart', function (RouteCollectorProxy $app) {
+  $app->get('', [ \Scat\Web\Cart::class, 'cart' ])
+      ->setName('cart');
+});
 
 /* Contact */
 // TODO

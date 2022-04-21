@@ -74,7 +74,7 @@
     {% endif %}
   </td>
   <td class="avail">
-    {% if i.stock %}
+    {% if i.stock() %}
       <span class="text-important">In stock</span>
     {% else %}
       {% if i.minimum_quantity %}
