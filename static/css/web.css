@@ -493,3 +493,11 @@ hr {
   background-color: #d9edf7;
   border-color: #bce8f1;
 }
+
+h1.page-header {
+  border-bottom: 1px solid var(--light-primary-color);
+}
+h1 > small {
+  font-weight: normal;
+  color: #555;
+}
