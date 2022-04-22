@@ -155,5 +155,6 @@ if ($DEBUG) {
 
 /* Pages (everything else) */
 $app->get('/{param:.*}', [ \Scat\Web\Page::class, 'page' ]);
+$app->post('/{param:.*}', [ \Scat\Web\Page::class, 'savePage' ]);
 
 $app->run();

@@ -1,0 +1,48 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title -%}
+  {{ content.title }}
+{%- endblock %}
+
+{% block content %}
+  <style>
+  main form {
+    display: grid;
+    place-content: center;
+    grid-gap: 0.5rem;
+    margin: 0 0 2em 0;
+  }
+  </style>
+
+  <form method="POST" action="{{ current_url() }}">
+    <label for="title">Title</label>
+    <input class="input" type="text" name="title" value="{{ content.title }}" size="100">
+
+    <label for="format">Format</label>
+    <div class="select">
+      <select name="format">
+        <option value="markdown">
+          Markdown
+        </option>
+        <option value="html" {{ content.format == 'html' ? 'selected' }}>
+          HTML
+        </option>
+      </select>
+      <span class="focus"></span>
+    </div>
+
+    <label for="content">Content</label>
+    <textarea class="input" name="content" rows="20">{{ content.content }}</textarea>
+
+    <label for="description">Description</label>
+    <textarea class="input" name="description">{{ content.description }}</textarea>
+
+    <button type="submit">
+      <i class="lni lni-save"></i>
+      Save
+    </button>
+
+  </form>
+
+{% endblock %}

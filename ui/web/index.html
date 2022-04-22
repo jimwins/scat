@@ -2,188 +2,33 @@
 {% import 'macros.twig' as scat %}
 
 {% block title -%}
-  Raw Materials Art Supplies - Downtown Los Angeles
+  {{ content.title }}
 {%- endblock %}
 
 {% block content %}
-  <style>
-/* Based on
- * https://moderncss.dev/3-popular-website-heroes-created-with-css-grid-layout/
- * */
-.hero {
-  display: grid;
-  grid-template-areas: "hero";
-  align-items: center;
-  height: fit-content(65vh);
-  max-height: 600px;
-  background: #eee;
-  border-radius: var(--border-radius);
-}
-.hero > * {
-  grid-area: hero;
-}
-.hero img {
-  -o-object-fit: cover;
-     object-fit: cover;
-  height: min(65vh, 600px);
-  width: 80%;
-  transition: 180ms width ease-in;
-  justify-self: end;
-  border-top-right-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-}
-@media (min-width: 60rem) {
-  .hero img {
-    width: 60%;
-  }
-}
-.hero .hero__content {
-  margin: 1rem 0 1rem 5%;
-  max-width: 50%;
-  min-width: 30ch;
-  z-index: 1;
-  background-color: rgba(238,238,238,0.8);
-  border-radius: var(--border-radius);
-  padding: 1rem 2rem 2rem 2rem;
-  box-shadow: none;
-}
-.hero .hero__content h1 {
-  font-size: 3rem;
-  font-weight: 500;
-  margin: 0 0 1rem;
-}
-.hero .hero__content p {
-  font-size: 1.75rem;
-}
-  </style>
+
+  {% if DEBUG %}
+    <style>
+      .page-editor {
+        position: fixed;
+        right: 1em;
+        top: 1em;
+      }
+    </style>
+    <div class="page-editor">
+      <a class="button" href="{{ current_url() }}?edit=1">
+        <i class="lni lni-pencil-alt"></i>
+        Edit Page
+      </a>
+    </div>
+  {% endif %}
 
   <main>
-    {% if param %}
-      <p>param: <code>{{ param | json_encode }}</code>
+    {% if content.format == 'markdown' %}
+      {{ content.content | markdown }}
+    {% else %}
+      {{ content.content | raw }}
     {% endif %}
-
-    <div class="hero">
-      <div class="card hero__content">
-        <h1>Itoya ProFolios</h1>
-        <p>Boring binders begone with ITOYA! Psst, it's not magic🦄 Corral the chaos. Organize, store, and present your art with ITOYA.</p>
-        <a class="button" href="/art-supplies/storage-and-portfolios/portfolios-and-presentation-cases/itoya-the-original-art-profolio">Shop Sizes</a>
-      </div>
-      <img src="//rawmats.gumlet.io/i/o/623e053b01ab573a1117d2423b.jpg?w=600&h=600&mode=fit&fm=auto" alt="" />
-    </div>
-
-<style>
-/*
- * Based on https://smolcss.dev/#card
- */
-.smol-grid {
-  --min: 20ch;
-  --gap: 1rem;
-
-  display: grid;
-  grid-gap: var(--gap);
-  /* min() with 100% prevents overflow in extra narrow spaces */
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min)), 1fr));
-
-  margin: var(--gap) 0;
-
-  /* ul.smol-grid gets wonky padding otherwise */
-  padding: 0;
-}
-
-.card {
-  --img-ratio: 3/2;
-
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0.25em 0.25em 1em rgba(0, 0, 0, 0.35);
-  border-radius: var(--border-radius);
-}
-.card.hot {
-  cursor: pointer;
-}
-
-/* Soon we can replace this with: gap: 1rem; */
-.card > * + * {
-  margin-top: 1rem;
-}
-
-.card > img {
-  /* Fallback for `aspect-ratio` of defining
-  a height */
-  height: max(18vh, 12rem);
-  object-fit: cover;
-  width: 100%;
-}
-
-/* When supported, use `aspect-ratio` */
-@supports (aspect-ratio: 1) {
-  .card > img {
-    aspect-ratio: var(--img-ratio);
-    height: auto;
-  }
-}
-
-.card > img:first-child {
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-}
-
-.card > img:last-child {
-  border-radius: 0 0 var(--border-radius) var(--border-radius);
-  margin-top: auto;
-}
-
-.card > :not(img) {
-  margin-left: 1rem;
-  margin-right: 1rem;
-}
-
-.card > :not(img):first-child {
-  margin-top: 1rem;
-}
-
-/* Enhanced `:not()` accepts a selector list,
-but as a fallback you can chain `:not()` instead */
-.card > :last-of-type:not(img, h2, h3, h4) {
-  margin-bottom: 1rem;
-}
-
-.card > :not(h2, h3, h4) {
-  font-size: 0.9rem;
-}
-
-.card > button {
-  align-self: center;
-}
-
-.card.hot:hover h3 {
-  text-decoration: underline;
-  color: var(--primary-color);
-}
-.card.hot:hover {
-  box-shadow: 0.25em 0.25em 1em rgba(var(--primary-color-r), var(--primary-color-g), var(--primary-color-b), 0.8);
-}
-</style>
-
-    <ul class="smol-grid">
-      <li class="card">
-        <h3>Fabriano EcoQua Notebooks</h3>
-        <img src="//rawmats.gumlet.io/i/o/62449bc40160db7eb14617466e.jpg?w=400&h=400&mode=fit&fm=auto" alt="">
-        <p>🌈🌺Is it a Spring Thing? Fabriano EcoQua Notebooks 💥ON SALE at 25% OFF💥 EcoQua Notebooks have wonderfully colorful covers and are ideal for writing, sketching, and/or drawing in pen, pencil, and marker. Made in 🇮🇹 Italy w/environmentally friendly FSC certified 57 lb. (85gsm) paper that is chlorine-free, acid-free, and completely recyclable. Available Staple- and/or Spiral-Bound with Lined, Blank, Standard Grid, and Dot Grid sheets. So is it a Spring Thing, or do you always color-code your projects to stay better organized? 🤔 🛒</p>
-        <a class="button" href="/art-supplies/paper-board-and-films/sketch-books-and-journals/fabriano-ecoqua-notebooks">Shop Colors &amp; Sizes</a>
-      </li>
-      <li class="card">
-        <h3>40% off M. Graham Gouache</h3>
-        <img src="//rawmats.gumlet.io/i/o/62339c0d012c2430c7da3d8b07.jpg?w=400&h=400&mode=fit&fm=auto" alt="">
-        <p>M. Graham Artists’ Gouache 💥ON SALE at 40% OFF💥 Buy 3 get 1 FREE 15ml tube 🎉 M. Graham Artists’ Gouache contains no added chalk or adulterants that would degrade the appearance of the color when dry. By mixing white when, where, and how you want it, you’re in control of the colors🎨 and the base of Northwest blackberry honey🍯 protects the color’s brilliance and offers direct, smooth application. (Free tube available at checkout. While supplies last!)</p>
-        <a class="button" href="/art-supplies/paints-and-mediums/gouache-colors-and-sets/m-graham-artists-gouache">Shop Colors &amp; Sizes</a>
-      </li>
-      <li class="card">
-        <h3>New: Zig Clean Color Dot Markers</h3>
-        <img src="//rawmats.gumlet.io/i/o/623a0c760123c6f0e262bfec7d.jpg?w=400&h=400&mode=fit&fm=auto" alt="">
-        <p>🌱Spring into… ✨NEW✨ Kuretake Zig Clean Color Dot Marker Sets 🔴🔵🟣🟢⚫️ Clean Color Dot Markers are dual tip markers with a 0.5mm fine tip on one end and a flexible, rounded dot tip on the other. Dots of various sizes can be drawn by adjusting the pressure applied to the pen during use. Whether you make like Seurat on Sundays and sketch with a set in the park, or prefer to punctuate pumpkins like Yayoi, a 6-Color or 12-Color Clean Color Dot Marker Set is a great way refresh your routine marker array.</p>
-        <a class="button" href="/art-supplies/pens-inks-and-markers/art-markers/kuretake-zig-clean-color-dot-marker-sets">Shop Sets</a>
-      </li>
-    </ul>
   </main>
 
 {% endblock %}
