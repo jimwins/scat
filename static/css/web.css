@@ -324,8 +324,8 @@ summary.small {
   font-size: 0.85rem;
 }
 a.button.block,
-.button.block,
-.summary.block {
+button.block,
+summary.block {
   width: 100%;
 }
 
