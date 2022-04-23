@@ -158,26 +158,20 @@ figure img {
         <input type="hidden" name="name" value="{{ item.name }}">
         <input type="hidden" name="sale_price"
                value="{{ item.sale_price }}">
-        <p>
-          <div class="input-group" style="width: 100%">
-            <label class="input-group-addon" for="quantity">
-              Quantity
-            </label >
-            <input type="text" class="form-control"
-                   id="quantity" name="quantity"
-                   value="{{ item.purchase_quantity }}">
-          </div>
-          {% if item.purchase_quantity > 1 %}
-            <span class="help-block">
-              Must be multiple of {{ item.purchase_quantity }}.
-            </span>
-          {% endif %}
-        </p>
-        <p>
-          <button type="submit" class="block btn-lg">
-            <i class="lni lni-circle-plus"></i> Add to Cart
-          </button>
-        </p>
+        <label for="quantity">
+          Quantity
+        </label>
+        <input type="text" class="input"
+               id="quantity" name="quantity"
+               value="{{ item.purchase_quantity }}">
+        {% if item.purchase_quantity > 1 %}
+          <span class="help-block">
+            Must be multiple of {{ item.purchase_quantity }}.
+          </span>
+        {% endif %}
+        <button type="submit" class="block btn-lg">
+          <i class="lni lni-circle-plus"></i> Add to Cart
+        </button>
       </form>
     {% else %}
       <button class="btn btn-block btn-lg btn-danger" disabled>
