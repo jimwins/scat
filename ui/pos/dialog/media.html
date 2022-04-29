@@ -14,7 +14,7 @@
           {{ include('carousel.twig', { images: [ i ], thumb: true }) }}
         </div>
         <div class="media-body">
-          <h4 class="media-heading">{{ i.name }}</h4>
+          <h4 class="media-heading" style="overflow-wrap: break-word; max-width: 30ch">{{ i.name }}</h4>
           {{ i.caption }}
         </div>
         <div class="media-right">
