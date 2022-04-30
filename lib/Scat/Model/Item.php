@@ -32,7 +32,9 @@ class Item extends \Scat\Model {
     }
     // m[3] = weight
     // m[4] = weight units (# or gsm)
-    $ret[]= $m[3] . " " . ($m[4] == '#' ? ' lbs.' : 'gsm');
+    if (isset($m[3])) {
+      $ret[]= $m[3] . " " . ($m[4] == '#' ? ' lbs.' : 'gsm');
+    }
     // m[5] = CP, HP, R
     if (isset($m[5])) {
       switch ($m[5]) {
@@ -58,9 +60,10 @@ class Item extends \Scat\Model {
     // 9x12 Canvas -> 9" x 12" Canvas
     $title= preg_replace('/^([-\\/\d.]+)x([-\\/\d.]+) /', '\1" x \2" ', $title);
     // 9x12 Sketch 80/WB/90# -> 9" x 12" Sketch (80 sheets, Wirebound, 90 lbs.)
-    $title= preg_replace_callback('!(\d+)/(\w\w\w?)/([\d.]+)(gsm|#)(\w\w?)?$!',
-                                  "self::expand_pad_details",
-                                  $title);
+    $title= preg_replace_callback(
+      '!(\d+)/(\w\w\w?)(?:/([\d.]+)(gsm|#)(\w\w?)?)?$!',
+      "self::expand_pad_details",
+      $title);
     // 5oz Titanium White Acrylic
     $title= preg_replace('/^([\d.]+)oz /', '\1 oz. ', $title);
 
