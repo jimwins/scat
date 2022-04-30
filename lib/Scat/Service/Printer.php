@@ -54,6 +54,8 @@ class Printer
   }
 
   public function printPDF(Response $response, $pageType, $pdf) {
+    $cups_host= $this->config->get('cups.host');
+
     $printerManager= $this->getPrinterManager();
 
     $details= explode(':', $pageType);
@@ -91,6 +93,8 @@ class Printer
   }
 
   public function printPNG(Response $response, $pageType, $png) {
+    $cups_host= $this->config->get('cups.host');
+
     $printerManager= $this->getPrinterManager();
 
     $details= explode(':', $pageType);
@@ -138,6 +142,8 @@ class Printer
   }
 
   public function printZPL(Response $response, $pageType, $zpl) {
+    $cups_host= $this->config->get('cups.host');
+
     $printerManager= $this->getPrinterManager();
 
     $details= explode(':', $pageType);
