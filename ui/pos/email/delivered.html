@@ -5,10 +5,12 @@
   Your order has been delivered!
 {%- endblock %}
 
+{% set person= txn.person %}
+
 {% block content_top %}
   <p>
-    {% if txn.person.name %}
-      Dear {{ txn.person.name }},
+    {% if person.name %}
+      Dear {{ person.name }},
     {% else %}
       Dear,
     {% endif %}
@@ -29,6 +31,24 @@
     If there were any problems with your delivery or you did not receive
     it, please let us know right away so we can get it sorted out!
   </p>
+
+  {% if person.points_available() > 50 %}
+    <p>
+      <b>Did you know that you have a reward waiting?</b> You have enough
+      points for a reward on your next purchase, just make sure to
+      <a href="https://rawmaterialsla.com/login?utm_source=internal&amp;utm_medium=email&amp;utm_campaign=delivered">log in</a> on the website
+      during checkout so you can take advantage of it.
+    </p>
+  {% else %}
+    {% if not person.suppress_loyalty %}
+      <p>
+        <b>Keep going to earn a reward for future purchases.</b> You don't have
+        enough points yet for a reward on your next purchase, but make sure to
+        <a href="https://rawmaterialsla.com/login?utm_source=internal&amp;utm_medium=email&amp;utm_campaign=delivered">log in</a> on the website
+        during checkout so you can keep accumulating points.
+      </p>
+    {% endif %}
+  {% endif %}
 
 {% endblock %}
 
