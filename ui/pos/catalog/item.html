@@ -371,7 +371,8 @@
                 </thead>
                 {% set ext_sale, ext_retail, ext_quantity= 0, 0, 0 %}
                 <tbody>
-                  {% for k in item.kit_items.find_many() %}
+                  {% set kit_items= item.kit_items.find_many() %}
+                  {% for k in kit_items|sort((b,a) => b.item.code <=> a.item.code) %}
                     {% set i = k.item %}
                     {% set ext_retail= ext_retail + (k.quantity * i.retail_price) %}
                     {% set ext_sale= ext_sale + (k.quantity * i.sale_price) %}
