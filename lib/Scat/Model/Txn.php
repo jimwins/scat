@@ -769,12 +769,20 @@ class Txn extends \Scat\Model {
     if ($this->no_rewards)
       return 0;
 
-    $taxed= $this->taxed();
-    $points= (int)$taxed *
-              (defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1);
+    $points= (int)$this->subtotal();
+
+    // subtract any gift cards and shipping charges
+    // relies on quantity being 1 of these
+    $points-= (int)$this->items()->where_in('tic', [ '10005', '11000' ])->sum('retail_price');
+
     // subtract amount paid with loyalty points
     $points-= $this->payments()->where('method', 'loyalty')->sum('amount');
-    if ($points <= 0 && $taxed > 0) $points= 1;
+
+    // always get at least one point on positive transaction
+    if ($points <= 0 && $this->subtotal() > 0) $points= 1;
+
+    $points*= (defined('LOYALTY_MULTIPLIER') ? LOYALTY_MULTIPLIER : 1);
+
     return $points;
   }
 
