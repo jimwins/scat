@@ -22,89 +22,82 @@
 <body>
 
   <header>
-    <nav aria-labelledby="site-name">
-      <div id="site-name">
-        <details id="department-nav" class="left">
-          <summary class="min">
-            <i class="lni lni-menu"></i>
-            <span class="visually-hidden">Show list of departments</span>
-          </summary>
-          <div>
-            <h2>Departments</h2>
-            <ul id="departments">
-              {% for dept in topDepartments() %}
-                <li>
-                  <a href="{{ url_for('catalog', { dept: dept.slug }) }}">
-                    {{ dept.name }}
-                  </a>
-                </li>
-              {% endfor %}
-              <li>
-                <a href="{{ url_for('catalog-brand') }}">
-                  Brands
-                </a>
-              </li>
-            </ul>
-          </div>
-        </details>
-        <a href="/">
-          <img src="https://rawmats.gumlet.io/i/o/619408b8005c11013ca45b7b75.png?w=622&h=69&mode=fit&fm=auto" alt="Raw Materials Art Supplies">
+    <nav id="site-navigation">
+      <a id="site-dept-menu" class="button nav-button"
+          data-toggle="panel" data-target="site-depts"
+          href="/art-supplies">
+        <i class="lni lni-menu"></i>
+      </a>
+      <a id="site-name" href="/">
+        <img src="https://rawmats.gumlet.io/i/o/619408b8005c11013ca45b7b75.png?w=622&h=69&mode=fit&fm=auto" alt="Raw Materials Art Supplies">
+      </a>
+      <form id="site-search" action="/art-supplies/search">
+	<input class="input" type="text" name="q"
+		placeholder="Search our online catalog"
+		value="{{ q }}">
+	<button class="button" type="submit">
+	  Search
+	</button>
+      </form>
+      <div id="site-info">
+        <a class="button nav-button"
+            data-toggle="panel" data-target="site-about"
+            href="/about">
+          <i class="lni lni-map-marker"></i>
+          <span class="label">About</span>
         </a>
       </div>
-
-      <form id="search-form" action="/art-supplies/search">
-          <input class="input" type="search" name="q"
-                  placeholder="Search our online catalog"
-                  value="{{ q }}">
-          <button type="submit">
-            Search
-          </button>
-      </form>
-
-      <div id="info-and-cart">
-        <details id="info">
-          <summary class="outline">
-            <i class="lni lni-map-marker lni-lg"></i> Store
-          </summary>
-          <div class="popup">
-            <a href="https://www.google.com/maps?cid=10837226433205632471&amp;hl=en" title="Find our location">645 South Los Angeles Street<br>
-            Los Angeles, CA 90014</a><br>
-            <strong><a href="tel:+18007297060">(800) 729-7060</a></strong><br>
-            <a href="/contact">info@rawmaterialsla.com</a><br>
-            Monday - Saturday, 10am to 6pm <br>
-            Closed Sundays
-            <ul class="list-horizontal no-separator">
-              <li><a href="http://twitter.com/RawMaterials" title="Follow us on Twitter"><i class="lni lni-lg lni-twitter"></i></a></li>
-              <li><a href="http://facebook.com/RawMaterialsLA" title="Like us on Facebook"><i class="lni lni-lg lni-facebook"></i></a></li>
-              <li><a href="http://instagram.com/rawmaterialsartsupplies" title="Follow us on Instagram"><i class="lni lni-lg lni-instagram"></i></a></li>
-              <li><a href="https://www.pinterest.com/rawmaterialsla/" title="Follow us on Pinterest"><i class="lni lni-lg lni-pinterest"></i></a></li>
-              <li><a href="https://www.youtube.com/channel/UC8QdVII0oYUnrO5RLAcivSQ" title="Subscribe to our YouTube channel"><i class="lni lni-lg lni-youtube"></i></a></li>
-            </ul>
-          </div>
-        </details>
-        <details id="cart">
-          <summary>
-            <i class="lni lni-cart"></i>
-            Cart
-            <span class="badge"></span>
-          </summary>
-          <div class="popup">
-            <noscript>
-              <a href="/login">Log in</a> or <a href="/rewards">Sign up</a>
-              <br>
-              Sorry, this button won't work because JavaScript is disabled.
-            </noscript>
-          </div>
-          <template id="cart-loading">
-            <div class="contents">
-              <div class="cart">
-                <progress>
-              </div>
-            </div>
-          </template>
-        </details>
+      <div id="site-cart">
+        <a class="button"
+            data-toggle="panel" data-target="site-cart-contents"
+            href="/cart">
+          <i class="lni lni-cart"></i>
+          <span class="badge">1</span>
+        </a>
       </div>
+      <div id="site-depts">
+        <ul id="departments">
+          <li><b>Departments</b></li>
+          {% for dept in topDepartments() %}
+            <li>
+              <a href="{{ url_for('catalog', { dept: dept.slug }) }}">
+                {{ dept.name }}
+              </a>
+            </li>
+          {% endfor %}
+          <li>
+            <a href="{{ url_for('catalog-brand') }}">
+              Brands
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div id="site-about" class="panel">
+        <a href="https://www.google.com/maps?cid=10837226433205632471&amp;hl=en" title="Find our location">645 South Los Angeles Street<br>
+        Los Angeles, CA 90014</a><br>
+        <strong><a href="tel:+18007297060">(800) 729-7060</a></strong><br>
+        <a href="/contact">info@rawmaterialsla.com</a><br>
+        Monday - Saturday, 10am to 6pm <br>
+        Closed Sundays
+        <ul class="list-horizontal no-separator">
+          <li><a href="http://twitter.com/RawMaterials" title="Follow us on Twitter"><i class="lni lni-lg lni-twitter"></i></a></li>
+          <li><a href="http://facebook.com/RawMaterialsLA" title="Like us on Facebook"><i class="lni lni-lg lni-facebook"></i></a></li>
+          <li><a href="http://instagram.com/rawmaterialsartsupplies" title="Follow us on Instagram"><i class="lni lni-lg lni-instagram"></i></a></li>
+          <li><a href="https://www.pinterest.com/rawmaterialsla/" title="Follow us on Pinterest"><i class="lni lni-lg lni-pinterest"></i></a></li>
+          <li><a href="https://www.youtube.com/channel/UC8QdVII0oYUnrO5RLAcivSQ" title="Subscribe to our YouTube channel"><i class="lni lni-lg lni-youtube"></i></a></li>
+        </ul>
+      </div>
+      <div id="site-cart-contents" class="panel">
+      </div>
+      <template id="cart-loading">
+        <div class="contents">
+          <div class="cart">
+            <progress>
+          </div>
+        </div>
+      </template>
     </nav>
+
   </header>
 
   <style>
@@ -212,23 +205,31 @@
   </footer>
 
   <script>
-    /* Make <details> close when we click outside or on its <summary> */
-    document.querySelectorAll('details').forEach((details) => {
-      let closeDetailsOnClick= (ev) => {
-        let in_summary= details.contains(ev.target.closest('summary'))
-        if (!details.contains(ev.target) || in_summary) {
-          if (in_summary) {
-            ev.preventDefault(); ev.stopPropagation()
-          }
-          details.removeAttribute('open')
-          document.removeEventListener('click', closeDetailsOnClick)
-        }
-      }
-      details.addEventListener("toggle", (ev) => {
-        if (details.open) {
-          document.addEventListener('click', closeDetailsOnClick)
+    let togglePanel= (ev) => {
+      ev.preventDefault(); ev.stopPropagation();
+      let id= ev.currentTarget.dataset.target
+      document.querySelectorAll('.open-panel').forEach((panel) => {
+        if (panel.id != id) {
+          panel.style.display= 'none';
+          panel.open= false
+          panel.dispatchEvent(new Event('toggle'))
         }
       })
+      let panel= document.getElementById(id)
+      if (panel.style.display == 'block') {
+        panel.style.display= 'none'
+        panel.classList.remove('open-panel')
+        panel.open= false
+      } else {
+        panel.style.display= 'block'
+        panel.classList.add('open-panel')
+        panel.open= true
+      }
+      panel.dispatchEvent(new Event('toggle'))
+    }
+
+    document.querySelectorAll('[data-toggle="panel"]').forEach((button) => {
+      button.addEventListener('click', togglePanel);
     })
 
     window.getCookie= function(name) {
@@ -242,10 +243,10 @@
       try {
         details= JSON.parse(details)
         if (details.items > 0) {
-          var icon= document.querySelector('#cart .lni-cart')
+          var icon= document.querySelector('#site-cart .lni-cart')
           icon.classList.remove('lni-cart')
           icon.classList.add('lni-cart-full')
-          var badge= document.querySelector('#cart .badge')
+          var badge= document.querySelector('#site-cart .badge')
           badge.innerText= details.items
         }
       } catch (err) {
@@ -253,7 +254,7 @@
       }
     }
 
-    let cart= document.getElementById('cart')
+    let cart= document.getElementById('site-cart-contents')
     cart.addEventListener('toggle', (ev) => {
       if (ev.currentTarget.open) {
         let loading= document.getElementById('cart-loading').content.firstElementChild.cloneNode(true);
@@ -282,7 +283,7 @@
         })
       } else {
         let contents= cart.querySelector('.contents')
-        cart.removeChild(contents);
+        if (contents) cart.removeChild(contents);
       }
     })
 
