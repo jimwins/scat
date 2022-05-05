@@ -46,6 +46,7 @@ class Page {
     $content->title= $request->getParam('title');
     $content->content= $request->getParam('content');
     $content->description= $request->getParam('description');
+    $content->format= $request->getParam('format');
     $content->save();
 
     $uri= $request->getUri()->withQuery("");
