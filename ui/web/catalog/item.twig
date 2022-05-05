@@ -66,13 +66,13 @@ figure img {
 <div class="item-info">
   <div class="media">
     {{ include('carousel.twig', { images: item.media ?: product.media }) }}
-    <div class="input-group" style="width: 100%">
-      <label class="input-group-addon" for="code">
+    <div class="input-group block">
+      <label for="code">
         Code
       </label>
-      <p class="form-control form-control-static">
+      <div class="fake-input">
         {{ item.code }}
-      </p>
+      </div>
     </div>
   </div>
 
@@ -172,12 +172,14 @@ figure img {
         <input type="hidden" name="name" value="{{ item.name }}">
         <input type="hidden" name="sale_price"
                value="{{ item.sale_price }}">
-        <label for="quantity">
-          Quantity
-        </label>
-        <input type="text" class="input"
-               id="quantity" name="quantity"
-               value="{{ item.purchase_quantity }}">
+        <div class="input-group">
+          <label for="quantity">
+            Quantity
+          </label>
+          <input type="text" class="input"
+                 id="quantity" name="quantity"
+                 value="{{ item.purchase_quantity }}">
+        </div>
         {% if item.purchase_quantity > 1 %}
           <span class="help-block">
             Must be multiple of {{ item.purchase_quantity }}.
