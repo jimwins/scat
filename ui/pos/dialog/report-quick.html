@@ -25,8 +25,8 @@
         <td>{{ day.raw_date | date("l, F j") }}</td>
         <td>{{ day.transactions }}</td>
         <td>{{ scat.amount(day.total / day.transactions) }}</td>
-        <td>{{ scat.amount(day.online) }}</td>
         <td>{{ scat.amount(day.in_person) }}</td>
+        <td>{{ scat.amount(day.online) }}</td>
         <td>{{ scat.amount(day.total) }}</td>
       </tr>
     {% endfor %}
