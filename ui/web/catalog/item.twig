@@ -30,8 +30,12 @@
 .item-info {
   display: grid;
   grid-template-columns: auto auto auto;
+  grid-template-rows: min-content auto;
   grid-gap: 2em;
   max-width: calc(1070px - 4em);
+}
+.item-info > .description {
+  grid-column: 1 / 4;
 }
 figure {
   margin: 0;
@@ -45,6 +49,18 @@ figure img {
   border-radius: var(--border-radius);
 }
 
+@media (min-width: 600px) {
+  .item-info {
+    display: grid;
+    grid-template-columns: 40% 30% 30%;
+  }
+  .item-info > .media {
+    grid-row: 1 / 3;
+  }
+  .item-info > .description {
+    grid-column: 2 / 4;
+  }
+}
 </style>
 
 <div class="item-info">
@@ -177,19 +193,20 @@ figure img {
       </button>
     {% endif %}
   </div>
-</div>
 
-<hr>
+  <div class="description">
+    <hr>
 
-{{ item.description ?? product.description | markdown }}
+    {{ item.description ?? product.description | markdown }}
 
-{% if item.prop65 %}
-  <a class="pull-right" href="/proposition-65-warning" data-toggle="tooltip" title="WARNING: This product can expose you to chemicals which are known to the state of California to cause cancer and/or to cause birth defects or other reproductive harm. Click for more details."><img src="/static/msds/warning.svg" width="20" alt="WARNING"></a>
-{% endif %}
-{% if item.hazmat %}
-  <a class="pull-right" href="/shipping#hazmat" data-toggle="tooltip" title="Hazardous materials: special shipping is required, and there may be additional costs. Click for more details."><img src="/static/msds/dot-limited-quantity-surface.svg" width="20" alt="Hazardous Materials"></a>
-{% endif %}
-{% if item.oversized %}
-  <a class="pull-right" href="/shipping#oversized" data-toggle="tooltip" title="Oversized item: special shipping is required, and there will be additional costs. Click for more details."><i class="lni lni-delivery"></i></a>
-{% endif %}
+    {% if item.prop65 %}
+      <a class="pull-right" href="/proposition-65-warning" data-toggle="tooltip" title="WARNING: This product can expose you to chemicals which are known to the state of California to cause cancer and/or to cause birth defects or other reproductive harm. Click for more details."><img src="/static/msds/warning.svg" width="20" alt="WARNING"></a>
+    {% endif %}
+    {% if item.hazmat %}
+      <a class="pull-right" href="/shipping#hazmat" data-toggle="tooltip" title="Hazardous materials: special shipping is required, and there may be additional costs. Click for more details."><img src="/static/msds/dot-limited-quantity-surface.svg" width="20" alt="Hazardous Materials"></a>
+    {% endif %}
+    {% if item.oversized %}
+      <a class="pull-right" href="/shipping#oversized" data-toggle="tooltip" title="Oversized item: special shipping is required, and there will be additional costs. Click for more details."><i class="lni lni-delivery"></i></a>
+    {% endif %}
+  </div>
 </div>
