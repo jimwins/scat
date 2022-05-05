@@ -65,6 +65,7 @@ class Report
            FROM (SELECT 
                         txn.uuid,
                         txn.online_sale_id,
+                        txn.shipping_address_id,
                         paid,
                         CAST(ROUND_TO_EVEN(
                           SUM(IF(txn_line.taxfree, 1, 0) *
