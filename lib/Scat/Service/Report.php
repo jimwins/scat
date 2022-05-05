@@ -47,11 +47,13 @@ class Report
     $q= "SELECT DATE_FORMAT(paid, '$format') AS span,
                 SUM(taxed + untaxed) AS total,
                 SUM(IF(tax_rate OR uuid, 0, taxed + untaxed)) AS resale,
-                SUM(IF(online_sale_id, 0, taxed + untaxed)) AS in_person,
-                SUM(IF(online_sale_id, taxed + untaxed, 0)) AS online,
-                SUM(IF(online_sale_id AND shipping_address_id = 1,
+                SUM(IF(online_sale_id IS NULL, taxed + untaxed, 0))
+                  AS in_person,
+                SUM(IF(online_sale_id IS NOT NULL, taxed + untaxed, 0))
+                  AS online,
+                SUM(IF(online_sale_id IS NOT NULL AND shipping_address_id = 1,
                         taxed + untaxed, 0)) AS pickup,
-                SUM(IF(online_sale_id AND shipping_address_id > 1,
+                SUM(IF(online_sale_id IS NOT NULL AND shipping_address_id > 1,
                         taxed + untaxed, 0)) AS shipped,
                 SUM(IF(uuid, tax,
                        ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)))
