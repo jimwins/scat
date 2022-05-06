@@ -12,22 +12,22 @@
   <thead>
     <tr>
       <th>Day</th>
-      <th>Sales</th>
-      <th>Average</th>
-      <th>In Person</th>
-      <th>Online</th>
-      <th>Total</th>
+      <th style="text-align: right">Sales</th>
+      <th style="text-align: right">Average</th>
+      <th style="text-align: right">In Person</th>
+      <th style="text-align: right">Online</th>
+      <th style="text-align: right">Total</th>
     </tr>
   </thead>
   <tbody>
     {% for day in sales %}
       <tr>
         <td>{{ day.raw_date | date("l, F j") }}</td>
-        <td>{{ day.transactions }}</td>
-        <td>{{ scat.amount(day.total / day.transactions) }}</td>
-        <td>{{ scat.amount(day.in_person) }}</td>
-        <td>{{ scat.amount(day.online) }}</td>
-        <td>{{ scat.amount(day.total) }}</td>
+        <td align="right">{{ day.transactions }}</td>
+        <td align="right">{{ scat.amount(day.total / day.transactions) }}</td>
+        <td align="right">{{ scat.amount(day.in_person) }}</td>
+        <td align="right">{{ scat.amount(day.online) }}</td>
+        <td align="right">{{ scat.amount(day.total) }}</td>
       </tr>
     {% endfor %}
   </tbody>
