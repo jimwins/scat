@@ -46,7 +46,6 @@ class Report
 
     $q= "SELECT DATE_FORMAT(paid, '$format') AS span,
                 SUM(taxed + untaxed) AS total,
-                SUM(IF(tax_rate OR uuid, 0, taxed + untaxed)) AS resale,
                 SUM(IF(online_sale_id IS NULL, taxed + untaxed, 0))
                   AS in_person,
                 SUM(IF(online_sale_id IS NOT NULL, taxed + untaxed, 0))
