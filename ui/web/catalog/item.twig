@@ -29,13 +29,8 @@
 <style>
 .item-info {
   display: grid;
-  grid-template-columns: auto auto auto;
-  grid-template-rows: min-content auto;
   grid-gap: 2em;
   max-width: calc(1070px - 4em);
-}
-.item-info > .description {
-  grid-column: 1 / 4;
 }
 figure {
   margin: 0;
@@ -49,10 +44,16 @@ figure img {
   border-radius: var(--border-radius);
 }
 
+@media (max-width: 599.8px) {
+  nav.breadcrumb {
+    display: none;
+  }
+}
+
 @media (min-width: 600px) {
   .item-info {
-    display: grid;
     grid-template-columns: 40% 30% 30%;
+    grid-template-rows: min-content auto;
   }
   .item-info > .media {
     grid-row: 1 / 3;
