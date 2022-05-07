@@ -8,11 +8,14 @@
   {% if person %}
     <h2>
       Welcome back{{ person ? ', ' ~ person.friendly_name }}!
-      <small><a href="{# url_for('logout') #}">(log out)</a></small>
+      <small>
+        (<a href="{# url_for('account') #}">view your account</a>
+        or <a href="{# url_for('logout') #}">log out</a>)
+      </small>
     </h2>
   {% else %}
     <h2>
-      Welcome! <a href="/login">Log in or create an account.</a>
+      Welcome! <a href="{# url_for('login')#}">Log in or create an account.</a>
     </h2>
   {% endif %}
 
@@ -54,7 +57,7 @@
       <label for="email">
         Email
       </label>
-      <input type="text" class="input" name="email" size="50">
+      <input type="email" class="input" name="email">
       <button role="submit" class="button">
         <i class="lni lni-cart"></i>
         <span class="label">Retrieve Saved Cart</span>
