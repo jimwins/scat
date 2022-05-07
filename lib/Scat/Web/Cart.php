@@ -12,18 +12,18 @@ class Cart {
 
   public function __construct(
     \Scat\Service\Data $data,
+    \Scat\Service\Auth $auth,
     View $view
   ) {
     $this->data= $data;
+    $this->auth= $auth;
     $this->view= $view;
   }
 
   public function cart(Request $request, Response $response)
   {
     $cart= $request->getAttribute('cart');
-    $person= [
-      'friendly_name' => 'Jim Winstead',
-    ];
+    $person= $this->auth->get_person_details($request);
 
     $template= 'cart/index.html';
 

@@ -1,0 +1,20 @@
+{% extends 'layout/page.html' %}
+
+{% block title %}
+  Account @ Raw Materials Art Supplies
+{% endblock %}
+
+{% block content %}
+  <h1 class="page-header">
+    Welcome back{{ person ? ', ' ~ person.friendly_name }}!
+    <small>
+      (<a href="{{ url_for('logout') }}">log out</a>)
+    </small>
+  </h1>
+
+  {% if success == 'login' %}
+    <div class="alert alert-success">
+      <b>Success!</b> You have been logged in to your account successfully.
+    </div>
+  {% endif %}
+{% endblock %}

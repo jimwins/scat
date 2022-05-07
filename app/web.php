@@ -138,7 +138,19 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
 /* Tracking */
 // TODO
 
-/* Rewards */
+/* Auth & Rewards */
+$app->group('', function (RouteCollectorProxy $app) {
+  $app->get('/account', [ \Scat\Web\Auth::class, 'account' ])
+      ->setName('account');
+  $app->get('/login/key/{key:.*}', [ \Scat\Web\Auth::class, 'handleLoginKey' ])
+      ->setName('handleLoginKey');
+  $app->get('/login', [ \Scat\Web\Auth::class, 'loginForm' ])
+      ->setName('login');
+  $app->post('/login', [ \Scat\Web\Auth::class, 'handleLogin' ])
+      ->setName('handleLogin');
+  $app->get('/logout', [ \Scat\Web\Auth::class, 'logout' ])
+      ->setName('logout');
+});
 
 /* Webhooks */
 

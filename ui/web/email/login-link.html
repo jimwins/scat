@@ -1,0 +1,15 @@
+{% extends 'layout/email.html' %}
+
+{% block title -%}
+  Log in to your account
+{%- endblock %}
+
+{% block content_top %}
+  <p>Here is a link to log in to your account on our website:</p>
+{% endblock %}
+
+{% set call_to_action_url= link %}
+
+{% block call_to_action %}
+  Log in
+{% endblock %}

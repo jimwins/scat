@@ -1,0 +1,67 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title -%}
+  Sign In @ Raw Materials Art Supplies
+{%- endblock %}
+
+{% block content %}
+<div style="max-width: 80ch; margin: auto">
+  <h1 class="page-header">
+    Rewards Program Sign-In
+  </h1>
+
+  {% if error == 'invalid_loyalty' %}
+    <div class="alert alert-danger">
+      <b>Request failed.</b> That number or email did not match up with any
+      accounts in our system.
+    </div>
+  {% endif %}
+
+  {% if error == 'invalid_key' %}
+    <div class="alert alert-danger">
+      <b>Login failed.</b> The key you provided was not valid. It may have
+      expired.
+    </div>
+  {% endif %}
+
+  {% if success == 'email_sent' %}
+    <div class="alert alert-success">
+      <b>Success!</b> An email has been sent with a link to log in. The link
+      will only work for the next 24 hours.
+    </div>
+  {% endif %}
+
+  {% if success == 'sms_sent' %}
+    <div class="alert alert-success">
+      <b>Success!</b> A text message has been sent with a link to log in. The
+      link will only work for the next 24 hours.
+    </div>
+  {% endif %}
+
+  {% if success == 'logout' %}
+    <div class="alert alert-success">
+      <b>Success!</b> You have been logged out of the website.
+    </div>
+  {% endif %}
+
+  <p class="lead">Are you a member of <a href="/rewards">our rewards
+  program</a>? We can text or email you a link to log you into the online
+  store so you can access the benefits of your rewards membership. (Standard
+  messaging and data rates may apply.)</p>
+
+  <form class="stacked-form"
+        method="POST" action="{{ url_for('handleLogin') }}">
+    <label for="loyalty">
+      What is the phone number or email address for your loyalty account?
+    </label>
+    <input type="text" class="input"
+            name="loyalty" value="{{ loyalty }}"
+            placeholder="213-627-7223 or vincent.van.gogh@example.com">
+    <button type="submit" class="button">
+      Get Login Link
+    </button>
+  </form>
+</div>
+
+{% endblock %}
