@@ -194,7 +194,7 @@ label {
 }
 
 label + .input, label + .select {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 select {
@@ -477,12 +477,22 @@ hr {
   border-color: #bce8f1;
 }
 
-h1.page-header {
-  border-bottom: 1px solid var(--light-primary-color);
+:is(h1, h2, h3) {
+  line-height: 1.2;
 }
-h1 > small {
+
+:is(h2, h3):not(:first-child) {
+  margin-top: 2em;
+}
+
+:is(h1, h2, h3, h4, h5) > small {
   font-weight: normal;
   color: #555;
+}
+
+h1.page-header {
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--light-primary-color);
 }
 
 nav#site-navigation {
@@ -684,4 +694,10 @@ nav#site-navigation #site-cart-contents {
   border: 1px solid #ccc;
   border-radius: var(--border-radius);
   margin-bottom: 2em;
+}
+
+p.lead {
+  font-size: 1.25em;
+  font-weight: 300;
+  line-height: 1.4;
 }
