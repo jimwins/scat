@@ -48,22 +48,20 @@
   }
 </style>
 
-  {% if not cart.email %}
-    <div class="well">
-      <p>Want to retrieve a cart that you saved? Enter your email address and
-      we'll email you a link to access it.</p>
+  <div class="well">
+    <p>Want to retrieve a cart that you saved? Enter your email address and
+    we'll email you a link to access it.</p>
 
-      <form class="stacked-form"
-            method="POST" action="{# url_for('cart-retrieve') #}">
-        <label for="email">
-          Email
-        </label>
-        <input type="email" class="input" name="email">
-        <button role="submit" class="button">
-          <i class="lni lni-cart"></i>
-          <span class="label">Retrieve Saved Cart</span>
-        </button>
-      </form>
-    </div>
-  {% endif %}
+    <form class="stacked-form"
+          method="POST" action="{# url_for('cart-retrieve') #}">
+      <label for="email">
+        Email
+      </label>
+      <input type="email" class="input" name="email">
+      <button role="submit" class="button">
+        <i class="lni lni-cart"></i>
+        <span class="label">Retrieve Saved Cart</span>
+      </button>
+    </form>
+  </div>
 {% endblock %}
