@@ -25,14 +25,7 @@ class Cart {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
 
-    $template= 'cart/index.html';
-
-    $accept= $request->getHeaderLine('Accept');
-    if (strpos($accept, 'application/vnd.scat.cart+html') !== false) {
-      $template= 'cart/popup.html';
-    }
-
-    return $this->view->render($response, $template, [
+    return $this->view->render($response, 'cart/index.html', [
       'person' => $person,
       'cart' => $cart,
     ]);

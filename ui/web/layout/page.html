@@ -49,7 +49,6 @@
       </div>
       <div id="site-cart">
         <a class="button"
-            data-toggle="panel" data-target="site-cart-contents"
             href="/cart">
           <i class="lni lni-cart"></i>
           <span class="badge"></span>
@@ -87,15 +86,6 @@
           <li><a href="https://www.youtube.com/channel/UC8QdVII0oYUnrO5RLAcivSQ" title="Subscribe to our YouTube channel"><i class="lni lni-lg lni-youtube"></i></a></li>
         </ul>
       </div>
-      <div id="site-cart-contents" class="panel">
-      </div>
-      <template id="cart-loading">
-        <div class="contents">
-          <div class="cart">
-            <progress>
-          </div>
-        </div>
-      </template>
     </nav>
 
   </header>
@@ -253,39 +243,6 @@
         // don't care
       }
     }
-
-    let cart= document.getElementById('site-cart-contents')
-    cart.addEventListener('toggle', (ev) => {
-      if (ev.currentTarget.open) {
-        let loading= document.getElementById('cart-loading').content.firstElementChild.cloneNode(true);
-        cart.appendChild(loading);
-
-        fetch('/cart', {
-          headers: {
-            'Accept': 'application/vnd.scat.cart+html'
-          }
-        })
-        .then((res) => {
-          if (res.status >= 200 && res.status < 300) {
-            return Promise.resolve(res)
-          }
-          return Promise.reject(new Error(res.statusText))
-        })
-        .then((res) => { return res.text() })
-        .then((text) => {
-          return new Promise((resolve, reject) => {
-            let template= document.createElement('template')
-            template.innerHTML= text.trim()
-            let contents= template.content.firstChild
-            cart.removeChild(loading)
-            cart.appendChild(contents)
-          })
-        })
-      } else {
-        let contents= cart.querySelector('.contents')
-        if (contents) cart.removeChild(contents);
-      }
-    })
 
     /* Progressive enhancement: make whole .card clickable */
     function handleCardClick(ev) {
