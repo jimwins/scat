@@ -130,7 +130,7 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
 $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Web\Cart::class, 'cart' ])
       ->setName('cart');
-});
+})->add($container->get(\Scat\Middleware\Cart::class));
 
 /* Contact */
 // TODO

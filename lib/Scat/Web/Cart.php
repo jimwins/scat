@@ -20,7 +20,7 @@ class Cart {
 
   public function cart(Request $request, Response $response)
   {
-    $cart= null;
+    $cart= $request->getAttribute('cart');
     $person= [
       'friendly_name' => 'Jim Winstead',
     ];
