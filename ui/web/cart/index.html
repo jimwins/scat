@@ -5,5 +5,60 @@
 {% endblock %}
 
 {% block content %}
-  UUID {{ cart.uuid }}
+  {% if person %}
+    <h2>
+      Welcome back{{ person ? ', ' ~ person.friendly_name }}!
+      <small><a href="{# url_for('logout') #}">(log out)</a></small>
+    </h2>
+  {% else %}
+    <h2>
+      Welcome! <a href="/login">Log in or create an account.</a>
+    </h2>
+  {% endif %}
+
+  {% if cart.is_empty() %}
+    <div class="alert alert-warning">
+      <b>You don't have anything in your cart.</b>
+      You can <a href="{{ url_for('catalog') }}">start browsing for art
+      supplies</a> or use the search form at the top of the page to find
+      what you need.
+    </div>
+
+    {# XXX show some popular products #}
+    <p>This is where I'll show some popular products.</p>
+  {% else %}
+
+  {% endif %}
+
+<style>
+  .stacked-form {
+    display: grid;
+    grid-gap: 0.5rem;
+    margin: 0 0 1em 0;
+  }
+  .well {
+    padding: 1em 1.5em;
+    background: #eee;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius);
+    margin-bottom: 2em;
+  }
+</style>
+
+  <div class="well">
+    <p>Want to retrieve a cart that you saved? Enter your email address and
+    we'll email you a link to access it.</p>
+
+    <form class="stacked-form"
+          method="POST" action="{# url_for('cart-retrieve') #}">
+      <label for="email">
+        Email
+      </label>
+      <input type="text" class="input" name="email" size="50">
+      <button role="submit" class="button">
+        <i class="lni lni-cart"></i>
+        <span class="label">Retrieve Saved Cart</span>
+      </button>
+    </form>
+  </div>
 {% endblock %}

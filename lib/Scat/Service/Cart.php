@@ -11,4 +11,8 @@ class Cart
     $this->data= $data;
   }
 
+  public function is_empty() {
+    return true;
+  }
+
 }
