@@ -1205,6 +1205,17 @@ class Catalog {
         if (count($variations) == 1 && $variations[0] == '') {
           $variations= null;
         }
+
+        if ($request->getAttribute('no_solo_item') && count($items) == 1) {
+          $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+          $routeParser= $routeContext->getRouteParser();
+          return $response->withRedirect(
+            $routeParser->urlFor(
+              'catalog',
+              $items[0]->url_params()
+            )
+          );
+        }
       }
 
       $brands= $deptO ? null : $this->catalog->getBrands();

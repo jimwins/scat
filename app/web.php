@@ -120,7 +120,10 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
       ->setName('catalog-brand');
   $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]',
             [ \Scat\Controller\Catalog::class, 'catalogPage' ])
-      ->setName('catalog');
+      ->setName('catalog')
+      ->add(function ($request, $handler) {
+          return $handler->handle($request->withAttribute('no_solo_item', true));
+      });
 });
 
 /* Buy a Gift Card */
