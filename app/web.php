@@ -139,7 +139,34 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
 // TODO
 
 /* Tracking */
-// TODO
+$app->group('/track', function (RouteCollectorProxy $app) {
+  $app->get('/{service}/{code}', function ($request, $response, $service, $code)
+  {
+    switch ($service) {
+    case 'ups':
+    case 'upsdap':
+      $uri= 'http://wwwapps.ups.com/WebTracking/processInputRequest?AgreeToTermsAndConditions=yes&track.x=38&track.y=9&InquiryNumber1=' . $code;
+      return $response->withRedirect($uri);
+    case 'usps':
+      $uri= 'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=' . $code;
+      return $response->withRedirect($uri);
+    case 'ontrac':
+      $uri= 'http://www.ontrac.com/trackingres.asp?tracking_number=' . $code;
+      return $response->withRedirect($uri);
+    case 'fedex':
+      $uri= 'https://www.fedex.com/apps/fedextrack/?cntry_code=us&tracknumbers=' . $code;
+      return $response->withRedirect($uri);
+    case 'gso':
+      $uri= 'https://www.gso.com/Tracking/PackageDetail?TrackingNumber=' . $code;
+      return $response->withRedirect($uri);
+    case 'yrc':
+      $uri= 'http://my.yrc.com/dynamic/national/servlet?CONTROLLER=com.rdwy.ec.rextracking.http.controller.ProcessPublicTrackingController&PRONumber=' . $code;
+      return $response->withRedirect($uri);
+    default:
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+  });
+});
 
 /* Auth & Rewards */
 $app->group('', function (RouteCollectorProxy $app) {
