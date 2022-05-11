@@ -31,6 +31,7 @@
   display: grid;
   grid-gap: 2em;
   max-width: calc(1070px - 4em);
+  padding-bottom: 1em;
 }
 figure {
   margin: 0;
@@ -95,8 +96,7 @@ figure img {
 
     <div id="afterpay-clearpay-message"></div>
 
-    {# if /*(CAN_SHIP || CAN_PICKUP) and */ (item.minimum_quantity or item.stocked) #}
-    {% if (item.minimum_quantity or item.stocked) %}
+    {% if item.minimum_quantity or item.stock %}
       {% if item.stock > 0 %}
         <p class="text-success">In stock</p>
       {% else %}
@@ -111,62 +111,61 @@ figure img {
         {% endif %}
       {% endif %}
     {% else %}
-      {# if /*not (CAN_SHIP || CAN_PICKUP) and CAN_DROPSHIP */ and item.is_dropshippable #}
-      {% if item.is_dropshippable %}
-        <p class="text-warning" data-toggle="tooltip" title="Sorry, we don't have live stock information for items that are drop-shipped.">Maybe</p>
+      {% if item.no_backorder %}
+        <p data-toggle="tooltip" class="text-danger" title="This item is currently unavailable.">Unavailable</p>
       {% else %}
-        {% if item.no_backorder %}
-          <p data-toggle="tooltip" class="text-danger" title="This item is currently unavailable.">Unavailable</p>
+        {% if item.dropship_fee > 0 %}
+          <span data-toggle="tooltip" title="This item will be shipped directly to you.">Shipped direct</span>
         {% else %}
-          {% if item.dropship_fee > 0 %}
-            <span data-toggle="tooltip" title="This item will be shipped directly to you.">Shipped direct</span>
-          {% else %}
-            <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Out of stock, special order</span>
-          {% endif %}
+          <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Out of stock, special order</span>
         {% endif %}
       {% endif %}
     {% endif %}
 
-    <p>
-      <b>FREE</b> curbside pickup
-      {% if shipping_options.local %}
-        {% if shipping_options.local is same as(0) %}
-          <b>FREE local delivery
-        {% else %}
+    {% if item.stock or not item.no_backorder %}
+      <p>
+        <b>FREE</b> curbside pickup
+        {% set local= item.estimate_local_delivery_rate() %}
+        {% if local %}
           <br>
-          Local delivery starting at {{ scat.amount(shipping_options.local) }}
+          Local delivery starting at {{ scat.amount(local) }}
         {% endif %}
-      {% endif %}
-      {% if item.oversized %}
-        <br><span class="text-warning">Shipping not available</span>
-      {% endif %}
-      {% if shipping_options.shipping is defined and not shipping_options.shipping is same as(false) %}
-        {% if shipping_options.shipping == 0 %}
-          {% if item.dropship_fee > 0 %}
-            <br>Shipped direct for {{ scat.amount(item.dropship_fee) }}/order
-          {% else %}
-            <br><b>FREE</b> Nationwide shipping
-          {% endif %}
+        {% if item.oversized %}
+          <br><span class="text-warning">Shipping not available</span>
         {% else %}
-          <br>
-          Nationwide shipping starting at {{ scat.amount(shipping_options.shipping) }}
-          {% if item.dropship_fee > 0 %}
-            plus a {{ scat.amount(item.dropship_fee) }}/order dropship fee.
-          {% endif%}
-          <br>
-          {% if item.no_free_shipping or item.dropship_fee %}
-            <span class="text-warning">This item is not eligible for free shipping.</span>
+          {% set shipping= item.estimate_shipping_rate() %}
+          {% if shipping is null %}
+            <br><span class="text-danger">Unable to estimate shipping</span>
           {% else %}
-            <span class="text-success">FREE shipping with order over $79.</span>
+            {% if item.can_ship_free and item.sale_price > 79 %}
+              {% if item.dropship_fee > 0 %}
+                <br>Shipped direct for
+                {{ scat.amount(item.dropship_fee) }}/order
+              {% else %}
+                <br><b>FREE</b> nationwide shipping
+              {% endif %}
+            {% else %}
+              <br>
+              Nationwide shipping starting at
+              {{ scat.amount(shipping) }}
+              {% if item.dropship_fee > 0 %}
+                plus a {{ scat.amount(item.dropship_fee) }}/order dropship fee.
+              {% endif%}
+            {% endif %}
+            <br>
+            {% if item.dropship_fee or not item.can_ship_free %}
+              <span class="text-warning">This item is not eligible for free shipping</span>
+            {% else %}
+              <span class="text-success"><b>FREE</b> shipping with order over $79</span>
+            {% endif %}
           {% endif %}
         {% endif %}
-      {% endif %}
-    </p>
+      </p>
+    {% endif %}
   </div>
 
   <div class="order">
-    {% if 1 %}
-    {# <check if="@FEATURE_cart && @CAN_ORDER && (((@CAN_PICKUP || @CAN_SHIP) && (@item.stock || !@item.no_backorder)) || (@CAN_DROPSHIP && @item.is_dropshippable && !@item.no_backorder))"> #}
+    {% if item.stock or not item.no_backorder %}
       <form class="form-inline add-item"
             action="/cart/add-item" method="POST">
         <input type="hidden" name="item" value="{{ item.code }}">
@@ -186,13 +185,13 @@ figure img {
             Must be multiple of {{ item.purchase_quantity }}.
           </span>
         {% endif %}
-        <button type="submit" class="button block btn-lg">
+        <button type="submit" class="button block">
           <i class="lni lni-circle-plus"></i>
           <span class="label">Add to Cart</span>
         </button>
       </form>
     {% else %}
-      <button class="btn btn-block btn-lg btn-danger" disabled>
+      <button class="button block" disabled>
         Unavailable
       </button>
     {% endif %}
@@ -203,14 +202,18 @@ figure img {
 
     {{ item.description ?? product.description | markdown }}
 
-    {% if item.prop65 %}
-      <a class="pull-right" href="/proposition-65-warning" data-toggle="tooltip" title="WARNING: This product can expose you to chemicals which are known to the state of California to cause cancer and/or to cause birth defects or other reproductive harm. Click for more details."><img src="/static/msds/warning.svg" width="20" alt="WARNING"></a>
-    {% endif %}
-    {% if item.hazmat %}
-      <a class="pull-right" href="/shipping#hazmat" data-toggle="tooltip" title="Hazardous materials: special shipping is required, and there may be additional costs. Click for more details."><img src="/static/msds/dot-limited-quantity-surface.svg" width="20" alt="Hazardous Materials"></a>
-    {% endif %}
-    {% if item.oversized %}
-      <a class="pull-right" href="/shipping#oversized" data-toggle="tooltip" title="Oversized item: special shipping is required, and there will be additional costs. Click for more details."><i class="lni lni-delivery"></i></a>
+    {% if item.prop65 or item.hazmat or item.oversized %}
+      <div class="alert alert-warning">
+        {% if item.prop65 %}
+          <p><a href="/proposition-65-warning"><img src="{{ STATIC }}/msds/warning.svg" width="16" alt="WARNING"> WARNING:</a> This product can expose you to chemicals which are known to the state of California to cause cancer and/or to cause birth defects or other reproductive harm.</p>
+        {% endif %}
+        {% if item.hazmat %}
+          <p><a href="/shipping#hazmat"><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"> Hazardous materials:</a> special shipping is required, and there may be additional costs.</p>
+        {% endif %}
+        {% if item.oversized %}
+          <p><a href="/shipping#oversized"><i class="lni lni-delivery"></i> Oversized item:</a> special shipping is required, and there will be additional costs.</p>
+        {% endif %}
+      </div>
     {% endif %}
   </div>
 </div>

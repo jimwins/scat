@@ -562,6 +562,27 @@ class Item extends \Scat\Model {
     return "standard";
   }
 
+  public function estimate_local_delivery_rate() {
+    $dims= [ [ $this->width, $this->height, $this->length ] ];
+    $local= \Scat\Service\Shipping::get_base_local_delivery_rate($dims, $this->weight);
+    if ($local) {
+      // assume 2-mile minimum delivery
+      return ($local + 3) * 1.05;
+    }
+    return null;
+  }
+
+  public function estimate_shipping_rate() {
+    if ($this->can_ship_first_class_package()) {
+      return 4.99;
+    }
+
+    $box= \Scat\Service\Shipping::get_shipping_box([ [ $this->width, $this->height, $this->length ] ]);
+    if ($box) {
+      return 9 + $box[4];
+    }
+  }
+
   public function variations() {
     return $this->factory('Item')
       ->where('product_id', $this->product_id)

@@ -8,7 +8,7 @@ class Shipping
 
   # TODO put this in a database table
   # width, height, depth, weight (lb), cost
-  private $all_boxes= [
+  static private $all_boxes= [
     [  5,     5,     3.5,  0.13, 0.39 ],
     [  9,     5,     3,    0.21, 0.53 ],
     [  9,     8,     8,    0.48, 0.86 ],
@@ -27,6 +27,94 @@ class Shipping
     [ 42,    32,     5,    2.09, 2.50 ], # guess
     [ 54,     4,     4,    0.88, 0.00 ],
     [ 87,     4,     4,    1.28, 0.00 ],
+  ];
+
+  # TODO put this in a database table
+  static public $test_addresses= [
+    [
+      'name' => 'Test Address',
+      'street1' => '76 9TH AVE',
+      'city' => 'NEW YORK',
+      'state' => 'NY',
+      'zip' => '10011',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '401 N TRYON ST',
+      'city' => 'CHARLOTTE',
+      'state' => 'NC',
+      'zip' => '28202',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '2332 GALIANO ST',
+      'city' => 'CORAL GABLES',
+      'state' => 'FL',
+      'zip' => '33134',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '2590 PEARL ST',
+      'city' => 'BOULDER',
+      'state' => 'CO',
+      'zip' => '80302',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '1600 AMPHITHEATRE PKWY',
+      'city' => 'MOUNTAIN VIEW',
+      'state' => 'CA',
+      'zip' => '94043',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '4021 VERNON AVE S',
+      'city' => 'MINNEAPOLIS',
+      'state' => 'MN',
+      'zip' => '55416',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '201 COLORADO ST',
+      'city' => 'AUSTIN',
+      'state' => 'TX',
+      'zip' => '78701',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '651 N 34TH ST',
+      'city' => 'SEATTLE',
+      'state' => 'WA',
+      'zip' => '98103',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '4581 WEBB ST',
+      'city' => 'PRYOR',
+      'state' => 'OK',
+      'zip' => '74361',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '201 S DIVISION ST',
+      'city' => 'ANN ARBOR',
+      'state' => 'MI',
+      'zip' => '48104',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '364 S KING ST',
+      'city' => 'HONOLULU',
+      'state' => 'HI',
+      'zip' => '96813',
+    ],
+    [
+      'name' => 'Test Address',
+      'street1' => '631 E INTERNATIONAL AIRPORT RD',
+      'city' => 'ANCHORAGE',
+      'state' => 'AK',
+      'zip' => '99518',
+    ],
   ];
 
   public function __construct(Config $config, Data $data) {
@@ -135,8 +223,8 @@ class Shipping
     return false;
   }
 
-  function get_shipping_box($items) {
-    return self::fits_in_box($this->all_boxes, $items);
+  static function get_shipping_box($items) {
+    return self::fits_in_box(self::$all_boxes, $items);
   }
 
   function get_shipping_estimate($box, $weight, $hazmat, $dest) {
@@ -160,14 +248,11 @@ class Shipping
       'options' => $options,
     ];
 
-    error_log(json_encode($details));
-
     $shipment= $this->createShipment($details);
 
     $best_rate= null;
 
     foreach ($shipment->rates as $rate) {
-      error_log("rate: {$rate->carrier} / {$rate->service}: {$rate->rate}\n");
       if ($hazmat) {
         if (in_array($rate->carrier, [ 'USPS' ]) &&
             $rate->service == 'ParcelSelect' &&
@@ -201,6 +286,34 @@ class Shipping
     }
 
     return [ $best_rate + $box[4], $method ];
+  }
+
+  static function get_base_local_delivery_rate($item_dim, $weight) {
+    $truck_sizes= [
+      'sm' => [ [ 30, 25, 16 ], [ 108, 4, 4 ] ],
+      'md' => [ [ 46, 38, 36 ] ],
+      'lg' => [ [ 74, 42, 36 ], [ 108, 8, 8 ] ],
+      'xl' => [ [ 85, 56, 36 ] ],
+      'xxl' => [ [ 150, 60, 60 ] ],
+    ];
+
+    $base= [
+      'sm' => 13,
+      'md' => 35,
+      'lg' => 55,
+      'xl' => 95,
+      'xxl' => 170,
+    ];
+
+    $best= null;
+    // figure out cargo size
+    foreach ($truck_sizes as $name => $sizes) {
+      if (self::fits_in_box($sizes, $item_dim)) {
+        return $base[$name];
+      }
+    }
+
+    return false;
   }
 
   static function address_is_po_box($address) {
