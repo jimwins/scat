@@ -4,8 +4,65 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91184fd09bee7758f2819b8c90a9d826",
+    "content-hash": "29fc6a7694df2c2941d2dba355dfa063",
     "packages": [
+        {
+            "name": "akrabat/ip-address-middleware",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/akrabat/ip-address-middleware.git",
+                "reference": "00e090afb08274320b86108130a23f59da9cd3f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/akrabat/ip-address-middleware/zipball/00e090afb08274320b86108130a23f59da9cd3f6",
+                "reference": "00e090afb08274320b86108130a23f59da9cd3f6",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0",
+                "psr/http-message": "^1.0",
+                "psr/http-server-middleware": "^1.0"
+            },
+            "replace": {
+                "akrabat/rka-ip-address-middleware": "*"
+            },
+            "require-dev": {
+                "laminas/laminas-diactoros": "^2.4",
+                "phpunit/phpunit": "^8.5.8 || ^9.4",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "RKA\\Middleware\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Rob Allen",
+                    "email": "rob@akrabat.com",
+                    "homepage": "http://akrabat.com"
+                }
+            ],
+            "description": "PSR-15 middleware that determines the client IP address and stores it as a ServerRequest attribute",
+            "homepage": "http://github.com/akrabat/rka-ip-address-middleware",
+            "keywords": [
+                "IP",
+                "middleware",
+                "psr7"
+            ],
+            "support": {
+                "issues": "https://github.com/akrabat/ip-address-middleware/issues",
+                "source": "https://github.com/akrabat/ip-address-middleware/tree/2.1.0"
+            },
+            "time": "2021-11-11T21:19:34+00:00"
+        },
         {
             "name": "amzn/amazon-pay-api-sdk-php",
             "version": "2.3.2",
@@ -406,6 +463,48 @@
                 "source": "https://github.com/cakephp/utility"
             },
             "time": "2022-01-28T18:02:00+00:00"
+        },
+        {
+            "name": "cleantalk/php-antispam",
+            "version": "2.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CleanTalk/php-antispam.git",
+                "reference": "de6fd320f12836cbb20dcc92de8af2477c88e91e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CleanTalk/php-antispam/zipball/de6fd320f12836cbb20dcc92de8af2477c88e91e",
+                "reference": "de6fd320f12836cbb20dcc92de8af2477c88e91e",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/cleantalk-php-patch.php"
+                ],
+                "psr-4": {
+                    "Cleantalk\\": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "description": "PHP API for antispam service cleantalk.org. Invisible protection from spam, no captches, no puzzles, no animals and no math.",
+            "homepage": "http://cleantalk.org",
+            "keywords": [
+                "anti-spam",
+                "antispam",
+                "api",
+                "spam"
+            ],
+            "support": {
+                "email": "welcome@cleantalk.org",
+                "issues": "https://github.com/CleanTalk/php-antispam/issues",
+                "source": "https://github.com/CleanTalk/php-antispam/tree/2.6"
+            },
+            "time": "2021-05-26T06:30:07+00:00"
         },
         {
             "name": "cloudstek/php-laff",

@@ -1,0 +1,22 @@
+{% extends 'layout/email.html' %}
+
+{% block title -%}
+  {{ subject }}
+{%- endblock %}
+
+{% block content_top %}
+  <p>{{ message }}</p>
+
+  <hr>
+{% endblock %}
+
+{% block content_bottom %}
+  <dl>
+    <dt>Name</dt>
+    <dd>{{ name }}</dd>
+    <dt>Email</dt>
+    <dd>{{ email }}</dd>
+    <dt>IP</dt>
+    <dd>{{ ip }}</dd>
+  </dl>
+{% endblock %}

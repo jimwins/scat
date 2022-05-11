@@ -69,7 +69,9 @@
         "amzn/amazon-pay-api-sdk-php": "^2.2",
         "cloudstek/php-laff": "dev-master",
         "twig/html-extra": "^3.3",
-        "google/apiclient": "^2.12.1"
+        "google/apiclient": "^2.12.1",
+        "cleantalk/php-antispam": "^2.6",
+        "akrabat/ip-address-middleware": "^2.1"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"

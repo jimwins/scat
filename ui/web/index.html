@@ -30,9 +30,9 @@
 
   <main>
     {% if content.format == 'markdown' %}
-      {{ content.content | markdown }}
+      {{ include(template_from_string(content.content)) | markdown }}
     {% else %}
-      {{ content.content | raw }}
+      {{ include(template_from_string(content.content)) | raw }}
     {% endif %}
   </main>
 

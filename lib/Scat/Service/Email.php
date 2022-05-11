@@ -11,6 +11,13 @@ class Email {
     $this->from_name= $config->get('email.from_name');
   }
 
+  public function default_from_address() {
+    return [
+      'name' => $this->from_name,
+      'email' => $this->from_email,
+    ];
+  }
+
   public function send($to, $subject, $body,
                         $attachments= null, $options= null)
   {
@@ -52,7 +59,7 @@ class Email {
 
     /* Always Bcc ourselves (for now) */
     $bcc= NULL;
-    if (!$GLOBALS['DEBUG']) {
+    if (!$GLOBALS['DEBUG'] && !@$options['no_bcc']) {
       $bcc= $this->from_name . " " . $this->from_email;
     }
 
@@ -68,7 +75,8 @@ class Email {
 
     return $postmark->sendEmail(
       $from, $to_list, $subject, $body, NULL, NULL, NULL,
-      NULL, $cc, $bcc, NULL, $attach, NULL, NULL, @$options['stream']
+      @$options['replyTo'], $cc, $bcc, NULL, $attach, NULL, NULL,
+      @$options['stream']
     );
   }
 

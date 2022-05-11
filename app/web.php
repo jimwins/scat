@@ -68,6 +68,9 @@ $container->set('view', function($container) {
   // Add the HTML extension
   $view->addExtension(new \Twig\Extra\Html\HtmlExtension());
 
+  // Add StringLoader extension
+  $view->addExtension(new \Twig\Extension\StringLoaderExtension());
+
   // Add our Twig extensions
   $view->addExtension(new \Scat\TwigExtension($container->get('config')));
 
@@ -133,10 +136,13 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
 $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Web\Cart::class, 'cart' ])
       ->setName('cart');
+  $app->post('/add-item', [ \Scat\Web\Cart::class, 'addItem' ]);
 })->add($container->get(\Scat\Middleware\Cart::class));
 
 /* Contact */
-// TODO
+$app->post('/contact', [ \Scat\Web\Contact::class, 'handleContact' ])
+    ->add(new \RKA\Middleware\IpAddress(/* TODO check proxy? */))
+    ->setName('handleContact');
 
 /* Tracking */
 $app->group('/track', function (RouteCollectorProxy $app) {
@@ -183,6 +189,7 @@ $app->group('', function (RouteCollectorProxy $app) {
 });
 
 /* Webhooks */
+// TODO
 
 /* Info (DEBUG only) */
 if ($DEBUG) {
@@ -197,6 +204,8 @@ if ($DEBUG) {
 
 /* Pages (everything else) */
 $app->get('/{param:.*}', [ \Scat\Web\Page::class, 'page' ]);
-$app->post('/{param:.*}', [ \Scat\Web\Page::class, 'savePage' ]);
+if ($DEBUG) {
+  $app->post('/~edit/{param:.*}', [ \Scat\Web\Page::class, 'savePage' ]);
+}
 
 $app->run();

@@ -40,7 +40,8 @@ class Page {
 
     $content= $this->data->factory('Page')->where('slug', $param)->find_one();
     if (!$content) {
-      // handle redirects
+      $content= $this->data->factory('Page')->create();
+      $content->slug= $param;
     }
 
     $content->title= $request->getParam('title');
@@ -49,9 +50,8 @@ class Page {
     $content->format= $request->getParam('format');
     $content->save();
 
-    $uri= $request->getUri()->withQuery("");
+    $uri= preg_replace('!/~edit!', '', $request->getUri()->withQuery(""));
 
     return $response->withRedirect($uri);
   }
 }
-
