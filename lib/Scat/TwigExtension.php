@@ -16,6 +16,7 @@ class TwigExtension
       'DEBUG' => $GLOBALS['DEBUG'],
       'PUBLIC' => ORDURE,
       'PUBLIC_CATALOG' => ORDURE . '/art-supplies',
+      'TIME' => $_SERVER['REQUEST_TIME_FLOAT'],
       'STATIC' => ORDURE_STATIC,
     ];
   }
