@@ -449,6 +449,7 @@ hr {
   float: right;
 }
 
+.text-success { color: #3d9970; /* olive */ }
 .text-important { color: #0074d9; /* blue */ }
 .text-muted { color: #555; /* dark gray */ }
 .text-danger { color: #800000; /* maroon */  }
