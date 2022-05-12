@@ -19,7 +19,8 @@
     </h2>
   {% endif %}
 
-  {% if cart.is_empty() %}
+  {% set items= cart.items.find_many() %}
+  {% if not items|length %}
     <div class="alert alert-warning">
       <b>You don't have anything in your cart.</b>
       You can <a href="{{ url_for('catalog') }}">start browsing for art
@@ -30,6 +31,8 @@
     {# XXX show some popular products #}
     <p>This is where I'll show some popular products.</p>
   {% else %}
+
+    <pre>{{ items |json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
 
   {% endif %}
 

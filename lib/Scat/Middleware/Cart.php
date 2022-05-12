@@ -16,26 +16,37 @@ final class Cart implements MiddlewareInterface
 
   public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
   {
-    $this->cart->uuid= $request->getParam('uuid');
+    $uuid= $request->getParam('uuid');
 
     /* Check cookie and request to see if we have a cart. */
     $cookies= $request->getCookieParams();
     if (isset($cookies['cartID'])) {
-      if ($this->cart->uuid && $cookies['cartID'] != $this->cart->uuid) {
+      if ($uuid && $cookies['cartID'] != $uuid) {
         error_log("UUID {$this->cart->uuid} as param, UUID {$cookies['cartID']} as cookie!");
       } else {
-        $this->cart->uuid= $cookies['cartID'];
+        $uuid= $cookies['cartID'];
       }
     }
 
-    $response= $handler->handle($request->withAttribute('cart', $this->cart));
+    if ($uuid) {
+      error_log("Loading cart $uuid");
+      $cart= $this->cart->findByUuid($uuid);
+    } else {
+      $cart= $this->cart->create();
+    }
 
-    /* Update the cart cookie. */
-    if ($this->cart->uuid) {
+    if (!$cart) {
+      error_log("Cart not found for $uuid");
+    }
+
+    $response= $handler->handle($request->withAttribute('cart', $cart));
+
+    /* Update the cart cookie if necessary. */
+    if ($cart->id && @$cookies['cartID'] != $cart->uuid) {
       $domain= ($_SERVER['HTTP_HOST'] != 'localhost' ?
-          $_SERVER['HTTP_HOST'] : false);
+                $_SERVER['HTTP_HOST'] : false);
 
-      SetCookie('cartID', $this->cart->uuid, null /* don't expire */,
+      SetCookie('cartID', $cart->uuid, null /* don't expire */,
                 '/', $domain, true, true);
     }
 
