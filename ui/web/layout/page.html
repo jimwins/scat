@@ -17,6 +17,8 @@
   <link rel="stylesheet" type="text/css" href="/css/normalize.css">
   <link rel="stylesheet" type="text/css" href="/css/lineicons.css">
   <link rel="stylesheet" type="text/css" href="/css/web.css">
+
+  {% block extra_header %}{% endblock %}
 </head>
 
 <body>
@@ -258,5 +260,6 @@
     })
   </script>
 
+  {% block script %}{% endblock %}
 </body>
 </html>
