@@ -707,3 +707,7 @@ p.lead {
   font-weight: 300;
   line-height: 1.4;
 }
+
+table {
+  font-variant-numeric: tabular-nums;
+}

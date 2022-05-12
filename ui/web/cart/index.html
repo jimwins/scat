@@ -1,4 +1,5 @@
 {% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
 
 {% block title %}
   Shopping Cart @ Raw Materials Art Supplies
@@ -29,11 +30,194 @@
     </div>
 
     {# XXX show some popular products #}
-    <p>This is where I'll show some popular products.</p>
   {% else %}
+    <style>
+      table.cart {
+        empty-cells: show;
+        border-collapse: collapse;
+        width: 100%;
+        margin: 2em 0;
+        table-layout: fixed;
+        text-overflow: ellipsis;
+        line-height: 1.1;
+      }
+      table.cart .input {
+        margin: 0;
+      }
+      table.cart thead {
+        border-bottom: var(--border-width) solid #999;
+      }
+      table.cart td, table.cart th {
+        padding: 0.5rem;
+        vertical-align: top;
+      }
+      table.cart th:not([align]) {
+        text-align: left;
+      }
+      table.cart tbody tr:nth-child(odd) {
+        background: #f9f9f9;
+      }
+      table.cart tbody tr {
+        border-bottom: calc(var(--border-width) / 2) solid #ddd;
+      }
+      table.cart tfoot {
+        border-top: var(--border-width) solid #999;
+      }
+      table.cart tfoot td {
+        vertical-align: middle;
+      }
+    </style>
+    <table class="cart">
+      <thead>
+        <tr>
+          <th width="15%">Quantity</th>
+          <th width="10%">Code</th>
+          <th>Name</th>
+          <th width="8%" align="right">Price</th>
+          <th width="8%" align="right">Ext</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in items %}
+          {% set item= line.item %}
+          <tr data-item-code="{{ item.code }}"
+              data-quantity="{{ line.quantity }}">
+            <td class="{{ not item.stock ? 'has-error' : (item.stock < line.quantity ? 'has-warning' : '') }}">
+              {% if line.kit_id %}
+                {{ line.quantity }}
+                <small class="help-block">
+                  Part of a kit.<br>
+              {% else %}
+                <label for="qty_{{ line.id }}" class="visually-hidden">
+                  Quantity
+                </label>
+                <input type="text" size="2"
+                       class="input" id="qty_{{ line.id }}"
+                       name="qty[{{ line.id }}]" value="{{ line.quantity }}">
+                <a href="/cart/remove-item?item={{ line.id }}"
+                   class="">
+                  <i class="lni lni-trash-can"></i>
+                </a>
+                <br>
+                <small class="help-block">
+              {% endif %}
+              {# above left <small> open #}
+                {% if item.purchase_quantity > 1 %}
+                  Must be multiple of {{ item.purchase_quantity }}.</br>
+                {% endif %}
+                {% if item.no_backorder %}
+                  Limited to stock on hand ({{ item.stock }}).<br>
+                {% endif %}
+                {% if item.stock %}
+                  {% if item.stock < line.quantity %}
+                    {{ max(item.stock, 0) }} currently available.
+                  {% endif %}
+                {% else %}
+                  {% if item.minimum_quantity or item.is_kit %}
+                    Out of stock.
+                  {% else %}
+                    <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Out of stock, special order</span>
+                  {% endif %}
+                {% endif %}
+              </small>
+            </td>
+            <td class="hidden-xs"><small>{{ item.code }}</small></td>
+            <td>
+              {% if item.hazmat %}
+                <a class="pull-right" href="/shipping#hazmat" data-toggle="tooltip" title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="20" alt="Hazardous Materials"></a>
+              {% endif %}
+              {% if item.oversized %}
+                <a class="pull-right" href="/shipping#oversized" data-toggle="tooltip" title="Oversized data: special shipping is required, and there will be additional costs. Click for more details."><i class="lni lni-delivery"></i></a>
+              {% else %}
+                {% if not item.can_ship_free %}
+                  <a class="pull-right" href="/shipping" data-toggle="tooltip" title="This item is not eligible for free shipping."><i class="lni lni-delivery text-success"></i></a>
+                {% endif %}
+              {% endif %}
+              <span>{{ item.name }}</span>
+              <br>
+              <small>
+                {% if line.discount %}
+                  {{ item.retail_price ? 'MSRP $' : 'List $' -}}
+                  {{- line.retail_price }}
+                  {% if line.discount_type in [ 'percentage', 'relative' ] %}
+                    / Sale: {{ scat.format_discount(line) }}
+                  {% endif %}
+                {% endif %}
+              </small>
+            </td>
+            {% if line.kit_id %}
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            {% else %}
+              <td align="right">{{ scat.amount(line.sale_price) }}</td>
+              <td align="right">
+                {{ scat.amount(line.sale_price * line.quantity) }}
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>
+            <button type="submit" class="button">
+              <i class="lni lni-reload"></i>
+              <span class="label">Update</span>
+            </button>
+          </td>
+          <td></td>
+          <td colspan="2" align="right">
+            Subtotal:
+          </td>
+          <td align="right">
+            {{ scat.amount(cart.subtotal) }}
+          </td>
+        </tr>
+        <tr>
+          {% if cart.shipping_method %}
+            <td colspan="4" align="right">
+              TODO shipping method
+            </td>
+            <td align="right">
+              {{ scat.amount(cart.shipping) }}
+            </td>
+          {% else %}
+            <td colspan="4" align="right">
+              Shipping &amp; Handling:
+              <br>or pick up in store for no charge.
+            </td>
+            <td align="right">
+              <span class="text-danger">TBD</span>
+            </td>
+          {% endif %}
+        </tr>
+        <tr>
+          <td colspan="4" align="right">
+            Estimated tax:
+          </td>
+          <td align="right">
+            {% if cart.tax_calculated %}
+              {{ scat.amount(cart.tax) }}
+            {% else %}
+              <span class="text-danger">TBD</span>
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4" align="right">Total:</td>
+          <td align="right">
+            {% if cart.shipping_method and cart.tax_calculated %}
+              {{ scat.amount(cart.total) }}
+            {% else %}
+              <span class="text-danger">TBD</span>
+            {% endif %}
+          </td>
+        </tr>
+        {# TODO payments #}
+      </tfoot>
+    </table>
 
-    <pre>{{ items |json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
-
+    {# TODO checkout buttons #}
   {% endif %}
 
   <div class="well">
