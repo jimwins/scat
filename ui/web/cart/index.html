@@ -66,6 +66,25 @@
       table.cart tfoot td {
         vertical-align: middle;
       }
+
+      .edit-quantity {
+        display: inline-grid;
+        grid-template-columns: min-content min-content min-content;
+      }
+      .edit-quantity .input {
+        width: 3em;
+        min-width: 3em;
+        text-align: center;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      .edit-quantity .update {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+      .edit-quantity .remove {
+        margin-left: 0.25em;
+      }
     </style>
     <table class="cart">
       <thead>
@@ -82,7 +101,7 @@
           {% set item= line.item %}
           <tr data-item-code="{{ item.code }}"
               data-quantity="{{ line.quantity }}">
-            <td class="{{ not item.stock ? 'has-error' : (item.stock < line.quantity ? 'has-warning' : '') }}">
+            <td class="quantity {{ not item.stock ? 'has-error' : (item.stock < line.quantity ? 'has-warning' : '') }}">
               {% if line.kit_id %}
                 {{ line.quantity }}
                 <small class="help-block">
@@ -91,13 +110,19 @@
                 <label for="qty_{{ line.id }}" class="visually-hidden">
                   Quantity
                 </label>
-                <input type="text" size="2"
-                       class="input" id="qty_{{ line.id }}"
-                       name="qty[{{ line.id }}]" value="{{ line.quantity }}">
-                <a href="/cart/remove-item?item={{ line.id }}"
-                   class="">
-                  <i class="lni lni-trash-can"></i>
-                </a>
+                <span class="edit-quantity">
+                  <input type="text"
+                         class="input" id="qty_{{ line.id }}"
+                         name="qty[{{ line.id }}]" value="{{ line.quantity }}">
+                  <button class="update button min">
+                    <i class="lni lni-reload"></i>
+                    <span class="visually-hidden">Update</span>
+                  </button>
+                  <a href="/cart/remove-item?item={{ line.id }}"
+                     class="remove button min">
+                    <i class="lni lni-trash-can"></i>
+                  </a>
+                </span>
                 <br>
                 <small class="help-block">
               {% endif %}
@@ -159,13 +184,12 @@
       </tbody>
       <tfoot>
         <tr>
-          <td>
-            <button type="submit" class="button">
-              <i class="lni lni-reload"></i>
-              <span class="label">Update</span>
+          <td rowspan="4" colspan="2">
+            <button type="submit" class="button block">
+              <i class="lni lni-enter"></i>
+              <span class="label">Checkout</span>
             </button>
           </td>
-          <td></td>
           <td colspan="2" align="right">
             Subtotal:
           </td>
@@ -175,14 +199,14 @@
         </tr>
         <tr>
           {% if cart.shipping_method %}
-            <td colspan="4" align="right">
+            <td colspan="2" align="right">
               TODO shipping method
             </td>
             <td align="right">
               {{ scat.amount(cart.shipping) }}
             </td>
           {% else %}
-            <td colspan="4" align="right">
+            <td colspan="2" align="right">
               Shipping &amp; Handling:
               <br>or pick up in store for no charge.
             </td>
@@ -192,7 +216,7 @@
           {% endif %}
         </tr>
         <tr>
-          <td colspan="4" align="right">
+          <td colspan="2" align="right">
             Estimated tax:
           </td>
           <td align="right">
@@ -204,7 +228,7 @@
           </td>
         </tr>
         <tr>
-          <td colspan="4" align="right">Total:</td>
+          <td colspan="2" align="right">Total:</td>
           <td align="right">
             {% if cart.shipping_method and cart.tax_calculated %}
               {{ scat.amount(cart.total) }}
