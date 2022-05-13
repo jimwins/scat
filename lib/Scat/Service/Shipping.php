@@ -287,7 +287,7 @@ class Shipping
 
     if ($best_rate) {
       return [
-        new \Decimal\Decimal((string)$box[4]) + $best_rate,
+        (string)(new \Decimal\Decimal((string)$box[4]) + $best_rate),
         $method
       ];
     }
