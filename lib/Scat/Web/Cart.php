@@ -13,13 +13,67 @@ class Cart {
   public function __construct(
     \Scat\Service\Data $data,
     \Scat\Service\Catalog $catalog,
+    \Scat\Service\Config $config,
     \Scat\Service\Auth $auth,
     View $view
   ) {
     $this->data= $data;
     $this->auth= $auth;
     $this->catalog= $catalog;
+    $this->config= $config;
     $this->view= $view;
+  }
+
+  public function get_amzn_client() {
+    $config= [
+      'public_key_id' => $this->config->get('amazon.public_key_id'),
+      'private_key'   => $this->config->get('amazon.private_key'),
+      'region'        => 'US',
+    ];
+    if ($GLOBALS['DEBUG']) {
+      $config['sandbox']= true;
+    }
+
+    return new \Amazon\Pay\API\Client($config);
+  }
+
+  public function get_amzn_environment(Request $request) {
+    $merchant_id= $this->config->get('amazon.merchant_id');
+    if (!$merchant_id) return null;
+
+    $client= $this->get_amzn_client();
+
+    $uri= $request->getUri();
+    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+    $link= $routeContext->getRouteParser()->fullUrlFor($uri, 'checkout-amzn');
+
+    $payload= [
+      'webCheckoutDetails' => [
+        'checkoutReviewReturnUrl' => $link,
+      ],
+      'storeId' => $this->config->get('amazon.client_id'),
+      'deliverySpecifications' => [
+        'addressRestrictions' => [
+          'type' => 'Allowed',
+          'restrictions' => [
+            'US' => [
+              'zipCodes' => [ '*' ],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $json_payload= json_encode($payload);
+
+    $signature= $client->generateButtonSignature($json_payload);
+
+    return [
+      'merchant_id' => $merchant_id,
+      'public_key_id' => $this->config->get('amazon.public_key_id'),
+      'payload' => $json_payload,
+      'signature' => $signature,
+    ];
   }
 
   public function cart(Request $request, Response $response)
@@ -30,6 +84,7 @@ class Cart {
     return $this->view->render($response, 'cart/index.html', [
       'person' => $person,
       'cart' => $cart,
+      'amzn' => $this->get_amzn_environment($request),
     ]);
   }
 

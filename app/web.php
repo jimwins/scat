@@ -137,6 +137,10 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Web\Cart::class, 'cart' ])
       ->setName('cart');
   $app->post('/add-item', [ \Scat\Web\Cart::class, 'addItem' ]);
+  $app->get('/checkout', [ \Scat\Web\Cart::class, 'checkout' ])
+      ->setName('checkout');
+  $app->get('/checkout/amzn', [ \Scat\Web\Cart::class, 'checkout' ])
+      ->setName('checkout-amzn');
 })->add($container->get(\Scat\Middleware\Cart::class));
 
 /* Contact */
