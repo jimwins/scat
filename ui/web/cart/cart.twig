@@ -178,7 +178,13 @@
     <tr>
       {% if cart.shipping_method %}
         <td colspan="2" align="right">
-          TODO shipping method
+          {% if cart.shipping_address_id == 1 %}
+            Pickup at store:
+          {% elseif cart.shipping_method starts with 'local' %}
+            Local delivery:
+          {% else %}
+            Shipping &amp; handling:
+          {% endif %}
         </td>
         <td align="right">
           {{ scat.amount(cart.shipping) }}
