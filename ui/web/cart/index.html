@@ -275,7 +275,7 @@
   {% if amzn.merchant_id %}
     <script src="https://static-na.payments-amazon.com/checkout.js"></script>
     <script type="text/javascript" charset="utf-8">
-      amazon.Pay.renderButton('#AmazonPayButton', {
+      let amazonPayButton= amazon.Pay.renderButton('#AmazonPayButton', {
         merchantId: '{{ amzn.merchant_id }}',
         ledgerCurrency: 'USD',
         {% if DEBUG %}
@@ -285,12 +285,18 @@
         productType: 'PayAndShip',
         placement: 'Cart',
         buttonColor: 'Gold',
-        createCheckoutSessionConfig: {
-          payloadJSON: '{{ amzn.payload | raw }}',
-          signature: '{{ amzn.signature }}',
-          publicKeyId: '{{ amzn.public_key_id }}'
-        }
-      });
+      })
+
+      amazonPayButton.onClick(() => {
+        /* TODO fire ecommerce event */
+        amazonPayButton.initCheckout({
+          createCheckoutSessionConfig: {
+            payloadJSON: '{{ amzn.payload | raw }}',
+            signature: '{{ amzn.signature }}',
+            publicKeyId: '{{ amzn.public_key_id }}'
+          }
+        })
+      })
     </script>
   {% endif %}
 {% endblock %}

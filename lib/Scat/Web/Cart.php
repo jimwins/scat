@@ -37,7 +37,7 @@ class Cart {
     return new \Amazon\Pay\API\Client($config);
   }
 
-  public function get_amzn_environment(Request $request) {
+  public function get_amzn_environment(Request $request, $uuid) {
     $merchant_id= $this->config->get('amazon.merchant_id');
     if (!$merchant_id) return null;
 
@@ -45,7 +45,12 @@ class Cart {
 
     $uri= $request->getUri();
     $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
-    $link= $routeContext->getRouteParser()->fullUrlFor($uri, 'checkout-amzn');
+    $link= $routeContext->getRouteParser()->fullUrlFor(
+      $uri,
+      'checkout-amzn',
+      [],
+      [ 'uuid' => $uuid ]
+    );
 
     $payload= [
       'webCheckoutDetails' => [
@@ -84,7 +89,7 @@ class Cart {
     return $this->view->render($response, 'cart/index.html', [
       'person' => $person,
       'cart' => $cart,
-      'amzn' => $this->get_amzn_environment($request),
+      'amzn' => $this->get_amzn_environment($request, $cart->uuid),
     ]);
   }
 
