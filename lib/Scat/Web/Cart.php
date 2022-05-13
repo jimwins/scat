@@ -149,6 +149,7 @@ class Cart {
     \Scat\Service\Tax $tax
   ) {
     $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
 
     $amzn_session_id= $request->getParam('amazonCheckoutSessionId');
 
@@ -203,6 +204,10 @@ class Cart {
 
     $cart->save();
 
-    return $response->withJson($cart);
+    return $this->view->render($response, 'cart/checkout-amzn.html', [
+      'person' => $person,
+      'cart' => $cart,
+      'amzn' => $session,
+    ]);
   }
 }

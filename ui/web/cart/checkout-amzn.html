@@ -1,0 +1,71 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Amazon Pay Checkout @ Raw Materials Art Supplies
+{% endblock %}
+
+{% block content %}
+  {% if person %}
+    <h2>
+      Welcome back{{ person ? ', ' ~ person.friendly_name }}!
+      <small>
+        (<a href="{{ url_for('account') }}">view your account</a>
+        or <a href="{{ url_for('logout') }}">log out</a>)
+      </small>
+    </h2>
+  {% else %}
+    <h2>
+      Welcome! <a href="{{ url_for('login')}}">Log in or create an account.</a>
+    </h2>
+  {% endif %}
+
+  <h3>Shipping Address</h3>
+  {% set address= cart.shipping_address() %}
+  <p>
+    <div>{{ address.name }}</div>
+    <div>{{ address.company }}</div>
+    <div>{{ address.street1 }}</div>
+    <div>{{ address.street2 }}</div>
+    <div>{{ address.city }}, {{ address.state }} {{ address.zip }}</div>
+  </p>
+  <button id="change-address" class="button">
+    Change
+  </button>
+
+  <h3>Payment method</h3>
+  <p>
+    {{ amzn.paymentPreferences[0].paymentDescriptor }}
+  </p>
+  <button id="change-payment" class="button">
+    Change
+  </button>
+
+  {% embed 'cart/cart.twig' with { 'editable' : false } %}
+    {% block buttons %}
+      {% import 'macros.twig' as scat %}
+      <div class="pay-button">
+        <button type="submit" class="button block">
+          <i class="lni lni-enter"></i>
+          <span class="label">Pay {{ scat.amount(cart.due) }}</span>
+        </button>
+      </div>
+      </div>
+    {% endblock %}
+  {% endembed %}
+
+{% endblock %}
+
+{% block script %}
+  <script src="https://static-na.payments-amazon.com/checkout.js"></script>
+  <script type="text/javascript" charset="utf-8">
+    amazon.Pay.bindChangeAction('#change-address', {
+      amazonCheckoutSessionId: '{{ cart.amz_order_reference_id }}',
+      changeAction: 'changeAddress'
+    });
+
+    amazon.Pay.bindChangeAction('#change-payment', {
+      amazonCheckoutSessionId: '{{ cart.amz_order_reference_id }}',
+      changeAction: 'changePayment'
+  </script>
+{% endblock %}
