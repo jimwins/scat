@@ -712,3 +712,7 @@ p.lead {
 table {
   font-variant-numeric: tabular-nums;
 }
+
+.help-block {
+  color: #3c763d;
+}
