@@ -137,4 +137,18 @@ class Cart {
 
     return $response->withRedirect('/cart');
   }
+
+  public function amznCheckout(Request $request, Response $response) {
+    $cart= $request->getAttribute('cart');
+
+    $amzn_session_id= $request->getParam('amazonCheckoutSessionId');
+
+    $client= $this->get_amzn_client();
+
+    $res= $client->getCheckoutSession($amzn_session_id);
+
+    $session= json_decode($res['response']);
+
+    return $response->withJson($session);
+  }
 }
