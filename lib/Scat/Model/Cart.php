@@ -10,7 +10,20 @@ class Cart extends \Scat\Model {
     return $this->has_many('CartLine');
   }
 
-  public function shipping_address() {
+  public function shipping_address($address= []) {
+    if (!empty($address)) {
+      $new= $this->belongs_to('CartAddress', 'shipping_address_id')
+                 ->create($address);
+      $new->save();
+      $this->shipping_address_id= $new->id;
+
+      /* Passing in a new address always nukes our shipping costs */
+      $this->shipping_method= NULL;
+      $this->shipping= 0;
+      $this->shipping_tax= 0;
+
+      /* BUT DOES NOT SAVE */
+    }
     return $this->belongs_to('CartAddress', 'shipping_address_id')->find_one();
   }
 
@@ -89,6 +102,47 @@ class Cart extends \Scat\Model {
   public function ordered() {
     $total= $this->_loadTotals();
     return $total['ordered'];
+  }
+
+  public function get_shipping_box() {
+    $items= [];
+
+    foreach ($this->items()->find_many() as $line) {
+      if ($line->quantity <= 0) continue;
+
+      $item= $line->item();
+
+      if (!$item->length || !$item->height || !$item->width) {
+        return null;
+      }
+
+      $dims= [
+        'length' => $item->length,
+        'height' => $item->height,
+        'width' => $item->width
+      ];
+
+      $items+= array_fill(0, $line->quantity, $dims);
+    }
+
+    return \Scat\Service\Shipping::get_shipping_box($items);
+  }
+
+  public function get_shipping_weight() {
+    $weight= 0;
+    foreach ($this->items()->find_many() as $line) {
+      $item= $line->item();
+      if (isset($item->weight)) {
+        $weight+= $line->quantity + $item->weight;
+      } else {
+        return NULL; /* Unable to calculate weight */
+      }
+    }
+    return $weight;
+  }
+
+  public function has_hazmat_items() {
+    return $this->items()->join('item', [ 'item.id', '=', 'sale_item.item_id' ])->where_gt('item.hazmat', 0)->count();
   }
 }
 

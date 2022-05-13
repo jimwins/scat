@@ -256,8 +256,8 @@ class Shipping
       if ($hazmat) {
         if (in_array($rate->carrier, [ 'USPS' ]) &&
             $rate->service == 'ParcelSelect' &&
-            self::state_in_continental_us($address->state) &&
-            self::address_is_po_box($address))
+            self::state_in_continental_us($to->state) &&
+            self::address_is_po_box($to))
         {
           if (!$best_rate || $rate->rate < $best_rate) {
             $method= "{$rate->carrier} / {$rate->service }";
@@ -285,7 +285,15 @@ class Shipping
       }
     }
 
-    return [ $best_rate + $box[4], $method ];
+    if ($best_rate) {
+      return [
+        new \Decimal\Decimal((string)$box[4]) + $best_rate,
+        $method
+      ];
+    }
+
+    return [ 0.00, null ];
+
   }
 
   static function get_base_local_delivery_rate($item_dim, $weight) {
@@ -317,7 +325,7 @@ class Shipping
   }
 
   static function address_is_po_box($address) {
-    return preg_match('/po box/i', $address->address1 . $address->address2);
+    return preg_match('/po box/i', $address->street1. $address->street2);
   }
 
   static function state_in_continental_us($state) {

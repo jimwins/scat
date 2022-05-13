@@ -143,7 +143,11 @@ class Cart {
     return $response->withRedirect('/cart');
   }
 
-  public function amznCheckout(Request $request, Response $response) {
+  public function amznCheckout(
+    Request $request, Response $response,
+    \Scat\Service\Shipping $shipping,
+    \Scat\Service\Tax $tax
+  ) {
     $cart= $request->getAttribute('cart');
 
     $amzn_session_id= $request->getParam('amazonCheckoutSessionId');
@@ -154,6 +158,51 @@ class Cart {
 
     $session= json_decode($res['response']);
 
-    return $response->withJson($session);
+    if ($cart->amz_order_reference_id &&
+        $cart->amz_order_reference_id != $session->checkoutSessionId)
+    {
+      throw new \Exception("Got new checkoutSessionId?");
+    }
+
+    $cart->amz_order_reference_id= $session->checkoutSessionId;
+
+    $name= $session->buyer->name;
+    $email= $session->buyer->email;
+
+    if (!$cart->name) $cart->name= $name;
+    if (!$cart->email) $cart->email= $email;
+
+    // TODO handle $session->shippingAddress->countryCode != 'US'
+
+    $amzn_address= [
+      'name' => $session->shippingAddress->name,
+      // we put addressLine3 in company, because why not?
+      'company' =>  $session->shippingAddress->addressLine3,
+      'phone' =>  $session->shippingAddress->phoneNumber ?? '',
+      'street1' =>  $session->shippingAddress->addressLine1 ?? '',
+      'street2' =>  $session->shippingAddress->addressLine2 ?? '',
+      'city' =>  $session->shippingAddress->city,
+      'state' =>  $session->shippingAddress->stateOrRegion,
+      'zip' =>  $session->shippingAddress->postalCode,
+    ];
+
+    $address= $cart->shipping_address($amzn_address);
+
+    $box= $cart->get_shipping_box();
+    $weight= $cart->get_shipping_weight();
+    $hazmat= $cart->has_hazmat_items();
+
+    // recalculate shipping costs
+    list($cost, $method)=
+      $shipping->get_shipping_estimate($box, $weight, $hazmat,
+                                        $address->as_array());
+    $cart->shipping_method= $method ? 'default' : null;
+    $cart->shipping= $method ? $cost : null;
+
+    // and then recalculate sales tax
+
+    $cart->save();
+
+    return $response->withJson($cart);
   }
 }
