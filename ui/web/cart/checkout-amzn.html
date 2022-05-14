@@ -45,10 +45,11 @@
     {% block buttons %}
       {% import 'macros.twig' as scat %}
       <div class="pay-button">
-        <button type="submit" class="button block">
+        <a class="button block"
+           href="{{ url_for('pay-amzn') }}">
           <i class="lni lni-enter"></i>
           <span class="label">Pay {{ scat.amount(cart.due) }}</span>
-        </button>
+        </a>
       </div>
       </div>
     {% endblock %}

@@ -211,4 +211,57 @@ class Cart {
       'amzn' => $session,
     ]);
   }
+
+  public function amznPay(
+    Request $request, Response $response,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    // TODO validate
+
+    $client= $this->get_amzn_client();
+
+    $amzn_session_id= $cart->amz_order_reference_id;
+
+    $uri= $request->getUri();
+    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+    $link= $routeContext->getRouteParser()->fullUrlFor(
+      $uri,
+      'finalize-amzn',
+      [],
+      [ 'uuid' => $cart->uuid ]
+    );
+
+    $data= [
+      'webCheckoutDetails' => [
+        'checkoutResultReturnUrl' => $link,
+      ],
+      'paymentDetails' => [
+        'paymentIntent' => 'AuthorizeWithCapture',
+        'canHandlePendingAuthorization' => false,
+        'softDescriptor' => null,
+        'chargeAmount' => [
+          'amount' => $cart->due(),
+          'currencyCode' => 'USD',
+        ],
+      ],
+      'merchantMetadata' => [
+        'merchantReferenceId' => $cart->uuid,
+        'merchantStoreName' => 'Raw Materials Art Supplies',
+        'noteToBuyer' => 'Your order of art supplies',
+      ],
+    ];
+
+    $res= $client->updateCheckoutSession($amzn_session_id, $data);
+
+    // TODO handle errors
+
+    $session= json_decode($res['response']);
+
+    return $response->withRedirect(
+      $session->webCheckoutDetails->amazonPayRedirectUrl
+    );
+  }
 }
