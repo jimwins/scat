@@ -253,6 +253,7 @@ class Shipping
     $best_rate= null;
 
     foreach ($shipment->rates as $rate) {
+      error_log("{$rate->carrier} / {$rate->service} = {$rate->rate}");
       if ($hazmat) {
         if (in_array($rate->carrier, [ 'USPS' ]) &&
             $rate->service == 'ParcelSelect' &&
@@ -286,6 +287,7 @@ class Shipping
     }
 
     if ($best_rate) {
+      error_log("Selecting {$method} = {$best_rate} + $box[4]");
       return [
         (string)(new \Decimal\Decimal((string)$box[4]) + $best_rate),
         $method

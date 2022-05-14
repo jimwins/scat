@@ -147,6 +147,12 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
       ->setName('finalize-amzn');
 })->add($container->get(\Scat\Middleware\Cart::class));
 
+/* Sale (= a completed cart) */
+$app->group('/sale', function (RouteCollectorProxy $app) {
+  $app->get('/{uuid}/thanks', [ \Scat\Web\Sale::class, 'thanks' ])
+      ->setName('sale-thanks');
+});
+
 /* Contact */
 $app->post('/contact', [ \Scat\Web\Contact::class, 'handleContact' ])
     ->add(new \RKA\Middleware\IpAddress(/* TODO check proxy? */))

@@ -31,23 +31,38 @@ final class Cart implements MiddlewareInterface
     if ($uuid) {
       error_log("Loading cart $uuid");
       $cart= $this->cart->findByUuid($uuid);
-    } else {
-      $cart= $this->cart->create();
+      if ($cart && $cart->status != 'cart') {
+        error_log("Cart is already complete");
+        unset($cart);
+      }
     }
 
-    if (!$cart) {
-      error_log("Cart not found for $uuid");
+    if (!isset($cart)) {
+      $cart= $this->cart->create([ 'status' => 'cart' ]);
     }
 
     $response= $handler->handle($request->withAttribute('cart', $cart));
 
     /* Update the cart cookie if necessary. */
-    if ($cart->id && @$cookies['cartID'] != $cart->uuid) {
+    if (@$cookies['cartID'] != $cart->uuid) {
       $domain= ($_SERVER['HTTP_HOST'] != 'localhost' ?
                 $_SERVER['HTTP_HOST'] : false);
 
-      SetCookie('cartID', $cart->uuid, null /* don't expire */,
-                '/', $domain, true, true);
+      if ($cart->id <= 0) {
+        SetCookie('cartID', "", (new \Datetime("-24 hours"))->format("U"),
+                  '/', $domain, true, true);
+        SetCookie('cartDetails', "", (new \Datetime("-24 hours"))->format("U"),
+                  '/', $domain, true, false);
+      } else {
+        $details= json_encode([
+          'items' => $cart->items()->count(),
+          'total' => $cart->total()
+        ]);
+        SetCookie('cartID', $cart->uuid, null /* don't expire */,
+                  '/', $domain, true, true);
+        SetCookie('cartDetails', "", 0 /* session cookie */,
+                  '/', $domain, true, false); /* Javascript accessible */
+      }
     }
 
     return $response;

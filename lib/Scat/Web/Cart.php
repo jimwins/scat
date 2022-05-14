@@ -162,7 +162,7 @@ class Cart {
     if ($cart->amz_order_reference_id &&
         $cart->amz_order_reference_id != $session->checkoutSessionId)
     {
-      throw new \Exception("Got new checkoutSessionId?");
+      error_log("Got new checkoutSessionId, hope that's okay.");
     }
 
     $cart->amz_order_reference_id= $session->checkoutSessionId;
@@ -256,12 +256,65 @@ class Cart {
 
     $res= $client->updateCheckoutSession($amzn_session_id, $data);
 
-    // TODO handle errors
-
     $session= json_decode($res['response']);
+
+    // TODO handle errors
+    if (!isset($session->statusDetails)) {
+      throw new \Exception($session->message);
+    }
 
     return $response->withRedirect(
       $session->webCheckoutDetails->amazonPayRedirectUrl
     );
+  }
+
+  public function amznFinalize(
+    Request $request, Response $response,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    // TODO validate
+
+    $client= $this->get_amzn_client();
+
+    $amzn_session_id= $cart->amz_order_reference_id;
+
+    $data= [
+      'chargeAmount' => [
+        'amount' => $cart->due(),
+        'currencyCode' => 'USD',
+      ],
+    ];
+
+    $res= $client->completeCheckoutSession($amzn_session_id, $data);
+
+    $session= json_decode($res['response']);
+
+    if (!isset($session->statusDetails)) {
+      throw new \Exception($session->message);
+    }
+
+    $cart->addPayment('amazon', $cart->due(), false, $session);
+
+    $cart->save();
+
+    if ($cart->status != 'paid') {
+      throw new \Exception("Not completely paid!");
+    }
+
+    $uri= $request->getUri();
+    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+    $link= $routeContext->getRouteParser()->fullUrlFor(
+      $uri,
+      'sale-thanks',
+      [ 'uuid' => $cart->uuid ]
+    );
+
+    /* Set cart id to -1 so cookie will get unset */
+    $cart->id= -1;
+
+    return $response->withRedirect($link);
   }
 }

@@ -10,6 +10,10 @@ class Cart extends \Scat\Model {
     return $this->has_many('CartLine');
   }
 
+  public function payments() {
+    return $this->has_many('CartPayment');
+  }
+
   public function shipping_address($address= []) {
     if (!empty($address)) {
       $new= $this->belongs_to('CartAddress', 'shipping_address_id')
@@ -102,6 +106,10 @@ class Cart extends \Scat\Model {
   public function ordered() {
     $total= $this->_loadTotals();
     return $total['ordered'];
+  }
+
+  public function flushTotals() {
+    $this->_totals= null;
   }
 
   public function get_shipping_box() {
@@ -234,6 +242,29 @@ class Cart extends \Scat\Model {
     }
 
     $this->set_expr('tax_calculated', 'NOW()');
+    $this->flushTotals();
+  }
+
+  public function addPayment($method, $amount, $captured, $data) {
+    $payment= $this->payments()->create([
+      'sale_id' => $this->id,
+      'method' => $method,
+      'amount' => $amount,
+    ]);
+    if ($data) {
+      $payment->data= json_encode($data);
+    }
+    if ($captured) {
+      $payment->set_expr('captured', 'NOW()');
+    }
+    $payment->set_expr('processed', 'NOW()');
+    $payment->save();
+
+    $this->flushTotals();
+
+    if ($this->due() <= 0) {
+      $this->status= 'paid';
+    }
   }
 }
 
