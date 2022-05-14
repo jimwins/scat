@@ -22,7 +22,7 @@ final class Cart implements MiddlewareInterface
     $cookies= $request->getCookieParams();
     if (isset($cookies['cartID'])) {
       if ($uuid && $cookies['cartID'] != $uuid) {
-        error_log("UUID {$this->cart->uuid} as param, UUID {$cookies['cartID']} as cookie!");
+        error_log("UUID {$uuid} as param, UUID {$cookies['cartID']} as cookie!");
       } else {
         $uuid= $cookies['cartID'];
       }

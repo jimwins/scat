@@ -24,72 +24,27 @@ class Cart {
     $this->view= $view;
   }
 
-  public function get_amzn_client() {
-    $config= [
-      'public_key_id' => $this->config->get('amazon.public_key_id'),
-      'private_key'   => $this->config->get('amazon.private_key'),
-      'region'        => 'US',
-    ];
-    if ($GLOBALS['DEBUG']) {
-      $config['sandbox']= true;
-    }
-
-    return new \Amazon\Pay\API\Client($config);
-  }
-
-  public function get_amzn_environment(Request $request, $uuid) {
-    $merchant_id= $this->config->get('amazon.merchant_id');
-    if (!$merchant_id) return null;
-
-    $client= $this->get_amzn_client();
+  public function cart(
+    Request $request, Response $response,
+    \Scat\Service\AmazonPay $amzn
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
 
     $uri= $request->getUri();
     $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
-    $link= $routeContext->getRouteParser()->fullUrlFor(
+    $return_link= $routeContext->getRouteParser()->fullUrlFor(
       $uri,
       'checkout-amzn',
       [],
-      [ 'uuid' => $uuid ]
+      [ 'uuid' => $cart->uuid ]
     );
 
-    $payload= [
-      'webCheckoutDetails' => [
-        'checkoutReviewReturnUrl' => $link,
-      ],
-      'storeId' => $this->config->get('amazon.client_id'),
-      'deliverySpecifications' => [
-        'addressRestrictions' => [
-          'type' => 'Allowed',
-          'restrictions' => [
-            'US' => [
-              'zipCodes' => [ '*' ],
-            ],
-          ],
-        ],
-      ],
-    ];
-
-    $json_payload= json_encode($payload);
-
-    $signature= $client->generateButtonSignature($json_payload);
-
-    return [
-      'merchant_id' => $merchant_id,
-      'public_key_id' => $this->config->get('amazon.public_key_id'),
-      'payload' => $json_payload,
-      'signature' => $signature,
-    ];
-  }
-
-  public function cart(Request $request, Response $response)
-  {
-    $cart= $request->getAttribute('cart');
-    $person= $this->auth->get_person_details($request);
 
     return $this->view->render($response, 'cart/index.html', [
       'person' => $person,
       'cart' => $cart,
-      'amzn' => $this->get_amzn_environment($request, $cart->uuid),
+      'amzn' => $amzn->getEnvironment($return_link),
     ]);
   }
 
@@ -146,6 +101,7 @@ class Cart {
   public function amznCheckout(
     Request $request, Response $response,
     \Scat\Service\Shipping $shipping,
+    \Scat\Service\AmazonPay $amzn,
     \Scat\Service\Tax $tax
   ) {
     $cart= $request->getAttribute('cart');
@@ -153,11 +109,7 @@ class Cart {
 
     $amzn_session_id= $request->getParam('amazonCheckoutSessionId');
 
-    $client= $this->get_amzn_client();
-
-    $res= $client->getCheckoutSession($amzn_session_id);
-
-    $session= json_decode($res['response']);
+    $session= $amzn->getCheckoutSession($amzn_session_id);
 
     if ($cart->amz_order_reference_id &&
         $cart->amz_order_reference_id != $session->checkoutSessionId)
@@ -214,14 +166,13 @@ class Cart {
 
   public function amznPay(
     Request $request, Response $response,
+    \Scat\Service\AmazonPay $amzn,
     \Scat\Service\Tax $tax
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
 
     // TODO validate
-
-    $client= $this->get_amzn_client();
 
     $amzn_session_id= $cart->amz_order_reference_id;
 
@@ -255,9 +206,7 @@ class Cart {
       ],
     ];
 
-    $res= $client->updateCheckoutSession($amzn_session_id, $data);
-
-    $session= json_decode($res['response']);
+    $session= $amzn->updateCheckoutSession($amzn_session_id, $data);
 
     // TODO handle errors
     if (!isset($session->statusDetails)) {
@@ -271,14 +220,13 @@ class Cart {
 
   public function amznFinalize(
     Request $request, Response $response,
+    \Scat\Service\AmazonPay $amzn,
     \Scat\Service\Tax $tax
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
 
     // TODO validate
-
-    $client= $this->get_amzn_client();
 
     $amzn_session_id= $cart->amz_order_reference_id;
 
@@ -289,9 +237,7 @@ class Cart {
       ],
     ];
 
-    $res= $client->completeCheckoutSession($amzn_session_id, $data);
-
-    $session= json_decode($res['response']);
+    $session= $amzn->completeCheckoutSession($amzn_session_id, $data);
 
     if (!isset($session->statusDetails)) {
       throw new \Exception($session->message);
