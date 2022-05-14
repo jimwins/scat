@@ -248,9 +248,10 @@ class Cart {
         ],
       ],
       'merchantMetadata' => [
-        'merchantReferenceId' => $cart->uuid,
+        'merchantReferenceId' => $cart->id,
         'merchantStoreName' => 'Raw Materials Art Supplies',
         'noteToBuyer' => 'Your order of art supplies',
+        'customInformation' => $cart->uuid,
       ],
     ];
 
