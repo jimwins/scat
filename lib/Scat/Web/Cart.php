@@ -239,7 +239,7 @@ class Cart {
         'checkoutResultReturnUrl' => $link,
       ],
       'paymentDetails' => [
-        'paymentIntent' => 'AuthorizeWithCapture',
+        'paymentIntent' => 'Authorize',
         'canHandlePendingAuthorization' => false,
         'softDescriptor' => null,
         'chargeAmount' => [
