@@ -144,6 +144,97 @@ class Cart extends \Scat\Model {
   public function has_hazmat_items() {
     return $this->items()->join('item', [ 'item.id', '=', 'sale_item.item_id' ])->where_gt('item.hazmat', 0)->count();
   }
+
+  public function generateCartItems() {
+    $cartItems= []; $index_map= [];
+    $n= 1;
+
+    foreach ($this->items()->find_many() as $i) {
+      $tic= $i->tic;
+      $index= ($tic == '11000') ? 0 : $n++;
+      $index_map[$index]= $i->id;
+      $cartItems[]= [
+        'Index' => $index,
+        'ItemID' => ($tic == '11000') ? 'shipping' : $i->item_id,
+        'TIC' => $tic,
+        'Price' => $i->sale_price(),
+        'Qty' => $i->quantity,
+      ];
+    }
+
+    if ($cartItems && $this->shipping > 0) {
+      $cartItems[]= [
+        'Index' => 0,
+        'ItemID' => 'shipping',
+        'TIC' => '11000',
+        'Price' => $this->shipping,
+        'Qty' => 1,
+      ];
+    }
+
+    return [ $cartItems, $index_map ];
+  }
+
+  public function recalculateTax(\Scat\Service\Tax $tax) {
+    $address= $this->shipping_address();
+
+    if (!$address) {
+      $this->tax_calculated= null;
+      return;
+    }
+
+    $zip= explode('-', $address->zip);
+
+    // Look up all non-returned items
+    $data= [
+      'customerId' => $this->person_id ?: 0,
+      'cartId' => $this->uuid,
+      'deliveredBySeller' => false,
+      // XXX get from default shipping address
+      'origin' => [
+        'Zip4' => '1320',
+        'Zip5' => '90014',
+        'State' => 'CA',
+        'City' => 'Los Angeles',
+        'Address2' => '',
+        'Address1' => '645 S Los Angeles St',
+      ],
+      'destination' => [
+        'Zip4' => $zip[1] ?? '',
+        'Zip5' => $zip[0],
+        'State' => $address->state,
+        'City' => $address->city,
+        'Address2' => $address->address2,
+        'Address1' => $address->address1,
+      ],
+      'cartItems' => [],
+    ];
+
+    list($cartItems, $index_map)= $this->generateCartItems();
+
+    $data['cartItems']= $cartItems;
+
+    // Done if there's nothing to look up
+    if (!count($data['cartItems'])) return;
+
+    $response= $tax->lookup($data);
+
+    if ($response->ResponseType < 2) {
+      throw new \Exception($response->Messages[0]->Message);
+    }
+
+    foreach ($response->CartItemsResponse as $i) {
+      if ($i->CartItemIndex == 0) {
+        $this->shipping_tax= $i->TaxAmount;
+      } else {
+        $line= $this->items()->find_one($index_map[$i->CartItemIndex]);
+        $line->tax= $i->TaxAmount;
+        $line->save();
+      }
+    }
+
+    $this->set_expr('tax_calculated', 'NOW()');
+  }
 }
 
 class CartAddress extends \Scat\Model {

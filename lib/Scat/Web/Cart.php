@@ -201,6 +201,7 @@ class Cart {
     $cart->shipping= $method ? $cost : null;
 
     // and then recalculate sales tax
+    $cart->recalculateTax($tax);
 
     $cart->save();
 
