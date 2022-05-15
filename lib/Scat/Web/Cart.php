@@ -48,6 +48,64 @@ class Cart {
     ]);
   }
 
+  public function cartUpdate(
+    Request $request, Response $response,
+    \Scat\Service\Shipping $shipping,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    $recalculate= false;
+
+    foreach ($request->getParams() as $key => $value) {
+      switch ($key) {
+        case 'email':
+          // TODO validate
+          $cart->email= $value;
+          break;
+        case 'name':
+          $cart->name= $value;
+          break;
+        case 'address':
+          error_log(json_encode($value));
+          $cart->shipping_address([
+            'name' => $cart->name,
+            'street1' => $value['line1'],
+            'street2' => $value['line2'],
+            'city' => $value['city'],
+            'state' => $value['state'],
+            'zip' => $value['postal_code'],
+          ]);
+          $recalculate= true;
+          break;
+        default:
+          throw new \Exception("Not allowed to change {$key}");
+      }
+    }
+
+    if ($recalculate) {
+      $box= $cart->get_shipping_box();
+      $weight= $cart->get_shipping_weight();
+      $hazmat= $cart->has_hazmat_items();
+
+      $address= $cart->shipping_address();
+      // recalculate shipping costs
+      list($cost, $method)=
+        $shipping->get_shipping_estimate($box, $weight, $hazmat,
+                                          $address->as_array());
+      $cart->shipping_method= $method ? 'default' : null;
+      $cart->shipping= $method ? $cost : null;
+
+      // and then recalculate sales tax
+      $cart->recalculateTax($tax);
+    }
+
+    $cart->save();
+
+    return $response->withJson($cart);
+  }
+
   public function addItem(Request $request, Response $response)
   {
     $cart= $request->getAttribute('cart');
@@ -263,5 +321,207 @@ class Cart {
     $cart->id= -1;
 
     return $response->withRedirect($link);
+  }
+
+  public function stripeCheckout(
+    Request $request, Response $response,
+    \Scat\Service\Shipping $shipping,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    $stripe= new \Stripe\StripeClient([
+      'api_key' => $this->config->get('stripe.secret_key'),
+      'stripe_version' => "2020-08-27;link_beta=v1",
+    ]);
+
+    $paymentIntent= $stripe->paymentIntents->create([
+      'payment_method_types' => [
+        'link',
+        'card'
+      ],
+      'metadata' => [
+        "sale_id" => $cart->id,
+        "sale_uuid" => $cart->uuid,
+      ],
+      'amount' => $cart->due() * 100,
+      'currency' => 'usd',
+    ]);
+
+    $cart->stripe_payment_intent_id= $paymentIntent->id;
+    $cart->save();
+
+    return $this->view->render($response, 'cart/checkout-stripe.html', [
+      'person' => $person,
+      'cart' => $cart,
+      'stripe' => [
+        'key' => $this->config->get('stripe.key'),
+        'payment_intent' => $paymentIntent,
+      ],
+    ]);
+  }
+
+  public function setAddress(
+    Request $request,
+    Response $response,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+
+    $cart->shipping_address_id= 0;
+    $cart->shipping_method= null;
+    $cart->shipping= 0;
+    $cart->shipping_tax= 0;
+
+    // and then recalculate sales tax
+    $cart->recalculateTax($tax);
+
+    $cart->save();
+
+    return $response->withRedirect('/cart/checkout/stripe');
+  }
+
+  public function setCurbsidePickup(
+    Request $request,
+    Response $response,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+
+    $cart->shipping_address_id= 1;
+    $cart->shipping_method= 'default';
+    $cart->shipping= 0;
+    $cart->shipping_tax= 0;
+
+    // and then recalculate sales tax
+    $cart->recalculateTax($tax);
+
+    $cart->save();
+
+    return $response->withRedirect('/cart/checkout/stripe');
+  }
+
+  public function stripeFinalize(
+    Request $request, Response $response,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    // TODO validate
+
+    if ($cart->status != 'paid') {
+      throw new \Exception("Not completely paid!");
+    }
+
+    $uri= $request->getUri();
+    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+    $link= $routeContext->getRouteParser()->fullUrlFor(
+      $uri,
+      'sale-thanks',
+      [ 'uuid' => $cart->uuid ]
+    );
+
+    /* Set cart id to -1 so cookie will get unset */
+    $cart->id= -1;
+
+    return $response->withRedirect($link);
+  }
+
+  public function handleStripeWebhook(
+    Request $request, Response $response,
+    \Scat\Service\Cart $carts
+  ) {
+    \Stripe\Stripe::setApiKey($this->config->get('stripe.secret_key'));
+
+    try {
+      $event= \Stripe\Webhook::constructEvent(
+        $request->getBody(),
+        $request->getHeaderLine('Stripe-Signature'),
+        $this->config->get('stripe.webhook_secret')
+      );
+    } catch(\UnexpectedValueException $e) {
+      // TODO should be 400 error
+      throw new \Exception("Invalid payload");
+    } catch(\Stripe\Exception\SignatureVerificationException $e) {
+      // TODO should be 400 error
+      throw new \Exception("Signature exception");
+    }
+
+    // Handle the event
+    switch ($event->type) {
+      case 'payment_intent.succeeded':
+        $paymentIntent= $event->data->object; // contains a StripePaymentIntent
+        $uuid= $paymentIntent->charges->data[0]->metadata->sale_uuid;
+        if (!$uuid) {
+          error_log("No uuid on payment_intent, probably a gift card");
+          break;
+        }
+
+        $cart= $carts->findByUuid($uuid);
+        if (!$cart) {
+          throw new \Slim\Exception\HttpNotFoundException($request);
+        }
+
+        $payment_intent_id= $cart->stripe_payment_intent_id;
+
+	// if we already have it, don't do it again!
+        $has= $cart->payments()
+                    ->where_raw(
+                      'data->"$.payment_intent_id" = ?', [ $payment_intent_id ])
+                    ->find_one();
+	if ($has) {
+	  error_log("Already processed Stripe payment $payment_intent_id\n");
+	  return $response->withJson([ 'message' => 'Already processed.' ]);
+	}
+
+        $stripe= new \Stripe\StripeClient([
+          'api_key' => $this->config->get('stripe.secret_key'),
+          'stripe_version' => "2020-08-27;link_beta=v1",
+        ]);
+
+        $payment_intent=
+          $stripe->paymentIntents->retrieve($cart->stripe_payment_intent_id, []);
+
+        if ($payment_intent->status != 'succeeded') {
+          throw new \Exception("Can only handle successful payment attempts here.");
+        }
+
+        foreach ($payment_intent->charges->data as $charge) {
+          if ($charge->payment_method_details->type == 'afterpay_clearpay') {
+            $cc_brand= 'AfterPay';
+            $cc_last4= '';
+          } if ($charge->payment_method_details->type == 'link') {
+            $cc_brand= 'Link';
+            $cc_last4= '';
+          } else {
+            $cc_brand= ucwords($charge->payment_method_details->card->brand);
+            $cc_last4= $charge->payment_method_details->card->last4;
+          }
+
+          $data= [
+            'payment_intent_id' => $payment_intent_id,
+            'charge_id' => $charge->id,
+            'cc_brand' => $cc_brand,
+            'cc_last4' => $cc_last4,
+          ];
+
+          $cart->addPayment('credit', $charge->amount / 100, true, $data);
+        }
+
+        $cart->save();
+
+        if ($cart->status != 'paid') {
+//          throw new \Exception("Not completely paid!");
+        }
+
+        break;
+      case 'payment_intent.payment_failed':
+        /* Don't do anything with these yet. */
+        break;
+    }
+
+    return $response->withJson([ 'message' => 'Success!' ]);
   }
 }

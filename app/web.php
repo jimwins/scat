@@ -136,6 +136,8 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
 $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Web\Cart::class, 'cart' ])
       ->setName('cart');
+  $app->post('', [ \Scat\Web\Cart::class, 'cartUpdate' ])
+      ->setName('update-cart');
   $app->post('/add-item', [ \Scat\Web\Cart::class, 'addItem' ]);
   $app->get('/checkout', [ \Scat\Web\Cart::class, 'checkout' ])
       ->setName('checkout');
@@ -145,7 +147,23 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
       ->setName('pay-amzn');
   $app->get('/finalize/amzn', [ \Scat\Web\Cart::class, 'amznFinalize' ])
       ->setName('finalize-amzn');
+
+  $app->get('/checkout/paypal', [ \Scat\Web\Cart::class, 'paypalCheckout' ])
+      ->setName('checkout-paypal');
+
+  $app->get('/checkout/stripe', [ \Scat\Web\Cart::class, 'stripeCheckout' ])
+      ->setName('checkout-stripe');
+  $app->get('/checkout/stripe-pickup',
+            [ \Scat\Web\Cart::class, 'setCurbsidePickup' ]);
+  $app->get('/checkout/stripe-shipped',
+            [ \Scat\Web\Cart::class, 'setAddress' ]);
+  $app->get('/finalize/stripe', [ \Scat\Web\Cart::class, 'stripeFinalize' ])
+      ->setName('finalize-stripe');
+
 })->add($container->get(\Scat\Middleware\Cart::class));
+
+$app->post('/~webhook/stripe',
+            [ \Scat\Web\Cart::class, 'handleStripeWebhook' ]);
 
 /* Sale (= a completed cart) */
 $app->group('/sale', function (RouteCollectorProxy $app) {
