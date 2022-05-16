@@ -33,6 +33,13 @@ final class Cart implements MiddlewareInterface
       $cart= $this->cart->findByUuid($uuid);
       if ($cart && $cart->status != 'cart') {
         error_log("Cart is already complete");
+        if ($cart->status == 'paid') {
+          // TODO this is ugly, but it works
+          $response= $GLOBALS['app']->getResponseFactory()->createResponse();
+          return $response->withRedirect(
+            '/sale/' . $cart->uuid . '/thanks'
+          );
+        }
         unset($cart);
       }
     }
