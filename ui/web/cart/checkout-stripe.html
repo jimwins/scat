@@ -53,7 +53,15 @@
       {% block buttons %}
         {% import 'macros.twig' as scat %}
         <div class="pay-button">
-          <button id="submit" class="button">Submit</button>
+          {% if cart.ready_for_payment %}
+            <button type="submit" class="button">
+              Pay {{ scat.amount(cart.due) }}
+            </button>
+          {% else %}
+            <button class="button" disabled>
+              Pay
+            </button>
+          {% endif %}
         </div>
         </div>
       {% endblock %}
@@ -112,13 +120,13 @@
         {% if cart.shipping_address %}
           {% set address= cart.shipping_address %}
           defaultValues: {
-            name: {{ address.name }},
+            name: '{{ address.name }}',
             address: {
-              line1: {{ address.street1 }},
-              line2: {{ address.street2 }},
-              city: {{ address.city }},
-              state: {{ address.state }},
-              postal_code: {{ address.zip }},
+              line1: '{{ address.street1 }}',
+              line2: '{{ address.street2 }}',
+              city: '{{ address.city }}',
+              state: '{{ address.state }}',
+              postal_code: '{{ address.zip }}',
               country: 'US',
             }
           }

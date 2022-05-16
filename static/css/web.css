@@ -331,6 +331,13 @@ a.button:link, a.button:visited {
   background-color: #fff;
   color: var(--primary-color);
 }
+.button[disabled] {
+  --primary-color: #ccc;
+
+  background-color: #eee;
+  color: #999;
+  cursor: not-allowed;
+}
 
 a:link, a:visited {
   color: var(--link-color);

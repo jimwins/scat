@@ -108,6 +108,10 @@ class Cart extends \Scat\Model {
     return $total['ordered'];
   }
 
+  public function ready_for_payment() {
+    return $this->shipping_method && $this->tax_calculated;
+  }
+
   public function flushTotals() {
     $this->_totals= null;
   }
