@@ -200,7 +200,11 @@
     </tr>
     <tr>
       <td colspan="2" align="right">
-        Estimated tax:
+        {% if cart.status == 'cart' %}
+          Estimated tax:
+        {% else %}
+          Tax:
+        {% endif %}
       </td>
       <td align="right">
         {% if cart.tax_calculated %}
@@ -220,6 +224,26 @@
         {% endif %}
       </td>
     </tr>
-    {# TODO payments #}
+    {% set payments= sale.payments.find_many() %}
+    {% if payments|length %}
+      {% for payment in payments %}
+        <tr>
+          <td colspan="4" align="right">
+            {{ payment.pretty_method }}:
+          </td>
+          <td align="right">
+            {{ scat.amount(payment.amount) }}
+          </td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="4" align="right">
+          Due:
+        </td>
+        <td align="right">
+          {{ scat.amount(cart.due) }}
+        </td>
+      </tr>
+    {% endif %}
   </tfoot>
 </table>

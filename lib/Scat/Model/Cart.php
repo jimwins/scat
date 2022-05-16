@@ -310,4 +310,33 @@ class CartPayment extends \Scat\Model {
   public function cart() {
     return $this->belongs_to('Cart')->find_one();
   }
+
+  function pretty_method() {
+    $methods= \Scat\Model\Payment::$methods;
+    switch ($this->method) {
+    case 'stripe':
+      if (!$this->cc_type) {
+        return 'Paid by ' . $methods[$this->method];
+      }
+      /* fall through since we know credit card info */
+    case 'credit':
+      $data= $this->data();
+      return 'Paid by ' . $data->cc_brand .
+             ($data->cc_last4 ? ' ending in ' . $data->cc_last4 : '');
+    case 'discount':
+      if ($this->discount) {
+        return sprintf("Discount (%g%%)", $this->discount);
+      } else {
+        return 'Discount';
+      }
+    case 'change':
+      return 'Change';
+    default:
+      return 'Paid by ' . $methods[$this->method];
+    }
+  }
+
+  public function data() {
+    return json_decode($this->data);
+  }
 }
