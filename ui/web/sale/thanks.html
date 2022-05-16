@@ -1,0 +1,34 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Sale {{ sale.id }} @ Raw Materials Art Supplies
+{% endblock %}
+
+{% block content %}
+  <h1 class="page-header">
+    Thanks for your order!
+  </h1>
+
+  <div class="alert alert-danger">
+    We will email updates about your order, you may want to add <a
+    href="mailto:info@rawmaterialsla.com">info@rawmaterialsla.com</a>
+    to your address book to prevent them being miscategorized as spam.
+    The emails may also end up in the "Promotions" tab for Gmail users.
+  </div>
+
+  <p class="lead">
+    We will let you know when your order
+    {% if sale.shipping_address_id == 1 %}
+      is ready for pickup,
+    {% else %}
+      has shipped,
+    {% endif %}
+    or contact you if there are any issues.
+
+    {# TODO merchant center survey #}
+  </p>
+
+  {% embed 'cart/cart.twig' with { cart: sale } %}
+  {% endembed %}
+{% endblock %}

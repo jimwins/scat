@@ -25,17 +25,19 @@ class Sale {
   }
 
   public function thanks(Request $request, Response $response, $uuid) {
-    $cart= $this->data->factory('Cart')->where('uuid', $uuid)->find_one();
+    $sale= $this->data->factory('Cart')->where('uuid', $uuid)->find_one();
 
-    if (!$cart || $cart->status != 'paid') {
-      if (!$cart || $cart->status == 'cart') {
-        // redirect to cart
+    if (!$sale || $sale->status != 'paid') {
+      if (!$sale || $sale->status == 'sale') {
+        // redirect to sale
       }
-      if ($cart->status == '') {
+      if ($sale->status == '') {
         // other stuff
       }
     }
 
-    return $response->withJson($cart);
+    return $this->view->render($response, 'sale/thanks.html', [
+      'sale' => $sale,
+    ]);
   }
 }
