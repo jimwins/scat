@@ -72,12 +72,15 @@ class Cart {
           $cart->shipping_address([
             'name' => $cart->name,
             'street1' => $value['line1'],
-            'street2' => $value['line2'],
+            'street2' => $value['line2'] ?? '',
             'city' => $value['city'],
             'state' => $value['state'],
             'zip' => $value['postal_code'],
           ]);
           $recalculate= true;
+          break;
+        case 'stripe':
+          /* ignore, we use this below */
           break;
         default:
           throw new \Exception("Not allowed to change {$key}");
@@ -103,7 +106,83 @@ class Cart {
 
     $cart->save();
 
-    return $response->withJson($cart);
+    $data= $cart->as_array();
+
+    if ($cart->stripe_payment_intent_id) {
+      $amount= $cart->due();
+
+      $stripe= new \Stripe\StripeClient([
+        'api_key' => $this->config->get('stripe.secret_key'),
+        'stripe_version' => "2020-08-27;link_beta=v1",
+      ]);
+
+      $payment_intent= $stripe->paymentIntents->retrieve(
+        $cart->stripe_payment_intent_id
+      );
+
+      if ($payment_intent->status == 'succeeded') {
+        throw new \Exception(
+          "Stripe payment intent {$payment_intent->id} already succeeeded?!"
+        );
+      }
+
+      $customer_details= [
+        'email' => $cart->email,
+        'name' => $cart->name,
+        'metadata' => [
+          "person_id" => $cart->person_id,
+        ],
+      ];
+
+      if ($cart->shipping_address_id > 1) {
+        $address= $cart->shipping_address();
+
+        $customer_details['shipping']= [
+          'name' => $address->name,
+          'phone' => $address->phone,
+          'address' => [
+            'line1' => $address->street1,
+            'line2' => $address->street2,
+            'city' => $address->city,
+            'state' => $address->state,
+            'postal_code' => $address->zip,
+            'country' => 'US',
+          ],
+        ];
+      }
+
+      $intent_options= [
+        'amount' => $amount * 100,
+      ];
+
+      if ($payment_intent->customer) {
+        $stripe->customers->update(
+          $payment_intent->customer,
+          $customer_details
+        );
+      } else {
+        $customer= $stripe->customers->create($customer_details);
+        $intent_options['customer']= $customer->id;
+      }
+
+      if ($customer_details['shipping']) {
+        //$intent_options['shipping']= $customer_details['shipping'];
+      }
+      $stripe->paymentIntents->update(
+        $cart->stripe_payment_intent_id,
+        $intent_options
+      );
+    }
+
+    if ($request->getParam('stripe')) {
+      $data['html']=
+        $this->view->fetchBlock('cart/checkout-stripe.html', 'cart', [
+          'person' => $person,
+          'cart' => $cart,
+        ]);
+    }
+
+    return $response->withJson($data);
   }
 
   public function addItem(Request $request, Response $response)

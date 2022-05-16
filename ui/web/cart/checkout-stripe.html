@@ -49,23 +49,27 @@
     <h3>Payment</h3>
     <div id="payment-element"></div>
 
-    {% embed 'cart/cart.twig' with { 'editable' : false } %}
-      {% block buttons %}
-        {% import 'macros.twig' as scat %}
-        <div class="pay-button">
-          {% if cart.ready_for_payment %}
-            <button type="submit" class="button">
-              Pay {{ scat.amount(cart.due) }}
-            </button>
-          {% else %}
-            <button class="button" disabled>
-              Pay
-            </button>
-          {% endif %}
-        </div>
-        </div>
-      {% endblock %}
-    {% endembed %}
+    {% block cart %}
+      <div id="cart">
+        {% embed 'cart/cart.twig' with { 'editable' : false } %}
+          {% block buttons %}
+            {% import 'macros.twig' as scat %}
+            <div class="pay-button">
+              {% if cart.ready_for_payment %}
+                <button type="submit" class="button">
+                  Pay {{ scat.amount(cart.due) }}
+                </button>
+              {% else %}
+                <button class="button" disabled>
+                  Pay
+                </button>
+              {% endif %}
+            </div>
+            </div>
+          {% endblock %}
+        {% endembed %}
+      </div>
+    {% endblock %}
   </form>
 
 {% endblock %}
@@ -137,6 +141,7 @@
 
       shippingAddressElement.on('change', (event) => {
         const details= event.value;
+        details.stripe= true;
         clearTimeout(timeout);
         timeout= setTimeout(() => {
           fetch('{{ url_for('update-cart') }}', {
@@ -146,6 +151,20 @@
               'Content-type': 'application/json',
             },
             body: JSON.stringify(details)
+          }).then((res) => {
+            if (res.status >= 200 && res.status < 300) {
+              return Promise.resolve(res)
+            }
+            return Promise.reject(new Error(res.statusText))
+          }).then((res) => {
+            return res.json()
+          }).then((data) => {
+            if (data.html) {
+              let template= document.createElement('template')
+              template.innerHTML= data.html.trim()
+              let cart= document.getElementById('cart')
+              cart.replaceWith(template.content.firstChild)
+            }
           })
         }, 500);
       });
