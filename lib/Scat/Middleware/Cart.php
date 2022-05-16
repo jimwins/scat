@@ -35,6 +35,7 @@ final class Cart implements MiddlewareInterface
         error_log("Cart is already complete");
         if ($cart->status == 'paid') {
           // TODO this is ugly, but it works
+          $this->dumpCookies();
           $response= $GLOBALS['app']->getResponseFactory()->createResponse();
           return $response->withRedirect(
             '/sale/' . $cart->uuid . '/thanks'
@@ -56,10 +57,7 @@ final class Cart implements MiddlewareInterface
                 $_SERVER['HTTP_HOST'] : false);
 
       if ($cart->id <= 0) {
-        SetCookie('cartID', "", (new \Datetime("-24 hours"))->format("U"),
-                  '/', $domain, true, true);
-        SetCookie('cartDetails', "", (new \Datetime("-24 hours"))->format("U"),
-                  '/', $domain, true, false);
+        $this->dumpCookies();
       } else {
         $details= json_encode([
           'items' => $cart->items()->count(),
@@ -73,5 +71,14 @@ final class Cart implements MiddlewareInterface
     }
 
     return $response;
+  }
+
+  protected function dumpCookies() {
+    $domain= ($_SERVER['HTTP_HOST'] != 'localhost' ?
+              $_SERVER['HTTP_HOST'] : false);
+    SetCookie('cartID', "", (new \Datetime("-24 hours"))->format("U"),
+              '/', $domain, true, true);
+    SetCookie('cartDetails', "", (new \Datetime("-24 hours"))->format("U"),
+              '/', $domain, true, false);
   }
 }
