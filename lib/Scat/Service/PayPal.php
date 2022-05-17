@@ -2,12 +2,13 @@
 namespace Scat\Service;
 
 class PayPal {
-  private $client_id, $secret;
+  private $client_id, $secret, $webhook_id;
   public $from_email, $from_name;
 
   public function __construct(Config $config) {
     $this->client_id= $config->get('paypal.client_id');
     $this->secret= $config->get('paypal.secret');
+    $this->webhook_id= $config->get('paypal.webhook_id');
   }
 
   private function getClient() {
@@ -26,6 +27,10 @@ class PayPal {
 
   public function getClientId() {
     return $this->client_id;
+  }
+
+  public function getWebhookId() {
+    return $this->webhook_id;
   }
 
   public function refund($capture_id, $amount) {

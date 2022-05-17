@@ -10,6 +10,10 @@ class Cart extends \Scat\Model {
     return $this->has_many('CartLine');
   }
 
+  public function notes() {
+    return $this->has_many('CartNote');
+  }
+
   public function payments() {
     return $this->has_many('CartPayment');
   }

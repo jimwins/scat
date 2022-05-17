@@ -158,12 +158,14 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
             [ \Scat\Web\Cart::class, 'paypalOrder' ]);
   $app->post('/checkout/paypal-update',
             [ \Scat\Web\Cart::class, 'paypalUpdate' ]);
-  $app->get('/checkout/paypal-pickup',
+  $app->post('/checkout/paypal-pickup',
             [ \Scat\Web\Cart::class, 'paypalSetPickup' ]);
   $app->post('/checkout/paypal-shipped',
             [ \Scat\Web\Cart::class, 'paypalSetAddress' ]);
   $app->get('/pay/paypal', [ \Scat\Web\Cart::class, 'paypalPay' ])
       ->setName('pay-paypal');
+  $app->post('/finalize/paypal', [ \Scat\Web\Cart::class, 'paypalFinalize' ])
+      ->setName('finalize-paypal');
 
   /* Stripe */
   $app->get('/checkout/stripe', [ \Scat\Web\Cart::class, 'stripeCheckout' ])
@@ -179,6 +181,8 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
 
 $app->post('/~webhook/stripe',
             [ \Scat\Web\Cart::class, 'handleStripeWebhook' ]);
+$app->post('/~webhook/paypal',
+            [ \Scat\Web\Cart::class, 'handlePayPalWebhook' ]);
 
 /* Sale (= a completed cart) */
 $app->group('/sale', function (RouteCollectorProxy $app) {

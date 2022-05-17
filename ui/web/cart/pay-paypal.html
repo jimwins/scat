@@ -20,19 +20,29 @@
     </h2>
   {% endif %}
 
+  <form id="paypal-form" class="stacked-form">
+    <label for="comment">Any special requests?</label>
+    <textarea class="input" name="comment" rows="5"></textarea>
+    {% if cart.shipping_address_id > 1 %}
+      <small class="help-block">
+        Please note that we are unable to pass along detailed delivery
+        instructions on orders being shipped.
+      </small>
+    {% endif %}
 
-  {% block cart %}
-    <div id="cart">
-      {% embed 'cart/cart.twig' with { 'editable' : false } %}
-        {% block buttons %}
-          {% import 'macros.twig' as scat %}
-          <div class="pay-button">
-            <div id="paypal-buttons"></div>
-          </div>
-        {% endblock %}
-      {% endembed %}
-    </div>
-  {% endblock %}
+    {% block cart %}
+      <div id="cart">
+        {% embed 'cart/cart.twig' with { 'editable' : false } %}
+          {% block buttons %}
+            {% import 'macros.twig' as scat %}
+            <div class="pay-button">
+              <div id="paypal-buttons"></div>
+            </div>
+          {% endblock %}
+        {% endembed %}
+      </div>
+    {% endblock %}
+  </form>
 
 {% endblock %}
 
@@ -69,21 +79,18 @@
 
         // Finalize the transaction on the server after payer approval
         onApprove: (data, actions) => {
-          return actions.reject()
-          return fetch(`/api/orders/${data.orderID}/capture`, {
-            method: "post",
-          })
-          .then((response) => response.json())
-          .then((orderData) => {
-            // Successful capture! For dev/demo purposes:
-            console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
-            const transaction = orderData.purchase_units[0].payments.captures[0];
-            alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
-            // When ready to go live, remove the alert and show a success message within this page. For example:
-            // const element = document.getElementById('paypal-button-container');
-            // element.innerHTML = '<h3>Thank you for your payment!</h3>';
-            // Or go to another URL:  actions.redirect('thank_you.html');
-          });
+	  return actions.order.capture().then(function(details) {
+	    let formData= new FormData(document.getElementById('paypal-form'))
+	    formData.append('order_id', details.id)
+	    return fetch('{{ url_for('finalize-paypal') }}', {
+	      method: 'POST',
+	      body: formData
+	    }).then(function (data) {
+	      if (data.ok) {
+		window.location.href= '{{ url_for('sale-thanks', { uuid: cart.uuid }) }}'
+	      }
+	    });
+	  });
         }
       }).render('#paypal-buttons');
     }

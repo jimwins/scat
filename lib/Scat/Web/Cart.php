@@ -721,10 +721,6 @@ class Cart {
       ];
 
       $paypal->updateOrder($cart->paypal_order_id, $patch);
-
-      $order= $paypal->getOrder($cart->paypal_order_id);
-
-      error_log("after details: " . json_encode($order));
     } else {
       $order= $paypal->createOrder($details);
       $cart->paypal_order_id= $order->id;
@@ -834,6 +830,10 @@ class Cart {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
 
+    // TODO should be part of login/guest process
+    $cart->name= $request->getParam('name');
+    $cart->email= $request->getParam('email');
+
     $cart->shipping_address_id= 1;
     $cart->shipping_method= 'default';
     $cart->shipping= 0;
@@ -905,5 +905,147 @@ class Cart {
       'cart' => $cart,
       'paypal' => $paypal->getClientId(),
     ]);
+  }
+
+  public function paypalFinalize(
+    Request $request, Response $response,
+    \Scat\Service\PayPal $paypal,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    // Save comment, not fatal if it doesn't work
+    if (($comment= $request->getParam('comment'))) {
+      $note= $cart->notes()->create([
+        'sale_id' => $cart->id,
+        'person_id' => $person->id,
+        'content' => $comment,
+      ]);
+      try {
+        $note->save();
+      } catch (\Exception $e) {
+        error_log("Failed to save comment for {$cart->uuid}: {$comment}");
+      }
+    }
+
+    $uuid= $cart->uuid;
+    $order_id= $request->getParam('order_id');
+
+    // TODO validate that $order_id = $cart->paypal_order_id
+
+    return $this->paypalFinalizeCart(
+      $request,
+      $response,
+      $paypal,
+      $tax,
+      $cart
+    );
+  }
+
+  public function paypalFinalizeCart(
+    Request $request, Response $response,
+    \Scat\Service\PayPal $paypal,
+    \Scat\Service\Tax $tax,
+    \Scat\Model\Cart $cart
+  ) {
+    $order_id= $cart->paypal_order_id;
+
+    // TODO validate
+    error_log("Finalizing PayPal {$order_id} on {$cart->uuid}");
+
+    // if we already have it, don't do it again!
+    $has= $cart->payments()
+                ->where_raw(
+                  'data->"$.id" = ?', [ $order_id ])
+                ->find_one();
+    if ($has) {
+      error_log("Already processed PayPal payment $order_id\n");
+      return $response->withJson([ 'message' => 'Already processed.' ]);
+    }
+
+    $order= $paypal->getOrder($order_id);
+
+    $amount= $order->purchase_units[0]->amount->value;
+
+    $cart->addPayment('paypal', $amount, false, $order);
+
+    $cart->save();
+
+end:
+    if ($cart->status != 'paid') {
+      throw new \Exception("Not completely paid!");
+    }
+
+    /* Set cart id to -1 so cookie will get unset */
+    $cart->id= -1;
+
+    return $response->withJson([ 'message' => 'Processed' ] );
+  }
+
+  public function handlePayPalWebhook(
+    Request $request, Response $response,
+    \Scat\Service\PayPal $paypal,
+    \Scat\Service\Tax $tax,
+    \Scat\Service\Cart $carts
+  ) {
+    $webhook_id= $paypal->getWebhookId();
+
+    // adapted from https://stackoverflow.com/a/62870569
+    if ($webhook_id) {
+      $headers= $request->getHeaders();
+      $body= $request->getBody();
+
+      $data= join('|', [
+		  $headers['Paypal-Transmission-Id'][0],
+		  $headers['Paypal-Transmission-Time'][0],
+		  $webhook_id,
+		  crc32($body) ]);
+
+      $cert= file_get_contents($headers['Paypal-Cert-Url'][0]);
+      $pubkey= openssl_pkey_get_public($cert);
+
+      $sig= base64_decode($headers['Paypal-Transmission-Sig'][0]);
+
+      $res= openssl_verify($data, $sig, $pubkey, 'sha256WithRSAEncryption');
+
+      if ($res == 0) {
+        throw new \Exception("Webhook signature validation failed.");
+      } elseif ($res < 0) {
+        throw new \Exception("Error validating signature: " . openssl_error_string());
+      }
+    }
+
+    $event_type= $request->getParam('event_type');
+    $resource= $request->getParam('resource');
+
+    // Handle the event
+    switch ($event_type) {
+      case 'PAYMENT.CAPTURE.COMPLETED':
+        $uuid= $resource['custom_id'];
+        if (!$uuid) {
+          error_log("No uuid on resource, dunno what this is");
+          error_log(json_encode($resource));
+          break;
+        }
+
+        $cart= $carts->findByUuid($uuid);
+        if (!$cart) {
+          throw new \Slim\Exception\HttpNotFoundException($request);
+        }
+
+        return $this->paypalFinalizeCart(
+          $request,
+          $response,
+          $paypal,
+          $tax,
+          $cart
+        );
+
+      default:
+        throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    return $response->withJson([ 'message' => 'Success!' ]);
   }
 }
