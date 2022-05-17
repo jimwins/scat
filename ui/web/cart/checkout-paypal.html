@@ -1,0 +1,120 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  PayPal Checkout @ Raw Materials Art Supplies
+{% endblock %}
+
+{% block content %}
+  {% if person %}
+    <h2>
+      Welcome back{{ person ? ', ' ~ person.friendly_name }}!
+      <small>
+        (<a href="{{ url_for('account') }}">view your account</a>
+        or <a href="{{ url_for('logout') }}">log out</a>)
+      </small>
+    </h2>
+  {% else %}
+    <h2>
+      Welcome! <a href="{{ url_for('login')}}">Log in or create an account.</a>
+    </h2>
+  {% endif %}
+
+  <form id="payment-form" class="stacked-form"
+        method="POST" action="/cart/checkout/paypal-shipped">
+    <h3>Contact info</h3>
+
+    <label for="name">Name</label>
+    <input type="text" class="input" name="name" required
+            value="{{ cart.name }}"
+            placeholder="Vincent Van Gogh">
+
+    <label for="email">Email</label>
+    <input type="text" class="input" name="email" required
+            value="{{ cart.email }}"
+            placeholder="vincent.van.gogh@example.com">
+
+    <h3>Shipping</h3>
+    <p>
+      <strong>Where do you want to us to ship the order?</strong> We can
+      prepare your order for pick-up at our store in downtown Los
+      Angeles, or we can ship it anywhere in the United States. (Sorry,
+      we don't ship internationally.)
+    </p>
+
+    {% if cart.shipping_address_id == 1 %}
+      <a href="/cart/checkout/paypal-shipped" class="button">
+        <i class="lni lni-delivery"></i>
+        <span class="label">I want it shipped</span>
+      </a>
+    {% else %}
+      <a href="/cart/checkout/paypal-pickup" class="button">
+        <i class="lni lni-apartment"></i>
+        <span class="label">Pick it up at the store!</span>
+      </a>
+      <hr>
+
+      {% set address= cart.shipping_address() %}
+
+      <label for="shipping_name">Name</label>
+      <input type="text" class="input"
+             name="shipping_name" autocomplete="name" required
+             value="{{ address.name ?? cart.name }}">
+
+      <label for="company">Company</label>
+      <input type="text" class="input"
+             name="company" placeholder="(optional)"
+             autocomplete="organization"
+             value="{{ address.company }}">
+
+      <label for="phone">Phone</label>
+      <input type="text" class="input"
+             name="phone" placeholder="(optional)"
+             value="{{ address.phone }}">
+
+      <label for="street1">Address</label>
+      <input type="text" class="input"
+             name="street1" placeholder="645 S Los Angeles St" required
+             autocomplete="address-line1"
+             value="{{ address.street1 }}">
+      <input type="text" class="input"
+             name="street2" placeholder="Apt 2-B"
+             autocomplete="address-line2"
+             value="{{ address.street2 }}">
+
+      <label for="city">City</label>
+      <input type="text" class="input" name="city" required
+             autocomplete="address-level-2"
+             value="{{ address.city }}"
+             placeholder="Los Angeles">
+
+      <label for="state">State</label>
+      <input type="text" class="input" name="state" required
+             autocomplete="address-level-1"
+             maxlength="2"
+             value="{{ address.state }}"
+             placeholder="CA">
+
+      <label for="zip">ZIP</label>
+      <input type="text" class="input" name="zip" required
+             autocomplete="postal-code"
+             value="{{ address.zip }}"
+             placeholder="90014">
+    </div>
+
+    <button type="submit" class="button">
+      <i class="lni lni-delivery"></i>
+      <span class="label">Ship to this address</span>
+    </button>
+
+    {% endif %}
+
+    {% block cart %}
+      <div id="cart">
+        {% embed 'cart/cart.twig' with { 'editable' : false } %}
+        {% endembed %}
+      </div>
+    {% endblock %}
+  </form>
+
+{% endblock %}

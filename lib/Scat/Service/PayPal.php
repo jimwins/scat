@@ -24,6 +24,10 @@ class PayPal {
     return new \PayPalCheckoutSdk\Core\PayPalHttpClient($env);
   }
 
+  public function getClientId() {
+    return $this->client_id;
+  }
+
   public function refund($capture_id, $amount) {
     $paypal= $this->getClient();
 
@@ -67,5 +71,49 @@ class PayPal {
     //error_log(json_encode($res) . "\n");
 
     return $res;
+  }
+
+  public function createOrder($details) {
+    $client= $this->getClient();
+
+    $request= new \PayPalCheckoutSdk\Orders\OrdersCreateRequest();
+    $request->prefer('return=representation');
+    $request->body= json_encode($details);
+
+    $response= $client->execute($request);
+
+    /* TODO error handling? */
+
+    return $response->result;
+  }
+
+  public function getOrder($paypal_order_id) {
+    $client= $this->getClient();
+
+    $response= $client->execute(
+      new \PayPalCheckoutSdk\Orders\OrdersGetRequest($paypal_order_id)
+    );
+
+    /* TODO error handling? */
+
+    return $response->result;
+  }
+
+  public function updateOrder($paypal_order_id, $patch) {
+    $client= $this->getClient();
+
+    $request= new \PayPalCheckoutSdk\Orders\OrdersPatchRequest(
+      $paypal_order_id
+    );
+    $request->body= json_encode($patch);
+
+    try {
+      $response= $client->execute($request);
+    } catch (\PayPalHttp\HttpException $e) {
+      error_log("HttpException {$e->statusCode}: {$e->result}");
+      throw $e;
+    }
+
+    return $response->result;
   }
 }

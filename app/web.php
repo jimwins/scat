@@ -139,8 +139,11 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->post('', [ \Scat\Web\Cart::class, 'cartUpdate' ])
       ->setName('update-cart');
   $app->post('/add-item', [ \Scat\Web\Cart::class, 'addItem' ]);
+
   $app->get('/checkout', [ \Scat\Web\Cart::class, 'checkout' ])
       ->setName('checkout');
+
+  /* Amazon */
   $app->get('/checkout/amzn', [ \Scat\Web\Cart::class, 'amznCheckout' ])
       ->setName('checkout-amzn');
   $app->get('/pay/amzn', [ \Scat\Web\Cart::class, 'amznPay' ])
@@ -148,9 +151,21 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->get('/finalize/amzn', [ \Scat\Web\Cart::class, 'amznFinalize' ])
       ->setName('finalize-amzn');
 
+  /* PayPal */
   $app->get('/checkout/paypal', [ \Scat\Web\Cart::class, 'paypalCheckout' ])
       ->setName('checkout-paypal');
+  $app->get('/checkout/paypal-order',
+            [ \Scat\Web\Cart::class, 'paypalOrder' ]);
+  $app->post('/checkout/paypal-update',
+            [ \Scat\Web\Cart::class, 'paypalUpdate' ]);
+  $app->get('/checkout/paypal-pickup',
+            [ \Scat\Web\Cart::class, 'paypalSetPickup' ]);
+  $app->post('/checkout/paypal-shipped',
+            [ \Scat\Web\Cart::class, 'paypalSetAddress' ]);
+  $app->get('/pay/paypal', [ \Scat\Web\Cart::class, 'paypalPay' ])
+      ->setName('pay-paypal');
 
+  /* Stripe */
   $app->get('/checkout/stripe', [ \Scat\Web\Cart::class, 'stripeCheckout' ])
       ->setName('checkout-stripe');
   $app->get('/checkout/stripe-pickup',

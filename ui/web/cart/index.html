@@ -39,13 +39,14 @@
             <span class="label">Pay with Credit Card</span>
           </a>
         </div>
-        <div class="pay-button">
-          <a class="button block" href="{{ url_for('checkout-paypal' ) }}"
-             style="--primary-color: #253B80">
-            <i class="lni lni-paypal"></i>
-            <span class="label">Pay with PayPal</span>
-          </a>
-        </div>
+        {% if paypal %}
+          <div class="pay-button" style="--primary-color: #1e477a">
+            <a class="button block" href="{{ url_for('checkout-paypal' ) }}">
+              <i class="lni lni-paypal"></i>
+              <span class="label">Pay with PayPal</span>
+            </a>
+          </div>
+        {% endif %}
         <div class="pay-button">
           <div id="AmazonPayButton"></div>
         </div>

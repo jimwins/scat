@@ -26,6 +26,7 @@ class Cart {
 
   public function cart(
     Request $request, Response $response,
+    \Scat\Service\PayPal $paypal,
     \Scat\Service\AmazonPay $amzn
   ) {
     $cart= $request->getAttribute('cart');
@@ -40,10 +41,10 @@ class Cart {
       [ 'uuid' => $cart->uuid ]
     );
 
-
     return $this->view->render($response, 'cart/index.html', [
       'person' => $person,
       'cart' => $cart,
+      'paypal' => $paypal->getClientId(),
       'amzn' => $amzn->getEnvironment($return_link),
     ]);
   }
@@ -602,5 +603,307 @@ class Cart {
     }
 
     return $response->withJson([ 'message' => 'Success!' ]);
+  }
+
+  public function paypalCheckout(
+    Request $request, Response $response,
+    \Scat\Service\PayPal $paypal
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    return $this->view->render($response, 'cart/checkout-paypal.html', [
+      'paypal' => [
+        'client_id' => $paypal->getClientId(),
+      ],
+      'person' => $person,
+      'cart' => $cart,
+    ]);
+  }
+
+  public function paypalOrder(
+    Request $request, Response $response,
+    \Scat\Service\Shipping $shipping,
+    \Scat\Service\PayPal $paypal,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    /* Less detail to the amount if order is partially paid already. */
+    if ($cart->total_paid()) {
+      $amount= [
+        'currency_code' => 'USD',
+        'value' => $cart->due(),
+      ];
+    } else {
+      $amount= [
+        'currency_code' => 'USD',
+        'value' => $cart->total(),
+        'breakdown' => [
+          'item_total' => [
+            'currency_code' => 'USD',
+            // TODO need to use Decimal here?
+            'value' => $cart->subtotal() + cart->shipping,
+          ],
+          'tax_total' => [
+            'currency_code' => 'USD',
+          ],
+        ]
+      ];
+    }
+
+    $address= $cart->shipping_address();
+
+    $shipping= [
+      'name' => [
+        'full_name' => $address->name ?: $address->company,
+      ],
+      'address' => [
+        'address_line_1' => $address->street1,
+        'address_line_2' => $address->street2,
+        'admin_area_2' => $address->city,
+        'admin_area_1' => $address->state,
+        'postal_code' => $address->zip,
+        'country_code' => 'US',
+      ],
+    ];
+
+    $details= [
+      'intent' => 'CAPTURE',
+      'application_context' => [
+        'shipping_preference' => 'SET_PROVIDED_ADDRESS',
+        'user_action' => 'PAY_NOW',
+      ],
+      'purchase_units' => [
+        [
+          'reference_id' => $cart->uuid,
+          'custom_id' => $cart->uuid,
+          'amount' => $amount,
+          'items' => [],
+          'shipping' => $shipping,
+        ]
+      ],
+    ];
+
+    $order= null;
+
+    try {
+      if ($cart->paypal_order_id) {
+        $order= $paypal->getOrder($cart->paypal_order_id);
+      }
+    } catch (\PayPalHttp\HttpException $e) {
+      error_log("HttpException {$e->statusCode}");
+      $cart->paypal_order_id= null;
+    }
+
+    if ($order) {
+      if ($order->status == 'COMPLETED') {
+        throw new \Exception("Payment already completed.");
+      }
+
+      $patch = [
+        [
+          'op' => 'replace',
+          'path' => "/purchase_units/@reference_id=='{$cart->uuid}'/amount",
+          'value' => $amount,
+        ],
+        [
+          'op' => 'replace',
+          'path' => "/purchase_units/@reference_id=='{$cart->uuid}'/shipping/name",
+          'value' => $shipping['name'],
+        ],
+        [
+          'op' => 'replace',
+          'path' => "/purchase_units/@reference_id=='{$cart->uuid}'/shipping/address",
+          'value' => $shipping['address'],
+        ]
+      ];
+
+      $paypal->updateOrder($cart->paypal_order_id, $patch);
+
+      $order= $paypal->getOrder($cart->paypal_order_id);
+
+      error_log("after details: " . json_encode($order));
+    } else {
+      $order= $paypal->createOrder($details);
+      $cart->paypal_order_id= $order->id;
+    }
+
+    $cart->save();
+
+    return $response->withJson($order);
+  }
+
+  public function paypalUpdate(
+    Request $request, Response $response,
+    \Scat\Service\PayPal $paypal,
+    \Scat\Service\Shipping $shipping,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    error_log("incoming: " . json_encode($request->getParams()));
+
+    $order= $paypal->getOrder($cart->paypal_order_id);
+
+    error_log("order details: " . json_encode($order));
+
+    $recalculate= false;
+
+    if (isset($order->payer)) {
+      $cart->name= trim($order->payer->name->given_name . ' ' . $order->payer->name->surname);
+    }
+
+    if (isset($order->purchase_units[0]->shipping)) {
+      $details= $order->purchase_units[0]->shipping;
+      $address= $cart->shipping_address([
+        'name' => $details->name->full_name ?? '',
+        'street1' => $details->address->address_line_1 ?? '',
+        'street2' => $details->address->address_line_2 ?? '',
+        'city' => $details->address->admin_area_2 ?? '',
+        'state' => $details->address->admin_area_1 ?? '',
+        'zip' => $details->address->postal_code ?? '',
+      ]);
+      $recalculate= true;
+    }
+
+    if ($recalculate) {
+      $box= $cart->get_shipping_box();
+      $weight= $cart->get_shipping_weight();
+      $hazmat= $cart->has_hazmat_items();
+
+      // recalculate shipping costs
+      list($cost, $method)=
+        $shipping->get_shipping_estimate($box, $weight, $hazmat,
+                                          $address->as_array());
+      $cart->shipping_method= $method ? 'default' : null;
+      $cart->shipping= $method ? $cost : null;
+
+      // and then recalculate sales tax
+      $cart->recalculateTax($tax);
+    }
+
+    $cart->save();
+
+    $data= $cart->as_array();
+
+    if ($cart->total_paid()) {
+      $amount= [
+        'currency_code' => 'USD',
+        'value' => $cart->due(),
+      ];
+    } else {
+      $amount= [
+        'currency_code' => 'USD',
+        'value' => $cart->total(),
+        'breakdown' => [
+          'item_total' => [
+            'currency_code' => 'USD',
+            // TODO need to use Decimal here?
+            'value' => $cart->subtotal() + cart->shipping,
+          ],
+          'tax_total' => [
+            'currency_code' => 'USD',
+            'value' => $cart->tax(),
+          ],
+        ]
+      ];
+    }
+
+    $patch= [
+      [
+        'op' => 'replace',
+        'path' => "/purchase_units/@reference_id=='{$cart->uuid}'/amount",
+        'value' => $amount,
+      ]
+    ];
+
+    $paypal->updateOrder($cart->paypal_order_id, $patch);
+
+    return $response->withJson($data);
+  }
+
+  public function paypalSetPickup(
+    Request $request, Response $response,
+    \Scat\Service\PayPal $paypal,
+    \Scat\Service\Shipping $shipping,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    $cart->shipping_address_id= 1;
+    $cart->shipping_method= 'default';
+    $cart->shipping= 0;
+    $cart->shipping_tax= 0;
+
+    // and then recalculate sales tax
+    $cart->recalculateTax($tax);
+
+    $cart->save();
+
+    return $response->withRedirect('/cart/pay/paypal');
+  }
+
+  public function paypalSetAddress(
+    Request $request, Response $response,
+    \Scat\Service\PayPal $paypal,
+    \Scat\Service\Shipping $shipping,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    // TODO should be part of login/guest process
+    $cart->name= $request->getParam('name');
+    $cart->email= $request->getParam('email');
+
+    $cart->shipping_address([
+      'name' => $request->getParam('shipping_name'),
+      'company' => $request->getParam('company'),
+      'phone' => $request->getParam('phone'),
+      'street1' => $request->getParam('street1'),
+      'street2' => $request->getParam('street2'),
+      'city' => $request->getParam('city'),
+      'state' => $request->getParam('state'),
+      'zip' => $request->getParam('zip'),
+    ]);
+
+    $box= $cart->get_shipping_box();
+    $weight= $cart->get_shipping_weight();
+    $hazmat= $cart->has_hazmat_items();
+
+    $address= $cart->shipping_address();
+    // recalculate shipping costs
+    list($cost, $method)=
+      $shipping->get_shipping_estimate($box, $weight, $hazmat,
+                                        $address->as_array());
+    $cart->shipping_method= $method ? 'default' : null;
+    $cart->shipping= $method ? $cost : null;
+
+    // and then recalculate sales tax
+    $cart->recalculateTax($tax);
+
+    $cart->save();
+
+    return $response->withRedirect('/cart/pay/paypal');
+  }
+
+  public function paypalPay(
+    Request $request, Response $response,
+    \Scat\Service\PayPal $paypal,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    // TODO validate
+    return $this->view->render($response, 'cart/pay-paypal.html', [
+      'person' => $person,
+      'cart' => $cart,
+      'paypal' => $paypal->getClientId(),
+    ]);
   }
 }
