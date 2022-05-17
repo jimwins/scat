@@ -12,7 +12,7 @@
 {% endmacro %}
 
 <tr data-id="{{ i.id }}"
-    data-stocked="{{ (i.stock or i.minimum_quantity) ? 1 : 0 }}"
+    data-stocked="{{ (i.stock() or i.minimum_quantity) ? 1 : 0 }}"
     data-code="{{ i.code }}"
     class="{{ (item and item.id == i.id) ? 'info' }}
            {{ not i.active ? 'inactive' }}">
@@ -98,8 +98,8 @@
   <td class="text-center">
     <span class="editable"
           data-pk="{{ i.code }}"
-          data-name="stock" data-value="{{ i.stock }}">
-      {{ i.stock }}
+          data-name="stock" data-value="{{ i.stock() }}">
+      {{ i.stock() }}
     </span>
   </td>
   <td class="text-center">

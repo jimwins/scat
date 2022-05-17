@@ -367,6 +367,7 @@
                   <th>Name</th>
                   <th class="text-right">Retail</th>
                   <th class="text-right">Sale</th>
+                  <th class="text-right">Stock</th>
                   <th class="text-right">Quantity</th>
                 </thead>
                 {% set ext_sale, ext_retail, ext_quantity= 0, 0, 0 %}
@@ -392,6 +393,9 @@
                         {{ scat.amount(i.sale_price) }}
                       </td>
                       <td class="text-right">
+                        {{ i.stock() }}
+                      </td>
+                      <td class="text-right">
                         <span class="editable" data-name="quantity">
                           {{- k.quantity -}}
                         </span>
@@ -406,7 +410,7 @@
                 </tbody>
                 <tfoot>
                   <tr style="border-top: 6px double #dbcbb1">
-                    <td colspan="3"></td>
+                    <td colspan="4"></td>
                     <td class="text-right">{{ scat.amount(ext_retail) }}</td>
                     <td class="text-right">{{ scat.amount(ext_sale) }}</td>
                     <td class="text-right">{{ ext_quantity }}</td>
