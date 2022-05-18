@@ -730,3 +730,32 @@ table {
 .help-block {
   color: #3c763d;
 }
+
+.hr {
+  overflow: hidden;
+  text-align: center;
+}
+
+.hr:before,
+.hr:after {
+  background-color: rgba(var(--primary-color-r),
+                          var(--primary-color-g),
+                          var(--primary-color-b),
+                          0.2);
+  content: "";
+  display: inline-block;
+  height: var(--border-width);
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+
+.hr:before {
+  right: 0.5em;
+  margin-left: -50%;
+}
+
+.hr:after {
+  left: 0.5em;
+  margin-right: -50%;
+}
