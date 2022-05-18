@@ -94,12 +94,12 @@
                      class="input" id="qty_{{ line.id }}"
                      name="qty[{{ line.id }}]" value="{{ line.quantity }}">
               <button class="update button min">
-                <i class="lni lni-reload"></i>
+                <i class="bi bi-cart-check"></i>
                 <span class="visually-hidden">Update</span>
               </button>
               <a href="/cart/remove-item?item={{ line.id }}"
                  class="remove button min">
-                <i class="lni lni-trash-can"></i>
+                <i class="bi bi-cart-dash"></i>
               </a>
             </span>
             <br>
@@ -131,10 +131,10 @@
             <a class="pull-right" href="/shipping#hazmat" data-toggle="tooltip" title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="20" alt="Hazardous Materials"></a>
           {% endif %}
           {% if item.oversized %}
-            <a class="pull-right" href="/shipping#oversized" data-toggle="tooltip" title="Oversized data: special shipping is required, and there will be additional costs. Click for more details."><i class="lni lni-delivery"></i></a>
+            <a class="pull-right" href="/shipping#oversized" data-toggle="tooltip" title="Oversized data: special shipping is required, and there will be additional costs. Click for more details."><i class="bi bi-truck"></i></a>
           {% else %}
             {% if not item.can_ship_free %}
-              <a class="pull-right" href="/shipping" data-toggle="tooltip" title="This item is not eligible for free shipping."><i class="lni lni-delivery text-success"></i></a>
+              <a class="pull-right" href="/shipping" data-toggle="tooltip" title="This item is not eligible for free shipping."><i class="bi bi-truck text-success"></i></a>
             {% endif %}
           {% endif %}
           <span>{{ item.name }}</span>

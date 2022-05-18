@@ -4,7 +4,7 @@
 {% if product.items.find_many|length > 1 %}
   <h4>
     <a href="{{ url_for('catalog', item.product.url_params()) }}">
-      <i class="lni lni-arrow-left"></i>
+      <i class="bi bi-arrow-left"></i>
       Back to {{ product.name }}
     </a>
   </h4>
@@ -186,7 +186,7 @@ figure img {
           </span>
         {% endif %}
         <button type="submit" class="button block">
-          <i class="lni lni-circle-plus"></i>
+          <i class="bi bi-cart-plus"></i>
           <span class="label">Add to Cart</span>
         </button>
       </form>
@@ -211,7 +211,7 @@ figure img {
           <p><a href="/shipping#hazmat"><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"> Hazardous materials:</a> special shipping is required, and there may be additional costs.</p>
         {% endif %}
         {% if item.oversized %}
-          <p><a href="/shipping#oversized"><i class="lni lni-delivery"></i> Oversized item:</a> special shipping is required, and there will be additional costs.</p>
+          <p><a href="/shipping#oversized"><i class="bi bi-truck"></i> Oversized item:</a> special shipping is required, and there will be additional costs.</p>
         {% endif %}
       </div>
     {% endif %}

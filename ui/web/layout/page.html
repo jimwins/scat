@@ -15,7 +15,7 @@
   </title>
 
   <link rel="stylesheet" type="text/css" href="/css/normalize.css">
-  <link rel="stylesheet" type="text/css" href="/css/lineicons.css">
+  <link rel="stylesheet" type="text/css" href="/css/bootstrap-icons-1.8.2/bootstrap-icons.css">
   <link rel="stylesheet" type="text/css" href="/css/web.css">
 
   {% block extra_header %}{% endblock %}
@@ -28,7 +28,7 @@
       <a id="site-dept-menu" class="button nav-button"
           data-toggle="panel" data-target="site-depts"
           href="/art-supplies">
-        <i class="lni lni-menu"></i>
+        <i class="bi bi-list"></i>
       </a>
       <a id="site-name" href="/">
         <img src="https://rawmats.gumlet.io/i/o/619408b8005c11013ca45b7b75.png?w=622&h=69&mode=fit&fm=auto" alt="Raw Materials Art Supplies">
@@ -45,14 +45,14 @@
         <a class="button nav-button"
             data-toggle="panel" data-target="site-about"
             href="/about">
-          <i class="lni lni-map-marker"></i>
+          <i class="bi bi-geo-alt"></i>
           <span class="label">About</span>
         </a>
       </div>
       <div id="site-cart">
         <a class="button"
             href="/cart">
-          <i class="lni lni-cart"></i>
+          <i class="bi bi-cart"></i>
           <span class="badge"></span>
         </a>
       </div>
@@ -81,11 +81,11 @@
         Monday - Saturday, 10am to 6pm <br>
         Closed Sundays
         <ul class="list-horizontal no-separator">
-          <li><a href="http://twitter.com/RawMaterials" title="Follow us on Twitter"><i class="lni lni-lg lni-twitter"></i></a></li>
-          <li><a href="http://facebook.com/RawMaterialsLA" title="Like us on Facebook"><i class="lni lni-lg lni-facebook"></i></a></li>
-          <li><a href="http://instagram.com/rawmaterialsartsupplies" title="Follow us on Instagram"><i class="lni lni-lg lni-instagram"></i></a></li>
-          <li><a href="https://www.pinterest.com/rawmaterialsla/" title="Follow us on Pinterest"><i class="lni lni-lg lni-pinterest"></i></a></li>
-          <li><a href="https://www.youtube.com/channel/UC8QdVII0oYUnrO5RLAcivSQ" title="Subscribe to our YouTube channel"><i class="lni lni-lg lni-youtube"></i></a></li>
+          <li><a href="http://twitter.com/RawMaterials" title="Follow us on Twitter"><i class="bi bi-lg bi-twitter"></i></a></li>
+          <li><a href="http://facebook.com/RawMaterialsLA" title="Like us on Facebook"><i class="bi bi-lg bi-facebook"></i></a></li>
+          <li><a href="http://instagram.com/rawmaterialsartsupplies" title="Follow us on Instagram"><i class="bi bi-lg bi-instagram"></i></a></li>
+          <li><a href="https://www.pinterest.com/rawmaterialsla/" title="Follow us on Pinterest"><i class="bi bi-lg bi-pinterest"></i></a></li>
+          <li><a href="https://www.youtube.com/channel/UC8QdVII0oYUnrO5RLAcivSQ" title="Subscribe to our YouTube channel"><i class="bi bi-lg bi-youtube"></i></a></li>
         </ul>
       </div>
     </nav>
@@ -235,9 +235,9 @@
       try {
         details= JSON.parse(details)
         if (details.items > 0) {
-          var icon= document.querySelector('#site-cart .lni-cart')
-          icon.classList.remove('lni-cart')
-          icon.classList.add('lni-cart-full')
+          var icon= document.querySelector('#site-cart .bi-cart')
+          icon.classList.remove('bi-cart')
+          icon.classList.add('bi-cart-full')
           var badge= document.querySelector('#site-cart .badge')
           badge.innerText= details.items
         }

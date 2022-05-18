@@ -108,10 +108,6 @@ but as a fallback you can chain `:not()` instead */
   margin-bottom: 1rem;
 }
 
-.card > :not(h2, h3, h4) {
-  font-size: 0.9rem;
-}
-
 .card > button {
   align-self: center;
 }
@@ -123,24 +119,45 @@ but as a fallback you can chain `:not()` instead */
 .card.hot:hover {
   box-shadow: 0.25em 0.25em 1em rgba(var(--primary-color-r), var(--primary-color-g), var(--primary-color-b), 0.8);
 }
-.card label, .card .lead {
-  font-size: 1.2rem;
-  font-weight: 300;
-  line-height: 1.4;
+.card h2 {
+  margin-bottom: 0;
 }
 </style>
 
     <div class="smol-grid">
       {% if person %}
         <div class="card cold" style="grid-column: 1 / span 2">
-          <h2>Welcome back!</h2>
+          <h2>Welcome back, {{ person.friendly_name }}!</h2>
+          {% if person.exemption_certificate_id %}
+            <p>We have your exemption certificate on file.</p>
+          {% endif %}
+          {% if person.giftcard_id %}
+            <p>We have a gift card on file for you.</p>
+          {% endif %}
+          {% if person.points_available >= 50 %}
+            <p>
+              <b>You have enough points for a loyalty reward on this
+              purchase!</b> You will be able to apply it during checkout.
+          {% elseif person.points_available + person.points_pending >= 50 %}
+            <p>
+              <b>You have enough points pending that you'll have access to
+              a loyalty reward tomorrow!</b>
+          {% else %}
+            <p>
+              <b>You don't have enough points for a loyalty reward yet.</b>
+          {% endif %}
+
+            You will earn {{ max(cart.subtotal // 1, 1) }} points from this
+            purchase.
+          </p>
+
         </div>
       {% else %}
         <div class="card cold">
           <h2>Log in &amp; Check out</h2>
           <form class="stacked-form"
                 method="POST" action="{{ url_for('handleLogin') }}">
-            <p class="lead">
+            <p>
               Access and add to your <a href="/rewards">loyalty rewards</a>
               by logging in. We'll email or text a link to continue.
             </p>
@@ -153,7 +170,7 @@ but as a fallback you can chain `:not()` instead */
 
             <input type="hidden" name="cart_uuid" value="{{ cart.uuid }}">
             <button type="submit" class="button">
-              <i class="lni lni-link"></i>
+              <i class="bi bi-box-arrow-in-right"></i>
               <span class="label">Get Login Link</span>
             </button>
             <div class="help-block">
@@ -165,7 +182,7 @@ but as a fallback you can chain `:not()` instead */
           <h2>Guest Checkout</h2>
           <form class="stacked-form"
                 method="POST" action="{{ url_for('handleLogin') }}">
-            <p class="lead">
+            <p>
               Not signed up yet? We'll need your email address to take
               you through the rest of the checkout process. You can pay
               with credit card or PayPal.
@@ -178,7 +195,7 @@ but as a fallback you can chain `:not()` instead */
                     placeholder="vincent.van.gogh@example.com">
 
             <button type="submit" class="button">
-              <i class="lni lni-revenue"></i>
+              <i class="bi bi-box-arrow-right"></i>
               <span class="label">Start Checkout</span>
             </button>
           </form>
@@ -187,7 +204,7 @@ but as a fallback you can chain `:not()` instead */
       {% if amzn.merchant_id %}
         <div class="card cold">
           <h2>Amazon Pay Checkout</h2>
-          <p class="lead">
+          <p>
             Log in and pay using your Amazon account. You'll also be able to
             access your loyalty rewards, but orders paid via Amazon must be
             shipped, you can't select curbside pickup or local delivery.
@@ -197,7 +214,7 @@ but as a fallback you can chain `:not()` instead */
       {% endif %}
     </div>
 
-    {% embed 'cart/cart.twig' %}
+    {% embed 'cart/cart.twig' with { editable: true } %}
       {% block buttons %}
       {% endblock %}
     {% endembed %}
@@ -214,7 +231,7 @@ but as a fallback you can chain `:not()` instead */
       </label>
       <input type="email" class="input" name="email">
       <button role="submit" class="button">
-        <i class="lni lni-cart"></i>
+        <i class="bi bi-cart"></i>
         <span class="label">Retrieve Saved Cart</span>
       </button>
     </form>

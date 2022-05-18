@@ -662,7 +662,14 @@ nav#site-navigation #site-cart-contents {
     display: inline;
   }
 }
+
+.bi-lg {
+  font-size: 1.2em;
+}
 .lni + .label {
+  margin-left: 0.25em;
+}
+.bi + .label {
   margin-left: 0.25em;
 }
 

@@ -34,12 +34,12 @@
 
     {% if cart.shipping_address_id == 1 %}
       <a href="/cart/checkout/stripe-shipped" class="button">
-        <i class="lni lni-delivery"></i>
+        <i class="bi bi-truck"></i>
         <span class="label">I want it shipped</span>
       </a>
     {% else %}
       <a href="/cart/checkout/stripe-pickup" class="button">
-        <i class="lni lni-apartment"></i>
+        <i class="bi bi-shop"></i>
         <span class="label">Pick it up at the store!</span>
       </a>
       <hr>

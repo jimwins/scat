@@ -44,18 +44,18 @@
 
     {% if cart.shipping_address_id == 1 %}
       <a href="/cart/checkout/paypal-shipped" class="button">
-        <i class="lni lni-delivery"></i>
+        <i class="bi bi-truck"></i>
         <span class="label">I want it shipped</span>
       </a>
 
       <button type="submit" class="button">
-        <i class="lni lni-apartment"></i>
+        <i class="bi bi-shop"></i>
         <span class="label">Pick it up at the store!</span>
       </button>
 
     {% else %}
       <a href="/cart/checkout/paypal-pickup" class="button">
-        <i class="lni lni-apartment"></i>
+        <i class="bi bi-shop"></i>
         <span class="label">Pick it up at the store!</span>
       </a>
       <hr>
@@ -108,7 +108,7 @@
              placeholder="90014">
 
       <button type="submit" class="button">
-        <i class="lni lni-delivery"></i>
+        <i class="bi bi-truck"></i>
         <span class="label">Ship to this address</span>
       </button>
 

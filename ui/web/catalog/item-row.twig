@@ -92,14 +92,14 @@
       <span title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" class="icon" width="16" alt="Hazardous Materials"></span>
     {% endif %}
     {% if i.oversized %}
-      <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="lni lni-delivery"></i></span>
+      <span title="Oversized item: special shipping is required, and there will be additional costs."><i class="bi bi-truck"></i></span>
     {% endif %}
   </td>
   <td class="text-right">
     <form method="POST" action="/cart/add-item">
       <input type="hidden" name="item" value="{{ i.code }}">
       <button type="submit" class="button small">
-        <i class="lni lni-circle-plus"></i>
+        <i class="bi bi-cart-plus"></i>
         <span class="label">Add to Cart</span>
       </button>
     </form>
