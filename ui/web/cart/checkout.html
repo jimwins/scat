@@ -44,27 +44,39 @@
       <div id="shipping-address-element"></div>
     {% endif %}
 
+    {% block shipping_options %}
+      <div class="shipping-options">
+        {% if cart.shipping_options|length > 1 %}
+          <h3>Shipping Options</h3>
+          Showing options.
+        {% elseif not cart.shipping_method %}
+          <div class="alert alert-warning">
+            Unable to determine any shipping methods.
+          </div>
+        {% endif %}
+      </div>
+    {% endblock %}
+
     <h3>Payment</h3>
-    <div id="payment-element"></div>
+
+    <div class="smol-grid">
+      <div class="payment-option">
+        <div id="payment-element"></div>
+        <br>
+        <button id="pay-stripe" type="submit" class="button block"
+                {{ not cart.ready_for_payment ? 'disabled' }}>
+          Pay {{ scat.amount(cart.due) }}
+        </button>
+      </div>
+      <div class="payment-option">
+        <div id="paypal-buttons" {{ not cart.ready_for_payment ? 'disabled' }}>
+        </div>
+      </div>
+    </div>
 
     {% block cart %}
       <div id="cart">
         {% embed 'cart/cart.twig' with { 'editable' : false } %}
-          {% block buttons %}
-            {% import 'macros.twig' as scat %}
-            <div class="pay-button">
-              {% if cart.ready_for_payment %}
-                <button type="submit" class="button">
-                  Pay {{ scat.amount(cart.due) }}
-                </button>
-              {% else %}
-                <button class="button" disabled>
-                  Pay
-                </button>
-              {% endif %}
-            </div>
-            </div>
-          {% endblock %}
         {% endembed %}
       </div>
     {% endblock %}
@@ -74,6 +86,7 @@
 
 {% block extra_header %}
   <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id={{ paypal }}&amp;currency=USD&amp;disable-funding=card&amp;enable-funding=venmo{{ DEBUG ? '&debug=true' }}"></script>
 {% endblock %}
 
 {% block script %}
@@ -159,12 +172,20 @@
           }).then((res) => {
             return res.json()
           }).then((data) => {
-            if (data.html) {
+            /* TODO update Stripe payment button */
+            if (data.cart) {
               let template= document.createElement('template')
               template.innerHTML= data.html.trim()
               let cart= document.getElementById('cart')
               cart.replaceWith(template.content.firstChild)
             }
+            if (data.shipping_options) {
+              let template= document.createElement('template')
+              template.innerHTML= data.html.trim()
+              let shipping_options= document.getElementById('shipping-options')
+              shipping_options.replaceWith(template.content.firstChild)
+            }
+            /* Enable PayPal buttons */
           })
         }, 500);
       });
@@ -208,5 +229,55 @@
         // to the `return_url`.
       }
     });
+
+    let paypalButtons= document.getElementById('paypal-buttons');
+    if (paypalButtons) {
+      paypal.Buttons({
+        createOrder: (data, actions) => {
+          return fetch("/cart/checkout/paypal-order", {
+            headers: {
+              'Accept': 'application/json',
+            }
+          })
+          .then((res) => {
+            if (!res.ok) {
+              return res.json().then((data) => {
+                if (data.text == 'Payment already completed.') {
+                  window.location.href= '/sale/{{ cart.uuid }}/thanks';
+                } else {
+                  return Promise.reject(new Error(data.text));
+                }
+              })
+            }
+            return res.json()
+          })
+          .then((order) => {
+            return order.id
+          });
+        },
+
+        onInit: function(data, actions) {
+          if (paypalButtons.hasAttribute('disabled')) {
+            actions.disable()
+          }
+        },
+
+        // Finalize the transaction on the server after payer approval
+        onApprove: (data, actions) => {
+	  return actions.order.capture().then(function(details) {
+	    let formData= new FormData(document.getElementById('paypal-form'))
+	    formData.append('order_id', details.id)
+	    return fetch('{{ url_for('finalize-paypal') }}', {
+	      method: 'POST',
+	      body: formData
+	    }).then(function (data) {
+	      if (data.ok) {
+		window.location.href= '{{ url_for('sale-thanks', { uuid: cart.uuid }) }}'
+	      }
+	    });
+	  });
+        }
+      }).render('#paypal-buttons');
+    }
   </script>
 {% endblock %}

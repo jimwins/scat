@@ -80,8 +80,8 @@ class Cart {
           $cart->name= $value;
           break;
         case 'address':
-          error_log("setting new address: " . json_encode($value));
-          if ($value->city) {
+          if ($value['city']) {
+            error_log("setting new address: " . json_encode($value));
             $cart->updateShippingAddress([
               'name' => $cart->name,
               'street1' => $value['line1'],
@@ -90,10 +90,8 @@ class Cart {
               'state' => $value['state'],
               'zip' => $value['postal_code'],
             ]);
-          } else {
-            $cart->shipping_address_id= null;
+            $recalculate= true;
           }
-          $recalculate= true;
           break;
         case 'stripe':
           /* ignore, we use this below */
@@ -182,8 +180,13 @@ class Cart {
     }
 
     if ($request->getParam('stripe')) {
-      $data['html']=
-        $this->view->fetchBlock('cart/checkout-stripe.html', 'cart', [
+      $data['cart']=
+        $this->view->fetchBlock('cart/checkout.html', 'cart', [
+          'person' => $person,
+          'cart' => $cart,
+        ]);
+      $data['shipping_options']=
+        $this->view->fetchBlock('cart/checkout.html', 'shipping_options', [
           'person' => $person,
           'cart' => $cart,
         ]);
@@ -264,9 +267,7 @@ class Cart {
         'key' => $stripe->getPublicKey(),
         'payment_intent' => $paymentIntent,
       ],
-      'paypal' => [
-        'client_id' => $paypal->getClientId(),
-      ],
+      'paypal' => $paypal->getClientId(),
     ]);
   }
 
