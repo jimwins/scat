@@ -58,7 +58,7 @@ class Auth {
 
     $person= $people[0];
 
-    $cart_uuid= $request->getAttribute('cart_uuid');
+    $cart_uuid= $request->getParam('cart_uuid');
 
     $key= $this->auth->generate_login_key($person->id, $cart_uuid);
 
@@ -100,6 +100,11 @@ class Auth {
     $token= $this->auth->generate_login_key($valid->person_id, $valid->cart_id);
 
     $this->auth->send_auth_cookie($token, $expires);
+
+    /* If this was a key with a cart, start checkout */
+    if ($valid->cart) {
+      return $response->withRedirect('/cart?uuid=' . $valid->cart);
+    }
 
     return $response->withRedirect('/account?success=login');
   }

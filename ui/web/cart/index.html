@@ -6,22 +6,23 @@
 {% endblock %}
 
 {% block content %}
-  {% if person %}
-    <h2>
-      Welcome back{{ person ? ', ' ~ person.friendly_name }}!
-      <small>
-        (<a href="{{ url_for('account') }}">view your account</a>
-        or <a href="{{ url_for('logout') }}">log out</a>)
-      </small>
-    </h2>
-  {% else %}
-    <h2>
-      Welcome! <a href="{{ url_for('login')}}">Log in or create an account.</a>
-    </h2>
-  {% endif %}
-
   {% set items= cart.items.find_many() %}
   {% if not items|length %}
+
+    {% if person %}
+      <h2>
+        Welcome back!
+        <small>
+          (<a href="{{ url_for('account') }}">view your account</a>
+          or <a href="{{ url_for('logout') }}">log out</a>)
+        </small>
+      </h2>
+    {% else %}
+      <h2>
+        Welcome!
+      </h2>
+    {% endif %}
+
     <div class="alert alert-warning">
       <b>You don't have anything in your cart.</b>
       You can <a href="{{ url_for('catalog') }}">start browsing for art
@@ -31,25 +32,173 @@
 
     {# XXX show some popular products #}
   {% else %}
-    {% embed 'cart/cart.twig' %}
-      {% block buttons %}
-        <div class="pay-button">
-          <a class="button block" href="{{ url_for('checkout-stripe' ) }}">
-            <i class="lni lni-credit-cards"></i>
-            <span class="label">Pay with Credit Card</span>
-          </a>
+<style>
+/*
+ * Based on https://smolcss.dev/#card
+ */
+.smol-grid {
+  --min: 20ch;
+  --gap: 1rem;
+
+  display: grid;
+  grid-gap: var(--gap);
+  /* min() with 100% prevents overflow in extra narrow spaces */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min)), 1fr));
+
+  margin: var(--gap) 0;
+
+  /* ul.smol-grid gets wonky padding otherwise */
+  padding: 0;
+}
+
+.card {
+  --img-ratio: 3/2;
+
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0.25em 0.25em 1em rgba(0, 0, 0, 0.35);
+  border-radius: var(--border-radius);
+}
+.card.hot {
+  cursor: pointer;
+}
+
+/* Soon we can replace this with: gap: 1rem; */
+.card > * + * {
+  margin-top: 1rem;
+}
+
+.card > img {
+  /* Fallback for `aspect-ratio` of defining
+  a height */
+  height: max(18vh, 12rem);
+  object-fit: cover;
+  width: 100%;
+}
+
+/* When supported, use `aspect-ratio` */
+@supports (aspect-ratio: 1) {
+  .card > img {
+    aspect-ratio: var(--img-ratio);
+    height: auto;
+  }
+}
+
+.card > img:first-child {
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.card > img:last-child {
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  margin-top: auto;
+}
+
+.card > :not(img) {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.card > :not(img):first-child {
+  margin-top: 1rem;
+}
+
+/* Enhanced `:not()` accepts a selector list,
+but as a fallback you can chain `:not()` instead */
+.card > :last-of-type:not(img, h2, h3, h4) {
+  margin-bottom: 1rem;
+}
+
+.card > :not(h2, h3, h4) {
+  font-size: 0.9rem;
+}
+
+.card > button {
+  align-self: center;
+}
+
+.card.hot:hover h2 {
+  text-decoration: underline;
+  color: var(--primary-color);
+}
+.card.hot:hover {
+  box-shadow: 0.25em 0.25em 1em rgba(var(--primary-color-r), var(--primary-color-g), var(--primary-color-b), 0.8);
+}
+.card label, .card .lead {
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1.4;
+}
+</style>
+
+    <div class="smol-grid">
+      {% if person %}
+        <div class="card cold" style="grid-column: 1 / span 2">
+          <h2>Welcome back!</h2>
         </div>
-        {% if paypal %}
-          <div class="pay-button" style="--primary-color: #1e477a">
-            <a class="button block" href="{{ url_for('checkout-paypal' ) }}">
-              <i class="lni lni-paypal"></i>
-              <span class="label">Pay with PayPal</span>
-            </a>
-          </div>
-        {% endif %}
-        <div class="pay-button">
+      {% else %}
+        <div class="card cold">
+          <h2>Log in &amp; Check out</h2>
+          <form class="stacked-form"
+                method="POST" action="{{ url_for('handleLogin') }}">
+            <p class="lead">
+              Access and add to your <a href="/rewards">loyalty rewards</a>
+              by logging in. We'll email or text a link to continue.
+            </p>
+            <label for="loyalty">
+              What is the phone number or email address for your account?
+            </label>
+            <input type="text" class="input block"
+                    name="loyalty" value="{{ loyalty }}"
+                    placeholder="213-627-7223 or vincent.van.gogh@example.com">
+
+            <input type="hidden" name="cart_uuid" value="{{ cart.uuid }}">
+            <button type="submit" class="button">
+              <i class="lni lni-link"></i>
+              <span class="label">Get Login Link</span>
+            </button>
+            <div class="help-block">
+              (Standard messaging and data rates may apply.)
+            </div>
+          </form>
+        </div>
+        <div class="card cold">
+          <h2>Guest Checkout</h2>
+          <form class="stacked-form"
+                method="POST" action="{{ url_for('handleLogin') }}">
+            <p class="lead">
+              Not signed up yet? We'll need your email address to take
+              you through the rest of the checkout process. You can pay
+              with credit card or PayPal.
+            </p>
+            <label for="email">
+              What is your email address?
+            </label>
+            <input type="text" class="input block"
+                    name="email" value="{{ email }}"
+                    placeholder="vincent.van.gogh@example.com">
+
+            <button type="submit" class="button">
+              <i class="lni lni-revenue"></i>
+              <span class="label">Start Checkout</span>
+            </button>
+          </form>
+        </div>
+      {% endif %}
+      {% if amzn.merchant_id %}
+        <div class="card cold">
+          <h2>Amazon Pay Checkout</h2>
+          <p class="lead">
+            Log in and pay using your Amazon account. You'll also be able to
+            access your loyalty rewards, but orders paid via Amazon must be
+            shipped, you can't select curbside pickup or local delivery.
+          </p>
           <div id="AmazonPayButton"></div>
         </div>
+      {% endif %}
+    </div>
+
+    {% embed 'cart/cart.twig' %}
+      {% block buttons %}
       {% endblock %}
     {% endembed %}
   {% endif %}
