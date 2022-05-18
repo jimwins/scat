@@ -245,6 +245,34 @@ class Cart {
     return $response->withRedirect('/cart');
   }
 
+  public function checkout(
+    Request $request, Response $response,
+    \Scat\Service\Shipping $shipping,
+    \Scat\Service\PayPal $paypal,
+    \Scat\Service\Stripe $stripe,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    $paymentIntent= $stripe->getPaymentIntent($cart);
+
+    $cart->stripe_payment_intent_id= $paymentIntent->id;
+    $cart->save();
+
+    return $this->view->render($response, 'cart/checkout.html', [
+      'person' => $person,
+      'cart' => $cart,
+      'stripe' => [
+        'key' => $stripe->getPublicKey(),
+        'payment_intent' => $paymentIntent,
+      ],
+      'paypal' => [
+        'client_id' => $paypal->getClientId(),
+      ],
+    ]);
+  }
+
   public function amznCheckout(
     Request $request, Response $response,
     \Scat\Service\Shipping $shipping,
@@ -451,7 +479,7 @@ class Cart {
     ]);
   }
 
-  public function setAddress(
+  public function setShipped(
     Request $request,
     Response $response,
     \Scat\Service\Tax $tax
@@ -468,7 +496,7 @@ class Cart {
 
     $cart->save();
 
-    return $response->withRedirect('/cart/checkout/stripe');
+    return $response->withRedirect('/cart/checkout');
   }
 
   public function setCurbsidePickup(
@@ -488,7 +516,7 @@ class Cart {
 
     $cart->save();
 
-    return $response->withRedirect('/cart/checkout/stripe');
+    return $response->withRedirect('/cart/checkout');
   }
 
   public function stripeFinalize(

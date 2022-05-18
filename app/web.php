@@ -142,6 +142,10 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
 
   $app->get('/checkout', [ \Scat\Web\Cart::class, 'checkout' ])
       ->setName('checkout');
+  $app->get('/checkout/set-pickup',
+            [ \Scat\Web\Cart::class, 'setCurbsidePickup' ]);
+  $app->get('/checkout/set-shipped',
+            [ \Scat\Web\Cart::class, 'setShipped' ]);
 
   /* Amazon */
   $app->get('/checkout/amzn', [ \Scat\Web\Cart::class, 'amznCheckout' ])
