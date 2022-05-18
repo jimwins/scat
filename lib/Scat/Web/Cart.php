@@ -32,6 +32,15 @@ class Cart {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
 
+    if ($person) {
+      if (!$cart->name) $cart->name= $person->name;
+      if (!$cart->email) $cart->email= $person->email;
+      if ($cart->person_id != $person->id) {
+        $cart->person_id= $person->id;
+      }
+      $cart->save(); /* won't do anything if nothing changed */
+    }
+
     $uri= $request->getUri();
     $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
     $return_link= $routeContext->getRouteParser()->fullUrlFor(
