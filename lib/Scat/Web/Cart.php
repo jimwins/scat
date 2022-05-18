@@ -597,9 +597,12 @@ class Cart {
         }
 
         break;
+
       case 'payment_intent.payment_failed':
         /* Don't do anything with these yet. */
-        break;
+
+      default:
+        error_log("Ignoring {$event->type} from Stripe");
     }
 
     return $response->withJson([ 'message' => 'Success!' ]);
@@ -1043,6 +1046,7 @@ end:
         );
 
       default:
+        error_log("Ignoring {$event_type} from PayPal");
         throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
