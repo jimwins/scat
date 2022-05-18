@@ -132,7 +132,7 @@ but as a fallback you can chain `:not()` instead */
             <p>We have your exemption certificate on file.</p>
           {% endif %}
           {% if person.giftcard_id %}
-            <p>We have a gift card on file for you.</p>
+            {# TODO say something once we can use it in check out #}
           {% endif %}
           {% if person.points_available >= 50 %}
             <p>
@@ -151,6 +151,10 @@ but as a fallback you can chain `:not()` instead */
             purchase.
           </p>
 
+          <a class="button" href="/cart/checkout">
+            <i class="bi bi-box-arrow-right"></i>
+            <span class="label">Start Checkout</span>
+          </a>
         </div>
       {% else %}
         <div class="card cold">
@@ -213,6 +217,8 @@ but as a fallback you can chain `:not()` instead */
         </div>
       {% endif %}
     </div>
+
+    {# TODO warnings about stock issues #}
 
     {% embed 'cart/cart.twig' with { editable: true } %}
       {% block buttons %}
