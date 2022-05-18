@@ -255,8 +255,10 @@
     }
 
     document.querySelectorAll('.card').forEach((card) => {
-      card.addEventListener("click", handleCardClick)
-      card.classList.add('hot')
+      if (!card.classList.contains('cold')) {
+        card.addEventListener("click", handleCardClick)
+        card.classList.add('hot')
+      }
     })
   </script>
 
