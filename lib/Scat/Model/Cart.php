@@ -19,20 +19,20 @@ class Cart extends \Scat\Model {
   }
 
   public function shipping_address($address= []) {
-    if (!empty($address)) {
-      $new= $this->belongs_to('CartAddress', 'shipping_address_id')
-                 ->create($address);
-      $new->save();
-      $this->shipping_address_id= $new->id;
-
-      /* Passing in a new address always nukes our shipping costs */
-      $this->shipping_method= NULL;
-      $this->shipping= 0;
-      $this->shipping_tax= 0;
-
-      /* BUT DOES NOT SAVE */
-    }
     return $this->belongs_to('CartAddress', 'shipping_address_id')->find_one();
+  }
+
+  public function updateShippingaddress($address) {
+    // TODO check if new data matches our address and just ignore update
+    $new= $this->belongs_to('CartAddress', 'shipping_address_id')
+               ->create($address);
+    $new->save();
+    $this->shipping_address_id= $new->id;
+
+    /* Passing in a new address always nukes our shipping costs */
+    $this->shipping_method= NULL;
+    $this->shipping= 0;
+    $this->shipping_tax= 0;
   }
 
   public function closed() {
@@ -168,13 +168,23 @@ class Cart extends \Scat\Model {
     $hazmat= $this->has_hazmat_items();
 
     $address= $this->shipping_address();
+
+    if (!$address) {
+      $this->shipping_method= null;
+      $this->shipping= 0.00;
+      $this->shipping_tax= 0.00;
+
+      return;
+    }
+
     // recalculate shipping costs
     list($cost, $method)=
       $shipping->get_shipping_estimate($box, $weight, $hazmat,
                                         $address->as_array());
 
     $this->shipping_method= $method ? 'default' : null;
-    $this->shipping= $method ? $cost : null;
+    $this->shipping= $method ? $cost : 0.00;
+    $this->shipping_tax= 0.00;
   }
 
   public function generateCartItems() {
@@ -210,8 +220,17 @@ class Cart extends \Scat\Model {
   public function recalculateTax(\Scat\Service\Tax $tax) {
     $address= $this->shipping_address();
 
+    /* No address? Forget all we had. */
     if (!$address) {
+      foreach ($this->items()->find_many() as $line) {
+        if ($line->tax) {
+          $line->tax= 0;
+          $line->save();
+        }
+      }
       $this->tax_calculated= null;
+      $this->shipping_tax= 0;
+      $this->flushTotals();
       return;
     }
 

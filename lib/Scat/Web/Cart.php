@@ -68,6 +68,8 @@ class Cart {
 
     $recalculate= false;
 
+    error_log("processing update: " . json_encode($request->getParams()));
+
     foreach ($request->getParams() as $key => $value) {
       switch ($key) {
         case 'email':
@@ -78,15 +80,19 @@ class Cart {
           $cart->name= $value;
           break;
         case 'address':
-          error_log(json_encode($value));
-          $cart->shipping_address([
-            'name' => $cart->name,
-            'street1' => $value['line1'],
-            'street2' => $value['line2'] ?? '',
-            'city' => $value['city'],
-            'state' => $value['state'],
-            'zip' => $value['postal_code'],
-          ]);
+          error_log("setting new address: " . json_encode($value));
+          if ($value->city) {
+            $cart->updateShippingAddress([
+              'name' => $cart->name,
+              'street1' => $value['line1'],
+              'street2' => $value['line2'] ?? '',
+              'city' => $value['city'],
+              'state' => $value['state'],
+              'zip' => $value['postal_code'],
+            ]);
+          } else {
+            $cart->shipping_address_id= null;
+          }
           $recalculate= true;
           break;
         case 'stripe':
@@ -305,7 +311,7 @@ class Cart {
       'zip' =>  $session->shippingAddress->postalCode,
     ];
 
-    $address= $cart->shipping_address($amzn_address);
+    $cart->updateShippingAddress($amzn_address);
 
     // recalculate shipping
     $cart->recalculateShipping($shipping);
@@ -474,7 +480,7 @@ class Cart {
     $cart->shipping= 0;
     $cart->shipping_tax= 0;
 
-    // and then recalculate sales tax
+    // and then recalculate (clear) sales tax
     $cart->recalculateTax($tax);
 
     $cart->save();
@@ -777,7 +783,7 @@ class Cart {
 
     if (isset($order->purchase_units[0]->shipping)) {
       $details= $order->purchase_units[0]->shipping;
-      $address= $cart->shipping_address([
+      $cart->updateShippingAddress([
         'name' => $details->name->full_name ?? '',
         'street1' => $details->address->address_line_1 ?? '',
         'street2' => $details->address->address_line_2 ?? '',
@@ -789,16 +795,7 @@ class Cart {
     }
 
     if ($recalculate) {
-      $box= $cart->get_shipping_box();
-      $weight= $cart->get_shipping_weight();
-      $hazmat= $cart->has_hazmat_items();
-
-      // recalculate shipping costs
-      list($cost, $method)=
-        $shipping->get_shipping_estimate($box, $weight, $hazmat,
-                                          $address->as_array());
-      $cart->shipping_method= $method ? 'default' : null;
-      $cart->shipping= $method ? $cost : null;
+      $cart->recalculateShipping($shipping);
 
       // and then recalculate sales tax
       $cart->recalculateTax($tax);
@@ -883,7 +880,7 @@ class Cart {
     $cart->name= $request->getParam('name');
     $cart->email= $request->getParam('email');
 
-    $cart->shipping_address([
+    $cart->updateShippingAddress([
       'name' => $request->getParam('shipping_name'),
       'company' => $request->getParam('company'),
       'phone' => $request->getParam('phone'),
@@ -894,17 +891,7 @@ class Cart {
       'zip' => $request->getParam('zip'),
     ]);
 
-    $box= $cart->get_shipping_box();
-    $weight= $cart->get_shipping_weight();
-    $hazmat= $cart->has_hazmat_items();
-
-    $address= $cart->shipping_address();
-    // recalculate shipping costs
-    list($cost, $method)=
-      $shipping->get_shipping_estimate($box, $weight, $hazmat,
-                                        $address->as_array());
-    $cart->shipping_method= $method ? 'default' : null;
-    $cart->shipping= $method ? $cost : null;
+    $cart->recalculateShipping($shipping);
 
     // and then recalculate sales tax
     $cart->recalculateTax($tax);
