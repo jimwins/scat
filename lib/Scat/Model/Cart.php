@@ -161,6 +161,22 @@ class Cart extends \Scat\Model {
     return $this->items()->join('item', [ 'item.id', '=', 'sale_item.item_id' ])->where_gt('item.hazmat', 0)->count();
   }
 
+  public function recalculateShipping(\Scat\Service\Shipping $shipping)
+  {
+    $box= $this->get_shipping_box();
+    $weight= $this->get_shipping_weight();
+    $hazmat= $this->has_hazmat_items();
+
+    $address= $this->shipping_address();
+    // recalculate shipping costs
+    list($cost, $method)=
+      $shipping->get_shipping_estimate($box, $weight, $hazmat,
+                                        $address->as_array());
+
+    $this->shipping_method= $method ? 'default' : null;
+    $this->shipping= $method ? $cost : null;
+  }
+
   public function generateCartItems() {
     $cartItems= []; $index_map= [];
     $n= 1;

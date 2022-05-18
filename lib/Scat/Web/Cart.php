@@ -98,19 +98,10 @@ class Cart {
     }
 
     if ($recalculate) {
-      $box= $cart->get_shipping_box();
-      $weight= $cart->get_shipping_weight();
-      $hazmat= $cart->has_hazmat_items();
+      // first we recalculate shipping
+      $cart->recalculateShipping($shipping);
 
-      $address= $cart->shipping_address();
-      // recalculate shipping costs
-      list($cost, $method)=
-        $shipping->get_shipping_estimate($box, $weight, $hazmat,
-                                          $address->as_array());
-      $cart->shipping_method= $method ? 'default' : null;
-      $cart->shipping= $method ? $cost : null;
-
-      // and then recalculate sales tax
+      // and then we recalculate sales tax
       $cart->recalculateTax($tax);
     }
 
@@ -316,16 +307,8 @@ class Cart {
 
     $address= $cart->shipping_address($amzn_address);
 
-    $box= $cart->get_shipping_box();
-    $weight= $cart->get_shipping_weight();
-    $hazmat= $cart->has_hazmat_items();
-
-    // recalculate shipping costs
-    list($cost, $method)=
-      $shipping->get_shipping_estimate($box, $weight, $hazmat,
-                                        $address->as_array());
-    $cart->shipping_method= $method ? 'default' : null;
-    $cart->shipping= $method ? $cost : null;
+    // recalculate shipping
+    $cart->recalculateShipping($shipping);
 
     // and then recalculate sales tax
     $cart->recalculateTax($tax);
