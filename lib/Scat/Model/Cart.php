@@ -309,6 +309,14 @@ class Cart extends \Scat\Model {
       $this->status= 'paid';
     }
   }
+
+  public function as_array() {
+    $data= parent::as_array();
+    $data['subtotal']= $this->subtotal();
+    $data['total']= $this->total();
+    $data['due']= $this->due();
+    return $data;
+  }
 }
 
 class CartAddress extends \Scat\Model {
