@@ -224,7 +224,7 @@
         {% endif %}
       </td>
     </tr>
-    {% set payments= sale.payments.find_many() %}
+    {% set payments= cart.payments.find_many() %}
     {% if payments|length %}
       {% for payment in payments %}
         <tr>

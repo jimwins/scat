@@ -45,7 +45,7 @@
     {% endif %}
 
     {% block shipping_options %}
-      <div class="shipping-options">
+      <div id="shipping-options">
         {% if cart.shipping_options|length > 1 %}
           <h3>Shipping Options</h3>
           Showing options.
@@ -172,7 +172,6 @@
           }).then((res) => {
             return res.json()
           }).then((data) => {
-            /* TODO update Stripe payment button */
             if (data.cart) {
               let template= document.createElement('template')
               template.innerHTML= data.cart.trim()
@@ -185,7 +184,14 @@
               let shipping_options= document.getElementById('shipping-options')
               shipping_options.replaceWith(template.content.firstChild)
             }
+
+            /* TODO disable, too
+            /* Enable Stripe payment button */
+            let stripeButton= document.getElementById('pay-stripe')
+            stripeButton.removeAttribute('disabled')
+
             /* Enable PayPal buttons */
+            paypalButtons.actions.enable()
           })
         }, 500);
       });
@@ -211,6 +217,8 @@
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
+      // TODO show loading spinner
+
       const {error}= await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -220,13 +228,13 @@
       });
 
       if (error) {
+        // TODO get rid of spinner
+
         // Show error to your customer (for example, payment details incomplete)
         console.log(error.message);
       } else {
-        // Your customer will be redirected to your `return_url`. For some
-        // payment methods like iDEAL, your customer will be redirected to an
-        // intermediate site first to authorize the payment, then redirected
-        // to the `return_url`.
+        // we should never get here because Stripe will redirect
+        alert("Sorry, something went wrong. Please try reloading the page.");
       }
     });
 
@@ -257,6 +265,7 @@
         },
 
         onInit: function(data, actions) {
+          paypalButtons.actions= actions /* save for later */
           if (paypalButtons.hasAttribute('disabled')) {
             actions.disable()
           }

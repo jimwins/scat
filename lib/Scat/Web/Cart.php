@@ -60,6 +60,7 @@ class Cart {
 
   public function cartUpdate(
     Request $request, Response $response,
+    \Scat\Service\Stripe $stripe,
     \Scat\Service\Shipping $shipping,
     \Scat\Service\Tax $tax
   ) {
@@ -116,18 +117,11 @@ class Cart {
     if ($cart->stripe_payment_intent_id) {
       $amount= $cart->due();
 
-      $stripe= new \Stripe\StripeClient([
-        'api_key' => $this->config->get('stripe.secret_key'),
-        'stripe_version' => "2020-08-27;link_beta=v1",
-      ]);
-
-      $payment_intent= $stripe->paymentIntents->retrieve(
-        $cart->stripe_payment_intent_id
-      );
+      $payment_intent= $stripe->getPaymentIntent($cart);
 
       if ($payment_intent->status == 'succeeded') {
         throw new \Exception(
-          "Stripe payment intent {$payment_intent->id} already succeeeded?!"
+          "Stripe payment intent {$payment_intent->id} already succeeded?!"
         );
       }
 
@@ -161,19 +155,16 @@ class Cart {
       ];
 
       if ($payment_intent->customer) {
-        $stripe->customers->update(
-          $payment_intent->customer,
-          $customer_details
-        );
+        $stripe->updateCustomer($payment_intent->customer, $customer_details);
       } else {
-        $customer= $stripe->customers->create($customer_details);
+        $customer= $stripe->createCustomer($customer_details);
         $intent_options['customer']= $customer->id;
       }
 
       if ($customer_details['shipping']) {
         //$intent_options['shipping']= $customer_details['shipping'];
       }
-      $stripe->paymentIntents->update(
+      $stripe->updatePaymentIntent(
         $cart->stripe_payment_intent_id,
         $intent_options
       );
@@ -509,14 +500,68 @@ class Cart {
     return $response->withRedirect('/cart/checkout');
   }
 
-  public function stripeFinalize(
+  public function stripeFinalizeCart(
     Request $request, Response $response,
-    \Scat\Service\Tax $tax
+    \Scat\Service\Stripe $stripe,
+    \Scat\Service\Tax $tax,
+    \Scat\Model\Cart $cart
   ) {
-    $cart= $request->getAttribute('cart');
-    $person= $this->auth->get_person_details($request);
+    $payment_intent_id= $cart->stripe_payment_intent_id;
 
-    // TODO validate
+    // if we already have it, don't do it again!
+    $has= $cart->payments()
+                ->where_raw(
+                  'data->"$.payment_intent_id" = ?', [ $payment_intent_id ])
+                ->find_one();
+    if ($has) {
+      error_log("Already processed Stripe payment $payment_intent_id\n");
+      goto endStripeFinalize;
+    }
+
+    $payment_intent= $stripe->getPaymentIntent($cart);
+
+    if ($payment_intent->status != 'succeeded') {
+      throw new \Exception("Can only handle successful payment attempts here, got {$payment_intent->status}.");
+    }
+
+    foreach ($payment_intent->charges->data as $charge) {
+      if ($charge->payment_method_details->type == 'afterpay_clearpay') {
+        $cc_brand= 'AfterPay';
+        $cc_last4= '';
+      } if ($charge->payment_method_details->type == 'link') {
+        $cc_brand= 'Link';
+        $cc_last4= '';
+      } else {
+        $cc_brand= ucwords($charge->payment_method_details->card->brand);
+        $cc_last4= $charge->payment_method_details->card->last4;
+      }
+
+      $data= [
+        'payment_intent_id' => $payment_intent_id,
+        'charge_id' => $charge->id,
+        'cc_brand' => $cc_brand,
+        'cc_last4' => $cc_last4,
+      ];
+
+      $cart->addPayment('credit', $charge->amount / 100, true, $data);
+      $cart->stripe_payment_intent_id= null; // close this payment_intent out
+    }
+
+    $cart->save();
+
+endStripeFinalize:
+
+    if ($cart->status != 'paid') {
+      throw new \Exception("Not completely paid!");
+    }
+
+    /* Set cart id to -1 so cookie will get unset */
+    $cart->id= -1;
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson([ 'message' => 'Processed' ] );
+    }
 
     if ($cart->status != 'paid') {
       throw new \Exception("Not completely paid!");
@@ -536,17 +581,38 @@ class Cart {
     return $response->withRedirect($link);
   }
 
+  public function stripeFinalize(
+    Request $request, Response $response,
+    \Scat\Service\Stripe $stripe,
+    \Scat\Service\Tax $tax
+  ) {
+    $cart= $request->getAttribute('cart');
+
+    $payment_intent= $request->getParam('payment_intent');
+
+    if ($payment_intent != $cart->stripe_payment_intent_id)
+    {
+      error_log("{$payment_intent} != {$cart->stripe_payment_intent_id}");
+      throw new \Exception("Got mismatching payment_intent");
+    }
+
+    return $this->stripeFinalizeCart(
+      $request, $response,
+      $stripe, $tax,
+      $cart
+    );
+  }
+
   public function handleStripeWebhook(
     Request $request, Response $response,
+    \Scat\Service\Stripe $stripe,
+    \Scat\Service\Tax $tax,
     \Scat\Service\Cart $carts
   ) {
-    \Stripe\Stripe::setApiKey($this->config->get('stripe.secret_key'));
-
     try {
-      $event= \Stripe\Webhook::constructEvent(
+      $event= $stripe->constructWebhookEvent(
         $request->getBody(),
-        $request->getHeaderLine('Stripe-Signature'),
-        $this->config->get('stripe.webhook_secret')
+        $request->getHeaderLine('Stripe-Signature')
       );
     } catch(\UnexpectedValueException $e) {
       // TODO should be 400 error
@@ -571,59 +637,16 @@ class Cart {
           throw new \Slim\Exception\HttpNotFoundException($request);
         }
 
-        $payment_intent_id= $cart->stripe_payment_intent_id;
-
-	// if we already have it, don't do it again!
-        $has= $cart->payments()
-                    ->where_raw(
-                      'data->"$.payment_intent_id" = ?', [ $payment_intent_id ])
-                    ->find_one();
-	if ($has) {
-	  error_log("Already processed Stripe payment $payment_intent_id\n");
-	  return $response->withJson([ 'message' => 'Already processed.' ]);
-	}
-
-        $stripe= new \Stripe\StripeClient([
-          'api_key' => $this->config->get('stripe.secret_key'),
-          'stripe_version' => "2020-08-27;link_beta=v1",
-        ]);
-
-        $payment_intent=
-          $stripe->paymentIntents->retrieve($cart->stripe_payment_intent_id, []);
-
-        if ($payment_intent->status != 'succeeded') {
-          throw new \Exception("Can only handle successful payment attempts here.");
+        if ($cart->stripe_payment_intent_id != $paymentIntent->id) {
+          error_log("Mismatch payment_id '{$cart->stripe_payment_intent_id}' != '{$paymentIntent->id}'");
+          $cart->stripe_payment_intent_id= $paymentIntent->id;
         }
 
-        foreach ($payment_intent->charges->data as $charge) {
-          if ($charge->payment_method_details->type == 'afterpay_clearpay') {
-            $cc_brand= 'AfterPay';
-            $cc_last4= '';
-          } if ($charge->payment_method_details->type == 'link') {
-            $cc_brand= 'Link';
-            $cc_last4= '';
-          } else {
-            $cc_brand= ucwords($charge->payment_method_details->card->brand);
-            $cc_last4= $charge->payment_method_details->card->last4;
-          }
-
-          $data= [
-            'payment_intent_id' => $payment_intent_id,
-            'charge_id' => $charge->id,
-            'cc_brand' => $cc_brand,
-            'cc_last4' => $cc_last4,
-          ];
-
-          $cart->addPayment('credit', $charge->amount / 100, true, $data);
-        }
-
-        $cart->save();
-
-        if ($cart->status != 'paid') {
-//          throw new \Exception("Not completely paid!");
-        }
-
-        break;
+        return $this->stripeFinalizeCart(
+          $request, $response,
+          $stripe, $tax,
+          $cart
+        );
 
       case 'payment_intent.payment_failed':
         /* Don't do anything with these yet. */
@@ -972,7 +995,7 @@ class Cart {
                 ->find_one();
     if ($has) {
       error_log("Already processed PayPal payment $order_id\n");
-      return $response->withJson([ 'message' => 'Already processed.' ]);
+      goto endPaypalFinalize;
     }
 
     $order= $paypal->getOrder($order_id);
@@ -983,7 +1006,7 @@ class Cart {
 
     $cart->save();
 
-end:
+endPaypalFinalize:
     if ($cart->status != 'paid') {
       throw new \Exception("Not completely paid!");
     }
