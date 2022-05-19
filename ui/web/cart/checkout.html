@@ -175,13 +175,13 @@
             /* TODO update Stripe payment button */
             if (data.cart) {
               let template= document.createElement('template')
-              template.innerHTML= data.html.trim()
+              template.innerHTML= data.cart.trim()
               let cart= document.getElementById('cart')
               cart.replaceWith(template.content.firstChild)
             }
             if (data.shipping_options) {
               let template= document.createElement('template')
-              template.innerHTML= data.html.trim()
+              template.innerHTML= data.shipping_options.trim()
               let shipping_options= document.getElementById('shipping-options')
               shipping_options.replaceWith(template.content.firstChild)
             }
