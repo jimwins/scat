@@ -163,10 +163,6 @@ class Cart extends \Scat\Model {
 
   public function recalculateShipping(\Scat\Service\Shipping $shipping)
   {
-    $box= $this->get_shipping_box();
-    $weight= $this->get_shipping_weight();
-    $hazmat= $this->has_hazmat_items();
-
     $address= $this->shipping_address();
 
     if (!$address) {
@@ -176,6 +172,10 @@ class Cart extends \Scat\Model {
 
       return;
     }
+
+    $box= $this->get_shipping_box();
+    $weight= $this->get_shipping_weight();
+    $hazmat= $this->has_hazmat_items();
 
     // recalculate shipping costs
     list($cost, $method)=
