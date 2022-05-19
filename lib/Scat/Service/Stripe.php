@@ -53,7 +53,7 @@ class Stripe {
 
   public function updatePaymentIntent($payment_intent_id, $details) {
     $stripe= $this->getClient();
-    return $stripe->paymentIntents->update($customer_id, $details);
+    return $stripe->paymentIntents->update($payment_intent_id, $details);
   }
 
   public function createCustomer($details) {

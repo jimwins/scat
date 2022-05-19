@@ -112,8 +112,6 @@ class Cart {
 
     $cart->save();
 
-    $data= $cart->as_array();
-
     if ($cart->stripe_payment_intent_id) {
       $amount= $cart->due();
 
@@ -169,6 +167,8 @@ class Cart {
         $intent_options
       );
     }
+
+    $data= $cart->as_array();
 
     if ($request->getParam('stripe')) {
       $data['cart']=
