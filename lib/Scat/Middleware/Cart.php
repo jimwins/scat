@@ -51,23 +51,21 @@ final class Cart implements MiddlewareInterface
 
     $response= $handler->handle($request->withAttribute('cart', $cart));
 
-    /* Update the cart cookie if necessary. */
-    if (@$cookies['cartID'] != $cart->uuid) {
-      $domain= ($_SERVER['HTTP_HOST'] != 'localhost' ?
-                $_SERVER['HTTP_HOST'] : false);
+    /* TODO only update when necessary */
+    $domain= ($_SERVER['HTTP_HOST'] != 'localhost' ?
+              $_SERVER['HTTP_HOST'] : false);
 
-      if ($cart->id <= 0) {
-        $this->dumpCookies();
-      } else {
-        $details= json_encode([
-          'items' => $cart->items()->count(),
-          'total' => $cart->total()
-        ]);
-        SetCookie('cartID', $cart->uuid, null /* don't expire */,
-                  '/', $domain, true, true);
-        SetCookie('cartDetails', "", 0 /* session cookie */,
-                  '/', $domain, true, false); /* Javascript accessible */
-      }
+    if ($cart->id <= 0) {
+      $this->dumpCookies();
+    } else {
+      $details= json_encode([
+        'items' => $cart->items()->count(),
+        'total' => $cart->total()
+      ]);
+      SetCookie('cartID', $cart->uuid, null /* don't expire */,
+                '/', $domain, true, true);
+      SetCookie('cartDetails', $details, 0 /* session cookie */,
+                '/', $domain, true, false); /* Javascript accessible */
     }
 
     return $response;
