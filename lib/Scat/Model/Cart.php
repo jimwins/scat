@@ -47,7 +47,9 @@ class Cart extends \Scat\Model {
 
     $new->easypost_id= $easypost->id;
     $new->verified= $easypost->verifications->delivery->success ? '1' : '0';
-    if ($easypost->verifications->delivery->details->longitude) {
+    if ($new->verified &&
+        $easypost->verifications->delivery->details->longitude)
+    {
       $distance= haversineGreatCircleDistance(
         34.043810, -118.250320, // XXX hardcoded location
         $easypost->verifications->delivery->details->latitude,
@@ -201,6 +203,14 @@ class Cart extends \Scat\Model {
     return $this->items()->join('item', [ 'item.id', '=', 'sale_item.item_id' ])->where_gt('item.hazmat', 0)->count();
   }
 
+  public function recalculate(
+    \Scat\Service\Shipping $shipping,
+    \Scat\Service\Tax $tax
+  ) {
+    $this->recalculateShipping($shipping);
+    $this->recalculateTax($tax);
+  }
+
   public function recalculateShipping(\Scat\Service\Shipping $shipping)
   {
     $address= $this->shipping_address();
@@ -223,10 +233,10 @@ class Cart extends \Scat\Model {
                                         $address->as_array());
 
     if ($shipping->in_delivery_area($address)) {
-      list($cost, $method)=
+      list($delivery_cost, $delivery_method)=
         $shipping->get_delivery_estimate($address, $this);
-      if ($cost) {
-        error_log("can delivery with {$method} for {$cost}");
+      if ($delivery_cost) {
+        error_log("can deliver with {$method} for {$cost}");
       } else {
         error_log("unable to calculate delivery cost");
       }

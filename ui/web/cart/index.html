@@ -5,6 +5,22 @@
   Shopping Cart @ Raw Materials Art Supplies
 {% endblock %}
 
+{% block notice %}
+  {% if removed %}
+    <div class="alert alert-danger">
+      Item removed from cart.
+      <form method="POST" action="/cart/add-item">
+        <input type="hidden" name="item" value="{{ removed }}">
+        <input type="hidden" name="quantity" value="{{ quantity }}">
+        <button class="button">
+          <i class="bi bi-arrow-counterclockwise"></i>
+          <span class="label">Undo</span>
+        </button>
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}
+
 {% block content %}
   {% set items= cart.items.find_many() %}
   {% if not items|length %}
@@ -22,6 +38,8 @@
         Welcome!
       </h2>
     {% endif %}
+
+    {{ block('notice') }}
 
     <div class="alert alert-warning">
       <b>You don't have anything in your cart.</b>
@@ -202,6 +220,8 @@ but as a fallback you can chain `:not()` instead */
         </div>
       {% endif %}
     </div>
+
+    {{ block('notice') }}
 
     {# TODO warnings about stock issues #}
 

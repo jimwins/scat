@@ -8,20 +8,15 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Cart {
-  private $view, $catalog, $data;
-
   public function __construct(
-    \Scat\Service\Data $data,
-    \Scat\Service\Catalog $catalog,
-    \Scat\Service\Config $config,
-    \Scat\Service\Auth $auth,
-    View $view
+    private \Scat\Service\Data $data,
+    private \Scat\Service\Catalog $catalog,
+    private \Scat\Service\Config $config,
+    private \Scat\Service\Shipping $shipping,
+    private \Scat\Service\Tax $tax,
+    private \Scat\Service\Auth $auth,
+    private View $view
   ) {
-    $this->data= $data;
-    $this->auth= $auth;
-    $this->catalog= $catalog;
-    $this->config= $config;
-    $this->view= $view;
   }
 
   public function cart(
@@ -55,21 +50,20 @@ class Cart {
       'cart' => $cart,
       'paypal' => $paypal->getClientId(),
       'amzn' => $amzn->getEnvironment($return_link),
+      'removed' => $request->getParam('removed'),
+      'quantity' => $request->getParam('quantity'),
+      'added' => $request->getParam('added'),
     ]);
   }
 
   public function cartUpdate(
     Request $request, Response $response,
-    \Scat\Service\Stripe $stripe,
-    \Scat\Service\Shipping $shipping,
-    \Scat\Service\Tax $tax
+    \Scat\Service\Stripe $stripe
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
 
     $recalculate= false;
-
-    error_log("processing update: " . json_encode($request->getParams()));
 
     foreach ($request->getParams() as $key => $value) {
       switch ($key) {
@@ -82,8 +76,7 @@ class Cart {
           break;
         case 'address':
           if ($value['city']) {
-            error_log("setting new address: " . json_encode($value));
-            $cart->updateShippingAddress($shipping, [
+            $cart->updateShippingAddress($this->shipping, [
               'name' => $cart->name,
               'street1' => $value['line1'],
               'street2' => $value['line2'] ?? '',
@@ -103,11 +96,7 @@ class Cart {
     }
 
     if ($recalculate) {
-      // first we recalculate shipping
-      $cart->recalculateShipping($shipping);
-
-      // and then we recalculate sales tax
-      $cart->recalculateTax($tax);
+      $cart->recalculate($this->shipping, $this->tax);
     }
 
     $cart->save();
@@ -229,6 +218,8 @@ class Cart {
 
     $line->save();
 
+    $cart->recalculate($this->shipping, $this->tax);
+
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
       return $response->withJson($cart);
@@ -237,12 +228,58 @@ class Cart {
     return $response->withRedirect('/cart');
   }
 
+  public function removeItem(Request $request, Response $response)
+  {
+    $cart= $request->getAttribute('cart');
+
+    $line_id= $request->getParam('line_id');
+    if (!$line_id) throw new \Exception("Must specify a line to remove.");
+
+    if ($cart->closed()) {
+      throw new \Exception("Cart already completed, start another one.");
+    }
+
+    // get item details
+    $line= $cart->items()->find_one($line_id);
+    if (!$line) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    $item= $line->item();
+
+    $details= [
+      'removed' => $item->code,
+      'quantity' => $line->quantity,
+    ];
+
+    if ($item->is_kit) {
+      error_log("Removing kit {$item->code} ({$line->id}) items from {$cart->uuid}\n");
+      $cart->items()->where('kit_id', $line->id)->delete_many();
+    }
+
+    $line->delete();
+    error_log("Removed {$item->code} ({$line->id}) from {$cart->uuid}\n");
+
+    $cart->recalculate($this->shipping, $this->tax);
+
+    $cart->save();
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($cart);
+    }
+
+    /* Bounce back to the cart with details so item can be re-added */
+    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+    $link= $routeContext->getRouteParser()->urlFor('cart', [], $details);
+
+    return $response->withRedirect($link);
+  }
+
   public function checkout(
     Request $request, Response $response,
-    \Scat\Service\Shipping $shipping,
     \Scat\Service\PayPal $paypal,
-    \Scat\Service\Stripe $stripe,
-    \Scat\Service\Tax $tax
+    \Scat\Service\Stripe $stripe
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
@@ -265,9 +302,7 @@ class Cart {
 
   public function amznCheckout(
     Request $request, Response $response,
-    \Scat\Service\Shipping $shipping,
-    \Scat\Service\AmazonPay $amzn,
-    \Scat\Service\Tax $tax
+    \Scat\Service\AmazonPay $amzn
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
@@ -304,13 +339,9 @@ class Cart {
       'zip' =>  $session->shippingAddress->postalCode,
     ];
 
-    $cart->updateShippingAddress($shipping, $amzn_address);
+    $cart->updateShippingAddress($this->shipping, $amzn_address);
 
-    // recalculate shipping
-    $cart->recalculateShipping($shipping);
-
-    // and then recalculate sales tax
-    $cart->recalculateTax($tax);
+    $cart->recalculate($this->shipping, $this->tax);
 
     $cart->save();
 
@@ -323,8 +354,7 @@ class Cart {
 
   public function amznPay(
     Request $request, Response $response,
-    \Scat\Service\AmazonPay $amzn,
-    \Scat\Service\Tax $tax
+    \Scat\Service\AmazonPay $amzn
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
@@ -377,8 +407,7 @@ class Cart {
 
   public function amznFinalize(
     Request $request, Response $response,
-    \Scat\Service\AmazonPay $amzn,
-    \Scat\Service\Tax $tax
+    \Scat\Service\AmazonPay $amzn
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
@@ -422,11 +451,8 @@ class Cart {
     return $response->withRedirect($link);
   }
 
-  public function setShipped(
-    Request $request,
-    Response $response,
-    \Scat\Service\Tax $tax
-  ) {
+  public function setShipped(Request $request, Response $response)
+  {
     $cart= $request->getAttribute('cart');
 
     $cart->shipping_address_id= 0;
@@ -434,19 +460,14 @@ class Cart {
     $cart->shipping= 0;
     $cart->shipping_tax= 0;
 
-    // and then recalculate (clear) sales tax
-    $cart->recalculateTax($tax);
+    $cart->recalculateTax($this->tax);
 
     $cart->save();
 
     return $response->withRedirect('/cart/checkout');
   }
 
-  public function setCurbsidePickup(
-    Request $request,
-    Response $response,
-    \Scat\Service\Tax $tax
-  ) {
+  public function setCurbsidePickup(Request $request, Response $response) {
     $cart= $request->getAttribute('cart');
 
     $cart->shipping_address_id= 1;
@@ -455,7 +476,7 @@ class Cart {
     $cart->shipping_tax= 0;
 
     // and then recalculate sales tax
-    $cart->recalculateTax($tax);
+    $cart->recalculateTax($this->tax);
 
     $cart->save();
 
@@ -465,7 +486,6 @@ class Cart {
   public function stripeFinalizeCart(
     Request $request, Response $response,
     \Scat\Service\Stripe $stripe,
-    \Scat\Service\Tax $tax,
     \Scat\Model\Cart $cart
   ) {
     $payment_intent_id= $cart->stripe_payment_intent_id;
@@ -545,8 +565,7 @@ endStripeFinalize:
 
   public function stripeFinalize(
     Request $request, Response $response,
-    \Scat\Service\Stripe $stripe,
-    \Scat\Service\Tax $tax
+    \Scat\Service\Stripe $stripe
   ) {
     $cart= $request->getAttribute('cart');
 
@@ -560,7 +579,7 @@ endStripeFinalize:
 
     return $this->stripeFinalizeCart(
       $request, $response,
-      $stripe, $tax,
+      $stripe,
       $cart
     );
   }
@@ -568,7 +587,6 @@ endStripeFinalize:
   public function handleStripeWebhook(
     Request $request, Response $response,
     \Scat\Service\Stripe $stripe,
-    \Scat\Service\Tax $tax,
     \Scat\Service\Cart $carts
   ) {
     try {
@@ -606,7 +624,7 @@ endStripeFinalize:
 
         return $this->stripeFinalizeCart(
           $request, $response,
-          $stripe, $tax,
+          $stripe,
           $cart
         );
 
@@ -622,9 +640,7 @@ endStripeFinalize:
 
   public function paypalOrder(
     Request $request, Response $response,
-    \Scat\Service\Shipping $shipping,
-    \Scat\Service\PayPal $paypal,
-    \Scat\Service\Tax $tax
+    \Scat\Service\PayPal $paypal
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
@@ -732,8 +748,7 @@ endStripeFinalize:
 
   public function paypalFinalize(
     Request $request, Response $response,
-    \Scat\Service\PayPal $paypal,
-    \Scat\Service\Tax $tax
+    \Scat\Service\PayPal $paypal
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
@@ -761,7 +776,6 @@ endStripeFinalize:
       $request,
       $response,
       $paypal,
-      $tax,
       $cart
     );
   }
@@ -769,7 +783,6 @@ endStripeFinalize:
   public function paypalFinalizeCart(
     Request $request, Response $response,
     \Scat\Service\PayPal $paypal,
-    \Scat\Service\Tax $tax,
     \Scat\Model\Cart $cart
   ) {
     $order_id= $cart->paypal_order_id;
@@ -809,7 +822,6 @@ endPaypalFinalize:
   public function handlePayPalWebhook(
     Request $request, Response $response,
     \Scat\Service\PayPal $paypal,
-    \Scat\Service\Tax $tax,
     \Scat\Service\Cart $carts
   ) {
     $webhook_id= $paypal->getWebhookId();
@@ -861,7 +873,6 @@ endPaypalFinalize:
           $request,
           $response,
           $paypal,
-          $tax,
           $cart
         );
 

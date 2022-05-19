@@ -394,7 +394,7 @@ class Shipping
 
   /* Local delivery */
   public function in_delivery_area($address) {
-    return $address->distance && $address->distance < 30;
+    return $address->distance > 0 && $address->distance < 30;
   }
 
   public function get_delivery_estimate($address, $cart) {
