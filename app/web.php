@@ -121,7 +121,7 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
       ->setName('catalog-whats-new');
   $app->get('/brand[/{brand}]', [ \Scat\Controller\Catalog::class, 'brand' ])
       ->setName('catalog-brand');
-  $app->get('[/{dept}[/{subdept}[/{product}[/{item}]]]]',
+  $app->get('[/{dept}[/{subdept}[/{product}[/{item:.*}]]]]',
             [ \Scat\Controller\Catalog::class, 'catalogPage' ])
       ->setName('catalog')
       ->add(function ($request, $handler) {
@@ -156,28 +156,12 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
       ->setName('finalize-amzn');
 
   /* PayPal */
-  $app->get('/checkout/paypal', [ \Scat\Web\Cart::class, 'paypalCheckout' ])
-      ->setName('checkout-paypal');
-  $app->get('/checkout/paypal-order',
-            [ \Scat\Web\Cart::class, 'paypalOrder' ]);
-  $app->post('/checkout/paypal-update',
-            [ \Scat\Web\Cart::class, 'paypalUpdate' ]);
-  $app->post('/checkout/paypal-pickup',
-            [ \Scat\Web\Cart::class, 'paypalSetPickup' ]);
-  $app->post('/checkout/paypal-shipped',
-            [ \Scat\Web\Cart::class, 'paypalSetAddress' ]);
-  $app->get('/pay/paypal', [ \Scat\Web\Cart::class, 'paypalPay' ])
-      ->setName('pay-paypal');
+  $app->get('/checkout/paypal-order', [ \Scat\Web\Cart::class, 'paypalOrder' ])
+      ->setName('paypal-order');
   $app->post('/finalize/paypal', [ \Scat\Web\Cart::class, 'paypalFinalize' ])
       ->setName('finalize-paypal');
 
   /* Stripe */
-  $app->get('/checkout/stripe', [ \Scat\Web\Cart::class, 'stripeCheckout' ])
-      ->setName('checkout-stripe');
-  $app->get('/checkout/stripe-pickup',
-            [ \Scat\Web\Cart::class, 'setCurbsidePickup' ]);
-  $app->get('/checkout/stripe-shipped',
-            [ \Scat\Web\Cart::class, 'setAddress' ]);
   $app->get('/finalize/stripe', [ \Scat\Web\Cart::class, 'stripeFinalize' ])
       ->setName('finalize-stripe');
 
