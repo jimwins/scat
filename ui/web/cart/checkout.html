@@ -265,7 +265,7 @@
         // Finalize the transaction on the server after payer approval
         onApprove: (data, actions) => {
 	  return actions.order.capture().then(function(details) {
-	    let formData= new FormData(document.getElementById('paypal-form'))
+	    let formData= new FormData(document.getElementById('payment-form'))
 	    formData.append('order_id', details.id)
 	    return fetch('{{ url_for('finalize-paypal') }}', {
 	      method: 'POST',
