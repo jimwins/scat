@@ -91,6 +91,41 @@
 
 {% block script %}
   <script>
+    // format number as $3.00 or ($3.00)
+    function amount(val) {
+      if (typeof(val) == 'function') {
+        val= val()
+      }
+      if (typeof(val) == 'undefined' || val == null) {
+        return ''
+      }
+      if (typeof(val) == 'string') {
+        val= parseFloat(val)
+      }
+      if (val < 0.0) {
+        return '($' + Math.abs(val).toFixed(2) + ')'
+      } else {
+        return '$' + val.toFixed(2)
+      }
+    }
+
+    function disablePayButtons() {
+      let stripeButton= document.getElementById('pay-stripe')
+      stripeButton.setAttribute('disabled', '')
+
+      let paypalButtons= document.getElementById('paypal-buttons');
+      paypalButtons.actions.disable()
+    }
+
+    function enablePayButtons(due) {
+      let stripeButton= document.getElementById('pay-stripe')
+      stripeButton.removeAttribute('disabled')
+      stripeButton.textContent= 'Pay ' + amount(due);
+
+      let paypalButtons= document.getElementById('paypal-buttons');
+      paypalButtons.actions.enable()
+    }
+
     const stripe= Stripe('{{ stripe.key }}', {
       betas: ['link_beta_3'],
       apiVersion: "2020-08-27;link_beta=v1"
@@ -98,7 +133,9 @@
     const clientSecret= '{{ stripe.payment_intent.client_secret }}';
 
     const appearance= {
-      colorPrimary: 'var(--primary-color)',
+      variables: {
+        colorPrimary: 'var(--primary-color)',
+      }
     };
 
     const elements= stripe.elements({clientSecret, appearance});
@@ -185,13 +222,12 @@
               shipping_options.replaceWith(template.content.firstChild)
             }
 
-            /* TODO disable, too
-            /* Enable Stripe payment button */
-            let stripeButton= document.getElementById('pay-stripe')
-            stripeButton.removeAttribute('disabled')
-
-            /* Enable PayPal buttons */
-            paypalButtons.actions.enable()
+            console.log("ready? " + data.ready_for_payment);
+            if (data.ready_for_payment) {
+              enablePayButtons(data.due);
+            } else {
+              disablePayButtons();
+            }
           })
         }, 500);
       });

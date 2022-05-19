@@ -315,6 +315,7 @@ class Cart extends \Scat\Model {
     $data['subtotal']= $this->subtotal();
     $data['total']= $this->total();
     $data['due']= $this->due();
+    $data['ready_for_payment']= $this->ready_for_payment();
     return $data;
   }
 }
