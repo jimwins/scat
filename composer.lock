@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "29fc6a7694df2c2941d2dba355dfa063",
+    "content-hash": "bd3857f905e4960c4a1e216592334c28",
     "packages": [
         {
             "name": "akrabat/ip-address-middleware",
@@ -6909,6 +6909,48 @@
                 "source": "https://github.com/wildbit/postmark-php/tree/4.0.2"
             },
             "time": "2021-06-13T08:50:30+00:00"
+        },
+        {
+            "name": "yidas/google-maps-services",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yidas/google-maps-services-php.git",
+                "reference": "804b1270dc58e04c75dd2080062227920f8f05ae"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yidas/google-maps-services-php/zipball/804b1270dc58e04c75dd2080062227920f8f05ae",
+                "reference": "804b1270dc58e04c75dd2080062227920f8f05ae",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~5.3.1|~6.0|^7.0",
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "yidas\\googleMaps\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP client library(SDK) for Google Maps API Web Services",
+            "homepage": "https://github.com/yidas/google-maps-services-php",
+            "keywords": [
+                "google maps",
+                "php",
+                "sdk",
+                "services"
+            ],
+            "support": {
+                "issues": "https://github.com/yidas/google-maps-services-php/issues",
+                "source": "https://github.com/yidas/google-maps-services-php"
+            },
+            "time": "2021-09-13T16:41:31+00:00"
         }
     ],
     "packages-dev": [
