@@ -22,11 +22,46 @@ class Cart extends \Scat\Model {
     return $this->belongs_to('CartAddress', 'shipping_address_id')->find_one();
   }
 
-  public function updateShippingaddress($address) {
+  public function updateShippingaddress(
+    \Scat\Service\Shipping $shipping,
+    $address
+  ) {
     // TODO check if new data matches our address and just ignore update
     $new= $this->belongs_to('CartAddress', 'shipping_address_id')
                ->create($address);
+
+    $easypost_params= [
+      "verify" => [ "delivery" ],
+      "name" => $new->name,
+      "company" => $new->company,
+      "street1" => $new->street1,
+      "street2" => $new->street2,
+      "city" => $new->city,
+      "state" => $new->state,
+      "zip" => $new->zip5,
+      "country" => "US",
+      "phone" => $new->phone,
+    ];
+
+    $easypost= $shipping->createAddress($easypost_params);
+
+    $new->easypost_id= $easypost->id;
+    $new->verified= $easypost->verifications->delivery->success ? '1' : '0';
+    if ($easypost->verifications->delivery->details->longitude) {
+      $distance= haversineGreatCircleDistance(
+        34.043810, -118.250320, // XXX hardcoded location
+        $easypost->verifications->delivery->details->latitude,
+        $easypost->verifications->delivery->details->longitude,
+        3959 /* want miles */
+      );
+
+      $new->distance= $distance;
+      $new->latitude= $easypost->verifications->delivery->details->latitude;
+      $new->longitude= $easypost->verifications->delivery->details->longitude;
+    }
+
     $new->save();
+
     $this->shipping_address_id= $new->id;
 
     /* Passing in a new address always nukes our shipping costs */
@@ -120,7 +155,7 @@ class Cart extends \Scat\Model {
     $this->_totals= null;
   }
 
-  public function get_shipping_box() {
+  public function get_item_dims() {
     $items= [];
 
     foreach ($this->items()->find_many() as $line) {
@@ -141,6 +176,11 @@ class Cart extends \Scat\Model {
       $items+= array_fill(0, $line->quantity, $dims);
     }
 
+    return $items;
+  }
+
+  public function get_shipping_box() {
+    $items= $this->get_item_dims();
     return \Scat\Service\Shipping::get_shipping_box($items);
   }
 
@@ -181,6 +221,16 @@ class Cart extends \Scat\Model {
     list($cost, $method)=
       $shipping->get_shipping_estimate($box, $weight, $hazmat,
                                         $address->as_array());
+
+    if ($shipping->in_delivery_area($address)) {
+      list($cost, $method)=
+        $shipping->get_delivery_estimate($address, $this);
+      if ($cost) {
+        error_log("can delivery with {$method} for {$cost}");
+      } else {
+        error_log("unable to calculate delivery cost");
+      }
+    }
 
     $this->shipping_method= $method ? 'default' : null;
     $this->shipping= $method ? $cost : 0.00;
@@ -387,4 +437,32 @@ class CartPayment extends \Scat\Model {
   public function data() {
     return json_decode($this->data);
   }
+}
+
+/**
+ * from: https://stackoverflow.com/a/10054282
+ * Calculates the great-circle distance between two points, with
+ * the Haversine formula.
+ * @param float $latitudeFrom Latitude of start point in [deg decimal]
+ * @param float $longitudeFrom Longitude of start point in [deg decimal]
+ * @param float $latitudeTo Latitude of target point in [deg decimal]
+ * @param float $longitudeTo Longitude of target point in [deg decimal]
+ * @param float $earthRadius Mean earth radius in [m]
+ * @return float Distance between points in [m] (same as earthRadius)
+ */
+function haversineGreatCircleDistance(
+  $latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000)
+{
+  // convert from degrees to radians
+  $latFrom = deg2rad($latitudeFrom);
+  $lonFrom = deg2rad($longitudeFrom);
+  $latTo = deg2rad($latitudeTo);
+  $lonTo = deg2rad($longitudeTo);
+
+  $latDelta = $latTo - $latFrom;
+  $lonDelta = $lonTo - $lonFrom;
+
+  $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+    cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+  return $angle * $earthRadius;
 }

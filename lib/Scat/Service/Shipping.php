@@ -5,6 +5,7 @@ class Shipping
 {
   private $webhook_url;
   private $data;
+  private $google;
 
   # TODO put this in a database table
   # width, height, depth, weight (lb), cost
@@ -117,10 +118,15 @@ class Shipping
     ],
   ];
 
-  public function __construct(Config $config, Data $data) {
+  public function __construct(
+    Config $config,
+    Data $data,
+    \Scat\Service\Google $google,
+  ) {
     $this->data= $data;
-    \EasyPost\EasyPost::setApiKey($config->get('shipping.key'));
+    $this->google= $google;
 
+    \EasyPost\EasyPost::setApiKey($config->get('shipping.key'));
     $this->webhook_url= $config->get('shipping.webhook_url');
   }
 
@@ -384,5 +390,64 @@ class Shipping
       'WI',
       'WY',
     ]);
+  }
+
+  /* Local delivery */
+  public function in_delivery_area($address) {
+    return $address->distance && $address->distance < 30;
+  }
+
+  public function get_delivery_estimate($address, $cart) {
+    $truck_sizes= [
+      'sm' => [ [ 30, 25, 16 ], [ 45, 25, 10 ], [ 108, 4, 4 ] ],
+      'md' => [ [ 46, 38, 36 ] ],
+      'lg' => [ [ 74, 42, 36 ], [ 108, 8, 8 ] ],
+      'xl' => [ [ 85, 56, 36 ] ],
+      'xxl' => [ [ 150, 60, 60 ] ],
+    ];
+
+    $base= [
+      'sm' => 13,
+      'md' => 35,
+      'lg' => 55,
+      'xl' => 95,
+      'xxl' => 170,
+    ];
+
+    $item_dims= $cart->get_item_dims();
+
+    $best= null;
+    // figure out cargo size
+    foreach ($truck_sizes as $name => $sizes) {
+      if ($this->fits_in_box($sizes, $item_dims)) {
+        $best= $name;
+        break;
+      }
+    }
+
+    // figure out price
+    if ($best) {
+      list($miles, $minutes)= $this->get_truck_distance($address);
+      if ($miles > 0) {
+        $price= ($base[$best] + $miles + ($minutes / 2)) * 1.05;
+        return [
+          ceil($price) - 0.01,
+          "local_{$best}"
+        ];
+      } else {
+        error_log("Unable to figure out distance for destination.");
+      }
+    }
+  }
+
+  function get_truck_distance($address) {
+    $from= $this->getDefaultFromAddress();
+    $from_str= "{$from->street1}, " .
+               "{$from->city}, {$from->state} {$from->zip}";
+
+    $to_str= "{$address->street1}, " .
+             "{$address->city}, {$address->state} {$address->zip}";
+
+    return $this->google->getMapsDistanceMatrix($from_str, $to_str);
   }
 }

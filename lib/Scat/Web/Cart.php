@@ -83,7 +83,7 @@ class Cart {
         case 'address':
           if ($value['city']) {
             error_log("setting new address: " . json_encode($value));
-            $cart->updateShippingAddress([
+            $cart->updateShippingAddress($shipping, [
               'name' => $cart->name,
               'street1' => $value['line1'],
               'street2' => $value['line2'] ?? '',
@@ -304,7 +304,7 @@ class Cart {
       'zip' =>  $session->shippingAddress->postalCode,
     ];
 
-    $cart->updateShippingAddress($amzn_address);
+    $cart->updateShippingAddress($shipping, $amzn_address);
 
     // recalculate shipping
     $cart->recalculateShipping($shipping);

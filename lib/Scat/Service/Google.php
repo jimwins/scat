@@ -51,12 +51,13 @@ class Google
       $result= $gm->distanceMatrix($from, $to);
 
       if ($result['status'] == 'OK') {
-        return [
+        $answer= [
           // we want distance in miles
           $result['rows'][0]['elements'][0]['distance']['value'] / 1609.34,
           // and time in minutes
           $result['rows'][0]['elements'][0]['duration']['value'] / 60,
         ];
+        return $answer;
       } else {
         error_log("Not OK: " . json_encode($result));
       }
