@@ -1564,7 +1564,7 @@ class Transactions {
       list($length, $width, $height)=
         preg_split('/[^\d.]+/', trim($request->getParam('dimensions')));
       if (preg_match('/(([0-9.]+)( *lbs)?)? +(([0-9.]+) *oz)?/', $weight, $m)) {
-        $weight= $m[2] + ($m[5] / 16);
+        $weight= $m[2] + (@$m[5] / 16);
       }
 
       $parcel= [
