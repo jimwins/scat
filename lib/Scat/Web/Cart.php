@@ -312,6 +312,14 @@ class Cart {
     return $response->withRedirect($link);
   }
 
+  public function guestCheckout(Request $request, Response $response) {
+    $cart= $request->getAttribute('cart');
+
+    $cart->email= $request->getParam('email');
+
+    return $response->withRedirect('/cart/checkout');
+  }
+
   public function checkout(
     Request $request, Response $response,
     \Scat\Service\PayPal $paypal,

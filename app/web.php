@@ -142,8 +142,12 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->post('/update-item', [ \Scat\Web\Cart::class, 'updateItem' ]);
   $app->get('/remove-item', [ \Scat\Web\Cart::class, 'removeItem' ]);
 
+  $app->post('/checkout/guest', [ \Scat\Web\Cart::class, 'guestCheckout' ])
+      ->setName('guestCheckout');
+
   $app->get('/checkout', [ \Scat\Web\Cart::class, 'checkout' ])
       ->setName('checkout');
+
   $app->get('/checkout/set-pickup',
             [ \Scat\Web\Cart::class, 'setCurbsidePickup' ]);
   $app->get('/checkout/set-shipped',
