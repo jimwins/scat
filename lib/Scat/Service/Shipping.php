@@ -345,6 +345,104 @@ class Shipping
 
   }
 
+  public function get_shipping_options($cart, $address) {
+    $box= $cart->get_shipping_box();
+    $weight= $cart->get_shipping_weight();
+    $hazmat= $cart->has_hazmat_items();
+
+    $from= $this->getDefaultFromAddress();
+    $to= $this->getAddress($address);
+
+    $shipping_options= [];
+
+    $options= [];
+    if ($hazmat) {
+      $options['hazmat']= 'LIMITED_QUANTITY';
+    }
+
+    $details= [
+      'from_address' => $from,
+      'to_address' => $to,
+      'parcel' => [
+        'length' => $box[0],
+        'width' => $box[1],
+        'height' => $box[2],
+        'weight' => ceil(($weight + $box[3]) * 16),
+      ],
+      'options' => $options,
+    ];
+
+    $shipment= $this->createShipment($details);
+
+    $acceptable_options= [
+      'default' => [
+        [ 'UPS', 'Ground' ],
+        [ 'UPSDAP', 'Ground' ],
+      ],
+      'two_day' => [
+        [ 'UPS', '2ndDayAir' ],
+        [ 'UPSDAP', '2ndDayAir' ],
+      ],
+      'next_day' => [
+        [ 'UPS', 'NextDayAir' ],
+        [ 'UPS', 'NextDayAirSaver' ],
+        [ 'UPSDAP', 'NextDayAir' ],
+        [ 'UPSDAP', 'NextDayAirSaver' ],
+      ],
+    ];
+
+    if (!$hazmat) {
+      /* We can use USPS for non-hazmat items. */
+      $acceptable_options['default'][]= [ 'USPS', 'First' ];
+      $acceptable_options['default'][]= [ 'USPS', 'Priority' ];
+    } else {
+      /* No express options for hazmat items. */
+      unset($acceptable_options['two_day']);
+      unset($acceptable_options['next_day']);
+    }
+
+    /* We will allow ParcelSelect to PO Box in continental US, too. */
+    if (self::state_in_continental_us($to->state) &&
+        self::address_is_po_box($to))
+    {
+      $acceptable_options['default'][]= [ 'USPS', 'ParcelSelect' ];
+    }
+
+    foreach ($shipment->rates as $rate) {
+      error_log("{$rate->carrier} / {$rate->service} = {$rate->rate}");
+      foreach ($acceptable_options as $method => $options) {
+        foreach ($options as $option) {
+          if ($rate->carrier == $option[0] && $rate->service == $option[1]) {
+            if (!array_key_exists($method, $shipping_options) ||
+                $rate->rate < $shipping_options[$method]['rate'])
+            {
+              $shipping_options[$method]= $rate->__toArray(true);
+            }
+          }
+        }
+      }
+    }
+
+    $shipping_options['box_cost']= $box[4];
+
+    /* Get local delivery options */
+    if ($this->in_delivery_area($address)) {
+      list($delivery_cost, $delivery_method)=
+        $this->get_delivery_estimate($address, $cart);
+      if ($delivery_cost) {
+        $shipping_options['local_delivery']= [
+          'carrier' => 'Ship District',
+          'vehicle' => $delivery_method,
+          'rate' => $delivery_cost,
+        ];
+      } else {
+        error_log("unable to calculate delivery cost");
+      }
+    }
+
+    return $shipping_options;
+  }
+
   static function get_base_local_delivery_rate($item_dim, $weight) {
     $truck_sizes= [
       'sm' => [ [ 30, 25, 16 ], [ 108, 4, 4 ] ],

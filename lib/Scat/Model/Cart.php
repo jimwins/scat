@@ -218,6 +218,7 @@ class Cart extends \Scat\Model {
     $address= $this->shipping_address();
 
     if (!$address) {
+      $this->shipping_options= null;
       $this->shipping_method= null;
       $this->shipping= 0.00;
       $this->shipping_tax= 0.00;
@@ -227,6 +228,7 @@ class Cart extends \Scat\Model {
 
     /* Curbside pickup */
     if ($address->id == 1) {
+      $this->shipping_options= null;
       $this->shipping_method= 'pickup';
       $this->shipping= 0.00;
       $this->shipping_tax= 0.00;
@@ -234,28 +236,37 @@ class Cart extends \Scat\Model {
       return;
     }
 
-    $box= $this->get_shipping_box();
-    $weight= $this->get_shipping_weight();
-    $hazmat= $this->has_hazmat_items();
+    $this->shipping_options= $shipping->get_shipping_options($this, $address);
+    error_log("got options: " . json_encode($this->shipping_options));
 
-    // recalculate shipping costs
-    list($cost, $method)=
-      $shipping->get_shipping_estimate($box, $weight, $hazmat,
-                                        $address->as_array());
+    $default= $this->shipping_options->default;
+    $box_cost= $this->shipping_options->box_cost;
 
-    if ($shipping->in_delivery_area($address)) {
-      list($delivery_cost, $delivery_method)=
-        $shipping->get_delivery_estimate($address, $this);
-      if ($delivery_cost) {
-        error_log("can deliver with {$method} for {$cost}");
-      } else {
-        error_log("unable to calculate delivery cost");
-      }
+    if ($default) {
+      $this->shipping_method= 'default';
+      $this->shipping= $default->rate + $box_cost;
+      $this->shipping_tax= 0.00;
+    } else {
+      $this->shipping_method= null;
+      $this->shipping= 0.00;
+      $this->shipping_tax= 0.00;
     }
+  }
 
-    $this->shipping_method= $method ? 'default' : null;
-    $this->shipping= $method ? $cost : 0.00;
-    $this->shipping_tax= 0.00;
+  /* Convert shipping_options to/from JSON on the way in & out */
+  public function __get($key) {
+    $value= parent::__get($key);
+    if ($key == 'shipping_options') {
+      return json_decode($value);
+    }
+    return $value;
+  }
+
+  public function __set($key, $value= null) {
+    if ($key == 'shipping_options' && $value !== null) {
+      $value= json_encode($value);
+    }
+    return parent::__set($key, $value);
   }
 
   public function generateCartItems() {
