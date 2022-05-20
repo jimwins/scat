@@ -834,6 +834,11 @@ class Transactions {
             "Unable to split an item that is being returned."
           );
         }
+        if ($line->item()->is_kit) {
+          throw new \Scat\Exception\HttpConflictException($request,
+            "Unable to split kit items."
+          );
+        }
 
         $quantity= (int)$m[2] * ($txn->type == 'customer' ? -1 : 1);
 
