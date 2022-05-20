@@ -203,20 +203,68 @@ class Cart {
     // TODO handle kits
     // TODO add quantity to existing line instead of changing quantity
 
-    $line= $cart->items()->create([
-      'sale_id' => $cart->id,
-      'item_id' => $item->id,
-    ]);
+    $existing=
+      $cart->items()
+            ->where('item_id', $item->id)
+            ->where_null('kit_id')
+            ->find_one();
 
-    // TODO update price on existing lines
-    $line->retail_price= $item->retail_price;
-    $line->discount= $item->discount;
-    $line->discount_type= $item->discount_type;
-    $line->tic= $item->tic;
+    if ($existing) {
+      $existing->quantity+= max($quantity, $item->purchase_quantity);
+      $existing->save();
 
-    $line->quantity+= $quantity;
+      error_log("Updated to {$existing->quantity} {$item->code} ({$existing->id}) on {$cart->uuid}");
 
-    $line->save();
+      /* Was this a kit? Need to adjust quantities of kit items */
+      // This assumes kit contents haven't changed
+      if ($item->is_kit) {
+        error_log("Updating quantities for kit {$existing->id} on {$cart->uuid}");
+        $q= "UPDATE sale_item, kit_item
+                SET sale_item.quantity = ? * kit_item.quantity
+              WHERE sale_id = ?
+                AND kit_item.kit_id = ?
+                AND sale_item.item_id = kit_item.item_id";
+        $existing->orm->for_table('sale_item')->raw_execute($q, [
+          $existing->quantity, $cart->id, $item->id
+        ]);
+      }
+    } else {
+      $line= $cart->items()->create([
+        'sale_id' => $cart->id,
+        'item_id' => $item->id,
+      ]);
+
+      $line->retail_price= $item->retail_price;
+      $line->discount= $item->discount;
+      $line->discount_type= $item->discount_type;
+      $line->tic= $item->tic;
+
+      $line->quantity= max($quantity, $item->purchase_quantity);
+      if ($item->no_backorder && $line->quantity > $item->stock) {
+        $line->quantity= $item->stock;
+      }
+
+      $line->save();
+
+      error_log("Added {$line->quantity} {$item->code} ({$line->id}) to {$cart->uuid}");
+
+      /* Was this a kit? Need to add the kit items */
+      if ($item->is_kit) {
+        $q= "INSERT INTO sale_item
+                    (sale_id, item_id, kit_id, quantity, retail_price, tax)
+             SELECT ?,
+                    item_id,
+                    kit_id,
+                    ? * quantity,
+                    0.00,
+                    0.00
+               FROM kit_item
+              WHERE kit_item.kit_id = ?";
+        $line->orm->for_table('sale_item')->raw_execute($q, [
+          $cart->id, $line->quantity, $item->id
+        ]);
+      }
+    }
 
     $cart->recalculate($this->shipping, $this->tax);
 
@@ -254,7 +302,7 @@ class Cart {
 
     if ($item->is_kit) {
       error_log("Removing kit {$item->code} ({$line->id}) items from {$cart->uuid}\n");
-      $cart->items()->where('kit_id', $line->id)->delete_many();
+      $cart->items()->where('kit_id', $line->item_id)->delete_many();
     }
 
     $line->delete();
