@@ -22,10 +22,12 @@ class Cart extends \Scat\Model {
     return $this->belongs_to('CartAddress', 'shipping_address_id')->find_one();
   }
 
-  public function updateShippingaddress(
+  public function updateShippingAddress(
     \Scat\Service\Shipping $shipping,
     $address
   ) {
+    /* TODO Move a bunch of this to Shipping service? Address model? */
+
     // TODO check if new data matches our address and just ignore update
     $new= $this->belongs_to('CartAddress', 'shipping_address_id')
                ->create($address);
@@ -38,7 +40,7 @@ class Cart extends \Scat\Model {
       "street2" => $new->street2,
       "city" => $new->city,
       "state" => $new->state,
-      "zip" => $new->zip5,
+      "zip" => $new->zip,
       "country" => "US",
       "phone" => $new->phone,
     ];
@@ -217,6 +219,15 @@ class Cart extends \Scat\Model {
 
     if (!$address) {
       $this->shipping_method= null;
+      $this->shipping= 0.00;
+      $this->shipping_tax= 0.00;
+
+      return;
+    }
+
+    /* Curbside pickup */
+    if ($address->id == 1) {
+      $this->shipping_method= 'pickup';
       $this->shipping= 0.00;
       $this->shipping_tax= 0.00;
 
@@ -461,7 +472,7 @@ class CartLine extends \Scat\Model {
       $cart->items()->where('kit_id', $this->item_id)->delete_many();
     }
 
-    error_log("Removing {$item->code} ({$line->id}) from {$cart->uuid}\n");
+    error_log("Removing {$item->code} ({$this->id}) from {$cart->uuid}\n");
 
     return parent::delete();
   }
