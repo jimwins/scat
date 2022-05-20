@@ -402,6 +402,69 @@ class CartLine extends \Scat\Model {
       $this->discount
     );
   }
+
+  public function updateQuantity($quantity) {
+    $item= $this->item();
+    $cart= $this->cart();
+
+    $this->quantity= $quantity;
+    if ($item->purchase_quantity && $this->quantity % $item->purchase_quantity)
+    {
+      $this->quantity=
+        ((floor($this->quantity / $item->purchase_quantity) + 1) *
+          $item->purchase_quantity);
+    }
+    if ($item->no_backorder && $this->quantity > $item->stock) {
+      $this->quantity= $item->stock;
+    }
+
+    /* Was this a kit? Need to adjust quantities of kit items */
+    // This assumes kit contents haven't changed
+    if ($item->is_kit) {
+      if ($this->id) {
+        error_log("Updating quantities for kit {$item->code} ({$this->id}) on {$cart->uuid}");
+        $q= "UPDATE sale_item, kit_item
+                SET sale_item.quantity = ? * kit_item.quantity
+              WHERE sale_id = ?
+                AND kit_item.kit_id = ?
+                AND sale_item.item_id = kit_item.item_id";
+        $this->orm->for_table('sale_item')->raw_execute($q, [
+          $this->quantity, $cart->id, $item->id
+        ]);
+      } else {
+        error_log("Inserting items for kit {$item->code} ({$this->id}) on {$cart->uuid}");
+        $q= "INSERT INTO sale_item
+                    (sale_id, item_id, kit_id, quantity, retail_price, tax)
+             SELECT ?,
+                    item_id,
+                    kit_id,
+                    ? * quantity,
+                    0.00,
+                    0.00
+               FROM kit_item
+              WHERE kit_item.kit_id = ?";
+        $this->orm->for_table('sale_item')->raw_execute($q, [
+          $cart->id, $this->quantity, $item->id
+        ]);
+      }
+    }
+
+    error_log("Updated to {$this->quantity} {$item->code} ({$this->id}) on {$cart->uuid}");
+  }
+
+  public function delete() {
+    $item= $this->item();
+    $cart= $this->cart();
+
+    if ($item->is_kit) {
+      error_log("Removing kit {$item->code} ({$this->id}) items from {$cart->uuid}\n");
+      $cart->items()->where('kit_id', $this->item_id)->delete_many();
+    }
+
+    error_log("Removing {$item->code} ({$line->id}) from {$cart->uuid}\n");
+
+    return parent::delete();
+  }
 }
 
 class CartNote extends \Scat\Model {

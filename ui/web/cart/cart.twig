@@ -89,11 +89,12 @@
             <label for="qty_{{ line.id }}" class="visually-hidden">
               Quantity
             </label>
-            <span class="edit-quantity">
-              <input type="text"
-                     class="input" id="qty_{{ line.id }}"
-                     name="qty[{{ line.id }}]" value="{{ line.quantity }}">
-              <button class="update button min">
+            <form class="edit-quantity"
+                  method="POST" action="/cart/update-item">
+              <input type="hidden" name="line_id" value="{{ line.id }}">
+              <input type="text" class="input"
+                     name="quantity" value="{{ line.quantity }}">
+              <button type="submit" class="update button min">
                 <i class="bi bi-arrow-clockwise"></i>
                 <span class="visually-hidden">Update</span>
               </button>
@@ -101,7 +102,7 @@
                  class="remove button min">
                 <i class="bi bi-cart-dash"></i>
               </a>
-            </span>
+            </form>
             <br>
             <small class="help-block">
           {% endif %}

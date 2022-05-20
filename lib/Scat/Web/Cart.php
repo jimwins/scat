@@ -210,24 +210,8 @@ class Cart {
             ->find_one();
 
     if ($existing) {
-      $existing->quantity+= max($quantity, $item->purchase_quantity);
+      $existing->updateQuantity($existing->quantity + $quantity);
       $existing->save();
-
-      error_log("Updated to {$existing->quantity} {$item->code} ({$existing->id}) on {$cart->uuid}");
-
-      /* Was this a kit? Need to adjust quantities of kit items */
-      // This assumes kit contents haven't changed
-      if ($item->is_kit) {
-        error_log("Updating quantities for kit {$existing->id} on {$cart->uuid}");
-        $q= "UPDATE sale_item, kit_item
-                SET sale_item.quantity = ? * kit_item.quantity
-              WHERE sale_id = ?
-                AND kit_item.kit_id = ?
-                AND sale_item.item_id = kit_item.item_id";
-        $existing->orm->for_table('sale_item')->raw_execute($q, [
-          $existing->quantity, $cart->id, $item->id
-        ]);
-      }
     } else {
       $line= $cart->items()->create([
         'sale_id' => $cart->id,
@@ -239,32 +223,42 @@ class Cart {
       $line->discount_type= $item->discount_type;
       $line->tic= $item->tic;
 
-      $line->quantity= max($quantity, $item->purchase_quantity);
-      if ($item->no_backorder && $line->quantity > $item->stock) {
-        $line->quantity= $item->stock;
-      }
+      $line->updateQuantity($quantity);
 
       $line->save();
-
-      error_log("Added {$line->quantity} {$item->code} ({$line->id}) to {$cart->uuid}");
-
-      /* Was this a kit? Need to add the kit items */
-      if ($item->is_kit) {
-        $q= "INSERT INTO sale_item
-                    (sale_id, item_id, kit_id, quantity, retail_price, tax)
-             SELECT ?,
-                    item_id,
-                    kit_id,
-                    ? * quantity,
-                    0.00,
-                    0.00
-               FROM kit_item
-              WHERE kit_item.kit_id = ?";
-        $line->orm->for_table('sale_item')->raw_execute($q, [
-          $cart->id, $line->quantity, $item->id
-        ]);
-      }
     }
+
+    $cart->recalculate($this->shipping, $this->tax);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($cart);
+    }
+
+    return $response->withRedirect('/cart');
+  }
+
+  public function updateItem(Request $request, Response $response)
+  {
+    $cart= $request->getAttribute('cart');
+
+    $line_id= $request->getParam('line_id');
+    if (!$line_id) throw new \Exception("Must specify a line to remove.");
+
+    if ($cart->closed()) {
+      throw new \Exception("Cart already completed, start another one.");
+    }
+
+    $quantity= $request->getParam('quantity');
+
+    $line= $cart->items()->find_one($line_id);
+    if (!$line) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    $line->updateQuantity($quantity);
+
+    $line->save();
 
     $cart->recalculate($this->shipping, $this->tax);
 
@@ -300,13 +294,7 @@ class Cart {
       'quantity' => $line->quantity,
     ];
 
-    if ($item->is_kit) {
-      error_log("Removing kit {$item->code} ({$line->id}) items from {$cart->uuid}\n");
-      $cart->items()->where('kit_id', $line->item_id)->delete_many();
-    }
-
-    $line->delete();
-    error_log("Removed {$item->code} ({$line->id}) from {$cart->uuid}\n");
+    $line->delete(); /* takes care of kit items, too */
 
     $cart->recalculate($this->shipping, $this->tax);
 
