@@ -156,6 +156,47 @@ class Shipping
     return \EasyPost\Address::retrieve($address_id);
   }
 
+  public function getAddress($address) {
+    if ($address->easypost_id) {
+      return \EasyPost\Address::retrieve($address->easypost_id);
+    }
+
+    $easypost_params= [
+      "verify" => [ "delivery" ],
+      "name" => $address->name,
+      "company" => $address->company,
+      "street1" => $address->street1,
+      "street2" => $address->street2,
+      "city" => $address->city,
+      "state" => $address->state,
+      "zip" => $address->zip,
+      "country" => "US",
+      "phone" => $address->phone,
+    ];
+
+    $easypost= \EasyPost\Address::create($easypost_params);
+
+    $address->easypost_id= $easypost->id;
+    $address->verified= $easypost->verifications->delivery->success ? '1' : '0';
+    if ($address->verified &&
+        $easypost->verifications->delivery->details->longitude)
+    {
+      $distance= haversineGreatCircleDistance(
+        34.043810, -118.250320, // XXX hardcoded location
+        $easypost->verifications->delivery->details->latitude,
+        $easypost->verifications->delivery->details->longitude,
+        3959 /* want miles */
+      );
+
+      $address->distance= $distance;
+      $address->latitude= $easypost->verifications->delivery->details->latitude;
+      $address->longitude=
+        $easypost->verifications->delivery->details->longitude;
+    }
+
+    $address->save();
+  }
+
   public function createTracker($tracking_code, $carrier) {
     $tracker= \EasyPost\Tracker::create([
       'tracking_code' => $tracking_code,
