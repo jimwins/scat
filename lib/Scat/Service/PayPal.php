@@ -33,6 +33,33 @@ class PayPal {
     return $this->webhook_id;
   }
 
+  public function verifyWebhook($request) {
+    // adapted from https://stackoverflow.com/a/62870569
+    if ($webhook_id) {
+      $headers= $request->getHeaders();
+      $body= $request->getBody();
+
+      $data= join('|', [
+		  $headers['Paypal-Transmission-Id'][0],
+		  $headers['Paypal-Transmission-Time'][0],
+		  $this->webhook_id,
+		  crc32($body) ]);
+
+      $cert= file_get_contents($headers['Paypal-Cert-Url'][0]);
+      $pubkey= openssl_pkey_get_public($cert);
+
+      $sig= base64_decode($headers['Paypal-Transmission-Sig'][0]);
+
+      $res= openssl_verify($data, $sig, $pubkey, 'sha256WithRSAEncryption');
+
+      if ($res == 0) {
+        throw new \Exception("Webhook signature validation failed.");
+      } elseif ($res < 0) {
+        throw new \Exception("Error validating signature: " . openssl_error_string());
+      }
+    }
+  }
+
   public function refund($capture_id, $amount) {
     $paypal= $this->getClient();
 

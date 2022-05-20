@@ -872,32 +872,7 @@ endPaypalFinalize:
     \Scat\Service\PayPal $paypal,
     \Scat\Service\Cart $carts
   ) {
-    $webhook_id= $paypal->getWebhookId();
-
-    // adapted from https://stackoverflow.com/a/62870569
-    if ($webhook_id) {
-      $headers= $request->getHeaders();
-      $body= $request->getBody();
-
-      $data= join('|', [
-		  $headers['Paypal-Transmission-Id'][0],
-		  $headers['Paypal-Transmission-Time'][0],
-		  $webhook_id,
-		  crc32($body) ]);
-
-      $cert= file_get_contents($headers['Paypal-Cert-Url'][0]);
-      $pubkey= openssl_pkey_get_public($cert);
-
-      $sig= base64_decode($headers['Paypal-Transmission-Sig'][0]);
-
-      $res= openssl_verify($data, $sig, $pubkey, 'sha256WithRSAEncryption');
-
-      if ($res == 0) {
-        throw new \Exception("Webhook signature validation failed.");
-      } elseif ($res < 0) {
-        throw new \Exception("Error validating signature: " . openssl_error_string());
-      }
-    }
+    $paypal->verifyWebhook($request);
 
     $event_type= $request->getParam('event_type');
     $resource= $request->getParam('resource');
@@ -923,6 +898,10 @@ endPaypalFinalize:
           $paypal,
           $cart
         );
+
+      case 'CHECKOUT.ORDER.APPROVED':
+        /* Ignore these */
+        break;
 
       default:
         error_log("Ignoring {$event_type} from PayPal");
