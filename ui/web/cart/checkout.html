@@ -63,7 +63,7 @@
     {% block shipping_options %}
       {% import 'macros.twig' as scat %}
       <div id="shipping-options">
-        {% if cart.shipping_options|length > 1 or cart.shipping_options.default is not defined %}
+        {% if cart.shipping_address_id != 1 and (cart.shipping_options|length > 1 or cart.shipping_options.default is not defined) %}
           <h3>Shipping Options</h3>
 
           {% for method, details in cart.shipping_options %}
