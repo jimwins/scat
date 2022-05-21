@@ -307,26 +307,36 @@ class Cart extends \Scat\Model {
     return [ $cartItems, $index_map ];
   }
 
+  public function flushTax() {
+    foreach ($this->items()->find_many() as $line) {
+      if ($line->tax) {
+        $line->tax= 0;
+        $line->save();
+      }
+    }
+    $this->tax_calculated= null;
+    $this->shipping_tax= 0;
+  }
+
   public function recalculateTax(\Scat\Service\Tax $tax) {
     $address= $this->shipping_address();
 
     /* No address? Forget all we had. */
     if (!$address) {
-      foreach ($this->items()->find_many() as $line) {
-        if ($line->tax) {
-          $line->tax= 0;
-          $line->save();
-        }
-      }
-      $this->tax_calculated= null;
-      $this->shipping_tax= 0;
+      $this->flushTax();
+      $this->flushTotals();
+      return;
+    }
+
+    if ($this->tax_exemption == 'manual') {
+      $this->flushTax();
+      $this->set_expr('tax_calculated', 'NOW()');
       $this->flushTotals();
       return;
     }
 
     $zip= explode('-', $address->zip);
 
-    // Look up all non-returned items
     $data= [
       'customerId' => $this->person_id ?: 0,
       'cartId' => $this->uuid,
@@ -350,6 +360,10 @@ class Cart extends \Scat\Model {
       ],
       'cartItems' => [],
     ];
+
+    if ($this->tax_exemption) {
+      $data['exemptCert']= [ 'CertificateID' => $this->tax_exemption ];
+    }
 
     list($cartItems, $index_map)= $this->generateCartItems();
 

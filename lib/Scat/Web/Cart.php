@@ -198,6 +198,46 @@ class Cart {
     return $response->withJson($cart);
   }
 
+  public function applyTaxExemption(Request $request, Response $response) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    if (!$person) {
+      throw new \Exception("Unable to apply exemption, nobody is logged in.");
+    }
+
+    if (!$cart->person_id) $cart->person_id= $person->id;
+    $cart->tax_exemption= $person->exemption_certificate_id;
+
+    $cart->recalculateTax($this->tax);
+
+    $cart->save();
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($cart);
+    }
+
+    return $response->withRedirect('/cart');
+  }
+
+  public function removeTaxExemption(Request $request, Response $response) {
+    $cart= $request->getAttribute('cart');
+
+    $cart->tax_exemption= null;
+
+    $cart->recalculateTax($this->tax);
+
+    $cart->save();
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($cart);
+    }
+
+    return $response->withRedirect('/cart');
+  }
+
   public function addItem(Request $request, Response $response)
   {
     $cart= $request->getAttribute('cart');

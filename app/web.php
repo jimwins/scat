@@ -144,6 +144,11 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->post('/update-item', [ \Scat\Web\Cart::class, 'updateItem' ]);
   $app->get('/remove-item', [ \Scat\Web\Cart::class, 'removeItem' ]);
 
+  $app->post('/apply-exemption',
+              [ \Scat\Web\Cart::class, 'applyTaxExemption' ]);
+  $app->post('/remove-exemption',
+              [ \Scat\Web\Cart::class, 'removeTaxExemption' ]);
+
   $app->post('/checkout/guest', [ \Scat\Web\Cart::class, 'guestCheckout' ])
       ->setName('guestCheckout');
 

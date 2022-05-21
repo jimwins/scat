@@ -132,7 +132,21 @@ but as a fallback you can chain `:not()` instead */
         <div class="card cold" style="grid-column: 1 / span 2">
           <h2>Welcome back, {{ person.friendly_name }}!</h2>
           {% if person.exemption_certificate_id %}
-            <p>We have your exemption certificate on file.</p>
+            {% if cart.tax_exemption %}
+              <form method="POST" action="/cart/remove-exemption">
+                <button type="submit" class="button">
+                  <i class="bi bi-patch-exclamation"></i>
+                  <span class="label">Remove Tax Exemption</span>
+                </button>
+              </form>
+            {% else %}
+              <form method="POST" action="/cart/apply-exemption">
+                <button type="submit" class="button">
+                  <i class="bi bi-patch-check"></i>
+                  <span class="label">Apply Tax Exemption</span>
+                </button>
+              </form>
+            {% endif %}
           {% endif %}
           {% if person.giftcard_id %}
             {# TODO say something once we can use it in check out #}
