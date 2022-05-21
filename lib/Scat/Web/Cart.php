@@ -782,9 +782,13 @@ endStripeFinalize:
       ];
 
       $paypal->updateOrder($cart->paypal_order_id, $patch);
+      error_log("Updated PayPal order ({$cart->paypal_order_id}) with new details");
+
+      $order= $paypal->getOrder($cart->paypal_order_id);
     } else {
       $order= $paypal->createOrder($details);
       $cart->paypal_order_id= $order->id;
+      error_log("Created PayPal order ({$cart->paypal_order_id})");
     }
 
     $cart->save();

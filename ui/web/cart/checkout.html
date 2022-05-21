@@ -6,6 +6,22 @@
 {% endblock %}
 
 {% block content %}
+<style>
+  form#payment-form {
+    position: relative;
+  }
+  form#payment-form[disabled]:after {
+    content: " ";
+    display: block;
+    background: rgba(0,0,0,0.3);
+    height: calc(100% + 2em);
+    width: calc(100% + 2em);
+    position: absolute;
+    top: -1em; left: -1em;
+    z-index: 1000; /* get over everything */
+  }
+</style>
+
   <form id="payment-form" class="stacked-form">
     <h3>Contact info</h3>
     <div id="link-authentication-element"></div>
@@ -153,6 +169,9 @@
     }
 
     function updateCart(details) {
+      let form= document.getElementById('payment-form')
+      form.setAttribute('disabled', '')
+
       return fetch('{{ url_for('update-cart') }}', {
         'method': 'POST',
         'headers' : {
@@ -188,6 +207,9 @@
         } else {
           disablePayButtons();
         }
+      })
+      .finally(() => {
+        form.removeAttribute('disabled')
       })
     }
 
@@ -295,7 +317,11 @@
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
-      // TODO show loading spinner
+      if (form.getAttribute('disabled')) {
+        return
+      }
+
+      form.setAttribute('disabled', '')
 
       const {error}= await stripe.confirmPayment({
         elements,
@@ -306,10 +332,9 @@
       });
 
       if (error) {
-        // TODO get rid of spinner
-
+        form.removeAttribute('disabled')
         // Show error to your customer (for example, payment details incomplete)
-        console.log(error.message);
+        alert(error.message);
       } else {
         // we should never get here because Stripe will redirect
         alert("Sorry, something went wrong. Please try reloading the page.");
@@ -351,6 +376,10 @@
 
         // Finalize the transaction on the server after payer approval
         onApprove: (data, actions) => {
+          if (form.getAttribute('disabled')) {
+            return actions.disabled()
+          }
+
 	  return actions.order.capture().then(function(details) {
 	    let formData= new FormData(document.getElementById('payment-form'))
 	    formData.append('order_id', details.id)
@@ -362,7 +391,7 @@
 		window.location.href= '{{ url_for('sale-thanks', { uuid: cart.uuid }) }}'
 	      }
 	    });
-	  });
+          });
         }
       }).render('#paypal-buttons');
     }
