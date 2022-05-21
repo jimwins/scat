@@ -174,6 +174,30 @@ class Cart {
     return $response->withJson($data);
   }
 
+  public function cartComment(
+    Request $request, Response $response,
+    \Scat\Service\Stripe $stripe
+  ) {
+    $cart= $request->getAttribute('cart');
+    $person= $this->auth->get_person_details($request);
+
+    // Save comment, not fatal if it doesn't work
+    if (($comment= $request->getParam('comment'))) {
+      $note= $cart->notes()->create([
+        'sale_id' => $cart->id,
+        'person_id' => $cart->person_id,
+        'content' => $comment,
+      ]);
+      try {
+        $note->save();
+      } catch (\Exception $e) {
+        error_log("Failed to save comment for {$cart->uuid}: {$comment}");
+      }
+    }
+
+    return $response->withJson($cart);
+  }
+
   public function addItem(Request $request, Response $response)
   {
     $cart= $request->getAttribute('cart');
@@ -513,9 +537,7 @@ class Cart {
     $cart= $request->getAttribute('cart');
 
     $cart->shipping_address_id= 1;
-    $cart->shipping_method= 'default';
-    $cart->shipping= 0;
-    $cart->shipping_tax= 0;
+    $cart->shipping_method= 'pickup';
 
     // and then recalculate sales tax
     $cart->recalculateTax($this->tax);
@@ -803,7 +825,7 @@ endStripeFinalize:
     if (($comment= $request->getParam('comment'))) {
       $note= $cart->notes()->create([
         'sale_id' => $cart->id,
-        'person_id' => $person->id,
+        'person_id' => $cart->person_id,
         'content' => $comment,
       ]);
       try {

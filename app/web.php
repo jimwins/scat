@@ -138,6 +138,8 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
       ->setName('cart');
   $app->post('', [ \Scat\Web\Cart::class, 'cartUpdate' ])
       ->setName('update-cart');
+  $app->post('/add-comment', [ \Scat\Web\Cart::class, 'cartComment' ])
+      ->setName('comment-cart');
   $app->post('/add-item', [ \Scat\Web\Cart::class, 'addItem' ]);
   $app->post('/update-item', [ \Scat\Web\Cart::class, 'updateItem' ]);
   $app->get('/remove-item', [ \Scat\Web\Cart::class, 'removeItem' ]);

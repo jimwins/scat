@@ -43,7 +43,10 @@
 
     {% if cart.shipping_address_id == 1 %}
       <p>
-        We will prepare...
+        You will be contacted when your order is ready to be picked up at our
+        store in downtown Los Angeles. Current pickup hours are Monday through
+        Saturday between 10am and 6pm. Orders placed during those hours are
+        generally ready to be picked up in fifteen minutes.
       </p>
       <a href="/cart/checkout/set-shipped" class="button">
         <i class="bi bi-truck"></i>
@@ -98,6 +101,14 @@
         {% endif %}
       </div>
     {% endblock %}
+
+    <h3>Comments</h3>
+    <label for="comment">Any special requests?</label>
+    <textarea class="input" rows="3" name="comment" id="comment"></textarea>
+    <small class="help-block">
+      Please note that we are unable to pass along detailed delivery
+      instructions on orders being shipped.
+    </small>
 
     <h3>Payment</h3>
 
@@ -322,6 +333,14 @@
       }
 
       form.setAttribute('disabled', '')
+
+      let formData= new FormData(document.getElementById('payment-form'))
+      if (formData.get('comment')) {
+        fetch('{{ url_for('comment-cart') }}', {
+          method: 'POST',
+          body: formData
+        })
+      }
 
       const {error}= await stripe.confirmPayment({
         elements,
