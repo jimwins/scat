@@ -152,10 +152,6 @@ class Cart {
         $intent_options['customer']= $customer->id;
       }
 
-      if (array_key_exists('shipping', $customer_details)) {
-        $intent_options['shipping']= $customer_details['shipping'];
-      }
-
       $stripe->updatePaymentIntent(
         $cart->stripe_payment_intent_id,
         $intent_options
