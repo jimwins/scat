@@ -87,9 +87,13 @@ class Cart {
             $recalculate= true;
           }
           break;
-        case 'stripe':
-          /* ignore, we use this below */
+
+        case 'method':
+        case 'shipping_method':
+          $cart->shipping_method= $value;
+          $cart->recalculateTax($this->tax);
           break;
+
         default:
           throw new \Exception("Not allowed to change {$key}");
       }
@@ -160,18 +164,16 @@ class Cart {
 
     $data= $cart->as_array();
 
-    if ($request->getParam('stripe')) {
-      $data['cart']=
-        $this->view->fetchBlock('cart/checkout.html', 'cart', [
-          'person' => $person,
-          'cart' => $cart,
-        ]);
-      $data['shipping_options']=
-        $this->view->fetchBlock('cart/checkout.html', 'shipping_options', [
-          'person' => $person,
-          'cart' => $cart,
-        ]);
-    }
+    $data['cart_html']=
+      $this->view->fetchBlock('cart/checkout.html', 'cart', [
+        'person' => $person,
+        'cart' => $cart,
+      ]);
+    $data['shipping_options_html']=
+      $this->view->fetchBlock('cart/checkout.html', 'shipping_options', [
+        'person' => $person,
+        'cart' => $cart,
+      ]);
 
     return $response->withJson($data);
   }

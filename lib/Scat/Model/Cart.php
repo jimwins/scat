@@ -237,14 +237,12 @@ class Cart extends \Scat\Model {
     }
 
     $this->shipping_options= $shipping->get_shipping_options($this, $address);
-    error_log("got options: " . json_encode($this->shipping_options));
 
-    $default= $this->shipping_options->default;
-    $box_cost= $this->shipping_options->box_cost;
+    $default= $this->shipping_options['default'];
 
     if ($default) {
       $this->shipping_method= 'default';
-      $this->shipping= $default->rate + $box_cost;
+      $this->shipping= $default['rate'];
       $this->shipping_tax= 0.00;
     } else {
       $this->shipping_method= null;
@@ -257,7 +255,7 @@ class Cart extends \Scat\Model {
   public function __get($key) {
     $value= parent::__get($key);
     if ($key == 'shipping_options') {
-      return json_decode($value);
+      return json_decode($value, true);
     }
     return $value;
   }
@@ -265,6 +263,14 @@ class Cart extends \Scat\Model {
   public function __set($key, $value= null) {
     if ($key == 'shipping_options' && $value !== null) {
       $value= json_encode($value);
+    }
+    if ($key == 'shipping_method' && $value !== null) {
+      $option= @$this->shipping_options[$value];
+      if (!$option) {
+        throw new \Exception("No such shipping option '$value'");
+      }
+      $this->shipping= $option['rate'];
+      $this->shipping_tax= 0.00;
     }
     return parent::__set($key, $value);
   }

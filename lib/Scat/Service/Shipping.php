@@ -423,7 +423,13 @@ class Shipping
       }
     }
 
-    $shipping_options['box_cost']= $box[4];
+    /* Add box cost to rates */
+    foreach ($shipping_options as $method => $rate) {
+      // TODO use Decimal?
+      $rate['rate']+= $box[4];
+    }
+
+    /* TODO Set free shipping */
 
     /* Get local delivery options */
     if ($this->in_delivery_area($address)) {

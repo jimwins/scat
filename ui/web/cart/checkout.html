@@ -45,10 +45,36 @@
     {% endif %}
 
     {% block shipping_options %}
+      {% import 'macros.twig' as scat %}
       <div id="shipping-options">
-        {% if cart.shipping_options|length > 1 %}
+        {% if cart.shipping_options|length > 1 or cart.shipping_options.default is not defined %}
           <h3>Shipping Options</h3>
-          Showing options.
+
+          {% for method, details in cart.shipping_options %}
+            <label class="input-radio">
+              <input type="radio" id="so-{{ method }}"
+                      {{ (cart.shipping_method == method) ? 'checked' }}
+                      name="shipping_method" value="{{ method }}">
+              <strong>
+                {{ details.rate ? scat.amount(details.rate) : 'FREE' }}
+              </strong>
+              &mdash;
+              {% if method == 'default' %}
+                Standard shipping (estimated delivery {{ details.est_delivery_days ?? '3 to 5' }} day{{ details.est_delivery_days > 1 ? 's' }})
+              {% elseif method == 'next_day' %}
+                Next-day shipping
+              {% elseif method == 'two_day' %}
+                Two-day shipping
+              {% elseif method == 'local_delivery' %}
+                Same-day local delivery (Monday - Saturday, ordered before 4pm)
+              {% endif %}
+            </label>
+          {% endfor %}
+          <div class="help-block">
+            Delivery time is how long it will take to arrive <b>after</b>
+            it is shipped, which may take up to two business days (except
+            for same-day local delivery).
+          </div>
         {% elseif not cart.shipping_method %}
           <div class="alert alert-warning">
             Unable to determine any shipping methods.
@@ -114,7 +140,7 @@
       stripeButton.setAttribute('disabled', '')
 
       let paypalButtons= document.getElementById('paypal-buttons');
-      paypalButtons.actions.disable()
+      if (paypalButtons.actions) paypalButtons.actions.disable()
     }
 
     function enablePayButtons(due) {
@@ -123,7 +149,46 @@
       stripeButton.textContent= 'Pay ' + amount(due);
 
       let paypalButtons= document.getElementById('paypal-buttons');
-      paypalButtons.actions.enable()
+      if (paypalButtons.actions) paypalButtons.actions.enable()
+    }
+
+    function updateCart(details) {
+      return fetch('{{ url_for('update-cart') }}', {
+        'method': 'POST',
+        'headers' : {
+          'Accept': 'application/json',
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify(details)
+      }).then((res) => {
+        if (res.status >= 200 && res.status < 300) {
+          return Promise.resolve(res)
+        }
+        return Promise.reject(new Error(res.statusText))
+      }).then((res) => {
+        return res.json()
+      }).then((data) => {
+        if (data.cart_html) {
+          let template= document.createElement('template')
+          template.innerHTML= data.cart_html.trim()
+          let cart= document.getElementById('cart')
+          cart.replaceWith(template.content.firstChild)
+        }
+        if (data.shipping_options_html) {
+          let template= document.createElement('template')
+          template.innerHTML= data.shipping_options_html.trim()
+          let shipping_options= document.getElementById('shipping-options')
+          shipping_options.replaceWith(template.content.firstChild)
+          listenToShippingMethod()
+        }
+
+        console.log("ready? " + data.ready_for_payment);
+        if (data.ready_for_payment) {
+          enablePayButtons(data.due);
+        } else {
+          disablePayButtons();
+        }
+      })
     }
 
     const stripe= Stripe('{{ stripe.key }}', {
@@ -191,44 +256,9 @@
 
       shippingAddressElement.on('change', (event) => {
         const details= event.value;
-        details.stripe= true;
         clearTimeout(timeout);
         timeout= setTimeout(() => {
-          fetch('{{ url_for('update-cart') }}', {
-            'method': 'POST',
-            'headers' : {
-              'Accept': 'application/json',
-              'Content-type': 'application/json',
-            },
-            body: JSON.stringify(details)
-          }).then((res) => {
-            if (res.status >= 200 && res.status < 300) {
-              return Promise.resolve(res)
-            }
-            return Promise.reject(new Error(res.statusText))
-          }).then((res) => {
-            return res.json()
-          }).then((data) => {
-            if (data.cart) {
-              let template= document.createElement('template')
-              template.innerHTML= data.cart.trim()
-              let cart= document.getElementById('cart')
-              cart.replaceWith(template.content.firstChild)
-            }
-            if (data.shipping_options) {
-              let template= document.createElement('template')
-              template.innerHTML= data.shipping_options.trim()
-              let shipping_options= document.getElementById('shipping-options')
-              shipping_options.replaceWith(template.content.firstChild)
-            }
-
-            console.log("ready? " + data.ready_for_payment);
-            if (data.ready_for_payment) {
-              enablePayButtons(data.due);
-            } else {
-              disablePayButtons();
-            }
-          })
+          updateCart(details)
         }, 500);
       });
     {% endif %}
@@ -239,16 +269,28 @@
       const name= event.currentTarget.value;
       clearTimeout(timeout);
       timeout= setTimeout(() => {
-        fetch('{{ url_for('update-cart') }}', {
-          'method': 'POST',
-          'headers' : {
-            'Accept': 'application/json',
-            'Content-type': 'application/json',
-          },
-          body: JSON.stringify({ name : name })
-        })
+        updateCart({ name : name })
       }, 500);
     })
+
+    let handleShippingMethodChange= (event) => {
+      const method= event.currentTarget.value;
+      clearTimeout(timeout);
+      timeout= setTimeout(() => {
+        updateCart({ method : method })
+      }, 500);
+    }
+
+    function listenToShippingMethod() {
+      let form= document.getElementById('payment-form')
+      if (!form.elements['shipping_method']) return;
+
+      form.elements['shipping_method'].forEach((el) => {
+        el.addEventListener('change', handleShippingMethodChange)
+      })
+    }
+
+    listenToShippingMethod()
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();

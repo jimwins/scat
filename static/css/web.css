@@ -774,3 +774,12 @@ table {
   /* ul.smol-grid gets wonky padding otherwise */
   padding: 0;
 }
+
+.input-radio {
+  display: block;
+  margin-bottom: 0.5em;
+
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}

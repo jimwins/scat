@@ -180,8 +180,12 @@
         <td colspan="2" align="right">
           {% if cart.shipping_address_id == 1 %}
             Pickup at store:
-          {% elseif cart.shipping_method starts with 'local' %}
+          {% elseif cart.shipping_method == 'local_delivery' %}
             Local delivery:
+          {% elseif cart.shipping_method == 'two_day' %}
+            2-Day Shipping &amp; handling:
+          {% elseif cart.shipping_method == 'next_day' %}
+            Next Shipping &amp; handling:
           {% else %}
             Shipping &amp; handling:
           {% endif %}
