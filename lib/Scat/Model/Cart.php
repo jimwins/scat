@@ -185,6 +185,7 @@ class Cart extends \Scat\Model {
 
   public function get_shipping_box() {
     $items= $this->get_item_dims();
+    if (!$items) return null;
     return \Scat\Service\Shipping::get_shipping_box($items);
   }
 
@@ -238,7 +239,7 @@ class Cart extends \Scat\Model {
 
     $this->shipping_options= $shipping->get_shipping_options($this, $address);
 
-    $default= $this->shipping_options['default'];
+    $default= @$this->shipping_options['default'];
 
     if ($default) {
       $this->shipping_method= 'default';

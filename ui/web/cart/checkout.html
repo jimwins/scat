@@ -90,17 +90,25 @@
                 {% endif %}
               </label>
             {% endfor %}
+            <div class="help-block">
+              Delivery time is how long it will take to arrive <b>after</b>
+              it is shipped, which may take up to two business days (except
+              for same-day local delivery).
+            </div>
           {% else %}
-            <p class="text-danger">
-              You must provide a valid address for us to provide options
-              for shipping.
-            </p>
+            {% if cart.shipping_address_id %}
+              <p class="text-danger">
+                Sorry, we were not able to calculate the shipping cost for your
+                order.
+                {# TODO link to get help with shipping #}
+              </p>
+            {% else %}
+              <p class="text-danger">
+                You must provide a valid address for us to provide options
+                for shipping.
+              </p>
+            {% endif %}
           {% endif %}
-          <div class="help-block">
-            Delivery time is how long it will take to arrive <b>after</b>
-            it is shipped, which may take up to two business days (except
-            for same-day local delivery).
-          </div>
         {% elseif not cart.shipping_method %}
           <div class="alert alert-warning">
             Unable to determine any shipping methods.

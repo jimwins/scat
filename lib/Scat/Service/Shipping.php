@@ -350,6 +350,11 @@ class Shipping
     $weight= $cart->get_shipping_weight();
     $hazmat= $cart->has_hazmat_items();
 
+    /* If we can figure out the $box or $weight, no options */
+    if (!$box || !$weight) {
+      return [];
+    }
+
     $from= $this->getDefaultFromAddress();
     $to= $this->getAddress($address);
 
