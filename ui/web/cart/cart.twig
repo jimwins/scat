@@ -248,7 +248,11 @@
           Due:
         </td>
         <td align="right">
-          {{ scat.amount(cart.due) }}
+          {% if cart.shipping_method and cart.tax_calculated %}
+            {{ scat.amount(cart.due) }}
+          {% else %}
+            <span class="text-danger">TBD</span>
+          {% endif %}
         </td>
       </tr>
     {% endif %}
