@@ -89,20 +89,32 @@ class Cart {
           break;
 
         case 'reward':
-          if ($cart->loyalty_used()) {
-            throw new \Exception("A loyalty reward is already being used.");
-          }
+          if ($value) {
+            if ($cart->loyalty_used()) {
+              throw new \Exception("A loyalty reward is already being used.");
+            }
 
-          $points= $person->points_available;
-          $loyaltyReward= $cart->loyalty_reward_available($points);
-          if ($loyaltyReward->id != $value) {
-            error_log("{$loyaltyReward->id} != {$value}");
-            throw new \Exception("An invalid loyalty reward was attempted.");
-          }
+            $points= $person->points_available;
+            $loyaltyReward= $cart->loyalty_reward_available($points);
+            if ($loyaltyReward->id != $value) {
+              error_log("{$loyaltyReward->id} != {$value}");
+              throw new \Exception("An invalid loyalty reward was attempted.");
+            }
 
-          $cart->addPayment(
-            'loyalty', -$loyaltyReward->item()->retail_price, false
-          );
+            $cart->addPayment(
+              'loyalty',
+              -$loyaltyReward->item()->retail_price,
+              false,
+              $loyaltyReward
+            );
+          } else {
+            if (!$cart->loyalty_used()) {
+              throw new \Exception("No loyalty reward is being used.");
+            }
+
+            // TODO should really be a method on the cart, whatevs.
+            $cart->payments()->where('method', 'loyalty')->delete_many();
+          }
 
           break;
 

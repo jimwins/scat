@@ -404,7 +404,7 @@ class Cart extends \Scat\Model {
     $this->flushTotals();
   }
 
-  public function addPayment($method, $amount, $captured, $data= null) {
+  public function addPayment($method, $amount, $captured, $data) {
     $payment= $this->payments()->create([
       'sale_id' => $this->id,
       'method' => $method,

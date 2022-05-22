@@ -128,9 +128,9 @@
     {% block loyalty %}
       {% import 'macros.twig' as scat %}
       <div id="loyalty">
-        {% if not cart.loyalty_used %}
-          <h3>Loyalty Rewards</h3>
+        <h3>Loyalty Rewards</h3>
 
+        {% if not cart.loyalty_used %}
           {% if person.points_available > 50 %}
             <p>
               <b>You have {{ person.points_available }} point{{ person.points_available > 1 ? 's'}} available.</b>
@@ -168,6 +168,16 @@
               points!
             </p>
           {% endif %}
+        {% else %}
+          <p>
+            <b>You have already applied a loyalty reward to this cart.</b>
+            But if you've changed your mind, you can remove it.
+          </p>
+            <button class="button" type="button"
+                    data-action="remove-reward"
+            >
+              Remove the loyalty reward
+            </button>
         {% endif %}
       </div>
     {% endblock %}
@@ -379,6 +389,9 @@
       let action= ev.target.closest('[data-action]')
       if (action.dataset.action == 'apply-reward') {
         updateCart({ reward: action.dataset.id })
+      }
+      if (action.dataset.action == 'remove-reward') {
+        updateCart({ reward: 0 })
       }
     })
 
