@@ -426,6 +426,31 @@ class Cart extends \Scat\Model {
     }
   }
 
+  public function removePayments($method) {
+    $this->payments()
+          ->where('method', $method)->where_null('captured')->delete_many();
+    $this->flushTotals();
+  }
+
+  /* Did this make our total less than loyalty or gift card applied?
+   * If so, remove them until we still have a balance due. */
+  public function ensureBalanceDue() {
+    // TODO bail if cart finalized
+
+    if ($this->due() < 0) {
+      if ($this->loyalty_used()) {
+        $this->removePayments('loyalty');
+      }
+      if ($this->due() < 0 &&
+          $this->payments()->where('method', 'gift')->find_one())
+      {
+        $this->removePayments('gift');
+      }
+    }
+
+    // TODO return useful information
+  }
+
   public function as_array() {
     $data= parent::as_array();
     $data['subtotal']= $this->subtotal();

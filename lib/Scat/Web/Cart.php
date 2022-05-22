@@ -111,9 +111,7 @@ class Cart {
             if (!$cart->loyalty_used()) {
               throw new \Exception("No loyalty reward is being used.");
             }
-
-            // TODO should really be a method on the cart, whatevs.
-            $cart->payments()->where('method', 'loyalty')->delete_many();
+            $cart->removePayments('loyalty');
           }
 
           break;
@@ -133,7 +131,7 @@ class Cart {
       $cart->recalculate($this->shipping, $this->tax);
     }
 
-    $cart->save();
+    $cart->ensureBalanceDue();
 
     if ($cart->stripe_payment_intent_id) {
       $amount= $cart->due();
@@ -359,6 +357,8 @@ class Cart {
 
     $cart->recalculate($this->shipping, $this->tax);
 
+    $cart->ensureBalanceDue();
+
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
       return $response->withJson($cart);
@@ -394,6 +394,8 @@ class Cart {
     $line->delete(); /* takes care of kit items, too */
 
     $cart->recalculate($this->shipping, $this->tax);
+
+    $cart->ensureBalanceDue();
 
     $cart->save();
 
