@@ -151,6 +151,17 @@ class Cart extends \Scat\Model {
     return $total['ordered'];
   }
 
+  public function loyalty_used() {
+    return $this->payments()->where('method', 'loyalty')->find_one();
+  }
+
+  public function loyalty_reward_available($points) {
+    return self::factory('LoyaltyReward')
+                ->where_lte('cost', $points)
+                ->order_by_desc('cost')
+                ->find_one();
+  }
+
   public function ready_for_payment() {
     return $this->shipping_method && $this->tax_calculated;
   }
@@ -393,7 +404,7 @@ class Cart extends \Scat\Model {
     $this->flushTotals();
   }
 
-  public function addPayment($method, $amount, $captured, $data) {
+  public function addPayment($method, $amount, $captured, $data= null) {
     $payment= $this->payments()->create([
       'sale_id' => $this->id,
       'method' => $method,

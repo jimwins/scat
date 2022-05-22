@@ -88,6 +88,24 @@ class Cart {
           }
           break;
 
+        case 'reward':
+          if ($cart->loyalty_used()) {
+            throw new \Exception("A loyalty reward is already being used.");
+          }
+
+          $points= $person->points_available;
+          $loyaltyReward= $cart->loyalty_reward_available($points);
+          if ($loyaltyReward->id != $value) {
+            error_log("{$loyaltyReward->id} != {$value}");
+            throw new \Exception("An invalid loyalty reward was attempted.");
+          }
+
+          $cart->addPayment(
+            'loyalty', -$loyaltyReward->item()->retail_price, false
+          );
+
+          break;
+
         case 'method':
         case 'shipping_method':
           $cart->shipping_method= $value;
@@ -167,6 +185,11 @@ class Cart {
       ]);
     $data['shipping_options_html']=
       $this->view->fetchBlock('cart/checkout.html', 'shipping_options', [
+        'person' => $person,
+        'cart' => $cart,
+      ]);
+    $data['loyalty_html']=
+      $this->view->fetchBlock('cart/checkout.html', 'loyalty', [
         'person' => $person,
         'cart' => $cart,
       ]);
