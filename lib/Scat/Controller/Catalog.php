@@ -1169,7 +1169,8 @@ class Catalog {
     $items= $this->catalog->getItems()
       ->select('*')
       ->select_expr('COUNT(*) OVER (PARTITION BY product_id)', 'siblings')
-      ->where_gt('product_id', 0);
+      ->where_gt('product_id', 0)
+      ->where_gt('minimum_quantity', 0);
 
     if (($code= $request->getParam('code'))) {
       $items= $items->where_like('code', "{$code}%");
