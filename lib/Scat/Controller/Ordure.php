@@ -48,19 +48,27 @@ class Ordure {
                             'is_dropshippable')
               ->find_many();
 
+    /* Second version of this */
+    $version= 2;
+
     /* Just in-memory, could be clever and build a stream interface. */
-    $data= "retail_price\tdiscount_type\tdiscount\tstock\tcode\t".
-           "minimum_quantity\tpurchase_quantity\tis_dropshippable\r\n";
+    $data= "id\tretail_price\tdiscount_type\tdiscount\t".
+           "minimum_quantity\tpurchase_quantity\t".
+           "stock\tactive\t".
+           "code\tis_dropshippable\r\n";
 
     foreach ($items as $item) {
-      $data.= $item->retail_price . "\t" .
+      $data.= $item->id . "\t" .
+              $item->retail_price . "\t" .
               ($item->discount_type ?: 'NULL') . "\t" .
               ($item->discount ?: 'NULL') . "\t" .
-              ($item->stock ?: 'NULL') . "\t" .
-              $item->code . "\t" .
               $item->minimum_quantity . "\t" .
               $item->purchase_quantity . "\t" .
-              ($item->is_dropshippable ?: '0') . "\r\n";
+              ($item->stock ?: 'NULL') . "\t" .
+              $item->active . "\t" .
+              $item->code . "\t" .
+              ($item->is_dropshippable ?: '0') .
+              "\r\n";
     }
 
     $client= new \GuzzleHttp\Client();
@@ -76,6 +84,10 @@ class Ordure {
                                [
                                  'name' => 'key',
                                  'contents' => $key
+                               ],
+                               [
+                                 'name' => 'version',
+                                 'contents' => $version
                                ]
                              ],
                            ]);
