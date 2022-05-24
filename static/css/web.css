@@ -27,7 +27,6 @@ body {
   padding: 1em 2em;
 }
 header {
-  margin-bottom: 0.5em;
 }
 
 footer {
@@ -99,6 +98,7 @@ body > * {
   width: min(100%, var(--max-width));
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 1em;
 }
 
 img.responsive {
@@ -112,7 +112,6 @@ main {
 }
 
 footer {
-  margin-bottom: 0.5rem;
   font-size: smaller;
 
   border: var(--border-width) solid #ccc;

@@ -23,7 +23,9 @@ class Page {
 
     $content= $this->data->factory('Page')->where('slug', $param)->find_one();
     if (!$content) {
-      // handle redirects
+      // TODO handle redirects
+
+      throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
     $template= ($GLOBALS['DEBUG'] && $request->getParam('edit')) ? 'edit.html' : 'index.html';

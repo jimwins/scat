@@ -1,1 +1,39 @@
-Nothing to see here.
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title -%}
+  Page Not Found
+{%- endblock %}
+
+{% block content %}
+
+  {% if DEBUG %}
+    <style>
+      .page-editor {
+        position: fixed;
+        right: 1em;
+        top: 1em;
+      }
+      @media (max-width: 599.98px) {
+        .page-editor {
+          display: none;
+        }
+      }
+    </style>
+    <div class="page-editor">
+      <a class="button" href="{{ current_url() }}?edit=1">
+        <i class="bi bi-pencil-square"></i>
+        Edit Page
+      </a>
+    </div>
+  {% endif %}
+
+  <h1 class="page-heading">Oops!</h1>
+
+  <p>Sorry, but something went awry here at this website for <strong>Raw Materials Art Supplies</strong>. It appears that that page you are looking for no longer exists.</p>
+
+  <a href="/" class="button">
+    Start from the top &raquo;
+  </a>
+
+{% endblock %}

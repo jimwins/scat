@@ -28,12 +28,10 @@
     </div>
   {% endif %}
 
-  <main>
-    {% if content.format == 'markdown' %}
-      {{ include(template_from_string(content.content)) | markdown }}
-    {% else %}
-      {{ include(template_from_string(content.content)) | raw }}
-    {% endif %}
-  </main>
+  {% if content.format == 'markdown' %}
+    {{ include(template_from_string(content.content)) | markdown }}
+  {% else %}
+    {{ include(template_from_string(content.content)) | raw }}
+  {% endif %}
 
 {% endblock %}
