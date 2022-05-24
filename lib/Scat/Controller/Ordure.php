@@ -76,7 +76,7 @@ class Ordure {
     $client= new \GuzzleHttp\Client();
 
     $res= $client->request('POST', $url, [
-                             //'debug' => true,
+                             'debug' => $GLOBALS['DEBUG'],
                              'multipart' => [
                                [
                                  'name' => 'prices', 
