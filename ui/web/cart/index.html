@@ -19,6 +19,12 @@
       </form>
     </div>
   {% endif %}
+  {% if help %}
+    <div class="alert alert-success">
+      <b>Your request for help has been sent.</b> You should get a response
+      within one business day.
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -127,6 +133,8 @@ but as a fallback you can chain `:not()` instead */
 }
 </style>
 
+    {{ block('notice') }}
+
     <div class="smol-grid">
       {% if person %}
         <div class="card cold" style="grid-column: 1 / span 2">
@@ -234,8 +242,6 @@ but as a fallback you can chain `:not()` instead */
         </div>
       {% endif %}
     </div>
-
-    {{ block('notice') }}
 
     {# TODO warnings about stock issues #}
 

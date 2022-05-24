@@ -100,8 +100,37 @@
               <p class="text-danger">
                 Sorry, we were not able to calculate the shipping cost for your
                 order.
-                {# TODO link to get help with shipping #}
               </p>
+
+              {% if cart.has_truck_only_items %}
+                <p>
+                  There are items in the cart that can only be picked up
+                  at these store or delivered to addresses within 30 miles.
+                  Those are indicated with the <i class="bi bi-truck"></i>
+                  <span class="visually-hidden">Truck Only</span>
+                  indicator in the cart.
+                </p>
+              {% elseif cart.has_incomplete_items %}
+                <p>
+                  There are items for which our system doesn't have enough
+                  info to calculate the shipping cost. Those are indicated
+                  with the <i class="bi bi-patch-question text-danger"></i>
+                  <span class="visually-hidden">Missing Info</span> indicator
+                  in the cart.
+                </p>
+              {% endif %}
+
+              <p>
+                If you'd like someone at the store to take a look at your
+                cart and see if we can work out the shipping &amp; handling
+                cost manually, click on the 'Get Help' button below and
+                we'll get back to you!
+              </p>
+
+              <a href="/cart/get-help" class="button">
+                <i class="bi bi-question-circle"></i>
+                <span class="label">Get help</span>
+              </a>
             {% else %}
               <p class="text-danger">
                 You must provide a valid address for us to provide options
@@ -201,7 +230,7 @@
 
     {% block cart %}
       <div id="cart">
-        {% embed 'cart/cart.twig' with { 'editable' : false } %}
+        {% embed 'cart/cart.twig' with { 'editable' : false, 'skip_address' : true } %}
         {% endembed %}
       </div>
     {% endblock %}

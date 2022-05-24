@@ -6,6 +6,15 @@ class Cart extends \Scat\Model {
 
   private $_totals;
 
+  /* A couple of helpers to act like a Txn model for templates */
+  public function person() {
+    return null;
+  }
+
+  public function type() {
+    return 'customer';
+  }
+
   public function items() {
     return $this->has_many('CartLine');
   }
@@ -215,6 +224,14 @@ class Cart extends \Scat\Model {
 
   public function has_hazmat_items() {
     return $this->items()->join('item', [ 'item.id', '=', 'sale_item.item_id' ])->where_gt('item.hazmat', 0)->count();
+  }
+
+  public function has_truck_only_items() {
+    return $this->items()->join('item', [ 'item.id', '=', 'sale_item.item_id' ])->where_gt('item.oversized', 0)->count();
+  }
+
+  public function has_incomplete_items() {
+    return $this->items()->join('item', [ 'item.id', '=', 'sale_item.item_id' ])->where_raw('IFNULL(weight, 0) = 0 OR IFNULL(length, 0) = 0 OR IFNULL(width, 0) = 0 OR IFNULL(height, 0) = 0')->count();
   }
 
   public function recalculate(
@@ -476,12 +493,37 @@ class CartLine extends \Scat\Model {
     return $this->belongs_to('Item')->find_one();
   }
 
+  /* A few helpers to look more like a TxnLine */
+  public function code() {
+    return $this->item()->code;
+  }
+
+  public function name() {
+    return $this->override_name ?: $this->item()->name;
+  }
+
+  public function ordered() {
+    return $this->quantity * -1;
+  }
+
   public function sale_price() {
     return $this->calcSalePrice(
       $this->retail_price,
       $this->discount_type,
       $this->discount
     );
+  }
+
+  public function pricing_detail() {
+    if (!$this->discount_type) return '';
+    $item= $this->item();
+    return ($item->retail_price ? 'MSRP $' : 'List $') .
+           $this->retail_price .
+           ($this->discount_type == 'percentage' ?
+            ' / Sale: ' . sprintf('%.0f', $this->discount) . '% off' :
+            ($this->discount_type == 'relative' ?
+             ' / Sale: $' . $this->discount . ' off' :
+             ''));
   }
 
   public function updateQuantity($quantity) {

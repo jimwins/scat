@@ -1,0 +1,49 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Get Help @ Raw Materials Art Supplies
+{% endblock %}
+
+{% block notice %}
+{% endblock %}
+
+{% block content %}
+  <h1 class="page-heading">
+    Get Help with your Cart
+  </h1>
+
+  <p class="lead">
+    <b>Need help completing your purchase?</b> Sorry, sometimes the system
+    isn't able to calculate shipping costs due to incomplete information in
+    our system or other technical problems. We try to respond to all requests
+    for help within one business day.
+  </p>
+
+  <p class="alert alert-warning">
+    Please note that we do not currently ship canvases or panels larger than
+    30" &times; 40" and rolls of seamless backdrop paper wider than 86"
+    outside of our local Los Angeles delivery area.
+  </p>
+
+  <form method="POST" action="/cart/get-help" class="stacked-form">
+    <label for="comment">
+      Any special requests or considerations?
+    </label>
+    <textarea class="input" rows="3" name="comment" id="comment"></textarea>
+
+    <button role="submit" class="button">
+      <i class="bi bi-send"></i>
+      <span class="label">Submit</span>
+    </button>
+  </form>
+
+  {% embed 'cart/cart.twig' %}
+    {% block buttons %}
+    {% endblock %}
+  {% endembed %}
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}

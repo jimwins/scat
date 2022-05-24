@@ -134,7 +134,9 @@
           {% if item.oversized %}
             <a class="pull-right" href="/shipping#oversized" data-toggle="tooltip" title="Oversized data: special shipping is required, and there will be additional costs. Click for more details."><i class="bi bi-truck"></i></a>
           {% else %}
-            {% if not item.can_ship_free %}
+            {% if not item.dimensions or not item.weight %}
+              <a class="pull-right" href="/shipping" data-toggle="tooltip" title="The system doesn't have enough information to calculate shipping for this item."><i class="bi bi-patch-question text-danger"></i></a>
+            {% elseif not item.can_ship_free %}
               <a class="pull-right" href="/shipping" data-toggle="tooltip" title="This item is not eligible for free shipping."><i class="bi bi-truck text-success"></i></a>
             {% endif %}
           {% endif %}
@@ -258,3 +260,22 @@
     {% endif %}
   </tfoot>
 </table>
+{% if not skip_address or cart.shipping_address_id <= 1 %}
+  <h3>Shipping Address</h3>
+  {% set shipping_address= cart.shipping_address %}
+  <div>{{ shipping_address.name }}</div>
+  <div>{{ shipping_address.company }}</div>
+  <div>{{ shipping_address.email }}</div>
+  {% if shipping_address.phone %}
+    <div>{{ shipping_address.phone | phone_number_format }}</div>
+  {% endif %}
+  <div>{{ shipping_address.street1 }}</div>
+  <div>{{ shipping_address.street2 }}</div>
+  <div>
+    {% if shipping_address.city %}
+      {{ shipping_address.city }},
+    {% endif %}
+    {{ shipping_address.state }}
+    {{ shipping_address.zip }}
+  </div>
+{% endif %}

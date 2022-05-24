@@ -1,0 +1,21 @@
+{% extends 'layout/email.html' %}
+
+{% block title -%}
+  Help with Cart {{ cart.id }}
+{%- endblock %}
+
+{% block content_top %}
+  <p>
+    {{ txn.name }} &lt;{{ txn.email }}&gt; requested help with their cart.
+  </p>
+
+  {% if comment %}
+    <p>
+      {{ txn.name }} said:
+    </p>
+    <pre>{{ comment }}</pre>
+  {% endif %}
+{% endblock %}
+
+{% block content_bottom %}
+{% endblock %}

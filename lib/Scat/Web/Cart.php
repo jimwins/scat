@@ -50,6 +50,8 @@ class Cart {
       'cart' => $cart,
       'paypal' => $paypal->getClientId(),
       'amzn' => $amzn->getEnvironment($return_link),
+      /* XXX should be a better way to pass this stuff through */
+      'help' => $request->getParam('help'),
       'removed' => $request->getParam('removed'),
       'quantity' => $request->getParam('quantity'),
       'added' => $request->getParam('added'),
@@ -185,6 +187,8 @@ class Cart {
         $intent_options
       );
     }
+
+    $cart->save();
 
     $data= $cart->as_array();
 
@@ -1010,5 +1014,57 @@ endPaypalFinalize:
     }
 
     return $response->withJson([ 'message' => 'Success!' ]);
+  }
+
+  public function getHelpForm(Request $request, Response $response) {
+    $cart= $request->getAttribute('cart');
+
+    return $this->view->render($response, 'cart/get-help.html', [
+      'cart' => $cart,
+    ]);
+  }
+
+  public function getHelp(
+    Request $request,
+    Response $response,
+    \Scat\Service\Email $email
+  ) {
+    $cart= $request->getAttribute('cart');
+
+    if (($comment= $request->getParam('comment'))) {
+      $note= $cart->notes()->create([
+        'sale_id' => $cart->id,
+        'person_id' => $cart->person_id,
+        'content' => $comment,
+      ]);
+      try {
+        $note->save();
+      } catch (\Exception $e) {
+        error_log("Failed to save comment for {$cart->uuid}: {$comment}");
+      }
+    }
+
+    $data= [
+      'txn' => $cart, /* looks enough like a txn to work */
+      'comment' => $comment,
+      'full_invoice' => true
+    ];
+
+    $template= $this->view->getEnvironment()->load('email/get-help.html');
+
+    $subject= $template->renderBlock('title', $data);
+    $body= $template->render($data);
+
+    $to= $email->default_from_address();
+
+    $email->send($to, $subject, $body);
+
+    /* Bounce back to the cart with with success message */
+    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+    $link= $routeContext->getRouteParser()->urlFor('cart', [], [
+      'help' => true
+    ]);
+
+    return $response->withRedirect($link);
   }
 }

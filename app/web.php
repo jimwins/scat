@@ -143,6 +143,8 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->post('/add-item', [ \Scat\Web\Cart::class, 'addItem' ]);
   $app->post('/update-item', [ \Scat\Web\Cart::class, 'updateItem' ]);
   $app->get('/remove-item', [ \Scat\Web\Cart::class, 'removeItem' ]);
+  $app->get('/get-help', [ \Scat\Web\Cart::class, 'getHelpForm' ]);
+  $app->post('/get-help', [ \Scat\Web\Cart::class, 'getHelp' ]);
 
   $app->post('/apply-exemption',
               [ \Scat\Web\Cart::class, 'applyTaxExemption' ]);
