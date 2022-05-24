@@ -12,12 +12,13 @@ class TwigExtension
   }
 
   public function getGlobals() : array {
+    $public= $this->config->get('ordure.url');
     return [
       'DEBUG' => $GLOBALS['DEBUG'],
-      'PUBLIC' => ORDURE,
-      'PUBLIC_CATALOG' => ORDURE . '/art-supplies',
+      'PUBLIC' => $public,
+      'PUBLIC_CATALOG' => $public . '/art-supplies',
       'TIME' => $_SERVER['REQUEST_TIME_FLOAT'],
-      'STATIC' => ORDURE_STATIC,
+      'STATIC' => $this->config->get('ordure.static_url'),
     ];
   }
 
