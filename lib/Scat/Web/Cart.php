@@ -415,6 +415,7 @@ class Cart {
     $cart= $request->getAttribute('cart');
 
     $cart->email= $request->getParam('email');
+    $cart->save();
 
     return $response->withRedirect('/cart/checkout');
   }
