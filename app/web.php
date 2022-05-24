@@ -241,7 +241,9 @@ $app->group('', function (RouteCollectorProxy $app) {
 });
 
 /* Webhooks */
-// TODO
+
+/* BTS stuff */
+$app->post('/update-pricing', [ \Scat\Web\Catalog::class, 'updatePricing' ]);
 
 /* Info (DEBUG only) */
 if ($DEBUG) {
