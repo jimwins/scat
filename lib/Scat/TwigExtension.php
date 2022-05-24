@@ -7,7 +7,7 @@ class TwigExtension
 {
   private $config;
 
-  public function __construct(\Scat\Service\Config $config= null) {
+  public function __construct(\Scat\Service\Config $config) {
     $this->config= $config;
   }
 
