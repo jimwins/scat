@@ -1246,8 +1246,8 @@ class Catalog {
         $item->retail_price . ' USD',
         $item->sale_price() . ' USD',
         ($item->siblings > 1 ?
-         $ordure . '/art-supplies/' . $product->full_slug() . '/' . $item->code :
-         $ordure . '/art-supplies/' . $product->full_slug()),
+         $ordure_url . '/art-supplies/' . $product->full_slug() . '/' . $item->code :
+         $ordure_url . '/art-supplies/' . $product->full_slug()),
         $image,
         '',#'additional_image_link',
         $product->brand()->name,
