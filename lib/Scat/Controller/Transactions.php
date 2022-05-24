@@ -1224,6 +1224,7 @@ class Transactions {
       $payment->data= json_encode($data);
     }
     $payment->set_expr('processed', 'NOW()');
+    $payment->set_expr('captured', 'NOW()');
     $payment->save();
 
     $txn->flushTotals(); // Need to recalculate totals

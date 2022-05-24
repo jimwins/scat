@@ -350,6 +350,7 @@ class Ordure {
 
           $payment->amount= $pay->amount;
           $payment->processed= $pay->processed;
+          $payment->captured= $pay->captured;
           $payment->data= json_encode($pay->data);
           $payment->save();
         }
