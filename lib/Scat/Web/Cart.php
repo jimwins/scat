@@ -952,7 +952,7 @@ endStripeFinalize:
 
     $amount= $order->purchase_units[0]->amount->value;
 
-    $cart->addPayment('paypal', $amount, false, $order);
+    $cart->addPayment('paypal', $amount, true, $order);
 
     $cart->save();
 
