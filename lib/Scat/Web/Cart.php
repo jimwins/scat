@@ -425,6 +425,9 @@ class Cart {
     \Scat\Service\Stripe $stripe
   ) {
     $cart= $request->getAttribute('cart');
+    if (!$cart->id) {
+      return $response->withRedirect('/cart');
+    }
     $person= $this->auth->get_person_details($request);
 
     $paymentIntent= $stripe->getPaymentIntent($cart);
