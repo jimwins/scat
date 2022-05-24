@@ -4,14 +4,18 @@ use \Slim\Http\ServerRequest as Request;
 
 class Auth
 {
-  private $data, $scat;
+  private $scat_key;
 
   public function __construct(
-    \Scat\Service\Data $data,
-    \Scat\Service\Scat $scat
+    private \Scat\Service\Data $data,
+    private \Scat\Service\Scat $scat,
+    \Scat\Service\Config $config
   ) {
-    $this->data= $data;
-    $this->scat= $scat;
+    $this->scat_key= $config->get('ordure.key');
+  }
+
+  public function verify_access_key($key) {
+    return $key == $this->scat_key;
   }
 
   public function generate_auth_token($person_id, $expires, $cart_uuid) {
