@@ -109,9 +109,9 @@ class Cart extends \Scat\Model {
                      AS DECIMAL(9,2)) AS total_paid
            FROM sale
            LEFT JOIN sale_item ON (sale.id = sale_item.sale_id)
-          WHERE sale.id = {$this->id}) t";
+          WHERE sale.id = ?) t";
 
-    $this->orm->raw_execute($q);
+    $this->orm->raw_execute($q, [ $this->id ]);
     $st= $this->orm->get_last_statement();
 
     $this->orm->configure('logging', true);
