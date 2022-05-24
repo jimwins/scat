@@ -187,8 +187,14 @@ $app->post('/~webhook/paypal',
 
 /* Sale (= a completed cart) */
 $app->group('/sale', function (RouteCollectorProxy $app) {
+  $app->get('/list', [ \Scat\Web\Sale::class, 'listSales' ]);
+  $app->get('/{uuid}', [ \Scat\Web\Sale::class, 'sale' ]);
+  $app->get('/{uuid}/json', [ \Scat\Web\Sale::class, 'saleJson' ]);
   $app->get('/{uuid}/thanks', [ \Scat\Web\Sale::class, 'thanks' ])
       ->setName('sale-thanks');
+  $app->post('/{uuid}/set-status', [ \Scat\Web\Sale::class, 'setStatus' ]);
+  $app->post('/{uuid}/set-abandoned-level',
+              [ \Scat\Web\Sale::class, 'setAbandonedLevel' ]);
 });
 
 /* Contact */

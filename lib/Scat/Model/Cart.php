@@ -591,6 +591,12 @@ class CartPayment extends \Scat\Model {
   public function data() {
     return json_decode($this->data);
   }
+
+  public function jsonSerialize() {
+    $data= parent::jsonSerialize();
+    $data['data']= json_decode($this->data);
+    return $data;
+  }
 }
 
 /**
