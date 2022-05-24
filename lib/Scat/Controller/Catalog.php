@@ -1161,8 +1161,12 @@ class Catalog {
   }
 
   public function itemFeed(Request $request, Response $response,
+                            \Scat\Service\Config $config,
                             \Scat\Service\Shipping $shipping)
   {
+    $ordure_url= $config->get('ordure.url');
+    $ordure_static= $config->get('ordure.static_url');
+
     /* turn off logging here, it's just too much */
     $this->data->configure('logging', false);
 
@@ -1202,7 +1206,7 @@ class Catalog {
     foreach ($items as $item) {
       $html= $item->description ?: $item->product()->description;
       $html= preg_replace('/\s+/', ' ', $html); // replace all whitespace
-      $html= preg_replace('/{{ *@STATIC *}}/', 'https:' . ORDURE_STATIC, $html);
+      $html= preg_replace('/{{ *@STATIC *}}/', 'https:' . $ordure_static, $html);
       $text= strip_tags($html);
 
       $product= $item->product();
@@ -1242,8 +1246,8 @@ class Catalog {
         $item->retail_price . ' USD',
         $item->sale_price() . ' USD',
         ($item->siblings > 1 ?
-         ORDURE . '/art-supplies/' . $product->full_slug() . '/' . $item->code :
-         ORDURE . '/art-supplies/' . $product->full_slug()),
+         $ordure . '/art-supplies/' . $product->full_slug() . '/' . $item->code :
+         $ordure . '/art-supplies/' . $product->full_slug()),
         $image,
         '',#'additional_image_link',
         $product->brand()->name,
