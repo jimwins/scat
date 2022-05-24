@@ -18,7 +18,7 @@ class TwigExtension
       'PUBLIC' => $public,
       'PUBLIC_CATALOG' => $public . '/art-supplies',
       'TIME' => $_SERVER['REQUEST_TIME_FLOAT'],
-      'STATIC' => $config ? $this->config->get('ordure.static_url') : 'no',
+      'STATIC' => $this->config ? $this->config->get('ordure.static_url') : 'no',
     ];
   }
 
