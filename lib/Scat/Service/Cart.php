@@ -3,10 +3,9 @@ namespace Scat\Service;
 
 class Cart
 {
-  private $data;
-
-  public function __construct(\Scat\Service\Data $data) {
-    $this->data= $data;
+  public function __construct(
+    private \Scat\Service\Data $data
+  ) {
   }
 
   public function create($data= null) {
@@ -26,4 +25,7 @@ class Cart
     return $this->data->Factory('Cart')->where('uuid', $uuid)->find_one();
   }
 
+  public function findByStatus($status) {
+    return $this->data->Factory('Cart')->where('status', $status)->find_many();
+  }
 }
