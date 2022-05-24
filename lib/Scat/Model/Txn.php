@@ -621,19 +621,6 @@ class Txn extends \Scat\Model {
     }
   }
 
-  public function getOnlineDetails() {
-    $client= new \GuzzleHttp\Client();
-
-    $url= ORDURE . '/sale/' . $this->uuid . '/json';
-    $res= $client->request('GET', $url,
-                           [
-                             'debug' => $DEBUG,
-                             'query' => [ 'key' => ORDURE_KEY ]
-                           ]);
-
-    return json_decode($res->getBody());
-  }
-
   public function captureTax(\Scat\Service\Tax $tax) {
     if ($this->tax_captured) {
       throw new \Exception("Tax already captured.");
