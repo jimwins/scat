@@ -8,13 +8,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 final class Cart implements MiddlewareInterface
 {
-  private $cart;
-
-  public function __construct(\Scat\Service\Cart $cart) {
-    $this->cart= $cart;
+  public function __construct(
+    private \Scat\Service\Cart $cart
+  ) {
   }
 
-  public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+  public function process(
+    ServerRequestInterface $request,
+    RequestHandlerInterface $handler): ResponseInterface
   {
     $uuid= $request->getParam('uuid');
 
@@ -32,20 +33,23 @@ final class Cart implements MiddlewareInterface
       error_log("Loading cart $uuid");
       $cart= $this->cart->findByUuid($uuid);
       if ($cart && $cart->status != 'cart') {
-        error_log("Cart is already complete");
         if ($cart->status == 'paid') {
+          error_log("Cart is already paid");
           // TODO this is ugly, but it works
           $this->dumpCookies();
           $response= $GLOBALS['app']->getResponseFactory()->createResponse();
           return $response->withRedirect(
             '/sale/' . $cart->uuid . '/thanks'
           );
+        } else {
+          error_log("Not sure what to do with a cart in '{$cart->status}' status\n");
         }
         unset($cart);
       }
     }
 
     if (!isset($cart)) {
+      error_log("Creating new cart $uuid");
       $cart= $this->cart->create([ 'status' => 'cart' ]);
     }
 
