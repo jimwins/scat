@@ -8,25 +8,27 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Ordure {
-  protected $txn, $data, $email;
+  private $ordure_url, $ordure_key;
 
   public function __construct(
-    \Scat\Service\Txn $txn,
-    \Scat\Service\Data $data,
-    \Scat\Service\Email $email
+    \Scat\Service\Config $config,
+    private \Scat\Service\Txn $txn,
+    private \Scat\Service\Data $data,
+    private \Scat\Service\Email $email
   ) {
-    $this->txn= $txn;
-    $this->data= $data;
-    $this->email= $email;
+    $this->ordure_url = $config->get('ordure.url');
+    $this->ordure_key= $config->get('ordure.key');
   }
 
   public function pushPrices(Response $response,
-                              \Scat\Service\Catalog $catalog) {
-    $url= ORDURE . '/update-pricing';
-    $key= ORDURE_KEY;
+                              \Scat\Service\Catalog $catalog)
+  {
+    $url= $this->ordure_url . '/update-pricing';
+    $key= $this->ordure_key;
 
     $items= $catalog
               ->getItems()
+              ->select_many('id','active')
               ->select_many('retail_price','discount_type','discount')
               ->select_expr('IF(is_kit,
                                 (SELECT MIN((SELECT SUM(allocated)
@@ -104,11 +106,11 @@ class Ordure {
 
     $client= new \GuzzleHttp\Client();
 
-    $url= ORDURE . '/get-pending-rewards';
+    $url= $this->ordure_url . '/get-pending-rewards';
     $res= $client->request('GET', $url,
                            [
                              'debug' => $GLOBALS['DEBUG'],
-                             'query' => [ 'key' => ORDURE_KEY ]
+                             'query' => [ 'key' => $this->ordure_key ]
                            ]);
 
     $updates= json_decode($res->getBody());
@@ -184,11 +186,11 @@ class Ordure {
         $messages[]= "Exception: " . $e->getMessage();
       }
 
-      $url= ORDURE . '/mark-rewards-processed';
+      $url= $this->ordure_url . '/mark-rewards-processed';
       $res= $client->request('GET', $url,
                              [
                                'debug' => $GLOBALS['DEBUG'],
-                               'query' => [ 'key' => ORDURE_KEY,
+                               'query' => [ 'key' => $this->ordure_key,
                                             'id' => $update->id ]
                              ]);
 
@@ -206,11 +208,11 @@ class Ordure {
     $client= new \GuzzleHttp\Client();
     $messages= [];
 
-    $url= ORDURE . '/sale/list';
+    $url= $this->ordure_url . '/sale/list';
     $res= $client->request('GET', $url,
                            [
                              'debug' => $GLOBALS['DEBUG'],
-                             'query' => [ 'key' => ORDURE_KEY,
+                             'query' => [ 'key' => $this->ordure_key,
                                           'json' => 1 ]
                            ]);
 
@@ -223,11 +225,11 @@ class Ordure {
 
       try {
 
-        $url= ORDURE . '/sale/' . $summary->uuid . '/json';
+        $url= $this->ordure_url . '/sale/' . $summary->uuid . '/json';
         $res= $client->request('GET', $url,
                                [
                                  'debug' => $GLOBALS['DEBUG'],
-                                 'query' => [ 'key' => ORDURE_KEY ]
+                                 'query' => [ 'key' => $this->ordure_key ]
                                ]);
 
         $data= json_decode($res->getBody());
@@ -413,7 +415,7 @@ class Ordure {
 
         // Mark status on Ordure
 
-        $url= ORDURE . '/sale/' . $summary->uuid . '/set-status';
+        $url= $this->ordure_url . '/sale/' . $summary->uuid . '/set-status';
         $res= $client->request('POST', $url,
                                [
                                  'debug' => $GLOBALS['DEBUG'],
@@ -421,7 +423,7 @@ class Ordure {
                                    'X-Requested-With' => 'XMLHttpRequest',
                                  ],
                                  'form_params' => [
-                                   'key' => ORDURE_KEY,
+                                   'key' => $this->ordure_key,
                                    'status' => 'processing'
                                  ]
                                ]);
@@ -460,11 +462,11 @@ class Ordure {
 
     $seen= [];
 
-    $url= ORDURE . '/sale/list';
+    $url= $this->ordure_url . '/sale/list';
     $res= $client->request('GET', $url,
                            [
                              'debug' => $GLOBALS['DEBUG'],
-                             'query' => [ 'key' => ORDURE_KEY,
+                             'query' => [ 'key' => $this->ordure_key,
                                           'carts' => 1,
                                           'yesterday' => 1,
                                           'json' => 1 ]
@@ -477,11 +479,11 @@ class Ordure {
         continue;
       }
 
-      $url= ORDURE . '/sale/' . $summary->uuid . '/json';
+      $url= $this->ordure_url . '/sale/' . $summary->uuid . '/json';
       $res= $client->request('GET', $url,
                              [
                                'debug' => $GLOBALS['DEBUG'],
-                               'query' => [ 'key' => ORDURE_KEY ]
+                               'query' => [ 'key' => $this->ordure_key ]
                              ]);
 
       $data= json_decode($res->getBody(), true);
@@ -512,7 +514,7 @@ class Ordure {
         }
       }
 
-      $url= ORDURE . '/sale/' . $summary->uuid . '/set-abandoned-level';
+      $url= $this->ordure_url . '/sale/' . $summary->uuid . '/set-abandoned-level';
       $res= $client->request('POST', $url,
                              [
                                'debug' => $GLOBALS['DEBUG'],
@@ -520,12 +522,12 @@ class Ordure {
                                  'X-Requested-With' => 'XMLHttpRequest',
                                ],
                                'form_params' => [
-                                 'key' => ORDURE_KEY,
+                                 'key' => $this->ordure_key,
                                  'abandoned_level' => 2
                                ]
                              ]);
 
-      $data['call_to_action_url']= ORDURE . '/cart?uuid=' . $data['sale']['uuid'] . '&utm_source=internal&utm_medium=email&utm_id=abandoned-cart';
+      $data['call_to_action_url']= $this->ordure_url . '/cart?uuid=' . $data['sale']['uuid'] . '&utm_source=internal&utm_medium=email&utm_id=abandoned-cart';
 
       $template= $view->getEnvironment()->load('email/abandoned-cart.html');
 
