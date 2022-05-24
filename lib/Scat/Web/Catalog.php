@@ -8,16 +8,11 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Catalog {
-  private $catalog, $view, $data;
-
   public function __construct(
-    \Scat\Service\Catalog $catalog,
-    \Scat\Service\Data $data,
-    View $view
+    private \Scat\Service\Catalog $catalog,
+    private \Scat\Service\Data $data,
+    private View $view
   ) {
-    $this->catalog= $catalog;
-    $this->data= $data;
-    $this->view= $view;
   }
 
   public function search(Request $request, Response $response,
@@ -86,4 +81,45 @@ class Catalog {
     ]);
   }
 
+  public function updatePricing(Request $request, Response $response,
+                                \Scat\Service\Config $config)
+  {
+    $key= $request->getParam('key');
+    $version= (int)$request->getParam('version');
+
+    if ($version != 2) {
+      throw new \Exception("Don't know how to handle version {$version}");
+    }
+
+    if ($key != $config->get('ordure.key')) {
+      throw new \Exception("Wrong key.");
+    }
+
+    $rows= 0;
+    foreach ($request->getUploadedFiles() as $file) {
+      $q= "LOAD DATA LOCAL INFILE ?
+             REPLACE
+                INTO TABLE item_status
+              FIELDS TERMINATED BY '\t'
+              IGNORE 1 LINES
+              (id, retail_price, @discount_type, @discount,
+               minimum_quantity, purchase_quantity,
+               @stock, active,
+               @code, @is_dropshippable)
+                 SET discount_type = IF(@discount_type = 'NULL', NULL,
+                                        @discount_type),
+                     discount = IF(@discount = 'NULL', NULL, @discount),
+                     stock = IF(@stock = 'NULL', NULL, @stock)
+          ";
+
+      $stream= $file->getStream();
+
+      $this->data->execute($q, [ ($stream->getMetaData())['uri'] ]);
+      $rows+= $this->data->get_last_statement()->rowCount();
+    }
+
+    touch('/tmp/last-loaded-prices');
+
+    return $response->withJson([ 'message' => "Loaded {$rows} prices." ]);
+  }
 }
