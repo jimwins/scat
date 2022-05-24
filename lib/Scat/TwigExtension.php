@@ -7,12 +7,12 @@ class TwigExtension
 {
   private $config;
 
-  public function __construct(\Scat\Service\Config $config) {
+  public function __construct(\Scat\Service\Config $config= null) {
     $this->config= $config;
   }
 
   public function getGlobals() : array {
-    $public= $this->config->get('ordure.url');
+    $public= $this->config ? $this->config->get('ordure.url') : 'no-public';
     return [
       'DEBUG' => $GLOBALS['DEBUG'],
       'PUBLIC' => $public,
