@@ -434,7 +434,13 @@ class Shipping
       $rate['rate']+= $box[4];
     }
 
-    /* TODO Set free shipping */
+    /* Set free shipping */
+    if (isset($shipping_options['default']) &&
+        $cart->eligible_for_free_shipping() &&
+        $cart->subtotal() >= 79)
+    {
+      $shipping_options['default']['rate']= 0.00;
+    }
 
     /* Get local delivery options */
     if ($this->in_delivery_area($address)) {

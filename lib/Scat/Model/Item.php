@@ -536,6 +536,10 @@ class Item extends \Scat\Model {
       return null;
     }
 
+    if ($this->oversized) {
+      return false; // Easy no.
+    }
+
     return ($this->weight < 10 &&
             \Scat\Service\Shipping::fits_in_box($boxes, [
               [ $this->width, $this->height, $this->length ]

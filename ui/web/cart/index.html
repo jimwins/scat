@@ -135,6 +135,29 @@ but as a fallback you can chain `:not()` instead */
 
     {{ block('notice') }}
 
+    {% if cart.eligible_for_free_shipping() %}
+      {% if cart.subtotal > 79 %}
+        <p class="lead alert alert-success">
+          <b>This order will ship for free to the continental US!</b>
+        </p>
+      {% else %}
+        <p class="lead alert alert-danger">
+          <b>You're almost there for free shipping!</b>
+          Just spend {{ scat.amount(79 - cart.subtotal) }} more on eligible
+          items and your order will ship for free to the continental US.
+          <a href="{{ url_for('catalog') }}">Continue shopping &rarr;</a>
+        </p>
+      {% endif %}
+    {% else %}
+      <p class="lead alert alert-info">
+        <b>This order can't ship for free.</b>
+        Sorry, but you're ordering items that don't qualify for free shipping.
+        They are marked with a truck (<i class="bi bi-truck"></i>) or notice
+        (<i class="bi bi-patch-question"></i>) in the cart. Shipping charges
+        will be calculated during checkout.
+      <p>
+    {% endif %}
+
     <div class="smol-grid">
       {% if person %}
         <div class="card cold" style="grid-column: 1 / span 2">

@@ -222,6 +222,15 @@ class Cart extends \Scat\Model {
     return $weight;
   }
 
+  public function eligible_for_free_shipping() {
+    foreach ($this->items()->find_many() as $line) {
+      if (!$line->item()->can_ship_free()) {
+        return false; /* It just takes one. */
+      }
+    }
+    return true;
+  }
+
   public function has_hazmat_items() {
     return $this->items()->join('item', [ 'item.id', '=', 'sale_item.item_id' ])->where_gt('item.hazmat', 0)->count();
   }
