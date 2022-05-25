@@ -301,6 +301,7 @@ class Ordure {
           case 'cargo_bike':
             $code= 'ZZ-DELIVERY-CARGO';
             break;
+          case 'local_delivery':
           case 'local_sm':
           case 'local_md':
           case 'local_lg':
@@ -311,6 +312,12 @@ class Ordure {
             break;
           case 'economy':
             $code= 'ZZ-SHIPPING-ECONOMY';
+            break;
+          case 'two_day':
+            $code= 'ZZ-SHIPPING-TWODAY';
+            break;
+          case 'next_day':
+            $code= 'ZZ-SHIPPING-NEXTDAY';
             break;
           case 'default':
           default:
