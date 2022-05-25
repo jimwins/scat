@@ -64,86 +64,7 @@
     {% endif %}
 
     {% block shipping_options %}
-      {% import 'macros.twig' as scat %}
-      <div id="shipping-options">
-        {% if cart.shipping_address_id != 1 and (cart.shipping_options|length > 1 or cart.shipping_options.default is not defined) %}
-          <h3>Shipping Options</h3>
-
-          {% if cart.shipping_options|length %}
-            {% for method, details in cart.shipping_options %}
-              <label class="input-radio">
-                <input type="radio" id="so-{{ method }}"
-                        {{ (cart.shipping_method == method) ? 'checked' }}
-                        name="shipping_method" value="{{ method }}">
-                <strong>
-                  {{ details.rate ? scat.amount(details.rate) : 'FREE' }}
-                </strong>
-                &mdash;
-                {% if method == 'default' %}
-                  Standard shipping (estimated delivery {{ details.est_delivery_days ?? '3 to 5' }} day{{ details.est_delivery_days > 1 ? 's' }})
-                {% elseif method == 'next_day' %}
-                  Next-day shipping
-                {% elseif method == 'two_day' %}
-                  Two-day shipping
-                {% elseif method == 'local_delivery' %}
-                  Same-day local delivery (Monday - Saturday, ordered before 4pm)
-                {% endif %}
-              </label>
-            {% endfor %}
-            <div class="help-block">
-              Delivery time is how long it will take to arrive <b>after</b>
-              it is shipped, which may take up to two business days (except
-              for same-day local delivery).
-            </div>
-          {% else %}
-            {% if cart.shipping_address_id %}
-              <p class="text-danger">
-                Sorry, we were not able to calculate the shipping cost for your
-                order.
-              </p>
-
-              {% if cart.has_truck_only_items %}
-                <p>
-                  There are items in the cart that can only be picked up
-                  at these store or delivered to addresses within 30 miles.
-                  Those are indicated with the <i class="bi bi-truck"></i>
-                  <span class="visually-hidden">Truck Only</span>
-                  indicator in the cart.
-                </p>
-              {% elseif cart.has_incomplete_items %}
-                <p>
-                  There are items for which our system doesn't have enough
-                  info to calculate the shipping cost. Those are indicated
-                  with the <i class="bi bi-patch-question text-danger"></i>
-                  <span class="visually-hidden">Missing Info</span> indicator
-                  in the cart.
-                </p>
-              {% endif %}
-
-              <p>
-                If you'd like someone at the store to take a look at your
-                cart and see if we can work out the shipping &amp; handling
-                cost manually, click on the 'Get Help' button below and
-                we'll get back to you!
-              </p>
-
-              <a href="/cart/get-help" class="button">
-                <i class="bi bi-question-circle"></i>
-                <span class="label">Get help</span>
-              </a>
-            {% else %}
-              <p class="text-danger">
-                You must provide a valid address for us to provide options
-                for shipping.
-              </p>
-            {% endif %}
-          {% endif %}
-        {% elseif not cart.shipping_method %}
-          <div class="alert alert-warning">
-            Unable to determine any shipping methods.
-          </div>
-        {% endif %}
-      </div>
+      {{ include('cart/shipping-options.twig') }}
     {% endblock %}
 
     <h3>Comments</h3>
@@ -155,60 +76,7 @@
     </small>
 
     {% block loyalty %}
-      {% import 'macros.twig' as scat %}
-      <div id="loyalty">
-        <h3>Loyalty Rewards</h3>
-
-        {% if not cart.loyalty_used %}
-          {% if person.points_available > 50 %}
-            <p>
-              <b>You have {{ person.points_available }} point{{ person.points_available > 1 ? 's'}} available.</b>
-              {% set reward= cart.loyalty_reward_available(person.points_available) %}
-              {% if reward %}
-                  If you'd rather not use any yet, you can skip down to just
-                  pay for this order and you'll just keep racking them up!
-                </p>
-                <button class="button" type="button"
-                        data-action="apply-reward"
-                        data-id="{{ reward.id }}"
-                >
-                  Use {{ reward.cost }} for a {{ scat.amount(-1 * reward.item.retail_price) }} store credit
-                </button>
-              {% else %}
-                  But you aren't spending enough to be able to use any
-                  rewards right now.
-                </p>
-              {% endif %}
-            </p>
-          {% elseif person %}
-            <p>
-              <b>You don't have enough points for a reward yet</b>, but don't
-              forget that you earn one point for every $1 you spend (tax not
-              included). You'll earn your first reward when you have 50
-              points!
-              {% if person.points_available %}
-                You have {{ person.points_available }} point{{ person.points_available > 1 ? 's'}} now.
-              {% endif %}
-            </p>
-          {% else %}
-            <p>
-              <b>You will earn one point for every $1 you spend</b> (tax not
-              included). You'll earn your first reward when you have 50
-              points!
-            </p>
-          {% endif %}
-        {% else %}
-          <p>
-            <b>You have already applied a loyalty reward to this cart.</b>
-            But if you've changed your mind, you can remove it.
-          </p>
-            <button class="button" type="button"
-                    data-action="remove-reward"
-            >
-              Remove the loyalty reward
-            </button>
-        {% endif %}
-      </div>
+      {{ include('cart/loyalty.twig') }}
     {% endblock %}
 
     <h3>Payment</h3>
@@ -245,23 +113,7 @@
 
 {% block script %}
   <script>
-    // format number as $3.00 or ($3.00)
-    function amount(val) {
-      if (typeof(val) == 'function') {
-        val= val()
-      }
-      if (typeof(val) == 'undefined' || val == null) {
-        return ''
-      }
-      if (typeof(val) == 'string') {
-        val= parseFloat(val)
-      }
-      if (val < 0.0) {
-        return '($' + Math.abs(val).toFixed(2) + ')'
-      } else {
-        return '$' + val.toFixed(2)
-      }
-    }
+    {{ include('cart/shared.js') }}
 
     function disablePayButtons() {
       let stripeButton= document.getElementById('pay-stripe')
@@ -278,58 +130,6 @@
 
       let paypalButtons= document.getElementById('paypal-buttons');
       if (paypalButtons.actions) paypalButtons.actions.enable()
-    }
-
-    function updateCart(details) {
-      let form= document.getElementById('payment-form')
-      form.setAttribute('disabled', '')
-
-      return fetch('{{ url_for('update-cart') }}', {
-        'method': 'POST',
-        'headers' : {
-          'Accept': 'application/json',
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(details)
-      }).then((res) => {
-        if (res.status >= 200 && res.status < 300) {
-          return Promise.resolve(res)
-        }
-        return Promise.reject(new Error(res.statusText))
-      }).then((res) => {
-        return res.json()
-      }).then((data) => {
-        if (data.cart_html) {
-          let template= document.createElement('template')
-          template.innerHTML= data.cart_html.trim()
-          let cart= document.getElementById('cart')
-          cart.replaceWith(template.content.firstChild)
-        }
-        if (data.shipping_options_html) {
-          let template= document.createElement('template')
-          template.innerHTML= data.shipping_options_html.trim()
-          let shipping_options= document.getElementById('shipping-options')
-          shipping_options.replaceWith(template.content.firstChild)
-          listenToShippingMethod()
-        }
-        if (data.loyalty_html) {
-          let template= document.createElement('template')
-          template.innerHTML= data.loyalty_html.trim()
-          let loyalty= document.getElementById('loyalty')
-          loyalty.replaceWith(template.content.firstChild)
-          listenToShippingMethod()
-        }
-
-        console.log("ready? " + data.ready_for_payment);
-        if (data.ready_for_payment) {
-          enablePayButtons(data.due);
-        } else {
-          disablePayButtons();
-        }
-      })
-      .finally(() => {
-        form.removeAttribute('disabled')
-      })
     }
 
     const stripe= Stripe('{{ stripe.key }}', {
@@ -353,8 +153,6 @@
     });
 
     linkAuthenticationElement.mount("#link-authentication-element");
-
-    let timeout= null;
 
     linkAuthenticationElement.on('change', (event) => {
       const email= event.value.email;
@@ -413,35 +211,6 @@
         updateCart({ name : name })
       }, 500);
     })
-
-    form.addEventListener('click', (ev) => {
-      let action= ev.target.closest('[data-action]')
-      if (action.dataset.action == 'apply-reward') {
-        updateCart({ reward: action.dataset.id })
-      }
-      if (action.dataset.action == 'remove-reward') {
-        updateCart({ reward: 0 })
-      }
-    })
-
-    let handleShippingMethodChange= (event) => {
-      const method= event.currentTarget.value;
-      clearTimeout(timeout);
-      timeout= setTimeout(() => {
-        updateCart({ method : method })
-      }, 500);
-    }
-
-    function listenToShippingMethod() {
-      let form= document.getElementById('payment-form')
-      if (!form.elements['shipping_method']) return;
-
-      form.elements['shipping_method'].forEach((el) => {
-        el.addEventListener('change', handleShippingMethodChange)
-      })
-    }
-
-    listenToShippingMethod()
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();

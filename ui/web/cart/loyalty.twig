@@ -1,0 +1,52 @@
+{% import 'macros.twig' as scat %}
+<div id="loyalty">
+  <h3>Loyalty Rewards</h3>
+
+  {% if not cart.loyalty_used %}
+    {% if person.points_available > 50 %}
+      <p>
+        <b>You have {{ person.points_available }} point{{ person.points_available > 1 ? 's'}} available.</b>
+        {% set reward= cart.loyalty_reward_available(person.points_available) %}
+        {% if reward %}
+            If you'd rather not use any yet, you can skip down to just
+            pay for this order and you'll just keep racking them up!
+          </p>
+          <button class="button" type="button"
+                  data-action="apply-reward"
+                  data-id="{{ reward.id }}"
+          >
+            Use {{ reward.cost }} for a {{ scat.amount(-1 * reward.item.retail_price) }} store credit
+          </button>
+        {% else %}
+            But you aren't spending enough to be able to use any
+            rewards right now.
+          </p>
+        {% endif %}
+      </p>
+    {% elseif person %}
+      <p>
+        <b>You don't have enough points for a reward yet</b>, but don't
+        forget that you earn one point for every $1 you spend (tax not
+        included). You'll earn your first reward when you have 50
+        points!
+        {% if person.points_available %}
+          You have {{ person.points_available }} point{{ person.points_available > 1 ? 's'}} now.
+        {% endif %}
+      </p>
+    {% else %}
+      <p>
+        <b>You will earn one point for every $1 you spend</b> (tax not
+        included). You'll earn your first reward when you have 50
+        points!
+      </p>
+    {% endif %}
+  {% else %}
+    <p>
+      <b>You have already applied a loyalty reward to this cart.</b>
+      But if you've changed your mind, you can remove it.
+    </p>
+      <button class="button" type="button" data-action="remove-reward">
+        Remove the loyalty reward
+      </button>
+  {% endif %}
+</div>

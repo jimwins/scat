@@ -293,15 +293,13 @@ class Cart extends \Scat\Model {
     if ($key == 'shipping_options' && $value !== null) {
       $value= json_encode($value);
     }
-    $this->shipping= 0.00;
-    $this->shipping_tax= 0.00;
     if ($key == 'shipping_method' && $value !== null && $value != 'pickup') {
       $option= @$this->shipping_options[$value];
       if (!$option) {
         throw new \Exception("No such shipping option '$value'");
       }
       $this->shipping= $option['rate'];
-      $this->shipping_tax= 0.00;
+      $this->shipping_tax= 0;
     }
     return parent::__set($key, $value);
   }
@@ -384,8 +382,8 @@ class Cart extends \Scat\Model {
         'Zip5' => $zip[0],
         'State' => $address->state,
         'City' => $address->city,
-        'Address2' => $address->address2,
-        'Address1' => $address->address1,
+        'Address2' => $address->street2,
+        'Address1' => $address->street1,
       ],
       'cartItems' => [],
     ];
@@ -471,6 +469,7 @@ class Cart extends \Scat\Model {
   public function as_array() {
     $data= parent::as_array();
     $data['subtotal']= $this->subtotal();
+    $data['tax']= $this->tax();
     $data['total']= $this->total();
     $data['due']= $this->due();
     $data['ready_for_payment']= $this->ready_for_payment();

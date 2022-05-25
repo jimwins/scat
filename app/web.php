@@ -165,7 +165,7 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
   /* Amazon */
   $app->get('/checkout/amzn', [ \Scat\Web\Cart::class, 'amznCheckout' ])
       ->setName('checkout-amzn');
-  $app->get('/pay/amzn', [ \Scat\Web\Cart::class, 'amznPay' ])
+  $app->post('/pay/amzn', [ \Scat\Web\Cart::class, 'amznPay' ])
       ->setName('pay-amzn');
   $app->get('/finalize/amzn', [ \Scat\Web\Cart::class, 'amznFinalize' ])
       ->setName('finalize-amzn');

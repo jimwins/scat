@@ -190,6 +190,9 @@ class Cart {
 
     $cart->save();
 
+    $cart->flushTotals();
+    $cart->reload();
+
     $data= $cart->as_array();
 
     $data['cart_html']=
@@ -222,7 +225,7 @@ class Cart {
     if (($comment= $request->getParam('comment'))) {
       $note= $cart->notes()->create([
         'sale_id' => $cart->id,
-        'person_id' => $cart->person_id,
+        'person_id' => $cart->person_id ?? 0,
         'content' => $comment,
       ]);
       try {
@@ -508,9 +511,20 @@ class Cart {
     \Scat\Service\AmazonPay $amzn
   ) {
     $cart= $request->getAttribute('cart');
-    $person= $this->auth->get_person_details($request);
 
-    // TODO validate
+    // Save comment, not fatal if it doesn't work
+    if (($comment= $request->getParam('comment'))) {
+      $note= $cart->notes()->create([
+        'sale_id' => $cart->id,
+        'person_id' => $cart->person_id ?? 0,
+        'content' => $comment,
+      ]);
+      try {
+        $note->save();
+      } catch (\Exception $e) {
+        error_log("Failed to save comment for {$cart->uuid}: {$comment}");
+      }
+    }
 
     $amzn_session_id= $cart->amz_order_reference_id;
 
@@ -910,7 +924,7 @@ endStripeFinalize:
     if (($comment= $request->getParam('comment'))) {
       $note= $cart->notes()->create([
         'sale_id' => $cart->id,
-        'person_id' => $cart->person_id,
+        'person_id' => $cart->person_id ?? 0,
         'content' => $comment,
       ]);
       try {
@@ -1034,7 +1048,7 @@ endPaypalFinalize:
     if (($comment= $request->getParam('comment'))) {
       $note= $cart->notes()->create([
         'sale_id' => $cart->id,
-        'person_id' => $cart->person_id,
+        'person_id' => $cart->person_id ?? 0,
         'content' => $comment,
       ]);
       try {

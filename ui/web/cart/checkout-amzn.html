@@ -6,6 +6,21 @@
 {% endblock %}
 
 {% block content %}
+<style>
+  form#payment-form {
+    position: relative;
+  }
+  form#payment-form[disabled]:after {
+    content: " ";
+    display: block;
+    background: rgba(0,0,0,0.3);
+    height: calc(100% + 2em);
+    width: calc(100% + 2em);
+    position: absolute;
+    top: -1em; left: -1em;
+    z-index: 1000; /* get over everything */
+  }
+</style>
   {% if person %}
     <h2>
       Welcome back{{ person ? ', ' ~ person.friendly_name }}!
@@ -41,19 +56,39 @@
     Change
   </button>
 
-  {% embed 'cart/cart.twig' with { 'editable' : false } %}
-    {% block buttons %}
-      {% import 'macros.twig' as scat %}
-      <div class="pay-button">
-        <a class="button block"
-           href="{{ url_for('pay-amzn') }}">
-          <i class="bi bi-box-arrow-right"></i>
-          <span class="label">Pay {{ scat.amount(cart.due) }}</span>
-        </a>
-      </div>
+  <form id="payment-form" class="stacked-form"
+        method="POST" action="{{ url_for('pay-amzn') }}">
+    {% block shipping_options %}
+      {{ include('cart/shipping-options.twig') }}
+    {% endblock %}
+
+    <h3>Comments</h3>
+    <label for="comment">Any special requests?</label>
+    <textarea class="input" rows="3" name="comment" id="comment"></textarea>
+    <small class="help-block">
+      Please note that we are unable to pass along detailed delivery
+      instructions on orders being shipped.
+    </small>
+
+    {% block loyalty %}
+      {{ include('cart/loyalty.twig') }}
+    {% endblock %}
+
+    <div class="pay-button">
+      <button id="pay-amazon" type="submit" class="button"
+              {{ not cart.ready_for_payment ? 'disabled' }}>
+        Pay {{ scat.amount(cart.due) }}
+      </button>
+    </div>
+
+    {% block cart %}
+      <div id="cart">
+        {% embed 'cart/cart.twig' with { 'editable' : false, 'skip_address' : true } %}
+        {% endembed %}
       </div>
     {% endblock %}
-  {% endembed %}
+
+  </form>
 
 {% endblock %}
 
@@ -69,5 +104,18 @@
       amazonCheckoutSessionId: '{{ cart.amz_order_reference_id }}',
       changeAction: 'changePayment'
     });
+
+    {{ include('cart/shared.js') }}
+
+    function disablePayButtons() {
+      let amazonButton= document.getElementById('pay-amazon')
+      amazonButton.setAttribute('disabled', '')
+    }
+
+    function enablePayButtons(due) {
+      let amazonButton= document.getElementById('pay-amazon')
+      amazonButton.removeAttribute('disabled')
+      amazonButton.textContent= 'Pay ' + amount(due);
+    }
   </script>
 {% endblock %}
