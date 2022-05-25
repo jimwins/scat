@@ -451,7 +451,7 @@ class Catalog {
 
       return $this->view->render($response, 'dialog/item-add.html', [
         'product_id' => $request->getParam('product_id'),
-        'vendor_item' => $vendor_item,
+        'vendor_item' => $vendor_item ?? null,
         'item' => $item,
       ]);
     }
