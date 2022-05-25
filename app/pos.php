@@ -8,7 +8,7 @@ use \Respect\Validation\Validator as v;
 use \Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
 
 /* Some defaults */
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(E_ALL);
 $tz= @$_ENV['PHP_TIMEZONE'] ?: @$_ENV['TZ'];
 if ($tz) date_default_timezone_set($tz);
 bcscale(2);
