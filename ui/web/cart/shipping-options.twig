@@ -5,24 +5,26 @@
 
     {% if cart.shipping_options|length %}
       {% for method, details in cart.shipping_options %}
-        <label class="input-radio">
-          <input type="radio" id="so-{{ method }}"
-                  {{ (cart.shipping_method == method) ? 'checked' }}
-                  name="shipping_method" value="{{ method }}">
-          <strong>
-            {{ details.rate ? scat.amount(details.rate) : 'FREE' }}
-          </strong>
-          &mdash;
-          {% if method == 'default' %}
-            Standard shipping (estimated delivery {{ details.est_delivery_days ?? '3 to 5' }} day{{ details.est_delivery_days > 1 ? 's' }})
-          {% elseif method == 'next_day' %}
-            Next-day shipping
-          {% elseif method == 'two_day' %}
-            Two-day shipping
-          {% elseif method == 'local_delivery' %}
-            Same-day local delivery (Monday - Saturday, ordered before 4pm)
-          {% endif %}
-        </label>
+        {% if not exclude_local_delivery or method != 'local_delivery' %}
+          <label class="input-radio">
+            <input type="radio" id="so-{{ method }}"
+                    {{ (cart.shipping_method == method) ? 'checked' }}
+                    name="shipping_method" value="{{ method }}">
+            <strong>
+              {{ details.rate ? scat.amount(details.rate) : 'FREE' }}
+            </strong>
+            &mdash;
+            {% if method == 'default' %}
+              Standard shipping (estimated delivery {{ details.est_delivery_days ?? '3 to 5' }} day{{ details.est_delivery_days > 1 ? 's' }})
+            {% elseif method == 'next_day' %}
+              Next-day shipping
+            {% elseif method == 'two_day' %}
+              Two-day shipping
+            {% elseif method == 'local_delivery' %}
+              Same-day local delivery (Monday - Saturday, ordered before 4pm)
+            {% endif %}
+          </label>
+        {% endif %}
       {% endfor %}
       <div class="help-block">
         Delivery time is how long it will take to arrive <b>after</b>

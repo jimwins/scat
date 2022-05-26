@@ -59,7 +59,7 @@
   <form id="payment-form" class="stacked-form"
         method="POST" action="{{ url_for('pay-amzn') }}">
     {% block shipping_options %}
-      {{ include('cart/shipping-options.twig') }}
+      {{ include('cart/shipping-options.twig', { exclude_local_delivery: true }) }}
     {% endblock %}
 
     <h3>Comments</h3>
