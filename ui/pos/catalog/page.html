@@ -126,7 +126,11 @@
             <a class="list-group-item" style="break-inside: avoid-column"
                href="{{ url_for('catalog-brand', { 'brand' : b.slug }) }}">
               {{ b.name }}
-              {# <span class="badge">{{ b.products.count }}</span> #}
+              <span class="badge">
+                {%- if b.warning %}
+                  <i class="fa fa-exclamation-circle"></i>
+                {% endif -%}
+              </span>
             </a>
           {% endfor %}
         </div>
