@@ -24,14 +24,6 @@
   {% if person %}
     <h2>
       Welcome back{{ person ? ', ' ~ person.friendly_name }}!
-      <small>
-        (<a href="{{ url_for('account') }}">view your account</a>
-        or <a href="{{ url_for('logout') }}">log out</a>)
-      </small>
-    </h2>
-  {% else %}
-    <h2>
-      Welcome! <a href="{{ url_for('login')}}">Log in or create an account.</a>
     </h2>
   {% endif %}
 
