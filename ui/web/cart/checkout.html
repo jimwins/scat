@@ -202,8 +202,6 @@
       });
     {% endif %}
 
-    const form= document.getElementById('payment-form');
-
     form.elements['name'].addEventListener('change', (event) => {
       const name= event.currentTarget.value;
       clearTimeout(timeout);
