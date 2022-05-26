@@ -246,6 +246,13 @@ $app->group('', function (RouteCollectorProxy $app) {
       ->setName('handleLogin');
   $app->get('/logout', [ \Scat\Web\Auth::class, 'logout' ])
       ->setName('logout');
+
+  $app->post('/process-rewards', [ \Scat\Web\Auth::class, 'processSignup' ])
+      ->setName('process-signup');
+  $app->get('/get-pending-rewards',
+            [ \Scat\Web\Auth:: class, 'getPendingSignups' ]);
+  $app->post('/mark-rewards-processed',
+              [ \Scat\Web\Auth:: class, 'markSignupProcessed' ]);
 });
 
 /* Webhooks */

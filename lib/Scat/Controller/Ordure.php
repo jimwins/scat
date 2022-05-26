@@ -187,7 +187,7 @@ class Ordure {
       }
 
       $url= $this->ordure_url . '/mark-rewards-processed';
-      $res= $client->request('GET', $url,
+      $res= $client->request('POST', $url,
                              [
                                'debug' => $GLOBALS['DEBUG'],
                                'query' => [ 'key' => $this->ordure_key,

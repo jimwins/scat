@@ -32,6 +32,7 @@ class Page {
 
     return $this->view->render($response, $template, [
       'param' => $param,
+      'request' => $request->getParams(),
       'content' => $content,
     ]);
   }

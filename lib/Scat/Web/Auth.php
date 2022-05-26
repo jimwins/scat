@@ -8,18 +8,13 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Auth {
-  private $view, $data, $auth, $scat;
-
   public function __construct(
-    \Scat\Service\Data $data,
-    \Scat\Service\Auth $auth,
-    \Scat\Service\Scat $scat,
-    View $view
+    private \Scat\Service\Data $data,
+    private \Scat\Service\Auth $auth,
+    private \Scat\Service\Scat $scat,
+    private \Scat\Service\Config $config,
+    private View $view
   ) {
-    $this->data= $data;
-    $this->auth= $auth;
-    $this->scat= $scat;
-    $this->view= $view;
   }
 
   public function account(Request $request, Response $response)
@@ -118,5 +113,103 @@ class Auth {
               '/', $domain, true, true);
 
     return $response->withRedirect('/login?success=logout');
+  }
+
+  public function processSignup(Request $request, Response $response)
+  {
+    $name= trim($request->getParam('name'));
+    $email= trim($request->getParam('email'));
+    $phone= trim($request->getParam('phone'));
+
+    if (!$email && !$phone) {
+      throw new \Exception("You need to provide an email or phone number.");
+    }
+
+    if (!v::email()->validate($email)) {
+      throw new \Exception("Sorry, you must provide a valid email address.");
+    }
+
+    $key= $this->config->get('cleantalk.key');
+    if ($key && $email) {
+      $ip= $request->getAttribute('ip_address');
+
+      $req= new \Cleantalk\CleantalkRequest();
+      $req->auth_key= $key;
+      $req->agent= 'php-api';
+      $req->sender_email= $email;
+      $req->sender_ip= $ip;
+      $req->sender_nickname= $name;
+      $req->js_on= $request->getParam('scriptable');
+      // Calculate how long they took to fill out the form
+      $when= $request->getParam('when');
+      $now= $request->getServerParam('REQUEST_TIME_FLOAT');
+      $req->submit_time= (int)($now - $when);
+
+      $ct= new \Cleantalk\Cleantalk();
+      $ct->server_url= 'http://moderate.cleantalk.org/api2.0/';
+
+      $res= $ct->isAllowUser($req);
+      if ($res->allow == 1) {
+        error_log("User allowed. Reason = " . $res->comment);
+      } else {
+        error_log("User forbidden. Reason = " . $res->comment);
+        throw new \Exception("Sorry, there was a problem processing your email address.");
+      }
+
+    }
+
+    $signup= $this->data->factory('Signup')->create();
+
+    $signup->name= $name;
+    $signup->email= $email;
+    $signup->phone= $phone;
+    $signup->loyalty_number= preg_replace('/\D+/', '', $phone);
+    $signup->code= $request->getParam('receipt_code');
+    $signup->subscribe= $request->getParam('subscribe') ?? 0;
+    $signup->rewardsplus= $request->getParam('plus') ?? 0;
+
+    $signup->save();
+
+    $data= [];
+    if ($signup->subscribe) {
+      $data['subscribe']= 1;
+    }
+    if ($signup->code) {
+      $data['code']= 1;
+    }
+
+    return $response->withRedirect(
+      '/reward-thanks' . (count($data) ? '?' . http_build_query($data) : '')
+    );
+  }
+
+  public function getPendingSignups(Request $request, Response $response)
+  {
+    if (!$this->auth->verify_access_key($request->getParam('key'))) {
+      throw new \Slim\Exception\HttpForbiddenException($request, "Wrong key");
+    }
+
+    $signups=
+      $this->data->factory('Signup')->where('processed', 0)->find_many();
+    return $response->withJson($signups);
+  }
+
+  public function markSignupProcessed(Request $request, Response $response)
+  {
+    if (!$this->auth->verify_access_key($request->getParam('key'))) {
+      throw new \Slim\Exception\HttpForbiddenException($request, "Wrong key");
+    }
+
+    $signup_id= (int)$request->getParam('id');
+
+    $signup= $this->data->factory('Signup')->find_one($signup_id);
+    if (!$signup) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    $signup->processed= 1;
+    $signup->save();
+
+    return $response->withJson($signup);
   }
 }

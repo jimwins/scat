@@ -774,7 +774,7 @@ table {
   padding: 0;
 }
 
-.input-radio {
+.input-radio, .input-checkbox {
   display: block;
   margin-bottom: 0.5em;
 
