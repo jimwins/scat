@@ -19,6 +19,25 @@ class Cart {
   ) {
   }
 
+  protected function redirectAfterPaid(
+    Request $request,
+    Response $response,
+    $cart
+  ) {
+    $uri= $request->getUri();
+    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+    $link= $routeContext->getRouteParser()->fullUrlFor(
+      $uri,
+      'sale-thanks',
+      [ 'uuid' => $cart->uuid ]
+    );
+
+    /* Set cart id to -1 so cookie will get unset */
+    $cart->id= -1;
+
+    return $response->withRedirect($link);
+  }
+
   public function cart(
     Request $request, Response $response,
     \Scat\Service\PayPal $paypal,
@@ -60,7 +79,8 @@ class Cart {
 
   public function cartUpdate(
     Request $request, Response $response,
-    \Scat\Service\Stripe $stripe
+    \Scat\Service\Stripe $stripe,
+    \Scat\Service\Scat $scat
   ) {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
@@ -122,6 +142,31 @@ class Cart {
         case 'shipping_method':
           $cart->shipping_method= $value;
           $cart->recalculateTax($this->tax);
+          break;
+
+        case 'giftcard':
+          // if we already have it, don't do it again!
+          $has= $cart->payments()
+                      ->where_raw(
+                        'data->"$.card" = ?', [ $value ])
+                      ->find_one();
+          if ($has) {
+            throw new \Exception("You have already applied this gift card.");
+          }
+
+          $balance= $scat->get_giftcard_balance($value);
+          if ($value == 0) {
+            throw new \Exception("There is no remaining balance on this card.");
+          }
+
+          $amount= min($balance, $cart->due());
+
+          $cart->addPayment('gift', $amount, false, [ 'card' => $value ]);
+          if ($cart->status == 'paid') {
+            $cart->save();
+            return $this->redirectAfterPaid($request, $response, $cart);
+          }
+
           break;
 
         default:
@@ -602,18 +647,7 @@ class Cart {
       throw new \Exception("Not completely paid!");
     }
 
-    $uri= $request->getUri();
-    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
-    $link= $routeContext->getRouteParser()->fullUrlFor(
-      $uri,
-      'sale-thanks',
-      [ 'uuid' => $cart->uuid ]
-    );
-
-    /* Set cart id to -1 so cookie will get unset */
-    $cart->id= -1;
-
-    return $response->withRedirect($link);
+    return $this->redirectAfterPaid($request, $response, $cart);
   }
 
   public function setShipped(Request $request, Response $response)
@@ -712,18 +746,7 @@ endStripeFinalize:
       throw new \Exception("Not completely paid!");
     }
 
-    $uri= $request->getUri();
-    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
-    $link= $routeContext->getRouteParser()->fullUrlFor(
-      $uri,
-      'sale-thanks',
-      [ 'uuid' => $cart->uuid ]
-    );
-
-    /* Set cart id to -1 so cookie will get unset */
-    $cart->id= -1;
-
-    return $response->withRedirect($link);
+    return $this->redirectAfterPaid($request, $response, $cart);
   }
 
   public function stripeFinalize(

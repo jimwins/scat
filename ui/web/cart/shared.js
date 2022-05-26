@@ -28,8 +28,17 @@ function updateCart(details) {
     },
     body: JSON.stringify(details)
   }).then((res) => {
-    if (res.status >= 200 && res.status < 300) {
+    if (res.redirected) {
+      window.location.href= res.url
+    } else if (res.status >= 200 && res.status < 300) {
       return Promise.resolve(res)
+    }
+    /* Handle JSON error response by pulling the error message out */
+    if (res.headers.get('Content-type').indexOf("application/json") !== -1) {
+      return res.json()
+                .then((data) => {
+                  return Promise.reject(new Error(data.message))
+                })
     }
     return Promise.reject(new Error(res.statusText))
   }).then((res) => {
@@ -93,10 +102,24 @@ function listenToShippingMethod() {
   let form= document.getElementById('payment-form')
   if (!form.elements['shipping_method']) return;
 
-  form.elements['shipping_method'].forEach((el) => {
+  let methods= form.elements['shipping_method']
+  if (!Array.isArray(methods)) {
+    methods= [ methods ]
+  }
+
+  methods.forEach((el) => {
     el.addEventListener('change', handleShippingMethodChange)
   })
 }
 
 listenToShippingMethod()
 
+document.getElementById('apply-gift-card').addEventListener('click', (ev) => {
+  let giftcardField= document.getElementById('giftcard')
+  updateCart({ giftcard : giftcardField.value }).then((res) => {
+    giftcardField.value= '' // clear it
+    alert("Gift card applied.")
+  }).catch((err) => {
+    alert(err.message)
+  })
+})

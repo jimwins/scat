@@ -78,4 +78,26 @@ class Scat
 
     return $data;
   }
+
+  public function get_giftcard_balance($card) {
+    $client= new \GuzzleHttp\Client();
+
+    $uri= $this->url . "/gift-card/" . rawurlencode($card);
+
+    try {
+      $res= $client->get($uri, [
+        'headers' => [ 'Accept' => 'application/json' ]
+      ]);
+    } catch (\Exception $e) {
+      throw $e;
+    }
+
+    $data= json_decode($res->getBody());
+
+    if (json_last_error() != JSON_ERROR_NONE) {
+      throw new \Exception(json_last_error_msg());
+    }
+
+    return $data->balance;
+  }
 }

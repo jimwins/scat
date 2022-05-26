@@ -350,96 +350,94 @@ class Shipping
     $weight= $cart->get_shipping_weight();
     $hazmat= $cart->has_hazmat_items();
 
-    /* If we can figure out the $box or $weight, no options */
-    if (!$box || !$weight) {
-      return [];
-    }
+    /* Can only calculate shipping if it fits in a box and has weight */
+    if ($box && $weight) {
+      $from= $this->getDefaultFromAddress();
+      $to= $this->getAddress($address);
 
-    $from= $this->getDefaultFromAddress();
-    $to= $this->getAddress($address);
+      $shipping_options= [];
 
-    $shipping_options= [];
+      $options= [];
+      if ($hazmat) {
+        $options['hazmat']= 'LIMITED_QUANTITY';
+      }
 
-    $options= [];
-    if ($hazmat) {
-      $options['hazmat']= 'LIMITED_QUANTITY';
-    }
+      $details= [
+        'from_address' => $from,
+        'to_address' => $to,
+        'parcel' => [
+          'length' => $box[0],
+          'width' => $box[1],
+          'height' => $box[2],
+          'weight' => ceil(($weight + $box[3]) * 16),
+        ],
+        'options' => $options,
+      ];
 
-    $details= [
-      'from_address' => $from,
-      'to_address' => $to,
-      'parcel' => [
-        'length' => $box[0],
-        'width' => $box[1],
-        'height' => $box[2],
-        'weight' => ceil(($weight + $box[3]) * 16),
-      ],
-      'options' => $options,
-    ];
+      $shipment= $this->createShipment($details);
 
-    $shipment= $this->createShipment($details);
+      $acceptable_options= [
+        'default' => [
+          [ 'UPS', 'Ground' ],
+          [ 'UPSDAP', 'Ground' ],
+        ],
+        'two_day' => [
+          [ 'UPS', '2ndDayAir' ],
+          [ 'UPSDAP', '2ndDayAir' ],
+        ],
+        'next_day' => [
+          [ 'UPS', 'NextDayAir' ],
+          [ 'UPS', 'NextDayAirSaver' ],
+          [ 'UPSDAP', 'NextDayAir' ],
+          [ 'UPSDAP', 'NextDayAirSaver' ],
+        ],
+      ];
 
-    $acceptable_options= [
-      'default' => [
-        [ 'UPS', 'Ground' ],
-        [ 'UPSDAP', 'Ground' ],
-      ],
-      'two_day' => [
-        [ 'UPS', '2ndDayAir' ],
-        [ 'UPSDAP', '2ndDayAir' ],
-      ],
-      'next_day' => [
-        [ 'UPS', 'NextDayAir' ],
-        [ 'UPS', 'NextDayAirSaver' ],
-        [ 'UPSDAP', 'NextDayAir' ],
-        [ 'UPSDAP', 'NextDayAirSaver' ],
-      ],
-    ];
+      if (!$hazmat) {
+        /* We can use USPS for non-hazmat items. */
+        $acceptable_options['default'][]= [ 'USPS', 'First' ];
+        $acceptable_options['default'][]= [ 'USPS', 'Priority' ];
+      } else {
+        /* No express options for hazmat items. */
+        unset($acceptable_options['two_day']);
+        unset($acceptable_options['next_day']);
+      }
 
-    if (!$hazmat) {
-      /* We can use USPS for non-hazmat items. */
-      $acceptable_options['default'][]= [ 'USPS', 'First' ];
-      $acceptable_options['default'][]= [ 'USPS', 'Priority' ];
-    } else {
-      /* No express options for hazmat items. */
-      unset($acceptable_options['two_day']);
-      unset($acceptable_options['next_day']);
-    }
+      /* We will allow ParcelSelect to PO Box in continental US, too. */
+      if (self::state_in_continental_us($to->state) &&
+          self::address_is_po_box($to))
+      {
+        $acceptable_options['default'][]= [ 'USPS', 'ParcelSelect' ];
+      }
 
-    /* We will allow ParcelSelect to PO Box in continental US, too. */
-    if (self::state_in_continental_us($to->state) &&
-        self::address_is_po_box($to))
-    {
-      $acceptable_options['default'][]= [ 'USPS', 'ParcelSelect' ];
-    }
-
-    foreach ($shipment->rates as $rate) {
-      error_log("{$rate->carrier} / {$rate->service} = {$rate->rate}");
-      foreach ($acceptable_options as $method => $options) {
-        foreach ($options as $option) {
-          if ($rate->carrier == $option[0] && $rate->service == $option[1]) {
-            if (!array_key_exists($method, $shipping_options) ||
-                $rate->rate < $shipping_options[$method]['rate'])
-            {
-              $shipping_options[$method]= $rate->__toArray(true);
+      foreach ($shipment->rates as $rate) {
+        error_log("{$rate->carrier} / {$rate->service} = {$rate->rate}");
+        foreach ($acceptable_options as $method => $options) {
+          foreach ($options as $option) {
+            if ($rate->carrier == $option[0] && $rate->service == $option[1]) {
+              if (!array_key_exists($method, $shipping_options) ||
+                  $rate->rate < $shipping_options[$method]['rate'])
+              {
+                $shipping_options[$method]= $rate->__toArray(true);
+              }
             }
           }
         }
       }
-    }
 
-    /* Add box cost to rates */
-    foreach ($shipping_options as $method => $rate) {
-      // TODO use Decimal?
-      $rate['rate']+= $box[4];
-    }
+      /* Add box cost to rates */
+      foreach ($shipping_options as $method => $rate) {
+        // TODO use Decimal?
+        $rate['rate']+= $box[4];
+      }
 
-    /* Set free shipping */
-    if (isset($shipping_options['default']) &&
-        $cart->eligible_for_free_shipping() &&
-        $cart->subtotal() >= 79)
-    {
-      $shipping_options['default']['rate']= 0.00;
+      /* Set free shipping */
+      if (isset($shipping_options['default']) &&
+          $cart->eligible_for_free_shipping() &&
+          $cart->subtotal() >= 79)
+      {
+        $shipping_options['default']['rate']= 0.00;
+      }
     }
 
     /* Get local delivery options */
