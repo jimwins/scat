@@ -620,13 +620,6 @@
       </h4>
     {% endif %}
 
-    <p>
-      <span class="editable" data-name="dropship_fee" data-reload="pricing">
-        {{ scat.amount(item.dropship_fee) }}
-      </span>
-      dropship fee
-    </p>
-
     {% set overrides= item.price_overrides.find_many %}
     {% if overrides|length %}
       <!-- TODO allow editing/removal from here -->

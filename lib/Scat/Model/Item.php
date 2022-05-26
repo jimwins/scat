@@ -273,7 +273,6 @@ class Item extends \Scat\Model {
 
   public function setProperty($name, $value) {
     switch ($name) {
-      case 'dropship_fee':
       case 'retail_price':
         $value= preg_replace('/^\\$/', '', $value);
         // passthrough

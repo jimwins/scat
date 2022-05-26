@@ -114,11 +114,7 @@ figure img {
       {% if item.no_backorder %}
         <p data-toggle="tooltip" class="text-danger" title="This item is currently unavailable.">Unavailable</p>
       {% else %}
-        {% if item.dropship_fee > 0 %}
-          <span data-toggle="tooltip" title="This item will be shipped directly to you.">Shipped direct</span>
-        {% else %}
-          <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Out of stock, special order</span>
-        {% endif %}
+        <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Out of stock, special order</span>
       {% endif %}
     {% endif %}
 
@@ -138,22 +134,14 @@ figure img {
             <br><span class="text-danger">Unable to estimate shipping</span>
           {% else %}
             {% if item.can_ship_free and item.sale_price > 79 %}
-              {% if item.dropship_fee > 0 %}
-                <br>Shipped direct for
-                {{ scat.amount(item.dropship_fee) }}/order
-              {% else %}
-                <br><b>FREE</b> nationwide shipping
-              {% endif %}
+              <br><b>FREE</b> nationwide shipping
             {% else %}
               <br>
               Nationwide shipping starting at
               {{ scat.amount(shipping) }}
-              {% if item.dropship_fee > 0 %}
-                plus a {{ scat.amount(item.dropship_fee) }}/order dropship fee.
-              {% endif%}
             {% endif %}
             <br>
-            {% if item.dropship_fee or not item.can_ship_free %}
+            {% if not item.can_ship_free %}
               <span class="text-warning">This item is not eligible for free shipping</span>
             {% else %}
               <span class="text-success"><b>FREE</b> shipping with order over $79</span>
