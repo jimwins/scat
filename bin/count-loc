@@ -3,8 +3,7 @@ find api app css db js lib old-report print scat.php static ui \
   -type f \
   -not -name '*.png' \
   -not -name '*.svg' \
-  -not -name 'LineIcons*' \
-  -not -name 'lineicons*' \
+  -not -path '*bootstrap-icons*' \
   -not -name 'normalize.css' \
   -not -name 'jquery*' \
   | xargs wc -l
