@@ -205,3 +205,16 @@ figure img {
     {% endif %}
   </div>
 </div>
+
+{% block script %}
+  <script>
+    zaraz.ecommerce('Product Viewed', {
+      product_id : '{{ item.code }}',
+      category : '{{ dept.name ~ "/" ~ subdept.name }}',
+      name : '{{ item.name }}',
+      brand : '{{ product.brand.name }}',
+      price : '{{ item.sale_price }}',
+      currency : 'usd',
+    })
+  </script>
+{% endblock %}
