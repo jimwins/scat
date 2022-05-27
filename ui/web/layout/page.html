@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
@@ -46,12 +46,16 @@
           data-toggle="panel" data-target="site-depts"
           href="/art-supplies">
         <i class="bi bi-list"></i>
+        <span class="visually-hidden">Departments</span>
       </a>
       <a id="site-name" href="/">
         <img src="https://rawmats.gumlet.io/i/o/619408b8005c11013ca45b7b75.png?w=622&h=69&mode=fit&fm=auto" alt="Raw Materials Art Supplies">
       </a>
       <form id="site-search" action="/art-supplies/search">
-	<input class="input" type="text" name="q"
+        <label class="visually-hidden" for="q">
+          Search Terms
+        </label>
+	<input class="input" type="text" name="q" id="q"
 		placeholder="Search our online catalog"
 		value="{{ q }}">
 	<button class="button" type="submit">
@@ -70,6 +74,7 @@
         <a class="button"
             href="/cart">
           <i class="bi bi-cart"></i>
+          <span class="visually-hidden">Shopping Cart</span>
           <span class="badge"></span>
         </a>
       </div>
