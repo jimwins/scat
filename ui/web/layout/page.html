@@ -18,6 +18,10 @@
   <link rel="stylesheet" type="text/css" href="/css/bootstrap-icons-1.8.2/bootstrap-icons.css">
   <link rel="stylesheet" type="text/css" href="/css/web.css">
 
+  {% if DEBUG %}
+    <script src="/js/dummy-zaraz.js"></script>
+  {% endif %}
+
   {% block extra_header %}{% endblock %}
 </head>
 
