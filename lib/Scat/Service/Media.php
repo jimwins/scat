@@ -27,8 +27,9 @@ class Media
 
   public function createFromUrl($url) {
     $upload= $this->ordure->grabImage($url);
+    $base= $this->config->get('gumlet.base_url');
 
-    $url= 'https:' . GUMLET_BASE .
+    $url= 'https:' . $base .
            $upload->uuid . '.' . $upload->ext .
            '?fm=json';
     $body= file_get_contents($url);
@@ -63,7 +64,8 @@ class Media
       'Body' => $file,
     ]);
 
-    $url= 'https:' . GUMLET_BASE .
+    $base= $this->config->get('gumlet.base_url');
+    $url= 'https:' . $base .
            $uuid . '.' . $ext .
            '?fm=json';
     $body= file_get_contents($url);
