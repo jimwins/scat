@@ -19,7 +19,7 @@ if (file_exists($config_file)) {
   $config= require $config_file;
 } else {
   $config= [
-    'data' => [
+    'webdata' => [
       'dsn' => 'mysql:host=db;dbname=scat;charset=utf8mb4',
       'options' => [
         'return_result_sets' => true,
