@@ -116,24 +116,27 @@ class ProductToImage extends \Scat\Model {
  */
 class DummyMedia {
   private $image;
+  private $static;
 
   function __construct($image) {
     $this->image= $image;
+    $config= $GLOBALS['container']->get(\Scat\Service\Config::class);
+    $this->static= $config->get('ordure.static_url');
   }
 
   function original() {
-    return ORDURE_STATIC . $this->image;
+    return $this->static . $this->image;
   }
 
   function medium() {
-    return ORDURE_STATIC . $this->image;
+    return $this->static . $this->image;
   }
 
   function thumbnail() {
-    return ORDURE_STATIC . $this->image;
+    return $this->static . $this->image;
   }
 
   function large_square() {
-    return ORDURE_STATIC . $this->image;
+    return $this->static . $this->image;
   }
 }
