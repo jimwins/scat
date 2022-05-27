@@ -23,6 +23,23 @@
 
 <body>
 
+  {% set banner= config('banner') %}
+  {% if banner %}
+    <style>
+      .top-banner {
+        position: sticky;
+        top: 0; left: 0;
+        border: 1px solid red;
+        padding: 0.25em 1em;
+        background: #fee;
+        z-index: 300;
+      }
+    </style>
+    <div class="top-banner">
+      {{ banner | raw }}
+    </div>
+  {% endif %}
+
   <header>
     <nav id="site-navigation">
       <a id="site-dept-menu" class="button nav-button"
