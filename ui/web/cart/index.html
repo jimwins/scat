@@ -293,6 +293,24 @@ but as a fallback you can chain `:not()` instead */
 {% endblock %}
 
 {% block script %}
+  <script>
+    zaraz.ecommerce('Cart Viewed', {
+      products: [
+        {% for line in cart.items.find_many() %}
+          {% set item= line.item %}
+          {
+            product_id: '{{ line.code }}',
+            name: '{{ line.name }}',
+            category: '{{ item.category }}',
+            brand: '{{ item.product.brand.name }}',
+            price: '{{ line.sale_price }}',
+            currency: 'usd',
+            quantity: '{{ line.quantity }}',
+          },
+        {% endfor %}
+      ]
+    })
+  </script>
   {% if amzn.merchant_id %}
     <script src="https://static-na.payments-amazon.com/checkout.js"></script>
     <script type="text/javascript" charset="utf-8">
