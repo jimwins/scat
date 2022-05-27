@@ -191,6 +191,21 @@ class Item extends \Scat\Model {
     $rel->save();
   }
 
+  public function category() {
+    $product= $this->product();
+    if ($product)
+      $subdept= $product->dept();
+    if ($subdept)
+      $dept= $subdept->parent();
+    if (!$product || !$subdept || !$dept)
+      return "";
+
+    return
+      $dept->name . ' > ' .
+      $subdept->name . ' > ' .
+      $product->name;
+  }
+
   public function full_slug() {
     $product= $this->product();
     if ($product)

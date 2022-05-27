@@ -210,7 +210,7 @@ figure img {
   <script>
     zaraz.ecommerce('Product Viewed', {
       product_id : '{{ item.code }}',
-      category : '{{ dept.name ~ "/" ~ subdept.name }}',
+      category : '{{ item.category }}',
       name : '{{ item.name }}',
       brand : '{{ product.brand.name }}',
       price : '{{ item.sale_price }}',

@@ -95,3 +95,20 @@
 {% endfor %}
 {{ s.end_table() }}
 </div><!-- .item-list -->
+
+<script>
+  zaraz.ecommerce('Product List Viewed', {
+    products: [
+      {% for item in items %}
+        {
+          product_id: '{{ item.code }}',
+          name: '{{ item.name }}',
+          price: '{{ item.sale_price }}',
+          currency: 'usd',
+          brand: '{{ item.product.brand.name }}',
+          category: '{{ item.category }}',
+        },
+      {% endfor %}
+    ]
+  })
+</script>
