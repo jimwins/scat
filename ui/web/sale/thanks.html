@@ -32,3 +32,31 @@
   {% embed 'cart/cart.twig' with { cart: sale } %}
   {% endembed %}
 {% endblock %}
+
+{% block script %}
+  <script>
+    zaraz.ecommerce('Order Completed', {
+      checkout_id: '{{ cart.id }}',
+      order_id: '{{ cart.uuid }}',
+      subtotal: '{{ cart.subtotal }}',
+      shipping: '{{ cart.shipping }}',
+      tax: '{{ cart.tax }}',
+      total: '{{ cart.total }}',
+      currency: 'usd',
+      products: [
+        {% for line in cart.items.find_many() %}
+          {% set item= line.item %}
+          {
+            product_id: '{{ line.code }}',
+            name: '{{ line.name }}',
+            category: '{{ item.category }}',
+            brand: '{{ item.product.brand.name }}',
+            price: '{{ line.sale_price }}',
+            currency: 'usd',
+            quantity: '{{ line.quantity }}',
+          },
+        {% endfor %}
+      ]
+    })
+  </script>
+{% endblock %}
