@@ -10,6 +10,7 @@ class InitialFunctions extends AbstractMigration
 CREATE FUNCTION
 ROUND_TO_EVEN(val DECIMAL(32,16), places INT)
 RETURNS DECIMAL(32,16) DETERMINISTIC
+READS SQL DATA
 BEGIN
   RETURN IF(ABS(val - TRUNCATE(val, places)) * POWER(10, places + 1) = 5 
             AND NOT CONVERT(TRUNCATE(ABS(val) * POWER(10, places), 0),
@@ -23,6 +24,7 @@ EOF;
 CREATE FUNCTION
 SALE_PRICE(retail_price DECIMAL(9,2), type CHAR(32), discount DECIMAL(9,2))
 RETURNS DECIMAL(9,2) DETERMINISTIC
+READS SQL DATA
 BEGIN
   RETURN IF(type IS NOT NULL AND type != '',
             CASE type
