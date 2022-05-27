@@ -22,7 +22,6 @@ if (file_exists($config_file)) {
     'webdata' => [
       'dsn' => 'mysql:host=db;dbname=web;charset=utf8mb4',
       'options' => [
-        'return_result_sets' => true,
         'username' => $_ENV['MYSQL_USER'],
         'password' => $_ENV['MYSQL_PASSWORD'],
       ],
