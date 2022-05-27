@@ -483,6 +483,11 @@ class Cart {
     }
     $person= $this->auth->get_person_details($request);
 
+    $disabled= $this->config->get('disable_checkout');
+    if ($disabled) {
+      throw new \Exception("Sorry, checkout is currently disabled.");
+    }
+
     $paymentIntent= $stripe->getPaymentIntent($cart);
 
     $cart->stripe_payment_intent_id= $paymentIntent->id;

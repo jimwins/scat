@@ -253,7 +253,7 @@ but as a fallback you can chain `:not()` instead */
           </form>
         </div>
       {% endif %}
-      {% if amzn.merchant_id %}
+      {% if amzn.merchant_id and not config('disable_checkout') %}
         <div class="card cold">
           <h2>Amazon Pay Checkout</h2>
           <p>
