@@ -271,6 +271,11 @@ if ($DEBUG) {
             })->setName('info');
 }
 
+/* Robot stuff */
+$app->get('/robots.txt', [ \Scat\Web\Page::class, 'robotsTxt' ]);
+$app->get('/sitemap.xml', [ \Scat\Web\Page::class, 'sitemap' ])
+  ->setName('sitemap');
+
 /* Pages (everything else) */
 $app->get('/{param:.*}', [ \Scat\Web\Page::class, 'page' ]);
 if ($DEBUG) {

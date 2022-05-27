@@ -1,0 +1,11 @@
+{% if config('disable_checkout') %}
+User-agent: *
+Disallow: /
+{% endif %}
+
+Sitemap: {{ full_url_for('sitemap') }}
+
+User-agent: *
+Disallow: /sale/
+Disallow: /cart
+Disallow: /cart/

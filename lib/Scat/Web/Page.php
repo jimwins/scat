@@ -57,4 +57,13 @@ class Page {
 
     return $response->withRedirect($uri);
   }
+
+  function robotsTxt(Request $request, Response $response) {
+    return $this->view->render($response, 'robots.txt')
+                ->withHeader('Content-type', 'text/plain;charset=UTF-8');
+  }
+
+  function sitemap(Request $request, Response $response) {
+    // TODO
+  }
 }
