@@ -4,13 +4,17 @@
 {% macro begin_table() %}
   <table>
     <thead>
-      <th width="15%">Item No.</th>
-      <th>Description</th>
+      <th width="15%">Item&nbsp;No.</th>
+      <th class="description">Description</th>
       <th width="8%">List</th>
       <th width="8%">Sale</th>
-      <th width="10%" class="avail">In Stock</th>
-      <th width="16">&nbsp;</th>
-      <th width="160">&nbsp;</th>
+      <th width="10%" class="avail">In&nbsp;Stock</th>
+      <th width="16">
+        <span class="visually-hidden">Notices</span>
+      </th>
+      <th width="160">
+        <span class="visually-hidden">Add to Cart</span>
+      </th>
     </thead>
     <tbody>
 {% endmacro %}
@@ -67,6 +71,16 @@
     }
     .item-list table tbody tr {
       border-bottom: calc(var(--border-width) / 2) solid #ddd;
+    }
+
+    @media (max-width: 599.98px) {
+      .item-list tr {
+        display: grid;
+        grid: auto-flow / 6em auto auto;
+      }
+      .item-list .description {
+        grid-column-end: span 2;
+      }
     }
   </style>
 
