@@ -26,6 +26,7 @@ class TwigExtension
     return [
       new \Twig\TwigFunction('notes', [ $this, 'getNotes' ]),
       new \Twig\TwigFunction('config', [ $this, 'getConfig' ]),
+      new \Twig\TwigFunction('item', [ $this, 'getItem' ]),
       new \Twig\TwigFunction('topDepartments', [ $this, 'topDepartments' ]),
     ];
   }
@@ -53,11 +54,16 @@ class TwigExtension
     return $this->config->get($name);
   }
 
+  /* XXX really should be using Catalog service or something */
   public function topDepartments() {
     return \Titi\Model::factory('Department')
              ->where('parent_id', 0)
              ->order_by_asc('name')
              ->find_many();
+  }
+
+  public function getItem($code) {
+    return \Titi\Model::factory('Item')->where('code', $code)->find_one();
   }
 
   public function phone_number_format($phone, $country_code= 'US') {

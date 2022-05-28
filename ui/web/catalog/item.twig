@@ -154,30 +154,7 @@ figure img {
 
   <div class="order">
     {% if item.stock or not item.no_backorder %}
-      <form class="form-inline add-item"
-            action="/cart/add-item" method="POST">
-        <input type="hidden" name="item" value="{{ item.code }}">
-        <input type="hidden" name="name" value="{{ item.name }}">
-        <input type="hidden" name="sale_price"
-               value="{{ item.sale_price }}">
-        <div class="input-group">
-          <label for="quantity">
-            Quantity
-          </label>
-          <input type="text" class="input"
-                 id="quantity" name="quantity"
-                 value="{{ item.purchase_quantity }}">
-        </div>
-        {% if item.purchase_quantity > 1 %}
-          <span class="help-block">
-            Must be multiple of {{ item.purchase_quantity }}.
-          </span>
-        {% endif %}
-        <button type="submit" class="button block">
-          <i class="bi bi-cart-plus"></i>
-          <span class="label">Add to Cart</span>
-        </button>
-      </form>
+      {{ include('add-to-cart.twig') }}
     {% else %}
       <button class="button block" disabled>
         Unavailable

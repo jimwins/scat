@@ -1,0 +1,30 @@
+{% import 'macros.twig' as scat %}
+<form class="add-item" action="/cart/add-item" method="POST">
+  <input type="hidden" name="item" value="{{ item.code }}">
+  <input type="hidden" name="name" value="{{ item.name }}">
+  <input type="hidden" name="brand" value="{{ item.brand_name }}">
+  <input type="hidden" name="category" value="{{ item.category }}">
+  <input type="hidden" name="sale_price" value="{{ item.sale_price }}">
+  {% if not fixed_quantity and not quantity %}
+    <div class="input-group">
+      <label for="quantity">
+        Quantity
+      </label>
+      <input type="text" class="input"
+             id="quantity" name="quantity"
+             value="{{ item.purchase_quantity ?: 1 }}">
+    </div>
+    {% if item.purchase_quantity > 1 %}
+      <span class="help-block">
+        Must be multiple of {{ item.purchase_quantity }}.
+      </span>
+    {% endif %}
+  {% else %}
+    <input type="hidden" name="quantity"
+            value="{{ quantity ?? item.purchase_quantity ?: 1}}">
+  {% endif %}
+  <button type="submit" class="button {{ button_size ?? 'block' }}">
+    <i class="bi bi-cart-plus"></i>
+    <span class="label">Add to Cart</span>
+  </button>
+</form>

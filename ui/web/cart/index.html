@@ -8,15 +8,8 @@
 {% block notice %}
   {% if removed %}
     <div class="alert alert-danger">
-      Item removed from cart.
-      <form method="POST" action="/cart/add-item">
-        <input type="hidden" name="item" value="{{ removed }}">
-        <input type="hidden" name="quantity" value="{{ quantity }}">
-        <button class="button">
-          <i class="bi bi-arrow-counterclockwise"></i>
-          <span class="label">Undo</span>
-        </button>
-      </form>
+      Item removed from cart. Add it back:
+      {{ include('add-to-cart.twig', { item: item(removed), quantity: quantity, button_size: '' }) }}
     </div>
   {% endif %}
   {% if help %}
@@ -302,7 +295,7 @@ but as a fallback you can chain `:not()` instead */
             product_id: '{{ line.code }}',
             name: '{{ line.name }}',
             category: '{{ item.category }}',
-            brand: '{{ item.product.brand.name }}',
+            brand: '{{ item.brand_name }}',
             price: '{{ line.sale_price }}',
             currency: 'usd',
             quantity: '{{ line.quantity }}',

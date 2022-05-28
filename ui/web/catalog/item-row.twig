@@ -96,12 +96,6 @@
     {% endif %}
   </td>
   <td class="text-right">
-    <form method="POST" action="/cart/add-item">
-      <input type="hidden" name="item" value="{{ i.code }}">
-      <button type="submit" class="button small">
-        <i class="bi bi-cart-plus"></i>
-        <span class="label">Add to Cart</span>
-      </button>
-    </form>
+    {{ include('add-to-cart.twig', { item: i, fixed_quantity: true, button_size: 'small' }) }}
   </td>
 </tr>

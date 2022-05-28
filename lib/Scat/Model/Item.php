@@ -191,6 +191,15 @@ class Item extends \Scat\Model {
     $rel->save();
   }
 
+  public function brand_name() {
+    $product= $this->product();
+    if ($product)
+      $brand= $product->brand();
+    if ($brand)
+      return $brand->name;
+    return "";
+  }
+
   public function category() {
     $product= $this->product();
     if ($product)
