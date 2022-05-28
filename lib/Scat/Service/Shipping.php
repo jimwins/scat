@@ -350,12 +350,12 @@ class Shipping
     $weight= $cart->get_shipping_weight();
     $hazmat= $cart->has_hazmat_items();
 
+    $shipping_options= [];
+
     /* Can only calculate shipping if it fits in a box and has weight */
     if ($box && $weight) {
       $from= $this->getDefaultFromAddress();
       $to= $this->getAddress($address);
-
-      $shipping_options= [];
 
       $options= [];
       if ($hazmat) {
