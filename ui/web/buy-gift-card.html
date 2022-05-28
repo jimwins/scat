@@ -1,0 +1,202 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title -%}
+  Buy a Gift Card
+{%- endblock %}
+
+{% block content %}
+  <h1 class="page-heading">Buy a Gift Card</h1>
+
+  <p class="lead">We offer gift cards in any amount that can be used at our store in downtown Los Angeles or in our online store.</p>
+
+  <p>Give the gift of art supplies!</p>
+
+  <div class="alert alert-danger">
+    <strong>Gift cards will be emailed within 24 hours.</strong>
+  </div>
+
+  <form id="payment-form" class="stacked-form">
+
+    <label for="name">Your name</label>
+    <input type="text" class="input" autocomplete="name" required
+            id="name" name="name" placeholder="Lorenzo de' Medici">
+
+    <div id="link-authentication-element"></div>
+    <input type="hidden" name="email">
+
+    <label for="comment">Message</label>
+    <textarea class="input" rows="4"
+              id="comment" name="comment"
+              placeholder="Enter your message for the gift recipient here."
+    ></textarea>
+
+    <label for="recipient_name">Recipient name</label>
+    <input type="text" class="input" autocomplete="shipping name"
+            id="recipient_name" name="recipient_name" required
+            placeholder="Leonardo da Vinci">
+
+    <label for="recipient_email">Recipient email</label>
+    <input type="email" class="input" autocomplete="shipping email"
+            id="recipient_email" name="recipient_email" required
+            placeholder="leonardo.da.vinci@example.com">
+
+    <label for="amount">Amount</label>
+    <input type="text" class="input" autocomplete="transaction-amount"
+            name="amount" required placeholder="$0.00">
+
+    <div id="payment-element"></div>
+
+    <button type="submit" id="stripe-button" class="button" disabled>
+      Complete Details Above
+    </button>
+  </form>
+{% endblock %}
+
+{% block extra_header %}
+  <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block script %}
+  <script>
+    {{ include('cart/shared.js', { amount_only: true }) }}
+
+    const stripe= Stripe('{{ stripe.key }}', {
+      betas: ['link_beta_3'],
+      apiVersion: "2020-08-27;link_beta=v1"
+    });
+    const clientSecret= '{{ stripe.payment_intent.client_secret }}';
+
+    const appearance= {
+      variables: {
+        colorPrimary: 'var(--primary-color)',
+      }
+    };
+
+    const elements= stripe.elements({clientSecret, appearance});
+
+    const linkAuthenticationElement= elements.create("linkAuthentication", {
+      {% if cart.email %}
+        defaultValues: { email: "{{ person.email }}" }
+      {% endif %}
+    });
+
+    linkAuthenticationElement.mount("#link-authentication-element");
+
+    const paymentElement= elements.create("payment");
+    paymentElement.mount("#payment-element");
+
+    let form= document.getElementById('payment-form');
+    let button= document.getElementById('stripe-button')
+
+    const updateAmount= (gc_amount) => {
+      form.setAttribute('disabled', '')
+
+      return fetch('/buy-gift-card', {
+        'method': 'POST',
+        'headers' : {
+          'Accept': 'application/json',
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          action : 'update',
+          payment_intent_id: '{{ stripe.payment_intent.id }}',
+          amount : gc_amount
+        })
+      }).then((res) => {
+        if (res.redirected) {
+          window.location.href= res.url
+        } else if (res.status >= 200 && res.status < 300) {
+          return Promise.resolve(res)
+        }
+        /* Handle JSON error response by pulling the error message out */
+        if (res.headers.get('Content-type').indexOf("application/json") !== -1)
+        {
+          return res.json()
+                    .then((data) => {
+                      return Promise.reject(new Error(data.message))
+                    })
+        }
+        return Promise.reject(new Error(res.statusText))
+      }).then((res) => {
+        return res.json()
+      }).then((data) => {
+        if (data.amount) {
+          button.removeAttribute('disabled')
+          button.textContent= 'Pay ' + amount(data.amount/100)
+        } else {
+          return Promise.reject(new Error("Unable to determine amount."))
+        }
+      })
+      .catch((err) => {
+        button.setAttribute('disabled', '')
+        button.textContent= 'Complete Details Above'
+      })
+      .finally(() => {
+        form.removeAttribute('disabled')
+      })
+    }
+
+    let timeout= null;
+
+    linkAuthenticationElement.on('change', (event) => {
+      form.elements['email'].value= event.value.email
+    });
+
+    form.elements['amount'].addEventListener('change', (event) => {
+      const amount= event.currentTarget.value;
+      clearTimeout(timeout);
+      timeout= setTimeout(() => {
+        updateAmount(amount)
+      }, 500);
+    })
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      if (form.getAttribute('disabled')) {
+        return
+      }
+
+      form.setAttribute('disabled', '')
+
+      return stripe.confirmPayment({
+        elements,
+        redirect: 'if_required',
+        confirmParams: {
+          return_url: '{{ full_url_for('buy-gift-card') }}',
+        }
+      }).then((res) => {
+        if (res.error) {
+          return Promise.reject(new Error(result.error.message))
+        }
+
+        let formData= new FormData(form)
+        formData.set('action', 'finalize');
+        formData.set('payment_intent_id', res.paymentIntent.id)
+
+        return fetch('/buy-gift-card', {
+          method: 'post',
+          'headers' : {
+            'Accept': 'application/json',
+            'Content-type': 'application/json',
+          },
+          body: JSON.stringify(Object.fromEntries(formData))
+        }).then((res) => {
+          if (res.ok) {
+            window.location.href= '/gift-card/thanks';
+          } else {
+            alert("Unable to process payment")
+          }
+        }).catch((err) => {
+          alert(err.message)
+        })
+      }).catch((error) => {
+        form.removeAttribute('disabled')
+        // Show error to your customer (for example, payment details incomplete)
+        alert(error.message);
+      })
+    });
+
+  </script>
+{% endblock %}

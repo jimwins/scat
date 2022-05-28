@@ -205,6 +205,11 @@ $app->post('/contact', [ \Scat\Web\Contact::class, 'handleContact' ])
     ->add(new \RKA\Middleware\IpAddress(/* TODO check proxy? */))
     ->setName('handleContact');
 
+/* Gift cards */
+$app->get('/buy-gift-card', [ \Scat\Web\Giftcard::class, 'form' ])
+    ->setName('buy-gift-card');
+$app->post('/buy-gift-card', [ \Scat\Web\Giftcard::class, 'process' ]);
+
 /* Tracking */
 $app->group('/track', function (RouteCollectorProxy $app) {
   $app->get('/{service}/{code}', function ($request, $response, $service, $code)
