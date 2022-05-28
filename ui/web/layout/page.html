@@ -303,6 +303,19 @@
     document.querySelectorAll('form.add-item').forEach((form) => {
       form.addEventListener('submit', recordAddToCart)
     })
+
+    let recordRemoveFromCart= (ev) => {
+      let data= ev.currentTarget.dataset
+      zaraz.ecommerce('Product Removed', {
+        product_id: data.code,
+        quantity: data.quantity
+      })
+      return true
+    }
+
+    document.querySelectorAll('a.remove-item').forEach((a) => {
+      a.addEventListener('click', recordRemoveFromCart)
+    })
   </script>
 
   {% block script %}{% endblock %}

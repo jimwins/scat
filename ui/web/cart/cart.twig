@@ -53,7 +53,7 @@
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
-  .edit-quantity .remove {
+  .edit-quantity .remove-item {
     margin-left: 0.25em;
   }
   .pay-button {
@@ -99,7 +99,9 @@
                 <span class="visually-hidden">Update</span>
               </button>
               <a href="/cart/remove-item?line_id={{ line.id }}"
-                 class="remove button min">
+                  data-code="{{ line.item.code }}"
+                  data-quantity="{{ line.quantity }}"
+                  class="remove-item button min">
                 <i class="bi bi-cart-dash"></i>
               </a>
             </form>
