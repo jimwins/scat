@@ -122,4 +122,11 @@ class Catalog {
 
     return $response->withJson([ 'message' => "Loaded {$rows} prices." ]);
   }
+
+  public function sitemap(Request $request, Response $response) {
+    $products= $this->catalog->getProducts();
+    return $this->view->render($response, 'catalog/sitemap.xml', [
+      'products' => $products
+    ])->withHeader('Content-type', 'text/xml;charset=UTF-8');
+  }
 }

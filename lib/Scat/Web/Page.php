@@ -66,6 +66,7 @@ class Page {
   }
 
   function sitemap(Request $request, Response $response) {
-    // TODO
+    return $this->view->render($response, 'sitemap.xml')
+                ->withHeader('Content-type', 'text/xml;charset=UTF-8');
   }
 }

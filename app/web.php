@@ -120,6 +120,8 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
       ->setName('catalog-whats-new');
   $app->get('/brand[/{brand}]', [ \Scat\Controller\Catalog::class, 'brand' ])
       ->setName('catalog-brand');
+  $app->get('/sitemap.xml', [ \Scat\Web\Catalog::class, 'sitemap' ])
+      ->setName('catalog-sitemap');
   $app->get('[/{dept}[/{subdept}[/{product}[/{item:.*}]]]]',
             [ \Scat\Controller\Catalog::class, 'catalogPage' ])
       ->setName('catalog')
@@ -276,7 +278,8 @@ $app->get('/sitemap.xml', [ \Scat\Web\Page::class, 'sitemap' ])
   ->setName('sitemap');
 
 /* Pages (everything else) */
-$app->get('/{param:.*}', [ \Scat\Web\Page::class, 'page' ]);
+$app->get('/{param:.*}', [ \Scat\Web\Page::class, 'page' ])
+  ->setName('page');
 if ($DEBUG) {
   $app->post('/~edit/{param:.*}', [ \Scat\Web\Page::class, 'savePage' ]);
 }
