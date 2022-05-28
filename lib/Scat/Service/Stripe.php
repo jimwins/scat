@@ -21,6 +21,20 @@ class Stripe {
     return $this->public_key;
   }
 
+  public function createPaymentIntent($details) {
+    $stripe= $this->getClient();
+
+    $full_details= array_merge([
+      'payment_method_types' => [
+        'link',
+        'card'
+      ],
+      'currency' => 'usd',
+    ], $details);
+
+    return $stripe->paymentIntents->create($full_details);
+  }
+
   public function getPaymentIntent($cart) {
     $stripe= $this->getClient();
 
