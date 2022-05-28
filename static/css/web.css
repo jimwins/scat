@@ -56,6 +56,9 @@ footer li:last-child:after {
 
 /* horizontal phone, tablet */
 @media (min-width: 600px) {
+  .mobile-only {
+    display: none;
+  }
 }
 
 /* horizontal tablet, desktop window */
