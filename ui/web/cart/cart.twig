@@ -268,7 +268,7 @@
     {% endif %}
   </tfoot>
 </table>
-{% if not skip_address or cart.shipping_address_id <= 1 %}
+{% if not skip_address and cart.shipping_address_id > 1 %}
   <h3>Shipping Address</h3>
   {% set shipping_address= cart.shipping_address %}
   <div>{{ shipping_address.name }}</div>
