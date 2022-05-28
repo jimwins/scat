@@ -59,13 +59,23 @@
   .pay-button {
     margin-bottom: 0.5em;
   }
+
+  @media (max-width: 599.98px) {
+    table.cart tr {
+      display: grid;
+      grid: auto-flow / auto auto;
+    }
+    table.cart .hidden-xs {
+      display: none;
+    }
+  }
 </style>
 <table class="cart">
   <thead>
     <tr>
       <th width="15%">Quantity</th>
-      <th width="10%">Code</th>
-      <th>Name</th>
+      <th class="hidden-xs" width="10%">Code</th>
+      <th class="description">Name</th>
       <th width="8%" align="right">Price</th>
       <th width="8%" align="right">Ext</th>
     </tr>
@@ -129,7 +139,7 @@
           </small>
         </td>
         <td class="hidden-xs"><small>{{ item.code }}</small></td>
-        <td>
+        <td class="description">
           {% if item.hazmat %}
             <a class="pull-right" href="/shipping#hazmat" data-toggle="tooltip" title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="20" alt="Hazardous Materials"></a>
           {% endif %}
@@ -168,11 +178,7 @@
   </tbody>
   <tfoot>
     <tr>
-      <td rowspan="4" colspan="2">
-        {% block buttons %}
-        {% endblock %}
-      </td>
-      <td colspan="2" align="right">
+      <td colspan="3" align="right">
         Subtotal:
       </td>
       <td align="right">
@@ -181,7 +187,7 @@
     </tr>
     <tr>
       {% if cart.shipping_method %}
-        <td colspan="2" align="right">
+        <td colspan="3" align="right">
           {% if cart.shipping_address_id == 1 %}
             Pickup at store:
           {% elseif cart.shipping_method == 'local_delivery' %}
@@ -198,7 +204,7 @@
           {{ scat.amount(cart.shipping) }}
         </td>
       {% else %}
-        <td colspan="2" align="right">
+        <td colspan="3" align="right">
           Shipping &amp; Handling:
           <br>or pick up in store for no charge.
         </td>
@@ -208,7 +214,7 @@
       {% endif %}
     </tr>
     <tr>
-      <td colspan="2" align="right">
+      <td colspan="3" align="right">
         {% if cart.status == 'cart' %}
           Estimated tax:
         {% else %}
@@ -226,7 +232,7 @@
       </td>
     </tr>
     <tr>
-      <td colspan="2" align="right">Total:</td>
+      <td colspan="3" align="right">Total:</td>
       <td align="right">
         {% if cart.shipping_method and cart.tax_calculated %}
           {{ scat.amount(cart.total) }}
@@ -239,7 +245,7 @@
     {% if payments|length %}
       {% for payment in payments %}
         <tr>
-          <td colspan="4" align="right">
+          <td colspan="3" align="right">
             {{ payment.pretty_method }}:
           </td>
           <td align="right">
@@ -248,7 +254,7 @@
         </tr>
       {% endfor %}
       <tr>
-        <td colspan="4" align="right">
+        <td colspan="3" align="right">
           Due:
         </td>
         <td align="right">
