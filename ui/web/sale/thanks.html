@@ -36,15 +36,15 @@
 {% block script %}
   <script>
     zaraz.ecommerce('Order Completed', {
-      checkout_id: '{{ cart.id }}',
-      order_id: '{{ cart.uuid }}',
-      subtotal: '{{ cart.subtotal }}',
-      shipping: '{{ cart.shipping }}',
-      tax: '{{ cart.tax }}',
-      total: '{{ cart.total }}',
+      checkout_id: '{{ sale.id }}',
+      order_id: '{{ sale.uuid }}',
+      subtotal: '{{ sale.subtotal }}',
+      shipping: '{{ sale.shipping }}',
+      tax: '{{ sale.tax }}',
+      total: '{{ sale.total }}',
       currency: 'usd',
       products: [
-        {% for line in cart.items.find_many() %}
+        {% for line in sale.items.find_many() %}
           {% set item= line.item %}
           {
             product_id: '{{ line.code }}',
