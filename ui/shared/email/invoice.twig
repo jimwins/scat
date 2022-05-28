@@ -162,40 +162,6 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-6">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">
-              <i class="fa fa-address-card-o"></i>
-              Billing Address
-            </h3>
-          </div>
-          <div class="panel-body">
-            {% if not billing_address.id %}
-              Not specified.
-            {% else %}
-              {% if shipping.address_id == billing_address.id %}
-                <div>
-                  Same as shipping address.
-                </div>
-              {% else %}
-                <div>{{ billing_address.name }}</div>
-                <div>{{ billing_address.company }}</div>
-                <div>{{ billing_address.phone | phone_number_format }}</div>
-                <div>{{ billing_address.address1 }}</div>
-                <div>{{ billing_address.address2 }}</div>
-                <div>
-                  {{ billing_address.city }}, {{ billing_address.state }}
-                  {{ billing_address.zip5 }}{{ billing_address.zip4 ? "-" ~ billing_address.zip4 : "" }}
-                </div>
-              {% endif %}
-            {% endif %}
-            {% if action == 'pay' and sale.status == 'unpaid' %}
-              <small><a href="./checkout?billing=1">(change)</a></small>
-            {% endif %}
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
