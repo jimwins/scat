@@ -16,6 +16,8 @@ function amount(val) {
   }
 }
 
+{% if not amount_only %}
+
 function updateCart(details) {
   let form= document.getElementById('payment-form')
   form.setAttribute('disabled', '')
@@ -123,3 +125,5 @@ document.getElementById('apply-gift-card').addEventListener('click', (ev) => {
     alert(err.message)
   })
 })
+
+{% endif %}
