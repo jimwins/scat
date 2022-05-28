@@ -570,6 +570,8 @@ class Shipping
 
     $item_dims= $cart->get_item_dims();
 
+    if (!$item_dims) return;
+
     $best= null;
     // figure out cargo size
     foreach ($truck_sizes as $name => $sizes) {
