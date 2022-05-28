@@ -104,6 +104,11 @@
         <div id="paypal-buttons" {{ not cart.ready_for_payment ? 'disabled' }}>
         </div>
       </div>
+      <style>
+        div#paypal-buttons[disabled] {
+          opacity: 50%;
+        }
+      </style>
     </div>
 
     {% block cart %}
