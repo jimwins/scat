@@ -96,7 +96,8 @@ body {
   white-space: nowrap; /* added line to stop words getting smushed together (as they go onto seperate lines and some screen readers do not understand line feeds as a space */
 }
 
-body > * {
+/* was body > *, but be explicit to not mess with UserWay elements */
+.top-banner, header, style, main, footer {
   --max-width: 1070px;
   width: min(100%, var(--max-width));
   margin-left: auto;
@@ -129,7 +130,7 @@ address {
 footer > div:last-child {
   background: #eee;
   border-top: var(--border-width) solid #ccc;
-  padding: 0 1rem;
+  padding: 0 1em 1em;
   border-bottom-right-radius: calc(var(--border-radius) - 1px);
   border-bottom-left-radius: calc(var(--border-radius) - 1px);
 }
