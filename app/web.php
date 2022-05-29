@@ -262,6 +262,10 @@ $app->group('', function (RouteCollectorProxy $app) {
 });
 
 /* Webhooks */
+$app->any('/~webhook/test/{name:.*}',
+          [ \Scat\Web\Webhook::class, 'testWebhook' ]);
+$app->any('/~webhook/{name:.*}',
+          [ \Scat\Web\Webhook::class, 'production' ]);
 
 /* BTS stuff */
 $app->post('/update-pricing', [ \Scat\Web\Catalog::class, 'updatePricing' ]);

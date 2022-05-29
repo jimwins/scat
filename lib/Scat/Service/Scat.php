@@ -4,11 +4,9 @@ namespace Scat\Service;
 class Scat
 {
   public $url;
-  public $key;
 
   public function __construct(Config $config) {
     $this->url= $config->get('scat.url');
-    $this->key= $config->get('scat.key');
   }
 
   public function find_person($loyalty) {
