@@ -505,7 +505,7 @@ class Quickbooks {
 
     $name= addslashes($name);
 
-    if ($cache[$name]) {
+    if (array_key_exists($name, $cache)) {
       return $cache[$name];
     }
 
