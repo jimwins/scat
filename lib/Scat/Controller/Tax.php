@@ -62,6 +62,8 @@ class Tax {
   {
     $missed= $txn->find('customer', 0, 100, 'tax_captured:0')->find_many();
 
+    $errors= [];
+
     foreach ($missed as $sale) {
       error_log("found {$sale->id}\n");
       if ($sale->paid) {
