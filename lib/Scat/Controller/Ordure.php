@@ -507,7 +507,7 @@ class Ordure {
         continue;
       }
 
-      if ($seen[$email]++) {
+      if (@$seen[$email]++) {
         error_log("Skipping abandoned cart email: already today to $email\n");
         continue;
       }
