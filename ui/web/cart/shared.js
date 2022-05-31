@@ -105,9 +105,6 @@ function listenToShippingMethod() {
   if (!form.elements['shipping_method']) return;
 
   let methods= form.elements['shipping_method']
-  if (!Array.isArray(methods)) {
-    methods= [ methods ]
-  }
 
   methods.forEach((el) => {
     el.addEventListener('change', handleShippingMethodChange)
