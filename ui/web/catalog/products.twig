@@ -16,7 +16,7 @@
   }
 
   small, small a:link, small a:visited {
-    color: #999;
+    color: #555;
   }
 
   .thumbnail {
@@ -49,7 +49,7 @@
         {% if media is not empty %}
           <img class="media-object"
                src="{{ media[0].thumbnail }}"
-               alt="{{ media[0].alt_text }}">
+               alt="{{ media[0].alt_text ?: p.name }}">
         {% endif %}
       </a>
     </div>
