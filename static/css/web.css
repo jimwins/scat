@@ -356,7 +356,7 @@ a:hover, a:focus {
   margin-left: 0.5em;
   border-radius: calc(var(--border-radius) / 2);
   font-size: 0.8em;
-  color: var(--input-border);
+  color: var(--primary-color);
   background-color: #fff;
 }
 .badge:empty {
