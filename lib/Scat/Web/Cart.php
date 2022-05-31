@@ -375,8 +375,9 @@ class Cart {
       $line->save();
     }
 
-    $cart->shipping_method= null; // reset shipping
     $cart->recalculate($this->shipping, $this->tax);
+
+    $cart->save();
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
@@ -411,6 +412,8 @@ class Cart {
     $cart->recalculate($this->shipping, $this->tax);
 
     $cart->ensureBalanceDue();
+
+    $cart->save();
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
