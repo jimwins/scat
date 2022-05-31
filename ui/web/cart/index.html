@@ -209,7 +209,7 @@ but as a fallback you can chain `:not()` instead */
             <label for="loyalty">
               What is the phone number or email address for your account?
             </label>
-            <input type="text" class="input block"
+            <input type="text" class="input block" id="loyalty"
                     name="loyalty" value="{{ loyalty }}" required
                     placeholder="213-627-7223 or vincent.van.gogh@example.com">
 
@@ -236,7 +236,7 @@ but as a fallback you can chain `:not()` instead */
               What is your email address?
             </label>
             <input type="text" class="input block"
-                    name="email" value="{{ cart.email }}"
+                    id="email" name="email" value="{{ cart.email }}"
                     placeholder="vincent.van.gogh@example.com">
 
             <button type="submit" class="button">
@@ -273,10 +273,10 @@ but as a fallback you can chain `:not()` instead */
 
     <form class="stacked-form"
           method="POST" action="{# url_for('cart-retrieve') #}">
-      <label for="email">
+      <label for="cart_email">
         Email
       </label>
-      <input type="email" class="input" name="email">
+      <input type="email" class="input" name="email" id="cart_email">
       <button role="submit" class="button">
         <i class="bi bi-cart"></i>
         <span class="label">Retrieve Saved Cart</span>
