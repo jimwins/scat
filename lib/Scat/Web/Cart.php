@@ -375,6 +375,7 @@ class Cart {
       $line->save();
     }
 
+    $cart->shipping_method= null; // reset shipping
     $cart->recalculate($this->shipping, $this->tax);
 
     $accept= $request->getHeaderLine('Accept');
