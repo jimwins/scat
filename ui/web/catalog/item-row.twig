@@ -96,6 +96,12 @@
     {% endif %}
   </td>
   <td class="text-right">
-    {{ include('add-to-cart.twig', { item: i, fixed_quantity: true, button_size: 'small' }) }}
+    {% if not i.no_backorder or i.stock %}
+      {{ include('add-to-cart.twig', { item: i, fixed_quantity: true, button_size: 'small' }) }}
+    {% else %}
+      <button class="button" disabled>
+        Unavailable
+      </button>
+    {% endif %}
   </td>
 </tr>
