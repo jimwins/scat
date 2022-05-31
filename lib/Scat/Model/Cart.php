@@ -197,7 +197,7 @@ class Cart extends \Scat\Model {
         'width' => $item->width
       ];
 
-      $items+= array_fill(0, $line->quantity, $dims);
+      $items= array_merge($items, array_fill(0, $line->quantity, $dims));
     }
 
     return $items;
