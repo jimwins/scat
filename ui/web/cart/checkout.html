@@ -159,6 +159,7 @@
       stripeButton.setAttribute('disabled', '')
 
       let paypalButtons= document.getElementById('paypal-buttons');
+      paypalButtons.setAttribute('disabled', '')
       if (paypalButtons.actions) paypalButtons.actions.disable()
     }
 
@@ -168,6 +169,7 @@
       stripeButton.textContent= 'Pay ' + amount(due);
 
       let paypalButtons= document.getElementById('paypal-buttons');
+      paypalButtons.removeAttribute('disabled')
       if (paypalButtons.actions) paypalButtons.actions.enable()
     }
 
