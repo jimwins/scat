@@ -96,13 +96,13 @@
             <br>
             <small class="help-block">
           {% else %}
-            <label for="qty_{{ line.id }}" class="visually-hidden">
-              Quantity
-            </label>
             <form class="edit-quantity"
                   method="POST" action="/cart/update-item">
+              <label for="qty_{{ line.id }}" class="visually-hidden">
+                Quantity
+              </label>
               <input type="hidden" name="line_id" value="{{ line.id }}">
-              <input type="text" class="input"
+              <input type="text" class="input" id="qty_{{ line.id }}"
                      name="quantity" value="{{ line.quantity }}">
               <button type="submit" class="update button min">
                 <i class="bi bi-arrow-clockwise"></i>
