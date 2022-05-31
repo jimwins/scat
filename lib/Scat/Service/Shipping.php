@@ -354,6 +354,7 @@ class Shipping
 
     /* Can only calculate shipping if it fits in a box and has weight */
     if ($box && $weight) {
+      error_log("getting options for $weight lb box: " . json_encode($box));
       $from= $this->getDefaultFromAddress();
       $to= $this->getAddress($address);
 
