@@ -398,7 +398,7 @@ class Cart {
       throw new \Exception("Cart already completed, start another one.");
     }
 
-    $quantity= $request->getParam('quantity');
+    $quantity= (int)$request->getParam('quantity');
 
     $line= $cart->items()->find_one($line_id);
     if (!$line) {
