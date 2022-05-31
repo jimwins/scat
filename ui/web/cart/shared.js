@@ -106,6 +106,10 @@ function listenToShippingMethod() {
 
   let methods= form.elements['shipping_method']
 
+  if (methods.id) {
+    methods= [ methods ]
+  }
+
   methods.forEach((el) => {
     el.addEventListener('change', handleShippingMethodChange)
   })
