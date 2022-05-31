@@ -180,8 +180,15 @@ class Cart {
 
     $cart->ensureBalanceDue();
 
-    if ($cart->stripe_payment_intent_id) {
-      $amount= $cart->due();
+    $cart->save();
+
+    $cart->flushTotals();
+    $cart->reload();
+    $amount= $cart->due();
+
+    if ($cart->stripe_payment_intent_id && $amount) {
+
+      error_log("updating stripe intent to {$amount}");
 
       $payment_intent= $stripe->getPaymentIntent($cart);
 
@@ -232,11 +239,6 @@ class Cart {
         $intent_options
       );
     }
-
-    $cart->save();
-
-    $cart->flushTotals();
-    $cart->reload();
 
     $data= $cart->as_array();
 
