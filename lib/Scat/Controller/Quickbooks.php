@@ -339,7 +339,7 @@ class Quickbooks {
             $category= 'freight';
           }
 
-          $sales[$category]= bcadd($sales[$category], $line->ext_price());
+          $sales[$category]= bcadd(@$sales[$category], $line->ext_price());
           $total= bcadd($total, $line->ext_price());
           $costs= bcadd($costs, $line->cost_of_goods());
         }
@@ -525,7 +525,7 @@ class Quickbooks {
 
     $name= addslashes($name);
 
-    if ($cache[$name]) {
+    if (array_key_exists($name, $cache)) {
       return $cache[$name];
     }
 
