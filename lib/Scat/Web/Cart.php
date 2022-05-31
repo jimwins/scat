@@ -405,7 +405,16 @@ class Cart {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
-    $line->updateQuantity($quantity);
+    $details= [
+      'removed' => $line->item()->code,
+      'quantity' => $line->quantity,
+    ];
+
+    if ($quantity) {
+      $line->updateQuantity($quantity);
+    } else {
+      $line->delete(); /* takes care of kit items, too */
+    }
 
     $line->save();
 
@@ -420,7 +429,15 @@ class Cart {
       return $response->withJson($cart);
     }
 
-    return $response->withRedirect('/cart');
+    if ($quantity) {
+      return $response->withRedirect('/cart');
+    } else {
+      /* Bounce back to the cart with details so item can be re-added */
+      $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+      $link= $routeContext->getRouteParser()->urlFor('cart', [], $details);
+
+      return $response->withRedirect($link);
+    }
   }
 
   public function removeItem(Request $request, Response $response)
