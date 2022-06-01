@@ -319,7 +319,7 @@ class Person extends \Scat\Model {
     } elseif (preg_match('/^ColArt/', $line, $m)) {
       $sep= preg_match("/\t/", $line) ? "\t" : ",";
       // ColArt
-#,Order,Brand,Category,Range,Size/Format,Product Code,Description,Health Label,Series,Bar Code,MOQ,Inner Pack,Case Pack,Trade Discount,,Promo Discount,2020 MSRP,Net,Extended Net,USA MAP Pricing,Country of Origin,Harmonized Tariff Codes,Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),,,,,,,,,,,,,,
+#,Order,Brand,Category,Range,Size/Format,Product Code,Description,Product Notes,Health Label,Series,Bar Code,Inner Pack Bar Code,Case Pack Bar Code,MOQ,Inner Pack,Case Pack,Trade Discount,,Promo Discount,2020 MSRP,Net,Extended Net,USA MAP Pricing,Country of Origin,Harmonized Tariff Codes,Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),Height (Inches),Width (Inches),Depth (Inches),Cubic Feet,Weight (Oz),,,,,,,,,,,,,,
       error_log("Importing '$fn' as ColArt price list\n");
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
                 INTO TABLE vendor_upload
@@ -331,7 +331,7 @@ class Person extends \Scat\Model {
                vendor_sku, name, @notes, @health_label, @series,
                barcode, @inner_pack_upc, @case_pack_upc,
                purchase_quantity, @inner_pack, @case_pack,
-               @trade_discount, @promo_discount,
+               @trade_discount, @blank, @promo_discount,
                retail_price, net_price, @extended_net, @map_price,
                @country_of_origin,
                @tariff, height, width, length, @cubic, weight)
