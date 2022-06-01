@@ -349,9 +349,6 @@ class Cart {
       $cart->save();
     }
 
-    // TODO handle kits
-    // TODO add quantity to existing line instead of changing quantity
-
     $existing=
       $cart->items()
             ->where('item_id', $item->id)
