@@ -15,7 +15,7 @@
         {% if brand %}
           <li class="active">
             <a href="{{ url_for('catalog-brand', { 'brand' : brand.slug }) }}">
-              {{ brand.name }}
+              {{- brand.name -}}
             </a>
           </li>
         {% endif %}

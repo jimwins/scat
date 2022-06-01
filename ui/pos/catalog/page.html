@@ -31,7 +31,7 @@
               <li><a href="{{ url_for('catalog') }}">Catalog</a></li>
               <li class="{{ not subdept ? 'active' }}">
                 <a href="{{ url_for('catalog', { 'dept' : dept.slug }) }}">
-                  {{ dept.name }}
+                  {{- dept.name -}}
                 </a>
               </li>
               {% if subdept %}
@@ -39,7 +39,7 @@
                   <a style="{{ not subdept.active ? 'text-decoration: line-through' }}"
                      href="{{ url_for('catalog', {'dept': dept.slug,
                                                    'subdept': subdept.slug }) }}">
-                    {{ subdept.name }}
+                    {{- subdept.name -}}
                   </a>
                 </li>
               {% endif %}
@@ -48,7 +48,7 @@
                   <a href="{{ url_for('catalog', { 'dept': dept.slug,
                                                     'subdept': subdept.slug,
                                                     'product': product.slug}) }}">
-                    {{ product.name }}
+                    {{- product.name -}}
                   </a>
                 </li>
               {% endif %}
