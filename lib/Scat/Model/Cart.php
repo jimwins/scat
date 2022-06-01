@@ -596,6 +596,15 @@ class CartLine extends \Scat\Model {
 
     return parent::delete();
   }
+
+  public function as_array() {
+    $data= parent::as_array();
+    $data['code']= $this->code();
+    $data['name']= $this->name();
+    $data['detail']= $this->pricing_detail();
+    $data['sale_price']= $this->sale_price();
+    return $data;
+  }
 }
 
 class CartNote extends \Scat\Model {
