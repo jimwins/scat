@@ -172,7 +172,7 @@ class Cart extends \Scat\Model {
   }
 
   public function ready_for_payment() {
-    return $this->shipping_method && $this->tax_calculated;
+    return $this->shipping_method && $this->tax_calculated && $this->email;
   }
 
   public function flushTotals() {

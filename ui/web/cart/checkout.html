@@ -199,14 +199,7 @@
       const email= event.value.email;
       clearTimeout(timeout);
       timeout= setTimeout(() => {
-        fetch('{{ url_for('update-cart') }}', {
-          'method': 'POST',
-          'headers' : {
-            'Accept': 'application/json',
-            'Content-type': 'application/json',
-          },
-          body: JSON.stringify({ email : email })
-        })
+        updateCart({ email: email });
       }, 500);
     });
 
