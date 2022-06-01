@@ -22,7 +22,9 @@ class Sale {
       throw new \Slim\Exception\HttpForbiddenException($request, "Wrong key");
     }
 
-    $sales= $this->carts->findByStatus('paid');
+    $status= $request->getParam('carts') ? 'cart' : 'paid';
+
+    $sales= $this->carts->findByStatus($status, $status == 'cart');
 
     $accept= $request->getHeaderLine('Accept');
     if ($request->getParam('json') ||
