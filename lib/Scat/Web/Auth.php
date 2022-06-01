@@ -71,7 +71,9 @@ class Auth {
       $subject= $template->renderBlock('title', $data);
       $body= $template->render($data);
 
-      $email->send([ $person->email => $person->name], $subject, $body);
+      $email->send([ $person->email => $person->name], $subject, $body, null, [
+        'no_bcc' => true
+      ]);
 
       return $response->withRedirect('/login?success=email_sent');
     }
