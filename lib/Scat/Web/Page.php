@@ -23,6 +23,17 @@ class Page {
 
     $content= $this->data->factory('Page')->where('slug', $param)->find_one();
     if (!$content) {
+      $item= $catalog->getItemByCode($param);
+      if ($item && $item->active) {
+        $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+        $routeParser= $routeContext->getRouteParser();
+        return $response->withRedirect(
+          $routeParser->urlFor(
+            'catalog',
+            $item->url_params(),
+          )
+        );
+      }
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
