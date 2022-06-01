@@ -90,7 +90,9 @@ class Cart {
     foreach ($request->getParams() as $key => $value) {
       switch ($key) {
         case 'email':
-          // TODO validate
+          if (!v::email()->validate($value)) {
+            throw new \Exception("Sorry, but '{$value}' doesn't look like a valid email address.");
+          }
           $cart->email= $value;
           break;
         case 'name':
