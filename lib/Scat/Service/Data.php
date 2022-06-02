@@ -69,4 +69,19 @@ class Data
   public function escape($value) {
     return \Titi\ORM::get_db()->quote($value);
   }
+
+  public function fetch_single_value($query, $params= []) {
+    if (\Titi\ORM::raw_execute($query, $params)) {
+      $stmt= \Titi\ORM::get_last_statement();
+      return $stmt->fetchColumn();
+    }
+    return false;
+  }
+
+  public function get_lock($name, $timeout= 5) {
+    return $this->fetch_single_value(
+      "SELECT GET_LOCK(?,?)",
+      [ $name, $timeout ]
+    );
+  }
 }

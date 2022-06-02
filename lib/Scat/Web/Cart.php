@@ -715,6 +715,12 @@ class Cart {
   ) {
     $payment_intent_id= $cart->stripe_payment_intent_id;
 
+    /* Avoid race between webhook and client-forwarded notification. */
+    if (!$this->data->get_lock('web.stripe_payment')) {
+      error_log("Unable to grab web.stripe_payment lock\n");
+      goto endStripeFinalize;
+    }
+
     // if we already have it, don't do it again!
     $has= $cart->payments()
                 ->where_raw(
@@ -1004,6 +1010,12 @@ endStripeFinalize:
 
     // TODO validate
     error_log("Finalizing PayPal {$order_id} on {$cart->uuid}");
+
+    /* Avoid race between webhook and client-forwarded notification. */
+    if (!$this->data->get_lock('web.paypal_payment')) {
+      error_log("Unable to grab web.paypal_payment lock\n");
+      goto endStripeFinalize;
+    }
 
     // if we already have it, don't do it again!
     $has= $cart->payments()
