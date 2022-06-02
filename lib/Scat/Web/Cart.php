@@ -715,6 +715,8 @@ class Cart {
   ) {
     $payment_intent_id= $cart->stripe_payment_intent_id;
 
+    error_log("Finalizing Stripe {$payment_intent_id} on {$cart->uuid}");
+
     /* Avoid race between webhook and client-forwarded notification. */
     if (!$this->data->get_lock('web.stripe_payment')) {
       error_log("Unable to grab web.stripe_payment lock\n");
@@ -1014,7 +1016,7 @@ endStripeFinalize:
     /* Avoid race between webhook and client-forwarded notification. */
     if (!$this->data->get_lock('web.paypal_payment')) {
       error_log("Unable to grab web.paypal_payment lock\n");
-      goto endStripeFinalize;
+      goto endPaypalFinalize;
     }
 
     // if we already have it, don't do it again!
