@@ -670,7 +670,7 @@ class Cart {
 
     $cart->save();
 
-    if ($cart->status != 'paid') {
+    if (!in_array($cart->status, [ 'paid', 'processing', 'shipped' ])) {
       throw new \Exception("Not completely paid!");
     }
 
@@ -757,7 +757,7 @@ class Cart {
 
 endStripeFinalize:
 
-    if ($cart->status != 'paid') {
+    if (!in_array($cart->status, [ 'paid', 'processing', 'shipped' ])) {
       throw new \Exception("Not completely paid!");
     }
 
@@ -767,10 +767,6 @@ endStripeFinalize:
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
       return $response->withJson([ 'message' => 'Processed' ] );
-    }
-
-    if ($cart->status != 'paid') {
-      throw new \Exception("Not completely paid!");
     }
 
     return $this->redirectAfterPaid($request, $response, $cart);
@@ -1026,7 +1022,7 @@ endStripeFinalize:
     $cart->save();
 
 endPaypalFinalize:
-    if ($cart->status != 'paid') {
+    if (!in_array($cart->status, [ 'paid', 'processing', 'shipped' ])) {
       throw new \Exception("Not completely paid!");
     }
 
