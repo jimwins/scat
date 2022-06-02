@@ -264,6 +264,8 @@ $app->group('', function (RouteCollectorProxy $app) {
 /* Webhooks */
 $app->any('/~webhook/test/{name:.*}',
           [ \Scat\Web\Webhook::class, 'testWebhook' ]);
+$app->any('/~webhook/test-www/{name:.*}',
+          [ \Scat\Web\Webhook::class, 'testWebWebhook' ]);
 $app->any('/~webhook/{name:.*}',
           [ \Scat\Web\Webhook::class, 'production' ]);
 

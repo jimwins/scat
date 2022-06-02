@@ -64,4 +64,30 @@ class Webhook {
 
     return $res;
   }
+  public function testWebWebhook(Request $request, Response $response, $name) {
+    $key= $request->getParam('key');
+
+    if ($key != $this->config->get('webhook.key')) {
+      throw new \Exception("Wrong key.");
+    }
+
+    $client= new \GuzzleHttp\Client();
+    $request_uri= preg_replace(
+      '!/test-www/!', '/',
+      $request->getServerParam('REQUEST_URI')
+    );
+
+    $url= $this->config->get('scat.test_www_url') . $request_uri;
+
+    /* Pass through everything but Host */
+    $headers= $request->getHeaders();
+    unset($headers['Host']);
+
+    $res= $client->request($request->getMethod(), $url, [
+      'headers' => $headers,
+      'body' => $request->getBody(),
+    ]);
+
+    return $res;
+  }
 }
