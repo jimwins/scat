@@ -270,7 +270,7 @@ class Ordure {
         $txn->created= $data->sale->modified;
         $txn->filled= $data->sale->modified;
         $txn->paid= $data->sale->modified;
-        $txn->tax_captured= $data->sale->modified;
+        $txn->tax_captured= NULL;
         $txn->person_id= $person->id;
         $txn->tax_rate= 0.0;
 
