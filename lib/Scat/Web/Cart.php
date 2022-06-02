@@ -710,7 +710,8 @@ class Cart {
   public function stripeFinalizeCart(
     Request $request, Response $response,
     \Scat\Service\Stripe $stripe,
-    \Scat\Model\Cart $cart
+    \Scat\Model\Cart $cart,
+    $force_json= false
   ) {
     $payment_intent_id= $cart->stripe_payment_intent_id;
 
@@ -765,7 +766,7 @@ endStripeFinalize:
     $cart->id= -1;
 
     $accept= $request->getHeaderLine('Accept');
-    if (strpos($accept, 'application/json') !== false) {
+    if ($force_json || strpos($accept, 'application/json') !== false) {
       return $response->withJson([ 'message' => 'Processed' ] );
     }
 
@@ -834,7 +835,8 @@ endStripeFinalize:
         return $this->stripeFinalizeCart(
           $request, $response,
           $stripe,
-          $cart
+          $cart,
+          true /* force_json */
         );
 
       case 'payment_intent.payment_failed':
