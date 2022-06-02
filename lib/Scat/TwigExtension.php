@@ -27,6 +27,10 @@ class TwigExtension
       new \Twig\TwigFunction('notes', [ $this, 'getNotes' ]),
       new \Twig\TwigFunction('config', [ $this, 'getConfig' ]),
       new \Twig\TwigFunction('item', [ $this, 'getItem' ]),
+      new \Twig\TwigFunction('kit', [ $this, 'showKit' ], [
+        'is_safe' => [ 'html' ],
+        'needs_environment' => true,
+      ]),
       new \Twig\TwigFunction('topDepartments', [ $this, 'topDepartments' ]),
     ];
   }
@@ -64,6 +68,13 @@ class TwigExtension
 
   public function getItem($code) {
     return \Titi\Model::factory('Item')->where('code', $code)->find_one();
+  }
+
+  public function showKit($env, $code) {
+    error_log("code: {$code}");
+    $kit= \Titi\Model::factory('Item')->where('code', $code)->find_one();
+    if (!$kit) return;
+    return $env->render('catalog/kit.twig', [ 'kit' => $kit ]);
   }
 
   public function phone_number_format($phone, $country_code= 'US') {

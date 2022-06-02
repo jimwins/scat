@@ -1,0 +1,43 @@
+{% import 'macros.twig' as scat %}
+
+<h2>{{ kit.name }}</h2>
+<h4>Total Value: {{ scat.amount(kit.retail_price) }}</h4>
+<h4>Your Price: {{ scat.amount(kit.sale_price) }}</h4>
+
+<p>
+  {{ include('add-to-cart.twig', { item: kit, button_size: '', fixed_quantity: 1 }) }}
+</p>
+
+<div class="well">
+  <table style="width: 100%">
+    <thead>
+      <tr>
+        <th align="left">Item No.</th>
+        <th align="left">Description</th>
+        <th align="right">List</th>
+        <th align="right">Quantity</th>
+        <th align="center">In Stock</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for kit_item in kit.kit_items.find_many() %}
+        {% set item= kit_item.item %}
+        <tr>
+          <td><a href="/{{ item.code }}">{{ item.code }}</a></td>
+          <td>{{ item.name }}</td>
+          <td align="right">
+            {{ scat.amount(kit_item.quantity * item.retail_price) }}
+          </td>
+          <td align="right">{{ kit_item.quantity }}</td>
+          <td align="center">
+            {% if item.stock < kit_item.quantity %}
+              <span class="text-danger">Out of stock</span>
+            {% else %}
+              <span>In stock</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
