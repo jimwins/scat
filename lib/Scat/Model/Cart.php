@@ -475,6 +475,38 @@ class Cart extends \Scat\Model {
     // TODO return useful information
   }
 
+  public function backordered_items() {
+    foreach ($this->items()->find_many() as $line) {
+      if ($line->quantity > $line->item()->stock) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public function eta() {
+    if (in_array($this->status, [ 'paid', 'processing '])) {
+      $start= strtotime($this->modified);
+      $eta= $start;
+      if ($this->shipping_address_id == 1) {
+        // on Sunday, pickup is ready Monday (ignoring holidays)
+        if (date('w', $start) == 6) {
+          $eta= strtotime('next Monday', $start);
+        }
+      } else {
+        $eta= strtotime("+1 week", $eta);
+      }
+      // Add extra week for out of stock items
+      if ($this->backordered_items()) {
+        $eta= strtotime("+1 week", $eta);
+      }
+
+      return $eta;
+    }
+
+    return null;
+  }
+
   public function as_array() {
     $data= parent::as_array();
     $data['subtotal']= $this->subtotal();
