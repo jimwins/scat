@@ -1,0 +1,67 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Items in Carts @ Raw Materials Art Supplies
+{% endblock %}
+
+{% block content %}
+
+  <style>
+    table {
+      empty-cells: show;
+      border-collapse: collapse;
+      width: 100%;
+      margin: 2em 0;
+      text-overflow: ellipsis;
+    }
+    thead {
+      border-bottom: var(--border-width) solid #ddd;
+    }
+    td, th {
+      padding: 0.5rem;
+      vertical-align: top;
+    }
+    th {
+      text-align: left;
+    }
+    table tbody tr:nth-child(odd) {
+      background: #f9f9f9;
+    }
+    table tbody tr {
+      border-bottom: calc(var(--border-width) / 2) solid #ddd;
+    }
+  </style>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Quantity</th>
+        <th>Code</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+        <tr valign="top">
+          <td>
+            {{ item.quantity }}
+          </td>
+          <td>
+            <a href="/{{ item.code }}" class="{{ not (item.length > 0 and item.width > 0 and item.height > 0 and item.weight > 0) ? 'text-danger' }}">
+              {{- item.code -}}
+            </a>
+            {% if not item.media %}
+              <span style="float: right" class="text-danger">
+                <i class="bi bi-file-image"></i>
+              </span>
+            {% endif %}
+          </td>
+          <td>
+            {{ item.name }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

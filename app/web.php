@@ -191,6 +191,7 @@ $app->post('/~webhook/paypal',
 /* Sale (= a completed cart) */
 $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->get('/list', [ \Scat\Web\Sale::class, 'listSales' ]);
+  $app->get('/items', [ \Scat\Web\Sale::class, 'listItems' ]);
   $app->get('/{uuid}', [ \Scat\Web\Sale::class, 'sale' ]);
   $app->get('/{uuid}/thanks', [ \Scat\Web\Sale::class, 'thanks' ])
       ->setName('sale-thanks');

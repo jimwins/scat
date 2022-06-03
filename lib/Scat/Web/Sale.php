@@ -16,7 +16,6 @@ class Sale {
   ) {
   }
 
-  /* XXX Hardwired for the info the Scat side needs to pull orders. */
   public function listSales(Request $request, Response $response) {
     $person= $this->auth->get_person_details($request);
     $key= $request->getParam('key');
@@ -42,6 +41,47 @@ class Sale {
 
     return $this->view->render($response, 'sale/list.html', [
       'sales' => $sales,
+    ]);
+  }
+
+  public function listItems(
+    Request $request,
+    Response $response,
+    \Scat\Service\Data $data,
+  ) {
+    $person= $this->auth->get_person_details($request);
+    $key= $request->getParam('key');
+
+    if (!$this->auth->verify_access_key($key) &&
+        (!$person || $person->role != 'employee'))
+    {
+      throw new \Slim\Exception\HttpForbiddenException($request, "Wrong key");
+    }
+
+    $days= (int)$request->getParam('days') ?: 2;
+
+    $q= "SELECT item.code, item.name,
+                item.width, item.length, item.height, item.weight,
+                (SELECT COUNT(*) FROM item_to_image WHERE item_id = item.id)
+                  media,
+                SUM(quantity) quantity
+           FROM sale_item
+           JOIN sale ON sale_item.sale_id = sale.id
+           JOIN item ON sale_item.item_id = item.id
+          WHERE sale.modified BETWEEN NOW() - INTERVAL ? DAY AND NOW()
+            AND sale.status = 'cart'
+          GROUP BY item.id
+          ORDER BY code";
+
+    $items= $data->for_table('item')->raw_query($q, [ $days ])->find_many();
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($items);
+    }
+
+    return $this->view->render($response, 'sale/items.html', [
+      'items' => $items,
     ]);
   }
 
