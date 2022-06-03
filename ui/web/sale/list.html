@@ -1,0 +1,75 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Sales @ Raw Materials Art Supplies
+{% endblock %}
+
+{% block content %}
+
+  <style>
+    table {
+      empty-cells: show;
+      border-collapse: collapse;
+      width: 100%;
+      margin: 2em 0;
+      text-overflow: ellipsis;
+    }
+    thead {
+      border-bottom: var(--border-width) solid #ddd;
+    }
+    td, th {
+      padding: 0.5rem;
+      vertical-align: top;
+    }
+    th {
+      text-align: left;
+    }
+    table tbody tr:nth-child(odd) {
+      background: #f9f9f9;
+    }
+    table tbody tr {
+      border-bottom: calc(var(--border-width) / 2) solid #ddd;
+    }
+  </style>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Created</th>
+        <th>Modified</th>
+        <th>Status</th>
+        <th>Customer</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sale in sales %}
+        <tr valign="top">
+          <td>
+            <a href="{{ sale.uuid }}">{{ '%07d'|format(sale.id) }}</a>
+          </td>
+          <td nowrap>
+            {{ sale.created|date('M j H:i') }}
+          </td>
+          <td nowrap>
+            {{ sale.modified|date('M j H:i') }}
+          </td>
+          <td>
+            {{ sale.status }}
+          </td>
+          <td>
+            {{ sale.name }}
+            {% if sale.email %}
+              &lt;{{ sale.email }}&gt;
+            {% endif %}
+          </td>
+          <td>
+            {{ scat.amount(sale.total) }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
