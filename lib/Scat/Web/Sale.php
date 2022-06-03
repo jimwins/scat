@@ -60,7 +60,7 @@ class Sale {
 
     $days= (int)$request->getParam('days') ?: 2;
 
-    $q= "SELECT item.code, item.name,
+    $q= "SELECT item.code, item.name, item.stock,
                 item.width, item.length, item.height, item.weight,
                 (SELECT COUNT(*) FROM item_to_image WHERE item_id = item.id)
                   media,

@@ -57,7 +57,7 @@
               </span>
             {% endif %}
           </td>
-          <td>
+          <td class="{{ item.stock < item.quantity ? 'text-danger' }}">
             {{ item.name }}
           </td>
         </tr>
