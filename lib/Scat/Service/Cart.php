@@ -25,10 +25,13 @@ class Cart
     return $this->data->Factory('Cart')->where('uuid', $uuid)->find_one();
   }
 
-  public function findByStatus($status, $yesterday= null) {
+  public function findByStatus($status, $yesterday= null, $limit= null) {
     $query= $this->data->Factory('Cart')->where('status', $status);
     if ($yesterday) {
       $query= $query->where_raw("DATE(created) = DATE(NOW() - INTERVAL 1 DAY)");
+    }
+    if ($limit) {
+      $query= $query->limit($limit);
     }
     return $query->find_many();
   }

@@ -18,13 +18,24 @@ class Sale {
 
   /* XXX Hardwired for the info the Scat side needs to pull orders. */
   public function listSales(Request $request, Response $response) {
-    if (!$this->auth->verify_access_key($request->getParam('key'))) {
+    $person= $this->auth->get_person_details($request);
+    $key= $request->getParam('key');
+
+    error_log(json_encode($person));
+
+    if (!$this->auth->verify_access_key($key) &&
+        (!$person || $person->role != 'employee'))
+    {
       throw new \Slim\Exception\HttpForbiddenException($request, "Wrong key");
     }
 
     $status= $request->getParam('carts') ? 'cart' : 'paid';
 
-    $sales= $this->carts->findByStatus($status, $status == 'cart');
+    $sales= $this->carts->findByStatus(
+      status: $status,
+      yesterday: $status == 'cart',
+      limit: $key ? null : 100,
+    );
 
     $accept= $request->getHeaderLine('Accept');
     if ($request->getParam('json') ||
@@ -33,7 +44,9 @@ class Sale {
       return $response->withJson($sales);
     }
 
-    throw new \Slim\Exception\HttpNotFoundException($request);
+    return $this->view->render($response, 'sale/list.html', [
+      'sales' => $sales,
+    ]);
   }
 
   public function sale(Request $request, Response $response, $uuid) {

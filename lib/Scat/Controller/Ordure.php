@@ -209,12 +209,16 @@ class Ordure {
     $messages= [];
 
     $url= $this->ordure_url . '/sale/list';
-    $res= $client->request('GET', $url,
-                           [
-                             'debug' => $GLOBALS['DEBUG'],
-                             'query' => [ 'key' => $this->ordure_key,
-                                          'json' => 1 ]
-                           ]);
+    $res= $client->request('GET', $url, [
+      //'debug' => $GLOBALS['DEBUG'],
+      'headers' => [
+        'Accept' => 'application/json',
+      ],
+      'query' => [
+        'key' => $this->ordure_key,
+        'status' => 'paid'
+      ]
+    ]);
 
     $sales= json_decode($res->getBody());
 
@@ -225,12 +229,16 @@ class Ordure {
 
       try {
 
-        $url= $this->ordure_url . '/sale/' . $summary->uuid . '/json';
-        $res= $client->request('GET', $url,
-                               [
-                                 'debug' => $GLOBALS['DEBUG'],
-                                 'query' => [ 'key' => $this->ordure_key ]
-                               ]);
+        $url= $this->ordure_url . '/sale/' . $summary->uuid;
+        $res= $client->request('GET', $url, [
+          //'debug' => $GLOBALS['DEBUG'],
+          'headers' => [
+            'Accept' => 'application/json',
+          ],
+          'query' => [
+            'key' => $this->ordure_key
+          ]
+        ]);
 
         $data= json_decode($res->getBody());
 
@@ -397,7 +405,7 @@ class Ordure {
           $address->country= $easypost_address->country;
           $address->phone= $easypost_address->phone;
           $address->timezone=
-            $easypost_address->verifications->delivery->details->time_zone;
+            @$easypost_address->verifications->delivery->details->time_zone;
           $address->save();
 
           $txn->shipping_address_id= $address->id;
