@@ -33,6 +33,23 @@
     }
   </style>
 
+  <h1 class="page-heading">
+    Items in carts active in last {{ days }} day{{ days != 1 ? 's' }}
+  </h1>
+
+  <form method="GET" action="{{ current_url() }}" class="stacked-form">
+    <label for="days">
+      # of Days
+    </label>
+    <input type="number" class="input"
+            id="days" name="days"
+            min="1"
+            value="{{ days }}">
+    <button type="submit" class="button">
+      Change
+    </button>
+  </form>
+
   <table>
     <thead>
       <tr>

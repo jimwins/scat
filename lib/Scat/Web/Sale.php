@@ -82,6 +82,7 @@ class Sale {
 
     return $this->view->render($response, 'sale/items.html', [
       'items' => $items,
+      'days' => $days,
     ]);
   }
 
