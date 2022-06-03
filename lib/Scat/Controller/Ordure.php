@@ -479,14 +479,17 @@ class Ordure {
     $seen= [];
 
     $url= $this->ordure_url . '/sale/list';
-    $res= $client->request('GET', $url,
-                           [
-                             'debug' => $GLOBALS['DEBUG'],
-                             'query' => [ 'key' => $this->ordure_key,
-                                          'carts' => 1,
-                                          'yesterday' => 1,
-                                          'json' => 1 ]
-                           ]);
+    $res= $client->request('GET', $url, [
+      'debug' => $GLOBALS['DEBUG'],
+      'headers' => [
+        'Accept' => 'application/json',
+      ],
+      'query' => [
+        'key' => $this->ordure_key,
+        'status' => 'cart',
+        'yesterday' => 1,
+      ]
+    ]);
 
     $sales= json_decode($res->getBody());
 

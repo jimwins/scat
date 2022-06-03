@@ -26,12 +26,17 @@ class Cart
   }
 
   public function findByStatus($status, $yesterday= null, $limit= null) {
-    $query= $this->data->Factory('Cart')->where('status', $status);
+    $query= $this->data->Factory('Cart');
+    if (is_array($status)) {
+      $query= $query->where_in('status', $status);
+    } elseif ($status) {
+      $query= $query->where('status', $status);
+    }
     if ($yesterday) {
       $query= $query->where_raw("DATE(created) = DATE(NOW() - INTERVAL 1 DAY)");
     }
     if ($limit) {
-      $query= $query->limit($limit);
+      $query= $query->limit($limit)->order_by_desc('id');
     }
     return $query->find_many();
   }

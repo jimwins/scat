@@ -27,7 +27,7 @@ class Sale {
       throw new \Slim\Exception\HttpForbiddenException($request, "Wrong key");
     }
 
-    $status= $request->getParam('carts') ? 'cart' : 'paid';
+    $status= $request->getParam('status') ?: [ 'paid', 'processing' ];
 
     $sales= $this->carts->findByStatus(
       status: $status,
