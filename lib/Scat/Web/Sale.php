@@ -21,8 +21,6 @@ class Sale {
     $person= $this->auth->get_person_details($request);
     $key= $request->getParam('key');
 
-    error_log(json_encode($person));
-
     if (!$this->auth->verify_access_key($key) &&
         (!$person || $person->role != 'employee'))
     {
@@ -38,9 +36,7 @@ class Sale {
     );
 
     $accept= $request->getHeaderLine('Accept');
-    if ($request->getParam('json') ||
-        strpos($accept, 'application/json') !== false)
-    {
+    if (strpos($accept, 'application/json') !== false) {
       return $response->withJson($sales);
     }
 
@@ -56,9 +52,7 @@ class Sale {
     }
 
     $accept= $request->getHeaderLine('Accept');
-    if ($request->getParam('json') ||
-        strpos($accept, 'application/json') !== false)
-    {
+    if (strpos($accept, 'application/json') !== false) {
       return $response->withJson([
         'sale' => $sale,
         'shipping_address' => $sale->shipping_address(),
@@ -69,21 +63,6 @@ class Sale {
     }
 
     // TODO redirect to correct URL depending on $sale->status
-  }
-
-  public function saleJson(Request $request, Response $response, $uuid) {
-    $sale= $this->carts->findByUuid($uuid);
-    if (!$sale) {
-      throw new \Slim\Exception\HttpNotFoundException($request);
-    }
-
-    return $response->withJson([
-      'sale' => $sale,
-      'shipping_address' => $sale->shipping_address(),
-      'items' => $sale->items()->find_many(),
-      'payments' => $sale->payments()->find_many(),
-      'notes' => $sale->notes()->find_many(),
-    ]);
   }
 
   public function thanks(Request $request, Response $response, $uuid) {
