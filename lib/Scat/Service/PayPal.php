@@ -83,6 +83,10 @@ class PayPal {
     $charge= json_decode($payment->data);
     $capture_id= $charge->purchase_units[0]->payments->captures[0]->id;
 
+    /* Force carrier to UPS if it was UPSDAP */
+    $carrier= strtoupper($tracker->carrier);
+    if ($carrier == 'UPSDAP') $carrier= 'UPS';
+
     $req= new \PayPalHttp\HttpRequest('/v1/shipping/trackers-batch', 'POST');
     $req->headers["Content-Type"]= "application/json";
     $req->body= [
@@ -91,7 +95,7 @@ class PayPal {
           'transaction_id' => $capture_id,
           'tracking_number' => $tracker->tracking_code,
           'status' => 'SHIPPED',
-          'carrier' => strtoupper($tracker->carrier),
+          'carrier' => $carrier,
         ],
       ]
     ];

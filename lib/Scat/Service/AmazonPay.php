@@ -91,28 +91,27 @@ class AmazonPay {
   public function addTracker($payment, $tracker) {
     $client= $this->getClient();
 
-    // TODO get order reference id
+    $charge_permission_id= $payment->data()->chargePermissionId;
+
+    /* Force carrier to UPS if it was UPSDAP */
+    $carrier= strtoupper($tracker->carrier);
+    if ($carrier == 'UPSDAP') $carrier= 'UPS';
 
     $payload= [
-      'amazonOrderReferenceId' => 'P00-0000000-0000000',
+      'chargePermissionId' => $charge_permission_id,
       'deliveryDetails' => [
         [
           'trackingNumber' => $tracker->tracking_code,
-          'carrierCode' => strtoupper($tracker->carrier),
+          'carrierCode' => $carrier,
         ]
       ],
     ];
 
-    try {
-      $result= $client->deliveryTrackers($payload);
-      if ($result['status'] != 200) {
-        error_log("Unexpected status from Amazon: {$result['status']}, response= {$results['response']}\n");
-      }
-    } catch (\Exception $e) {
-      error_log("Unexpected exception from Amazon: {$e->message}\n");
-    }
+    error_log("Amazon: Adding tracker to {$charge_permission_id}");
 
-    return $result;
+    return $this->handleResult(
+      $client->deliveryTrackers($payload)
+    );
   }
 
   private function handleResult($result) {

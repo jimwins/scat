@@ -8,23 +8,16 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Shipping {
-  private $shipping, $txn, $email, $view, $ordure, $paypal;
-
-  public function __construct(\Scat\Service\Shipping $shipping,
-                              \Scat\Service\Txn $txn,
-                              \Scat\Service\Email $email,
-                              \Scat\Service\Ordure $ordure,
-                              \Scat\Service\PayPal $paypal,
-                              \Scat\Service\Data $data,
-                              View $view)
-  {
-    $this->txn= $txn;
-    $this->shipping= $shipping;
-    $this->email= $email;
-    $this->ordure= $ordure;
-    $this->paypal= $paypal;
-    $this->data= $data;
-    $this->view= $view;
+  public function __construct(
+    private \Scat\Service\Shipping $shipping,
+    private \Scat\Service\Txn $txn,
+    private \Scat\Service\Email $email,
+    private \Scat\Service\Ordure $ordure,
+    private \Scat\Service\PayPal $paypal,
+    private \Scat\Service\AmazonPay $amazon,
+    private \Scat\Service\Data $data,
+    private View $view
+  ) {
   }
 
   function index(Request $request, Response $response) {
@@ -185,10 +178,20 @@ class Shipping {
         $note->full_content= $body;
         $note->save();
 
-        foreach ($txn->payments()->find_many() as $payment) {
-          if ($payment->method == 'paypal') {
-            $this->paypal->addTracker($payment, $tracker);
+        /* Try to add trackers for payment methods that care, but not fatal if
+         * we can't. */
+        try {
+          foreach ($txn->payments()->find_many() as $payment) {
+            if ($payment->method == 'paypal') {
+              $this->paypal->addTracker($payment, $tracker);
+            }
+            if ($payment->method == 'amazon') {
+              $this->amazon->addTracker($payment, $tracker);
+            }
           }
+        } catch (\Exception $e) {
+          error_log("failed to add tracker to payment for {$txn->uuid}: " .
+                    $e->getMessage());
         }
 
         break;
