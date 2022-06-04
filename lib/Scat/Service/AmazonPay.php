@@ -116,11 +116,11 @@ class AmazonPay {
   }
 
   private function handleResult($result) {
-    if ($result['status'] != 200) {
-      throw new \Exception($result['response']);
-    }
-
     $data= json_decode($result['response']);
+
+    if ($result['status'] != 200) {
+      throw new \Exception("{$data->reasonCode}: $data->message}");
+    }
 
     if (json_last_error() != JSON_ERROR_NONE) {
       throw new \Exception(json_last_error_msg());
@@ -147,6 +147,23 @@ class AmazonPay {
     $client= $this->getClient();
     return $this->handleResult(
       $client->completeCheckoutSession($amzn_session_id, $data)
+    );
+  }
+
+  public function capture($charge_id, $amount, $uuid) {
+    $client= $this->getClient();
+
+    $payload= [
+      'captureAmount' => [
+        'amount' => $amount,
+        'currencyCode' => 'USD',
+      ],
+    ];
+
+    return $this->handleResult(
+      $client->captureCharge($charge_id, $payload, [
+        'x-amz-pay-idempotency-key' => $uuid,
+      ])
     );
   }
 }

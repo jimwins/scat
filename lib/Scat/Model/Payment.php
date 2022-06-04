@@ -54,4 +54,12 @@ class Payment extends \Scat\Model {
   public function data() {
     return json_decode($this->data);
   }
+
+  public function amznCapture(\Scat\Service\AmazonPay $amzn) {
+    return $amzn->capture(
+      $this->data()->chargeId,
+      $this->amount,
+      $this->txn()->uuid
+    );
+  }
 }

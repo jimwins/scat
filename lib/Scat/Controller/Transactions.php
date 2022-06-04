@@ -225,9 +225,13 @@ class Transactions {
     return $response->withRedirect('/sale/' . $sale->id);
   }
 
-  public function updateSale(Request $request, Response $response,
-                              \Scat\Service\Ordure $ordure, $id)
-  {
+  public function updateSale(
+    Request $request,
+    Response $response,
+    \Scat\Service\Ordure $ordure,
+    \Scat\Service\AmazonPay $amzn,
+    $id
+  ) {
     $txn= $this->txn->fetchById($id);
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
@@ -258,10 +262,12 @@ class Transactions {
     }
 
     // Pass along status change to Ordure when shipping
-    if (isset($changed['status']) && $txn->online_sale_id) {
+    if (array_key_exists('status', $changed) && $txn->online_sale_id) {
       if (in_array($txn->status,
                     [ 'readyforpickup', 'shipping', 'shipped', 'complete']))
       {
+        error_log("{$txn->uuid}: Capturing payments and marking shipped");
+        $txn->captureAmazonPayments($amzn);
         $ordure->markOrderShipped($txn->uuid);
       }
     }

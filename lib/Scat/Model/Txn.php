@@ -830,6 +830,17 @@ class Txn extends \Scat\Model {
     $this->loyalty()->delete_many();
   }
 
+  public function captureAmazonPayments(\Scat\Service\AmazonPay $amzn) {
+    foreach ($this->payments()->where('method', 'amazon')->where_null('captured')->find_many() as $payment) {
+      $capture= $payment->amznCapture($amzn);
+      if ($capture) {
+        error_log("Captured Amazon Pay payment: " . json_encode($capture));
+        $payment->set_expr('captured', 'NOW()');
+        $payment->save();
+      }
+    }
+  }
+
   public function as_array() {
     $res= parent::as_array();
     $res['items']= $this->items()->find_many();
