@@ -498,12 +498,14 @@ class Ordure {
         continue;
       }
 
-      $url= $this->ordure_url . '/sale/' . $summary->uuid . '/json';
-      $res= $client->request('GET', $url,
-                             [
-                               'debug' => $GLOBALS['DEBUG'],
-                               'query' => [ 'key' => $this->ordure_key ]
-                             ]);
+      $url= $this->ordure_url . '/sale/' . $summary->uuid;
+      $res= $client->request('GET', $url, [
+        'debug' => $GLOBALS['DEBUG'],
+        'headers' => [
+          'Accept' => 'application/json',
+        ],
+        'query' => [ 'key' => $this->ordure_key ]
+       ]);
 
       $data= json_decode($res->getBody(), true);
 
