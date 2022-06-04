@@ -130,6 +130,15 @@ class Catalog {
     ])->withHeader('Content-type', 'text/xml;charset=UTF-8');
   }
 
+  public function status(Request $request, Response $response) {
+    $file= '/tmp/last-loaded-prices';
+    if (file_exists($file) &&
+        filemtime($file) > time() - (15 * 60)) {
+      return $response->withJson([ 'status' => "Prices are current." ]);
+    }
+    return $response->withJson(['status' => "ERROR: Prices are not current."]);
+  }
+
   public function grabImage(Request $request, Response $response,
                             \Scat\Service\Auth $auth,
                             \Scat\Service\Media $media)

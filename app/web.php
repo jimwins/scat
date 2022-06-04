@@ -122,6 +122,7 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
       ->setName('catalog-brand');
   $app->get('/sitemap.xml', [ \Scat\Web\Catalog::class, 'sitemap' ])
       ->setName('catalog-sitemap');
+  $app->get('/status', [ \Scat\Web\Catalog::class, 'status' ]);
   $app->get('[/{dept}[/{subdept}[/{product}[/{item:.*}]]]]',
             [ \Scat\Controller\Catalog::class, 'catalogPage' ])
       ->setName('catalog')
