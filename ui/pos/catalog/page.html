@@ -45,7 +45,8 @@
               {% endif %}
               {% if product %}
                 <li class="{{ not item ? 'active' }}">
-                  <a href="{{ url_for('catalog', { 'dept': dept.slug,
+                  <a style="{{ not product.active ? 'text-decoration: line-through' }}"
+                     href="{{ url_for('catalog', { 'dept': dept.slug,
                                                     'subdept': subdept.slug,
                                                     'product': product.slug}) }}">
                     {{- product.name -}}
