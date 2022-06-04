@@ -1132,6 +1132,14 @@ class Catalog {
         }
       }
 
+      if ($request->getAttribute('only_active') &&
+          (($deptO && !$deptO->active) ||
+            ($subdeptO && !$subdeptO->active) ||
+            ($productO && !$productO->active)))
+      {
+        throw new \Slim\Exception\HttpNotFoundException($request);
+      }
+
       $brands= $deptO ? null : $this->catalog->getBrands();
 
       return $this->view->render($response, 'catalog/page.html',

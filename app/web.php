@@ -126,7 +126,10 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Catalog::class, 'catalogPage' ])
       ->setName('catalog')
       ->add(function ($request, $handler) {
-          return $handler->handle($request->withAttribute('no_solo_item', true));
+          return $handler->handle(
+            $request->withAttribute('no_solo_item', true)
+                    ->withAttribute('only_active', true)
+          );
       });
 });
 
