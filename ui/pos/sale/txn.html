@@ -90,7 +90,7 @@
       #txn th:last-child, #txn td:last-child {
         padding-right: 1rem;
       }
-      .no-backorder {
+      .no-backorder, .no-backorder a {
         color: #500;
       }
     </style>
@@ -116,7 +116,7 @@
         {% for line in txn.items.find_many %}
           <tr data-id="{{ line.id }}"
               data-editable-base="/sale/{{ txn.id }}/item/{{ line.id }}"
-              class="{{ line.item().no_backorder ? 'no-backorder' }}"
+              class="{{ line.item().no_backorder or not line.item.active ? 'no-backorder' }}"
               >
             <td>
               {% if not line.kit_id %}
@@ -135,7 +135,7 @@
                 {{ line.code }}
               </a>
             </td>
-            <td>
+            <td style="{{ not line.item.active ? 'text-decoration: line-through' }}">
               {% if line.item.code == 'ZZ-GIFTCARD' and txn.paid %}
                 {% if line.data().card %}
                   <a data-action="print-gift-card"
