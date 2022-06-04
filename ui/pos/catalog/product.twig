@@ -18,7 +18,9 @@
           </a>
         </small>
       </span>
+      {{ not product.active ? "<s>" }}
       {{ product.name }}
+      {{ not product.active ? "</s>" }}
       <small>
         {% set brand = product.brand %}
         <a href="{{ url_for('catalog-brand', { 'brand' : brand.slug }) }}">
