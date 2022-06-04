@@ -129,4 +129,65 @@ class Catalog {
       'products' => $products
     ])->withHeader('Content-type', 'text/xml;charset=UTF-8');
   }
+
+  public function grabImage(Request $request, Response $response,
+                            \Scat\Service\Auth $auth,
+                            \Scat\Service\Media $media)
+  {
+    $key= $request->getParam('key');
+
+    if (!$auth->verify_access_key($key))
+    {
+      throw new \Slim\Exception\HttpForbiddenException($request, "Wrong key");
+    }
+
+    $url= $request->getParam('url');
+
+    // Special hack to get full-size Salsify images
+    $url= str_replace('/c_limit,cs_srgb,h_600,w_600', '', $url);
+
+    error_log("Grabbing image from URL '$url'\n");
+
+    $client= new \GuzzleHttp\Client();
+    $res= $client->get($url);
+
+    $file= $res->getBody();
+    $name= basename(parse_url($url, PHP_URL_PATH));
+
+    if ($res->hasHeader('Content-Type')) {
+      $content_type= $res->getHeader('Content-Type')[0];
+      if (!preg_match('/^image/', $content_type)) {
+        $f3->error(500, "URL was not an image, it was a '$content_type'");
+      }
+    }
+
+    $uuid= sprintf("%08x%02x%s", time(), 1, bin2hex(random_bytes(8)));
+
+    // No extension? Probably a JPEG
+    $ext= pathinfo($name, PATHINFO_EXTENSION) ?: 'jpg';
+
+    $b2= $media->getB2Client();
+    $b2_bucket= $media->getB2Bucket();
+
+    $b2_file= $b2->upload([
+      'BucketName' => $b2_bucket,
+      'FileName' => "i/o/$uuid.$ext",
+      'Body' => $file,
+    ]);
+
+    $path= sprintf(
+      '%s/file/%s/%s',
+      $b2->getAuthorization()['downloadUrl'],
+      $b2_bucket,
+      $b2_file->getName()
+    );
+
+    return $response->withJson([
+      'path' => $path,
+      'ext' => $ext,
+      'uuid' => $uuid,
+      'name' => $name,
+      'id' => $b2_file->getId()
+    ]);
+  }
 }

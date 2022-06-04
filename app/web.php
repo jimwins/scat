@@ -271,6 +271,7 @@ $app->any('/~webhook/{name:.*}',
 
 /* BTS stuff */
 $app->post('/update-pricing', [ \Scat\Web\Catalog::class, 'updatePricing' ]);
+$app->post('/~grab-image', [ \Scat\Web\Catalog::class, 'grabImage' ]);
 
 /* Info (DEBUG only) */
 if ($DEBUG) {
