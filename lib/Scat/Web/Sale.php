@@ -105,6 +105,9 @@ class Sale {
 
     // TODO redirect to correct URL depending on $sale->status
 
+    $person= $this->auth->get_person_details($request);
+    $key= $request->getParam('key');
+
     if (!$this->auth->verify_access_key($key) &&
         (!$person || $person->role != 'employee'))
     {
