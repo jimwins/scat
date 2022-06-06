@@ -104,6 +104,16 @@ class Sale {
     }
 
     // TODO redirect to correct URL depending on $sale->status
+
+    if (!$this->auth->verify_access_key($key) &&
+        (!$person || $person->role != 'employee'))
+    {
+      throw new \Slim\Exception\HttpForbiddenException($request, "Wrong key");
+    }
+
+    return $this->view->render($response, 'sale/sale.html', [
+      'sale' => $sale,
+    ]);
   }
 
   public function thanks(Request $request, Response $response, $uuid) {
