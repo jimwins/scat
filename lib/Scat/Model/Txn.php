@@ -621,7 +621,7 @@ class Txn extends \Scat\Model {
     }
   }
 
-  public function captureTax(\Scat\Service\Tax $tax) {
+  public function captureTax(\Scat\Service\Tax $tax, $force= false) {
     if ($this->tax_captured) {
       throw new \Exception("Tax already captured.");
     }
@@ -677,29 +677,37 @@ class Txn extends \Scat\Model {
       // If we have new items, have to report it as new sale
       if ($this->items()->where_null('returned_from_id')->count()) {
         // Was this a local transaction or return? If so, lookup the tax
-        if (!$this->online_sale_id || $this->returned_from_id) {
+        if (!$this->online_sale_id || $this->returned_from_id || $force) {
+          // XXX get from default shipping address
+          $default_address= [
+            'Zip4' => '1320',
+            'Zip5' => '90014',
+            'State' => 'CA',
+            'City' => 'Los Angeles',
+            'Address2' => '',
+            'Address1' => '645 S Los Angeles St',
+          ];
+          if ($this->shipping_address_id) {
+            $address= $this->shipping_address();
+            list($zip5, $zip4)= explode('-', $address->zip);
+            $destination= [
+              'Zip4' => $zip4,
+              'Zip5' => $zip5,
+              'State' => $address->state,
+              'City' => $address->city,
+              'Address2' => $address->street2 ?? '',
+              'Address1' => $address->street1,
+            ];
+          } else {
+            $destination= $default_address;
+          }
           // Look up all non-returned items
           $data= [
             'customerId' => $this->person_id ?: 0,
             'cartId' => $this->uuid,
             'deliveredBySeller' => false,
-            // XXX get from default shipping address
-            'origin' => [
-              'Zip4' => '1320',
-              'Zip5' => '90014',
-              'State' => 'CA',
-              'City' => 'Los Angeles',
-              'Address2' => '',
-              'Address1' => '645 S Los Angeles St',
-            ],
-            'destination' => [
-              'Zip4' => '1320',
-              'Zip5' => '90014',
-              'State' => 'CA',
-              'City' => 'Los Angeles',
-              'Address2' => '',
-              'Address1' => '645 S Los Angeles St',
-            ],
+            'origin' => $default_address,
+            'destination' => $destination,
             'cartItems' => [],
           ];
 

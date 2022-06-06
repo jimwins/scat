@@ -78,7 +78,17 @@ class Tax {
             $sale->set_expr('tax_captured', 'NOW()');
             $sale->save();
           }
-          $errors[]= $sale->id . ": " . $e->getMessage();
+          if (preg_match('/^A matching lookup could not be found for this authorization/', $message)) {
+            try {
+              $sale->captureTax($this->tax, true);
+              $sale->set_expr('tax_captured', 'NOW()');
+              $sale->save();
+              $message= "Couldn't find existing lookup, forced a new one and captured";
+            } catch (\Exception $e) {
+              $message= $e->getMessage();
+            }
+          }
+          $errors[]= $sale->id . ": " . $message;
         }
       }
     }
