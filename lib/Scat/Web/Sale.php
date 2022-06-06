@@ -30,7 +30,7 @@ class Sale {
 
     $sales= $this->carts->findByStatus(
       status: $status,
-      yesterday: $status == 'cart',
+      yesterday: $request->getParam('yesterday'),
       limit: $key ? null : 100,
     );
 
