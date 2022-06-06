@@ -376,6 +376,7 @@ class Cart extends \Scat\Model {
     $data= [
       'customerID' => $this->person_id ?: 0,
       'cartID' => $this->uuid,
+      'orderID' => $this->uuid,
       'deliveredBySeller' => false,
       // XXX get from default shipping address
       'origin' => [
