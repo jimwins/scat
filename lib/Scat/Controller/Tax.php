@@ -65,13 +65,16 @@ class Tax {
     $errors= [];
 
     foreach ($missed as $sale) {
-      error_log("found {$sale->id}\n");
       if ($sale->paid) {
         try {
           $sale->captureTax($this->tax);
         } catch (\Exception $e) {
           $message= $e->getMessage();
           if (preg_match('/^This transaction has already been captured/', $message)) {
+            $sale->set_expr('tax_captured', 'NOW()');
+            $sale->save();
+          }
+          if (preg_match('/^This transaction has already been marked as authorized/', $message)) {
             $sale->set_expr('tax_captured', 'NOW()');
             $sale->save();
           }
