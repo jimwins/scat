@@ -374,8 +374,8 @@ class Cart extends \Scat\Model {
     $zip= explode('-', $address->zip);
 
     $data= [
-      'customerId' => $this->person_id ?: 0,
-      'cartId' => $this->uuid,
+      'customerID' => $this->person_id ?: 0,
+      'cartID' => $this->uuid,
       'deliveredBySeller' => false,
       // XXX get from default shipping address
       'origin' => [
