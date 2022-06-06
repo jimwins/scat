@@ -18,7 +18,7 @@
     {% if delivery %}
       <p>Nothing here yet.</p>
     {% else %}
-      {% set method= txn.delivery_details.data().method %}
+      {% set method= txn.delivery_details.data().details.vehicle %}
       <div class="form-group">
         <label for="vehicle">Vehicle Size</label>
         <select class="form-control" name="service">

@@ -515,6 +515,7 @@ class Cart extends \Scat\Model {
     $data['total']= $this->total();
     $data['due']= $this->due();
     $data['ready_for_payment']= $this->ready_for_payment();
+    $data['shipping_options']= $this->shipping_options;
     return $data;
   }
 }

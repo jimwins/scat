@@ -343,8 +343,10 @@ class Ordure {
           $txn_line->tic= $item->tic;
           $txn_line->retail_price= $data->sale->shipping;
           $txn_line->tax= $data->sale->shipping_tax;
+          $method= $data->sale->shipping_method;
           $txn_line->data= json_encode([
-            'method' => $data->sale->shipping_method
+            'method' => $method,
+            'details' => $data->sale->shipping_options->$method,
           ]);
           $txn_line->save();
         }
