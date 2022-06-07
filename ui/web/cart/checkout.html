@@ -182,7 +182,24 @@
 
       const appearance= {
         variables: {
-          colorPrimary: 'var(--primary-color)',
+          fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
+          borderRadius: '8px',
+          colorPrimary: '#c45417',
+        },
+        rules: {
+          '.Label': {
+            'fontSize': '1.125em',
+            'fontWeight': '500',
+            'lineHeight': '1',
+          },
+          '.Input': {
+            'border': '1px solid #e66a25',
+            'borderRadius': '8px',
+            'boxSizing': 'border-box',
+            'boxShadow': '0 3px 5px rgba(0, 0, 0, 0.18)',
+            'padding': '0.25em 0.5em',
+            'lineHeight': '1.625',
+          }
         }
       };
 
