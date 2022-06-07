@@ -127,211 +127,213 @@
 {% endblock %}
 
 {% block script %}
-  <script>
-    zaraz.ecommerce('Checkout Started', {
-      checkout_id: '{{ cart.id }}',
-      order_id: '{{ cart.uuid }}',
-      subtotal: '{{ cart.subtotal }}',
-      shipping: '{{ cart.shipping }}',
-      tax: '{{ cart.tax }}',
-      total: '{{ cart.total }}',
-      currency: 'usd',
-      products: [
-        {% for line in cart.items.find_many() %}
-          {% set item= line.item %}
-          {
-            product_id: '{{ line.code }}',
-            name: '{{ line.name }}',
-            category: '{{ item.category }}',
-            brand: '{{ item.brand_name }}',
-            price: '{{ line.sale_price }}',
-            currency: 'usd',
-            quantity: '{{ line.quantity }}',
-          },
-        {% endfor %}
-      ]
-    })
+  {% autoescape 'js' %}
+    <script>
+      zaraz.ecommerce('Checkout Started', {
+        checkout_id: '{{ cart.id }}',
+        order_id: '{{ cart.uuid }}',
+        subtotal: '{{ cart.subtotal }}',
+        shipping: '{{ cart.shipping }}',
+        tax: '{{ cart.tax }}',
+        total: '{{ cart.total }}',
+        currency: 'usd',
+        products: [
+          {% for line in cart.items.find_many() %}
+            {% set item= line.item %}
+            {
+              product_id: '{{ line.code }}',
+              name: '{{ line.name }}',
+              category: '{{ item.category }}',
+              brand: '{{ item.brand_name }}',
+              price: '{{ line.sale_price }}',
+              currency: 'usd',
+              quantity: '{{ line.quantity }}',
+            },
+          {% endfor %}
+        ]
+      })
 
-    {{ include('cart/shared.js') }}
+      {{ include('cart/shared.js') }}
 
-    function disablePayButtons() {
-      let stripeButton= document.getElementById('pay-stripe')
-      stripeButton.setAttribute('disabled', '')
+      function disablePayButtons() {
+        let stripeButton= document.getElementById('pay-stripe')
+        stripeButton.setAttribute('disabled', '')
 
-      let paypalButtons= document.getElementById('paypal-buttons');
-      paypalButtons.setAttribute('disabled', '')
-      if (paypalButtons.actions) paypalButtons.actions.disable()
-    }
-
-    function enablePayButtons(due) {
-      let stripeButton= document.getElementById('pay-stripe')
-      stripeButton.removeAttribute('disabled')
-      stripeButton.textContent= 'Pay ' + amount(due);
-
-      let paypalButtons= document.getElementById('paypal-buttons');
-      paypalButtons.removeAttribute('disabled')
-      if (paypalButtons.actions) paypalButtons.actions.enable()
-    }
-
-    const stripe= Stripe('{{ stripe.key }}', {
-      betas: ['link_beta_3'],
-      apiVersion: "2020-08-27;link_beta=v1"
-    });
-    const clientSecret= '{{ stripe.payment_intent.client_secret }}';
-
-    const appearance= {
-      variables: {
-        colorPrimary: 'var(--primary-color)',
+        let paypalButtons= document.getElementById('paypal-buttons');
+        paypalButtons.setAttribute('disabled', '')
+        if (paypalButtons.actions) paypalButtons.actions.disable()
       }
-    };
 
-    const elements= stripe.elements({clientSecret, appearance});
+      function enablePayButtons(due) {
+        let stripeButton= document.getElementById('pay-stripe')
+        stripeButton.removeAttribute('disabled')
+        stripeButton.textContent= 'Pay ' + amount(due);
 
-    const linkAuthenticationElement= elements.create("linkAuthentication", {
-      {% if cart.email %}
-        defaultValues: { email: "{{ cart.email }}" }
-      {% endif %}
-    });
+        let paypalButtons= document.getElementById('paypal-buttons');
+        paypalButtons.removeAttribute('disabled')
+        if (paypalButtons.actions) paypalButtons.actions.enable()
+      }
 
-    linkAuthenticationElement.mount("#link-authentication-element");
+      const stripe= Stripe('{{ stripe.key }}', {
+        betas: ['link_beta_3'],
+        apiVersion: "2020-08-27;link_beta=v1"
+      });
+      const clientSecret= '{{ stripe.payment_intent.client_secret }}';
 
-    linkAuthenticationElement.on('change', (event) => {
-      const email= event.value.email;
-      clearTimeout(timeout);
-      timeout= setTimeout(() => {
-        updateCart({ email: email });
-      }, 500);
-    });
+      const appearance= {
+        variables: {
+          colorPrimary: 'var(--primary-color)',
+        }
+      };
 
-    const paymentElement= elements.create("payment");
-    paymentElement.mount("#payment-element");
+      const elements= stripe.elements({clientSecret, appearance});
 
-    {% if cart.shipping_address_id != 1 %}
-      const shippingAddressElement= elements.create("shippingAddress", {
-        allowedCountries: ['US'],
-        {% if cart.shipping_address %}
-          {% set address= cart.shipping_address %}
-          defaultValues: {
-            name: '{{ address.name }}',
-            address: {
-              line1: '{{ address.street1 }}',
-              line2: '{{ address.street2 }}',
-              city: '{{ address.city }}',
-              state: '{{ address.state }}',
-              postal_code: '{{ address.zip }}',
-              country: 'US',
-            }
-          }
+      const linkAuthenticationElement= elements.create("linkAuthentication", {
+        {% if cart.email %}
+          defaultValues: { email: "{{ cart.email }}" }
         {% endif %}
       });
 
-      shippingAddressElement.mount("#shipping-address-element");
+      linkAuthenticationElement.mount("#link-authentication-element");
 
-      shippingAddressElement.on('change', (event) => {
-        const details= event.value;
+      linkAuthenticationElement.on('change', (event) => {
+        const email= event.value.email;
         clearTimeout(timeout);
         timeout= setTimeout(() => {
-          updateCart(details)
+          updateCart({ email: email });
         }, 500);
       });
-    {% endif %}
 
-    form.elements['name'].addEventListener('change', (event) => {
-      const name= event.currentTarget.value;
-      clearTimeout(timeout);
-      timeout= setTimeout(() => {
-        updateCart({ name : name })
-      }, 500);
-    })
+      const paymentElement= elements.create("payment");
+      paymentElement.mount("#payment-element");
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
+      {% if cart.shipping_address_id != 1 %}
+        const shippingAddressElement= elements.create("shippingAddress", {
+          allowedCountries: ['US'],
+          {% if cart.shipping_address %}
+            {% set address= cart.shipping_address %}
+            defaultValues: {
+              name: '{{ address.name }}',
+              address: {
+                line1: '{{ address.street1 }}',
+                line2: '{{ address.street2 }}',
+                city: '{{ address.city }}',
+                state: '{{ address.state }}',
+                postal_code: '{{ address.zip }}',
+                country: 'US',
+              }
+            }
+          {% endif %}
+        });
 
-      if (form.getAttribute('disabled')) {
-        return
-      }
+        shippingAddressElement.mount("#shipping-address-element");
 
-      form.setAttribute('disabled', '')
+        shippingAddressElement.on('change', (event) => {
+          const details= event.value;
+          clearTimeout(timeout);
+          timeout= setTimeout(() => {
+            updateCart(details)
+          }, 500);
+        });
+      {% endif %}
 
-      let formData= new FormData(document.getElementById('payment-form'))
-      if (formData.get('comment')) {
-        fetch('{{ url_for('comment-cart') }}', {
-          method: 'POST',
-          body: formData
-        })
-      }
+      form.elements['name'].addEventListener('change', (event) => {
+        const name= event.currentTarget.value;
+        clearTimeout(timeout);
+        timeout= setTimeout(() => {
+          updateCart({ name : name })
+        }, 500);
+      })
 
-      const {error}= await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url:
-            '{{ full_url_for('finalize-stripe', {}, { uuid : cart.uuid }) }}',
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (form.getAttribute('disabled')) {
+          return
+        }
+
+        form.setAttribute('disabled', '')
+
+        let formData= new FormData(document.getElementById('payment-form'))
+        if (formData.get('comment')) {
+          fetch('{{ url_for('comment-cart') }}', {
+            method: 'POST',
+            body: formData
+          })
+        }
+
+        const {error}= await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url:
+              '{{ full_url_for('finalize-stripe', {}, { uuid : cart.uuid }) }}',
+          }
+        });
+
+        if (error) {
+          form.removeAttribute('disabled')
+          // Show error to your customer (for example, payment details incomplete)
+          alert(error.message);
+        } else {
+          // we should never get here because Stripe will redirect
+          alert("Sorry, something went wrong. Please try reloading the page.");
         }
       });
 
-      if (error) {
-        form.removeAttribute('disabled')
-        // Show error to your customer (for example, payment details incomplete)
-        alert(error.message);
-      } else {
-        // we should never get here because Stripe will redirect
-        alert("Sorry, something went wrong. Please try reloading the page.");
-      }
-    });
+      let paypalButtons= document.getElementById('paypal-buttons');
+      if (paypalButtons) {
+        paypal.Buttons({
+          createOrder: (data, actions) => {
+            return fetch("/cart/checkout/paypal-order", {
+              headers: {
+                'Accept': 'application/json',
+              }
+            })
+            .then((res) => {
+              if (!res.ok) {
+                return res.json().then((data) => {
+                  if (data.text == 'Payment already completed.') {
+                    window.location.href= '/sale/{{ cart.uuid }}/thanks';
+                  } else {
+                    return Promise.reject(new Error(data.text));
+                  }
+                })
+              }
+              return res.json()
+            })
+            .then((order) => {
+              return order.id
+            });
+          },
 
-    let paypalButtons= document.getElementById('paypal-buttons');
-    if (paypalButtons) {
-      paypal.Buttons({
-        createOrder: (data, actions) => {
-          return fetch("/cart/checkout/paypal-order", {
-            headers: {
-              'Accept': 'application/json',
+          onInit: function(data, actions) {
+            paypalButtons.actions= actions /* save for later */
+            if (paypalButtons.hasAttribute('disabled')) {
+              actions.disable()
             }
-          })
-          .then((res) => {
-            if (!res.ok) {
-              return res.json().then((data) => {
-                if (data.text == 'Payment already completed.') {
-                  window.location.href= '/sale/{{ cart.uuid }}/thanks';
-                } else {
-                  return Promise.reject(new Error(data.text));
+          },
+
+          // Finalize the transaction on the server after payer approval
+          onApprove: (data, actions) => {
+            if (form.getAttribute('disabled')) {
+              return actions.disabled()
+            }
+
+            return actions.order.capture().then(function(details) {
+              let formData= new FormData(document.getElementById('payment-form'))
+              formData.append('order_id', details.id)
+              return fetch('{{ url_for('finalize-paypal') }}', {
+                method: 'POST',
+                body: formData
+              }).then(function (data) {
+                if (data.ok) {
+                  window.location.href= '{{ url_for('sale-thanks', { uuid: cart.uuid }) }}'
                 }
-              })
-            }
-            return res.json()
-          })
-          .then((order) => {
-            return order.id
-          });
-        },
-
-        onInit: function(data, actions) {
-          paypalButtons.actions= actions /* save for later */
-          if (paypalButtons.hasAttribute('disabled')) {
-            actions.disable()
+              });
+            });
           }
-        },
-
-        // Finalize the transaction on the server after payer approval
-        onApprove: (data, actions) => {
-          if (form.getAttribute('disabled')) {
-            return actions.disabled()
-          }
-
-	  return actions.order.capture().then(function(details) {
-	    let formData= new FormData(document.getElementById('payment-form'))
-	    formData.append('order_id', details.id)
-	    return fetch('{{ url_for('finalize-paypal') }}', {
-	      method: 'POST',
-	      body: formData
-	    }).then(function (data) {
-	      if (data.ok) {
-		window.location.href= '{{ url_for('sale-thanks', { uuid: cart.uuid }) }}'
-	      }
-	    });
-          });
-        }
-      }).render('#paypal-buttons');
-    }
-  </script>
+        }).render('#paypal-buttons');
+      }
+    </script>
+  {% endautoescape %}
 {% endblock %}

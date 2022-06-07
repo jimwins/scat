@@ -34,54 +34,56 @@
 {% endblock %}
 
 {% block script %}
-  <script>
-    zaraz.ecommerce('Order Completed', {
-      checkout_id: '{{ sale.id }}',
-      order_id: '{{ sale.uuid }}',
-      subtotal: '{{ sale.subtotal }}',
-      shipping: '{{ sale.shipping }}',
-      tax: '{{ sale.tax }}',
-      total: '{{ sale.total }}',
-      currency: 'usd',
-      products: [
-        {% for line in sale.items.find_many() %}
-          {% set item= line.item %}
-          {
-            product_id: '{{ line.code }}',
-            name: '{{ line.name }}',
-            category: '{{ item.category }}',
-            brand: '{{ item.brand_name }}',
-            price: '{{ line.sale_price }}',
-            currency: 'usd',
-            quantity: '{{ line.quantity }}',
-          },
-        {% endfor %}
-      ]
-    })
-  </script>
-
-  {% if config('google.merchant_center_id') and sale.eta %}
-    <script src="https://apis.google.com/js/platform.js?onload=renderOptIn" async defer></script>
+  {% autoescape 'js' %}
     <script>
-      window.renderOptIn = function() {
-        window.gapi.load('surveyoptin', function() {
-          window.gapi.surveyoptin.render(
+      zaraz.ecommerce('Order Completed', {
+        checkout_id: '{{ sale.id }}',
+        order_id: '{{ sale.uuid }}',
+        subtotal: '{{ sale.subtotal }}',
+        shipping: '{{ sale.shipping }}',
+        tax: '{{ sale.tax }}',
+        total: '{{ sale.total }}',
+        currency: 'usd',
+        products: [
+          {% for line in sale.items.find_many() %}
+            {% set item= line.item %}
             {
-              "merchant_id": {{ config('google.merchant_center_id') }},
-              "order_id": "{{ sale.uuid }}",
-              "email": "{{ sale.email }}",
-              "delivery_country": "US",
-              "estimated_delivery_date": "{{ sale.eta|date('Y-m-d') }}",
-
-              // OPTIONAL FIELDS
-              "products": [
-                {% for line in sale.items.find_many %}
-                  { "gtin" : "{{ line.item.barcode }}" },
-                {% endfor %}
-              ]
-            });
-        });
-      }
+              product_id: '{{ line.code }}',
+              name: '{{ line.name|e("js") }}',
+              category: '{{ item.category }}',
+              brand: '{{ item.brand_name }}',
+              price: '{{ line.sale_price }}',
+              currency: 'usd',
+              quantity: '{{ line.quantity }}',
+            },
+          {% endfor %}
+        ]
+      })
     </script>
-  {% endif %}
+
+    {% if config('google.merchant_center_id') and sale.eta %}
+      <script src="https://apis.google.com/js/platform.js?onload=renderOptIn" async defer></script>
+      <script>
+        window.renderOptIn = function() {
+          window.gapi.load('surveyoptin', function() {
+            window.gapi.surveyoptin.render(
+              {
+                "merchant_id": {{ config('google.merchant_center_id') }},
+                "order_id": "{{ sale.uuid }}",
+                "email": "{{ sale.email }}",
+                "delivery_country": "US",
+                "estimated_delivery_date": "{{ sale.eta|date('Y-m-d') }}",
+
+                // OPTIONAL FIELDS
+                "products": [
+                  {% for line in sale.items.find_many %}
+                    { "gtin" : "{{ line.item.barcode }}" },
+                  {% endfor %}
+                ]
+              });
+          });
+        }
+      </script>
+    {% endif %}
+  {% endautoescape %}
 {% endblock %}

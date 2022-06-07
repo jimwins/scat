@@ -195,14 +195,16 @@ figure img {
 </div>
 
 {% block script %}
-  <script>
-    zaraz.ecommerce('Product Viewed', {
-      product_id : '{{ item.code }}',
-      category : '{{ item.category }}',
-      name : '{{ item.name }}',
-      brand : '{{ product.brand.name }}',
-      price : '{{ item.sale_price }}',
-      currency : 'usd',
-    })
-  </script>
+  {% autoescape 'js' %}
+    <script>
+      zaraz.ecommerce('Product Viewed', {
+        product_id : '{{ item.code }}',
+        category : '{{ item.category }}',
+        name : '{{ item.name }}',
+        brand : '{{ product.brand.name }}',
+        price : '{{ item.sale_price }}',
+        currency : 'usd',
+      })
+    </script>
+  {% endautoescape %}
 {% endblock %}
