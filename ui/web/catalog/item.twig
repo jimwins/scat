@@ -78,21 +78,32 @@ figure img {
     </div>
   </div>
 
-  <div class="details">
-    {% if item.sale_price != item.retail_price %}
-      <h4 class="text-danger" style="margin: 0px">
-        Save {{ "%.0f"|format((item.retail_price - item.sale_price) / item.retail_price * 100) }}% off list
-      </h4>
-    {% endif %}
+  <style>
+    .details h2, .details h3 {
+      margin-top: 0;
+      margin-bottom: 0.25em;
+    }
+  </style>
 
-    <h3>
+  <div class="details">
+    <h2>
+      {% if item.sale_price != item.retail_price %}
+        Our Price
+      {% endif %}
       {{ scat.amount(item.sale_price) }}
       {% if item.sale_price != item.retail_price %}
         <small style="white-space: nowrap;">
           List Price {{ scat.amount(item.retail_price) }}
         </small>
       {% endif %}
-    </h3>
+    </h2>
+
+    {% if item.sale_price != item.retail_price %}
+      <h3 class="text-danger" style="margin: 0px">
+        Save {{ "%.0f"|format((item.retail_price - item.sale_price) / item.retail_price * 100) }}% off list
+      </h3>
+    {% endif %}
+
 
     <div id="afterpay-clearpay-message"></div>
 
