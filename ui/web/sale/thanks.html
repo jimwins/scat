@@ -2,7 +2,7 @@
 {% import 'macros.twig' as scat %}
 
 {% block title %}
-  Sale {{ sale.id }} @ Raw Materials Art Supplies
+  Sale {{ "%07d"|format(sale.id) }}
 {% endblock %}
 
 {% block content %}
