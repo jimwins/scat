@@ -1,13 +1,13 @@
 {% extends 'layout/page.html' %}
 {% import 'macros.twig' as scat %}
 
-{% block title %}
-  Sale {{ sale.id }} @ Raw Materials Art Supplies
-{% endblock %}
+{% block title -%}
+  Sale {{ "%07d"|format(sale.id) }}
+{%- endblock %}
 
 {% block content %}
   <h1 class="page-header">
-    Sale {{ sale.id }}
+    {{ block('title') }}
   </h1>
 
   <div class="alert alert-danger">
