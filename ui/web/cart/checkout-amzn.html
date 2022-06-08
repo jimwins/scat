@@ -66,8 +66,19 @@
       {{ include('cart/loyalty.twig') }}
     {% endblock %}
 
+    <h3>Apply Gift Card</h3>
+
+    <label for="giftcard">Code</label>
+    <input type="text" class="input" id="giftcard">
+    <button type="button" id="apply-gift-card" class="button">
+      <i class="bi bi-gift"></i>
+      <span class="label">Apply</span>
+    </button>
+
+    <hr>
+
     <div class="pay-button">
-      <button id="pay-amazon" type="submit" class="button"
+      <button id="pay-amazon" type="submit" class="button block"
               {{ not cart.ready_for_payment ? 'disabled' }}>
         Pay {{ scat.amount(cart.due) }}
       </button>
