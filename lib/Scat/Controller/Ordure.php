@@ -203,6 +203,8 @@ class Ordure {
 
   public function pullOrders(Request $request, Response $response,
                               \Scat\Service\Shipping $shipping,
+                              \Scat\Service\Giftcard $gift,
+                              \Scat\Service\Tax $tax,
                               View $view)
   {
     $client= new \GuzzleHttp\Client();
@@ -356,9 +358,26 @@ class Ordure {
           $payment= $txn->payments()->create();
           $payment->txn_id= $txn->id;
           $payment->method= ($pay->method == 'credit') ? 'stripe' : $pay->method;
+          $payment->processed= $pay->processed;
+          $payment->captured= $pay->captured;
+
           if ($pay->method == 'credit') {
             $payment->cc_type= $pay->data->cc_brand;
             $payment->cc_lastfour= $pay->data->cc_last4;
+          }
+
+          if ($pay->method == 'gift') {
+            /* Try to capture the payment. Not fatal, we'll have to sort
+             * it out manually later. */
+            try {
+              $card= $pay->data->card;
+              $gift->add_txn($card, -$pay->amount, $txn->id);
+              $payment->set_expr('captured', 'NOW()');
+            } catch (\Exception $e) {
+              $messages[]=
+                "{$txn->uuid}: Failed to capture gift card {$card}, " .
+                $e->getMessage();
+            }
           }
 
           if ($pay->method == 'other') {
@@ -366,8 +385,6 @@ class Ordure {
           }
 
           $payment->amount= $pay->amount;
-          $payment->processed= $pay->processed;
-          $payment->captured= $pay->captured;
           $payment->data= json_encode($pay->data);
           $payment->save();
         }
@@ -426,6 +443,14 @@ class Ordure {
           $note->added= $sale_note->added;
           $note->todo= 1;
           $note->save();
+        }
+
+        // Capture tax (not fatal if problem, we will re-try later)
+        try {
+          $txn->captureTax($tax);
+        } catch (\Exception $e) {
+          $messages[]=
+            "{$txn->uuid}: Failed to capture tax, " . $e->getMessage();
         }
 
         // Reward loyalty

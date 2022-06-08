@@ -818,6 +818,14 @@ class Txn extends \Scat\Model {
 
     $this->orm->raw_execute($q);
 
+    /* Mark them captured */
+    foreach ($this->payments()->where('method', 'loyalty')->find_many()
+              as $payment)
+    {
+      $payment->set_expr('captured', 'NOW()');
+      $payment->save();
+    }
+
     // No rewards for this txn?
     if ($this->no_rewards)
       return;
