@@ -12,7 +12,7 @@ class Scat
   public function find_person($loyalty) {
     $client= new \GuzzleHttp\Client();
 
-    $uri= $this->url . "/person/search/?loyalty=" . $loyalty;
+    $uri= $this->url . "/person/search/?loyalty=" . rawurlencode($loyalty);
 
     try {
       $res= $client->get($uri, [
