@@ -11,7 +11,7 @@ class Ordure {
   private $ordure_url, $ordure_key;
 
   public function __construct(
-    \Scat\Service\Config $config,
+    private \Scat\Service\Config $config,
     private \Scat\Service\Txn $txn,
     private \Scat\Service\Data $data,
     private \Scat\Service\Email $email
@@ -154,6 +154,27 @@ class Ordure {
           $person->setProperty('rewardsplus', $update->rewardsplus);
         } catch (\Exception $e) {
           $messages[]= "Exception: " . $e->getMessage();
+        }
+      }
+
+      if ($update->subscribe) {
+        try {
+          $key= $this->config->get('mailerlite.key');
+          $groupsApi= (new \MailerLiteApi\MailerLite($key))->groups();
+
+          $subscriber= [
+            'email' => $person->email,
+            'fields' => [
+              'name' => $person->name,
+            ]
+          ];
+
+          $groupsApi->addSubscriber(
+            $this->config->get('mailerlite.group_id'),
+            $subscriber
+          );
+        } catch (\Exception $e) {
+          $messages[]= "{$person->id}: Problem with newsletter signup: " . $e->getMessage();
         }
       }
 
