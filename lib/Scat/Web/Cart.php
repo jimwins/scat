@@ -528,6 +528,7 @@ class Cart {
 
   public function amznCheckout(
     Request $request, Response $response,
+    \Scat\Service\Scat $scat,
     \Scat\Service\AmazonPay $amzn
   ) {
     $cart= $request->getAttribute('cart');
@@ -548,8 +549,20 @@ class Cart {
     $name= $session->buyer->name;
     $email= $session->buyer->email;
 
-    if (!$cart->name) $cart->name= $name;
+    if (!$person) {
+      $people= $scat->find_person($email);
+      if (count($people)) {
+        $person= $people[0];
+        $expires= new \Datetime('+14 days');
+        $token= $this->auth->generate_login_key($person->id, $cart->uuid);
+        $this->auth->send_auth_cookie($token, $expires);
+      }
+    }
+
+    // XXX do we want to do something when we already had a different email?
     if (!$cart->email) $cart->email= $email;
+    if (!$cart->name) $cart->name= $name;
+    if (!$cart->person_id && $person) $cart->person_id= $person->id;
 
     // TODO handle $session->shippingAddress->countryCode != 'US'
 
