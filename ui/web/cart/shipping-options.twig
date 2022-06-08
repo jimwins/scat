@@ -5,7 +5,7 @@
 
     {% if cart.shipping_options|length %}
       {% for method, details in cart.shipping_options %}
-        {% if not exclude_local_delivery or method != 'local_delivery' %}
+        {% if not no_local_delivery or method != 'local_delivery' %}
           <label class="input-radio">
             <input type="radio" id="so-{{ method }}"
                     {{ (cart.shipping_method == method) ? 'checked' }}

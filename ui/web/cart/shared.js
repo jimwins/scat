@@ -22,6 +22,10 @@ function updateCart(details) {
   let form= document.getElementById('payment-form')
   form.setAttribute('disabled', '')
 
+  {% if no_local_delivery %}
+    details['no_local_delivery']= 1
+  {% endif %}
+
   return fetch('{{ url_for('update-cart') }}', {
     'method': 'POST',
     'headers' : {

@@ -5,6 +5,8 @@
   Amazon Pay Checkout @ Raw Materials Art Supplies
 {% endblock %}
 
+{% set no_local_delivery= 1 %}
+
 {% block content %}
 <style>
   form#payment-form {
@@ -51,7 +53,7 @@
   <form id="payment-form" class="stacked-form"
         method="POST" action="{{ url_for('pay-amzn') }}">
     {% block shipping_options %}
-      {{ include('cart/shipping-options.twig', { exclude_local_delivery: true }) }}
+      {{ include('cart/shipping-options.twig') }}
     {% endblock %}
 
     <h3>Comments</h3>

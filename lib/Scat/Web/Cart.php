@@ -171,6 +171,10 @@ class Cart {
 
           break;
 
+        /* ignore, this is a signal for later */
+        case 'no_local_delivery':
+          break;
+
         default:
           throw new \Exception("Not allowed to change {$key}");
       }
@@ -253,6 +257,7 @@ class Cart {
       $this->view->fetchBlock('cart/checkout.html', 'shipping_options', [
         'person' => $person,
         'cart' => $cart,
+        'no_local_delivery' => $request->getParam('no_local_delivery'),
       ]);
     $data['loyalty_html']=
       $this->view->fetchBlock('cart/checkout.html', 'loyalty', [
