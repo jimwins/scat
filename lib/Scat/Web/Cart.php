@@ -98,6 +98,9 @@ class Cart {
         case 'name':
           $cart->name= $value;
           break;
+        case 'phone':
+          $cart->phone= $value;
+          break;
         case 'address':
           if ($value['city']) {
             $cart->updateShippingAddress($this->shipping, [

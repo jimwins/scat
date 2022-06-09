@@ -33,6 +33,13 @@
             value="{{ cart.name }}"
             placeholder="Vincent Van Gogh">
 
+    <label for="phone">
+      Phone
+    </label>
+    <input type="text" class="input" phone="phone" id="phone"
+            value="{{ cart.phone }}"
+            placeholder="(213) 627-7223 (optional except for local delivery)">
+
     <h3>Shipping</h3>
     <p>
       <strong>Where do you want to us to ship the order?</strong> We can
@@ -259,6 +266,14 @@
         clearTimeout(timeout);
         timeout= setTimeout(() => {
           updateCart({ name : name })
+        }, 500);
+      })
+
+      form.elements['phone'].addEventListener('change', (event) => {
+        const phone= event.currentTarget.value;
+        clearTimeout(timeout);
+        timeout= setTimeout(() => {
+          updateCart({ phone : phone })
         }, 500);
       })
 

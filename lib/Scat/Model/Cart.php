@@ -172,6 +172,10 @@ class Cart extends \Scat\Model {
   }
 
   public function ready_for_payment() {
+    // We require phone # with local delivery
+    if ($this->shipping_method == 'local_delivery' && !$this->phone) {
+      return false;
+    }
     return $this->shipping_method && $this->tax_calculated && $this->email;
   }
 
@@ -376,7 +380,6 @@ class Cart extends \Scat\Model {
     $data= [
       'customerID' => $this->person_id ?: 0,
       'cartID' => $this->uuid,
-      'orderID' => $this->uuid,
       'deliveredBySeller' => false,
       // XXX get from default shipping address
       'origin' => [

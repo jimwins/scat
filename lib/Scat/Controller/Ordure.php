@@ -270,11 +270,22 @@ class Ordure {
         if ($data->sale->person_id) {
           $person=
             $this->data->factory('Person')->find_one($data->sale->person_id);
-        } elseif ($data->sale->name) {
+        } else {
+          /* Prefer to find by email. */
           $person=
             $this->data->factory('Person')->where('email', $data->sale->email)
                                           ->where('active', 1)
                                           ->find_one();
+
+          /* But try phone number next, if we have one */
+          if (!$person && $data->sale->phone) {
+            $loyalty_number= preg_replace('/\D+/', '', $data->sale->phone);
+            $person=
+              $this->data->factory('Person')->where('loyalty_number',
+                                                    $loyalty_number)
+                                            ->where('active', 1)
+                                            ->find_one();
+          }
         }
 
         /* Didn't find them? Create them. */
@@ -282,12 +293,15 @@ class Ordure {
           $person= $this->data->factory('Person')->create();
           $person->name= $data->sale->name;
           $person->email= $data->sale->email;
+          $person->phone= $data->sale->phone;
           $person->save();
         }
         /* Otherwise update name, email */
         else {
+          // XXX think about how/whether we want to change email and phone
           if ($data->sale->name) $person->name= $data->sale->name;
           if ($data->sale->email) $person->email= $data->sale->email;
+          if ($data->sale->phone) $person->phone= $data->sale->phone;
           $person->save();
         }
 
@@ -419,8 +433,8 @@ class Ordure {
           } else {
             $easypost_address= $shipping->createAddress([
               'verify'  => [ 'delivery' ],
-              'name' => $data->shipping_address->name,
-              'email' => $data->shipping_address->email,
+              'name' => $data->shipping_address->name ?: $data->sale->name,
+              'email' => $data->shipping_address->email ?: $data->sale->email,
               'company' => $data->shipping_address->company,
               'street1' => $data->shipping_address->address1 ?? $data->shipping_address->street1,
               'street2' => $data->shipping_address->address2 ?? $data->shipping_address->street2,
@@ -428,14 +442,14 @@ class Ordure {
               'state' => $data->shipping_address->state,
               'zip' => $data->shipping_address->zip5 ?? $data->shipping_address->zip,
               'country' => 'US',
-              'phone' => $data->shipping_address->phone,
+              'phone' => $data->shipping_address->phone ?: $data->sale->phone,
             ]);
           }
 
           $address= $this->data->factory('Address')->create();
           $address->easypost_id= $easypost_address->id;
           $address->name= $easypost_address->name;
-          $address->email= $easypost_address->email;
+          $address->email= $easypost_address->email ?: $data->sale->email;
           $address->company= $easypost_address->company;
           $address->street1= $easypost_address->street1;
           $address->street2= $easypost_address->street2;
@@ -443,7 +457,7 @@ class Ordure {
           $address->state= $easypost_address->state;
           $address->zip= $easypost_address->zip;
           $address->country= $easypost_address->country;
-          $address->phone= $easypost_address->phone;
+          $address->phone= $easypost_address->phone ?: $data->sale->phone;
           $address->timezone=
             @$easypost_address->verifications->delivery->details->time_zone;
           $address->save();
