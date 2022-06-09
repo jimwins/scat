@@ -62,7 +62,7 @@ class Contact {
       }
     }
 
-    if (preg_match('/(bitcoin|cryptocurrency|sexy?.*girl|seowriters|goo\\.gl)/i', $message)) {
+    if (preg_match('/(erype|bitcoin|cryptocurrency|sexy?.*girl|seowriters|goo\\.gl)/i', $message)) {
       throw new \Exception("Sorry, your message looks like spam.");
     }
 
