@@ -31,6 +31,11 @@ class Email {
 
     $addr= [];
 
+    /* Convert [ email = '', name = '' ] to [ email => name ] */
+    if (is_array($to) && array_key_exists('email', $to)) {
+      $to= [ $to['email'] => @$to['name'] ];
+    }
+
     /* We might have just gotten an email in $to */
     foreach (is_array($to) ? $to : [ $to => '' ] as $address => $name) {
       /* For DEBUG, always just send to ourselves */

@@ -76,8 +76,7 @@ class Contact {
     ]);
 
     /* We are sending mail to ourselves, but we set the Reply-To */
-    $from= $this->email->default_from_address();
-    $to= [ $from->email => $from->name ];
+    $to= $this->email->default_from_address();
 
     $this->email->send($to, $subject, $body, NULL, [ 'replyTo' => $email, 'no_bcc' => true ]);
 
