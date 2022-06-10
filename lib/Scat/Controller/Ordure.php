@@ -96,8 +96,6 @@ class Ordure {
 
     $body= $res->getBody();
 
-    error_log("done uploading, got: {$body}\n");
-
     return $response;
   }
 
