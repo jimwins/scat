@@ -193,19 +193,23 @@ class Item extends \Scat\Model {
 
   public function brand_name() {
     $product= $this->product();
-    if ($product)
+    if ($product) {
       $brand= $product->brand();
-    if ($brand)
-      return $brand->name;
+      if ($brand) {
+        return $brand->name;
+      }
+    }
     return "";
   }
 
   public function category() {
     $product= $this->product();
-    if ($product)
+    if ($product) {
       $subdept= $product->dept();
-    if ($subdept)
-      $dept= $subdept->parent();
+      if ($subdept) {
+        $dept= $subdept->parent();
+      }
+    }
     if (!$product || !$subdept || !$dept)
       return "";
 
