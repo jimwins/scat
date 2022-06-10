@@ -1,10 +1,10 @@
 #!/usr/bin/php
 <?php
 
-include basename(__FILENAME__) . '/../config.php';
-include basename(__FILENAME__) . '/../extern/cryptor.php';
+include basename(__FILE__) . '/../config.php';
+include basename(__FILE__) . '/../extern/cryptor.php';
 
-$file= $_SERVER['argv'][1];
+$file= @$_SERVER['argv'][1];
 
 if (!$file || !file_exists($file))
   die("usage: {$_SERVER['argv'][0]} file\n");
