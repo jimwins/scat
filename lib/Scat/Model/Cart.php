@@ -186,7 +186,8 @@ class Cart extends \Scat\Model {
   public function get_item_dims() {
     $items= [];
 
-    foreach ($this->items()->find_many() as $line) {
+    /* Exclude kits items, the kit should have dimensions */
+    foreach ($this->items()->where_null('kit_id')->find_many() as $line) {
       if ($line->quantity <= 0) continue;
 
       $item= $line->item();
