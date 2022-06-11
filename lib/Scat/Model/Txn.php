@@ -860,6 +860,7 @@ class Txn extends \Scat\Model {
   public function as_array() {
     $res= parent::as_array();
     $res['items']= $this->items()->find_many();
+    $res['shipments']= $this->shipments()->find_many();
     return $res;
   }
 }
