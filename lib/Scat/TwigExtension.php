@@ -24,6 +24,7 @@ class TwigExtension
 
   public function getFunctions() : array {
     return [
+      new \Twig\TwigFunction('current_release', [ $this, 'getCurrentRelease' ]),
       new \Twig\TwigFunction('notes', [ $this, 'getNotes' ]),
       new \Twig\TwigFunction('config', [ $this, 'getConfig' ]),
       new \Twig\TwigFunction('item', [ $this, 'getItem' ]),
@@ -45,6 +46,14 @@ class TwigExtension
       new \Twig\TwigFilter('phone_number_format',
                            [ $this, 'phone_number_format' ])
     ];
+  }
+
+  public function getCurrentRelease() {
+    $link= @readlink('/app/current');
+    if ($link) {
+      return basename($link);
+    }
+    return '';
   }
 
   public function getNotes() {
