@@ -284,6 +284,7 @@ class Catalog {
     $dept->slug= $request->getParam('slug');
     $dept->description= $request->getParam('description');
     $dept->active= (int)$request->getParam('active');
+    $dept->featured= (int)$request->getParam('featured');
     $dept->save();
 
     if ($id) {
