@@ -55,13 +55,25 @@
       </tr>
       <tr>
         <th colspan="5" class="text-right">
-          {% if sale.shipping == 50.00 %}
+          {% if sale.shipping_address_id == 1 %}
+            Pickup at store:
+          {% elseif sale.shipping_method == 'local_delivery' %}
             Local delivery:
+          {% elseif sale.shipping_method == 'two_day' %}
+            2-Day Shipping &amp; handling:
+          {% elseif sale.shipping_method == 'next_day' %}
+            Next Day Shipping &amp; handling:
           {% else %}
             Shipping &amp; handling:
           {% endif %}
         </th>
-        <td class="text-right">{{ scat.amount(sale.shipping) }}</td>
+        <td class="text-right">
+          {% if sale.status == 'cart' and not sale.shipping_method %}
+            <span class="text-danger">TBD</span>
+          {% else %}
+            {{ scat.amount(sale.shipping) }}
+          {% endif %}
+        </td>
       </tr>
       <tr>
         <th colspan="5" class="text-right">
@@ -72,7 +84,7 @@
           {% endif %}
         </th>
         <td class="text-right" id="tax">
-          {% if sale.status == cart and not sale.tax_calculated %}
+          {% if sale.status == 'cart' and not sale.tax_calculated %}
             <span class="text-danger">TBD</span>
           {% else %}
             {{ scat.amount(sale.tax) }}
@@ -82,7 +94,7 @@
       <tr>
         <th colspan="5" class="text-right">Total:</th>
         <td class="text-right" id="total">
-          {% if sale.status == 'cart' and not sale.tax_calculated %}
+          {% if sale.status == 'cart' and not sale.tax_calculated or not sale.shipping_method %}
             <span class="text-danger">TBD</span>
           {% else %}
             {{ scat.amount(sale.total) }}
