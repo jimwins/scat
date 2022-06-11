@@ -184,6 +184,19 @@ class Txn extends \Scat\Model {
     return $this->items()->join('item', [ 'item.id', '=', 'txn_line.item_id' ])->where_gt('item.hazmat', 0)->count();
   }
 
+  public function shipping_method() {
+    if ($this->shipping_address_id <= 1)
+      return null;
+
+    $item= $this->items()->where('tic', '11000')->find_one();
+
+    if ($item) {
+      return $item->data()->method ?: 'default';
+    }
+
+    return 'default';
+  }
+
   public function is_firstclass_shipment() {
     /* XXX Fix hardcoded list */
     return $this->shipping_address_id > 1 &&
