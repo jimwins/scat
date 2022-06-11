@@ -370,6 +370,7 @@ class Item extends \Scat\Model {
     $data['stock']= $this->stock();
     $data['on_order']= $this->on_order();
     $data['sale_price']= $this->sale_price();
+    $data['data']= json_decode($this->data);
     return $data;
   }
 
