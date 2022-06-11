@@ -197,12 +197,6 @@ class Txn extends \Scat\Model {
     return 'default';
   }
 
-  public function is_firstclass_shipment() {
-    /* XXX Fix hardcoded list */
-    return $this->shipping_address_id > 1 &&
-      $this->items()->where_in('item_id', [ 93460, 11212 ])->find_one();
-  }
-
   public function dropships() {
     return $this->has_many('Txn', 'returned_from_id')
                 ->where('type', 'vendor');

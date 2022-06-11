@@ -1,9 +1,19 @@
 {% extends 'layout/dialog.html' %}
 {% import 'macros.twig' as scat %}
 
-{% if txn.is_firstclass_shipment() %}
+{% set shipping_method= txn.shipping_method %}
+
+{% if shipping_method == 'next_day' %}
   {% set preferred_rates= {
-    'USPS': [ 'First' ],
+    'UPS':  [ 'NextDayAir' ],
+    'UPS':  [ 'NextDayAirSaver' ],
+    'UPSDAP':  [ 'NextDayAir' ],
+    'UPSDAP':  [ 'NextDayAirSaver' ],
+  } %}
+{% elseif shipping_method == 'two_day ' %}
+  {% set preferred_rates= {
+    'UPS':  [ '2ndDayAir' ],
+    'UPSDAP':  [ '2ndDayAir' ],
   } %}
 {% else %}
   {% if txn.has_hazmat_items() %}
@@ -25,7 +35,7 @@
 {% endif %}
 
 {% block title %}
-  Add Shipment
+  Add Shipment {{ txn.shipping_method }}
 {% endblock %}
 
 {% block body %}

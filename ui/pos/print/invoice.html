@@ -79,8 +79,11 @@
       {{ addr.city }}, {{ addr.state }}
       {{ addr.zip }}<br>
       {% if addr.phone %} {{ addr.phone|phone_number_format }}<br>{% endif %}
-      {% if txn.is_firstclass_shipment() %}
-        <b>FIRST CLASS</b><br>
+      {% set shipping_method= txn.shipping_method %}
+      {% if shipping_method == 'two_day' %}
+        <b>TWO DAY SHIPPING</b><br>
+      {% elseif shipping_method == 'next_day' %}
+        <b>NEXT DAY SHIPPING</b><br>
       {% endif %}
       {% if txn.has_hazmat_items() %}
         <img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"> Hazardous Materials<br>
