@@ -72,11 +72,14 @@ class TwigExtension
   }
 
   /* XXX really should be using Catalog service or something */
-  public function topDepartments() {
-    return \Titi\Model::factory('Department')
-             ->where('parent_id', 0)
-             ->order_by_asc('name')
-             ->find_many();
+  public function topDepartments($featured= 0) {
+    $depts= \Titi\Model::factory('Department')
+              ->where('parent_id', 0)
+              ->order_by_asc('name');
+    if ($featured) {
+      $depts= $depts->where('featured', 1);
+    }
+    return $depts->find_many();
   }
 
   public function getItem($code) {

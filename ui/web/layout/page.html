@@ -82,9 +82,30 @@
           <span class="badge"></span>
         </a>
       </div>
+      <div id="site-featured-depts">
+        <ul id="departments">
+          {% for dept in topDepartments(true) %}
+            <li>
+              <a href="{{ url_for('catalog', { dept: dept.slug }) }}">
+                {{ dept.name }}
+              </a>
+            </li>
+          {% endfor %}
+          <li>
+            <a href="{{ url_for('catalog') }}">
+              <b>More Departments &rarr;</b>
+            </a>
+          </li>
+        </ul>
+      </div>
       <div id="site-depts">
         <ul id="departments">
           <li><b>Departments</b></li>
+          <li>
+            <a href="{{ url_for('catalog-whats-new') }}">
+              What's New
+            </a>
+          </li>
           {% for dept in topDepartments() %}
             <li>
               <a href="{{ url_for('catalog', { dept: dept.slug }) }}">
