@@ -81,7 +81,12 @@ class TwigExtension
   }
 
   public function showInternalAd($env, $tag, $start) {
-    $ad= \Titi\Model::factory('InternalAd')->where('tag', $tag)->limit(1)->offset($start)->where('active', 1)->find_one();
+    $ad= \Titi\Model::factory('InternalAd')
+          ->where('tag', $tag)
+          ->limit(1)->offset($start)
+          ->order_by_expr('RAND(TO_DAYS(NOW()))')
+          ->where('active', 1)
+          ->find_one();
     if (!$ad) return;
     return $env->render('ad.twig', [ 'ad' => $ad ]);
   }
