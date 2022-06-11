@@ -55,4 +55,30 @@ class Department extends \Scat\Model {
     }
     parent::save();
   }
+
+  public function image() {
+    if ($this->parent_id) {
+      $depts= [ $this ];
+    } else {
+      $depts= $this->departments()
+                    ->order_by_expr('RAND(TO_DAYS(NOW()))')
+                    ->find_many();
+    }
+
+    foreach ($depts as $dept) {
+      $products= $dept->products()
+                      ->order_by_expr('RAND(TO_DAYS(NOW()))')
+                      ->find_many();
+      foreach ($products as $product) {
+        if ($product->items()->count() > 0) {
+          $media= $product->media();
+          if ($media) {
+            return $media[0];
+          }
+        }
+      }
+    }
+
+    return false;
+  }
 }

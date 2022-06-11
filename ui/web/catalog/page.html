@@ -76,20 +76,97 @@
 <div class="row">
   <div class="col-md-{% block catalog_width "9 col-md-push-3" %}">
 
+<style>
+{# TODO move into static css #}
+.card {
+  --img-ratio: 3/2;
+
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0.25em 0.25em 1em rgba(0, 0, 0, 0.35);
+  border-radius: var(--border-radius);
+}
+.card.hot {
+  cursor: pointer;
+}
+
+/* Soon we can replace this with: gap: 1rem; */
+.card > * + * {
+  margin-top: 1rem;
+}
+
+.card > img {
+  /* Fallback for `aspect-ratio` of defining a height */
+  height: max(18vh, 12rem);
+  object-fit: cover;
+  width: 100%;
+}
+
+/* When supported, use `aspect-ratio` */
+@supports (aspect-ratio: 1) {
+  .card > img {
+    aspect-ratio: var(--img-ratio);
+    height: auto;
+  }
+}
+
+.card > img:first-child {
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.card > img:last-child {
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  margin-top: auto;
+}
+
+.card > :not(img) {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.card > :not(img):first-child {
+  margin-top: 1rem;
+}
+
+/* Enhanced `:not()` accepts a selector list,
+but as a fallback you can chain `:not()` instead */
+.card > :last-of-type:not(img, h2, h3, h4) {
+  margin-bottom: 1rem;
+}
+
+.card > :not(h2, h3, h4) {
+  font-size: 0.9rem;
+}
+
+.card > button {
+  align-self: center;
+}
+
+.card.hot:hover h3 {
+  text-decoration: underline;
+  color: var(--primary-color);
+}
+.card.hot:hover {
+  box-shadow: 0.25em 0.25em 1em rgba(var(--primary-color-r), var(--primary-color-g), var(--primary-color-b), 0.8);
+}
+</style>
+
     {% block catalog_content %}
       {% if dept and not subdept  %}
         <p>
           {{ dept.description | markdown }}
         </p>
-        <ul>
+        <div class="smol-grid">
           {% for subdept in subdepts %}
-            <li>
+            <div class="card hot">
               <a href="{{ url_for('catalog', subdept.url_params ) }}">
                 {{ subdept.name }}
               </a>
-            </li>
+              {% set image= subdept.image %}
+              <img src="{{ image.medium }}" alt="{{ subdept.name }}">
+            </div>
           {% endfor %}
-        </ul>
+        </div>
       {% endif %}
       {% if products and not product %}
         <h1>{{ subdept ? subdept.name : dept.name }}</h1>
@@ -117,25 +194,17 @@
       {% endif %}
 
       {% if not dept %}
-        <ol>
-          <li>
-            <a href="{{ url_for('catalog-whats-new') }}">
-              What's New
-            </a>
-          </li>
+        <div class="smol-grid">
           {% for dept in depts %}
-            <li>
+            <div class="card hot">
               <a href="{{ url_for('catalog', { dept: dept.slug }) }}">
                 {{ dept.name }}
               </a>
-            </li>
+              {% set image= dept.image %}
+              <img src="{{ image.medium }}" alt="{{ subdept.name }}">
+            </div>
           {% endfor %}
-          <li>
-            <a href="{{ url_for('catalog-brand') }}">
-              Brands
-            </a>
-          </li>
-        </ol>
+        </div>
       {% endif %}
 
     {% endblock %}
