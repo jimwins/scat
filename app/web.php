@@ -294,10 +294,10 @@ $app->get('/sitemap.xml', [ \Scat\Web\Page::class, 'sitemap' ])
   ->setName('sitemap');
 
 /* Pages (everything else) */
+if ($DEBUG) {
+  $app->post('/~edit[/{param:.*}]', [ \Scat\Web\Page::class, 'savePage' ]);
+}
 $app->get('/{param:.*}', [ \Scat\Web\Page::class, 'page' ])
   ->setName('page');
-if ($DEBUG) {
-  $app->post('/~edit/{param:.*}', [ \Scat\Web\Page::class, 'savePage' ]);
-}
 
 $app->run();
