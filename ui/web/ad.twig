@@ -1,0 +1,27 @@
+{% if ad.link_type == 'product' %}
+  {% set link= url_for('catalog', ad.product.url_params) %}
+{% elseif ad.link_type == 'item' %}
+  {% set link= url_for('catalog', ad.item.url_params) %}
+{% else %}
+  {% set link= ad.link_url %}
+{% endif %}
+
+{% if ad.tag == 'hero' %}
+  <div class="hero">
+    <div class="card hero__content">
+      <h1>{{ ad.headline }}</h1>
+      <p>{{ ad.caption }}</p>
+      <a class="button" href="{{ link }}">{{ ad.button_label }}</a>
+    </div>
+    <img src="{{ ad.image.large_square }}" alt="{{ ad.image.alt_text ?: ad.headline }}" />
+  </div>
+{% elseif ad.tag == 'basic' %}
+  <li class="card">
+    <h3>{{ ad.headline }}</h3>
+    <img src="{{ ad.image.medium }}" alt="{{ ad.image.alt_text ?: ad.headline }}">
+    <p>{{ ad.caption }}</p>
+    <a class="button" href="{{ link }}">{{ ad.button_label }}</a>
+  </li>
+{% else %}
+  {{ ad | json_encode }}
+{% endif %}

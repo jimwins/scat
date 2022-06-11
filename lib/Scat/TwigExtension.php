@@ -27,6 +27,10 @@ class TwigExtension
       new \Twig\TwigFunction('notes', [ $this, 'getNotes' ]),
       new \Twig\TwigFunction('config', [ $this, 'getConfig' ]),
       new \Twig\TwigFunction('item', [ $this, 'getItem' ]),
+      new \Twig\TwigFunction('ad', [ $this, 'showInternalAd' ], [
+        'is_safe' => [ 'html' ],
+        'needs_environment' => true,
+      ]),
       new \Twig\TwigFunction('kit', [ $this, 'showKit' ], [
         'is_safe' => [ 'html' ],
         'needs_environment' => true,
@@ -71,10 +75,15 @@ class TwigExtension
   }
 
   public function showKit($env, $code) {
-    error_log("code: {$code}");
     $kit= \Titi\Model::factory('Item')->where('code', $code)->find_one();
     if (!$kit) return;
     return $env->render('catalog/kit.twig', [ 'kit' => $kit ]);
+  }
+
+  public function showInternalAd($env, $tag, $start) {
+    $ad= \Titi\Model::factory('InternalAd')->where('tag', $tag)->limit(1)->offset($start)->where('active', 1)->find_one();
+    if (!$ad) return;
+    return $env->render('ad.twig', [ 'ad' => $ad ]);
   }
 
   public function phone_number_format($phone, $country_code= 'US') {
