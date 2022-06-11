@@ -50,7 +50,7 @@ class Page {
     ]);
   }
 
-  function savePage(Request $request, Response $response, $param)
+  function savePage(Request $request, Response $response, $param= null)
   {
     if (!$param) $param= '//';
 
