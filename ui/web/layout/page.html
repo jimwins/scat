@@ -306,7 +306,7 @@
     })
 
     let recordAddToCart= (ev) => {
-      let formData= new FormData(ev.target)
+      let formData= new FormData(ev.currentTarget)
       zaraz.ecommerce('Product Added', {
         product_id: formData.get('item'),
         name: formData.get('name'),
