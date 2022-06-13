@@ -53,8 +53,7 @@ class Txn extends \Scat\Model {
   public function stocked() {
     $stock= 1;
     foreach ($this->items()->find_many() as $line) {
-      $item= $line->item();
-      if ($item->tic != '00000') continue;
+      if ($line->tic != '00000') continue;
       $item_stock= $item->stock($this->created);
       if ($item_stock < -($line->ordered)) {
         $stock= 0;
@@ -527,7 +526,7 @@ class Txn extends \Scat\Model {
     foreach ($this->items()->where_null('returned_from_id')->find_many()
               as $i)
     {
-      $tic= $i->item->tic;
+      $tic= $i->tic;
       $index= ($tic == '11000') ? 0 : $n++;
       $index_map[$index]= $i->id;
       $cartItems[]= [
@@ -723,7 +722,7 @@ class Txn extends \Scat\Model {
           foreach ($this->items()->where_null('returned_from_id')->where_null('kit_id')->find_many()
                     as $i)
           {
-            $tic= $i->item()->tic;
+            $tic= $i->tic;
             $index= ($tic == '11000') ? 0 : $n++;
             $index_map[$index]= $i->id;
             $data['cartItems'][]= [
