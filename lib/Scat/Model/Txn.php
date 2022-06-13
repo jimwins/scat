@@ -54,7 +54,7 @@ class Txn extends \Scat\Model {
     $stock= 1;
     foreach ($this->items()->find_many() as $line) {
       if ($line->tic != '00000') continue;
-      $item_stock= $item->stock($this->created);
+      $item_stock= $line->item()->stock($this->created);
       if ($item_stock < -($line->ordered)) {
         $stock= 0;
       }
