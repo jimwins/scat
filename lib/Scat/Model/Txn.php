@@ -636,16 +636,20 @@ class Txn extends \Scat\Model {
     if ($this->tax() != 0) {
       // Is this a return or exchange?
       if ($this->returned_from_id) {
+        $returned_from= $this->returned_from();
+
         $data= [
-          'orderID' => $this->returned_from()->uuid,
+          'orderID' => $returned_from->uuid,
           'returnedDate' => $this->paid,
           'cartItems' => [],
         ];
 
         // These are the cartItems and index_map of the *returned txn*
         list($cartItems, $index_map)=
-          $this->returned_from()->generateCartItems();
+          $returned_from->generateCartItems();
         $index_map= array_flip($index_map); // we're going from id to index
+
+        $tax_returned= 0.00;
 
         foreach ($this->items()->where_not_null('returned_from_id')->find_many()
                   as $i)
@@ -666,9 +670,10 @@ class Txn extends \Scat\Model {
           $item['Qty']= $i->ordered;
 
           $data['cartItems'][]= $item;
+          $tax_returned+= $i->tax;
         }
 
-        if (count($data['cartItems'])) {
+        if (count($data['cartItems']) && $tax_returned != 0) {
           $response= $tax->returned($data);
 
           if ($response->ResponseType < 2) {
@@ -677,7 +682,6 @@ class Txn extends \Scat\Model {
         } else {
           error_log("No items to be returned for transaction {$this->id}\n");
         }
-
       }
 
       // If we have new items, have to report it as new sale
