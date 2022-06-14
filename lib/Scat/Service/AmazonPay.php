@@ -55,37 +55,23 @@ class AmazonPay {
     ];
   }
 
-  public function refund($capture_id, $amount) {
-    $amazon= $this->getClient();
+  public function refund($charge_id, $amount, $uuid) {
+    $client= $this->getClient();
 
-    // we only have the authorization here
-    $authorization= $amazon->getAuthorizationDetails([
-      'amazon_authorization_id' => $charge->AmazonAuthorizationId,
-    ]);
-    $details= $authorization->toArray();
+    $payload= [
+      'chargeId' => $charge_id,
+      'refundAmount' => [
+        'amount' => $amount,
+        'currencyCode' => 'USD',
+      ],
+      'softDescriptor' => 'Refund',
+    ];
 
-    if (!$amazon->success) {
-      error_log("Amazon FAIL: " . json_encode($details) . "\n");
-      throw new \Exception("An unexpected Amazon error occured.");
-    }
-
-    $refund= $amazon->refund([
-      // XXX We assume only one capture per authorization
-      'amazon_capture_id' => $details['GetAuthorizationDetailsResult']
-                                      ['AuthorizationDetails']
-                                      ['IdList']
-                                      ['member'],
-      'refund_reference_id' => uniqid(),
-      'refund_amount' => $amount,
-    ]);
-    $details= $refund->toArray();
-
-    if (!$amazon->success) {
-      error_log("Amazon FAIL: " . json_encode($details) . "\n");
-      throw new \Exception("An unexpected Amazon error occured.");
-    }
-
-    return $refund;
+    return $this->handleResult(
+      $client->createRefund($payload, [
+        'x-amz-pay-idempotency-key' => $uuid,
+      ])
+    );
   }
 
   public function addTracker($payment, $tracker) {
@@ -117,7 +103,7 @@ class AmazonPay {
   private function handleResult($result) {
     $data= json_decode($result['response']);
 
-    if ($result['status'] != 200) {
+    if ($result['status'] != 200 && $result['status'] != 201) {
       throw new \Exception("{$data->reasonCode}: $data->message}");
     }
 

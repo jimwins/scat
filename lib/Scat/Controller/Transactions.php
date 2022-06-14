@@ -26,21 +26,6 @@ class Transactions {
     $this->tax= $tax;
   }
 
-  private function getAmazonClient(\Scat\Service\Config $config) {
-    $config= [
-      'merchant_id' => $config->get('amazon.merchant_id'),
-      'access_key' => $config->get('amazon.access_key'),
-      'secret_key' => $config->get('amazon.secret_key'),
-      'client_id' => $config->get('amazon.client_id'),
-      'region' => $config->get('amazon.region'),
-      'currency_code' => $config->get('amazon.currency_code'),
-      'sandbox' => (bool)$GLOBALS['DEBUG']
-    ];
-
-    $client= new \AmazonPay\Client($config);
-    return $client;
-  }
-
   public function search(Request $request, Response $response, $type) {
     $q= trim($request->getParam('q'));
 
@@ -206,6 +191,7 @@ class Transactions {
       $data['allocated']= -$data['allocated'];
       $data['tax']= -$data['tax'];
       $new->set($data);
+      $new->data($line->data()); // XXX fix data() magic
       $new->txn_id= $sale->id;
       $new->returned_from_id= $line->id;
       $new->save();
@@ -975,6 +961,7 @@ class Transactions {
 
 
   public function addPayment(Request $request, Response $response,
+                              \Scat\Service\AmazonPay $amazon,
                               \Scat\Service\PayPal $paypal,
                               \Scat\Service\Giftcard $gift,
                               \Scat\Service\Dejavoo $dejavoo,
@@ -1015,52 +1002,17 @@ class Transactions {
         }
 
         $original= $txn->returned_from();
-        $original_payment= null;
-
-        foreach ($original->payments()->find_many() as $pay) {
-          if ($pay->method == 'amazon') {
-            $original_payment= $pay;
-            break;
-          }
-        }
+        $original_payment=
+          $original->payments()->where('method', 'amazon')->find_one();
 
         if (!$original_payment) {
-          throw new \Exception("Unable to find Amazon payment on original transaction");
+          throw new \Exception("Unable to find Amazon payment on original transaction {$original->id}");
         }
 
-        $charge= json_decode($original_payment->data);
+        $charge= $original_payment->data();
 
-        $amazon= $this->getAmazonClient($config);
-
-        // we only have the authorization here
-        error_log("getting details for {$charge->AmazonAuthorizationId}\n");
-        $authorization= $amazon->getAuthorizationDetails([
-          'amazon_authorization_id' => $charge->AmazonAuthorizationId,
-        ]);
-        $details= $authorization->toArray();
-
-        if (!$amazon->success) {
-          error_log("Amazon FAIL: " . json_encode($details) . "\n");
-          throw new \Exception("An unexpected Amazon error occured.");
-        }
-
-        $refund= $amazon->refund([
-          // XXX We assume only one capture per authorization
-          'amazon_capture_id' => $details['GetAuthorizationDetailsResult']
-                                          ['AuthorizationDetails']
-                                          ['IdList']
-                                          ['member'],
-          'refund_reference_id' => uniqid(),
-          'refund_amount' => $amount,
-        ]);
-
+        $data= $amazon->refund($charge->chargeId, $amount, $txn->uuid);
         $amount= -$amount;
-        $data= $refund->toArray();
-
-        if (!$amazon->success) {
-          error_log("Amazon FAIL: " . json_encode($data) . "\n");
-          throw new \Exception("An unexpected Amazon error occured.");
-        }
 
         break;
 
