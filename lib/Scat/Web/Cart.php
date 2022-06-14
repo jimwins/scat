@@ -719,6 +719,8 @@ class Cart {
 
     $cart->shipping_address_id= 1;
     $cart->shipping_method= 'pickup';
+    $cart->shipping= 0;
+    $cart->shipping_tax= 0;
 
     // and then recalculate sales tax
     $cart->recalculateTax($this->tax);
