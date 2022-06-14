@@ -13,12 +13,12 @@
       <p>{{ ad.caption }}</p>
       <a class="button" href="{{ link }}">{{ ad.button_label }}</a>
     </div>
-    <img src="{{ ad.image.large_square }}" alt="{{ ad.image.alt_text ?: ad.headline }}" />
+    <img src="{{ ad.image.at_size(282) }}" sizes="(max-width: 600px) 282px, 642px" srcset="{{ ad.image.at_size(282) }} 282w, {{ ad.image.at_size(642) }} 642w" alt="{{ ad.image.alt_text ?: ad.headline }}" />
   </div>
 {% elseif ad.tag == 'basic' %}
   <li class="card">
     <h3>{{ ad.headline }}</h3>
-    <img src="{{ ad.image.medium }}" alt="{{ ad.image.alt_text ?: ad.headline }}">
+    <img src="{{ ad.image.at_size(352) }}" alt="{{ ad.image.alt_text ?: ad.headline }}">
     <p>{{ ad.caption }}</p>
     <a class="button" href="{{ link }}">{{ ad.button_label }}</a>
   </li>
