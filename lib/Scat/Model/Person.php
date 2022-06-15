@@ -424,7 +424,7 @@ class Person extends \Scat\Model {
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load Masterpiece data file");
 
-    } elseif (preg_match('/CustomerPrice/', $line)) {
+    } elseif (preg_match('/Your Price/', $line)) {
       /* PA Dist */
 #Item    Description     UM	Min     CustomerPrice   Retail  UPC     ISBN    MAP     Not 4 Retail Website  ORMD    Weight  Height  Width   Depth
       error_log("Importing '$fn' as PA Distribution price list\n");
