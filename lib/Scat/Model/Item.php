@@ -2,6 +2,8 @@
 namespace Scat\Model;
 
 class Item extends \Scat\Model {
+  private $_cache= [];
+
   /* XXX Legacy, should get from parent product */
   public function brand() {
     return $this->belongs_to('Brand', 'brand')->find_one();
@@ -72,7 +74,8 @@ class Item extends \Scat\Model {
   }
 
   public function product() {
-    return $this->belongs_to('Product')->find_one();
+    return @$this->_cache['product'] ?:
+      ($this->_cache['product']= $this->belongs_to('Product')->find_one());
   }
 
   public function barcodes() {

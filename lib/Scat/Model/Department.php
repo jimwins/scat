@@ -3,6 +3,7 @@ namespace Scat\Model;
 
 class Department extends \Scat\Model {
   private $old_slug;
+  private $_cache= [];
 
   public function full_slug() {
     return
@@ -22,7 +23,8 @@ class Department extends \Scat\Model {
   }
 
   public function parent() {
-    return $this->belongs_to('Department', 'parent_id')->find_one();
+    return @$this->_cache['parent'] ?:
+      ($this->_cache['parent']= $this->belongs_to('Department', 'parent_id')->find_one());
   }
 
   public function departments($only_active= true) {

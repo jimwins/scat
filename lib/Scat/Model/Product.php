@@ -3,9 +3,11 @@ namespace Scat\Model;
 
 class Product extends \Scat\Model {
   private $old_slug;
+  private $_cache= [];
 
   public function brand() {
-    return $this->belongs_to('Brand')->find_one();
+    return @$this->_cache['brand'] ?:
+      ($this->_cache['brand']= $this->belongs_to('Brand')->find_one());
   }
 
   public function brand_name() {
@@ -13,7 +15,8 @@ class Product extends \Scat\Model {
   }
 
   public function dept() {
-    return $this->belongs_to('Department')->find_one();
+    return @$this->_cache['dept'] ?:
+      ($this->_cache['dept']= $this->belongs_to('Department')->find_one());
   }
 
   public function items($only_active= true) {
