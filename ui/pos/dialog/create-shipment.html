@@ -10,7 +10,7 @@
     'UPSDAP':  [ 'NextDayAir' ],
     'UPSDAP':  [ 'NextDayAirSaver' ],
   } %}
-{% elseif shipping_method == 'two_day ' %}
+{% elseif shipping_method == 'two_day' %}
   {% set preferred_rates= {
     'UPS':  [ '2ndDayAir' ],
     'UPSDAP':  [ '2ndDayAir' ],
@@ -35,7 +35,12 @@
 {% endif %}
 
 {% block title %}
-  Add Shipment {{ txn.shipping_method }}
+  Add Shipment
+  {% if shipping_method == 'next_day' %}
+    &mdash; <span class="text-danger">Next Day</span>
+  {% elseif shipping_method == 'two_day' %}
+    &mdash; <span class="text-danger">Two Day</span>
+  {% endif %}
 {% endblock %}
 
 {% block body %}
