@@ -10,8 +10,10 @@
       <label for="quantity">
         Quantity
       </label>
-      <input type="text" class="input"
+      <input type="number" class="input"
              id="quantity" name="quantity"
+             min="{{ item.purchase_quantity ?: 1 }}"
+             step="{{ item.purchase_quantity ?: 1 }}"
              value="{{ item.purchase_quantity ?: 1 }}">
     </div>
     {% if item.purchase_quantity > 1 %}
