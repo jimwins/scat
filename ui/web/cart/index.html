@@ -145,8 +145,8 @@ but as a fallback you can chain `:not()` instead */
       <p class="lead alert alert-info">
         <b>This order can't ship for free.</b>
         Sorry, but you're ordering items that don't qualify for free shipping.
-        They are marked with a truck (<i class="bi bi-truck"></i>) or notice
-        (<i class="bi bi-patch-question"></i>) in the cart. Shipping charges
+        They are marked with a truck ({{ bootstrap_icon('truck') }}) or notice
+        ({{ bootstrap_icon('patch-question') }}) in the cart. Shipping charges
         will be calculated during checkout.
       <p>
     {% endif %}
@@ -159,14 +159,14 @@ but as a fallback you can chain `:not()` instead */
             {% if cart.tax_exemption %}
               <form method="POST" action="/cart/remove-exemption">
                 <button type="submit" class="button">
-                  <i class="bi bi-patch-exclamation"></i>
+                  {{ bootstrap_icon('patch-exclamation') }}
                   <span class="label">Remove Tax Exemption</span>
                 </button>
               </form>
             {% else %}
               <form method="POST" action="/cart/apply-exemption">
                 <button type="submit" class="button">
-                  <i class="bi bi-patch-check"></i>
+                  {{ bootstrap_icon('patch-check') }}
                   <span class="label">Apply Tax Exemption</span>
                 </button>
               </form>
@@ -193,7 +193,7 @@ but as a fallback you can chain `:not()` instead */
           </p>
 
           <a class="button" href="/cart/checkout">
-            <i class="bi bi-box-arrow-right"></i>
+            {{ bootstrap_icon('box-arrow-right') }}
             <span class="label">Start Checkout</span>
           </a>
         </div>
@@ -215,7 +215,7 @@ but as a fallback you can chain `:not()` instead */
 
             <input type="hidden" name="cart_uuid" value="{{ cart.uuid }}">
             <button type="submit" class="button">
-              <i class="bi bi-box-arrow-in-right"></i>
+              {{ bootstrap_icon('box-arrow-in-right') }}
               <span class="label">Get Login Link</span>
             </button>
             <div class="help-block">
@@ -240,7 +240,7 @@ but as a fallback you can chain `:not()` instead */
                     placeholder="vincent.van.gogh@example.com">
 
             <button type="submit" class="button">
-              <i class="bi bi-box-arrow-right"></i>
+              {{ bootstrap_icon('box-arrow-right') }}
               <span class="label">Start Checkout</span>
             </button>
           </form>
@@ -286,7 +286,7 @@ but as a fallback you can chain `:not()` instead */
       </label>
       <input type="email" class="input" name="email" id="cart_email">
       <button role="submit" class="button">
-        <i class="bi bi-cart"></i>
+        {{ bootstrap_icon('cart') }}
         <span class="label">Retrieve Saved Cart</span>
       </button>
     </form>

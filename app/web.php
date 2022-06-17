@@ -70,6 +70,11 @@ $container->set('view', function($container) {
   // Add StringLoader extension
   $view->addExtension(new \Twig\Extension\StringLoaderExtension());
 
+  // Add the Bootstrap Icons extension
+  $view->addExtension(
+    new \whatwedo\TwigBootstrapIcons\Twig\BootstrapIconsExtensions()
+  );
+
   // Add our Twig extensions
   $view->addExtension(new \Scat\TwigExtension($container->get('config')));
 

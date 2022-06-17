@@ -29,6 +29,18 @@
         {
             "type": "vcs",
             "url": "https://github.com/jimwins/php-laff"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "twbs/icons",
+                "version": "1.8.3",
+                "source": {
+                    "url": "https://github.com/twbs/icons",
+                    "type": "git",
+                    "reference": "tags/v1.8.3"
+                }
+            }
         }
     ],
     "require": {
@@ -73,7 +85,8 @@
         "cleantalk/php-antispam": "^2.6",
         "akrabat/ip-address-middleware": "^2.1",
         "yidas/google-maps-services": "^1.0",
-        "mailerlite/mailerlite-api-v2-php-sdk": "^0.3.2"
+        "mailerlite/mailerlite-api-v2-php-sdk": "^0.3.2",
+        "whatwedo/twig-bootstrap-icons": "^1.0"
     },
     "require-dev": {
         "deployer/recipes": "^6.2"

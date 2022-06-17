@@ -56,12 +56,12 @@
         generally ready to be picked up in fifteen minutes.
       </p>
       <a href="/cart/checkout/set-shipped" class="button">
-        <i class="bi bi-truck"></i>
+        {{ bootstrap_icon('truck') }}
         <span class="label">Change to having it shipped</span>
       </a>
     {% else %}
       <a href="/cart/checkout/set-pickup" class="button">
-        <i class="bi bi-shop"></i>
+        {{ bootstrap_icon('shop') }}
         <span class="label">Change to curbside pickup</span>
       </a>
       <div class="hr">
@@ -102,7 +102,7 @@
     <label for="giftcard">Code</label>
     <input type="text" class="input" id="giftcard">
     <button type="button" id="apply-gift-card" class="button">
-      <i class="bi bi-gift"></i>
+      {{ bootstrap_icon('gift') }}
       <span class="label">Apply</span>
     </button>
 

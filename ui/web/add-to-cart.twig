@@ -26,7 +26,7 @@
             value="{{ quantity ?? item.purchase_quantity ?: 1}}">
   {% endif %}
   <button type="submit" class="button {{ button_size ?? 'block' }}">
-    <i class="bi bi-cart-plus"></i>
+    {{ bootstrap_icon('cart-plus') }}
     <span class="label">Add to Cart</span>
   </button>
 </form>

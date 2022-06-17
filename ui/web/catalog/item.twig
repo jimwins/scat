@@ -4,7 +4,7 @@
 {% if product.items.find_many|length > 1 %}
   <h4>
     <a href="{{ url_for('catalog', item.product.url_params()) }}">
-      <i class="bi bi-arrow-left"></i>
+      {{ bootstrap_icon('arrow-left') }}
       Back to {{ product.name }}
     </a>
   </h4>
@@ -187,7 +187,7 @@ figure img {
           <p><a href="/shipping#hazmat"><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"> Hazardous materials:</a> special shipping is required, and there may be additional costs.</p>
         {% endif %}
         {% if item.oversized %}
-          <p><a href="/shipping#oversized"><i class="bi bi-truck"></i> Oversized item:</a> special shipping is required, and there will be additional costs.</p>
+          <p><a href="/shipping#oversized">{{ bootstrap_icon('truck') }} Oversized item:</a> special shipping is required, and there will be additional costs.</p>
         {% endif %}
       </div>
     {% endif %}

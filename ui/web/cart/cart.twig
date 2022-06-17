@@ -105,14 +105,14 @@
               <input type="text" class="input" id="qty_{{ line.id }}"
                      name="quantity" value="{{ line.quantity }}">
               <button type="submit" class="update button min">
-                <i class="bi bi-arrow-clockwise"></i>
+                {{ bootstrap_icon('arrow-clockwise') }}
                 <span class="visually-hidden">Update</span>
               </button>
               <a href="/cart/remove-item?line_id={{ line.id }}"
                   data-code="{{ line.item.code }}"
                   data-quantity="{{ line.quantity }}"
                   class="remove-item button min">
-                <i class="bi bi-cart-dash"></i>
+                {{ bootstrap_icon('cart-dash') }}
                 <span class="visually-hidden">Remove from Cart">
               </a>
             </form>
@@ -145,12 +145,12 @@
             <a class="pull-right" href="/shipping#hazmat" data-toggle="tooltip" title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="20" alt="Hazardous Materials"></a>
           {% endif %}
           {% if item.oversized %}
-            <a class="pull-right" href="/shipping#oversized" data-toggle="tooltip" title="Oversized data: special shipping is required, and there will be additional costs. Click for more details."><i class="bi bi-truck"></i></a>
+            <a class="pull-right" href="/shipping#oversized" data-toggle="tooltip" title="Oversized data: special shipping is required, and there will be additional costs. Click for more details.">{{ bootstrap_icon('truck') }}</a>
           {% else %}
             {% if not item.dimensions or not item.weight %}
-              <a class="pull-right" href="/shipping" data-toggle="tooltip" title="The system doesn't have enough information to calculate shipping for this item."><i class="bi bi-patch-question text-danger"></i></a>
+              <a class="pull-right" href="/shipping" data-toggle="tooltip" title="The system doesn't have enough information to calculate shipping for this item.">{{ bootstrap_icon('patch-question', { class: 'text-danger' }) }}</a>
             {% elseif not item.can_ship_free %}
-              <a class="pull-right" href="/shipping" data-toggle="tooltip" title="This item is not eligible for free shipping."><i class="bi bi-truck text-success"></i></a>
+              <a class="pull-right" href="/shipping" data-toggle="tooltip" title="This item is not eligible for free shipping.">{{ bootstrap_icon('truck', { class: 'text-success' }) }}</a>
             {% endif %}
           {% endif %}
           <span>{{ item.name }}</span>

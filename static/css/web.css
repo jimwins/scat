@@ -687,6 +687,10 @@ nav#site-navigation #site-cart-contents {
   margin-left: 0.25em;
 }
 
+.button svg {
+  margin-right: 0.25em;
+}
+
 .input-group {
   display: grid;
   grid-template-columns: min-content auto;

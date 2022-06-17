@@ -15,7 +15,6 @@
   </title>
 
   <link rel="stylesheet" type="text/css" href="/css/normalize.css">
-  <link rel="stylesheet" type="text/css" href="/css/bootstrap-icons-1.8.2/bootstrap-icons.css">
   <link rel="stylesheet" type="text/css" href="/css/web.css?{{ current_release() }}">
 
   {% if DEBUG %}
@@ -51,7 +50,7 @@
       <a id="site-dept-menu" class="button nav-button"
           data-toggle="panel" data-target="site-depts"
           href="/art-supplies">
-        <i class="bi bi-list"></i>
+        {{ bootstrap_icon('list') }}
         <span class="visually-hidden">Departments</span>
       </a>
       <a id="site-name" href="/">
@@ -72,14 +71,14 @@
         <a class="button nav-button"
             data-toggle="panel" data-target="site-about"
             href="/about">
-          <i class="bi bi-geo-alt"></i>
+          {{ bootstrap_icon('geo-alt') }}
           <span class="label">About</span>
         </a>
       </div>
       <div id="site-cart">
         <a class="button"
             href="/cart">
-          <i class="bi bi-cart"></i>
+          {{ bootstrap_icon('cart') }}
           <span class="visually-hidden">Shopping Cart</span>
           <span class="badge"></span>
         </a>
@@ -130,11 +129,11 @@
         Monday - Saturday, 10am to 6pm <br>
         Closed Sundays
         <ul class="list-horizontal no-separator">
-          <li><a href="http://twitter.com/RawMaterials" title="Follow us on Twitter"><i class="bi bi-lg bi-twitter"></i></a></li>
-          <li><a href="http://facebook.com/RawMaterialsLA" title="Like us on Facebook"><i class="bi bi-lg bi-facebook"></i></a></li>
-          <li><a href="http://instagram.com/rawmaterialsartsupplies" title="Follow us on Instagram"><i class="bi bi-lg bi-instagram"></i></a></li>
-          <li><a href="https://www.pinterest.com/rawmaterialsla/" title="Follow us on Pinterest"><i class="bi bi-lg bi-pinterest"></i></a></li>
-          <li><a href="https://www.youtube.com/channel/UC8QdVII0oYUnrO5RLAcivSQ" title="Subscribe to our YouTube channel"><i class="bi bi-lg bi-youtube"></i></a></li>
+          <li><a href="http://twitter.com/RawMaterials" title="Follow us on Twitter">{{ bootstrap_icon('twitter', { class: 'bi-lg' }) }}</a></li>
+          <li><a href="http://facebook.com/RawMaterialsLA" title="Like us on Facebook">{{ bootstrap_icon('facebook', { class: 'bi-lg' }) }}</a></li>
+          <li><a href="http://instagram.com/rawmaterialsartsupplies" title="Follow us on Instagram">{{ bootstrap_icon('instagram', { class: 'bi-lg' }) }}</a></li>
+          <li><a href="https://www.pinterest.com/rawmaterialsla/" title="Follow us on Pinterest">{{ bootstrap_icon('pinterest', { class: 'bi-lg' }) }}</a></li>
+          <li><a href="https://www.youtube.com/channel/UC8QdVII0oYUnrO5RLAcivSQ" title="Subscribe to our YouTube channel">{{ bootstrap_icon('youtube', { class: 'bi-lg' }) }}</a></li>
         </ul>
       </div>
     </nav>
@@ -281,9 +280,11 @@
       try {
         details= JSON.parse(details)
         if (details.items > 0) {
+          /*
           var icon= document.querySelector('#site-cart .bi-cart')
           icon.classList.remove('bi-cart')
           icon.classList.add('bi-cart-fill')
+          */
           var badge= document.querySelector('#site-cart .badge')
           badge.innerText= details.items
         }

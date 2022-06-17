@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77847bd036fad2ac93f854ef7727f827",
+    "content-hash": "d3e90f38d312022b4601872aecf111b9",
     "packages": [
         {
             "name": "akrabat/ip-address-middleware",
@@ -6844,6 +6844,16 @@
             "time": "2021-12-03T19:33:31+00:00"
         },
         {
+            "name": "twbs/icons",
+            "version": "1.8.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twbs/icons",
+                "reference": "tags/v1.8.3"
+            },
+            "type": "library"
+        },
+        {
             "name": "twig/html-extra",
             "version": "v3.3.5",
             "source": {
@@ -6987,6 +6997,46 @@
                 }
             ],
             "time": "2022-02-04T06:59:48+00:00"
+        },
+        {
+            "name": "whatwedo/twig-bootstrap-icons",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/whatwedo/TwigBootstrapIcons.git",
+                "reference": "3076b821e86ca3dc65c76f538d85e35af3dd718a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/whatwedo/TwigBootstrapIcons/zipball/3076b821e86ca3dc65c76f538d85e35af3dd718a",
+                "reference": "3076b821e86ca3dc65c76f538d85e35af3dd718a",
+                "shasum": ""
+            },
+            "require": {
+                "twbs/icons": "^1.0",
+                "twig/twig": "^2.12|^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "whatwedo\\TwigBootstrapIcons\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "whatwedo GmbH",
+                    "email": "welove@whatwedo.ch"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/whatwedo/TwigBootstrapIcons/issues",
+                "source": "https://github.com/whatwedo/TwigBootstrapIcons/tree/v1.0.1"
+            },
+            "time": "2022-06-15T08:13:16+00:00"
         },
         {
             "name": "wildbit/postmark-php",
