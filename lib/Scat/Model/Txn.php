@@ -553,7 +553,7 @@ class Txn extends \Scat\Model {
     if ($this->shipping_address_id > 1) {
       $address= $this->shipping_address();
 
-      list($zip5, $zip4)= explode('-', $address->zip);
+      $zip= explode('-', $address->zip);
 
       // Look up all non-returned items
       $data= [
@@ -570,8 +570,8 @@ class Txn extends \Scat\Model {
           'Address1' => '645 S Los Angeles St',
         ],
         'destination' => [
-          'Zip4' => $zip4,
-          'Zip5' => $zip5,
+          'Zip4' => $zip[1] ?? '',
+          'Zip5' => $zip[0],
           'State' => $address->state,
           'City' => $address->city,
           'Address2' => $address->address2,
@@ -656,9 +656,13 @@ class Txn extends \Scat\Model {
         {
           $index= $index_map[$i->returned_from_id];
 
-          $item= array_shift(array_filter($cartItems, function ($v) use($index) {
-            return $v['Index'] == $index;
-          }));
+          $item= null;
+          foreach ($cartItems as $v) {
+            if ($v['Index'] == $index) {
+              $item= $i;
+              break;
+            }
+          }
 
           if (!$item) {
             throw new \Exception("Unable to find {$i->returned_from_id} in original transaction");
