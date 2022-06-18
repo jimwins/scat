@@ -228,7 +228,7 @@ class Cart extends \Scat\Model {
   }
 
   public function eligible_for_free_shipping() {
-    foreach ($this->items()->find_many() as $line) {
+    foreach ($this->items()->where_null('kit_id')->find_many() as $line) {
       if (!$line->item()->can_ship_free()) {
         return false; /* It just takes one. */
       }
