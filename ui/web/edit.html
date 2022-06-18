@@ -15,7 +15,13 @@
   }
   </style>
 
-  <form method="POST" action="/~edit{{ current_url() }}">
+  {# avoid trailing / problem when editing front page #}
+  {% set url= current_url() %}
+  {% if url == '/' %}
+    {% set url = '' %}
+  {% endif %}
+
+  <form method="POST" action="/~edit{{ url }}">
     <label for="title">Title</label>
     <input class="input" type="text" name="title" value="{{ content.title }}" size="100">
 
