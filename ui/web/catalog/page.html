@@ -153,6 +153,9 @@ but as a fallback you can chain `:not()` instead */
 
     {% block catalog_content %}
       {% if dept and not subdept  %}
+        <h1 class="page-header">
+          {{ dept.name }}
+        </h1>
         <p>
           {{ dept.description | markdown }}
         </p>
@@ -169,7 +172,7 @@ but as a fallback you can chain `:not()` instead */
         </div>
       {% endif %}
       {% if products and not product %}
-        <h1>{{ subdept ? subdept.name : dept.name }}</h1>
+        <h1 class="page-header">{{ subdept ? subdept.name : dept.name }}</h1>
         {% include 'catalog/products.twig' %}
       {% endif %}
 
@@ -194,6 +197,10 @@ but as a fallback you can chain `:not()` instead */
       {% endif %}
 
       {% if not dept %}
+        <h1 class="page-header">
+          Art Supplies
+        </h1>
+        {{ page('art-supplies').content | raw }}
         <div class="smol-grid">
           {% for dept in depts %}
             <div class="card hot">

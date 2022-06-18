@@ -28,6 +28,7 @@ class TwigExtension
       new \Twig\TwigFunction('notes', [ $this, 'getNotes' ]),
       new \Twig\TwigFunction('config', [ $this, 'getConfig' ]),
       new \Twig\TwigFunction('item', [ $this, 'getItem' ]),
+      new \Twig\TwigFunction('page', [ $this, 'getPage' ]),
       new \Twig\TwigFunction('ad', [ $this, 'showInternalAd' ], [
         'is_safe' => [ 'html' ],
         'needs_environment' => true,
@@ -84,6 +85,10 @@ class TwigExtension
 
   public function getItem($code) {
     return \Titi\Model::factory('Item')->where('code', $code)->find_one();
+  }
+
+  public function getPage($slug) {
+    return \Titi\Model::factory('Page')->where('slug', $slug)->find_one();
   }
 
   public function showKit($env, $code) {
