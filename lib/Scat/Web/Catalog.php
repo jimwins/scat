@@ -61,10 +61,13 @@ class Catalog {
           }
 
           if ($changed && count($new_terms)) {
-            $original_q= $q;
-            $q= trim(join(' ', $new_terms));
-            $retry= true;
-            goto retry; /* goto considered harmful. pfft. */
+            $new_q= trim(join(' ', $new_terms));
+            if ($new_q) {
+              $original_q= $q;
+              $q= $new_q;
+              $retry= true;
+              goto retry; /* goto considered harmful. pfft. */
+            }
           }
         }
       }
