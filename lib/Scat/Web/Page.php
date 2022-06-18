@@ -20,9 +20,10 @@ class Page {
                 \Scat\Service\Catalog $catalog)
   {
     if (!$param) $param= '//';
+    $edit= ($GLOBALS['DEBUG'] && $request->getParam('edit'));
 
     $content= $this->data->factory('Page')->where('slug', $param)->find_one();
-    if (!$content) {
+    if (!$content && !$edit) {
       $item= $catalog->getItemByCode($param);
       if ($item && $item->active) {
         $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
@@ -37,11 +38,11 @@ class Page {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
-    if ($content->format == 'redirect') {
+    if ($content && $content->format == 'redirect') {
       return $response->withRedirect($content->content);
     }
 
-    $template= ($GLOBALS['DEBUG'] && $request->getParam('edit')) ? 'edit.html' : 'index.html';
+    $template= $edit ? 'edit.html' : 'index.html';
 
     return $this->view->render($response, $template, [
       'param' => $param,
