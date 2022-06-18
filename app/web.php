@@ -85,7 +85,7 @@ $app->add(\Slim\Views\TwigMiddleware::createFromContainer($app));
 /* Hook up the data service, but not lazily because we rely on side-effects */
 $container->set('data', new \Scat\Service\Data($config['webdata']));
 
-$app->add(new \Middlewares\TrailingSlash());
+$app->add((new \Middlewares\TrailingSlash(false))->redirect());
 
 $errorMiddleware= $app->addErrorMiddleware($DEBUG, true, true);
 
