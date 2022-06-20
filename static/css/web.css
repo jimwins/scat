@@ -521,7 +521,7 @@ nav#site-navigation {
   place-content: center;
   grid-template-columns: auto 1fr auto auto;
   grid-column-gap: 0.25em;
-  grid-row-gap: 0.5em;
+  grid-row-gap: 1em;
 }
 nav#site-navigation #site-search {
   /* whole row to itself */
@@ -577,6 +577,7 @@ nav#site-navigation #site-featured-depts ul
   border-radius: var(--border-radius);
   overflow-x: auto;
   white-space: nowrap;
+  margin: 0;
 }
 nav#site-navigation #site-depts ul
 {
