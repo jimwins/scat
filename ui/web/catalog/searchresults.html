@@ -42,3 +42,15 @@
   {% endif %}
 
 {% endblock %}
+
+{% block script %}
+  {% autoescape 'js' %}
+    <script>
+      zaraz.track('view_search_results', {
+        search_term: '{{ q }}',
+        original_search_term: '{{ original_q }}',
+        search_hits: '{{ products|length }}',
+      })
+    </script>
+  {% endautoescape %}
+{% endblock %}
