@@ -659,7 +659,7 @@ class Txn extends \Scat\Model {
           $item= null;
           foreach ($cartItems as $v) {
             if ($v['Index'] == $index) {
-              $item= $i;
+              $item= $v;
               break;
             }
           }
