@@ -67,6 +67,11 @@ $container->set('view', function($container) {
   // Add the HTML extension
   $view->addExtension(new \Twig\Extra\Html\HtmlExtension());
 
+  // Add the Bootstrap Icons extension
+  $view->addExtension(
+    new \whatwedo\TwigBootstrapIcons\Twig\BootstrapIconsExtensions()
+  );
+
   // Add our Twig extensions
   $view->addExtension(new \Scat\TwigExtension($container->get('config')));
 
