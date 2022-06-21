@@ -76,7 +76,7 @@ class Ordure {
     $client= new \GuzzleHttp\Client();
 
     $res= $client->request('POST', $url, [
-                             'debug' => $GLOBALS['DEBUG'],
+                             //'debug' => $GLOBALS['DEBUG'],
                              'multipart' => [
                                [
                                  'name' => 'prices', 
@@ -107,7 +107,7 @@ class Ordure {
     $url= $this->ordure_url . '/get-pending-rewards';
     $res= $client->request('GET', $url,
                            [
-                             'debug' => $GLOBALS['DEBUG'],
+                             //'debug' => $GLOBALS['DEBUG'],
                              'query' => [ 'key' => $this->ordure_key ]
                            ]);
 
@@ -208,7 +208,7 @@ class Ordure {
       $url= $this->ordure_url . '/mark-rewards-processed';
       $res= $client->request('POST', $url,
                              [
-                               'debug' => $GLOBALS['DEBUG'],
+                               //'debug' => $GLOBALS['DEBUG'],
                                'query' => [ 'key' => $this->ordure_key,
                                             'id' => $update->id ]
                              ]);
@@ -494,7 +494,7 @@ class Ordure {
         $url= $this->ordure_url . '/sale/' . $summary->uuid . '/set-status';
         $res= $client->request('POST', $url,
                                [
-                                 'debug' => $GLOBALS['DEBUG'],
+                                 //'debug' => $GLOBALS['DEBUG'],
                                  'headers' => [
                                    'X-Requested-With' => 'XMLHttpRequest',
                                  ],
@@ -540,7 +540,7 @@ class Ordure {
 
     $url= $this->ordure_url . '/sale/list';
     $res= $client->request('GET', $url, [
-      'debug' => $GLOBALS['DEBUG'],
+      //'debug' => $GLOBALS['DEBUG'],
       'headers' => [
         'Accept' => 'application/json',
       ],
@@ -560,7 +560,7 @@ class Ordure {
 
       $url= $this->ordure_url . '/sale/' . $summary->uuid;
       $res= $client->request('GET', $url, [
-        'debug' => $GLOBALS['DEBUG'],
+        //'debug' => $GLOBALS['DEBUG'],
         'headers' => [
           'Accept' => 'application/json',
         ],
@@ -598,7 +598,7 @@ class Ordure {
       $url= $this->ordure_url . '/sale/' . $summary->uuid . '/set-abandoned-level';
       $res= $client->request('POST', $url,
                              [
-                               'debug' => $GLOBALS['DEBUG'],
+                               //'debug' => $GLOBALS['DEBUG'],
                                'headers' => [
                                  'X-Requested-With' => 'XMLHttpRequest',
                                ],
