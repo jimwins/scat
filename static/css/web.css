@@ -108,6 +108,16 @@ body {
   margin-bottom: 1em;
 }
 
+.top-banner {
+  position: sticky;
+  top: 0; left: 0;
+  border: 1px solid red;
+  border-radius: var(--border-radius);
+  padding: 0.25em 1em;
+  background: #fee;
+  z-index: 300;
+}
+
 img.responsive {
   width: 100%;
   height: auto;
