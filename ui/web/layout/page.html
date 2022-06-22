@@ -130,57 +130,6 @@
 
   </header>
 
-  <style>
-/* Based on
- * https://moderncss.dev/3-popular-website-heroes-created-with-css-grid-layout/
- * */
-.hero {
-  display: grid;
-  grid-template-areas: "hero";
-  align-items: center;
-  height: fit-content(65vh);
-  max-height: 600px;
-  background: #eee;
-  border-radius: var(--border-radius);
-}
-.hero > * {
-  grid-area: hero;
-}
-.hero img {
-  -o-object-fit: cover;
-     object-fit: cover;
-  height: min(65vh, 600px);
-  width: 80%;
-  transition: 180ms width ease-in;
-  justify-self: end;
-  border-top-right-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-}
-@media (min-width: 60rem) {
-  .hero img {
-    width: 60%;
-  }
-}
-.hero .hero__content {
-  margin: 1rem 0 1rem 5%;
-  max-width: 50%;
-  min-width: 30ch;
-  z-index: 1;
-  background-color: rgba(238,238,238,0.8);
-  border-radius: var(--border-radius);
-  padding: 1rem 2rem 2rem 2rem;
-  box-shadow: none;
-}
-.hero .hero__content h1 {
-  font-size: 3rem;
-  font-weight: 500;
-  margin: 0 0 1rem;
-}
-.hero .hero__content p {
-  font-size: 1.75rem;
-}
-  </style>
-
   <main>
     {% block content -%}
     {%- endblock %}
