@@ -288,6 +288,9 @@ class Report
         $vendor= $vendors[$row->person_id];
       } else {
         $vendor= $row->person();
+        if (!$vendor) {
+          $vendor= new \stdClass();
+        }
         $vendor->orders= 0;
         $vendors[$row->person_id]= $vendor;
       }
