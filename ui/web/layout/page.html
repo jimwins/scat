@@ -179,9 +179,38 @@
         <li><a href="/accessibility">Accessibility Statement</a>
       </ul>
       <ul id="payment-marks">
-        <li><img src="/payment-marks/four-cards.svg" width="108" height="24" alt="American Express / Mastercard / Visa / Discover">
-        <li><img src="/payment-marks/amazonpay.svg" width="38" height="24" alt="Amazon Pay">
-        <li><img src="/payment-marks/paypal.jpg" width="38" height="24" alt="PayPal">
+        <li>
+          <div style="width: 24px; height: 24px; display: inline-flex"
+               title="American Express">
+            {{ include('paymarks/cc-amex.svg') }}
+          <span class="visually-hidden">American Express</span>
+          </div>
+        <li>
+          <div style="width: 24px; height: 24px; display: inline-flex">
+            {{ include('paymarks/cc-discover.svg') }}
+          </div>
+          <span class="visually-hidden">Discover</span>
+        <li>
+          <div style="width: 24px; height: 24px; display: inline-flex">
+            {{ include('paymarks/cc-mastercard.svg') }}
+          </div>
+          <span class="visually-hidden">Mastercard</span>
+        <li>
+          <div style="width: 24px; height: 24px; display: inline-flex">
+            {{ include('paymarks/cc-visa.svg') }}
+          </div>
+          <span class="visually-hidden">Visa</span>
+        <li>
+          <div style="width: 24px; height: 24px; display: inline-flex">
+            {{ include('paymarks/cc-amazon-pay.svg') }}
+          </div>
+          <span class="visually-hidden">Amazon Pay</span>
+        <li>
+          <div style="width: 24px; height: 24px; display: inline-flex">
+            {{ include('paymarks/cc-paypal.svg') }}
+          </div>
+          <span class="visually-hidden">PayPal</span>
+        </li>
       </ul>
       <div id="copyright">
         Copyright &copy; 2022 Imperial Dog, Inc.
