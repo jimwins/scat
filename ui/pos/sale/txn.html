@@ -616,7 +616,7 @@
         {% endif %}
       {% endif %}
 
-      {% if txn.status in [ 'paid', 'processing', 'waitingforitems', 'readyforpickup' ] and txn.shipping_address_id == 1 %}
+      {% if txn.status in [ 'paid', 'processing', 'waitingforitems', 'readyforpickup' ] and (txn.shipping_address_id == 1 or txn.is_local_delivery) %}
         <a data-action="set-status" data-status="complete"
             class="btn btn-block btn-primary">
           <i class="fa fa-check-square-o"></i>
