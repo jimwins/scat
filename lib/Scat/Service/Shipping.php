@@ -554,7 +554,7 @@ class Shipping
 
   public function get_delivery_estimate($address, $cart) {
     $truck_sizes= [
-      'sm' => [ [ 30, 25, 16 ], [ 45, 25, 10 ], [ 108, 4, 4 ] ],
+      'sm' => [ [ 30, 25, 16 ], [ 45, 25, 10 ], [ 108, 4, 8 ] ],
       'md' => [ [ 46, 38, 36 ] ],
       'lg' => [ [ 74, 42, 36 ], [ 108, 8, 8 ] ],
       'xl' => [ [ 85, 56, 36 ] ],
