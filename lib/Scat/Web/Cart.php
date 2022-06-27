@@ -1156,7 +1156,7 @@ endPaypalFinalize:
 
     $to= $email->default_from_address();
 
-    $email->send($to, $subject, $body);
+    $email->send($to, $subject, $body, NULL, [ 'replyTo' => $cart->email ]);
 
     /* Bounce back to the cart with with success message */
     $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
