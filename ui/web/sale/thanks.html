@@ -49,7 +49,7 @@
             {% set item= line.item %}
             {
               product_id: '{{ line.code }}',
-              name: '{{ line.name|e("js") }}',
+              name: '{{ line.name }}',
               category: '{{ item.category }}',
               brand: '{{ item.brand_name }}',
               price: '{{ line.sale_price }}',
