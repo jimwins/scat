@@ -2,15 +2,15 @@
 {% import 'macros.twig' as scat %}
 
 {% block title %}
-  {%- if product %}
+  {%- if product -%}
     {{ product.name }}
-  {% elseif subdept %}
+  {%- elseif subdept -%}
     {{ subdept.name }}
-  {% elseif dept %}
+  {%- elseif dept -%}
     {{ dept.name }}
-  {% else %}
+  {%- else -%}
     Art Supplies
-  {% endif -%}
+  {%- endif -%}
 {% endblock %}
 
 {% block content %}

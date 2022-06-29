@@ -9,9 +9,10 @@
     {%- block title -%}
       Raw Materials Art Supplies - Downtown Los Angeles
     {%- endblock -%}
-    {%- if not (block('title') matches '/Raw Materials Art Supplies/') %}
-      @ Raw Materials Art Supplies
-    {% endif -%}
+    {# a little funky here to avoid adding unnecessary spaces #}
+    {%- if not (block('title') matches '/Raw Materials Art Supplies/')
+      %} @ Raw Materials Art Supplies
+    {%- endif -%}
   </title>
 
   <link rel="stylesheet" type="text/css" href="/css/web.css?{{ current_release() }}">
