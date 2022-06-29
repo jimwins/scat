@@ -1,0 +1,12 @@
+table.table {
+  width: 100%;
+}
+table.table th, table.table td {
+  padding: 0.5rem;
+}
+table.table th {
+  border-bottom: 2px solid black;
+}
+table.table td {
+  border-bottom: 1px solid black;
+}
