@@ -166,10 +166,7 @@
     .then((data) => {
       scat.alert('info', 'Added shipment.')
       scat.print('/sale/' + {{ txn.id }} + '/shipment/' + data.id + '/~print-label')
-      if (typeof viewModel !== 'undefined') { /* XXX old-index.php */
-        viewModel.setStatus(null, null, 'shipping')
-        Txn.loadId({{ txn.id }})
-      }
+      dialog.resolution= data
       $(dialog).modal('hide')
     })
     .catch((err) => {

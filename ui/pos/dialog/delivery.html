@@ -32,16 +32,8 @@
         </select>
       </div>
 
-{#
       <div class="form-group">
-        <label for="weight">Weight</label>
-        <input type="text" class="form-control autofocus"
-               name="weight" placeholder="3 lbs">
-      </div>
-#}
-
-      <div class="form-group">
-        <label for="dimensions">Cost</label>
+        <label for="rate">Cost</label>
         <input type="text" class="form-control"
                name="rate" placeholder="$5.99"
                value="{{ scat.amount(txn.delivery_details.retail_price) }}">
@@ -49,7 +41,7 @@
 
       <div class="form-group">
         <label for="dimensions">Instructions</label>
-        <textarea class="form-control" name="handling_instructions">{{ delivery.instructions }}</textarea>
+        <textarea class="form-control" name="handling_instructions" required>{{ delivery.instructions }}</textarea>
       </div>
 
     {% endif %}
