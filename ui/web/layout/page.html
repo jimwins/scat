@@ -6,12 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>
-    {% block title -%}
+    {%- block title -%}
       Raw Materials Art Supplies - Downtown Los Angeles
-    {%- endblock %}
-    {% if not (block('title') matches '/Raw Materials Art Supplies/') %}
+    {%- endblock -%}
+    {%- if not (block('title') matches '/Raw Materials Art Supplies/') %}
       @ Raw Materials Art Supplies
-    {% endif %}
+    {% endif -%}
   </title>
 
   <link rel="stylesheet" type="text/css" href="/css/web.css?{{ current_release() }}">

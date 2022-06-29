@@ -2,7 +2,7 @@
 {% import 'macros.twig' as scat %}
 
 {% block title %}
-  {% if product %}
+  {%- if product %}
     {{ product.name }}
   {% elseif subdept %}
     {{ subdept.name }}
@@ -10,7 +10,7 @@
     {{ dept.name }}
   {% else %}
     Art Supplies
-  {% endif %}
+  {% endif -%}
 {% endblock %}
 
 {% block content %}
