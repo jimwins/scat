@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Bing Ecommerce Events</title>
+
+    <script>(function(w,d,t,r,u){var f,n,i;w[u]=w[u]||[],f=function(){var o={ti:"27014682"};o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")},n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function(){var s=this.readyState;s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)},i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)})(window,document,"script","//bat.bing.com/bat.js","uetq");</script>
+
+    <script>
+      /* https://help.ads.microsoft.com/#apex/ads/en/60118/-1 */
+      function TestDirectReport() {
+	window.uetq = window.uetq || [];
+	window.uetq.push('event', 'add_to_cart', { 
+          'ecomm_prodid': ['test_item_direct'],
+          'ecomm_pagetype': 'product',
+          'ecomm_totalvalue': 2,
+          'revenue_value': 2,
+          'currency': 'USD',
+          'items': [ 
+            { 
+              'id': 'test_item_direct', 
+              'quantity': 2,
+              'price': 1,
+            }, 
+          ] 
+        });
+      }
+
+      function TestZarazReport() {
+        zaraz.ecommerce('Product Added', {
+          product_id: "test_item_zaraz",
+          price: 1,
+          currency: 'usd',
+          quantity: 2,
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+
+    <button onclick="TestZarazReport()">
+      Report 'Add to Item' with Zaraz
+    </button>
+
+    <button onclick="TestDirectReport()">
+      Report 'Add to Item' Directly
+    </button>
+
+  </body>
+</html>
