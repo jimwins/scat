@@ -8,8 +8,18 @@
     <script>(function(w,d,t,r,u){var f,n,i;w[u]=w[u]||[],f=function(){var o={ti:"27025335"};o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")},n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function(){var s=this.readyState;s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)},i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)})(window,document,"script","//bat.bing.com/bat.js","uetq");</script>
 
     <script>
+      /* From the 'Install event tag' instructions */
+      function TestDirectSimpleReport() {
+        window.uetq = window.uetq || [];
+        window.uetq.push('event', 'add_to_cart', {
+          "event_label":"test_item_direct",
+          "revenue_value":2,
+          "currency":"USD"
+        });
+      }
+
       /* https://help.ads.microsoft.com/#apex/ads/en/60118/-1 */
-      function TestDirectReport() {
+      function TestDirectDetailedReport() {
 	window.uetq = window.uetq || [];
 	window.uetq.push('event', 'add_to_cart', { 
           'ecomm_prodid': ['test_item_direct'],
@@ -40,12 +50,20 @@
 
   <body>
 
-    <button onclick="TestZarazReport()">
-      Report 'Add to Item' with Zaraz
+    <button onclick="TestDirectSimpleReport()">
+      Report 'Add to Item' Directly (Simple)
     </button>
 
-    <button onclick="TestDirectReport()">
-      Report 'Add to Item' Directly
+    <br><br>
+
+    <button onclick="TestDirectDetailedReport()">
+      Report 'Add to Item' Directly (Detailed)
+    </button>
+
+    <br><br>
+
+    <button onclick="TestZarazReport()">
+      Report 'Add to Item' with Zaraz
     </button>
 
   </body>
