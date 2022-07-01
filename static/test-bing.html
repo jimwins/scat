@@ -12,8 +12,8 @@
       function TestDirectSimpleReport() {
         window.uetq = window.uetq || [];
         window.uetq.push('event', 'add_to_cart', {
-          "event_label":"test_item_direct",
-          "revenue_value":2,
+          "event_label":"FUN-C-53100",
+          "revenue_value":"7.98",
           "currency":"USD"
         });
       }
@@ -22,28 +22,51 @@
       function TestDirectDetailedReport() {
 	window.uetq = window.uetq || [];
 	window.uetq.push('event', 'add_to_cart', { 
-          'ecomm_prodid': ['test_item_direct'],
+          'ecomm_prodid': ['FUN-C-53100'],
           'ecomm_pagetype': 'product',
-          'ecomm_totalvalue': 2,
-          'revenue_value': 2,
+          'ecomm_totalvalue': '7.98',
+          'revenue_value': '7.98',
           'currency': 'USD',
           'items': [ 
             { 
-              'id': 'test_item_direct', 
-              'quantity': 2,
-              'price': 1,
-            }, 
-          ] 
+              'id': 'FUN-C-53100',
+              'quantity': '2',
+              'price': '3.99',
+            },
+          ]
+        });
+      }
+
+      function TestDirectMulitpleReport() {
+	window.uetq = window.uetq || [];
+	window.uetq.push('event', 'add_to_cart', {
+          'ecomm_prodid': ['FUN-C-53100','FUN-C-53101'],
+          'ecomm_pagetype': 'product',
+          'ecomm_totalvalue': '11.97',
+          'revenue_value': '11.97',
+          'currency': 'USD',
+          'items': [
+            {
+              'id': 'FUN-C-53100',
+              'quantity': '2',
+              'price': '3.99',
+            },
+            {
+              'id': 'FUN-C-53101',
+              'quantity': '1',
+              'price': '3.99',
+            },
+          ]
         });
       }
 
       function TestZarazReport() {
         zaraz.ecommerce('Product Added', {
-          product_id: "test_item_zaraz",
-          price: 1,
+          product_id: "FUN-C-53100",
+          price: '7.98',
           currency: 'usd',
-          quantity: 2,
-          total: 2,
+          quantity: '2',
+          total: '3.99',
         });
       }
     </script>
@@ -59,6 +82,12 @@
 
     <button onclick="TestDirectDetailedReport()">
       Report 'Add to Item' Directly (Detailed)
+    </button>
+
+    <br><br>
+
+    <button onclick="TestDirectMulitpleReport()">
+      Report 'Add to Item' Directly (Multiple)
     </button>
 
     <br><br>
