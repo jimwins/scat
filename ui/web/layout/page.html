@@ -296,6 +296,7 @@
         price: formData.get('sale_price'),
         currency: 'usd',
         quantity: formData.get('quantity'),
+        total: formData.get('sale_price') * formData.get('quantity'),
       })
     }
 
