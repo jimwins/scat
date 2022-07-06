@@ -20,8 +20,8 @@ class ScatWeb {
   }
 
   ecommerce (event, parameters) {
-    if (zaraz) {
-      zaraz.ecommerce(event, parameters)
+    if (window.zaraz) {
+      window.zaraz.ecommerce(event, parameters)
     }
 
     if (window.uetq) {
