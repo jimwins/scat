@@ -24,6 +24,8 @@
     <link rel="preconnect" href="https://accessibilityserver.org">
   {% endif %}
 
+  <script src="/js/scat.web.js?{{ current_release() }}"></script>
+
   {% block extra_header %}{% endblock %}
 </head>
 
@@ -288,7 +290,7 @@
 
     let recordAddToCart= (ev) => {
       let formData= new FormData(ev.currentTarget)
-      zaraz.ecommerce('Product Added', {
+      scat.ecommerce('Product Added', {
         product_id: formData.get('item'),
         name: formData.get('name'),
         brand: formData.get('brand'),
@@ -306,7 +308,7 @@
 
     let recordRemoveFromCart= (ev) => {
       let data= ev.currentTarget.dataset
-      zaraz.ecommerce('Product Removed', {
+      scat.ecommerce('Product Removed', {
         product_id: data.code,
         quantity: data.quantity
       })

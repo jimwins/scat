@@ -296,7 +296,7 @@ but as a fallback you can chain `:not()` instead */
 {% block script %}
   {% autoescape 'js' %}
     <script>
-      zaraz.ecommerce('Cart Viewed', {
+      scat.ecommerce('Cart Viewed', {
         products: [
           {% for line in cart.items.find_many() %}
             {% set item= line.item %}

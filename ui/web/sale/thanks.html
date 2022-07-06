@@ -36,7 +36,7 @@
 {% block script %}
   {% autoescape 'js' %}
     <script>
-      zaraz.ecommerce('Order Completed', {
+      scat.ecommerce('Order Completed', {
         checkout_id: '{{ sale.id }}',
         order_id: '{{ sale.uuid }}',
         subtotal: '{{ sale.subtotal }}',

@@ -110,7 +110,7 @@
 {% block script %}
   {% autoescape 'js' %}
     <script>
-      zaraz.ecommerce('Checkout Started', {
+      scat.ecommerce('Checkout Started', {
         checkout_id: '{{ cart.id }}',
         order_id: '{{ cart.uuid }}',
         subtotal: '{{ cart.subtotal }}',
