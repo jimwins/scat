@@ -753,6 +753,8 @@ class Cart {
                 ->find_one();
     if ($has) {
       error_log("Already processed Stripe payment $payment_intent_id\n");
+      /* Reload to avoid race - other request may have changed status */
+      $cart->reload();
       goto endStripeFinalize;
     }
 
@@ -1049,6 +1051,8 @@ endStripeFinalize:
                 ->find_one();
     if ($has) {
       error_log("Already processed PayPal payment $order_id\n");
+      /* Reload to avoid race - other request may have changed status */
+      $cart->reload();
       goto endPaypalFinalize;
     }
 
