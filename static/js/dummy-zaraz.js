@@ -16,3 +16,4 @@ class Zaraz {
 }
 
 let zaraz= new Zaraz()
+window.zaraz= zaraz
