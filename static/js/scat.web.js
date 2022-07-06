@@ -83,7 +83,7 @@ class ScatWeb {
             break;
 
           case 'Product Viewed':
-            window.pintrk('track', 'pageview', {
+            window.pintrk('track', 'pagevisit', {
               'product_id': parameters.product_id,
             });
             break;
