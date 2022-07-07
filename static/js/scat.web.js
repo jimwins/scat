@@ -51,6 +51,13 @@ class ScatWeb {
             });
             break;
 
+          case 'Checkout Started':
+            window.uetq.push('event', 'begin_checkout', {
+              'revenue_value' : parameters.total,
+              'currency' : parameters.currency,
+            });
+            break;
+
           case 'Order Completed':
             window.uetq.push('event', 'purchase', {
               'revenue_value' : parameters.total,
