@@ -232,7 +232,10 @@
       linkAuthenticationElement.mount("#link-authentication-element");
 
       linkAuthenticationElement.on('change', (event) => {
-        const email= event.value.email;
+        const email= event.value.email.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          return
+        }
         clearTimeout(timeout);
         timeout= setTimeout(() => {
           updateCart({ email: email });
