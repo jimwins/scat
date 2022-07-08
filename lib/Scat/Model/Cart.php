@@ -219,7 +219,7 @@ class Cart extends \Scat\Model {
     foreach ($this->items()->find_many() as $line) {
       $item= $line->item();
       if (isset($item->weight)) {
-        $weight+= $line->quantity + $item->weight;
+        $weight+= $line->quantity * $item->weight;
       } else {
         return NULL; /* Unable to calculate weight */
       }
