@@ -113,6 +113,7 @@
 <script>
   {% autoescape 'js' %}
     scat.ecommerce('Product List Viewed', {
+      name: '{{ product.name }}',
       products: [
         {% for item in items %}
           {

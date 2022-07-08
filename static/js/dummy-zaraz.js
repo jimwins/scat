@@ -15,5 +15,18 @@ class Zaraz {
   }
 }
 
+/* Dummy Zaraz */
 let zaraz= new Zaraz()
-window.zaraz= zaraz
+window.zaraz= new Zaraz()
+
+/* Dummy Microsoft */
+window.uetq= [];
+
+/* Dummy Pinterest */
+class Pinterest {
+  pintrk (action, event, parameters) {
+    console.log("Pinterest %s: %s %O", action, event, parameters)
+  }
+}
+
+window.pintrk= new Pinterest()

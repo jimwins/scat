@@ -26,6 +26,13 @@ class ScatWeb {
       }
 
       if (window.uetq) {
+        let item_ids= parameters.products.map(x => x.product_id);
+        let items= parameters.products.map((x) => ({
+          'id' : x.product_id,
+          'quantity' : x.quantity,
+          'price' : x.price,
+        }));
+
         switch (event) {
           case 'Product Added':
             window.uetq.push('event', 'add_to_cart', {
@@ -51,6 +58,18 @@ class ScatWeb {
             });
             break;
 
+          case 'Cart Viewed':
+            window.uetq.push('event', '', {
+              'ecomm_prodid' : item_ids,
+              'ecomm_pagetype' : 'cart',
+              'ecomm_totalvalue' : parameters.total,
+              'revenue_value' : parameters.total,
+              'currency' : parameters.currency,
+              'items' : items,
+
+            });
+            break;
+
           case 'Checkout Started':
             window.uetq.push('event', 'begin_checkout', {
               'revenue_value' : parameters.total,
@@ -65,9 +84,16 @@ class ScatWeb {
             });
             break;
 
-          case 'Cart Viewed':
           case 'Product List Viewed':
+            window.uetq.push('event', '', {
+              'ecomm_category' : parameters.name,
+              'ecomm_prodid' : item_ids,
+              'ecomm_pagetype' : 'category',
+            });
+            break;
+
           case 'Products Searched':
+            /* Not used yet because of how our search works. */
 
           default:
             console.log(`No handling for ${event} with Bing, ignoring`)
