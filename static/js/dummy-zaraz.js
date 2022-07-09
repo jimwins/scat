@@ -23,10 +23,6 @@ window.zaraz= new Zaraz()
 window.uetq= [];
 
 /* Dummy Pinterest */
-class Pinterest {
-  pintrk (action, event, parameters) {
-    console.log("Pinterest %s: %s %O", action, event, parameters)
-  }
+window.pintrk= (action, event, parameters) => {
+  console.log("Pinterest %s: %s %O", action, event, parameters)
 }
-
-window.pintrk= new Pinterest()
