@@ -47,7 +47,12 @@
       what you need.
     </div>
 
-    {# XXX show some popular products #}
+    <ul class="smol-grid">
+      {{ ad('basic', 3) }}
+      {{ ad('basic', 4) }}
+      {{ ad('basic', 5) }}
+    </ul>
+
   {% else %}
 
     {{ block('notice') }}
