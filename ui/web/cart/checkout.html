@@ -268,10 +268,18 @@
 
         shippingAddressElement.on('change', (event) => {
           const details= event.value;
-          clearTimeout(timeout);
-          timeout= setTimeout(() => {
-            updateCart(details)
-          }, 500);
+          /* Don't update server if we don't have a full address yet */
+          if (details.name &&
+              details.address.line1 &&
+              details.address.city &&
+              details.address.state &&
+              details.address.postal_code.length >= 5)
+          {
+            clearTimeout(timeout);
+            timeout= setTimeout(() => {
+              updateCart(details)
+            }, 500);
+          }
         });
       {% endif %}
 
