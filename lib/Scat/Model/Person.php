@@ -208,9 +208,8 @@ class Person extends \Scat\Model {
     // TODO should throw better exceptions throughout
 
     /* Load uploaded file into a temporary table */
-# On DEBUG server, we leave behind the vendor_upload table for debugging
     $temporary= "TEMPORARY";
-    // XXX using global $DEBUG
+    /* With DEBUG, we leave behind the vendor_upload table for debugging */
     if ($GLOBALS['DEBUG']) {
       $q= "DROP TABLE IF EXISTS vendor_upload";
       if (!$this->orm->raw_execute($q))
