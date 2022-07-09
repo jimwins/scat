@@ -313,7 +313,7 @@ but as a fallback you can chain `:not()` instead */
         ]
       })
     </script>
-    {% if amzn.merchant_id %}
+    {% if amzn.merchant_id and cart.items.find_many()|length %}
       <script src="https://static-na.payments-amazon.com/checkout.js"></script>
       <script type="text/javascript" charset="utf-8">
         let amazonPayButton= amazon.Pay.renderButton('#AmazonPayButton', {
