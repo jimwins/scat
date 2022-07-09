@@ -26,13 +26,6 @@ class ScatWeb {
       }
 
       if (window.uetq) {
-        let item_ids= parameters.products.map(x => x.product_id);
-        let items= parameters.products.map((x) => ({
-          'id' : x.product_id,
-          'quantity' : x.quantity,
-          'price' : x.price,
-        }));
-
         switch (event) {
           case 'Product Added':
             window.uetq.push('event', 'add_to_cart', {
@@ -58,7 +51,14 @@ class ScatWeb {
             });
             break;
 
-          case 'Cart Viewed':
+          case 'Cart Viewed': {
+            let item_ids= parameters.products.map(x => x.product_id);
+            let items= parameters.products.map((x) => ({
+              'id' : x.product_id,
+              'quantity' : x.quantity,
+              'price' : x.price,
+            }));
+
             window.uetq.push('event', '', {
               'ecomm_prodid' : item_ids,
               'ecomm_pagetype' : 'cart',
@@ -66,9 +66,9 @@ class ScatWeb {
               'revenue_value' : parameters.total,
               'currency' : parameters.currency,
               'items' : items,
-
             });
             break;
+          }
 
           case 'Checkout Started':
             window.uetq.push('event', 'begin_checkout', {
@@ -84,13 +84,15 @@ class ScatWeb {
             });
             break;
 
-          case 'Product List Viewed':
+          case 'Product List Viewed': {
+            let item_ids= parameters.products.map(x => x.product_id);
             window.uetq.push('event', '', {
               'ecomm_category' : parameters.name,
               'ecomm_prodid' : item_ids,
               'ecomm_pagetype' : 'category',
             });
             break;
+          }
 
           case 'Products Searched':
             /* Not used yet because of how our search works. */
