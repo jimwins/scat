@@ -77,6 +77,10 @@ function updateCart(details) {
       disablePayButtons();
     }
   })
+  .catch((err) => {
+    console.log(err.message);
+    disablePayButtons();
+  })
   .finally(() => {
     form.removeAttribute('disabled')
   })
