@@ -9,8 +9,15 @@ class Scat
     $this->url= $config->get('scat.url');
   }
 
+  protected function getClient() {
+    return new \GuzzleHttp\Client([
+      'timeout' => 2,
+      'connect_timeout' => 2,
+    ]);
+  }
+
   public function find_person($loyalty) {
-    $client= new \GuzzleHttp\Client();
+    $client= $this->getClient();
 
     $uri= $this->url . "/person/search/?loyalty=" . rawurlencode($loyalty);
 
@@ -32,7 +39,7 @@ class Scat
   }
 
   public function sendSMS($to, $message) {
-    $client= new \GuzzleHttp\Client();
+    $client= $this->getClient();
 
     $uri= $this->url . "/sms/~send";
 
@@ -56,7 +63,7 @@ class Scat
   }
 
   public function get_person_details($person_id) {
-    $client= new \GuzzleHttp\Client();
+    $client= $this->getClient();
 
     $uri= $this->url . "/person/" . $person_id;
 
@@ -78,7 +85,7 @@ class Scat
   }
 
   public function get_giftcard_balance($card) {
-    $client= new \GuzzleHttp\Client();
+    $client= $this->getClient();
 
     $uri= $this->url . "/gift-card/" . rawurlencode($card);
 
