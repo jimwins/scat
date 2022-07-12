@@ -2,6 +2,7 @@
 {% import 'macros.twig' as scat %}
 
 {% set shipping_method= txn.shipping_method %}
+{% set hazmat = txn.has_hazmat_items() %}
 
 {% if shipping_method == 'next_day' %}
   {% set preferred_rates= {
@@ -17,7 +18,7 @@
   } %}
 {% else %}
   {% if txn.shipping_address.is_po_box() %}
-    {% if txn.has_hazmat_items() %}
+    {% if hazmat %}
       {% set preferred_rates= {
         'USPS': [ 'ParcelSelect' ],
       } %}
@@ -27,7 +28,7 @@
       } %}
     {% endif %}
   {% else %}
-    {% if txn.has_hazmat_items() %}
+    {% if hazmat %}
       {% set preferred_rates= {
         'GSO': [ 'CaliforniaParcelService' ],
         'UPS':  [ 'Ground' ],
@@ -53,7 +54,7 @@
   {% elseif shipping_method == 'two_day' %}
     &mdash; <span class="text-danger">Two Day</span>
   {% endif %}
-  {% if txn.has_hazmat_items() %}
+  {% if hazmat %}
     &mdash; <span class="text-danger">Hazardous Materials</span>
   {% endif %}
 {% endblock %}
@@ -68,7 +69,7 @@
             Paid
           </li>
           {% for rate in easypost.rates|sort((a,b) => a.rate <=> b.rate) %}
-            <a href="#" data-rate="{{ rate.id }}" class="list-group-item {{ rate.service in preferred_rates[rate.carrier] ? 'preferred' : 'hidden' }}">
+            <a href="#" data-rate="{{ rate.id }}" class="list-group-item {{ rate.service in preferred_rates[rate.carrier] ? 'preferred' : 'hidden' }} {{ hazmat and rate.service not in [ 'ParcelSelect', 'Ground', 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY', 'CaliforniaParcelService' ] ? 'disabled' }}">
               <span class="badge">{{ scat.amount(rate.rate) }}</span>
               {{ scat.format_shipping_carrier(rate.carrier) }}: {{ rate.service }}
               {% if rate.delivery_days %}
