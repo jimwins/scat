@@ -1369,7 +1369,7 @@ class Transactions {
 
     $details= $request->getParams();
 
-    if ($details['pickup'] == 1) {
+    if (@$details['pickup'] == 1) {
       $txn->shipping_address_id= 1;
     } else {
       $details['verify']= [ 'delivery' ];
