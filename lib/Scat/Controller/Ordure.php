@@ -480,7 +480,8 @@ class Ordure {
 
         // Capture tax (not fatal if problem, we will re-try later)
         try {
-          $txn->captureTax($tax);
+          // Need to force a new lookup if person_id has changed
+          $txn->captureTax($tax, $txn->person_id != $data->sale->person_id);
         } catch (\Exception $e) {
           $messages[]=
             "{$txn->uuid}: Failed to capture tax, " . $e->getMessage();
