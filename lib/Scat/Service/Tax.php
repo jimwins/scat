@@ -22,6 +22,10 @@ class Tax
       'connect_timeout' => 5,
     ]);
 
+    if (@$GLOBALS['DEBUG']) {
+      error_log("TaxCloud $method request: " . json_encode($params));
+    }
+
     $uri= 'https://api.taxcloud.net/1.0/TaxCloud/' . $method;
     $cred= [ 'apiKey' => $this->apiKey, 'apiLoginID' => $this->apiLoginID ];
 
@@ -38,6 +42,10 @@ class Tax
       file_put_contents("/tmp/taxcloud-in.json", json_encode($params));
       file_put_contents("/tmp/taxcloud-out.json", $body);
       throw new \Exception($data->ErrDescription);
+    }
+
+    if (@$GLOBALS['DEBUG']) {
+      error_log("TaxCloud $method response: " . json_encode($data));
     }
 
     return $data;
