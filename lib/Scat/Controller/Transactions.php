@@ -1525,21 +1525,25 @@ class Transactions {
 
     /* New package info? */
     if (($weight= $request->getParam('weight'))) {
-      list($length, $width, $height)=
-        preg_split('/[^\d.]+/', trim($request->getParam('dimensions')));
+      $dims= preg_split('/[^\d.]+/', trim($request->getParam('dimensions')));
       if (preg_match('/(([0-9.]+)( *lbs)?)? +(([0-9.]+) *oz)?/', $weight, $m)) {
         $weight= $m[2] + (@$m[5] / 16);
       }
 
       $parcel= [
         'weight' => $weight * 16, // Needs to be oz.
-        'length' => $length,
-        'width' => $width,
-        'height' => $height,
       ];
+      if (count($dims) == 3) {
+        $parcel['length']= $dims[0];
+        $parcel['width']= $dims[1];
+        $parcel['height']= $dims[2];
+      }
       $predefined_package= $request->getParam('predefined_package');
       if (strlen($predefined_package)) {
         $parcel['predefined_package']= $predefined_package;
+      }
+      if ($request->getParam('letter')) {
+        $parcel['predefined_package']= 'Letter';
       }
 
       $options= [
@@ -1562,10 +1566,10 @@ class Transactions {
       ]);
 
       $shipment->weight= $weight;
-      if ($length) {
-        $shipment->length= $length;
-        $shipment->width= $width;
-        $shipment->height= $height;
+      if (count($dims) == 3) {
+        $shipment->length= $dims[0];
+        $shipment->width= $dims[1];
+        $shipment->height= $dims[2];
       }
 
       $shipment->method_id= $extra->id;
