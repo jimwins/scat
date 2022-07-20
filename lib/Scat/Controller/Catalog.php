@@ -1215,7 +1215,7 @@ class Catalog {
     foreach ($items as $item) {
       $html= $item->description ?: $item->product()->description;
       $html= preg_replace('/\s+/', ' ', $html); // replace all whitespace
-      $html= preg_replace('/{{ *@STATIC *}}/', 'https:' . $ordure_static, $html);
+      $html= preg_replace('/{{ *@STATIC *}}/', $ordure_static, $html);
       $text= strip_tags($html);
 
       $product= $item->product();
@@ -1230,7 +1230,7 @@ class Catalog {
       }
 
       if (!$media || !$media[0]) continue;
-      $image= 'https:' . $media[0]->large_square();
+      $image= $media[0]->large_square();
 
       $barcodes= $item->barcodes()->find_many();
       $barcode= $barcodes ? $barcodes[0]->code : null;
