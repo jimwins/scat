@@ -29,7 +29,7 @@ class Media
     $upload= $this->ordure->grabImage($url);
     $base= $this->config->get('gumlet.base_url');
 
-    $url= 'https:' . $base .
+    $url= $base .
            $upload->uuid . '.' . $upload->ext .
            '?fm=json';
     $body= file_get_contents($url);
@@ -65,7 +65,7 @@ class Media
     ]);
 
     $base= $this->config->get('gumlet.base_url');
-    $url= 'https:' . $base .
+    $url= $base .
            $uuid . '.' . $ext .
            '?fm=json';
     $body= file_get_contents($url);
