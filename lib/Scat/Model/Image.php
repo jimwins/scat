@@ -23,7 +23,7 @@ class Image extends \Scat\Model {
   }
 
   public function large_square() {
-    $fm= in_array(strtolower($this->ext), [ 'tif', 'tiff' ]) ? 'jpeg' : 'auto';
+    $fm= in_array(strtolower($this->ext), [ 'tif', 'tiff' ]) ? 'jpg' : 'auto';
     $config= $GLOBALS['container']->get(\Scat\Service\Config::class);
     return $config->get('gumlet.base_url') .
            $this->uuid . '.' . $this->ext .
@@ -38,7 +38,7 @@ class Image extends \Scat\Model {
         $height= $width;
       }
     }
-    $fm= in_array(strtolower($this->ext), [ 'tif', 'tiff' ]) ? 'jpeg' : 'auto';
+    $fm= in_array(strtolower($this->ext), [ 'tif', 'tiff' ]) ? 'jpg' : 'auto';
     $config= $GLOBALS['container']->get(\Scat\Service\Config::class);
     return $config->get('gumlet.base_url') .
            $this->uuid . '.' . $this->ext .
