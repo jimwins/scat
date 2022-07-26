@@ -28,7 +28,11 @@
       } %}
     {% endif %}
   {% else %}
-    {% if hazmat %}
+    {% if hazmat and txn.shipping_address.state in [ 'AK', 'HI' ] %}
+      {% set preferred_rates= {
+        'USPS': [ 'ParcelSelect' ],
+      } %}
+    {% elseif hazmat %}
       {% set preferred_rates= {
         'GSO': [ 'CaliforniaParcelService' ],
         'UPS':  [ 'Ground' ],
