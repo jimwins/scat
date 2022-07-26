@@ -79,4 +79,13 @@
       Unable to determine any shipping methods.
     </div>
   {% endif %}
+
+  {% if cart.shipping_options.default.service == 'ParcelSelect' %}
+    <div class="alert alert-danger">
+      <b>Your package will be sent with the USPS ParcelSelect service.</b>
+      This is a ground service that can be quite slow, but is our only option
+      for packages with hazardous materials being sent outside the continental
+      United States or to a PO Box.
+    </div>
+  {% endif %}
 </div>

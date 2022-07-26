@@ -302,10 +302,11 @@ class Shipping
     foreach ($shipment->rates as $rate) {
       error_log("{$rate->carrier} / {$rate->service} = {$rate->rate}");
       if ($hazmat) {
+        /* PO Box or outside contintental US has to go USPS ParcelSelect */
         if (in_array($rate->carrier, [ 'USPS' ]) &&
             $rate->service == 'ParcelSelect' &&
-            self::state_in_continental_us($to->state) &&
-            self::address_is_po_box($to))
+            (self::address_is_po_box($to)) ||
+             !self::state_in_continental_us($to->state))
         {
           if (!$best_rate || $rate->rate < $best_rate) {
             $method= "{$rate->carrier} / {$rate->service }";
@@ -326,6 +327,10 @@ class Shipping
       if (in_array($rate->carrier, [ 'UPSDAP', 'UPS' ]) &&
           $rate->service == 'Ground')
       {
+        /* No hazmat outside contintental US. */
+        if ($hazmat && !self::state_in_continental_us($to->state)) {
+          continue;
+        }
         if (!$best_rate || $rate->rate < $best_rate) {
           $method= "{$rate->carrier} / {$rate->service }";
           $best_rate= $rate->rate;
@@ -395,7 +400,7 @@ class Shipping
       ];
 
       if (!$hazmat) {
-        /* We can use USPS for non-hazmat items. */
+        /* We can use USPS First/Priority for non-hazmat items. */
         $acceptable_options['default'][]= [ 'USPS', 'First' ];
         $acceptable_options['default'][]= [ 'USPS', 'Priority' ];
       } else {
@@ -404,11 +409,11 @@ class Shipping
         unset($acceptable_options['next_day']);
       }
 
-      /* We will allow ParcelSelect to PO Box in continental US, too. */
-      if (self::state_in_continental_us($to->state) &&
+      /* We force ParcelSelect if PO Box or not continental US, too. */
+      if (!self::state_in_continental_us($to->state) ||
           self::address_is_po_box($to))
       {
-        $acceptable_options['default'][]= [ 'USPS', 'ParcelSelect' ];
+        $acceptable_options['default']= [ [ 'USPS', 'ParcelSelect' ] ];
       }
 
       foreach ($shipment->rates as $rate) {
