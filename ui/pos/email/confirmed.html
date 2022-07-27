@@ -33,6 +33,13 @@
       we open. <b>Please wait for confirmation that your order is ready
       before coming to pick up your order.</b>
     </p>
+    {% if not txn.stocked() %}
+      <p>
+        <b>Not all of the items you ordered are in stock.</b> We will let you
+        know when what we do have available now is ready for pickup and an
+        estimate for when the other items will be available.
+      </p>
+    {% endif %}
   {% elseif txn.is_bike_delivery() %}
     <p>
       Thank you for your local bike delivery order from Raw Materials Art
@@ -59,11 +66,24 @@
     <p>
       Thank you for your order from Raw Materials Art Supplies!
     </p>
-    <p>
-      We will send another email with tracking information after your order
-      has shipped. Most orders are shipped out within two business days
-      (Monday - Friday).
-    </p>
+    {% if txn.stocked() %}
+      <p>
+        We will send another email with tracking information after your order
+        has shipped. Most orders are shipped out within two business days
+        (Monday - Friday).
+      </p>
+    {% else %}
+      <p>
+        We will send another email with tracking information after your order
+        has shipped. Because not all of your order is in stock at the store,
+        it may take up to two weeks to ship. We will contact you if we find it
+        will take longer.
+      </p>
+      <p>
+        If you would prefer that we ship what is available and cancel the rest
+        of the order, please let us know.
+      </p>
+    {% endif %}
   {% endif %}
 
 {% endblock %}
