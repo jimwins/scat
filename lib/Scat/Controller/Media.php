@@ -20,7 +20,7 @@ class Media {
 
   public function home(Request $request, Response $response, View $view) {
     $page= (int)$request->getParam('page');
-    $page_size= 20;
+    $page_size= (int)$request->getParam('limit') ?: 20;
 
     $media= $this->data->factory('Image')
       ->select('*')
