@@ -30,7 +30,26 @@ class Media {
 
     $q= $request->getParam('q');
     if ($q) {
-      $media= $media->where_raw('MATCH (name, alt_text, caption) AGAINST (? IN NATURAL LANGUAGE MODE)', [ $q ]);
+      $parser= new \Scat\Search\Parser();
+
+      $terms= $parser->parse($q);
+
+      $natural= [];
+
+      foreach ($terms as $term) {
+        if ($term instanceof \Scat\Search\Comparison) {
+          $name= $term->name;
+          if ($name == 'ext') {
+            $media= $media->where('ext', $term->value);
+          }
+        } elseif ($term instanceof \Scat\Search\Term) {
+          $natural[]= '"' . $term->value . '"';
+        }
+      }
+
+      if ($natural) {
+        $media= $media->where_raw('MATCH (name, alt_text, caption) AGAINST (? IN NATURAL LANGUAGE MODE)', [ join(' ', $natural) ]);
+      }
     }
 
     $media= $media->find_many();
