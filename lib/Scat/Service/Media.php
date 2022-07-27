@@ -88,36 +88,12 @@ class Media
     $b2= $this->getB2Client();
     $bucket= $this->config->get('b2.bucketName');
 
-    $publitio= new \Publitio\API(
-      $this->config->get('publitio.key'),
-      $this->config->get('publitio.secret')
-    );
+    $url= $image->original() . '?fm=jpg';
+    $upload= $this->ordure->grabImage($url, [ 'ext' => 'jpg' ]);
 
-    $url= sprintf('%s/file/%s/%s',
-                  $b2->getAuthorization()['downloadUrl'],
-                  $bucket,
-                  'i/o/' . $image->uuid . '.' . $image->ext);
-
-    try {
-      $res= $publitio->call("/files/delete/" . $image->publitio_id,
-                            'DELETE');
-    } catch (\Exception $e) {
-      error_log("failed to delete from publit.io: ". $e->getMessage());
-    }
-
-    $res= $publitio->call('/files/create', 'POST', [
-      'file_url' => $url,
-      'public_id' => $image->uuid,
-      'title' => $image->name,
-      'privacy' => 1,
-      'option_ad' => 0,
-      'tags' => $GLOBALS['DEBUG'] ? 'debug' : '',
-    ]);
-
-    $image->publitio_id= $res->id;
-    $image->width= $res->width;
-    $image->height= $res->height;
-    $image->ext= $res->extension;
+    $image->uuid= $upload->uuid;
+    $image->b2_file_id= $upload->id;
+    $image->ext= $upload->ext;
     $image->save();
 
     return $image;

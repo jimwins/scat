@@ -176,7 +176,7 @@ class Catalog {
     $uuid= sprintf("%08x%02x%s", time(), 1, bin2hex(random_bytes(8)));
 
     // No extension? Probably a JPEG
-    $ext= pathinfo($name, PATHINFO_EXTENSION) ?: 'jpg';
+    $ext= $request->getParam('ext') ?: pathinfo($name, PATHINFO_EXTENSION) ?: 'jpg';
 
     $b2= $media->getB2Client();
     $b2_bucket= $media->getB2Bucket();
