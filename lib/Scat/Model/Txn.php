@@ -651,7 +651,7 @@ class Txn extends \Scat\Model {
 
         $tax_returned= 0.00;
 
-        foreach ($this->items()->where_not_null('returned_from_id')->find_many()
+        foreach ($this->items()->where_not_null('returned_from_id')->where_null('kit_id')->find_many()
                   as $i)
         {
           $index= $index_map[$i->returned_from_id];
