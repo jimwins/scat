@@ -1,0 +1,42 @@
+{% extends 'layout/email.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title -%}
+  Your order is out for delivery!
+{%- endblock %}
+
+{% block content_top %}
+  <p>
+    {% if txn.person.name %}
+      Dear {{ txn.person.name }},
+    {% else %}
+      Dear,
+    {% endif %}
+  </p>
+
+  <p>
+    Thanks again for your order from Raw Materials Art Supplies!
+  </p>
+  <p>
+    We wanted to let you know that your order ({{ txn.formatted_number }}) was
+    reported to be out for delivery by {{ scat.format_shipping_carrier(tracker.carrier) }} on
+    {{ (out_for_delivery ?: tracker.updated_at) | date("c", "UTC") | date("l, F j", txn.shipping_address.timezone) }}.
+    {% if out_for_delivery and out_for_delivery|date("Y-m-d") != tracker.updated_at|date("Y-m-d") %}
+      (Sorry for the slow update, we just got the news!)
+    {% endif %}
+  </p>
+  <p>
+    If there are any problems with receiving your package, please let us know right away so we can get it sorted out!
+  </p>
+
+{% endblock %}
+
+{% set call_to_action_url= tracker.public_url %}
+{% block call_to_action "Track Your Shipment" %}
+
+{% block content_bottom %}
+  <p>
+    Thank you for your business and we look forward to serving you in the
+    future!
+  </p>
+{% endblock %}

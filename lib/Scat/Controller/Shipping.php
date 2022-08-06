@@ -292,6 +292,49 @@ class Shipping {
         break;
 
       case 'out_for_delivery':
+        // send order out_for_delivery
+        $txn= $shipment->txn();
+
+        if ($txn->type != 'customer') {
+          break;
+        }
+
+        if (!$txn->person()->email) {
+          error_log("Don't know the email for txn {$txn->id}, can't update");
+          break;
+        }
+
+        foreach ($tracker->tracking_details as $details) {
+          if ($details->status == 'out_for_delivery') {
+            $available_for_pickup= $details->datetime;
+          }
+        }
+
+        $subject= $this->view->fetchBlock('email/out_for_delivery.html', 'title', [
+          'tracker' => $tracker,
+          'out_for_delivery' => $out_for_delivery,
+          'txn' => $txn,
+        ]);
+        $body= $this->view->fetch('email/out_for_delivery.html', [
+          'tracker' => $tracker,
+          'out_for_delivery' => $out_for_delivery,
+          'txn' => $txn,
+        ]);
+
+        $res= $this->email->send(
+          [ $txn->person()->email => $txn->person()->name ],
+          $subject, $body
+        );
+
+        /* Attach email as a note */
+        $note= $txn->createNote();
+        $note->source= 'email';
+        $note->content= $subject;
+        $note->full_content= $body;
+        $note->save();
+
+        break;
+
       case 'return_to_sender':
       case 'failure':
       case 'cancelled':
