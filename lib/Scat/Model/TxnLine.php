@@ -89,27 +89,47 @@ class TxnLine extends \Scat\Model {
   }
 
   public function cost_of_goods() {
-    /* To calculate the cost of goods, we take the average of our vendor costs
-     * before this transaction. Not great, but okay. */
     $txn= $this->txn();
-    $q= "SELECT CAST(IFNULL(ROUND_TO_EVEN(
-                    {$this->allocated} * ROUND_TO_EVEN(AVG(tl.retail_price), 2),
-                    2), 0.00) AS DECIMAL(9,2)) AS cost
+
+    /* XXX Special items have no cost. */
+    /* TODO should probably be an exclusion list. */
+    if ($this->tic != 0) return 0;
+
+    $direction= $this->allocated > 0 ? '>' : '<';
+
+    $q= "SELECT SUM(allocated) allocated
            FROM txn
            JOIN txn_line tl ON txn.id = tl.txn_id
-          WHERE type = 'vendor'
-            AND item_id = {$this->item_id}
+          WHERE item_id = {$this->item_id}
+            AND allocated $direction 0
             AND created < '{$txn->created}'";
+    $allocated= $this->orm->for_table('txn')->raw_query($q)->find_one();
+    $allocated= abs($allocated->allocated);
 
-    $cost= $this->orm->for_table('txn')->raw_query($q)->find_one();
+    $q= "SELECT allocated, retail_price, discount_type, discount
+           FROM txn
+           JOIN txn_line tl ON txn.id = tl.txn_id
+          WHERE item_id = {$this->item_id}
+            AND 0 $direction allocated
+            AND created < '{$txn->created}'";
+    $in= $this->orm->for_table('txn')->raw_query($q)->find_many();
 
-    // No cost from that? Use best replacement cost
-    // Useful when there is a sale before a purchase
-    if (!$cost || $cost->cost == '0.00') {
-      return $this->item()->best_cost() * $this->ordered;
+    $cost= [];
+    foreach ($in as $entry) {
+      $cost= array_merge($cost, array_fill(0, abs($entry->allocated), $this->calcSalePrice($entry->retail_price, $entry->discount_type, $entry->discount)));
     }
 
-    return $cost->cost;
+    $allocating= abs($this->allocated);
+
+    /* Not enough costs to find them for this? Use replacement cost */
+    if (count($cost) < $allocated + $allocating) {
+      /* Useful when there is a sale before a purchase */
+      return $this->item()->best_cost() * $this->allocated;
+    }
+
+    $total= array_sum(array_slice($cost, $allocated, $allocating));
+
+    return ($this->allocated < 0 ? -1 : 1) * $total;
   }
 
   public function as_array() {
