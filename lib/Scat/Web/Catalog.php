@@ -98,6 +98,11 @@ class Catalog {
       throw new \Exception("Wrong key.");
     }
 
+    $this->data->beginTransaction();
+
+    /* Mark everything inactive until told otherwise. */
+    $this->data->execute("UPDATE item_status SET active = 0");
+
     $rows= 0;
     foreach ($request->getUploadedFiles() as $file) {
       $q= "LOAD DATA LOCAL INFILE ?
@@ -120,6 +125,8 @@ class Catalog {
       $this->data->execute($q, [ ($stream->getMetaData())['uri'] ]);
       $rows+= $this->data->get_last_statement()->rowCount();
     }
+
+    $this->data->commit();
 
     touch('/tmp/last-loaded-prices');
 
