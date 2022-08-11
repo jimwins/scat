@@ -1136,7 +1136,8 @@ class Catalog {
       if ($request->getAttribute('only_active') &&
           (($deptO && !$deptO->active) ||
             ($subdeptO && !$subdeptO->active) ||
-            ($productO && !$productO->active)))
+            ($productO && !$productO->active) ||
+            ($itemO && !$itemO->active)))
       {
         throw new \Slim\Exception\HttpNotFoundException($request);
       }
