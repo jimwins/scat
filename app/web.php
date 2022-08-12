@@ -38,7 +38,10 @@ $builder->addDefinitions([
 ]);
 $container= $builder->build();
 
-$container->set('config', new \Scat\Service\Config());
+/* Hook up the data service, but not lazily because we rely on side-effects */
+$container->set('data', new \Scat\Service\Data($config['webdata']));
+
+$container->set('config', new \Scat\Service\Config($container->get('data')));
 
 $app= \DI\Bridge\Slim\Bridge::create($container);
 
@@ -81,9 +84,6 @@ $container->set('view', function($container) {
   return $view;
 });
 $app->add(\Slim\Views\TwigMiddleware::createFromContainer($app));
-
-/* Hook up the data service, but not lazily because we rely on side-effects */
-$container->set('data', new \Scat\Service\Data($config['webdata']));
 
 $app->add((new \Middlewares\TrailingSlash(false))->redirect());
 

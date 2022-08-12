@@ -7,14 +7,10 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Settings {
-  private $data, $config;
-
   public function __construct(
-    \Scat\Service\Data $data,
-    \Scat\Service\Config $config
+    private \Scat\Service\Data $data,
+    private \Scat\Service\Config $config
   ) {
-    $this->data= $data;
-    $this->config= $config;
   }
 
   public function home(Response $response, View $view) {
