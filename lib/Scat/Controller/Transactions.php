@@ -104,6 +104,14 @@ class Transactions {
     ]);
   }
 
+  public function saleByUuid(Request $request, Response $response, $uuid) {
+    $txn= $this->txn->fetchByUuid($uuid);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    return $response->withJson($txn);
+  }
+
   public function createSale(Request $request, Response $response)
   {
     $this->data->beginTransaction();

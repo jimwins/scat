@@ -7,6 +7,12 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class People {
+  public function __construct(
+    private \Scat\Service\Data $data,
+    private View $view
+  ) {
+  }
+
   public function home(Request $request, Response $response, View $view,
                         \Scat\Service\Data $data)
   {
@@ -143,6 +149,18 @@ class People {
      'page' => $page,
      'limit' => $limit,
     ]);
+  }
+
+  public function sales(Request $request, Response $response, $id)
+  {
+    $person= $this->data->factory('Person')->find_one($id);
+
+    $page= $request->getParam('page') ?: 0;
+    $limit= $request->getParam('limit') ?: 25;
+
+    $sales= $person->txns($page, $limit)->find_many();
+
+    return $response->withJson($sales);
   }
 
   function uploadItems(Request $request, Response $response, $id,

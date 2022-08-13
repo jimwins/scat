@@ -123,6 +123,8 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->post('', [ \Scat\Controller\Transactions::class, 'createSale' ]);
   $app->get('/{id:[0-9]+}', [ \Scat\Controller\Transactions::class, 'sale' ])
       ->setName('sale');
+  $app->get('/{uuid:[0-9a-f]+}',
+            [ \Scat\Controller\Transactions::class, 'saleByUuid' ]);
   $app->patch('/{id:[0-9]+}',
               [ \Scat\Controller\Transactions::class, 'updateSale' ]);
   $app->delete('/{id:[0-9]+}',
@@ -445,6 +447,8 @@ $app->group('/person', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\People::class, 'mergePerson' ]);
   $app->post('/{id:[0-9]+}/~merge',
               [ \Scat\Controller\People::class, 'mergePerson' ]);
+  $app->get('/{id:[0-9]+}/sale',
+            [ \Scat\Controller\People::class, 'sales' ]);
 
   $app->get('/{id:[0-9]+}/sms',
             [ \Scat\Controller\People::class, 'startSms' ]);
