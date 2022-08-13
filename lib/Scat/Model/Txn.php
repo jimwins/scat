@@ -875,6 +875,8 @@ class Txn extends \Scat\Model {
     $res= parent::as_array();
     $res['items']= $this->items()->find_many();
     $res['shipments']= $this->shipments()->find_many();
+    $res['total']= $this->total();
+    $res['formatted_number']= $this->formatted_number();
     return $res;
   }
 }
