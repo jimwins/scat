@@ -92,7 +92,7 @@ class Sale {
 
     $person= $this->auth->get_person_details($request);
 
-    if (!$sale || $sale->status != 'cart') {
+    if (!$sale || !in_array($sale->status, [ 'cart', 'paid' ])) {
       return $this->scat->get_sale_invoice($uuid, $person);
     }
 
