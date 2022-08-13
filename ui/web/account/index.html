@@ -6,7 +6,7 @@
 
 {% block content %}
   <h1 class="page-header">
-    Welcome back{{ person ? ', ' ~ person.friendly_name }}!
+    Welcome back!
     <small>
       (<a href="{{ url_for('logout') }}">log out</a>)
     </small>
@@ -17,4 +17,27 @@
       <b>Success!</b> You have been logged in to your account successfully.
     </div>
   {% endif %}
+
+  <dl>
+    <dt>Name
+    <dd>{{ person.name }}
+
+    <dt>Company
+    <dd>{{ person.company }}
+
+    <dt>Email
+    <dd>{{ person.email }}
+
+    <dt>Phone
+    <dd>{{ person.pretty_phone }}
+  </dl>
+
+  {% if person.tax_exemption_certificate_id %}
+    <p>We have a tax exemption certificate on file for this account. You can
+    apply it during checkout.</p>
+  {% endif %}
+
+  {% if orders|length %}
+  {% endif %}
+
 {% endblock %}
