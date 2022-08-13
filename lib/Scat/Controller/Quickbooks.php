@@ -387,6 +387,10 @@ class Quickbooks {
       }
       else {
         $txn->qb_je_id= $res->Id;
+        /* Mark corrections complete */
+        if ($txn->type == 'correction') {
+          $txn->status= 'complete';
+        }
         $txn->save();
         $success[]= $res->Id;
       }
