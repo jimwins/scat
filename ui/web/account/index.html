@@ -92,7 +92,7 @@
       </tbody>
       <tfoot>
         <td colspan="7">
-          Showing {{ 1 + (page * limit) }} to {{ limit }} of {{ orders[0].records }}
+          Showing {{ 1 + (page * limit) }} to {{ min(limit, orders[0].records) }} of {{ orders[0].records }}
         </td>
       </tfoot>
     </table>
