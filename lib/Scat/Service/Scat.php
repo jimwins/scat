@@ -84,14 +84,18 @@ class Scat
     return $data;
   }
 
-  public function get_orders($person_id) {
+  public function get_orders($person_id, $page, $limit) {
     $client= $this->getClient();
 
     $uri= $this->url . "/person/" . $person_id . '/sale';
 
     try {
       $res= $client->get($uri, [
-        'headers' => [ 'Accept' => 'application/json' ]
+        'headers' => [ 'Accept' => 'application/json' ],
+        'query' => [
+          'page' => $page,
+          'limit' => $limit
+        ]
       ]);
     } catch (\Exception $e) {
       throw $e;

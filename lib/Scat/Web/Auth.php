@@ -25,14 +25,17 @@ class Auth {
       return $response->withRedirect('/login');
     }
 
-    $orders= $this->scat->get_orders($person->id);
+    $page= $request->getParam('page') ?: 0;
+    $limit= 25;
+
+    $orders= $this->scat->get_orders($person->id, $page, $limit);
 
     return $this->view->render($response, "account/index.html", [
       'success' => $request->getParam('success'),
       'person' => $person,
       'orders' => $orders,
-      'page' => 0,
-      'limit' => 25,
+      'page' => $page,
+      'limit' => $limit,
     ]);
   }
 

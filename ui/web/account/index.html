@@ -62,7 +62,7 @@
       <tbody>
         {% for order in orders %}
           <tr>
-            <td>{{ loop.index }}</td>
+            <td>{{ loop.index + page * limit }}</td>
             <td>
               <a href="sale/{{ order.uuid }}">
                 {{ order.formatted_number }}
@@ -92,7 +92,25 @@
       </tbody>
       <tfoot>
         <td colspan="7">
-          Showing {{ 1 + (page * limit) }} to {{ min(limit, orders[0].records) }} of {{ orders[0].records }}
+          <div class="pager">
+            {% if page > 0 %}
+              <a class="button small" href="/account?page={{ page - 1 }}">
+                {{ bootstrap_icon('arrow-left') }}
+                <span class="label">Previous</span>
+              </a>
+            {% else %}
+              <span></span>
+            {% endif %}
+            Showing {{ 1 + (page * limit) }} to {{ min(page * limit + limit, orders[0].records) }} of {{ orders[0].records }}
+            {% if page * limit + limit < orders[0].records %}
+              <a class="button small" href="/account?page={{ page + 1 }}">
+                {{ bootstrap_icon('arrow-right') }}
+                <span class="label">Next</span>
+              </a>
+            {% else %}
+              <span></span>
+            {% endif %}
+          </div>
         </td>
       </tfoot>
     </table>
@@ -126,8 +144,12 @@
       border-top: var(--border-width) solid #ddd;
       background: #f9f9f9;
     }
-    table.order-list tfoot td {
+    table.order-list .pager {
+      display: grid;
+      place-content: center;
       text-align: center;
+      grid-template-columns: auto 1fr auto;
+      grid-column-gap: 0.25em;
     }
   </style>
 
