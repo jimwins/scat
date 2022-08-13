@@ -12,6 +12,7 @@ class Sale {
     private \Scat\Service\Cart $carts,
     private \Scat\Service\Catalog $catalog,
     private \Scat\Service\Auth $auth,
+    private \Scat\Service\Scat $scat,
     private View $view
   ) {
   }
@@ -88,6 +89,11 @@ class Sale {
 
   public function sale(Request $request, Response $response, $uuid) {
     $sale= $this->carts->findByUuid($uuid);
+
+    if (!$sale || $sale->status != 'cart') {
+      return $this->scat->get_sale_invoice($uuid);
+    }
+
     if (!$sale) {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
@@ -108,10 +114,16 @@ class Sale {
     $person= $this->auth->get_person_details($request);
     $key= $request->getParam('key');
 
-    if (!$this->auth->verify_access_key($key) &&
-        (!$person || $person->role != 'employee'))
-    {
+    if ($key && !$this->auth->verify_access_key($key)) {
       throw new \Slim\Exception\HttpForbiddenException($request, "Wrong key");
+    }
+
+    if (!$person ||
+        ($person->id != $sale->person_id &&
+          $person->role != 'employee'))
+    {
+      error_log("person_id = {$person->id}, sale->person_id = {$sale->person_id}");
+      throw new \Slim\Exception\HttpForbiddenException($request);
     }
 
     return $this->view->render($response, 'sale/sale.html', [
@@ -176,5 +188,13 @@ class Sale {
     $sale->save();
 
     return $response->withJson($sale);
+  }
+
+  public function trackShipment(
+    Request $request, Response $response,
+    $uuid,
+    $shipment_id
+  ) {
+    return $this->scat->track_shipment($uuid, $shipment_id);
   }
 }

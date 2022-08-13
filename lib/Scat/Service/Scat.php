@@ -84,6 +84,52 @@ class Scat
     return $data;
   }
 
+  public function get_orders($person_id) {
+    $client= $this->getClient();
+
+    $uri= $this->url . "/person/" . $person_id . '/sale';
+
+    try {
+      $res= $client->get($uri, [
+        'headers' => [ 'Accept' => 'application/json' ]
+      ]);
+    } catch (\Exception $e) {
+      throw $e;
+    }
+
+    $data= json_decode($res->getBody());
+
+    if (json_last_error() != JSON_ERROR_NONE) {
+      throw new \Exception(json_last_error_msg());
+    }
+
+    return $data;
+  }
+
+  public function get_sale_invoice($uuid) {
+    $client= $this->getClient();
+
+    $uri= $this->url . "/sale/" . $uuid;
+
+    try {
+      $res= $client->get($uri, [
+        'headers' => [ 'Accept' => 'application/json' ]
+      ]);
+    } catch (\Exception $e) {
+      throw $e;
+    }
+
+    $data= json_decode($res->getBody());
+
+    if (json_last_error() != JSON_ERROR_NONE) {
+      throw new \Exception(json_last_error_msg());
+    }
+
+    $uri= $this->url . "/sale/" . $data->id . '/~print-invoice?download=1';
+
+    return $client->post($uri);
+  }
+
   public function get_giftcard_balance($card) {
     $client= $this->getClient();
 
@@ -104,5 +150,29 @@ class Scat
     }
 
     return $data->balance;
+  }
+
+  public function track_shipment($uuid, $shipment_id) {
+    $client= $this->getClient();
+
+    $uri= $this->url . "/sale/" . $uuid;
+
+    try {
+      $res= $client->get($uri, [
+        'headers' => [ 'Accept' => 'application/json' ]
+      ]);
+    } catch (\Exception $e) {
+      throw $e;
+    }
+
+    $data= json_decode($res->getBody());
+
+    if (json_last_error() != JSON_ERROR_NONE) {
+      throw new \Exception(json_last_error_msg());
+    }
+
+    $uri= $this->url . "/shipment/" . $shipment_id . '/track';
+
+    return $client->get($uri);
   }
 }

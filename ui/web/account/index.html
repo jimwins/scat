@@ -1,4 +1,5 @@
 {% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
 
 {% block title %}
   Account @ Raw Materials Art Supplies
@@ -37,7 +38,97 @@
     apply it during checkout.</p>
   {% endif %}
 
+  <h2>Cart</h2>
+
+  <a class="button" href="/cart">
+    Resume Shopping
+  </a>
+
   {% if orders|length %}
+    <h2>Orders</h2>
+
+    <table class="order-list">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Invoice</th>
+          <th>Created</th>
+          <th>Status</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="sale/{{ order.uuid }}">
+                {{ order.formatted_number }}
+              </a>
+            </td>
+            <td>{{ order.created }}</td>
+            <td>{{ scat.format_txn_status(order.status) }}</td>
+            <td>{{ order.items|length }}</td>
+            <td>{{ scat.amount(order.total) }}</td>
+            <td>
+              {% for shipment in order.shipments %}
+                {% if shipment.status != 'pending' %}
+                  <a class="button small"
+                    href="sale/{{ order.uuid }}/shipment/{{ shipment.id }}/track">
+                    {{ bootstrap_icon('truck') }}
+                    <span class="label">Track</span>
+                  </a>
+                {% endif %}
+              {% endfor %}
+              <a class="button small" href="sale/{{ order.uuid }}">
+                {{ bootstrap_icon('receipt') }}
+                <span class="label">View</span>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <td colspan="7">
+          Showing {{ 1 + (page * limit) }} to {{ limit }} of {{ orders[0].records }}
+        </td>
+      </tfoot>
+    </table>
   {% endif %}
+
+  <style>
+    table.order-list {
+      empty-cells: show;
+      border-collapse: collapse;
+      width: 100%;
+      margin: 2em 0;
+      text-overflow: ellipsis;
+    }
+    .order-list thead {
+      border-bottom: var(--border-width) solid #ddd;
+    }
+    .order-list td, .order-list th {
+      padding: 0.5rem;
+      vertical-align: top;
+    }
+    .order-list th {
+      text-align: left;
+    }
+    table.order-list tbody tr:nth-child(odd) {
+      background: #f9f9f9;
+    }
+    table.order-list tbody tr {
+      border-bottom: calc(var(--border-width) / 2) solid #ddd;
+    }
+    table.order-list tfoot tr {
+      border-top: var(--border-width) solid #ddd;
+      background: #f9f9f9;
+    }
+    table.order-list tfoot td {
+      text-align: center;
+    }
+  </style>
 
 {% endblock %}

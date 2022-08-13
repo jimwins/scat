@@ -207,6 +207,8 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->post('/{uuid}/set-status', [ \Scat\Web\Sale::class, 'setStatus' ]);
   $app->post('/{uuid}/set-abandoned-level',
               [ \Scat\Web\Sale::class, 'setAbandonedLevel' ]);
+  $app->get('/{uuid}/shipment/{shipment_id:[0-9]+}/track',
+            [ \Scat\Web\Sale:: class, 'trackShipment' ]);
 });
 
 /* Contact */
