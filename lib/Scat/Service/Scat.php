@@ -110,7 +110,7 @@ class Scat
     return $data;
   }
 
-  public function get_sale_invoice($uuid) {
+  public function get_sale_invoice($uuid, $person) {
     $client= $this->getClient();
 
     $uri= $this->url . "/sale/" . $uuid;
@@ -127,6 +127,10 @@ class Scat
 
     if (json_last_error() != JSON_ERROR_NONE) {
       throw new \Exception(json_last_error_msg());
+    }
+
+    if ($person->id != $data->person_id) {
+      throw new \Exception("Unable to get invoice for that sale.");
     }
 
     $uri= $this->url . "/sale/" . $data->id . '/~print-invoice?download=1';

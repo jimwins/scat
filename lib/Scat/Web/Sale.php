@@ -90,8 +90,10 @@ class Sale {
   public function sale(Request $request, Response $response, $uuid) {
     $sale= $this->carts->findByUuid($uuid);
 
+    $person= $this->auth->get_person_details($request);
+
     if (!$sale || $sale->status != 'cart') {
-      return $this->scat->get_sale_invoice($uuid);
+      return $this->scat->get_sale_invoice($uuid, $person);
     }
 
     if (!$sale) {
@@ -111,7 +113,6 @@ class Sale {
 
     // TODO redirect to correct URL depending on $sale->status
 
-    $person= $this->auth->get_person_details($request);
     $key= $request->getParam('key');
 
     if ($key && !$this->auth->verify_access_key($key)) {
