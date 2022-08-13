@@ -82,7 +82,7 @@
                   </a>
                 {% endif %}
               {% endfor %}
-              <a class="button small" href="sale/{{ order.uuid }}">
+              <a class="button small" href="sale/{{ order.uuid ?: order.id }}">
                 {{ bootstrap_icon('receipt') }}
                 <span class="label">View</span>
               </a>
