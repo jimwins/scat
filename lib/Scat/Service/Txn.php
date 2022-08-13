@@ -34,6 +34,10 @@ class Txn
     return $this->data->factory('Txn')->find_one($id);
   }
 
+  public function fetchByUuid($uuid) {
+    return $this->data->factory('Txn')->where('uuid', $uuid)->find_one();
+  }
+
   public function fetchByNumber($number) {
     return $this->data->factory('Txn')->where('type', 'customer')->where('number', $number)->find_one();
   }
