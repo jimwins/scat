@@ -64,7 +64,7 @@
           <tr>
             <td>{{ loop.index + page * limit }}</td>
             <td>
-              <a href="sale/{{ order.uuid }}">
+              <a href="sale/{{ order.uuid ?: order.id }}">
                 {{ order.formatted_number }}
               </a>
             </td>
