@@ -47,36 +47,6 @@
              value="" size="200">
       <span class="input-group-btn">
         <input type="submit" class="btn btn-default" value="Find Items">
-        <div class="btn-group">
-          <button type="button" class="btn btn-default dropdown-toggle"
-                  data-toggle="dropdown" aria-haspopup="true"
-                  aria-expanded="false">
-            Custom <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li>
-              <a data-action="add-item-by-code" data-code="ZZ-GIFT">
-                Gift Card
-              </a>
-            </li>
-            <li role="separator" class="divider"></li>
-            <li>
-              <a data-action="add-item-by-code" data-code="ZZ-FLOAT">
-                Floater Frame
-              </a>
-            </li>
-            <li>
-              <a data-action="add-item-by-code" data-code="ZZ-CANVAS">
-                Canvas
-              </a>
-            </li>
-            <li>
-              <a data-action="add-item-by-code" data-code="ZZ-PANEL">
-                Panel
-              </a>
-            </li>
-          </ul>
-        </div>
       </span>
     </div>
   </form>
@@ -117,13 +87,13 @@
             </td>
             <td>
               <div data-action="editable" data-name="ordered">
-                {{- (txn.type == 'vendor' ? 1 : -1) * line.ordered -}}
+                {{- (txn.type == 'correction' ? 1 : -1) * line.ordered -}}
               </div>
             </td>
             <td>
               <div data-action="editable" data-name="allocated"
                    class="{{ (line.allocated < line.ordered) ? 'text-danger' }}">
-                {{- (txn.type == 'vendor' ? 1 : -1) * line.allocated -}}
+                {{- (txn.type == 'correction' ? 1 : -1) * line.allocated -}}
               </div>
             </td>
             <td>
@@ -149,7 +119,7 @@
             </td>
             <td style="text-align: right">
               {% if not line.kit_id %}
-                {{ scat.amount((txn.type == 'vendor' ? 1 : -1) * line.ext_price) }}
+                {{ scat.amount((txn.type == 'correction' ? 1 : -1) * line.ext_price) }}
               {% endif %}
             </td>
           </tr>
