@@ -116,6 +116,7 @@ class Item extends \Scat\Model {
 
   public function in_kits() {
     return $this->has_many_through('Item', 'KitItem', null, 'kit_id', null, 'id')
+      ->where('active', 1)
       ->find_many();
   }
 
