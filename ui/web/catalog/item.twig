@@ -176,7 +176,13 @@ figure img {
   <div class="description">
     <hr>
 
-    {{ item.description ?? product.description | markdown }}
+    {% if item.description %}
+      {{ item.description | markdown }}
+      <hr>
+      <h3>Product Description</h3>
+    {% endif %}
+
+    {{ product.description | markdown }}
 
     {% if item.prop65 or item.hazmat or item.oversized %}
       <div class="alert alert-warning">

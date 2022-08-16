@@ -310,6 +310,7 @@ class Item extends \Scat\Model {
         // passthrough
       case 'active':
       case 'code':
+      case 'description':
       case 'variation':
       case 'tic':
       case 'color':
