@@ -51,10 +51,6 @@ footer li:last-child:after {
 
 /* special rules for only small size */
 @media (max-width: 599.98px) {
-  nav details#info > div {
-    left: 0; right: 0;
-    transform-origin: 50% 0%;
-  }
 }
 
 /* horizontal phone, tablet */
@@ -392,74 +388,6 @@ a:hover, a:focus {
 }
 .list-horizontal li:last-child:after {
   content: '';
-}
-
-details {
-  display: inline;
-  list-style: none;
-  position: relative;
-}
-details > summary::-webkit-details-marker {
-  display: none;
-}
-summary {
-  margin: 0;
-  list-style: none;
-  box-sizing: border-box;
-}
-details > div {
-  position: absolute;
-  right: 0;
-  width: max-content;
-
-  z-index: 100;
-
-  background-color: #fff;
-
-  border: var(--border-width) solid var(--primary-color);
-  border-radius: var(--border-radius);
-
-  padding: 1rem;
-
-  margin-top: 0.5rem;
-
-  animation: scale 0.25s ease;
-  transform-origin: 100% 0%;
-
-  box-shadow: 0.5rem 0.5rem 1rem rgb(0, 0, 0, 0.5);
-}
-@media (prefers-reduced-motion) {
-  details > div {
-    animation: dissolve;
-  }
-}
-details.left > div {
-  left: 0;
-  right: auto;
-  transform-origin: 0% 0%;
-}
-
-@keyframes scale {
-  0% {
-    transform: scale(0);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-#department-nav summary {
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color);
-  margin-right: 0.5em;
-  background: #fff;
-  box-shadow: none;
-}
-#department-nav h2 {
-  margin-top: 0;
-}
-#department-nav li::marker {
-  color: var(--primary-color);
 }
 
 hr {
