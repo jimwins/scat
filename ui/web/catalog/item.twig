@@ -62,6 +62,9 @@ figure img {
   .item-info > .description {
     grid-column: 2 / 4;
   }
+  .description > details {
+    font-weight: bold;
+  }
 }
 </style>
 
@@ -177,12 +180,32 @@ figure img {
     <hr>
 
     {% if item.description %}
-      {{ item.description | markdown }}
-      <hr>
-      <h3>Product Description</h3>
+      <details open>
+        <summary>Item Description</summary>
+        {{ item.description | markdown }}
+      </details>
     {% endif %}
 
-    {{ product.description | markdown }}
+    <details open>
+      <summary>Product Description</summary>
+      {{ product.description | markdown }}
+    </details>
+
+    <details>
+      <summary>Shipping &amp; Returns</summary>
+      <p>
+        Most orders of in-stock items ship within two business days, special
+        order or out of stock items usually ship within two weeks.
+        <a href="/shipping">Read the full shipping policy.</a>
+      </p>
+      <p>
+        You can return unopened, resalable merchandise within 30 days for both
+        online and in-store purchases, with some exceptions. All returns of
+        undamaged items are subject to a 20% restocking fee, except for easels
+        which are subject to a 50% restocking fee.
+        <a href="/return-policy">Read the full return policy.</a>
+      </p>
+    </details>
 
     {% if item.prop65 or item.hazmat or item.oversized %}
       <div class="alert alert-warning">
