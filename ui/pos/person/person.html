@@ -323,6 +323,13 @@
       <div class="col-sm-6">
         <div class="panel panel-default">
           <div class="panel-heading">
+            <div class="pull-right">
+              <button class="btn btn-xs btn-default"
+                      data-action="show-loyalty">
+                <i class="fa fa-history fa-fw"></i>
+                History
+              </button>
+            </div>
             <h2 class="panel-title">Rewards</h2>
           </div>
           <div class="panel-body form-horizontal">
@@ -553,6 +560,10 @@
 
     scat.handleAction('click', 'send-sms', (act) => {
       return scat.dialog("/person/{{ person.id }}/sms")
+    })
+
+    scat.handleAction('click', 'show-loyalty', (act) => {
+      return scat.dialog('/person/{{ person.id }}/loyalty')
     })
   </script>
 

@@ -337,6 +337,8 @@ class People {
   public function loyalty(Request $request, Response $response, $id, View $view,
                           \Scat\Service\Data $data) {
     $person= $data->factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\HttpNotFoundException($request);
 
     $activity= $person->loyalty()->order_by_desc('id')->find_many();
 
@@ -349,6 +351,29 @@ class People {
     }
 
     return $response->withJson($activity);
+  }
+
+  public function updateLoyalty(Request $request, Response $response, $id) {
+    $person= $this->data->factory('Person')->find_one($id);
+    if (!$person)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $points= (int)$request->getParam('points');
+    if (!$points)
+      throw new \Exception("No points entered.");
+
+    $note= $request->getParam('note');
+    if (!$note)
+      throw new \Exception("No note supplied.");
+
+    $loyalty= $person->loyalty()->create();
+    $loyalty->person_id= $person->id;
+    $loyalty->set_expr('processed', 'NOW()');
+    $loyalty->note= $note;
+    $loyalty->points= $points;
+    $loyalty->save();
+
+    return $response->withJson($loyalty);
   }
 
   public function backorderReport(Request $request, Response $response, $id,

@@ -27,8 +27,38 @@
         </tbody>
       </table>
     </div>
+    <div class="row">
+      <div class="form-group col-sm-4">
+        <label for="points">Points</label>
+        <input type="text" class="form-control" name="points" required>
+      </div>
+      <div class="form-group col-sm-8">
+        <label for="note">Note</label>
+        <input type="text" class="form-control" name="note" required>
+      </div>
+    </div>
   </div>
 {% endblock %}
 
 {% block submit %}
+  <button type="submit" class="btn btn-primary">
+    Update
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+    let formData= new FormData(form)
+    scat.call("/person/{{ person.id }}/loyalty", formData)
+        .then((res) => {
+          if (res.redirected) {
+            window.location.href= res.url
+          } else {
+            window.location.reload()
+          }
+        })
+  }
 {% endblock %}
