@@ -209,8 +209,8 @@ class Shipping
     return \EasyPost\Parcel::create($details);
   }
 
-  public function createShipment($details) {
-    return \EasyPost\Shipment::create($details);
+  public function createShipment($details, $apiKey= null, $withCarbonOffset= false) {
+    return \EasyPost\Shipment::create($details, $apiKey, $withCarbonOffset);
   }
 
   public function getShipment($shipment) {
@@ -295,7 +295,7 @@ class Shipping
       'options' => $options,
     ];
 
-    $shipment= $this->createShipment($details);
+    $shipment= $this->createShipment($details, null, true);
 
     $best_rate= null;
 
@@ -380,7 +380,7 @@ class Shipping
         'options' => $options,
       ];
 
-      $shipment= $this->createShipment($details);
+      $shipment= $this->createShipment($details, null, true);
 
       $acceptable_options= [
         'default' => [

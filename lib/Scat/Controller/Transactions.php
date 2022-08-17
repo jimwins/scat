@@ -1571,7 +1571,7 @@ class Transactions {
           $shipping->retrieveAddress($txn->shipping_address()->easypost_id),
         'parcel' => $parcel,
         'options' => $options,
-      ]);
+      ], null, true); // get carbon_offset in rates
 
       $shipment->weight= $weight;
       if (count($dims) == 3) {
@@ -1587,7 +1587,7 @@ class Transactions {
     /* Re-rate? */
     if (($rerate= $request->getParam('rerate'))) {
       $ep= $shipping->getShipment($shipment);
-      $ep->get_rates();
+      $ep->regenerate_rates();
 
       $shipment->status= 'pending';
     }

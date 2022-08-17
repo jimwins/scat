@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad1bc59ca91b8e202a4ae448fa7af627",
+    "content-hash": "4ca4e4812b381b4a5b99af17d4cdb466",
     "packages": [
         {
             "name": "akrabat/ip-address-middleware",
@@ -819,32 +819,34 @@
         },
         {
             "name": "easypost/easypost-php",
-            "version": "3.6.0",
+            "version": "5.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyPost/easypost-php.git",
-                "reference": "2c8adce0f9852bdac8d51232f1d9644fc1ae4f76"
+                "reference": "92172581efa31b64563de1af2f680b23ec2506f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyPost/easypost-php/zipball/2c8adce0f9852bdac8d51232f1d9644fc1ae4f76",
-                "reference": "2c8adce0f9852bdac8d51232f1d9644fc1ae4f76",
+                "url": "https://api.github.com/repos/EasyPost/easypost-php/zipball/92172581efa31b64563de1af2f680b23ec2506f9",
+                "reference": "92172581efa31b64563de1af2f680b23ec2506f9",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
-                "php": ">=5.3.0"
+                "php": ">=7.3"
             },
             "require-dev": {
-                "phpunit/php-token-stream": "3.*",
-                "phpunit/phpunit": "^8",
-                "squizlabs/php_codesniffer": "^3.0"
+                "allejo/php-vcr-sanitizer": "^1.0.9",
+                "php-vcr/php-vcr": "^1.5",
+                "phpunit/phpunit": "^9",
+                "roave/security-advisories": "dev-latest",
+                "squizlabs/php_codesniffer": "^3.6"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "EasyPost": "lib/"
+                "psr-4": {
+                    "EasyPost\\": "lib/EasyPost/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -867,9 +869,9 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyPost/easypost-php/issues",
-                "source": "https://github.com/EasyPost/easypost-php/tree/v3.6.0"
+                "source": "https://github.com/EasyPost/easypost-php/tree/v5.5.0"
             },
-            "time": "2021-06-10T21:43:16+00:00"
+            "time": "2022-08-02T16:11:12+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
