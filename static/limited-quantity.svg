@@ -1,0 +1,8 @@
+<svg width="144" height="144" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <rect fill="#ffffff" stroke="#000000" stroke-width="2" x="22.6" y="22.6" width="100" height="100" id="svg_1" transform="rotate(45 72.6 72.6)"/>
+  <polygon stroke="#000000" id="svg_2" fill="#000000" points="32.60000228881836,102.09999389946461 73.09999084472656,144.0999938994646 113.59999084472656,102.09999389946461 " stroke-width="2"/>
+  <polygon transform="rotate(180 72.1 23.6)" id="svg_3" stroke="#000000" fill="#000000" points="31.6 2.6 72.1 44.6 112.6 2.6" stroke-width="2"/>
+ </g>
+</svg>

@@ -88,7 +88,7 @@
         <b>NEXT DAY SHIPPING</b><br>
       {% endif %}
       {% if txn.has_hazmat_items() %}
-        <img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"> Hazardous Materials<br>
+        <img src="/static/limited-quantity.svg" width="16" alt="Hazardous Materials"> Hazardous Materials<br>
       {% endif %}
     {% elseif txn.type != 'vendor' and txn.shipping_address_id == 1 %}
       {% if txn.total > 100 %}
