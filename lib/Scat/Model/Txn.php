@@ -190,7 +190,8 @@ class Txn extends \Scat\Model {
     $item= $this->items()->where('tic', '11000')->find_one();
 
     if ($item) {
-      return $item->data()->method ?: 'default';
+      $data= $item->data();
+      return $data ? $data->method : 'default';
     }
 
     return 'default';
