@@ -1823,6 +1823,7 @@ class Transactions {
     $extra= $extra_field= $extra_field_name= '';
 
     $all= (int)$request->getParam('all');
+    $stocked= (int)$request->getParam('stocked');
 
     $vendor_code= "NULL";
     $vendor_id= (int)$request->getParam('vendor_id');
@@ -1886,9 +1887,14 @@ class Transactions {
     if ($code) {
       $extra.= " AND code LIKE " . $this->data->escape($code.'%');
     }
-    $criteria= ($all ? '1=1'
-                     : '(ordered IS NULL OR NOT ordered)
-                        AND IFNULL(stock, 0) < minimum_quantity');
+    if ($all) {
+      $criteria= '1=1';
+    } elseif ($stocked) {
+      $criteria= '(minimum_quantity > 0)';
+    } else {
+      $criteria= '(ordered IS NULL OR NOT ordered)
+                    AND IFNULL(stock, 0) < minimum_quantity';
+    }
     $q= "SELECT id, code, vendor_code, name, stock,
                 minimum_quantity, last3months,
                 $extra_field_name
