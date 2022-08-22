@@ -42,7 +42,7 @@ figure img {
   <div class="content">
     {{ product.description | replace({'{{ @STATIC }}' : STATIC}) | markdown }}
 
-    {% if variations|length %}
+    {% if variations|length > 1 %}
       <h2>Jump to:</h2>
       <ul>
         {% for variation in variations %}
