@@ -479,6 +479,8 @@ class Transactions {
   public function handleUploadedItems(Request $request, Response $response,
                                       $txn)
   {
+    $update_only= false;
+
     foreach ($request->getUploadedFiles() as $file) {
       $fn= $file->getClientFilename();
       $stream= $file->getStream();
@@ -613,6 +615,22 @@ class Transactions {
                  msrp = REPLACE(@msrp, '$', ''), net = REPLACE(@net, '$', '')";
         $this->data->execute($q);
 
+      } elseif (preg_match('/^Invoice#;/', $line)) {
+        error_log("Loading ColArt data\n");
+        $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+             INTO TABLE vendor_order
+             FIELDS TERMINATED BY ';'
+             LINES TERMINATED BY '\r\n'
+             IGNORE 1 LINES
+             (@invoice_no, @order_no, @order_line, @upc, @code, @alias,
+              @country_of_origin, @customs_code, description, @qty, msrp,
+              @discount_pct, net, @ext, @currency)
+             SET item_no= @code, barcode= REPLACE(@upc, \"'\", ''),
+                 ordered = @qty, shipped = @qty";
+        $this->data->execute($q);
+
+        $update_only= true;
+
       } elseif (preg_match('/^code\tqty/', $line)) {
         error_log("Loading order file\n");
         $q= "LOAD DATA LOCAL INFILE '$tmpfn'
@@ -728,68 +746,98 @@ class Transactions {
       /* Start a transaction now that we're working with live data */
       $this->data->beginTransaction();
 
-      // Make sure we have all the items
-      $q= "INSERT IGNORE INTO item (code, brand_id, name, retail_price, active)
-           SELECT item_no AS code,
-                  0 AS brand_id,
-                  description AS name,
-                  msrp AS retail_price,
-                  1 AS active
-             FROM vendor_order
-            WHERE (NOT item_id OR item_id IS NULL) AND msrp > 0 AND IFNULL(unit,'') != 'AS'";
-      $this->data->execute($q);
+      if ($update_only) {
+        $q= "SELECT COUNT(*) total
+               FROM vendor_order
+              WHERE item_id = 0 or item_id IS NULL";
+        $unknown= $this->data->fetch_single_value($q);
 
-      if ($this->data->get_last_statement()->rowCount()) {
-        # Attach order lines to new items
-        $q= "UPDATE vendor_order, item
-                SET vendor_order.item_id = item.id
-              WHERE (NOT vendor_order.item_id OR vendor_order.item_id IS NULL)
-                AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
-                AND vendor_order.item_no = item.code";
+        if ($unknown) {
+          throw new \Exception("Upload includes items not in the catalog");
+        }
+
+        $q= "SELECT COUNT(*) total
+               FROM vendor_order
+               LEFT JOIN txn_line ON vendor_order.item_id = txn_line.item_id
+                                 AND txn_id = {$txn->id}
+              WHERE txn_line.id IS NULL";
+        $unknown= $this->data->fetch_single_value($q);
+
+        if ($unknown) {
+          throw new \Exception("Upload includes items not on original order");
+        }
+
+
+        $q= "UPDATE txn_line, vendor_order
+                SET allocated = allocated + vendor_order.shipped
+              WHERE txn_line.item_id = vendor_order.item_id
+                AND txn_id = {$txn->id}";
+        $this->data->execute($q);
+
+      } else {
+        // Make sure we have all the items
+        $q= "INSERT IGNORE INTO item (code, brand_id, name, retail_price, active)
+             SELECT item_no AS code,
+                    0 AS brand_id,
+                    description AS name,
+                    msrp AS retail_price,
+                    1 AS active
+               FROM vendor_order
+              WHERE (NOT item_id OR item_id IS NULL) AND msrp > 0 AND IFNULL(unit,'') != 'AS'";
+        $this->data->execute($q);
+
+        if ($this->data->get_last_statement()->rowCount()) {
+          # Attach order lines to new items
+          $q= "UPDATE vendor_order, item
+                  SET vendor_order.item_id = item.id
+                WHERE (NOT vendor_order.item_id OR vendor_order.item_id IS NULL)
+                  AND vendor_order.item_no != '' AND vendor_order.item_no IS NOT NULL
+                  AND vendor_order.item_no = item.code";
+          $this->data->execute($q);
+        }
+
+        // Make sure all the items are active
+        $q= "UPDATE item, vendor_order
+                SET item.active = 1
+              WHERE vendor_order.item_id = item.id";
+        $this->data->execute($q);
+
+        // Make sure we know all the barcodes
+        $q= "INSERT IGNORE INTO barcode (item_id, code, quantity)
+             SELECT item_id,
+                    REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS code,
+                    1 AS quantity
+              FROM vendor_order
+             WHERE item_id AND barcode != ''";
+        $this->data->execute($q);
+
+        // Link items to vendor items if they aren't already
+        $q= "UPDATE vendor_item, vendor_order
+                SET vendor_item.item_id = vendor_order.item_id
+              WHERE NOT vendor_item.item_id
+                AND vendor_item.code = vendor_order.item_no
+                AND vendor_item.active";
+        $this->data->execute($q);
+
+        // Get pricing for items if vendor_order didn't have them
+        $q= "UPDATE vendor_order, vendor_item
+                SET msrp = vendor_item.retail_price,
+                    net = vendor_item.net_price
+              WHERE msrp IS NULL
+                AND vendor_order.item_id = vendor_item.item_id
+                AND vendor_id = {$txn->person_id}
+                AND vendor_item.active";
+        $this->data->execute($q);
+
+        // Add items to order
+        $q= "INSERT INTO txn_line (txn_id, item_id, ordered, allocated, retail_price)
+             SELECT {$txn->id} txn_id, item_id,
+                    ordered, shipped, net
+               FROM vendor_order
+              WHERE (shipped OR backordered)
+                AND (item_id != 0 AND item_id IS NOT NULL)";
         $this->data->execute($q);
       }
-
-      // Make sure all the items are active
-      $q= "UPDATE item, vendor_order
-              SET item.active = 1
-            WHERE vendor_order.item_id = item.id";
-      $this->data->execute($q);
-
-      // Make sure we know all the barcodes
-      $q= "INSERT IGNORE INTO barcode (item_id, code, quantity)
-           SELECT item_id,
-                  REPLACE(REPLACE(barcode, 'E-', ''), 'U-', '') AS code,
-                  1 AS quantity
-            FROM vendor_order
-           WHERE item_id AND barcode != ''";
-      $this->data->execute($q);
-
-      // Link items to vendor items if they aren't already
-      $q= "UPDATE vendor_item, vendor_order
-              SET vendor_item.item_id = vendor_order.item_id
-            WHERE NOT vendor_item.item_id
-              AND vendor_item.code = vendor_order.item_no
-              AND vendor_item.active";
-      $this->data->execute($q);
-
-      // Get pricing for items if vendor_order didn't have them
-      $q= "UPDATE vendor_order, vendor_item
-              SET msrp = vendor_item.retail_price,
-                  net = vendor_item.net_price
-            WHERE msrp IS NULL
-              AND vendor_order.item_id = vendor_item.item_id
-              AND vendor_id = {$txn->person_id}
-              AND vendor_item.active";
-      $this->data->execute($q);
-
-      // Add items to order
-      $q= "INSERT INTO txn_line (txn_id, item_id, ordered, allocated, retail_price)
-           SELECT {$txn->id} txn_id, item_id,
-                  ordered, shipped, net
-             FROM vendor_order
-            WHERE (shipped OR backordered)
-              AND (item_id != 0 AND item_id IS NOT NULL)";
-      $this->data->execute($q);
 
       $this->data->commit();
     }
