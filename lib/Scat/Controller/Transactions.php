@@ -399,6 +399,12 @@ class Transactions {
 
     $line->ordered+= $quantity * ($txn->type == 'customer') ? -1 : 1;
 
+    if ($line->is_new()) {
+      error_log("Added {$line->ordered} {$item->code} to txn {$txn->id}");
+    } else {
+      error_log("Updated to {$line->ordered} {$item->code} on txn {$txn->id}");
+    }
+
     $line->save();
 
     /* Is this a kit? Need to add kit items or adjust quantities */
@@ -977,6 +983,8 @@ class Transactions {
     if ($line->item()->is_kit) {
       $txn->items()->where('kit_id', $line->item_id)->delete_many();
     }
+
+    error_log("Removed {$line->ordered} {$line->item()->code} from txn $txn->id");
 
     $line->delete();
 
