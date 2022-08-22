@@ -1,6 +1,7 @@
 <div class="pull-right">
-  <button id="add-new-person" class="btn btn-default">
-    Add New Person
+  <button class="btn btn-default" data-action="add-new-person">
+    <i class="fa fa-user-plus fa-fw"></i>
+    Add Person
   </button>
 </div>
 <form method="GET" action="/person/search">
@@ -18,7 +19,11 @@
 </form>
 <hr style="border-color: rgba(0,0,0,0.1)">
 <script>
-document.getElementById('add-new-person').addEventListener('click', (ev) => {
-  scat.dialog('/person')
-})
+  scat.handleAction('click', 'add-new-person', (ev) => {
+    return scat.dialog('/person').then((res) => {
+      if (res) { return res.json() }
+    }).then((data) => {
+      window.location.href= '/person/' + data.id
+    })
+  })
 </script>
