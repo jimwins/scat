@@ -76,9 +76,9 @@
         <tr>
           <td>{{ dt }}</td>
           {% for method, name in methods %}
-            <td>{{ details[method] ? scat.amount(details[method].toString) }}</td>
+            <td>{{ details[method] ? scat.amount(details[method].toString()) }}</td>
           {% endfor %}
-          <td>{{ scat.amount(details.total.toString) }}
+          <td>{{ scat.amount(details.total.toString()) }}
         </tr>
       {% endfor %}
     </tbody>
