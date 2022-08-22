@@ -74,6 +74,15 @@
         {% set item= results.items[0] %}
         <div class="panel panel-default">
           <div class="panel-heading">
+            {% if not item.active %}
+              <div class="pull-right">
+                <a class="btn btn-danger"
+                   href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
+                  <i class="fa fa-exclamation-circle fa-fw"></i>
+                  Inactive
+                </a>
+              </div>
+            {% endif %}
             <h1 class="panel-title">
               <a href="{{ url_for('catalog-item', { 'code' : item.code }) }}">
                 <div class="text-info"><b>{{ item.code }}</b></div>
