@@ -230,7 +230,10 @@ figure img {
       "@type": "Product",
       "description": "{{ item.description ?: product.description }}",
       "name": "{{ item.name }}",
-      "brand": "{{ product.brand.name }}",
+      "brand": {
+        "@type": "Brand",
+        "name": "{{ brand.name }}"
+      },
       "sku": "{{ item.code }}",
       "gtin": "{{ item.barcode }}",
       "image": "{{ item.default_image }}",
