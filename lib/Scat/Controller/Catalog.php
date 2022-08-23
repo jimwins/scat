@@ -1222,16 +1222,8 @@ class Catalog {
       $product= $item->product();
 
       // only include items for which we have an image
-      $media= $item->media();
-      if (!$media) {
-        if ($item->siblings > 1) {
-          continue;
-        }
-        $media= $product->media();
-      }
-
-      if (!$media || !$media[0]) continue;
-      $image= $media[0]->large_square();
+      $image= $item->default_image();
+      if (!image) continue;
 
       $barcodes= $item->barcodes()->find_many();
       $barcode= $barcodes ? $barcodes[0]->code : null;

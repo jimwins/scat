@@ -195,6 +195,20 @@ class Item extends \Scat\Model {
     $rel->save();
   }
 
+  public function default_image() {
+    $media= $this->media();
+    if (!$media) {
+      if ($item->siblings() > 1) {
+        return null;
+      }
+      $media= $product->media();
+    }
+
+    if (!$media || !$media[0]) return null;
+
+    return $media[0]->large_square();
+  }
+
   public function brand_name() {
     $product= $this->product();
     if ($product) {

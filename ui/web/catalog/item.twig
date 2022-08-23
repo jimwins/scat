@@ -223,6 +223,28 @@ figure img {
   </div>
 </div>
 
+<script type="application/ld+json">
+  {% autoescape 'js' %}
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "description": "{{ item.description ?: product.description }}",
+      "name": "{{ item.name }}",
+      "brand": "{{ product.brand.name }}",
+      "sku": '{{ item.code }}',
+      "gtin": '{{ item.barcode }}',
+      "image": "{{ item.default_image }}",
+      "offers": {
+        "@type": "Offer",
+        "availability": "{{ item.stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}",
+        "price": "{{ item.sale_price }}",
+        "priceCurrency": "USD"
+      },
+    }
+  {% endautoescape %}
+</script>
+
+
 {% block script %}
   {% autoescape 'js' %}
     <script>
