@@ -195,6 +195,14 @@ class Item extends \Scat\Model {
     $rel->save();
   }
 
+  public function siblings() {
+    return $this->factory('Item')
+                ->where('product_id', $this->product_id)
+                ->where_not_equal('id', $this->item_id)
+                ->where('active', 1)
+                ->find_many();
+  }
+
   public function default_image() {
     $media= $this->media();
     if (!$media) {
