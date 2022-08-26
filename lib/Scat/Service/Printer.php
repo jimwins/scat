@@ -5,13 +5,12 @@ use \Slim\Http\Response as Response;
 
 class Printer
 {
-  private $view;
-  private $config;
   private $builder, $client, $responseParser;
 
-  public function __construct(\Slim\Views\Twig $view, Config $config) {
-    $this->view= $view;
-    $this->config= $config;
+  public function __construct(
+    private \Slim\Views\Twig $view,
+    private Config $config
+  ) {
   }
 
   public function getPrinterManager() {
