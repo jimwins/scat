@@ -240,6 +240,9 @@ $app->group('/shipment', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Shipping::class, 'trackShipment' ]);
   $app->post('/{id:[0-9]+}/~create-return',
               [ \Scat\Controller\Shipping::class, 'createShipmentReturn' ]);
+  $app->get('/{id}/returnLabel',
+            [ \Scat\Controller\Shipping::class, 'getReturnLabelPDF' ])
+      ->setName('shipment-return-label');
   $app->post('/{id:[0-9]+}/~print-label',
               [ \Scat\Controller\Shipping::class, 'printShipmentLabel' ]);
   $app->post('/{id:[0-9]+}/~refund',

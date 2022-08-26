@@ -858,6 +858,29 @@ class Shipping {
     return $print->printPDF($response, 'shipping-label', $pdf);
   }
 
+  public function getReturnLabelPDF(Request $request, Response $response,
+                                    \Scat\Service\Printer $printer, $id)
+  {
+    $shipment= $this->data->factory('Shipment')->find_one($id);
+    if (!$shipment) {
+      throw new \Slim\Exception\HttpNotFoundException($request);
+    }
+
+    $details= $this->shipping->getShipment($shipment);
+
+    if (!$details->is_return) {
+      throw new \Exception("Only able to generate return label for return.");
+    }
+
+    $pdf= $printer->generateFromTemplate('print/return-label.html', [
+      'shipment' => $shipment,
+      'details' => $details,
+    ]);
+
+    $response->getBody()->write($pdf);
+    return $response->withHeader('Content-type', 'application/pdf');
+  }
+
   public function refundShipment(Request $request, Response $response, $id)
   {
     $shipment= $this->data->factory('Shipment')->find_one($id);

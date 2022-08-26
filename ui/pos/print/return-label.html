@@ -1,0 +1,78 @@
+{% extends 'layout/print.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Return Label for Invoice {{ shipment.txn.formatted_number }}
+{% endblock %}
+
+{% block content %}
+  <a href="https://rawmaterialsla.com/">
+    <img src="/static/logo.svg" width="100%" alt="Raw Materials Art Supplies">
+  </a>
+
+  <h2>
+    {{ block('title') }}
+  </h2>
+
+  <table cellspacing="20">
+    <tr>
+      <td valign="top">
+        {% if details.selected_rate.carrier == 'USPS' %}
+          <ol>
+            <li>
+              Center the label onto the largest side of the package so that the
+              label information does not wrap around any edge.
+            </li>
+            <li>
+              If not using a self-adhesive label, tape or glue the shipping label
+              to the package. <b>Do not tape over the barcode.</b> Be sure all of
+              the label edges are secure.
+            </li>
+            <li>
+              <b>Do not photocopy.</b> Each shipping label number is unique to the
+              intended shipment and can be used only once. If needed, contact us
+              for a replacement label.
+            </li>
+            <li>
+              If reusing a container or box, remove, cover, or mark out completely
+              any other barcode and address markings.
+            </li>
+            <li>
+              Mail the parcel at a Post Office, drop it in a collection box, leave
+              it with a mail carrier, or scheduled a free carrier pickup at usps.com.
+            </li>
+          </ol>
+        {% else %}
+          <ol>
+            <li>
+              Center the label onto the largest side of the package so that the
+              label information does not wrap around any edge.
+            </li>
+            <li>
+              If not using a self-adhesive label, tape or glue the shipping label
+              to the package. <b>Do not tape over the barcode.</b> Be sure all of
+              the label edges are secure.
+            </li>
+            <li>
+              <b>Do not photocopy.</b> Each shipping label number is unique to the
+              intended shipment and can be used only once. If needed, contact us
+              for a replacement label.
+            </li>
+            <li>
+              If reusing a container or box, remove, cover, or mark out completely
+              any other barcode and address markings.
+            </li>
+            <li>
+              Mail the parcel at The UPS Store or other UPS shipping location, drop
+              it in a UPS collection box, leave it with a UPS carrier, or schedule
+              a pickup at UPS.com.
+            </li>
+          </ol>
+        {% endif %}
+      </td>
+      <td>
+        <img src="{{ details.postage_label.label_url}}" style="width: 4in; height: 6in">
+      </td>
+    </tr>
+  </table>
+{% endblock %}
