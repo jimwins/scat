@@ -390,7 +390,8 @@ function check_padist_stock($code) {
     error_log($body);
   }
 
-  if (preg_match('/i=(\d+)&/', $body, $m)) {
+  // gross, but we're parsing html with a regex. ¯\_(ツ)_/¯
+  if (preg_match("!/Item/(\d+)[^']+'><item-number><i>" . preg_quote($code) . '</i></item-number>!', $body, $m)) {
     $id= $m[1];
   } else {
     throw new \Exception("Unable to find ID for $code");
