@@ -44,6 +44,12 @@ figure {
 figure img {
   border-radius: var(--border-radius);
 }
+.alert > p {
+  margin-top: 0;
+}
+.alert > p:last-child {
+  margin-bottom: 0;
+}
 
 @media (max-width: 599.8px) {
   nav.breadcrumb {
@@ -191,7 +197,7 @@ figure img {
       {{ product.description | markdown }}
     </details>
 
-    <details>
+    <details open>
       <summary>Shipping &amp; Returns</summary>
       <p>
         Most orders of in-stock items ship within two business days, special
@@ -208,17 +214,20 @@ figure img {
     </details>
 
     {% if item.prop65 or item.hazmat or item.oversized %}
-      <div class="alert alert-warning">
-        {% if item.prop65 %}
-          <p><a href="/proposition-65-warning"><img src="{{ STATIC }}/msds/warning.svg" width="16" alt="WARNING"> WARNING:</a> This product can expose you to chemicals which are known to the state of California to cause cancer and/or to cause birth defects or other reproductive harm.</p>
-        {% endif %}
-        {% if item.hazmat %}
-          <p><a href="/shipping#hazmat"><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"> Hazardous materials:</a> special shipping is required, and there may be additional costs.</p>
-        {% endif %}
-        {% if item.oversized %}
-          <p><a href="/shipping#oversized">{{ bootstrap_icon('truck') }} Oversized item:</a> special shipping is required, and there will be additional costs.</p>
-        {% endif %}
-      </div>
+      <details open>
+        <summary>Special Notices</summary>
+        <div class="alert alert-warning">
+          {% if item.prop65 %}
+            <p><a href="/proposition-65-warning"><img src="{{ STATIC }}/msds/warning.svg" width="16" alt="WARNING"> WARNING:</a> This product can expose you to chemicals which are known to the state of California to cause cancer and/or to cause birth defects or other reproductive harm.</p>
+          {% endif %}
+          {% if item.hazmat %}
+            <p><a href="/shipping#hazmat"><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="16" alt="Hazardous Materials"> Hazardous materials:</a> special shipping is required, and there may be additional costs.</p>
+          {% endif %}
+          {% if item.oversized %}
+            <p><a href="/shipping#oversized">{{ bootstrap_icon('truck') }} Oversized item:</a> special shipping is required, and there will be additional costs.</p>
+          {% endif %}
+        </div>
+      </details>
     {% endif %}
   </div>
 </div>
