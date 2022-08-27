@@ -58,11 +58,14 @@ class VendorItem extends \Scat\Model {
   }
 
   public function checkVendorStock() {
+    // XXX hardcoded stuff
     switch ($this->vendor_id) {
     case 7: // Mac
       return check_mac_stock($this->vendor_sku);
     case 3757: // SLS
       return check_sls_stock($this->vendor_sku);
+    case 30803: // PA Dist
+      return check_padist_stock($this->vendor_sku);
     default:
       throw new \Exception("Don't know how to check stock for that vendor.");
       return [];
@@ -365,3 +368,52 @@ function check_sls_stock($code) {
   return [ 'Vegas' => $vg, 'New Orleans' => $no ];
 }
 
+function check_padist_stock($code) {
+  $lookup_url= 'https://www.pa-dist.com/ajax/search/suggestions';
+
+  $client= new \GuzzleHttp\Client();
+  $jar= \GuzzleHttp\Cookie\CookieJar::fromArray(
+    [ 'WebLogin' => PADIST_KEY ],
+    parse_url($lookup_url, PHP_URL_HOST)
+  );
+
+  $res= $client->request('GET', $lookup_url,
+                         [
+                           'cookies' => $jar,
+                           'query' => [
+                             'q' => $code
+                           ]
+                         ]);
+
+  $body= $res->getBody();
+  if ($GLOBALS['DEBUG']) {
+    error_log($body);
+  }
+
+  if (preg_match('/i=(\d+)&/', $body, $m)) {
+    $id= $m[1];
+  } else {
+    throw new \Exception("Unable to find ID for $code");
+  }
+
+  $details_url= 'https://www.pa-dist.com/ajax/item/detail/' . $id;
+
+  $res= $client->request('GET', $details_url,
+                         [
+                           'cookies' => $jar,
+                         ]);
+
+  $body= $res->getBody();
+  if ($GLOBALS['DEBUG']) {
+    error_log($body);
+  }
+
+  $dom= new \DOMDocument();
+  libxml_use_internal_errors(true);
+  $dom->loadHTML($body);
+
+  $xp= new \DOMXpath($dom);
+  $stock= $xp->query('//span[@class="StockLevel"]')->item(0)->textContent;
+
+  return [ 'stock' => $stock ];
+}
