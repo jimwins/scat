@@ -134,6 +134,7 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
       ->add(function ($request, $handler) {
           return $handler->handle(
             $request->withAttribute('no_solo_item', true)
+                    ->withAttribute('catalog_base', 'art-supplies')
                     ->withAttribute('only_active', true)
           );
       });
