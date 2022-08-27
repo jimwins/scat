@@ -68,7 +68,7 @@ class Catalog
                                      ->find_many();
   }
 
-  public function GetRedirectFrom($source) {
+  public function getRedirectFrom($source) {
     // Whole product moved?
     $dst=$this->data->factory('Redirect')->where_like('source', $source)->find_one();
     // Category moved?

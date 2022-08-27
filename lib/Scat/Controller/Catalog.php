@@ -1158,7 +1158,7 @@ class Catalog {
     }
     catch (\Slim\Exception\HttpNotFoundException $ex) {
       /* TODO figure out a way to not have to add/remove /catalog/ */
-      $path= preg_replace('!/catalog/!', '',
+      $path= preg_replace('!/(art-supplies|catalog)/!', '',
                           $request->getUri()->getPath());
       $re= $this->catalog->getRedirectFrom($path);
 
