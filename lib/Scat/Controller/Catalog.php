@@ -1224,7 +1224,7 @@ class Catalog {
 
       // only include items for which we have an image
       $image= $item->default_image();
-      if (!image) continue;
+      if (!$image) continue;
 
       $barcodes= $item->barcodes()->find_many();
       $barcode= $barcodes ? $barcodes[0]->code : null;
