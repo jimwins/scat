@@ -1621,13 +1621,19 @@ class Transactions {
         $options['delivery_confirmation']= 'SIGNATURE';
       }
 
-      $extra= $shipping->createShipment([
+      $details= [
         'from_address' => $shipping->getDefaultFromAddress(),
         'to_address' =>
           $shipping->retrieveAddress($txn->shipping_address()->easypost_id),
         'parcel' => $parcel,
         'options' => $options,
-      ], null, true); // get carbon_offset in rates
+      ];
+
+      if ($request->getParam('is_return')) {
+        $details['is_return']= true;
+      }
+
+      $extra= $shipping->createShipment($details, null, true);
 
       $shipment->weight= $weight;
       if (count($dims) == 3) {
