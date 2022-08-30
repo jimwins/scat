@@ -12,7 +12,7 @@
 {% endmacro %}
 
 <tr data-id="{{ i.id }}"
-    data-stocked="{{ (i.stock or i.minimum_quantity) ? 1 : 0 }}"
+    data-stocked="{{ (i.stock > 0 or i.minimum_quantity > 0) ? 1 : 0 }}"
     data-code="{{ i.code }}"
     class="{{ (item and item.id == i.id) ? 'info' }}
            {{ not i.active ? 'inactive' }}">
@@ -74,7 +74,7 @@
     {% endif %}
   </td>
   <td class="avail">
-    {% if i.stock() %}
+    {% if i.stock() > 0 %}
       <span class="text-important">In stock</span>
     {% else %}
       {% if i.minimum_quantity %}
@@ -96,7 +96,7 @@
     {% endif %}
   </td>
   <td class="text-right">
-    {% if not i.no_backorder or i.stock %}
+    {% if not i.no_backorder or i.stock > 0 %}
       {{ include('add-to-cart.twig', { item: i, fixed_quantity: true, button_size: 'small' }) }}
     {% else %}
       <button class="button" disabled>
