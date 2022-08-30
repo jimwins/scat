@@ -61,6 +61,8 @@ class Item extends \Scat\Model {
     $title= preg_replace('/^([-\\/\d.]+)in /', '\1" ', $title);
     // 9x12 Canvas -> 9" x 12" Canvas
     $title= preg_replace('/^([-\\/\d.]+)x([-\\/\d.]+) /', '\1" x \2" ', $title);
+    // 9x12yd Whatever -> 9" x 12 yd. Whatever
+    $title= preg_replace('/^([-\\/\d.]+)x([-\\/\d.]+)yd /', '\1" x \2 yd. ', $title);
     // 9x12 Sketch 80/WB/90# -> 9" x 12" Sketch (80 sheets, Wirebound, 90 lbs.)
     // note: has to be at the end of the name.
     $title= preg_replace_callback(
