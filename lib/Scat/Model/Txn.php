@@ -781,9 +781,9 @@ class Txn extends \Scat\Model {
 
     $points= (int)$this->subtotal();
 
-    // subtract any gift cards and shipping charges
-    // relies on quantity being 1 of these
-    $points-= (int)$this->items()->where_in('tic', [ '10005', '11000' ])->sum('retail_price');
+    // subtract/add any gift cards and shipping charges
+    $points-= (int)$this->items()->where_in('tic', [ '10005', '11000' ])->where('ordered', -1)->sum('retail_price');
+    $points+= (int)$this->items()->where_in('tic', [ '10005', '11000' ])->where('ordered', 1)->sum('retail_price');
 
     // subtract amount paid with loyalty points
     $points-= $this->payments()->where('method', 'loyalty')->sum('amount');
