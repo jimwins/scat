@@ -27,6 +27,18 @@
     <h2>
       Welcome back{{ person ? ', ' ~ person.friendly_name }}!
     </h2>
+    {% autoescape 'js' %}
+      <script>
+        if (window.analytics) {
+          window.analytics.identify('{{ person.id }}', {
+            name: '{{ person.name }}',
+            email: '{{ person.email }}',
+            phone: '{{ person.phone }}',
+            createdAt: '{{ person.created|date("c") }}',
+          })
+        }
+      </script>
+    {% endautoescape %}
   {% endif %}
 
   <h3>Shipping Address</h3>

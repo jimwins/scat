@@ -17,6 +17,18 @@
     <div class="alert alert-success">
       <b>Success!</b> You have been logged in to your account successfully.
     </div>
+    {% autoescape 'js' %}
+      <script>
+        if (window.analytics) {
+          window.analytics.identify('{{ person.id }}', {
+            name: '{{ person.name }}',
+            email: '{{ person.email }}',
+            phone: '{{ person.phone }}',
+            createdAt: '{{ person.created|date("c") }}',
+          })
+        }
+      </script>
+    {% endautoescape %}
   {% endif %}
 
   <dl>
