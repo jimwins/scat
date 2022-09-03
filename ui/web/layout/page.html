@@ -290,9 +290,10 @@
       }
     })
 
-    let recordAddToCart= (ev) => {
-      let formData= new FormData(ev.currentTarget)
-      scat.ecommerce('Product Added', {
+    let addToCartParameters= (form) => {
+      let formData= new FormData(form)
+      return {
+        cart_id: window.getCookie('cartID'),
         product_id: formData.get('item'),
         name: formData.get('name'),
         brand: formData.get('brand'),
@@ -301,24 +302,42 @@
         currency: 'usd',
         quantity: formData.get('quantity'),
         total: formData.get('sale_price') * formData.get('quantity'),
-      })
+      }
+    }
+
+    let recordAddToCart= (ev) => {
+      scat.ecommerce('Product Added', addToCartParameters(ev.currentTarget))
+      return true
     }
 
     document.querySelectorAll('form.add-item').forEach((form) => {
-      form.addEventListener('submit', recordAddToCart)
+      if (window.analytics) {
+        window.analytics.trackForm(form, 'Product Added', addToCartParameters)
+      } else {
+        form.addEventListener('submit', recordAddToCart)
+      }
     })
 
-    let recordRemoveFromCart= (ev) => {
-      let data= ev.currentTarget.dataset
-      scat.ecommerce('Product Removed', {
+    let removeFromCartParameters= (el) => {
+      let data= el.dataset
+      return {
+        cart_id: window.getCookie('cartID'),
         product_id: data.code,
-        quantity: data.quantity
-      })
+        quantity: data.quantity,
+      }
+    }
+
+    let recordRemoveFromCart= (ev) => {
+      scat.ecommerce('Product Removed', removeFromCartParameters(ev.currentTarget))
       return true
     }
 
     document.querySelectorAll('a.remove-item').forEach((a) => {
-      a.addEventListener('click', recordRemoveFromCart)
+      if (window.analytics) {
+        window.analytics.trackLink(a, 'Product Removed', removeFromCartParameters)
+      } else {
+        a.addEventListener('click', recordRemoveFromCart)
+      }
     })
   </script>
 
