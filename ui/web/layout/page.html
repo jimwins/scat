@@ -267,11 +267,6 @@
       try {
         details= JSON.parse(details)
         if (details.items > 0) {
-          /*
-          var icon= document.querySelector('#site-cart .bi-cart')
-          icon.classList.remove('bi-cart')
-          icon.classList.add('bi-cart-fill')
-          */
           var badge= document.querySelector('#site-cart .badge')
           badge.innerText= details.items
         }
