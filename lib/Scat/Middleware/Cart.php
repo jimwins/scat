@@ -67,9 +67,9 @@ final class Cart implements MiddlewareInterface
         'total' => $cart->total()
       ]);
       SetCookie('cartID', $cart->uuid, null /* don't expire */,
-                '/', $domain, true, true);
+                '/', $domain, true, false); /* JavaScript accessible */
       SetCookie('cartDetails', $details, 0 /* session cookie */,
-                '/', $domain, true, false); /* Javascript accessible */
+                '/', $domain, true, false); /* JavaScript accessible */
     }
 
     return $response;
