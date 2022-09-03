@@ -25,6 +25,40 @@ class ScatWeb {
         window.zaraz.ecommerce(event, parameters)
       }
 
+      if (window.analytics) {
+        switch (event) {
+          case 'Product List Viewed':
+            window.analytics.track('Product List Viewed', {
+              'list_id':  parameters.name,
+              'products': parameters.products,
+            });
+            break;
+
+          case 'Product Added':
+          case 'Product Removed':
+            /* Shouldn't really see these, we use trackLink/trackForm */
+          case 'Product Viewed':
+          case 'Cart Viewed':
+            window.analytics.track(event, parameters);
+            break;
+
+          case 'Checkout Started':
+          case 'Order Completed':
+            window.analytics.track(event, {
+              'checkout_id': parameters.order_id,
+              'order_id': parameters.order_id,
+              'value': parameters.subtotal,
+              'revenue': parameters.subtotal,
+              'shipping': parameters.shipping,
+              'tax': parameters.tax,
+              'currency': parameters.currency,
+              'products': parameters.products,
+            });
+            break;
+        }
+        return /* analytics.js actually handles everything */
+      }
+
       if (window.uetq) {
         switch (event) {
           case 'Product Added':
