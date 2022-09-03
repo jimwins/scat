@@ -226,6 +226,7 @@
   {% autoescape 'js' %}
     <script>
       scat.ecommerce('Cart Viewed', {
+        cart_id: '{{ cart.uuid }}',
         products: [
           {% for line in cart.items.find_many() %}
             {% set item= line.item %}
