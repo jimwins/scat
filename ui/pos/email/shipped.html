@@ -24,6 +24,23 @@
       The estimated delivery date is {{ tracker.est_delivery_date | date("l, F j", "UTC") }}.
     {% endif %}
   </p>
+  {% if tracker.carrier in [ 'UPS', 'UPSDAP' ] %}
+    <p>
+      We recommend signing up for <a href="https://www.ups.com/us/en/track/ups-my-choice.page">UPS My
+      Choice</a> if you need more flexibility in receiving your package. You
+      can leave specific delivery instructions for the driver, have them
+      leave packages with a neighbor, deliver your package another day, or
+      reroute your package to a UPS Access Point. The basic level of this
+      service is free, but extra fees may apply for some services.
+    </p>
+  {% elseif tracker.carrier == 'USPS' %}
+    <p>
+      We recommend signing up for <a href="https://informeddelivery.usps.com/box/pages/intro/start.action">USPS Informed Delivery</a>
+      if you need more flexibility in receiving your package. You can leave
+      specific delivery instructions for your mail carrier and schedule
+      redelivery online. This service is free.
+    </p>
+  {% endif %}
 
 {% endblock %}
 
