@@ -164,6 +164,7 @@
 
 {% block script %}
   {% autoescape 'js' %}
+    {% set num_items = 0 %}
     <script>
       scat.ecommerce('Checkout Started', {
         checkout_id: '{{ cart.id }}',
@@ -176,6 +177,7 @@
         products: [
           {% for line in cart.items.find_many() %}
             {% set item= line.item %}
+            {% set num_items= num_items + line.quantity %}
             {
               product_id: '{{ line.code }}',
               name: '{{ line.name }}',
@@ -186,7 +188,8 @@
               quantity: '{{ line.quantity }}',
             },
           {% endfor %}
-        ]
+        ],
+        num_items: {{ num_items }}
       })
 
       {{ include('cart/shared.js') }}
