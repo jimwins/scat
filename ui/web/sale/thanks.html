@@ -41,7 +41,7 @@
         shipping: '{{ sale.shipping }}',
         tax: '{{ sale.tax }}',
         total: '{{ sale.total }}',
-        currency: 'usd',
+        currency: 'USD',
         products: [
           {% for line in sale.items.find_many() %}
             {% set item= line.item %}

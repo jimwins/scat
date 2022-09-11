@@ -129,7 +129,7 @@
         shipping: '{{ cart.shipping }}',
         tax: '{{ cart.tax }}',
         total: '{{ cart.total }}',
-        currency: 'usd',
+        currency: 'USD',
         products: [
           {% for line in cart.items.find_many() %}
             {% set item= line.item %}
