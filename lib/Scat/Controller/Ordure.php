@@ -237,7 +237,8 @@ class Ordure {
       ],
       'query' => [
         'key' => $this->ordure_key,
-        'status' => 'paid'
+        'status' => 'paid',
+        'bust' => time(),
       ]
     ]);
 
