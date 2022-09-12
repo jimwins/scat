@@ -300,6 +300,11 @@ if ($DEBUG) {
 $app->get('/robots.txt', [ \Scat\Web\Page::class, 'robotsTxt' ]);
 $app->get('/sitemap.xml', [ \Scat\Web\Page::class, 'sitemap' ])
   ->setName('sitemap');
+/* For testing 503 response */
+$app->get('/503',
+          function (Request $request, Response $response) {
+            return $response->withStatus(503);
+          });
 
 /* Pages (everything else) */
 if ($DEBUG) {
