@@ -37,7 +37,7 @@ class Sale {
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
-      return $response->withJson($sales);
+      return $response->withHeader('Cache-control', 'private')->withJson($sales);
     }
 
     return $this->view->render($response, 'sale/list.html', [
