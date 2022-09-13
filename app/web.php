@@ -191,7 +191,8 @@ $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->get('/finalize/stripe', [ \Scat\Web\Cart::class, 'stripeFinalize' ])
       ->setName('finalize-stripe');
 
-})->add($container->get(\Scat\Middleware\Cart::class));
+})->add($container->get(\Scat\Middleware\Cart::class))
+  ->add($container->get(\Scat\Middleware\NoCache::class));
 
 $app->post('/~webhook/stripe',
             [ \Scat\Web\Cart::class, 'handleStripeWebhook' ]);
@@ -210,7 +211,7 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
               [ \Scat\Web\Sale::class, 'setAbandonedLevel' ]);
   $app->get('/{uuid}/shipment/{shipment_id:[0-9]+}/track',
             [ \Scat\Web\Sale:: class, 'trackShipment' ]);
-});
+})->add($container->get(\Scat\Middleware\NoCache::class));
 
 /* Contact */
 $app->post('/contact', [ \Scat\Web\Contact::class, 'handleContact' ])
