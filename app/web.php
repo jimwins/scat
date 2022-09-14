@@ -87,7 +87,9 @@ $app->add(\Slim\Views\TwigMiddleware::createFromContainer($app));
 
 $app->add((new \Middlewares\TrailingSlash(false))->redirect());
 
-$errorMiddleware= $app->addErrorMiddleware($DEBUG, true, true);
+$logger= new \Scat\Logger($container->get('config'));
+
+$errorMiddleware= $app->addErrorMiddleware($DEBUG, true, true, $logger);
 
 $errorHandler= $errorMiddleware->getDefaultErrorHandler();
 $errorHandler->registerErrorRenderer('application/json',
