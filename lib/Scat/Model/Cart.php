@@ -152,7 +152,10 @@ class Cart extends \Scat\Model {
 
   public function due() {
     $total= $this->_loadTotals();
-    return $total['total'] - $total['total_paid'];
+    /* Using Decimal to get a string to avoid floating point nonsense. */
+    $due= (string)(new \Decimal\Decimal($total['total']) -
+                    new \Decimal\Decimal($total['total_paid']))->round(2);
+    return $due;
   }
 
   public function ordered() {
