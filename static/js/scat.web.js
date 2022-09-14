@@ -21,43 +21,127 @@ class ScatWeb {
 
   ecommerce (event, parameters) {
     let func = () => {
-      if (window.zaraz) {
-        window.zaraz.ecommerce(event, parameters)
-      }
+      if (window.dataLayer) {
+        window.dataLayer.push({ ecommerce: null }); /* clear */
 
-      if (window.analytics) {
         switch (event) {
-          case 'Product List Viewed':
-            window.analytics.track('Product List Viewed', {
-              'list_id':  parameters.name,
-              'products': parameters.products,
+          case 'Product List Viewed': {
+            let items= parameters.products.map((x) => ({
+              'item_id' : x.product_id,
+              'name' : x.name,
+              'price' : x.price,
+              'currency' : x.currency,
+              'item_brand' : x.brand,
+              'item_category' : x.category
+            }));
+            window.dataLayer.push({
+              'event': 'view_item_list',
+              'ecommerce': {
+                'item_list_name': parameters.name,
+                'items': items
+              }
+            });
+            break;
+          }
+
+          case 'Product Viewed':
+            window.dataLayer.push({
+              'event': 'view_item',
+              'ecommerce': {
+                'items': [
+                  {
+                    'item_id': parameters.product_id,
+                    'item_name': parameters.name,
+                    'item_category': parameters.category,
+                    'item_brand': parameters.brand,
+                    'price': parameters.price,
+                    'currency': parameters.currency
+                  }
+                ]
+              }
             });
             break;
 
           case 'Product Added':
-          case 'Product Removed':
-            /* Shouldn't really see these, we use trackLink/trackForm */
-          case 'Product Viewed':
-          case 'Cart Viewed':
-            window.analytics.track(event, parameters);
-            break;
-
-          case 'Checkout Started':
-          case 'Order Completed':
-            window.analytics.track(event, {
-              'checkout_id': parameters.order_id,
-              'order_id': parameters.order_id,
-              'value': parameters.subtotal,
-              'revenue': parameters.subtotal,
-              'shipping': parameters.shipping,
-              'tax': parameters.tax,
-              'currency': parameters.currency,
-              'products': parameters.products,
+            window.dataLayer.push({
+              'event': 'add_to_cart',
+              'ecommerce': {
+                'items': [
+                  {
+                    'item_id': parameters.product_id,
+                    'item_name': parameters.name,
+                    'item_category': parameters.category,
+                    'item_brand': parameters.brand,
+                    'price': parameters.price,
+                    'quantity': parameters.quantity,
+                    'currency': parameters.currency
+                  }
+                ]
+              }
             });
             break;
+
+          case 'Product Removed':
+            window.dataLayer.push({
+              'event': 'remove_from_cart',
+              'ecommerce': {
+                'items': [
+                  {
+                    'item_id': parameters.product_id,
+                    'quantity': parameters.quantity,
+                  }
+                ]
+              }
+            });
+            break;
+
+          case 'Checkout Started': {
+            let items= parameters.products.map((x) => ({
+              'item_id' : x.product_id,
+              'item_name' : x.name,
+              'quantity' : x.quantity,
+              'price' : x.price,
+              'currency' : x.currency,
+              'brand' : x.brand,
+              'category' : x.category,
+            }));
+            window.dataLayer.push({
+              'event': 'begin_checkout',
+              'ecommerce': {
+                'items': items
+              }
+            });
+            break;
+          }
+
+          case 'Order Completed': {
+            let items= parameters.products.map((x) => ({
+              'item_id' : x.product_id,
+              'item_name' : x.name,
+              'quantity' : x.quantity,
+              'price' : x.price,
+              'currency' : x.currency,
+              'brand' : x.brand,
+              'category' : x.category,
+            }));
+            window.dataLayer.push({
+              'event': 'purchase',
+              'ecommerce': {
+                'transaction_id': parameters.order_id,
+                'value': parameters.subtotal,
+                'tax': parameters.tax,
+                'shipping': parameters.shipping,
+                'currency': parameters.currency,
+                'items': items
+              }
+            });
+            break;
+          }
+
+          default:
+            console.log(`No handling for ${event} with GA, ignoring`)
         }
-        return /* analytics.js actually handles everything */
-      }
+      } /* end dataLayer */
 
       if (window.uetq) {
         switch (event) {
@@ -111,12 +195,25 @@ class ScatWeb {
             });
             break;
 
-          case 'Order Completed':
-            window.uetq.push('event', 'purchase', {
+          case 'Order Completed': {
+            let item_ids= parameters.products.map(x => x.product_id);
+            let items= parameters.products.map((x) => ({
+              'id' : x.product_id,
+              'quantity' : x.quantity,
+              'price' : x.price,
+            }));
+
+            window.uetq.push('event', '', {
+              'transaction_id' : parameters.order_id,
+              'ecomm_prodid' : item_ids,
+              'ecomm_pagetype' : 'purchase',
+              'ecomm_totalvalue' : parameters.total,
               'revenue_value' : parameters.total,
               'currency' : parameters.currency,
+              'items' : items,
             });
             break;
+          }
 
           case 'Product List Viewed': {
             let item_ids= parameters.products.map(x => x.product_id);
@@ -134,7 +231,67 @@ class ScatWeb {
           default:
             console.log(`No handling for ${event} with Bing, ignoring`)
         }
-      }
+      } /* end uetq */
+
+      if (window.fbq) {
+        switch (event) {
+          case 'Product List Viewed': {
+            let item_ids= parameters.products.map(x => x.product_id);
+            window.fbq('track', 'ViewContent', {
+              'content_type': 'product',
+              'content_ids': item_ids,
+            });
+            break;
+          }
+
+          case 'Product Viewed':
+            window.fbq('track', 'ViewContent', {
+              'content_type': 'product',
+              'content_ids':  parameters.product_id
+            });
+            break;
+
+          case 'Product Added':
+            window.fbq('track', 'AddToCart', {
+              'content_type': 'product',
+              'content_ids':  parameters.product_id,
+              'currency': parameters.currency,
+              'value': parameters.price * parameters.quantity,
+            });
+            break;
+
+          case 'Checkout Started':
+            let items= parameters.products.map((x) => ({
+              'id' : x.product_id,
+              'quantity' : x.quantity,
+            }));
+            window.fbq('track', 'InitiateCheckout', {
+              'content_type': 'product',
+              'contents': items,
+              'num_items': items.length,
+              'currency': parameters.currency,
+              'value': parameters.total
+            });
+            break;
+
+          case 'Order Completed':
+            let contents= parameters.products.map((x) => ({
+              'id' : x.product_id,
+              'quantity' : x.quantity,
+            }));
+            window.fbq('track', 'Purchase', {
+              'content_type': 'product',
+              'contents': contents,
+              'num_items': contents.length,
+              'currency': parameters.currency,
+              'value': parameters.total
+            });
+            break;
+
+          default:
+            console.log(`No handling for ${event} with FB, ignoring`)
+        }
+      } /* end fbq */
 
       if (window.pintrk) {
         switch (event) {
@@ -177,7 +334,7 @@ class ScatWeb {
           default:
             console.log(`No handling for ${event} with Pinterest, ignoring`)
         }
-      }
+      } /* end pintrk */
     }
 
     if (window.document.readyState == 'complete') {

@@ -22,9 +22,7 @@
 
   <link rel="stylesheet" type="text/css" href="/css/web.css?{{ current_release() }}">
 
-  {% if DEBUG %}
-    <script src="/js/dummy-zaraz.js"></script>
-  {% else %}
+  {% if not DEBUG %}
     <link rel="preconnect" href="https://rawmats.gumlet.io">
     <link rel="preconnect" href="https://accessibilityserver.org">
   {% endif %}
@@ -37,6 +35,7 @@
 </head>
 
 <body>
+  {{ include('layout/tracking-body.twig') }}
 
   {% set banner= config('banner') %}
   {% if banner %}
@@ -307,15 +306,10 @@
 
     let recordAddToCart= (ev) => {
       scat.ecommerce('Product Added', addToCartParameters(ev.currentTarget))
-      return true
     }
 
     document.querySelectorAll('form.add-item').forEach((form) => {
-      if (window.analytics) {
-        window.analytics.trackForm(form, 'Product Added', addToCartParameters)
-      } else {
-        form.addEventListener('submit', recordAddToCart)
-      }
+      form.addEventListener('submit', recordAddToCart)
     })
 
     let removeFromCartParameters= (el) => {
@@ -329,15 +323,10 @@
 
     let recordRemoveFromCart= (ev) => {
       scat.ecommerce('Product Removed', removeFromCartParameters(ev.currentTarget))
-      return true
     }
 
     document.querySelectorAll('a.remove-item').forEach((a) => {
-      if (window.analytics) {
-        window.analytics.trackLink(a, 'Product Removed', removeFromCartParameters)
-      } else {
-        a.addEventListener('click', recordRemoveFromCart)
-      }
+      a.addEventListener('click', recordRemoveFromCart)
     })
   </script>
 
