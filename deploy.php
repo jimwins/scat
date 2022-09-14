@@ -14,6 +14,14 @@ set('repository', 'https://github.com/jimwins/scat.git');
 set('shared_files', []);
 set('shared_dirs', []);
 
+if ($_ENV['SENTRY_TOKEN']) {
+  set('sentry', [
+    'organization' => $_ENV['SENTRY_ORG'],
+    'projects' => [ 'scat-web' ],
+    'token' => $_ENV['SENTRY_TOKEN'],
+  ]);
+}
+
 // Hosts
 inventory('hosts.yml');
 
@@ -37,6 +45,10 @@ task('deploy', [
 ]);
 
 after('cleanup', 'phinx:migrate');
+
+if ($_ENV['SENTRY_TOKEN']) {
+  after('deploy', 'sentry');
+}
 
 // [Optional] If deploy fails automatically unlock.
 after('deploy:failed', 'deploy:unlock');
