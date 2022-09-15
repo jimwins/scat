@@ -77,6 +77,7 @@ class Ordure {
 
     $res= $client->request('POST', $url, [
                              //'debug' => $GLOBALS['DEBUG'],
+                             'verify' => false, # XXX no SSL verification
                              'multipart' => [
                                [
                                  'name' => 'prices', 
@@ -108,6 +109,7 @@ class Ordure {
     $res= $client->request('GET', $url,
                            [
                              //'debug' => $GLOBALS['DEBUG'],
+                             'verify' => false, # XXX no SSL verification
                              'query' => [ 'key' => $this->ordure_key ]
                            ]);
 
@@ -209,6 +211,7 @@ class Ordure {
       $res= $client->request('POST', $url,
                              [
                                //'debug' => $GLOBALS['DEBUG'],
+                               'verify' => false, # XXX no SSL verification
                                'query' => [ 'key' => $this->ordure_key,
                                             'id' => $update->id ]
                              ]);
@@ -232,6 +235,7 @@ class Ordure {
     $url= $this->ordure_url . '/sale/list';
     $res= $client->request('GET', $url, [
       //'debug' => $GLOBALS['DEBUG'],
+      'verify' => false, # XXX no SSL verification
       'headers' => [
         'Accept' => 'application/json',
       ],
@@ -254,6 +258,7 @@ class Ordure {
         $url= $this->ordure_url . '/sale/' . $summary->uuid;
         $res= $client->request('GET', $url, [
           //'debug' => $GLOBALS['DEBUG'],
+          'verify' => false, # XXX no SSL verification
           'headers' => [
             'Accept' => 'application/json',
           ],
@@ -497,6 +502,7 @@ class Ordure {
         $res= $client->request('POST', $url,
                                [
                                  //'debug' => $GLOBALS['DEBUG'],
+                                 'verify' => false, # XXX no SSL verification
                                  'headers' => [
                                    'X-Requested-With' => 'XMLHttpRequest',
                                  ],
@@ -543,6 +549,7 @@ class Ordure {
     $url= $this->ordure_url . '/sale/list';
     $res= $client->request('GET', $url, [
       //'debug' => $GLOBALS['DEBUG'],
+      'verify' => false, # XXX no SSL verification
       'headers' => [
         'Accept' => 'application/json',
       ],
@@ -563,6 +570,7 @@ class Ordure {
       $url= $this->ordure_url . '/sale/' . $summary->uuid;
       $res= $client->request('GET', $url, [
         //'debug' => $GLOBALS['DEBUG'],
+        'verify' => false, # XXX no SSL verification
         'headers' => [
           'Accept' => 'application/json',
         ],
@@ -601,6 +609,7 @@ class Ordure {
       $res= $client->request('POST', $url,
                              [
                                //'debug' => $GLOBALS['DEBUG'],
+                               'verify' => false, # XXX no SSL verification
                                'headers' => [
                                  'X-Requested-With' => 'XMLHttpRequest',
                                ],
