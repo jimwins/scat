@@ -19,6 +19,7 @@ class Ordure
     $client= new \GuzzleHttp\Client();
     $res= $client->request('POST', $url,
                            [
+                             'verify' => false, # XXX no SSL verification
                              'headers' => [
                                'X-Requested-With' => 'XMLHttpRequest',
                              ],
@@ -34,6 +35,7 @@ class Ordure
     $client= new \GuzzleHttp\Client();
     $res= $client->request('POST', $this->url . '/~grab-image',
                            [
+                             'verify' => false, # XXX no SSL verification
                              'headers' => [
                                'X-Requested-With' => 'XMLHttpRequest',
                              ],
