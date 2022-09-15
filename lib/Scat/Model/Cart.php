@@ -153,8 +153,8 @@ class Cart extends \Scat\Model {
   public function due() {
     $total= $this->_loadTotals();
     /* Using Decimal to get a string to avoid floating point nonsense. */
-    $due= (string)(new \Decimal\Decimal($total['total']) -
-                    new \Decimal\Decimal($total['total_paid']))->round(2);
+    $due= (string)(new \Decimal\Decimal($total['total']??0) -
+                    new \Decimal\Decimal($total['total_paid']??0))->round(2);
     return $due;
   }
 
