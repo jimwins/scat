@@ -35,7 +35,7 @@ class PayPal {
 
   public function verifyWebhook($request) {
     // adapted from https://stackoverflow.com/a/62870569
-    if ($webhook_id) {
+    if ($this->webhook_id) {
       $headers= $request->getHeaders();
       $body= $request->getBody();
 
