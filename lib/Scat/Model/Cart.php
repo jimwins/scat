@@ -263,6 +263,10 @@ class Cart extends \Scat\Model {
   {
     $address= $this->shipping_address();
 
+    if ($this->shipping_manual) {
+      return;
+    }
+
     if (!$address) {
       $this->shipping_options= null;
       $this->shipping_method= null;
