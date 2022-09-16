@@ -77,10 +77,12 @@ class Cart extends \Scat\Model {
 
     $this->shipping_address_id= $new->id;
 
-    /* Passing in a new address always nukes our shipping costs */
-    $this->shipping_method= NULL;
-    $this->shipping= 0;
-    $this->shipping_tax= 0;
+    /* Passing in a new address always nukes our shipping costs unless manual */
+    if (!$this->shipping_manual) {
+      $this->shipping_method= NULL;
+      $this->shipping= 0;
+      $this->shipping_tax= 0;
+    }
   }
 
   public function closed() {
