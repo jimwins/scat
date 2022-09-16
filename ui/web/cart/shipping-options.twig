@@ -3,7 +3,12 @@
   {% if cart.shipping_address_id != 1 and (cart.shipping_options|length > 1 or cart.shipping_options.default is not defined) %}
     <h3>Shipping Options</h3>
 
-    {% if cart.shipping_options|length %}
+    {% if cart.shipping_manual %}
+      <p>
+        <b>The shipping charge for this order has been set manually.</b>
+        Please contact us at the store if you have any questions.
+      </p>
+    {% elseif cart.shipping_options|length %}
       {% for method, details in cart.shipping_options %}
         {% if not no_local_delivery or method != 'local_delivery' %}
           <label class="input-radio">
