@@ -175,7 +175,7 @@
           </form>
         </div>
       {% endif %}
-      {% if amzn.merchant_id and not config('disable_checkout') %}
+      {% if amzn.merchant_id and not config('disable_checkout') and not cart.shipping_manual %}
         <div class="card cold">
           <h2>Amazon Pay Checkout</h2>
           <p>
