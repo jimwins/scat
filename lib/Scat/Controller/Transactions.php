@@ -190,6 +190,9 @@ class Transactions {
     $sale->save();
 
     foreach ($orig->items()->find_many() as $line) {
+      // don't return returned items
+      if ($line->ordered > 0) continue;
+
       $new= $sale->items()->create();
       $data= $line->as_array();
       unset($data['id']); // don't copy id!
