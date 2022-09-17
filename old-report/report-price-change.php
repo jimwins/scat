@@ -3,11 +3,11 @@ require '../scat.php';
 require '../lib/item.php';
 
 $sql_criteria= "1=1";
-if (($items= $_REQUEST['items'])) {
+if (($items= @$_REQUEST['items'])) {
   list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'], FIND_LIMITED);
 }
 
-$vendor= (int)$_REQUEST['vendor'];
+$vendor= (int)@$_REQUEST['vendor'];
 if ($vendor) {
   $sql_criteria= "($sql_criteria) AND vendor_item.vendor_id = $vendor";
 }
@@ -25,14 +25,14 @@ head("Price Increases @ Scat", true);
       <select class="form-control" name="vendor">
         <option value="">All vendors</option>
 <?
-$q= "SELECT id, company FROM person WHERE role = 'vendor' ORDER BY company";
+$q= "SELECT id, company, name FROM person WHERE role = 'vendor' AND active ORDER BY IF(company != '' AND company IS NOT NULL, company, name)";
 $r= $db->query($q);
 
 while ($row= $r->fetch_assoc()) {
   echo '<option value="', $row['id'], '"',
        ($row['id'] == $vendor) ? ' selected' : '',
        '>',
-       ashtml($row['company']),
+       ashtml($row['company'] ?: $row['name']),
        '</option>';
 }
 ?>
@@ -48,7 +48,7 @@ while ($row= $r->fetch_assoc()) {
     </div>
     <div class="col-sm-2">
       <input type="submit" class="btn btn-primary" value="Show">
-<?if ((int)$_REQUEST['vendor'] > 0) {?>
+<?if ((int)@$_REQUEST['vendor'] > 0) {?>
       <button id="apply-all" class="btn btn-danger">Apply All</button>
 <?}?>
     </div>
