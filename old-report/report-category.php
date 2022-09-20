@@ -174,7 +174,7 @@ while ($row= $r->fetch_assoc()) {
     $change= (($row['current_amount'] - $row['previous_amount']) / $row['previous_amount']) * 100;
   }
 ?>
-  <tr class="XXX<?=($change < 0) ? 'danger' : (($change > 100) ? 'success' : '')?>">
+  <tr>
     <td>
       <a href="/catalog/search?q=<?=rawurlencode($items)?>+category:<?=$row['slug']?>">
         <?=$row['parent_id'] ? ' &nbsp; ' . ashtml($row['name']) : '<b> ' . ashtml($row['name']) . '</b>' ?>
