@@ -360,7 +360,7 @@
 
       return scat.delete('/sale/{{ txn.id }}/item/' + line_id)
         .then((res) => {
-          scat.reload('invoice', 'sidebar') // XXX reload less of sidebar?
+          scat.reload('invoice', 'sidebar')
         })
         .catch((err) => {
           scat.alert('danger', err.message)
