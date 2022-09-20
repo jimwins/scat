@@ -142,9 +142,6 @@ $app->group('/art-supplies', function (RouteCollectorProxy $app) {
       });
 });
 
-/* Buy a Gift Card */
-// TODO
-
 /* Cart */
 $app->group('/cart', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Web\Cart::class, 'cart' ])
