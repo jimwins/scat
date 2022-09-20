@@ -1961,7 +1961,7 @@ class Transactions {
                     AND IFNULL(stock, 0) < minimum_quantity';
     }
     $q= "SELECT id, code, vendor_code, name, stock,
-                minimum_quantity, last3months,
+                minimum_quantity, last3months, no_backorder,
                 $extra_field_name
                 order_quantity
            FROM (SELECT item.id,
@@ -1976,6 +1976,7 @@ class Transactions {
                             AND txn_line.item_id = item.id
                             AND filled > NOW() - INTERVAL 3 MONTH)
                         AS last3months,
+                        item.no_backorder,
                         (SELECT SUM(ordered - allocated)
                            FROM txn_line JOIN txn ON (txn_id = txn.id)
                           WHERE type = 'vendor'

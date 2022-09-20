@@ -50,7 +50,12 @@
                 {{- item.vendor_code ?: item.code -}}
               </a>
             </td>
-            <td>{{ item.name }}</td>
+            <td>
+              {% if item.no_backorder %}
+                <i class="fa fa-fw fa-exclamation-circle text-danger"></i>
+              {% endif %}
+              {{ item.name }}
+            </td>
             <td align="center">{{ item.stock }}</td>
             <td align="center">{{ item.minimum_quantity }}</td>
             <td align="center">{{ item.last3months }}</td>
