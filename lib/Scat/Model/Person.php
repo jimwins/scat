@@ -337,6 +337,7 @@ class Person extends \Scat\Model {
               SET code = CONCAT(CASE @brand
                                 WHEN 'WINSOR & NEWTON' THEN 'WN'
                                 WHEN 'CONTE A PARIS' THEN 'CO'
+                                WHEN 'EDDING' THEN 'EDD-'
                                 WHEN 'LIQUITEX' THEN 'LQ'
                                 WHEN 'LEFRANC & BOURGEOIS' THEN 'LB'
                                 WHEN 'SCULPTURE BLOCK' THEN 'SL'
