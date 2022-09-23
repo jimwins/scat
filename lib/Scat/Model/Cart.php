@@ -611,6 +611,7 @@ class CartLine extends \Scat\Model {
         ]);
       } else {
         error_log("Inserting items for kit {$item->code} ({$this->id}) on {$cart->uuid}");
+        $this->save(); // save so kit shows up in cart first
         $q= "INSERT INTO sale_item
                     (sale_id, item_id, kit_id, quantity, retail_price, tax)
              SELECT ?,

@@ -354,6 +354,8 @@ class Cart {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
+    $this->data->beginTransaction();
+
     /* If this is a brand new cart, it won't have an ID yet. Save to create! */
     if (!$cart->id) {
       $cart->save();
@@ -387,6 +389,8 @@ class Cart {
     $cart->recalculate($this->shipping, $this->tax);
 
     $cart->save();
+
+    $this->data->commit();
 
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
