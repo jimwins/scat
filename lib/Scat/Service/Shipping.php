@@ -440,6 +440,7 @@ class Shipping
       /* Set free shipping */
       if (isset($shipping_options['default']) &&
           $cart->eligible_for_free_shipping() &&
+          self::state_in_continental_us($to->state) &&
           $cart->subtotal() >= 79)
       {
         $shipping_options['default']['rate']= 0.00;
