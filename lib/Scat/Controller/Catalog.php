@@ -1201,6 +1201,7 @@ class Catalog {
       'color', 'size',
       'item_group_id',
       'google_product_category',
+      'gender',
       'product_type',
       'inventory',
       'shipping_label',
@@ -1260,6 +1261,7 @@ class Catalog {
         '', # should be size, sometimes $item->variation,
         'P' . $item->product_id,
         $item->google_product_category_id ?: '',
+        '', # gender
         $product->dept()->parent()->name . ' > ' .  $product->dept()->name,
         max($item->stock(), 0),
         $item->shipping_rate(),
