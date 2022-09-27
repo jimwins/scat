@@ -11,7 +11,7 @@
 {% endif %}
 
 <h1 class="page-header">
-  {{ item.name }}
+  {{ item.title }}
   <small>
     {% set brand = product.brand %}
     <a href="{{ url_for('catalog-brand', { 'brand' : brand.slug }) }}">
