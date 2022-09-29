@@ -203,7 +203,7 @@ class ScatWeb {
               'price' : x.price,
             }));
 
-            window.uetq.push('event', 'product_purchase', {
+            window.uetq.push('event', 'purchase', {
               'transaction_id' : parameters.order_id,
               'ecomm_prodid' : item_ids,
               'ecomm_pagetype' : 'purchase',
