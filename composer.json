@@ -89,9 +89,6 @@
         "whatwedo/twig-bootstrap-icons": "^1.0",
         "sentry/sdk": "^3.2"
     },
-    "require-dev": {
-        "deployer/recipes": "^6.2"
-    },
     "scripts": {
       "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
     },
