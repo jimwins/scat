@@ -646,6 +646,11 @@ class Person extends \Scat\Model {
     return $punch ? $punch->start : null;
   }
 
+  public function last_punch_out() {
+    $punch= $this->punches()->where_not_null('end')->order_by_desc('id')->find_one();
+    return $punch ? $punch->end : null;
+  }
+
   public function punch() {
     $punch= $this->punches()->where_null('end')->find_one();
     if ($punch) {
