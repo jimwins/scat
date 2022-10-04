@@ -50,6 +50,7 @@
     }
 
     window.addEventListener('focus', reload);
+    window.addEventListener('pageshow', reload);
 
     scat.handleAction('click', 'punch', (act) => {
       let formData= new FormData()
