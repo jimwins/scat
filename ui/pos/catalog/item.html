@@ -245,26 +245,6 @@
 
           <div class="form-group">
             <label for="margin" class="col-sm-6 control-label">
-             Margin
-            </label>
-            <div class="col-sm-6">
-              <p class="form-control-static" id="margin">
-                {% set cost= item.usual_cost %}
-                {% if cost %}
-                  {{ "%.1f"|format((item.sale_price - cost) / item.sale_price * 100) }}%
-                  {% set best= item.best_cost %}
-                  {% if best != cost %}
-                    ({{ "%.1f"|format((item.sale_price - best) / item.sale_price * 100) }}%)
-                  {% endif %}
-                {% else %}
-                  Unknown
-                {% endif %}
-              </p>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="margin" class="col-sm-6 control-label">
               Google
               <a target="_blink"
                 href="https://merchants.google.com/mc/items/details?a={{ config('google.merchant_center_id') }}&offerId={{ item.code }}&language=en&channel=0&country=US&pli=1">
@@ -605,14 +585,25 @@
   {% import 'macros.twig' as scat %}
   <div id="pricing">
     <h3 style="margin-top: 0">
+      {% set cost= item.usual_cost %}
+      {% if cost %}
+        {% set margin= ((item.sale_price - cost) / item.sale_price * 100) %}
+        {% set label= "%.1f"|format(margin) ~ "%" %}
+        {% set best= item.best_cost %}
+        {% if best != cost %}
+          {% set label= label ~ "(%.1f"|format((item.sale_price - best) / item.sale_price * 100) ~ "%)" %}
+        {% endif %}
+      {% endif %}
+
       {% set override= item.override_price %}
       {% if override %}
         <span class="text-danger">{{ scat.amount(override) }}</span>
         <s>
       {% endif %}
-        <span class="editable"
+        <span class="editable {{ margin >= 50 ? 'text-success' : margin < 40 ? 'text-danger' }}"
               data-name="discount"
               data-reload="pricing"
+              title="{{ label }}"
               data-value="{{ scat.format_discount(item) }}">
           {{- scat.amount(item.sale_price) -}}
         </span>
