@@ -352,6 +352,7 @@ class Item extends \Scat\Model {
       case 'length':
       case 'width':
       case 'height':
+      case 'packaged_for_shipping':
         $this->$name= $value;
         break;
       case 'name':

@@ -1231,11 +1231,15 @@ class Catalog {
       $barcode= $barcodes ? $barcodes[0]->code : null;
 
       if ($item->length && $item->width && $item->height) {
-        $box= $shipping->get_shipping_box([ [
-          'length' => $item->length,
-          'width' => $item->width,
-          'height' => $item->height,
-        ]]);
+        if ($item->packaged_for_shipping) {
+          $box= [ $item->length, $item->width, $item->height ];
+        } else {
+          $box= $shipping->get_shipping_box([ [
+            'length' => $item->length,
+            'width' => $item->width,
+            'height' => $item->height,
+          ]]);
+        }
       } else {
         $box= null;
       }

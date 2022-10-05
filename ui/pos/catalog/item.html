@@ -753,6 +753,12 @@
       </span>
     </p>
 
+    <button type="button" class="btn btn-link toggle"
+            data-name="packaged_for_shipping" data-value="{{ item.packaged_for_shipping }}">
+      <i class="fa fa-fw {{ item.packaged_for_shipping ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+      Packaged for Shipping
+    </button>
+
     <p>
       {% if item.can_ship_free %}
         <b class="text-success">Can ship for free.</b>
