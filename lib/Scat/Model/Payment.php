@@ -62,4 +62,11 @@ class Payment extends \Scat\Model {
       $this->txn()->uuid
     );
   }
+
+  public function amznCancel(\Scat\Service\AmazonPay $amzn) {
+    return $amzn->cancel(
+      $this->data()->chargeId,
+      $this->txn()->uuid
+    );
+  }
 }

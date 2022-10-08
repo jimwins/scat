@@ -214,8 +214,14 @@
           <td style="text-align: right">{{ scat.amount(txn.total) }}</td>
         </tr>
         {% for payment in txn.payments.find_many %}
-          <tr>
+          <tr data-id="{{ payment.id }}">
             <th colspan="5" style="text-align: right">
+            {% if payment.method == 'amazon' and not payment.captured %}
+              <a class="btn btn-link btn-xs" data-action="cancel-amazon-payment">
+                <i class="fa fa-fw fa-trash-o"></i>
+                <span class="sr-only">Cancel</span>
+              </a>
+            {% endif %}
             {%- if payment.method == 'gift' -%}
               <a href="/gift-card/{{ payment.data().card }}">
             {%- endif -%}
@@ -1158,6 +1164,16 @@
 
     scat.handleAction('click', 'report', (act) => {
       return scat.dialog('/sale/{{ txn.id }}/report')
+    })
+
+    scat.handleAction('click', 'cancel-amazon-payment', (act) => {
+      let payment_id= act.closest('[data-id]').getAttribute('data-id')
+      return scat.post('/sale/{{ txn.id }}/payment/' + payment_id, {
+        'cancel': true,
+      })
+        .then((res) => {
+          scat.reload('invoice', 'sidebar')
+        })
     })
 
     /* Bind some global keys */

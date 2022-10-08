@@ -1306,6 +1306,32 @@ class Transactions {
     return $response->withJson($txn);
   }
 
+  public function modifyPayment(
+    Request $request, Response $response,
+    \Scat\Service\AmazonPay $amzn,
+    $id, $payment_id
+  ) {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $payment= $payment_id ? $txn->payments()->find_one($payment_id) : null;
+    if (!$payment)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    if ($request->getParam('cancel')) {
+      if ($payment->method == 'amazon' && !$payment->captured) {
+        $payment->amznCancel($amzn);
+        $payment->set_expr('captured', 'NOW()');
+        $payment->save();
+
+        return $response->withJson($payment);
+      }
+    }
+
+    throw new \Exception("Unable to modify payment.");
+  }
+
   public function clearLoyaltyReward(Request $request, Response $response, $id)
   {
     $txn= $this->txn->fetchById($id);

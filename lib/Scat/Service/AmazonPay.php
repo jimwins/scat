@@ -151,4 +151,18 @@ class AmazonPay {
       ])
     );
   }
+
+  public function cancel($charge_id, $uuid) {
+    $client= $this->getClient();
+
+    $payload= [
+      'cancellationReason' => "Cancelled",
+    ];
+
+    return $this->handleResult(
+      $client->cancelCharge($charge_id, $payload, [
+        'x-amz-pay-idempotency-key' => $uuid,
+      ])
+    );
+  }
 }
