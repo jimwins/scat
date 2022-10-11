@@ -1913,8 +1913,7 @@ class Transactions {
   public function reorderForm(Request $request, Response $response) {
     $extra= $extra_field= $extra_field_name= '';
 
-    $all= (int)$request->getParam('all');
-    $stocked= (int)$request->getParam('stocked');
+    $which= (int)$request->getParam('which');
 
     $vendor_code= "NULL";
     $vendor_id= (int)$request->getParam('vendor_id');
@@ -1978,9 +1977,9 @@ class Transactions {
     if ($code) {
       $extra.= " AND code LIKE " . $this->data->escape($code.'%');
     }
-    if ($all) {
+    if ($which == 2) {
       $criteria= '1=1';
-    } elseif ($stocked) {
+    } elseif ($which == 1) {
       $criteria= '(minimum_quantity > 0)';
     } else {
       $criteria= '(ordered IS NULL OR NOT ordered)
@@ -2031,7 +2030,7 @@ class Transactions {
 
     return $this->view->render($response, 'purchase/reorder.html', [
       'items' => $items,
-      'all' => $all,
+      'which' => $which,
       'code' => $code,
       'vendor_id' => $vendor_id,
       'person' => $this->data->factory('Person')->find_one($vendor_id)

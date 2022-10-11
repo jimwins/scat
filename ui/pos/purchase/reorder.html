@@ -14,6 +14,11 @@
       <button type="button" class="btn btn-default" id="optimize">
         Optimize
       </button>
+      <select name="which" class="form-control" data-action="change-which">
+        <option value="0">Below Minimum</option>
+        <option value="1" {{ which == 1 ? 'selected' }}">Stocked</option>
+        <option value="2" {{ which == 2 ? 'selected' }}">All</option>
+      </select>
     </div>
     <h2>
       <a tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" title="Notes" data-content="{{ person.notes }}">{{ person.friendly_name }}</a>
@@ -309,6 +314,12 @@
           icon.classList.add('fa-search')
         })
       }
+    })
+
+    scat.handleAction('change', 'change-which', (act) => {
+      let url= new URL(window.location.href)
+      url.searchParams.set('which', act.selectedIndex)
+      window.location.href= url.toString()
     })
   }
   </script>
