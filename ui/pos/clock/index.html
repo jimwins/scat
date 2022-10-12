@@ -10,6 +10,9 @@
     <div class="col-sm-offset-3 col-sm-6">
       <div class="alert alert-info">
         <strong>Click</strong> on a name to clock in or out.
+        <span class="badge pull-right faded">
+          {{- 'now'|date("Y-m-d H:i:s") -}}
+        </span>
       </div>
       <div class="list-group" data-loaded="{{ 'now'|date("U") }}">
         {% for person in people %}
