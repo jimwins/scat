@@ -11,7 +11,7 @@
       <div class="alert alert-info">
         <strong>Click</strong> on a name to clock in or out.
       </div>
-      <div class="list-group">
+      <div class="list-group" data-loaded="{{ 'now'|date("U") }}">
         {% for person in people %}
           <a data-id="{{ person.id }}"
               data-action="punch"
@@ -36,7 +36,7 @@
   </style>
   <script>
     let reload= () => {
-      fetch('/clock?block=content')
+      return fetch('/clock?block=content')
         .then((res) => {
           if (!res.ok) {
             throw new Error('Network response was not ok')
@@ -45,12 +45,26 @@
         })
         .then((data) => {
           document.querySelector('#scat-page').innerHTML= data
+          console.log("reloaded")
           return data
         })
     }
 
+    let reloadStale= scat.serialize(() => {
+      let loaded= document.querySelector('[data-loaded]').getAttribute('data-loaded')
+      let now= Math.floor(Date.now() / 1000)
+      if (!window.reloading && loaded < now - 15) {
+        window.reloading= true
+        console.log("reloading - stale")
+        reload().then(() => {
+          window.reloading= false
+        })
+      }
+    })
+
     window.addEventListener('focus', reload);
     window.addEventListener('pageshow', reload);
+    window.addEventListener('mousemove', reloadStale);
 
     scat.handleAction('click', 'punch', (act) => {
       let formData= new FormData()
