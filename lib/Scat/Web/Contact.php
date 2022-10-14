@@ -62,7 +62,7 @@ class Contact {
       }
     }
 
-    if (preg_match('/(BlahGaky)/i', $name)) {
+    if (preg_match('/(B[li]ahGaky)/i', $name)) {
       throw new \Exception("Sorry, your message looks like spam.");
     }
 
