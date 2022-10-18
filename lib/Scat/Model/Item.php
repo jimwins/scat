@@ -17,6 +17,8 @@ class Item extends \Scat\Model {
     switch ($m[2]) {
       case 'PB':
         $ret[]= "Perfect Bound"; break;
+      case 'GB':
+        $ret[]= "Glue Bound"; break;
       case 'TB':
         $ret[]= "Tape Bound"; break;
       case 'WB':
