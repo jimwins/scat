@@ -165,7 +165,7 @@ class Catalog {
     // Special hack to get full-size Salsify images
     $url= str_replace('/c_limit,cs_srgb,h_600,w_600', '', $url);
     // get jpeg instead of tiff
-    $url= str_replace('/tiff?$/i', 'jpg', $url);
+    $url= preg_replace('/tiff?$/i', 'jpg', $url);
 
     error_log("Grabbing image from URL '$url'\n");
 
