@@ -1208,7 +1208,8 @@ class Catalog {
       'shipping_length',
       'shipping_width',
       'shipping_height',
-      'shipping_weight'
+      'shipping_weight',
+      'custom_label_0'
     ];
 
     //$output= fopen("php://temp/maxmemory:" . (5*1024*1024), 'r+');
@@ -1273,6 +1274,7 @@ class Catalog {
         $box ? "{$box[1]} in" : '',
         $box ? "{$box[2]} in" : '',
         ($box && $item->weight) ? ($box[3] + $item->weight) . " lb" : '',
+        $item->shipping_rate(), // repeated as custom_label_0 so Shopping ads can use it
       ];
 
       fputcsv($output, $record);
