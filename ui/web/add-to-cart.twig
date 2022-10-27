@@ -1,10 +1,4 @@
 {% import 'macros.twig' as scat %}
-<style>
-  form.add-item {
-    --primary-color: #217a5b;
-    --input-border: #217a5b;
-  }
-</style>
 <form class="add-item" action="/cart/add-item" method="POST">
   <input type="hidden" name="item" value="{{ item.code }}">
   <input type="hidden" name="name" value="{{ item.name }}">
