@@ -424,9 +424,9 @@ class Person extends \Scat\Model {
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load Masterpiece data file");
 
-    } elseif (preg_match('/Your Price/', $line)) {
+    } elseif (preg_match('/^ItemNum/', $line)) {
       /* PA Dist */
-#Item    Description     UM	Min     CustomerPrice   Retail  UPC     ISBN    MAP     Not 4 Retail Website  ORMD    Weight  Height  Width   Depth
+#ItemNum	UM	SMIN	STD	CustomerPrice	List	Retail	ItemDesc	UPC
       error_log("Importing '$fn' as PA Distribution price list\n");
       $sep= preg_match("/\t/", $line) ? "\t" : ",";
       $q= "LOAD DATA LOCAL INFILE '$tmpfn'
@@ -435,16 +435,13 @@ class Person extends \Scat\Model {
               OPTIONALLY ENCLOSED BY '\"'
                LINES TERMINATED BY '\r\n'
               IGNORE 1 LINES
-              (vendor_sku, name, @uom, purchase_quantity,
-              @net_price, @retail_price,
-              @upc, @isbn, @map_price, @not_4_retail, hazmat, weight,
-              length, width, height)
+              (vendor_sku, @uom, purchase_quantity, @std,
+              @net_price, @x, @retail_price,
+              name,
+              barcode)
               SET code = vendor_sku,
                   retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
-                  net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', ''),
-                  weight = weight,
-                  barcode = IF(@upc = 'N/A', @isbn, @upc),
-                  prop65 = IF(@health_label = '65', 1, 0)
+                  net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', '')
               ";
 
       if (!$this->orm->raw_execute($q))
