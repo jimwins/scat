@@ -335,6 +335,30 @@ class ScatWeb {
             console.log(`No handling for ${event} with Pinterest, ignoring`)
         }
       } /* end pintrk */
+
+      if (window.rdt) {
+        switch (event) {
+          case 'Product Added':
+            window.rdt('track', 'AddToCart', {
+              'itemCount': parameters.quantity,
+              'value': parameters.price * parameters.quantity,
+              'currency': parameters.currency,
+            });
+            break;
+
+          case 'Order Completed':
+            window.rdt('track', 'Purchase', {
+              'itemCount' : parameters.products.reduce((a, b) => a + b.quantity, 0),
+              'value' : parameters.subtotal,
+              'currency' : parameters.currency,
+              'transactionId' : parameters.order_id,
+            });
+            break;
+
+          default:
+            console.log(`No handling for ${event} with Reddit, ignoring`)
+        }
+      } /* end rdt */
     }
 
     if (window.document.readyState == 'complete') {
