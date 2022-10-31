@@ -60,6 +60,10 @@ class Shipping {
       ]);
     }
 
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($shipment);
+    }
+
     return $this->view->render($response, 'shipping/shipment.html', [
       'shipment' => $shipment
     ]);
