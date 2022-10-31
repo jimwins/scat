@@ -58,14 +58,14 @@
           <div class="form-group">
             <label class="control-label">Carrier</label>
             <p class="form-control-static">
-              {{ scat.format_shipping_carrier(tracker.carrier) }}
+              {{ scat.format_shipping_carrier(tracker.carrier) ?: shipment.carrier }}
             </p>
           </div>
 
           <div class="form-group">
             <label class="control-label">Service</label>
             <p class="form-control-static">
-              {{ tracker.carrier_detail.service }}
+              {{ tracker.carrier_detail.service ?: shipment.service }}
             </p>
           </div>
 
