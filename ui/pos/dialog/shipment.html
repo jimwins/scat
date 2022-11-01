@@ -92,7 +92,7 @@
         <div class="form-group">
           <label class="control-label">ID</label>
           <p class="form-control-static">
-            {{ shipment.method_id }}
+            {{ shipment.method_id ?: shipment.tracker_id }}
           </p>
         </div>
 
