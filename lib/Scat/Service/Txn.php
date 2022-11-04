@@ -64,7 +64,11 @@ class Txn
           if ($name == 'tax_captured' && $term->value == 0) {
             $res= $res->where_null('tax_captured');
           } else {
-            $res= $res->where($name, $term->value);
+            if ($name == 'created') {
+              $res= $res->where_raw('DATE(txn.created) = ?', $term->value);
+            } else {
+              $res= $res->where($name, $term->value);
+            }
           }
         } elseif ($term instanceof \Scat\Search\Term) {
           $res= $res->where_raw("(txn.number = ? OR txn.uuid = ? OR txn.id = ? OR txn.online_sale_id = ? OR CONCAT_WS(' ',person.name, person.email, person.phone, person.company) RLIKE ?)",
