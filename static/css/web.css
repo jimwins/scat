@@ -339,9 +339,16 @@ a.button:link, a.button:visited {
 .button.small {
   font-size: 0.85em;
 }
+.button.large {
+  font-size: 1.15em;
+}
 
 .button.outline {
   background-color: #fff;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+a.button.outline:link, a.button.outline:visited {
   color: var(--primary-color);
 }
 .button[disabled] {
@@ -401,6 +408,11 @@ hr {
 .pull-right {
   float: right;
 }
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
 
 .text-success { color: #3d9970; /* olive */ }
 .text-important { color: #0038d9; /* blue */ }
@@ -457,13 +469,13 @@ h1.page-header {
 nav#site-navigation {
   display: grid;
   place-content: center;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto 1fr auto auto auto;
   grid-column-gap: 0.25em;
   grid-row-gap: 1em;
 }
 nav#site-navigation #site-search {
   /* whole row to itself */
-  grid-column: 1 / 5;
+  grid-column: 1 / 6;
   grid-row: 2;
 }
 nav#site-navigation img {
@@ -494,15 +506,16 @@ nav#site-navigation #site-search > .button {
 }
 /* Not sure why this is necessary */
 nav#site-navigation .nav-button,
+nav#site-navigation #site-wishlist .button,
 nav#site-navigation #site-cart .button {
   padding: 0;
 }
 nav#site-navigation #site-depts {
-  grid-column: 1 / 5;
+  grid-column: 1 / 6;
   max-width: 100%;
 }
 nav#site-navigation #site-featured-depts {
-  grid-column: 1 / 5;
+  grid-column: 1 / 6;
   max-width: 100%;
 }
 nav#site-navigation #site-depts ul,
@@ -538,12 +551,7 @@ nav#site-navigation #site-featured-depts ul li:last-child:after {
 }
 nav#site-navigation #site-about {
   display: none;
-  grid-column: 1 / 5;
-  max-width: 100%;
-}
-nav#site-navigation #site-cart-contents {
-  display: none;
-  grid-column: 1 / 5;
+  grid-column: 1 / 6;
   max-width: 100%;
 }
 
@@ -600,7 +608,7 @@ nav#site-navigation #site-cart-contents {
 
 @media (min-width: 600px) {
   nav#site-navigation {
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto auto auto;
     grid-column-gap: 1em;
   }
   nav#site-navigation #site-dept-menu,
@@ -623,10 +631,16 @@ nav#site-navigation #site-cart-contents {
 .bi-lg {
   font-size: 1.2em;
 }
+.bi-xl {
+  font-size: 2.0em;
+}
 .lni + .label {
   margin-left: 0.25em;
 }
 .bi + .label {
+  margin-left: 0.25em;
+}
+svg + .label {
   margin-left: 0.25em;
 }
 
@@ -657,6 +671,11 @@ nav#site-navigation #site-cart-contents {
   border-bottom-right-radius: 0;
 
   height: 2.25rem;
+}
+
+.input-group .button.left {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .input-group input, .input-group .fake-input {
@@ -735,6 +754,22 @@ table {
   /* ul.smol-grid gets wonky padding otherwise */
   padding: 0;
 }
+
+.smol-fill-grid {
+  --min: 20ch;
+  --gap: 1rem;
+
+  display: grid;
+  grid-gap: var(--gap);
+  /* min() with 100% prevents overflow in extra narrow spaces */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--min)), 1fr));
+
+  margin: var(--gap) 0;
+
+  /* ul.smol-fill-grid gets wonky padding otherwise */
+  padding: 0;
+}
+
 
 .input-radio, .input-checkbox {
   display: block;
@@ -862,4 +897,8 @@ but as a fallback you can chain `:not()` instead */
 }
 .hero .hero__content p {
   font-size: 1.75rem;
+}
+
+.add-item .button {
+  margin-bottom: 1em;
 }

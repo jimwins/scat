@@ -1,0 +1,83 @@
+<div class="well">
+  <p class="lead">
+    Share this wishlist with your friends, family, or other well-wishers.
+  </p>
+
+  {% set url= full_url_for('shared-wishlist', { uuid: wishlist.uuid }) %}
+  {% set subject= 'My Wishlist' %}
+  {% set body= 'Check out my wishlist at Raw Materials Art Supplies.' %}
+
+  <div class="smol-grid">
+    <a class="button large" id="share-link" href="{{ url }}">
+      {{ bootstrap_icon('link-45deg', { width: 16, height: 16 }) }}
+      <span class="label">Share Link</span>
+    </a>
+    <a class="button large" href="mailto:?subject={{ subject | e('url') }}&body={{ (body ~ "\r\n\r\n" ~ url) | e('url') }}">
+      {{ bootstrap_icon('envelope', { width: 16, height: 16 }) }}
+      <span class="label">Share via Email</span>
+    </a>
+    <a class="button large" target="_blank" href="https://www.facebook.com/sharer.php?u={{ url | e('url') }}&t={{ body | e('url') }}">
+      {{ bootstrap_icon('facebook', { width: 16, height: 16 }) }}
+      <span class="label">Share on Facebook</span>
+    </a>
+    <a class="button large" target="_blank" href="https://twitter.com/intent/tweet?text={{ body|e('url') }}&hashtags=wishlist&url={{ url|e('url') }}">
+      {{ bootstrap_icon('twitter', { width: 16, height: 16 }) }}
+      <span class="label">Share on Twitter</span>
+    </a>
+  </div>
+</div>
+<dialog id="share-link-dialog">
+  <div class="well">
+    <form method="dialog">
+      <p>
+        This is the link to share this wishlist with anyone.
+      </p>
+      <div class="input-group block">
+        <button class="button left" id="copy-share-link">
+          {{ bootstrap_icon('clipboard') }}
+          Copy
+        </button>
+        <input type="text" class="input" value="{{ url }}">
+      </div>
+      <p class="pull-right">
+        <button class="button" value="cancel">Close</button>
+      </p>
+      <div class="clearfix"></div>
+    </form>
+  </div>
+</dialog>
+<style>
+  dialog {
+    border: none;
+    min-width: 80ch;
+    background: inherit;
+  }
+  dialog::backdrop {
+    background: rgba(0, 0, 0, 0.25);
+  }
+</style>
+<script>
+{
+  let dialog= document.getElementById('share-link-dialog');
+
+  // https://stackoverflow.com/a/71783638
+  dialog.addEventListener('click', (ev) => {
+    if (ev.offsetX < 0 || ev.offsetX > ev.target.offsetWidth ||
+      ev.offsetY < 0 || ev.offsetY > ev.target.offsetHeight) {
+        dialog.close();
+    }
+  });
+
+  document.getElementById('share-link').addEventListener('click', (ev) => {
+    ev.stopPropagation(); ev.preventDefault();
+    if (typeof dialog.showModal == 'function') {
+      dialog.showModal()
+    }
+  })
+
+  document.getElementById('copy-share-link').addEventListener('click', (ev) => {
+    ev.stopPropagation(); ev.preventDefault();
+    navigator.clipboard.writeText('{{ url | e("js") }}')
+  })
+}
+</script>

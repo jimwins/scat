@@ -1,0 +1,47 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Shared Wishlist @ Raw Materials Art Supplies
+{% endblock %}
+
+{% block content %}
+
+  {% set items= wishlist.items.find_many() %}
+  {% if not items|length %}
+    <div class="alert alert-danger">
+      <b>There is nothing in this wishlist.</b> Sorry, there's nothing to show!
+    </div>
+  {% else %}
+    {% if person and person.id == wishlist.person_id %}
+      <div class="alert alert-success">
+        <b>This is the shared view of your wishlist.</b>
+        <br>
+        <a class="button small" href="/wishlist">
+          Edit the Wishlist
+        </a>
+      </div>
+    {% else %}
+      {# guidance on creating your own wishlist? #}
+    {% endif %}
+
+    {{ include('wishlist/links.twig') }}
+
+    <div class="smol-fill-grid">
+      {% for item in items %}
+        {% set i= item.item %}
+        <div class="card">
+          <img src="{{ i.media[0].large_square }}" alt="{{ i.name }}">
+          <h2><a href="{{ url_for('catalog', i.url_params()) }}">{{ i.name }}</a></h2>
+          {% if not i.active or not i.no_backorder or i.stock > 0 %}
+            {{ include('add-to-cart.twig', { item: i, no_add_to_wishlist: true, fixed_quantity: true }) }}
+          {% else %}
+            <button class="button" disabled>
+              Unavailable
+            </button>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

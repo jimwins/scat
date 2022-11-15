@@ -29,11 +29,13 @@ class Auth {
     $limit= 25;
 
     $orders= $this->scat->get_orders($person->id, $page, $limit);
+    $wishlist= $this->data->factory('Wishlist')->where('person_id', $person->id)->find_one();
 
     return $this->view->render($response, "account/index.html", [
       'success' => $request->getParam('success'),
       'person' => $person,
       'orders' => $orders,
+      'wishlist' => $wishlist,
       'page' => $page,
       'limit' => $limit,
     ]);

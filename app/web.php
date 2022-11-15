@@ -212,6 +212,15 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
             [ \Scat\Web\Sale:: class, 'trackShipment' ]);
 })->add($container->get(\Scat\Middleware\NoCache::class));
 
+/* Wishlist */
+$app->group('/wishlist', function (RouteCollectorProxy $app) {
+  $app->get('', [ \Scat\Web\Wishlist::class, 'top' ]);
+  $app->post('/~add', [ \Scat\Web\Wishlist::class, 'addItem' ]);
+  $app->post('/~remove', [ \Scat\Web\Wishlist::class, 'removeItem' ]);
+  $app->get('/{uuid}', [ \Scat\Web\Wishlist::class, 'show' ])
+      ->setName('shared-wishlist');
+})->add($container->get(\Scat\Middleware\NoCache::class));
+
 /* Contact */
 $app->post('/contact', [ \Scat\Web\Contact::class, 'handleContact' ])
     ->add(new \RKA\Middleware\IpAddress(/* TODO check proxy? */))

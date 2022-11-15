@@ -1,0 +1,75 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Wishlist @ Raw Materials Art Supplies
+{% endblock %}
+
+{% block content %}
+  {% if person %}
+    <h2>
+      Welcome back!
+      <small>
+        (<a href="{{ url_for('account') }}">view your account</a>
+        or <a href="{{ url_for('logout') }}">log out</a>)
+      </small>
+    </h2>
+  {% else %}
+    <h2>
+      Welcome!
+      <small>
+        (<a href="{{ url_for('login') }}">log in</a>)
+      </small>
+    </h2>
+  {% endif %}
+
+  {% set items= wishlist.items.find_many() %}
+  {% if not items|length %}
+    <div class="alert alert-warning">
+      <b>You don't have anything in your wishlist.</b>
+      You can <a href="{{ url_for('catalog') }}">start browsing for art
+      supplies</a> or use the search form at the top of the page to find
+      what you want.
+    </div>
+
+    <ul class="smol-grid">
+      {{ ad('basic', 6) }}
+      {{ ad('basic', 7) }}
+      {{ ad('basic', 8) }}
+    </ul>
+  {% else %}
+    {% if not person and not wishlist.person_id %}
+      <div class="alert alert-danger">
+        {{ bootstrap_icon('exclamation-triangle') }}
+        <b>Your wishlist isn't saved!</b> You need to <a href="{{ url_for('login') }}">log
+        in</a> or <a href="/rewards">sign up for a rewards account</a> to save your wishlist.
+      </div>
+    {% endif %}
+
+    {{ include('wishlist/links.twig') }}
+
+    <div class="smol-fill-grid">
+      {% for item in items %}
+        {% set i= item.item %}
+        <div class="card">
+          <img src="{{ i.media[0].large_square }}" alt="{{ i.name }}">
+          <h2><a href="{{ url_for('catalog', i.url_params()) }}">{{ i.name }}</a></h2>
+          {% if not i.active or not i.no_backorder or i.stock > 0 %}
+            {{ include('add-to-cart.twig', { item: i, no_add_to_wishlist: true, fixed_quantity: true }) }}
+          {% else %}
+            <button class="button" disabled>
+              Unavailable
+            </button>
+          {% endif %}
+          <form method="POST" action="/wishlist/~remove">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <button type="submit" class="button block outline">
+              {{ bootstrap_icon('bookmark-x') }}
+              Remove
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

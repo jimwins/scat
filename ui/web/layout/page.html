@@ -80,6 +80,15 @@
           <span class="label">About</span>
         </a>
       </div>
+      <div id="site-wishlist">
+        <a class="button"
+            href="/wishlist"
+            title="Wishlist">
+          {{ bootstrap_icon('stars') }}
+          <span class="visually-hidden">Wishlist</span>
+          <span class="badge"></span>
+        </a>
+      </div>
       <div id="site-cart">
         <a class="button"
             href="/cart">
@@ -273,6 +282,18 @@
         details= JSON.parse(details)
         if (details.items > 0) {
           var badge= document.querySelector('#site-cart .badge')
+          badge.innerText= details.items
+        }
+      } catch (err) {
+        // don't care
+      }
+    }
+    details= getCookie('wishlistDetails');
+    if (details) {
+      try {
+        details= JSON.parse(details)
+        if (details.items > 0) {
+          var badge= document.querySelector('#site-wishlist .badge')
           badge.innerText= details.items
         }
       } catch (err) {
