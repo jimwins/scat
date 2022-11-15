@@ -51,7 +51,7 @@
     <div class="smol-fill-grid">
       {% for item in items %}
         {% set i= item.item %}
-        <div class="card">
+        <div class="card cold">
           <img src="{{ i.media[0].large_square }}" alt="{{ i.name }}">
           <h2><a href="{{ url_for('catalog', i.url_params()) }}">{{ i.name }}</a></h2>
           {% if not i.active or not i.no_backorder or i.stock > 0 %}
