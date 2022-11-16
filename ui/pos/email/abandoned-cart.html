@@ -1,11 +1,7 @@
 {% extends 'layout/email.html' %}
 
 {% block title -%}
-  {%- if sale.name -%}
-    {{ sale.name }}, thank you for stopping by
-  {%- else -%}
-    Thank you for stopping by
-  {%- endif -%}
+  It looks like you left something behind...
 {%- endblock %}
 
 {% block preheader %}
