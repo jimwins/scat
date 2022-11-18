@@ -350,7 +350,7 @@ class Cart {
 
     // get item details
     $item= $this->catalog->getItemByCode($item_code);
-    if (!$item) {
+    if (!$item || $item->no_online_sale) {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 

@@ -116,7 +116,7 @@ figure img {
 
     <div id="afterpay-clearpay-message"></div>
 
-    {% if item.minimum_quantity or item.stock %}
+    {% if not item.no_online_sale and (item.minimum_quantity or item.stock) %}
       {% if item.stock > 0 %}
         <p class="text-success">In stock</p>
       {% else %}
@@ -131,14 +131,14 @@ figure img {
         {% endif %}
       {% endif %}
     {% else %}
-      {% if item.no_backorder %}
+      {% if item.no_backorder or item.no_online_sale %}
         <p data-toggle="tooltip" class="text-danger" title="This item is currently unavailable.">Unavailable</p>
       {% else %}
         <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Out of stock, special order</span>
       {% endif %}
     {% endif %}
 
-    {% if item.stock or not item.no_backorder %}
+    {% if not item.no_online_sale and (item.stock > 0 or not item.no_backorder) %}
       <p>
         <b>FREE</b> curbside pickup
         {% set local= item.estimate_local_delivery_rate() %}
@@ -173,7 +173,7 @@ figure img {
   </div>
 
   <div class="order">
-    {% if item.stock or not item.no_backorder %}
+    {% if not item.no_online_sale and (item.stock > 0 or not item.no_backorder) %}
       {{ include('add-to-cart.twig') }}
     {% else %}
       <button class="button block" disabled>

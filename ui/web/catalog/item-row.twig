@@ -96,7 +96,7 @@
     {% endif %}
   </td>
   <td class="text-right">
-    {% if not i.no_backorder or i.stock > 0 %}
+    {% if not i.no_online_sale and (not i.no_backorder or i.stock > 0) %}
       {{ include('add-to-cart.twig', { item: i, fixed_quantity: true, button_size: 'small block' }) }}
     {% else %}
       <button class="button" disabled>
