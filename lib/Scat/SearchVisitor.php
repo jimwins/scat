@@ -122,6 +122,7 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
     case 'hazmat':
     case 'oversized':
     case 'no_backorder':
+    case 'no_online_sale':
       $this->current[]= $value ? "(item.$name = '$value')" :
                                  "(NOT item.$name OR item.$name IS NULL)";
       break;
