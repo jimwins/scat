@@ -689,6 +689,12 @@
       No backorders?
     </button>
 
+    <button type="button" class="btn btn-link toggle"
+            data-name="no_online_sale" data-value="{{ item.no_online_sale }}">
+      <i class="fa fa-fw {{ item.no_online_sale ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+      No online sale?
+    </button>
+
   </div>
 {% endblock %}
 
