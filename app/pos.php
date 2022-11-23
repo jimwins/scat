@@ -387,8 +387,8 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
              });
   $app->post('/price-overrides/~edit',
              function (Request $request, Response $response) {
-               $override= \Titi\Model::factory('PriceOverride')
-                            ->find_one($request->getParam('id'));
+               $id= $request->getParam('id');
+               $override= $id ? \Titi\Model::factory('PriceOverride')->find_one($id) : null;
                if (!$override) {
                  $override= \Titi\Model::factory('PriceOverride')->create();
                }
