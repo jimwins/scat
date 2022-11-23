@@ -82,6 +82,13 @@ class Reports {
     return $this->view->render($response, 'report/cashflow.html', $data);
   }
 
+  public function dropByDrop(Request $request, Response $response) {
+    $begin= $request->getParam('begin');
+    $end= $request->getParam('end');
+    $data= $this->report->sales(null, $begin, $end);
+    return $this->view->render($response, 'report/drop-by-drop.html', $data);
+  }
+
   public function kitItems(Request $request, Response $response) {
     $data= $this->report->kitItems();
     return $this->view->render($response, 'report/kit-items.html', $data);

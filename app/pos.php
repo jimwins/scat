@@ -506,6 +506,8 @@ $app->group('/report', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Reports::class, 'backorderedItems' ]);
   $app->get('/cashflow',
             [ \Scat\Controller\Reports::class, 'cashflow' ]);
+  $app->get('/drop-by-drop',
+            [ \Scat\Controller\Reports::class, 'dropByDrop' ]);
   $app->get('/kit-items',
             [ \Scat\Controller\Reports::class, 'kitItems' ]);
   $app->get('/purchases-by-vendor',

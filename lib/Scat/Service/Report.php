@@ -50,6 +50,8 @@ class Report
                   AS in_person,
                 SUM(IF(online_sale_id IS NOT NULL, taxed + untaxed, 0))
                   AS online,
+                SUM(IF(online_sale_id IS NOT NULL AND first, taxed + untaxed, 0))
+                  AS online_first,
                 SUM(IF(online_sale_id IS NOT NULL AND shipping_address_id = 1,
                         taxed + untaxed, 0)) AS pickup,
                 SUM(IF(online_sale_id IS NOT NULL AND shipping_address_id > 1,
@@ -66,6 +68,10 @@ class Report
            FROM (SELECT 
                         txn.uuid,
                         txn.online_sale_id,
+                        IF(person_id,
+                           (SELECT MIN(id) FROM txn b WHERE b.person_id = person_id) = txn.id,
+                           0)
+                        AS first,
                         txn.shipping_address_id,
                         paid,
                         CAST(ROUND_TO_EVEN(
