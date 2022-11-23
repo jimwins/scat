@@ -69,7 +69,7 @@ class Report
                         txn.uuid,
                         txn.online_sale_id,
                         IF(person_id,
-                           (SELECT MIN(id) FROM txn b WHERE b.person_id = person_id) = txn.id,
+                           (SELECT MIN(id) FROM txn b WHERE b.person_id = txn.person_id) = txn.id,
                            0)
                         AS first,
                         txn.shipping_address_id,
