@@ -41,7 +41,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for sale in sales %}
+      {% for sale in sales|reverse %}
         <tr>
           <td>
             {{ sale.span }}
