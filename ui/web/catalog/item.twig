@@ -118,7 +118,10 @@ figure img {
 
     {% if not item.no_online_sale and (item.minimum_quantity or item.stock) %}
       {% if item.stock > 0 %}
-        <p class="text-success">In stock</p>
+        <p class="text-success">
+          {{ bootstrap_icon('check-circle-fill') }}
+          In stock
+        </p>
       {% else %}
         {% if item.minimum_quantity > 0 %}
           <p class="text-danger" data-toggle="tooltip" title="We normally stock this, but are out right now. We should have more soon!">Out of stock</p>
