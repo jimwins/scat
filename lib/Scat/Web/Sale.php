@@ -149,6 +149,8 @@ class Sale {
 
     return $this->view->render($response, 'sale/thanks.html', [
       'sale' => $sale,
+      // only use scat.ecommerce() to report if modified very recently
+      'report_sale' => strtotime($sale->modified) > time() - 30,
     ]);
   }
 

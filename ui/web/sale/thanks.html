@@ -33,31 +33,33 @@
 
 {% block script %}
   {% autoescape 'js' %}
-    <script>
-      scat.ecommerce('Order Completed', {
-        checkout_id: '{{ sale.id }}',
-        order_id: '{{ sale.uuid }}',
-        subtotal: '{{ sale.subtotal }}',
-        shipping: '{{ sale.shipping }}',
-        tax: '{{ sale.tax }}',
-        total: '{{ sale.total }}',
-        currency: 'USD',
-        products: [
-          {% for line in sale.items.find_many() %}
-            {% set item= line.item %}
-            {
-              product_id: '{{ line.code }}',
-              name: '{{ line.name }}',
-              category: '{{ item.category }}',
-              brand: '{{ item.brand_name }}',
-              price: '{{ line.sale_price }}',
-              currency: 'usd',
-              quantity: '{{ line.quantity }}',
-            },
-          {% endfor %}
-        ]
-      })
-    </script>
+    {% if report_sale %}
+      <script>
+        scat.ecommerce('Order Completed', {
+          checkout_id: '{{ sale.id }}',
+          order_id: '{{ sale.uuid }}',
+          subtotal: '{{ sale.subtotal }}',
+          shipping: '{{ sale.shipping }}',
+          tax: '{{ sale.tax }}',
+          total: '{{ sale.total }}',
+          currency: 'USD',
+          products: [
+            {% for line in sale.items.find_many() %}
+              {% set item= line.item %}
+              {
+                product_id: '{{ line.code }}',
+                name: '{{ line.name }}',
+                category: '{{ item.category }}',
+                brand: '{{ item.brand_name }}',
+                price: '{{ line.sale_price }}',
+                currency: 'usd',
+                quantity: '{{ line.quantity }}',
+              },
+            {% endfor %}
+          ]
+        })
+      </script>
+    {% endif %}
 
     {% if config('google.merchant_center_id') and sale.eta %}
       <script src="https://apis.google.com/js/platform.js?onload=renderOptIn" async defer></script>
