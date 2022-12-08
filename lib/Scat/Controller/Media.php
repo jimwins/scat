@@ -42,6 +42,12 @@ class Media {
           if ($name == 'ext') {
             $media= $media->where('ext', $term->value);
           }
+          if ($name == 'width') {
+            $media= $media->where('width', $term->value);
+          }
+          if ($name == 'height') {
+            $media= $media->where('height', $term->value);
+          }
         } elseif ($term instanceof \Scat\Search\Term) {
           $natural[]= '"' . $term->value . '"';
         }
