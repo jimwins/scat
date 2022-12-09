@@ -651,6 +651,8 @@ $app->get('/newsletter/~register-webhooks',
                     \Scat\Service\Newsletter $newsletter) {
   return $response->withJson($newsletter->registerWebhooks());
 });
+$app->post('/~webhook/newsletter',
+            [ \Scat\Controller\People::class, 'handleNewsletterWebhook' ]);
 
 /* QuickBooks */
 $app->group('/quickbooks', function (RouteCollectorProxy $app) {
