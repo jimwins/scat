@@ -117,8 +117,10 @@ class People {
     $page= (int)$request->getParam('page');
     $limit= 25;
 
-    $person->syncToMailerlite();
-    $person->save();
+    if ($person->mailerlite_id) {
+      $person->syncToMailerlite();
+      $person->save();
+    }
 
     return $view->render($response, 'person/person.html', [
       'person' => $person,
