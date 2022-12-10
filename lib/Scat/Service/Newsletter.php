@@ -6,7 +6,9 @@ class Newsletter
   protected $key;
   protected $webhook_url;
 
-  public function __construct(Config $config) {
+  public function __construct(
+    private Config $config
+  ) {
     $this->key= $config->get('newsletter.key');
     if (!$this->key) {
       throw new \Exception("Mailerlite API key is not configured.");
@@ -53,5 +55,22 @@ class Newsletter
     }
 
     return $results;
+  }
+
+
+  public function signup($email, $name) {
+    $groupsApi= (new \MailerLiteApi\MailerLite($this->key))->groups();
+
+    $subscriber= [
+      'email' => $email,
+      'fields' => [
+        'name' => $name,
+      ]
+    ];
+
+    $groupsApi->addSubscriber(
+      $this->config->get('mailerlite.group_id'),
+      $subscriber
+    );
   }
 }

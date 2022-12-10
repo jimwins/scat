@@ -265,6 +265,8 @@ $app->group('/track', function (RouteCollectorProxy $app) {
 $app->group('', function (RouteCollectorProxy $app) {
   $app->get('/account', [ \Scat\Web\Auth::class, 'account' ])
       ->setName('account');
+  $app->post('/account/signup-for-newsletter',
+              [ \Scat\Web\Auth:: class, 'signupForNewsletter' ]);
   $app->get('/login/key/{key:.*}', [ \Scat\Web\Auth::class, 'handleLoginKey' ])
       ->setName('handleLoginKey');
   $app->get('/login', [ \Scat\Web\Auth::class, 'loginForm' ])

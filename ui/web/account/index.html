@@ -45,6 +45,27 @@
     <dd>{{ person.pretty_phone }}
   </dl>
 
+  {% if person.subscriptions|length > 0 %}
+    <p><b>Congratulations!</b> You are subscribed to our newsletter.</p>
+  {% elseif newsletter %}
+    <p>
+      <b>Check your email!</b> We've sent a confirmation message with a link
+      you'll need to click to complete your newsletter signup. Thanks!
+    </p>
+  {% else %}
+    <p>
+      <b>Oh no, it looks like you're not signed up for our newsletter!</b>
+      That means you may be missing out on the newest deals and new arrivals.
+      Just mash the button below to fix this. (Don't worry, you can
+      unsubscribe at any time.)
+    </p>
+    <form method="post" action="/account/signup-for-newsletter">
+      <button type="submit" class="button">
+        Sign me up!
+      </button>
+    </form>
+  {% endif %}
+
   {% if person.tax_exemption_certificate_id %}
     <p>We have a tax exemption certificate on file for this account. You can
     apply it during checkout.</p>

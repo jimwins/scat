@@ -38,6 +38,7 @@ class Auth {
       'wishlist' => $wishlist,
       'page' => $page,
       'limit' => $limit,
+      'newsletter' => (int)$request->getParam('newsletter'),
     ]);
   }
 
@@ -223,5 +224,23 @@ class Auth {
     $signup->save();
 
     return $response->withJson($signup);
+  }
+
+  public function signupForNewsletter(
+    Request $request, Response $response,
+    \Scat\Service\Newsletter $newsletter
+  ) {
+    $person= $this->auth->get_person_details($request);
+    if (!$person) {
+      return $response->withRedirect('/login');
+    }
+
+    try {
+      $newsletter->signup($person->email, $person->name);
+    } catch (\Exception $e) {
+      // do something?
+    }
+
+    return $response->withRedirect('/account?newsletter=1');
   }
 }
