@@ -214,8 +214,7 @@
       }
 
       const stripe= Stripe('{{ stripe.key }}', {
-        betas: ['link_beta_3'],
-        apiVersion: "2020-08-27;link_beta=v1"
+        apiVersion: "2022-11-15"
       });
       const clientSecret= '{{ stripe.payment_intent.client_secret }}';
 
@@ -267,7 +266,8 @@
       paymentElement.mount("#payment-element");
 
       {% if cart.shipping_address_id != 1 %}
-        const shippingAddressElement= elements.create("shippingAddress", {
+        const shippingAddressElement= elements.create("address", {
+          mode: 'shipping',
           allowedCountries: ['US'],
           {% if cart.shipping_address %}
             {% set address= cart.shipping_address %}
@@ -288,17 +288,11 @@
         shippingAddressElement.mount("#shipping-address-element");
 
         shippingAddressElement.on('change', (event) => {
-          const details= event.value;
           /* Don't update server if we don't have a full address yet */
-          if (details.name &&
-              details.address.line1 &&
-              details.address.city &&
-              details.address.state &&
-              details.address.postal_code.length >= 5)
-          {
+          if (event.complete) {
             clearTimeout(timeout);
             timeout= setTimeout(() => {
-              updateCart(details)
+              updateCart(event.value)
             }, 500);
           }
         });
