@@ -133,6 +133,8 @@ class Sale {
   }
 
   public function thanks(Request $request, Response $response, $uuid) {
+    $person= $this->auth->get_person_details($request);
+
     $sale= $this->carts->findByUuid($uuid);
     if (!$sale) {
       throw new \Slim\Exception\HttpNotFoundException($request);
@@ -148,6 +150,7 @@ class Sale {
     }
 
     return $this->view->render($response, 'sale/thanks.html', [
+      'person' => $person,
       'sale' => $sale,
       // only use scat.ecommerce() to report if modified very recently
       'report_sale' => strtotime($sale->modified) > time() - 30,
