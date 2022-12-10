@@ -48,14 +48,14 @@
       Name
     </label>
     <input type="text" class="input" name="name" id="name" required
-            value="{{ cart.name }}"
+            value="{{ cart.name ?? person.name }}"
             placeholder="Vincent Van Gogh">
 
     <label for="phone">
       Phone
     </label>
     <input type="text" class="input" phone="phone" id="phone"
-            value="{{ cart.phone }}"
+            value="{{ cart.phone ?? person.phone }}"
             placeholder="(213) 627-7223 (optional except for local delivery)">
 
     <h3>Shipping</h3>
@@ -246,7 +246,7 @@
 
       const linkAuthenticationElement= elements.create("linkAuthentication", {
         {% if cart.email %}
-          defaultValues: { email: "{{ cart.email }}" }
+          defaultValues: { email: "{{ cart.email ?? person.email }}" }
         {% endif %}
       });
 
