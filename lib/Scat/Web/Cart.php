@@ -768,28 +768,27 @@ class Cart {
       throw new \Exception("Can only handle successful payment attempts here, got {$payment_intent->status}.");
     }
 
-    foreach ($payment_intent->charges->data as $charge) {
-      if ($charge->payment_method_details->type == 'afterpay_clearpay') {
-        $cc_brand= 'AfterPay';
-        $cc_last4= '';
-      } if ($charge->payment_method_details->type == 'link') {
-        $cc_brand= 'Link';
-        $cc_last4= '';
-      } else {
-        $cc_brand= ucwords($charge->payment_method_details->card->brand);
-        $cc_last4= $charge->payment_method_details->card->last4;
-      }
-
-      $data= [
-        'payment_intent_id' => $payment_intent_id,
-        'charge_id' => $charge->id,
-        'cc_brand' => $cc_brand,
-        'cc_last4' => $cc_last4,
-      ];
-
-      $cart->addPayment('credit', $charge->amount / 100, true, $data);
-      $cart->stripe_payment_intent_id= null; // close this payment_intent out
+    $charge= $stripe->getCharge($payment_intent->latest_charge);
+    if ($charge->payment_method_details->type == 'afterpay_clearpay') {
+      $cc_brand= 'AfterPay';
+      $cc_last4= '';
+    } if ($charge->payment_method_details->type == 'link') {
+      $cc_brand= 'Link';
+      $cc_last4= '';
+    } else {
+      $cc_brand= ucwords($charge->payment_method_details->card->brand);
+      $cc_last4= $charge->payment_method_details->card->last4;
     }
+
+    $data= [
+      'payment_intent_id' => $payment_intent_id,
+      'charge_id' => $charge->id,
+      'cc_brand' => $cc_brand,
+      'cc_last4' => $cc_last4,
+    ];
+
+    $cart->addPayment('credit', $charge->amount / 100, true, $data);
+    $cart->stripe_payment_intent_id= null; // close this payment_intent out
 
     $cart->save();
 

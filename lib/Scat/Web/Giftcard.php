@@ -77,37 +77,36 @@ class Giftcard {
 
         $item= $this->catalog->getItemByCode('ZZ-GIFTCARD');
 
-        foreach ($payment_intent->charges->data as $charge) {
-          $line= $sale->items()->create([
-            'sale_id' => $sale->id,
-            'item_id' => $item->id,
-            'quantity' => 1,
-            'retail_price' => $charge->amount / 100,
-            'tic' => $item->tic,
-            'tax' => 0.00,
-          ]);
-          $line->save();
+        $charge= $this->stripe->getCharge($payment_intent->latest_charge);
+        $line= $sale->items()->create([
+          'sale_id' => $sale->id,
+          'item_id' => $item->id,
+          'quantity' => 1,
+          'retail_price' => $charge->amount / 100,
+          'tic' => $item->tic,
+          'tax' => 0.00,
+        ]);
+        $line->save();
 
-          if ($charge->payment_method_details->type == 'afterpay_clearpay') {
-            $cc_brand= 'AfterPay';
-            $cc_last4= '';
-          } if ($charge->payment_method_details->type == 'link') {
-            $cc_brand= 'Link';
-            $cc_last4= '';
-          } else {
-            $cc_brand= ucwords($charge->payment_method_details->card->brand);
-            $cc_last4= $charge->payment_method_details->card->last4;
-          }
-
-          $data= [
-            'payment_intent_id' => $payment_intent->id,
-            'charge_id' => $charge->id,
-            'cc_brand' => $cc_brand,
-            'cc_last4' => $cc_last4,
-          ];
-
-          $sale->addPayment('credit', $charge->amount / 100, true, $data);
+        if ($charge->payment_method_details->type == 'afterpay_clearpay') {
+          $cc_brand= 'AfterPay';
+          $cc_last4= '';
+        } if ($charge->payment_method_details->type == 'link') {
+          $cc_brand= 'Link';
+          $cc_last4= '';
+        } else {
+          $cc_brand= ucwords($charge->payment_method_details->card->brand);
+          $cc_last4= $charge->payment_method_details->card->last4;
         }
+
+        $data= [
+          'payment_intent_id' => $payment_intent->id,
+          'charge_id' => $charge->id,
+          'cc_brand' => $cc_brand,
+          'cc_last4' => $cc_last4,
+        ];
+
+        $sale->addPayment('credit', $charge->amount / 100, true, $data);
 
         $sale->set_expr('tax_calculated', 'NOW()');
         $sale->status= 'paid';

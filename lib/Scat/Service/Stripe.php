@@ -13,7 +13,7 @@ class Stripe {
   private function getClient() {
     return new \Stripe\StripeClient([
       'api_key' => $this->secret_key,
-      'stripe_version' => "2020-08-27;link_beta=v1",
+      'stripe_version' => "2022-11-15",
     ]);
   }
 
@@ -68,6 +68,11 @@ class Stripe {
   public function updatePaymentIntent($payment_intent_id, $details) {
     $stripe= $this->getClient();
     return $stripe->paymentIntents->update($payment_intent_id, $details);
+  }
+
+  public function getCharge($charge_id) {
+    $stripe= $this->getClient();
+    return $stripe->charges->retrieve($charge_id);
   }
 
   public function createCustomer($details) {
