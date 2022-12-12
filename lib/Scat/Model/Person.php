@@ -677,7 +677,7 @@ class Person extends \Scat\Model {
     $client= new \GuzzleHttp\Client();
 
     $url= "https://api.mailerlite.com/api/v2" .
-          "/subscribers/{$this->mailerlite_id}/groups";
+          "/subscribers/{$this->email}/groups";
 
     $res= $client->request('GET', $url, [
                             //'debug' => true,
@@ -694,7 +694,6 @@ class Person extends \Scat\Model {
     }, $data);
 
     $this->subscriptions($groups);
-
   }
 
   public function store_credit() {
