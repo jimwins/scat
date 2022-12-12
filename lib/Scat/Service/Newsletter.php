@@ -22,39 +22,31 @@ class Newsletter
   public function registerWebhooks() {
     $client= new \GuzzleHttp\Client();
 
-    $events= [
-      'subscriber.created',
-      'subscriber.updated',
-      'subscriber.unsubscribed',
-      'subscriber.added_to_group',
-      'subscriber.removed_from_group',
+    $data= [
+      'url' => $this->webhook_url,
+      'events' => [
+        'subscriber.created',
+        'subscriber.updated',
+        'subscriber.unsubscribed',
+        'subscriber.added_to_group',
+        'subscriber.removed_from_group',
+      ]
     ];
 
     $url= "https://connect.mailerlite.com/api/webhooks";
-    $results= [];
 
-    foreach ($events as $event) {
-      $data= [
-        'url' => $this->webhook_url,
-        'event' => $event,
-      ];
+    $res= $client->request('POST', $url, [
+                             //'debug' => true,
+                             'json' => $data,
+                             'headers' => [
+                               'Authorization' => "Bearer {$this->key}",
+                               'cache-control' => "no-cache",
+                             ],
+                           ]);
 
-      $res= $client->request('POST', $url, [
-                               //'debug' => true,
-                               'json' => $data,
-                               'headers' => [
-                                 'Authorization' => "Bearer {$this->key}",
-                                 'cache-control' => "no-cache",
-                               ],
-                             ]);
+    $body= $res->getBody();
 
-      $body= $res->getBody();
-
-      $results[]= json_decode($body);
-
-    }
-
-    return $results;
+    return json_decode($body);
   }
 
 
