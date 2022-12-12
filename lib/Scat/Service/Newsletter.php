@@ -9,7 +9,7 @@ class Newsletter
   public function __construct(
     private Config $config
   ) {
-    $this->key= $config->get('newsletter.key');
+    $this->key= $config->get('mailerlite.key');
     if (!$this->key) {
       throw new \Exception("Mailerlite API key is not configured.");
     }

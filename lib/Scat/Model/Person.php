@@ -683,7 +683,7 @@ class Person extends \Scat\Model {
                             //'debug' => true,
                             'headers' => [
                               'X-MailerLite-ApiKey' =>
-                                $config->get("newsletter.key")
+                                $config->get("mailerlite.key")
                             ],
                           ]);
 
