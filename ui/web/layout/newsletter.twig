@@ -5,7 +5,7 @@
     .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
     n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
     (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
-    ml('account', '{{ mailerlite.account_id }}');
+    ml('account', '{{ config('mailerlite.account_id') }}');
 </script>
 <!-- End MailerLite Universal -->
 {% endif %}
