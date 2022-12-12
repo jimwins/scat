@@ -13,7 +13,7 @@ class Newsletter
     if (!$this->key) {
       throw new \Exception("Mailerlite API key is not configured.");
     }
-    $this->webhook_url= $config->get('newsletter.webhook_url');
+    $this->webhook_url= $config->get('mailerlite.webhook_url');
     if (!$this->webhook_url) {
       throw new \Exception("URL for Mailerlite webhooks is not configured.");
     }
@@ -23,14 +23,14 @@ class Newsletter
     $client= new \GuzzleHttp\Client();
 
     $events= [
-      'subscriber.create',
-      'subscriber.update',
-      'subscriber.unsubscribe',
-      'subscriber.add_to_group',
-      'subscriber.remove_from_group',
+      'subscriber.created',
+      'subscriber.updated',
+      'subscriber.unsubscribed',
+      'subscriber.added_to_group',
+      'subscriber.removed_from_group',
     ];
 
-    $url= "https://api.mailerlite.com/api/v2/webhooks";
+    $url= "https://connect.mailerlite.com/api/webhooks";
     $results= [];
 
     foreach ($events as $event) {
@@ -43,7 +43,7 @@ class Newsletter
                                //'debug' => true,
                                'json' => $data,
                                'headers' => [
-                                 'X-Mailerlite-ApiKey' => $this->key,
+                                 'Authorization' => "Bearer {$this->key}",
                                  'cache-control' => "no-cache",
                                ],
                              ]);
