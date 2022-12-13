@@ -19,8 +19,19 @@ class Newsletter
     }
   }
 
+  protected function getClient() {
+    return new \GuzzleHttp\Client([
+      'base_uri' => 'https://connect.mailerlite.com/api/',
+      'headers' => [
+        'Authorization' => "Bearer {$this->key}",
+        'cache-control' => "no-cache",
+      ],
+    ]);
+  }
+
+
   public function registerWebhooks() {
-    $client= new \GuzzleHttp\Client();
+    $client= $this->getClient();
 
     $data= [
       'url' => $this->webhook_url,
@@ -33,22 +44,12 @@ class Newsletter
       ]
     ];
 
-    $url= "https://connect.mailerlite.com/api/webhooks";
-
-    $res= $client->request('POST', $url, [
-                             //'debug' => true,
-                             'json' => $data,
-                             'headers' => [
-                               'Authorization' => "Bearer {$this->key}",
-                               'cache-control' => "no-cache",
-                             ],
-                           ]);
+    $res= $client->request('POST', 'webhooks', [ 'json' => data ]);
 
     $body= $res->getBody();
 
     return json_decode($body);
   }
-
 
   public function signup($email, $name) {
     $groupsApi= (new \MailerLiteApi\MailerLite($this->key))->groups();
