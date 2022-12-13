@@ -16,7 +16,7 @@ use Smalot\Cups\Transport\ResponseParser;
 $qty= (int)$_REQUEST['quantity'];
 if (!$qty) $qty= 1;
 
-if ($q= $_REQUEST['q']) {
+if ($q= @$_REQUEST['q']) {
   $items= item_find($db, $q, 0);
 
   if (!$items) die_json("No items found.");
@@ -170,7 +170,7 @@ noprice:
 
 $tmpfname= tempnam("/tmp", "lab");
 
-if ($_REQUEST['DEBUG']) {
+if (@$_REQUEST['DEBUG']) {
   $pdf->Output("test.pdf", 'I');
   exit;
 }

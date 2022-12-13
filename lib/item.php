@@ -7,7 +7,7 @@ define('FIND_STOCKED_FIRST', 32);
 define('FIND_NEW_METHOD', 64);
 
 function item_terms_to_sql($db, $q, $options) {
-if ($GLOBALS['DEBUG'] || ($options & FIND_NEW_METHOD)) {
+if (@$GLOBALS['DEBUG'] || ($options & FIND_NEW_METHOD)) {
   $scanner= new \OE\Lukas\Parser\QueryScanner();
   $parser= new \OE\Lukas\Parser\QueryParser($scanner);
   $parser->readString($q);

@@ -161,14 +161,14 @@ function dump_query($q) {
 }
 
 function jsonp($data) {
-  if (preg_match('/\W/', $_GET['callback'])) {
+  if (preg_match('/\W/', @$_GET['callback'])) {
     // if $_GET['callback'] contains a non-word character,
     // this could be an XSS attack.
     header('HTTP/1.1 400 Bad Request');
     exit();
   }
   header('Content-type: application/json; charset=utf-8');
-  if ($_GET['callback']) {
+  if (@$_GET['callback']) {
     return sprintf('%s(%s);', $_GET['callback'],
                    json_encode($data, JSON_PRETTY_PRINT));
   }
