@@ -585,6 +585,7 @@ class People {
     Request $request, Response $response,
     \Scat\Service\Newsletter $newsletter
   ) {
+    file_put_contents("/tmp/newsletter.json", $request->getBody());
     $incoming= json_decode($request->getBody());
 
     foreach ($incoming->events as $event) {
