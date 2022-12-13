@@ -69,13 +69,7 @@
     {% endblock %}
 
     {% if cart.backordered_items() %}
-      <div class="alert alert-warning">
-        <b>There are items in your cart that are not in stock.</b> You can
-        still place your order, but your order will not ship until all of the
-        items are ready to go. We will email you to let you know the status of
-        your order. (If you are picking up your order, you will be able to
-        pick up items as they are available.)
-      </div>
+      {{ include ('cart/backorder-warning.twig') }}
     {% endif %}
 
     <h3>Comments</h3>
