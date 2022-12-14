@@ -3,13 +3,13 @@ require '../scat.php';
 require '../lib/item.php';
 
 $sql_criteria= "1=1";
-if (($items= $_REQUEST['items'])) {
+if (($items= @$_REQUEST['items'])) {
   list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'],
                                              FIND_OR|FIND_ALL|FIND_NEW_METHOD);
 }
 
-$begin= $_REQUEST['begin'];
-$end= $_REQUEST['end'];
+$begin= @$_REQUEST['begin'];
+$end= @$_REQUEST['end'];
 
 if (!$begin) {
   $begin= date('Y-m-d', time());
