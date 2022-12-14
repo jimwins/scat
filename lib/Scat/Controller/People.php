@@ -585,7 +585,8 @@ class People {
     Request $request, Response $response,
     \Scat\Service\Newsletter $newsletter
   ) {
-    file_put_contents("/tmp/newsletter.json", $request->getBody());
+    $out= tempnam('/tmp', 'newsletter');
+    file_put_contents("{$out}.json", $request->getBody());
     $incoming= json_decode($request->getBody());
 
     /* We actually do the same thing for all events for now, just make
