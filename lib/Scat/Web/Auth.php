@@ -105,7 +105,7 @@ class Auth {
     }
 
     $expires= new \Datetime('+14 days');
-    $token= $this->auth->generate_login_key($valid->person_id, $valid->cart_id);
+    $token= $this->auth->generate_auth_token($valid->person_id, $expires, $valid->cart_id);
 
     $this->auth->send_auth_cookie($token, $expires);
 
