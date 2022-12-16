@@ -33,20 +33,22 @@ class Newsletter
   public function registerWebhooks() {
     $client= $this->getClient();
 
-    $data= [
-      'url' => $this->webhook_url,
-      'events' => [
-        'subscriber.created',
-        'subscriber.updated',
-        'subscriber.unsubscribed',
-        'subscriber.added_to_group',
-        'subscriber.removed_from_group',
-      ]
+    $events= [
+      'subscriber.created',
+      'subscriber.updated',
+      'subscriber.unsubscribed',
+      'subscriber.added_to_group',
+      'subscriber.removed_from_group',
     ];
 
-    $res= $client->request('POST', 'webhooks', [ 'json' => data ]);
+    foreach ($events as $event) {
+      $data= [
+        'url' => $this->webhook_url . '&event=' . rawurlencode($event),
+        'events' => [ $event ],
+      ];
 
-    $body= $res->getBody();
+      $res= $client->request('POST', 'webhooks', [ 'json' => data ]);
+    }
 
     return json_decode($body);
   }
