@@ -47,7 +47,7 @@ class Newsletter
         'events' => [ $event ],
       ];
 
-      $res= $client->request('POST', 'webhooks', [ 'json' => data ]);
+      $res= $client->request('POST', 'webhooks', [ 'json' => $data ]);
     }
 
     return json_decode($body);
