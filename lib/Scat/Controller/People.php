@@ -589,12 +589,16 @@ class People {
     file_put_contents("{$out}.json", $request->getBody());
     $incoming= json_decode($request->getBody());
 
+    if (!$incoming->subscriber) return;
+
     /* We actually do the same thing for all events for now, just make
      * sure we have this subscriber registered here and associated with
      * their Mailerlite ID. */
     $subscriber= $incoming->subscriber;
 
     error_log("Looking for person by id {$subscriber->id} or email {$subscriber->email}\n");
+
+    if (!$subscriber->id) return;
 
     $person= $this->data->factory('Person')->where('mailerlite_id', $subscriber->id)->find_one();
 
