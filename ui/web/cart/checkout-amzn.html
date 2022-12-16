@@ -68,6 +68,13 @@
       {{ include('cart/shipping-options.twig') }}
     {% endblock %}
 
+    <p class="alert alert-danger">
+      <b>Orders paid using Amazon Pay must be shipped due to Amazon fraud
+      prevention policies.</b> If you would like to pick up your order, <a
+      href="/cart/checkout/set-pickup">click here to continue with a different
+      payment method.</a>
+    </p>
+
     {% if cart.backordered_items() %}
       {{ include ('cart/backorder-warning.twig') }}
     {% endif %}
