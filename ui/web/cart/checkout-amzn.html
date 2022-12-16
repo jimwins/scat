@@ -65,14 +65,15 @@
   <form id="payment-form" class="stacked-form"
         method="POST" action="{{ url_for('pay-amzn') }}">
     {% block shipping_options %}
-      {{ include('cart/shipping-options.twig') }}
+      {{ include('cart/shipping-options.twig', { no_local_delivery: true }) }}
     {% endblock %}
 
     <p class="alert alert-danger">
       <b>Orders paid using Amazon Pay must be shipped due to Amazon fraud
-      prevention policies.</b> If you would like to pick up your order, <a
-      href="/cart/checkout/set-pickup">click here to continue with a different
-      payment method.</a>
+      prevention policies.</b> If you would like to pick up your order or have
+      it delivered with our local delivery service, <a
+      href="/cart/checkout">click here to continue with a different payment
+      method.</a>
     </p>
 
     {% if cart.backordered_items() %}
