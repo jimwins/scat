@@ -100,7 +100,10 @@ class Ordure {
     return $response;
   }
 
-  public function pullSignups(Request $request, Response $response) {
+  public function pullSignups(
+    Request $request, Response $response,
+    \Scat\Service\Newsletter $newsletter,
+  ) {
     $messages= [];
 
     $client= new \GuzzleHttp\Client();
@@ -159,20 +162,7 @@ class Ordure {
 
       if ($update->subscribe) {
         try {
-          $key= $this->config->get('mailerlite.key');
-          $groupsApi= (new \MailerLiteApi\MailerLite($key))->groups();
-
-          $subscriber= [
-            'email' => $person->email,
-            'fields' => [
-              'name' => $person->name,
-            ]
-          ];
-
-          $groupsApi->addSubscriber(
-            $this->config->get('mailerlite.group_id'),
-            $subscriber
-          );
+          $newsletter->signup($person->email, $person->name);
         } catch (\Exception $e) {
           $messages[]= "{$person->id}: Problem with newsletter signup: " . $e->getMessage();
         }
