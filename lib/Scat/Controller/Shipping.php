@@ -310,7 +310,7 @@ class Shipping {
 
         foreach ($tracker->tracking_details as $details) {
           if ($details->status == 'out_for_delivery') {
-            $available_for_pickup= $details->datetime;
+            $out_for_delivery= $details->datetime;
           }
         }
 
