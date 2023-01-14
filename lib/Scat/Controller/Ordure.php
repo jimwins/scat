@@ -331,6 +331,11 @@ class Ordure {
           $txn_line->save();
         }
 
+        /* If we priced anything manually, no rewards. */
+        if ($txn->items()->where('discount_manual', 1)->find_one()) {
+          $txn->no_rewards= 1;
+        }
+
         /* Add shipping item */
         if ($data->sale->shipping != 0) {
           switch ($data->sale->shipping_method) {
