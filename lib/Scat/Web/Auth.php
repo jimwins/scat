@@ -232,6 +232,9 @@ class Auth {
   ) {
     $person= $this->auth->get_person_details($request);
     if (!$person) {
+      if ($request->getParam('email')) {
+        return $this->signupEmailForNewsletter($request, $response, $newsletter);
+      }
       return $response->withRedirect('/login');
     }
 
@@ -242,5 +245,21 @@ class Auth {
     }
 
     return $response->withRedirect('/account?newsletter=1');
+  }
+
+  public function signupEmailForNewsletter(
+    Request $request, Response $response,
+    \Scat\Service\Newsletter $newsletter
+  ) {
+    $email= $request->getParam('email');
+    $name= $request->getParam('name');
+
+    try {
+      $newsletter->signup($email, $name);
+    } catch (\Exception $e) {
+      // do something?
+    }
+
+    return $response->withRedirect('/reward-thanks?subscribe=1');
   }
 }

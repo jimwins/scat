@@ -18,7 +18,23 @@
   </div>
 
 
-  {% if person and not person.subscriptions|length %}
+  {% if not person %}
+    <div class="well">
+      <p>
+        <b>I can't tell if you're signed up for our newsletter!</b>
+        That means you may be missing out on the newest deals and new arrivals.
+        Just mash the button below to fix this. (Don't worry, you can
+        unsubscribe at any time.)
+      </p>
+      <form method="post" action="/account/signup-for-newsletter">
+        <input type="hidden" name="name" value="{{ sale.name }}">
+        <input type="hidden" name="email" value="{{ sale.email }}">
+        <button type="submit" class="button">
+          Sign me up!
+        </button>
+      </form>
+    </div>
+  {% elseif not person.subscriptions|length %}
     <div class="well">
       <p>
         <b>Oh no, it looks like you're not signed up for our newsletter!</b>
