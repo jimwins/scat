@@ -2,7 +2,9 @@
 {% import 'macros.twig' as scat %}
 
 {% block title %}
-  {%- if product -%}
+  {%- if item -%}
+    {{ item.title }}
+  {%- elseif product -%}
     {{ product.name }}
   {%- elseif subdept -%}
     {{ subdept.name }}
