@@ -81,6 +81,7 @@ $q= "CREATE TEMPORARY TABLE report_current
        LEFT JOIN barcode ON item.id = barcode.item_id
        LEFT JOIN product ON product_id = product.id
        LEFT JOIN brand ON product.brand_id = brand.id
+       LEFT JOIN department ON department.id = department_id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
@@ -109,6 +110,7 @@ $q= "CREATE TEMPORARY TABLE report_previous
        LEFT JOIN barcode ON item.id = barcode.item_id
        LEFT JOIN product ON product_id = product.id
        LEFT JOIN brand ON product.brand_id = brand.id
+       LEFT JOIN department ON department.id = department_id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' - INTERVAL 1 YEAR

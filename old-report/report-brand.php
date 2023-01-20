@@ -3,13 +3,13 @@ require '../scat.php';
 require '../lib/item.php';
 
 $sql_criteria= "1=1";
-if (($items= $_REQUEST['items'])) {
+if (($items= @$_REQUEST['items'])) {
   list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'],
                                              FIND_OR|FIND_ALL);
 }
 
-$begin= $_REQUEST['begin'];
-$end= $_REQUEST['end'];
+$begin= @$_REQUEST['begin'];
+$end= @$_REQUEST['end'];
 
 if (!$begin) {
   $begin= date('Y-m-d', time());
@@ -68,7 +68,7 @@ $q= "CREATE TEMPORARY TABLE current
         amount DECIMAL(9,2) NOT NULL,
         KEY (brand_id))
      SELECT
-            item_id, 0 brand_id,
+            item_id, IFNULL(brand.id, 0) brand_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
@@ -76,20 +76,14 @@ $q= "CREATE TEMPORARY TABLE current
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn_id
             JOIN item ON txn_line.item_id = item.id
+       LEFT JOIN product ON product_id = product.id
+       LEFT JOIN brand ON product.brand_id = brand.id
+       LEFT JOIN department ON department.id = product.department_id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' AND '$end' + INTERVAL 1 DAY
         AND item_id IS NOT NULL
       GROUP BY 1";
-
-$db->query($q) or die('Line : ' . __LINE__ . $db->error);
-
-$q= "UPDATE current
-        SET brand_id = IFNULL((SELECT product.brand_id
-                                 FROM item
-                                 JOIN product ON item.product_id = product.id
-                                WHERE item.id = current.item_id),
-                                0)";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
@@ -101,7 +95,7 @@ $q= "CREATE TEMPORARY TABLE previous
         amount DECIMAL(9,2) NOT NULL,
         KEY (brand_id))
      SELECT
-            item_id, 0 brand_id,
+            item_id, IFNULL(brand.id, 0) brand_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
@@ -109,21 +103,15 @@ $q= "CREATE TEMPORARY TABLE previous
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn_id
             JOIN item ON txn_line.item_id = item.id
+       LEFT JOIN product ON product_id = product.id
+       LEFT JOIN brand ON product.brand_id = brand.id
+       LEFT JOIN department ON department.id = product.department_id
       WHERE type = 'customer'
         AND ($sql_criteria)
         AND filled BETWEEN '$begin' - INTERVAL 1 YEAR
                        AND '$end' + INTERVAL 1 DAY - INTERVAL 1 YEAR
         AND item_id IS NOT NULL
       GROUP BY 1";
-
-$db->query($q) or die('Line : ' . __LINE__ . $db->error);
-
-$q= "UPDATE previous
-        SET brand_id = IFNULL((SELECT product.brand_id
-                                 FROM item
-                                 JOIN product ON item.product_id = product.id
-                                WHERE item.id = previous.item_id),
-                                0)";
 
 $db->query($q) or die('Line : ' . __LINE__ . $db->error);
 
