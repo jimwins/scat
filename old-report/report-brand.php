@@ -68,7 +68,7 @@ $q= "CREATE TEMPORARY TABLE current
         amount DECIMAL(9,2) NOT NULL,
         KEY (brand_id))
      SELECT
-            item_id, IFNULL(brand.id, 0) brand_id,
+            txn_line.item_id, IFNULL(brand.id, 0) brand_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
@@ -96,7 +96,7 @@ $q= "CREATE TEMPORARY TABLE previous
         amount DECIMAL(9,2) NOT NULL,
         KEY (brand_id))
      SELECT
-            item_id, IFNULL(brand.id, 0) brand_id,
+            txn_line.item_id, IFNULL(brand.id, 0) brand_id,
             SUM(-1 * allocated) units,
             SUM(-1 * allocated * sale_price(txn_line.retail_price,
                                             txn_line.discount_type,
