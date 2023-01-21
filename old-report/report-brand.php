@@ -76,6 +76,7 @@ $q= "CREATE TEMPORARY TABLE current
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn_id
             JOIN item ON txn_line.item_id = item.id
+       LEFT JOIN barcode ON item.id = barcode.item_id
        LEFT JOIN product ON product_id = product.id
        LEFT JOIN brand ON product.brand_id = brand.id
        LEFT JOIN department ON department.id = product.department_id
@@ -103,6 +104,7 @@ $q= "CREATE TEMPORARY TABLE previous
        FROM txn
        LEFT JOIN txn_line ON txn.id = txn_line.txn_id
             JOIN item ON txn_line.item_id = item.id
+       LEFT JOIN barcode ON item.id = barcode.item_id
        LEFT JOIN product ON product_id = product.id
        LEFT JOIN brand ON product.brand_id = brand.id
        LEFT JOIN department ON department.id = product.department_id
