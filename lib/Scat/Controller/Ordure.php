@@ -44,10 +44,10 @@ class Ordure {
               ->select_expr('(SELECT MIN(purchase_quantity)
                                 FROM vendor_item
                                WHERE item_id = item.id
-                                 AND vendor_id = 7
+                                 AND vendor_id IN (7,3757)
                                  AND vendor_item.active
                                  AND NOT special_order)',
-                            'is_dropshippable')
+                            'is_in_warehouse')
               ->find_many();
 
     /* Second version of this */
@@ -57,7 +57,7 @@ class Ordure {
     $data= "id\tretail_price\tdiscount_type\tdiscount\t".
            "minimum_quantity\tpurchase_quantity\t".
            "stock\tactive\t".
-           "code\tis_dropshippable\r\n";
+           "code\tis_in_warehouse\r\n";
 
     foreach ($items as $item) {
       $data.= $item->id . "\t" .
@@ -69,7 +69,7 @@ class Ordure {
               ($item->stock ?: 'NULL') . "\t" .
               $item->active . "\t" .
               $item->code . "\t" .
-              ($item->is_dropshippable ?: '0') .
+              ($item->is_in_warehouse ?: '0') .
               "\r\n";
     }
 
