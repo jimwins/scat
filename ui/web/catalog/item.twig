@@ -128,16 +128,20 @@ figure img {
         {% else %}
           {% if item.no_backorder %}
             <p class="text-danger" data-toggle="tooltip" title="This item is currently unavailable.">Unavailable</p>
+          {% elseif item.is_in_warehouse %}
+            <p data-toggle="tooltip" title="We don't normally stock this, but we can get it for you in about a week!">Warehouse only</p>
           {% else %}
-            <p data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Out of stock, special order</p>
+            <p data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Special order</p>
           {% endif %}
         {% endif %}
       {% endif %}
     {% else %}
       {% if item.no_backorder or item.no_online_sale %}
         <p data-toggle="tooltip" class="text-danger" title="This item is currently unavailable.">Unavailable</p>
+      {% elseif item.is_in_warehouse %}
+        <p data-toggle="tooltip" title="We don't normally stock this, but we can get it for you in about a week!">Warehouse only</p>
       {% else %}
-        <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Out of stock, special order</span>
+        <p data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Special order</p>
       {% endif %}
     {% endif %}
 
@@ -203,8 +207,9 @@ figure img {
     <details open>
       <summary>Shipping &amp; Returns</summary>
       <p>
-        Most orders of in-stock items ship within two business days, special
-        order or out of stock items usually ship within two weeks.
+        Most orders of in-stock items ship within two business days,
+        "warehouse only" and "out of stock" items usually ship within two
+        weeks, and "special order" items can take four to six weeks.
         <a href="/shipping">Read the full shipping policy.</a>
       </p>
       <p>

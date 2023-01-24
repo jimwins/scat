@@ -133,8 +133,10 @@
             {% else %}
               {% if item.minimum_quantity or item.is_kit %}
                 Out of stock.
+              {% elseif item.is_in_warehouse %}
+                <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you in about two weeks!">Warehouse only</span>
               {% else %}
-                <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Out of stock, special order</span>
+                <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Special order</span>
               {% endif %}
             {% endif %}
           </small>

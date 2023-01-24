@@ -79,8 +79,10 @@
     {% else %}
       {% if i.minimum_quantity %}
         <span class="text-warning">Out of stock</span>
+      {% elseif i.is_in_warehouse %}
+        <span class="text-warning" data-toggle="tooltip" title="We don't normally stock this, but we can get it for you in about a week!">Warehouse only</span>
       {% else %}
-        <span class="text-danger">Out of stock, special order</span>
+        <span class="text-danger" data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Special order</span>
       {% endif %}
     {% endif %}
   </td>
