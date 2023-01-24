@@ -113,7 +113,7 @@ class Catalog {
               (id, retail_price, @discount_type, @discount,
                minimum_quantity, purchase_quantity,
                @stock, active,
-               @code, @is_dropshippable)
+               @code, is_in_warehouse)
                  SET discount_type = IF(@discount_type = 'NULL', NULL,
                                         @discount_type),
                      discount = IF(@discount = 'NULL', NULL, @discount),
