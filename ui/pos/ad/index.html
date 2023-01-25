@@ -62,14 +62,22 @@
   {{ block('pager') }}
 
   {% if ads|length %}
-    <div class="row">
+    <style>
+      .adgrid .col-sm-3:nth-child(4n+1) {
+        clear: left;
+      }
+    </style>
+    <div class="row adgrid">
       {% for ad in ads %}
-        <div class="col-sm-3">
+        <div class="col-sm-3" {{ not ad.active ? 'style="opacity: 50%"' }}>
+          <div class="pull-right" style="margin-right: 1em; margin-top: 1em">
+            <button data-id="{{ ad.id }}" data-action="edit-ad"
+                    class="btn btn-default btn-xs">
+              <i class="fa fa-edit"></i>
+              <span class="sr-only">Edit</span>
+            </button>
+          </div>
           {{ include('ad.twig', { ad: ad }) }}
-          <button data-id="{{ ad.id }}" data-action="edit-ad"
-                  class="btn btn-default btn-xs btn-block">
-            <i class="fa fa-edit"></i> Edit
-          </button>
         </div>
       {% endfor %}
     </div>
