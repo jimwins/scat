@@ -49,6 +49,9 @@
         <tr valign="top">
           <td>
             <a href="{{ sale.uuid }}">{{ '%07d'|format(sale.id) }}</a>
+            <a href="/cart?uuid={{ sale.uuid }}" onclick="return false">
+              {{ bootstrap_icon('cart') }}
+            </a>
           </td>
           <td nowrap>
             {{ sale.created|date('M j H:i') }}
