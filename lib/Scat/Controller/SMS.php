@@ -77,7 +77,7 @@ class SMS {
 
     $payload= $request->getParam('payload');
 
-    if (strtolower($payload['phone']) == 'help') {
+    if (strtolower($payload['message']) == 'help') {
       $message= $config->get('rewards.help_message');
       $this->phone->sendSMS($payload['from_did'], $message);
       return $response;
