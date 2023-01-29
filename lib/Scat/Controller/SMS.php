@@ -112,7 +112,6 @@ class SMS {
       $person->save();
       $message= $config->get('rewards.stop_message');
       $this->phone->sendSMS($person->loyalty_number, $message);
-      $this->phone->sendSMS($person->loyalty_number, $compliance);
       break;
 
     default:
