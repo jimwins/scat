@@ -159,8 +159,8 @@ class Person extends \Scat\Model {
         $phone= $GLOBALS['container']->get(\Scat\Service\Phone::class);
         $message= $config->get('rewards.signup_message');
         $compliance= 'Reply STOP to unsubscribe or HELP for help. 6 msgs per month, Msg&Data rates may apply.';
-        $phone->sendSMS($this->loyalty_number, $message);
-        $phone->sendSMS($this->loyalty_number, $compliance);
+        //$phone->sendSMS($this->loyalty_number, $message);
+        //$phone->sendSMS($this->loyalty_number, $compliance);
       }
       $this->$name= $value;
     }
