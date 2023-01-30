@@ -140,6 +140,17 @@ class Catalog {
     ])->withHeader('Content-type', 'text/xml;charset=UTF-8');
   }
 
+  public function wordforms(Request $request, Response $response) {
+    $wordforms= $this->data->Factory('Wordform')->find_many();
+
+    $body= $response->getBody();
+    foreach ($wordforms as $wordform) {
+      $body->write($wordform->source . ' => ' . $wordform->dest . "\n");
+    }
+    return $response->withHeader('Content-type', 'text/plain;charset=UTF-8');
+  }
+
+
   public function status(Request $request, Response $response) {
     $file= '/tmp/last-loaded-prices';
     if (file_exists($file) &&
