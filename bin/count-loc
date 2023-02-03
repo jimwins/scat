@@ -1,5 +1,11 @@
 #!/bin/sh
-find api app css db js lib old-report print scat.php static ui \
+
+dirs=$1
+if [ -z "$dirs" ]; then
+  dirs="api app css db js lib old-report print scat.php static ui"
+fi
+
+find $dirs \
   -type f \
   -not -name '*.png' \
   -not -name '*.svg' \
