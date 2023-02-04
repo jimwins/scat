@@ -593,31 +593,27 @@ class People {
 
     $incoming= json_decode($request->getBody());
 
-    if (!$incoming->subscriber) return $response->withJson([ 'message' => 'Ignored.']);
+    if (!$incoming->email) return $response->withJson([ 'message' => 'Ignored.']);
 
     /* We actually do the same thing for all events for now, just make
      * sure we have this subscriber registered here and associated with
      * their Mailerlite ID. */
-    $subscriber= $incoming->subscriber;
+    error_log("Looking for person by id {$incoming->id} or email {$incoming->email}\n");
 
-    error_log("Looking for person by id {$subscriber->id} or email {$subscriber->email}\n");
-
-    if (!$subscriber->id) return $response->withJson([ 'message' => 'Ignored.' ]);
-
-    $person= $this->data->factory('Person')->where('mailerlite_id', $subscriber->id)->find_one();
+    $person= $this->data->factory('Person')->where('mailerlite_id', $incoming->id)->find_one();
 
     if (!$person) {
-      $person= $this->data->factory('Person')->where('email', $subscriber->email)->find_one();
+      $person= $this->data->factory('Person')->where('email', $incoming->email)->find_one();
     }
 
     if (!$person) {
       error_log("Not found, creating a new person");
       $person= $this->data->factory('Person')->create();
-      $person->name= $subscriber->name;
-      $person->email= $subscriber->email;
+      $person->name= $incoming->fields->name;
+      $person->email= $incoming->email;
     }
 
-    $person->mailerlite_id= $subscriber->id;
+    $person->mailerlite_id= $incoming->id;
 
     $person->save();
 
