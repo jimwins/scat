@@ -29,6 +29,8 @@ class Contact {
       throw new \Exception("Sorry, you must provide a valid email address.");
     }
 
+    $donation= (int)$request->getParam('donation');
+
     $name= trim($request->getParam('name'));
     $ip= $request->getAttribute('ip_address');
 
@@ -78,6 +80,7 @@ class Contact {
       'subject' => $subject,
       'message' => $message,
       'ip' => $ip,
+      'request' => $request->getParams(),
     ]);
 
     /* We are sending mail to ourselves, but we set the Reply-To */
@@ -85,6 +88,8 @@ class Contact {
 
     $this->email->send($to, $subject, $body, NULL, [ 'replyTo' => $email, 'no_bcc' => true ]);
 
-    return $response->withRedirect('/contact/thanks');
+    $dest= $donation ? '/contact/donation-request-received' : '/contact/thanks';
+
+    return $response->withRedirect($dest);
   }
 }

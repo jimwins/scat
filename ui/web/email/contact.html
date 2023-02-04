@@ -7,6 +7,23 @@
 {% block content_top %}
   <p>{{ message }}</p>
 
+  {% if request.donation %}
+    <dl>
+      <dt>Organization</dt>
+      <dd>{{ request.organization }}</dd>
+      <dt>Website</dt>
+      <dd>{{ request.website }}</dd>
+      <dt>Type of support</dt>
+      <dd>{{ request.type_of_support }}</dd>
+      <dt>Needed by</dt>
+      <dd>{{ request.needed_by }}</dd>
+      <dt>Who benefits</dt>
+      <dd>{{ request.benefit }}</dd>
+      <dt>Acknowledgement</dt>
+      <dd>{{ request.how_ack }}</dd>
+    </dl>
+  {% endif %}
+
   <hr>
 {% endblock %}
 
