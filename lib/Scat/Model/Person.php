@@ -674,26 +674,31 @@ class Person extends \Scat\Model {
     // XXX There must be a better way to get this.
     $config= $GLOBALS['container']->get(\Scat\Service\Config::class);
 
-    $client= new \GuzzleHttp\Client();
+    try {
+      $client= new \GuzzleHttp\Client();
 
-    $url= "https://api.mailerlite.com/api/v2" .
-          "/subscribers/{$this->email}/groups";
+      $url= "https://api.mailerlite.com/api/v2" .
+            "/subscribers/{$this->email}/groups";
 
-    $res= $client->request('GET', $url, [
-                            //'debug' => true,
-                            'headers' => [
-                              'X-MailerLite-ApiKey' =>
-                                $config->get("mailerlite.key")
-                            ],
-                          ]);
+      $res= $client->request('GET', $url, [
+                              //'debug' => true,
+                              'headers' => [
+                                'X-MailerLite-ApiKey' =>
+                                  $config->get("mailerlite.key")
+                              ],
+                            ]);
 
-    $data= json_decode($res->getBody());
+      $data= json_decode($res->getBody());
 
-    $groups= array_map(function($group) {
-      return [ 'id' => $group->id, 'name' => $group->name ];
-    }, $data);
+      $groups= array_map(function($group) {
+        return [ 'id' => $group->id, 'name' => $group->name ];
+      }, $data);
 
-    $this->subscriptions($groups);
+      $this->subscriptions($groups);
+    } catch (\Exception $e) {
+      // log and go on with our life
+      error_log("Exception: " . $e->getMessage());
+    }
   }
 
   public function store_credit() {
