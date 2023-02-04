@@ -1,0 +1,26 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title -%}
+  Internal Ads @ Raw Materials Art Supplies
+{%- endblock %}
+
+{% block content %}
+  <h1 class="page_title">Internal Ads</h1>
+
+  <h2>Hero Ads</h2>
+
+  <div class="smol-grid">
+    {% for ad in heros %}
+      {{ include('ad.twig') }}
+    {% endfor %}
+  </div>
+
+  <h2>Basic Ads</h2>
+
+  <div class="smol-grid">
+    {% for ad in basics %}
+      {{ include('ad.twig') }}
+    {% endfor %}
+  </div>
+{% endblock %}

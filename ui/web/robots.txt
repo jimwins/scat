@@ -11,3 +11,5 @@ Disallow: /cart
 Disallow: /cart/
 Disallow: /account
 Disallow: /account/
+Disallow: /back
+Disallow: /back/

@@ -297,6 +297,8 @@ $app->any('/~webhook/{name:.*}',
 $app->post('/update-pricing', [ \Scat\Web\Catalog::class, 'updatePricing' ]);
 $app->post('/~grab-image', [ \Scat\Web\Catalog::class, 'grabImage' ]);
 
+$app->get('/backroom/ad', [ \Scat\Web\Backroom::class, 'showAds' ]);
+
 /* Info (DEBUG only) */
 if ($DEBUG) {
   $app->get('/info',
