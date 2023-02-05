@@ -10,17 +10,21 @@
 
   <h2>Hero Ads</h2>
 
-  <div class="smol-grid">
+  <div style="white-space: nowrap">
     {% for ad in heros %}
-      {{ include('ad.twig') }}
+      <div style="width: 75vw; white-space: normal; display: inline-block; margin-right: 2em">
+        {{ include('ad.twig') }}
+      </div>
     {% endfor %}
   </div>
 
   <h2>Basic Ads</h2>
 
-  <div class="smol-grid">
+  <div style="white-space: nowrap">
     {% for ad in basics %}
-      {{ include('ad.twig') }}
+      <div style="width: 25vw; white-space: normal; display: inline-block; margin-right: 2em">
+        {{ include('ad.twig') }}
+      </div>
     {% endfor %}
   </div>
 {% endblock %}
