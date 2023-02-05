@@ -10,7 +10,7 @@
 
   <h2>Hero Ads</h2>
 
-  <div style="white-space: nowrap">
+  <div style="white-space: nowrap; overflow: scroll">
     {% for ad in heros %}
       <div style="width: 75vw; white-space: normal; display: inline-block; margin-right: 2em; vertical-align: top">
         {{ include('ad.twig') }}
@@ -20,7 +20,7 @@
 
   <h2>Basic Ads</h2>
 
-  <div style="white-space: nowrap">
+  <div style="white-space: nowrap; overflow: scroll">
     {% for ad in basics %}
       <div style="width: 25vw; white-space: normal; display: inline-block; margin-right: 2em; vertical-align: top">
         {{ include('ad.twig') }}
