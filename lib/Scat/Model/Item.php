@@ -31,6 +31,8 @@ class Item extends \Scat\Model {
         $ret[]= "Sewn Binding"; break;
       case 'SH':
         $ret[]= "Unbound"; break;
+      case 'BL':
+        $ret[]= "Block"; break;
       default:
         error_log("Can't explain binding {$m[2]}");
     }
