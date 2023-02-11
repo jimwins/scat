@@ -20,9 +20,11 @@
   {% if message %}
     <p>We were asked to pass along this message with the card:</p>
 
-    <blockquote>
-      {{ message }}
-    </blockquote>
+    <p>
+      <blockquote>
+        {{ message|nl2br }}
+      </blockquote>
+    </p>
   {% endif %}
 
   <p>Thanks!</p>
