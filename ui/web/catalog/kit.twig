@@ -1,12 +1,23 @@
 {% import 'macros.twig' as scat %}
 
 <h2>{{ kit.name }}</h2>
-<h4>Total Value: {{ scat.amount(kit.retail_price) }}</h4>
-<h4>Your Price: {{ scat.amount(kit.sale_price) }}</h4>
+
+<div style="float:right; margin-left: 1em; width: 40%" class="alert alert-warning">
+  We will substitute equivalent items from a different manufacturer for out of
+  stock items as necessary.
+</div>
 
 <p>
-  {{ include('add-to-cart.twig', { item: kit, button_size: '', fixed_quantity: 1 }) }}
+  This kit contains items with a total retail value of {{ scat.amount(kit.retail_price) }}.
 </p>
+
+<h3>Our Price <span class="text-primary">{{ scat.amount(kit.sale_price) }}</span></h3>
+
+<p>
+  {{ include('add-to-cart.twig', { item: kit, button_size: '', fixed_quantity: 1, no_add_to_wishlist: 1 }) }}
+</p>
+
+<h3>Kit Contents</h3>
 
 <div class="well">
   <table style="width: 100%">
@@ -20,7 +31,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for kit_item in kit.kit_items.find_many() %}
+      {% for kit_item in kit.kit_items.find_many()|sort((b,a) => b.item.code <=> a.item.code) %}
         {% set item= kit_item.item %}
         <tr>
           <td><a href="/{{ item.code }}">{{ item.code }}</a></td>

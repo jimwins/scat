@@ -414,6 +414,7 @@ hr {
   display: table;
 }
 
+.text-primary { color: var(--primary-color) }
 .text-success { color: #3d9970; /* olive */ }
 .text-important { color: #0038d9; /* blue */ }
 .text-muted { color: #555; /* dark gray */ }
