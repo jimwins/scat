@@ -475,7 +475,7 @@
     let addItemById= (item_id) => {
       let status= document.querySelector('[data-txn-id]').getAttribute('data-status')
       // add or allocate?
-      if (status == 'waitingforitems') {
+      if (['waitingforitems', 'shipping', 'shipped'].includes(status)) {
         let line= document.querySelector('[data-item-id="' + item_id + '"]')
         if (!line) {
           scat.alert('danger', 'No such item found.')
