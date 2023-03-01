@@ -16,7 +16,7 @@ $q= "UPDATE item, vendor_item, product, brand
         SET item.retail_price = vendor_item.retail_price
      WHERE item.id = vendor_item.item_id
        AND vendor_id = $vendor
-       AND item.product_id = item.id
+       AND item.product_id = product.id
        AND product.brand_id = brand.id
        AND $sql_criteria
        AND item.active AND vendor_item.active";
