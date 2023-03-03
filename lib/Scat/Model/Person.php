@@ -452,6 +452,34 @@ class Person extends \Scat\Model {
 
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load PA Dist data file");
+    } elseif (preg_match('/^Brand[,\t]/', $line)) {
+      /* PA Dist */
+#Brand	Qty	ItemNum	UM	SMIN	CustomerPrice	Retail	ItemDesc	UPC
+      error_log("Importing '$fn' as PA Distribution price list\n");
+      $sep= preg_match("/\t/", $line) ? "\t" : ",";
+      $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+                INTO TABLE vendor_upload
+              FIELDS TERMINATED BY '$sep'
+              OPTIONALLY ENCLOSED BY '\"'
+               LINES TERMINATED BY '\r\n'
+              IGNORE 1 LINES
+              (@brand, @qty, vendor_sku, @uom, purchase_quantity,
+              @net_price, @retail_price, name, @barcode)
+              SET code = vendor_sku,
+                  barcode = IF(@barcode != 'N/A', @barcode, ''),
+                  retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
+                  net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', '')
+              ";
+
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to load PA Dist data file");
+
+      // toss junk from header lines
+      $q= "DELETE FROM vendor_upload WHERE purchase_quantity = 0";
+
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to load PA Dist data file");
+    } elseif (preg_match('/^golden/', $line)) {
     } elseif (preg_match('/^golden/', $line)) {
       /* Golden */
       error_log("Importing '$fn' as Golden price list\n");
