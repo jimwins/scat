@@ -208,7 +208,22 @@ class Transactions {
       $new->save();
     }
 
-    /* We don't copy notes or payments. */
+    /* The only payments we copy were loyalty rewards. */
+    foreach ($orig->payments()->find_many() as $payment) {
+      if ($payment->method != 'loyalty') continue;
+
+      $new= $sale->payments()->create();
+      $data= $payment->as_array();
+      unset($data['id']); // don't copy id
+      // flip some values
+      $data['amount']= -$data['amount'];
+      $new->set($data);
+      $new->data($line->data()); // XXX fix data() magic
+      $new->txn_id= $sale->id;
+      $new->save();
+    }
+
+    /* We don't copy notes. */
 
     $this->data->commit();
 

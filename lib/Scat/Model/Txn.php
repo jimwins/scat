@@ -825,7 +825,7 @@ class Txn extends \Scat\Model {
                 {$this->person_id} person_id,
                 NOW() processed,
                 'Used for purchase' note,
-                -1 * JSON_EXTRACT(CONVERT(data USING utf8mb4), '$.cost')
+                IF(amount > 0, -1, 1) * JSON_EXTRACT(CONVERT(data USING utf8mb4), '$.cost')
                   points
            FROM payment
           WHERE txn_id = {$this->id}
