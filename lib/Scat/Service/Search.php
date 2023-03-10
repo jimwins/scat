@@ -10,11 +10,7 @@ class Search
   public function __construct(Config $config, Data $data) {
     $this->data= $data;
 
-    $dsn= $config->get('search.dsn');
-
-    if (!$dsn) {
-      throw new \Exception("Unable to find DSN for search");
-    }
+    $dsn= $config->get('search.dsn') ?? 'mysql:host=search;port=9306';
 
     $username= $config->get('search.username');
     $password= $config->get('search.password');

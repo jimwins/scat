@@ -48,7 +48,8 @@ services:
     ports:
       - 5080:80
     volumes:
-      - ./pos:/var/www/html/
+      - .:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
 
 volumes:
   data:

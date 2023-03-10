@@ -41,7 +41,17 @@ $container= $builder->build();
 /* Hook up the data service, but not lazily because we rely on side-effects */
 $container->set('data', new \Scat\Service\Data($config['data']));
 
-$container->set('config', new \Scat\Service\Config($container->get('data')));
+try {
+  $container->set('config', new \Scat\Service\Config($container->get('data')));
+} catch (\PDOException $ex) {
+  if ($ex->getCode() == '42S02') {
+    header("Location: /setup.php");
+    exit;
+  }
+
+  // Not what we expected? just re-throw so we barf all over the place
+  throw $ex;
+}
 
 $app= \DI\Bridge\Slim\Bridge::create($container);
 
