@@ -16,10 +16,12 @@
     </button>
 
     {% if txn.due > 0 %}
-      <button type="button" class="btn btn-primary btn-lg btn-block"
-              data-action="choose-pay-method" data-method="credit">
-        Credit Card
-      </button>
+      {% if constant('DEJAVOO_URL') is defined %}
+        <button type="button" class="btn btn-primary btn-lg btn-block"
+                data-action="choose-pay-method" data-method="credit">
+          Credit Card
+        </button>
+      {% endif %}
 
       {% if txn.person_id and txn.person.giftcard_id and
             txn.person.store_credit.balance > 0 %}
