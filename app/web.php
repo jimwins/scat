@@ -8,7 +8,7 @@ use \Respect\Validation\Validator as v;
 use \Slim\Routing\RouteCollectorProxy as RouteCollectorProxy;
 
 /* Some defaults */
-error_reporting(E_ALL);
+error_reporting(E_ALL ^ E_DEPRECATED);
 $tz= @$_ENV['PHP_TIMEZONE'] ?: @$_ENV['TZ'];
 if ($tz) date_default_timezone_set($tz);
 bcscale(2);
@@ -27,6 +27,11 @@ if (file_exists($config_file)) {
       ],
     ],
   ];
+}
+
+/* Turn deprecation notices back on in debug mode */
+if ($DEBUG) {
+  error_reporting(E_ALL);
 }
 
 $builder= new \DI\ContainerBuilder();
