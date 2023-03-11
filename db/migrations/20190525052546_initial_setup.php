@@ -584,7 +584,7 @@ class InitialSetup extends AbstractMigration
                       'limit' => MysqlAdapter::INT_TINY,
                       'default' => 0,
                     ])
-        ->addColumn('tax_free', 'integer', [
+        ->addColumn('taxfree', 'integer', [
                       'limit' => MysqlAdapter::INT_TINY,
                       'default' => 0,
                     ])
