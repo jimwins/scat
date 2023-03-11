@@ -15,7 +15,7 @@ services:
     restart: always
 
   db:
-    image: mysql:8.0.16
+    image: mysql:8.0.32
     env_file:
       - sample.env
     # old password auth so sphinx can access it
@@ -28,7 +28,7 @@ services:
     restart: always
 
   search:
-    image: macbre/sphinxsearch:3.2.1
+    image: macbre/sphinxsearch:3.4.1
     links:
       - db
     expose:
