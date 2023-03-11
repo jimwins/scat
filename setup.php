@@ -33,16 +33,46 @@ $error= $wrap->getExitCode() > 0;
 
 header('Content-Type: text/html', true, $error ? 500 : 200);
 ?>
-<p>
-  <a href="setup.php?command=migrate">setup / migrate</a>
-  <a href="setup.php?command=init">init config</a>
-</p>
-<?php
-echo '<pre>';
-if ($debug) {
-  // Show what command was executed based on request parameters.
-  $args = implode(', ', [var_export($env, true), var_export($target, true)]);
-  echo "DEBUG: $command($args)" . PHP_EOL . PHP_EOL;
-}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Scat Setup</title>
+    <link rel="stylesheet" href="/static/css/web.css">
+  </head>
+  <body>
+    <h1 class="page-header">
+      Scat Setup
+    </h1>
+    <p class="lead">
+      Scat is a web-based Point-of-Sale (POS) system.
+    </p>
+    <p>
+      This is a very blunt-edged tool to set up the database (using Phinx) and
+      populate the database with test data. If you find yourself here, it
+      probably means that Scat was unable to connect to its database or find
+      its configuration data.
+    </p>
+    <p>
+      <a class="button" href="setup.php?command=migrate">
+        <span class="label">Set up the database</span>
+      </a>
+      <?php if ($command != 'status') {?>
+        <a href="/" class="button">Return to Scat</a>
+      <?php }?>
+    </p>
+    <h2>Phinx Output</h2>
+    <hr>
+    <pre>
+      <?php
+        echo '<pre>';
+        if ($debug) {
+          // Show what command was executed based on request parameters.
+          $args = implode(', ', [var_export($env, true), var_export($target, true)]);
+          echo "DEBUG: $command($args)" . PHP_EOL . PHP_EOL;
+        }
 
-echo $output;
+        echo $output;
+      ?>
+    </pre>
+  </body>
+</html>
