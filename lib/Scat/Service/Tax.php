@@ -11,7 +11,7 @@ class Tax
   public function __construct(Config $config) {
     $this->apiLoginID= $config->get('taxcloud.id');
     $this->apiKey= $config->get('taxcloud.key');
-    $this->default_rate= $config->get('tax.default_rate');
+    $this->default_rate= $config->get('tax.default_rate') ?? 0.00;
   }
 
   /* Very simple wrapper that builds the URL, merges in the API credentials,
