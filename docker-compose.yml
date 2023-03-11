@@ -47,6 +47,7 @@ services:
       - php-fpm
     ports:
       - 5080:80
+      - 5090:90
     volumes:
       - .:/var/www/html
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
