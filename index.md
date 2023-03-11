@@ -6,6 +6,15 @@ It is currently a very rough work-in-progress and not suitable for use by anyone
 
 ### Current Status
 
-I am working on making it possible to start and run this using the provided `docker-compose.yml`. Once that is done, work will continue on cleaning up the systems, removing dependencies on services that can be made optional, and otherwise making it possible that someone else could use it.
+Using the included `docker-compose.yml`, it's possible to get this up and running and maybe sort of working, at least enough to poke around. The steps:
+
+* clone the repository
+* `docker-compose up`
+* connect to `http://localhost:5080` (or the server name if it's not running on your local machine)
+* click the "Set up the database" button
+* click the "Return to Scat" button
+* start poking around
+
+Work will continue on cleaning up the systems, removing dependencies on services that can be made optional, and otherwise making it possible that someone else could use it.
 
 You can [read various blog posts about its development](https://trainedmonkey.com/tag/scat).
