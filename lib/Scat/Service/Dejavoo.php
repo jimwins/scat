@@ -5,8 +5,9 @@ require '../extern/cryptor.php';
 
 // TODO push this into class so it can get key from config service
 function include_encrypted($file) {
+  if (!defined('SCAT_ENCRYPTION_KEY')) return;
   $enc= file_get_contents($file);
-  $dec= \Cryptor::Decrypt($enc, SCAT_ENCRYPTION_KEY);
+  $dec= \Cryptor::Decrypt($enc, constant('SCAT_ENCRYPTION_KEY'));
   eval('?>' . $dec);
 }
 
