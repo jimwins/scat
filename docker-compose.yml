@@ -10,7 +10,7 @@ services:
     env_file:
       - sample.env
     volumes:
-      - .:/app
+#      - .:/app
       - ./php-fpm-extra.conf:/usr/local/etc/php-fpm.d/php-fpm-extra.conf
     restart: always
 
