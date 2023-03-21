@@ -390,6 +390,7 @@ class Quickbooks {
         /* Mark corrections complete */
         if ($txn->type == 'correction') {
           $txn->status= 'complete';
+          $txn->set_expr('filled', 'NOW()');
         }
         $txn->save();
         $success[]= $res->Id;
