@@ -102,6 +102,8 @@ class Till {
     $this->data->beginTransaction();
 
     $txn= $this->txn->create('drawer');
+    $txn->filled= $txn->created;
+    $txn->status= 'complete';
 
     $payment= $txn->payments()->create();
     $payment->txn_id= $txn->id;
@@ -117,6 +119,8 @@ class Till {
     $note->content= $reason;
 
     $note->save();
+
+    $txn->save();
 
     $this->data->commit();
 
