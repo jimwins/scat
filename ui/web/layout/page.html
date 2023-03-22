@@ -271,6 +271,17 @@
       button.addEventListener('click', togglePanel);
     })
 
+    document.getElementById('site-about').addEventListener('toggle', (ev) => {
+      if (ev.target.open) {
+        if (window.dataLayer) {
+          window.dataLayer.push(
+            'event', 'conversion',
+            { 'send_to': 'AW-1037436901/ZEbMCJu5qZMYEOWP2O4D' }
+          )
+        }
+      }
+    })
+
     window.getCookie= function(name) {
       var match= document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
       if (match) return decodeURIComponent(match[2]);
