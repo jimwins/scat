@@ -46,6 +46,16 @@ class Product extends \Scat\Model {
                 ->count();
   }
 
+  public function is_in_warehouse() {
+    foreach ($this->items()->find_many() as $item) {
+      if (!$item->is_in_warehouse()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+
   public function last_inventoried() {
     return $this->has_many('Item')
                 ->where_gte('item.active', 1)

@@ -668,6 +668,14 @@ class Item extends \Scat\Model {
                 ->count();
   }
 
+  public function is_in_warehouse() {
+    if (isset($this->is_in_warehouse)) return $this->is_in_warehouse;
+
+    return $this->vendor_items()
+                ->where_in('vendor_id', [ 7, 3757 ])
+                ->count();
+  }
+
 }
 
 class Barcode extends \Scat\Model {

@@ -67,7 +67,11 @@
         {% if not p.stocked %}
           <small class="pull-right">
             {{ bootstrap_icon('postcard') }}
-            Special Order Only
+            {% if p.is_in_warehouse %}
+              Warehouse Only
+            {% else %}
+              Special Order Only
+            {% endif %}
           </small>
         {% endif %}
       </h2>
