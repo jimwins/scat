@@ -668,11 +668,6 @@ class Item extends \Scat\Model {
                 ->count();
   }
 
-  /* XXX remove when we add description to item */
-  public function description() {
-    return null;
-  }
-
 }
 
 class Barcode extends \Scat\Model {
