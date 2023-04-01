@@ -15,6 +15,24 @@
   {%- endif -%}
 {% endblock %}
 
+{% block extra_header %}
+  <meta property="og:site_name" content="Raw Materials Art Supplies" />
+  <meta property="og:title" content="{{ block('title') | e('html_attr') }}" />
+  {% if product and not item %}
+    <meta property="og:description" content="{{ product.description | e('html_attr') }}" />
+    {% set media = product.media %}
+    {% if media is not empty %}
+      <meta property="og:image" content="{{ media[0].medium }}" />
+    {% endif %}
+  {% elseif item %}
+    <meta property="og:description" content="{{ item.description ?? product.description | e('html_attr') }}" />
+    {% set media = item.media %}
+    {% if media is not empty %}
+      <meta property="og:image" content="{{ media[0].medium }}" />
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 
   <style>
