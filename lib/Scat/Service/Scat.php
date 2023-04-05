@@ -11,7 +11,7 @@ class Scat
 
   protected function getClient() {
     return new \GuzzleHttp\Client([
-      'timeout' => 2,
+      'timeout' => 10,
       'connect_timeout' => 2,
     ]);
   }
