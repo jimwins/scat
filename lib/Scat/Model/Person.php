@@ -479,7 +479,33 @@ class Person extends \Scat\Model {
 
       if (!$this->orm->raw_execute($q))
         throw new \Exception("Unable to load PA Dist data file");
-    } elseif (preg_match('/^golden/', $line)) {
+    } elseif (preg_match('/^SKU[\t,]UPC/', $line, $m)) {
+      $sep= preg_match("/\t/", $line) ? "\t" : ",";
+      // Notions
+#SKU	UPC	Retail Price	Wholesale Price	Quantity Available	Description	Brand	Minimum Sell	Case Pack	Freight Collect
+      error_log("Importing '$fn' as Notions price list\n");
+      $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+                INTO TABLE vendor_upload
+              FIELDS TERMINATED BY '$sep'
+              OPTIONALLY ENCLOSED BY '\"'
+               LINES TERMINATED BY '\r\n'
+              IGNORE 1 LINES
+              (vendor_sku, barcode, @retail_price, @net_price, @stock,
+               name, @brand, purchase_quantity, @case_pack, @freight_collect)
+              SET code = vendor_sku,
+                  retail_price = REPLACE(REPLACE(@retail_price, ',', ''), '$', ''),
+                  net_price = REPLACE(REPLACE(@net_price, ',', ''), '$', '')
+              ";
+
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to load Notions data file");
+
+      // toss junk from header lines
+      $q= "DELETE FROM vendor_upload WHERE purchase_quantity = 0";
+
+      if (!$this->orm->raw_execute($q))
+        throw new \Exception("Unable to load Notions data file");
+
     } elseif (preg_match('/^golden/', $line)) {
       /* Golden */
       error_log("Importing '$fn' as Golden price list\n");
