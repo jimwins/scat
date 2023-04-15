@@ -1239,6 +1239,9 @@ class Transactions {
       break;
 
     case 'loyalty':
+      if ($txn->payments()->where('method', 'loyalty')->count()) {
+        throw new \Exception("Can only use one loyalty reward at a time.");
+      }
       $id= $request->getParam('reward_id');
       $data= $this->data->factory('LoyaltyReward')->find_one($id);
       $amount= -$data->item()->retail_price;
