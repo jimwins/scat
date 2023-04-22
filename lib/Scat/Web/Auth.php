@@ -204,7 +204,7 @@ class Auth {
 
     $signups=
       $this->data->factory('Signup')->where('processed', 0)->find_many();
-    return $response->withJson($signups);
+    return $response->withHeader('Cache-control', 'private')->withJson($signups);
   }
 
   public function markSignupProcessed(Request $request, Response $response)
