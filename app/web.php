@@ -250,7 +250,7 @@ $app->group('/track', function (RouteCollectorProxy $app) {
       $uri= 'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=' . $code;
       return $response->withRedirect($uri);
     case 'ontrac':
-      $uri= 'http://www.ontrac.com/trackingres.asp?tracking_number=' . $code;
+      $uri= 'https://www.ontrac.com/tracking/?number=' . $code;
       return $response->withRedirect($uri);
     case 'fedex':
       $uri= 'https://www.fedex.com/apps/fedextrack/?cntry_code=us&tracknumbers=' . $code;
