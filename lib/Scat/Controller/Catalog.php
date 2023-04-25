@@ -1196,7 +1196,7 @@ class Catalog {
     $fields= [
       'id', 'title', 'description', 'rich_text_description',
       'availability', 'condition', 'price', 'sale_price',
-      'link', 'image_link', 'additional_image_link',
+      'link', 'link_template', 'image_link', 'additional_image_link',
       'brand', 'gtin', 'mpn',
       'color', 'size',
       'item_group_id',
@@ -1245,6 +1245,11 @@ class Catalog {
         $box= null;
       }
 
+      $link=
+        ($item->siblings > 1 ?
+         $ordure_url . '/art-supplies/' . $product->full_slug() . '/' . $item->code :
+         $ordure_url . '/art-supplies/' . $product->full_slug());
+
       $record= [
         $item->code,
         $item->title(),
@@ -1254,6 +1259,8 @@ class Catalog {
         'new',
         $item->retail_price . ' USD',
         $item->sale_price() . ' USD',
+        $link,
+        $link . '?store={store_code}',
         ($item->siblings > 1 ?
          $ordure_url . '/art-supplies/' . $product->full_slug() . '/' . $item->code :
          $ordure_url . '/art-supplies/' . $product->full_slug()),
