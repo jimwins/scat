@@ -91,6 +91,7 @@ class Person extends \Scat\Model {
                    OR person.email LIKE '%$term%'
                    OR person.loyalty_number LIKE '%$term%'
                    OR person.phone LIKE '%$term%'
+                   OR person.instagram LIKE '%$term%'
                    OR person.notes LIKE '%$term%')";
       }
     }
