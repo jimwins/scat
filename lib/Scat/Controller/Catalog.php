@@ -1261,9 +1261,6 @@ class Catalog {
         $item->sale_price() . ' USD',
         $link,
         $link . '?store={store_code}',
-        ($item->siblings > 1 ?
-         $ordure_url . '/art-supplies/' . $product->full_slug() . '/' . $item->code :
-         $ordure_url . '/art-supplies/' . $product->full_slug()),
         $image,
         '',#'additional_image_link',
         $product->brand()->name,
