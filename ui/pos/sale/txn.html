@@ -467,6 +467,14 @@
         {{ txn.type == 'customer' ? 'Customer' : 'Vendor' }}
       </h3>
 
+      {% if txn.person.instagram %}
+        <a class="btn btn-default btn-sm pull-right"
+           href="https://www.instagram.com/{{ txn.person.instagram | trim('@','left') }}/"
+           target="_blank">
+          <i class="fa fa-instagram"></i>
+        </a>
+      {% endif %}
+
       <a data-action="edit-person" data-id="{{ txn.person_id }}">
         {{ txn.person.friendly_name ?: 'Anonymous' }}
         {% if txn.person and txn.person.store_credit.balance > 0 %}
