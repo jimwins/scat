@@ -151,6 +151,13 @@
           <div class="form-group">
             <label for="instagram" class="col-sm-2 control-label">
               Instagram
+              {% if person.instagram %}
+                <a class="btn btn-default btn-xs"
+                   href="https://www.instagram.com/{{ person.instagram | trim('@','left') }}/"
+                   target="_blank">
+                  <i class="fa fa-instagram"></i>
+                </a>
+              {% endif %}
             </label>
             <div class="col-sm-10">
               <p class="form-control-static editable"
