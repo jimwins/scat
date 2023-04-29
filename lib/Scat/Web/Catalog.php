@@ -189,7 +189,7 @@ class Catalog {
     if ($res->hasHeader('Content-Type')) {
       $content_type= $res->getHeader('Content-Type')[0];
       if (!preg_match('/^image/', $content_type)) {
-        $f3->error(500, "URL was not an image, it was a '$content_type'");
+        throw new \Exception("URL was not an image, it was a '$content_type'");
       }
     }
 
