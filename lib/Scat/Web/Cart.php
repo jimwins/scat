@@ -338,8 +338,7 @@ class Cart {
   public function addItem(Request $request, Response $response)
   {
     $cart= $request->getAttribute('cart');
-
-    // attach it to person, if logged in
+    $person= $this->auth->get_person_details($request);
 
     $item_code= trim($request->getParam('item'));
     $quantity= max((int)$request->getParam('quantity'), 1);
@@ -358,6 +357,10 @@ class Cart {
 
     /* If this is a brand new cart, it won't have an ID yet. Save to create! */
     if (!$cart->id) {
+      // attach it to person, if logged in
+      if ($person) {
+        $cart->person_id= $person->id;
+      }
       $cart->save();
     }
 
@@ -395,6 +398,15 @@ class Cart {
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/json') !== false) {
       return $response->withJson($cart);
+    }
+
+    if ($request->getParam('wantDialog') > 0) {
+      return $this->view->render($response, 'cart/add-to-cart-dialog.html', [
+        'person' => $person,
+        'cart' => $cart,
+        'item' => $item,
+        'quantity' => $quantity,
+      ]);
     }
 
     return $response->withRedirect('/cart');

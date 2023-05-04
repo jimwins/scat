@@ -343,8 +343,57 @@
       }
     }
 
+    let addToCartDialog= (ev, params) => {
+      ev.stopPropagation(); ev.preventDefault();
+
+      fetch("/cart/add-item", {
+        method: 'POST',
+        headers: {
+          'Content-type' : 'application/json'
+        },
+        body: JSON.stringify({
+          item: params.product_id,
+          quantity: params.quantity,
+          wantDialog: 1,
+        })
+      })
+      .then((res) => {
+        if (res.status >= 200 && res.status < 300) {
+          return Promise.resolve(res)
+        }
+        return Promise.reject(new Error(res.statusText))
+      })
+      .then((res) => { return res.text() })
+      .then((text) => {
+        let template= document.createElement('template')
+        template.innerHTML= text.trim()
+
+        let dialog= template.content.firstChild
+        document.body.insertAdjacentElement('beforeend', dialog)
+
+        // https://stackoverflow.com/a/71783638
+        dialog.addEventListener('click', (ev) => {
+          if (ev.offsetX < 0 || ev.offsetX > ev.target.offsetWidth ||
+            ev.offsetY < 0 || ev.offsetY > ev.target.offsetHeight) {
+              dialog.close();
+          }
+        });
+
+        // TODO destroy dialog when closed
+
+        dialog.showModal()
+      })
+      .catch((err) => {
+        alert("Sorry, something went wrong adding this item to the cart.")
+      })
+    }
+
     let recordAddToCart= (ev) => {
-      scat.ecommerce('Product Added', addToCartParameters(ev.currentTarget))
+      let params= addToCartParameters(ev.currentTarget)
+      scat.ecommerce('Product Added', params)
+      if (typeof HTMLDialogElement === 'function') {
+        addToCartDialog(ev, params)
+      }
     }
 
     document.querySelectorAll('form.add-item').forEach((form) => {
