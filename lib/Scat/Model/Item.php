@@ -214,7 +214,7 @@ class Item extends \Scat\Model {
   public function default_image() {
     $media= $this->media();
     if (!$media) {
-      if ($this->siblings() > 1) {
+      if (count($this->siblings()) > 1) {
         return null;
       }
       $media= $this->product()->media();
