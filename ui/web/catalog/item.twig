@@ -258,7 +258,19 @@ figure img {
         "@type": "Offer",
         "availability": "{{ item.stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}",
         "price": "{{ item.sale_price }}",
-        "priceCurrency": "USD"
+        "priceCurrency": "USD",
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": "US",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+          "merchantReturnDays": 30,
+          "customerRemorseReturnFees": [
+            "https://schema.org/OriginalShippingFees",
+            "https://schema.org/RestockingFees",
+            "https://schema.org/ReturnByMail",
+            "https://schema.org/ReturnInStore"
+          ]
+        }
       }
     }
   {% endautoescape %}
