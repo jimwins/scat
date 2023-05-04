@@ -206,7 +206,7 @@ class Item extends \Scat\Model {
   public function siblings() {
     return $this->factory('Item')
                 ->where('product_id', $this->product_id)
-                ->where_not_equal('id', $this->item_id)
+                ->where_not_equal('id', $this->id)
                 ->where('active', 1)
                 ->find_many();
   }
