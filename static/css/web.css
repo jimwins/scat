@@ -903,3 +903,12 @@ but as a fallback you can chain `:not()` instead */
 .add-item .button {
   margin-bottom: 1em;
 }
+
+dialog {
+  border: none;
+  min-width: 80ch;
+  background: inherit;
+}
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.25);
+}
