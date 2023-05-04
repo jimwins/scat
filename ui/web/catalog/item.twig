@@ -262,11 +262,14 @@ figure img {
         "hasMerchantReturnPolicy": {
           "@type": "MerchantReturnPolicy",
           "applicableCountry": "US",
+          "itemDefectReturnFees": "https://schema.org/FreeReturn",
           "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
           "merchantReturnDays": 30,
           "customerRemorseReturnFees": [
             "https://schema.org/OriginalShippingFees",
             "https://schema.org/RestockingFees",
+          ],
+          "returnMethod": [
             "https://schema.org/ReturnByMail",
             "https://schema.org/ReturnInStore"
           ]
