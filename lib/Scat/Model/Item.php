@@ -217,7 +217,7 @@ class Item extends \Scat\Model {
       if ($this->siblings() > 1) {
         return null;
       }
-      $media= $product->media();
+      $media= $this->product()->media();
     }
 
     if (!$media || !$media[0]) return null;
