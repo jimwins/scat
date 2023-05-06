@@ -1300,6 +1300,7 @@ class Catalog {
       ->select('*')
       ->select_expr('COUNT(*) OVER (PARTITION BY product_id)', 'siblings')
       ->where_gt('product_id', 0)
+      ->where_gt('minimum_quantity', 0)
       ->find_many();
 
     $fields= [
@@ -1313,14 +1314,8 @@ class Catalog {
 
     foreach ($items as $item) {
       // only include items for which we have an image
-      if ($item->siblings > 1) {
-        $media= $item->media();
-        if (!$media) {
-          continue;
-        }
-      } else {
-        $media= $item->product()->media();
-      }
+      $image= $item->default_image();
+      if (!$image) continue;
 
       $record= [
         $store_code,
