@@ -17,6 +17,11 @@
   {{ include('add-to-cart.twig', { item: kit, button_size: '', fixed_quantity: 1, no_add_to_wishlist: 1 }) }}
 </p>
 
+{% if options.individual %}
+  <p>You can also order the items from this kit individually using the 'Add to
+  Cart' buttons below.</p>
+{% endif %}
+
 <h3>Kit Contents</h3>
 
 <div class="well">
@@ -28,6 +33,9 @@
         <th align="right">List</th>
         <th align="right">Quantity</th>
         <th align="center">In Stock</th>
+        {% if options.individual %}
+          <th></th>
+        {% endif %}
       </tr>
     </thead>
     <tbody>
@@ -47,6 +55,11 @@
               <span>In stock</span>
             {% endif %}
           </td>
+          {% if options.individual %}
+            <td>
+              {{ include('add-to-cart.twig', { item: item, button_size: '', fixed_quantity: kit_item.quantity, no_add_to_wishlist: 1 }) }}
+            </td>
+          {% endif %}
         </tr>
       {% endfor %}
     </tbody>
