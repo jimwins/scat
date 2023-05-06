@@ -91,10 +91,10 @@ class TwigExtension
     return \Titi\Model::factory('Page')->where('slug', $slug)->find_one();
   }
 
-  public function showKit($env, $code) {
+  public function showKit($env, $code, $options= null) {
     $kit= \Titi\Model::factory('Item')->where('code', $code)->find_one();
     if (!$kit) return;
-    return $env->render('catalog/kit.twig', [ 'kit' => $kit ]);
+    return $env->render('catalog/kit.twig', [ 'kit' => $kit, 'options' => $options ]);
   }
 
   public function showInternalAd($env, $tag, $start) {
