@@ -580,6 +580,11 @@ class Ordure {
         continue;
       }
 
+      if (preg_match('/^(johnsmithstore.*@gmail\.com|fake.*@fakemail\.com)/', $email)) {
+        error_log("Skipping abandoned cart email: Google test account '$email'\n");
+        continue;
+      }
+
       if ($data['sale']['abandoned_level'] >= 1) {
         error_log("Skipping abandoned cart email: already sent\n");
         continue;
