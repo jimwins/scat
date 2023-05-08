@@ -474,6 +474,10 @@ class People {
     if (!$person)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    if (!$person->phone) {
+      throw new \Exception("There is no phone number for this person.");
+    }
+
     error_log("Sending message to {$person->phone}");
     $sent= $phone->sendSMS($person->phone, $request->getParam('content'));
 

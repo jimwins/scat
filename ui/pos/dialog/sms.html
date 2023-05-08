@@ -6,6 +6,11 @@
 {% endblock %}
 
 {% block body %}
+  {% if not person.phone %}
+    <div class="alert alert-danger">
+      There is no phone number for this person.
+    </div>
+  {% endif %}
   <div class="modal-body">
     <label for="content">Message</label>
     <div class="label label-default" id="content-length">0 / 139</div>
@@ -41,10 +46,23 @@
 
     let form= dialog.getElementsByTagName('form')[0]
     let formData= new FormData(form)
+
+    if (form.disabled) return;
+
+    form.disabled= true
+    form.style.filter= 'brightness(80%)'
+
     return scat.post("/person/{{ person.id }}/sms", formData)
           .then((res) => {
             scat.alert('info', 'Message sent.')
             $(dialog).modal('hide')
+          })
+          .catch((err) => {
+            scat.alert('danger', err.message)
+          })
+          .finally(() => {
+            form.disabled= false
+            form.style.filter= ''
           })
   }
 {% endblock %}
