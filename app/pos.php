@@ -264,6 +264,8 @@ $app->group('/shipment', function (RouteCollectorProxy $app) {
               [ \Scat\Controller\Shipping::class, 'printShipmentLabel' ]);
   $app->post('/{id:[0-9]+}/~refund',
               [ \Scat\Controller\Shipping::class, 'refundShipment' ]);
+  $app->post('/~print-limited-quantity-label',
+              [ \Scat\Controller\Shipping::class, 'printLimitedQuantityLabel' ]);
 });
 
 /* Address */

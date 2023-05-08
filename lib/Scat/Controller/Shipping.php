@@ -900,4 +900,12 @@ class Shipping {
     return $response->withJson($res);
   }
 
+  public function printLimitedQuantityLabel(
+    Request $request, Response $response,
+    \Scat\Service\Printer $print
+  ) {
+    $png= file_get_contents(__DIR__ . '/../../../static/limited-quantity-label.png');
+
+    return $print->printPNG($response, 'shipping-label', $png);
+  }
 }

@@ -60,6 +60,10 @@
           {{ block('controls') }}
         </div>
         <div class="col-sm-2">
+          <button type="button" class="btn btn-primary btn-block" data-action="print-lq-label">
+            <img src="/static/limited-quantity.svg" width="16" alt="Hazardous Materials">
+            Print Hazmat Label
+          </button>
           <button type="submit" class="btn btn-primary btn-block">
             <i class="fa fa-fw fa-barcode"></i>
             Create SCAN Form
@@ -215,6 +219,10 @@
       .then((res) => {
         scat.reload('sidebar')
       })
+  })
+
+  scat.handleAction('click', 'print-lq-label', (act) => {
+    return scat.post('/shipment/~print-limited-quantity-label', {})
   })
 
 </script>
