@@ -120,6 +120,14 @@
 
     <h3>Payment</h3>
 
+    {% if cart.shipping_address_id == 1 and cart.total > 100 %}
+      <div class="alert alert-danger">
+        <b>Card and ID required for orders over $100.</b> When you pick up,
+        you must be able to present the credit card used for the purchase
+        and a matching ID for orders over $100.
+      </div>
+    {% endif %}
+
     <div class="smol-grid">
       <div class="payment-option">
         <div id="payment-element"></div>
