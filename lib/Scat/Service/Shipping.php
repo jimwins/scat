@@ -1,6 +1,8 @@
 <?php
 namespace Scat\Service;
 
+use Scat\Distance;
+
 class Shipping
 {
   private $webhook_url;
@@ -181,7 +183,7 @@ class Shipping
     if ($address->verified &&
         $easypost->verifications->delivery->details->longitude)
     {
-      $distance= haversineGreatCircleDistance(
+      $distance= Distance::haversineGreatCircleDistance(
         34.043810, -118.250320, // XXX hardcoded location
         $easypost->verifications->delivery->details->latitude,
         $easypost->verifications->delivery->details->longitude,
@@ -445,6 +447,8 @@ class Shipping
       {
         $shipping_options['default']['rate']= 0.00;
       }
+    } else {
+      error_log("Couldn't calculate shipping box");
     }
 
     /* Get local delivery options */
@@ -555,7 +559,19 @@ class Shipping
 
   /* Local delivery */
   public function in_delivery_area($address) {
-    return $address->distance > 0 && $address->distance < 30;
+    /* No distance? Calculate it. */
+    if (!isset($address->distance)) {
+      $from= $this->data->factory('Address')->find_one(1);
+      $distance= Distance::haversineGreatCircleDistance(
+        $from->latitude, $from->longitude,
+        $address->latitude, $address->longitude,
+        3959 /* want miles */
+      );
+    } else {
+      $distance= $address->distance;
+    }
+
+    return $distance > 0 && $distance < 30;
   }
 
   public function get_delivery_estimate($address, $cart) {

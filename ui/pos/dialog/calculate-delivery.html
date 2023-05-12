@@ -1,0 +1,83 @@
+{% extends 'layout/dialog.html' %}
+{% import 'macros.twig' as scat %}
+
+{% set vehicle_sizes= {
+  'sm': 'Small',
+  'md': 'Medium',
+  'lg': 'Large',
+  'xl': 'XL',
+  'xxl': 'XXL',
+}%}
+
+{% block title %}
+  Calculate Delivery
+{% endblock %}
+
+{% block body %}
+  <div class="modal-body">
+    {% if not shipping_options.local_delivery %}
+      <div class="alert alert-danger">
+        <b>Unable to calculate.</b>
+      </div>
+    {% endif %}
+
+    {% set method= shipping_options.local_delivery %}
+    <div class="form-group">
+      <label for="vehicle">Vehicle Size</label>
+      <select class="form-control" name="service">
+        <option value=""></option>
+        {% for size, name in vehicle_sizes %}
+          <option value="{{ size }}"
+                  {{ (method.vehicle == ('local_' ~ size)) ? 'selected' }}>
+            {{ name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="rate">Cost</label>
+      <input type="text" class="form-control"
+             name="rate" placeholder="$5.99"
+             value="{{ scat.amount(method.rate) }}">
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit %}
+  <button type="submit" class="btn btn-primary">
+    Add Delivery Charge
+  </button>
+{% endblock %}
+
+{% block script %}
+  form.onsubmit= (event) => {
+    event.preventDefault()
+
+    let form= dialog.getElementsByTagName('form')[0]
+
+    if (form.disabled) return;
+
+    form.disabled= true
+    form.style.filter= 'brightness(80%)'
+
+    let formData= new FormData(form)
+    scat.post('/sale/{{ txn.id }}/item', {
+      code: 'ZZ-DELIVERY-VEHICLE',
+      retail_price: formData.get('rate'),
+      data: {{ shipping_options.local_delivery | json_encode | raw }},
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      dialog.resolution= data
+      $(dialog).modal('hide')
+    })
+    .catch((err) => {
+      scat.alert('danger', err.message)
+    })
+    .finally(() => {
+      form.disabled= false
+      form.style.filter= ''
+    })
+  }
+{% endblock %}

@@ -402,7 +402,9 @@ class Transactions {
             }
           }
         }
-
+      } elseif (($price= $request->getParam('retail_price'))) {
+        $price= preg_replace('/^\\$/', '', $price);
+        $line->retail_price= $price;
       } else {
         $line->retail_price= $item->retail_price;
         $line->discount= $item->discount;
@@ -411,6 +413,10 @@ class Transactions {
 
       $line->taxfree= $item->taxfree;
       $line->tic= $item->tic;
+    }
+
+    if (($data= $request->getParam('data'))) {
+      $line->data($data);
     }
 
     $quantity= $request->getParam('quantity') ?: 1;
@@ -465,6 +471,12 @@ class Transactions {
     }
 
     $item_id= $request->getParam('item_id');
+
+    if (!$item_id) {
+      $code= $request->getParam('code');
+      $item= $this->catalog->getItemByCode($code);
+      $item_id= $item->id;
+    }
 
     $this->data->beginTransaction();
 
@@ -1514,6 +1526,21 @@ class Transactions {
     $this->data->commit();
 
     return $response->withJson($address);
+  }
+
+  public function calculateDeliveryForm(
+    Request $request, Response $response,
+    \Scat\Service\Shipping $shipping,
+    $id
+  ) {
+    $txn= $this->txn->fetchById($id);
+
+    $data= [
+      'txn' => $txn,
+      'shipping_options' => $shipping->get_shipping_options($txn, $txn->shipping_address()),
+    ];
+
+    return $this->view->render($response, 'dialog/calculate-delivery.html', $data);
   }
 
   /* Shipments */

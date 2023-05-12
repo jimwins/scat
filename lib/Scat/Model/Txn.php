@@ -872,6 +872,62 @@ class Txn extends \Scat\Model {
     }
   }
 
+  public function get_item_dims() {
+    $items= [];
+
+    /* Exclude kits items, the kit should have dimensions */
+    foreach ($this->items()->where_null('kit_id')->find_many() as $line) {
+      $quantity= -$line->ordered;
+      if ($quantity <= 0) continue;
+
+      $item= $line->item();
+
+      if (!$item->length || !$item->height || !$item->width) {
+        return null;
+      }
+
+      $dims= [
+        'length' => $item->length,
+        'height' => $item->height,
+        'width' => $item->width
+      ];
+
+      $items= array_merge($items, array_fill(0, $quantity, $dims));
+    }
+
+    return $items;
+  }
+
+  public function get_shipping_box() {
+    $items= $this->get_item_dims();
+    if (!$items) return null;
+    return \Scat\Service\Shipping::get_shipping_box($items);
+  }
+
+  public function get_shipping_weight() {
+    $weight= 0;
+    /* Exclude kits items, the kit should have dimensions */
+    foreach ($this->items()->where_null('kit_id')->find_many() as $line) {
+      $item= $line->item();
+      $quantity= -$line->ordered;
+      if (isset($item->weight)) {
+        $weight+= $quantity * $item->weight;
+      } else {
+        return NULL; /* Unable to calculate weight */
+      }
+    }
+    return $weight;
+  }
+
+  public function eligible_for_free_shipping() {
+    foreach ($this->items()->where_null('kit_id')->find_many() as $line) {
+      if (!$line->item()->can_ship_free()) {
+        return false; /* It just takes one. */
+      }
+    }
+    return true;
+  }
+
   public function as_array() {
     $res= parent::as_array();
     $res['items']= $this->items()->find_many();
