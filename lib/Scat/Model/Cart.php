@@ -1,6 +1,8 @@
 <?php
 namespace Scat\Model;
 
+use Scat\Distance;
+
 class Cart extends \Scat\Model {
   public static $_table= 'sale';
 
@@ -61,7 +63,7 @@ class Cart extends \Scat\Model {
     if ($new->verified &&
         $easypost->verifications->delivery->details->longitude)
     {
-      $distance= haversineGreatCircleDistance(
+      $distance= Distance::haversineGreatCircleDistance(
         34.043810, -118.250320, // XXX hardcoded location
         $easypost->verifications->delivery->details->latitude,
         $easypost->verifications->delivery->details->longitude,
@@ -221,7 +223,8 @@ class Cart extends \Scat\Model {
 
   public function get_shipping_weight() {
     $weight= 0;
-    foreach ($this->items()->find_many() as $line) {
+    /* Exclude kits items, the kit should have dimensions */
+    foreach ($this->items()->where_null('kit_id')->find_many() as $line) {
       $item= $line->item();
       if (isset($item->weight)) {
         $weight+= $line->quantity * $item->weight;
@@ -704,32 +707,4 @@ class CartPayment extends \Scat\Model {
     $data['data']= json_decode($this->data);
     return $data;
   }
-}
-
-/**
- * from: https://stackoverflow.com/a/10054282
- * Calculates the great-circle distance between two points, with
- * the Haversine formula.
- * @param float $latitudeFrom Latitude of start point in [deg decimal]
- * @param float $longitudeFrom Longitude of start point in [deg decimal]
- * @param float $latitudeTo Latitude of target point in [deg decimal]
- * @param float $longitudeTo Longitude of target point in [deg decimal]
- * @param float $earthRadius Mean earth radius in [m]
- * @return float Distance between points in [m] (same as earthRadius)
- */
-function haversineGreatCircleDistance(
-  $latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000)
-{
-  // convert from degrees to radians
-  $latFrom = deg2rad($latitudeFrom);
-  $lonFrom = deg2rad($longitudeFrom);
-  $latTo = deg2rad($latitudeTo);
-  $lonTo = deg2rad($longitudeTo);
-
-  $latDelta = $latTo - $latFrom;
-  $lonDelta = $lonTo - $lonFrom;
-
-  $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
-    cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
-  return $angle * $earthRadius;
 }
