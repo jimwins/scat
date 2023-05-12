@@ -1500,6 +1500,10 @@ class Transactions {
       $address->phone= $easypost_address->phone;
       $address->timezone=
         $easypost_address->verifications->delivery->details->time_zone;
+      $address->latitude=
+        $easypost_address->verifications->delivery->details->latitude;
+      $address->longitude=
+        $easypost_address->verifications->delivery->details->longitude;
       $address->save();
 
       $txn->shipping_address_id= $address->id;
