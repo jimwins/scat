@@ -98,7 +98,7 @@
         </a>
       </div>
       <div id="site-featured-depts">
-        <ul id="departments">
+        <ul>
           {% for dept in topDepartments(true) %}
             <li>
               <a href="{{ url_for('catalog', { dept: dept.slug }) }}">
@@ -114,7 +114,7 @@
         </ul>
       </div>
       <div id="site-depts">
-        <ul id="departments">
+        <ul>
           <li><b>Departments</b></li>
           <li>
             <a href="{{ url_for('catalog-whats-new') }}">
