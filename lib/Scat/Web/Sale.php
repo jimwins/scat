@@ -28,11 +28,12 @@ class Sale {
     }
 
     $status= $request->getParam('status') ?: [ 'paid', 'processing' ];
+    $limit= $request->getParam('limit') ?: 100;
 
     $sales= $this->carts->findByStatus(
       status: $status,
       yesterday: $request->getParam('yesterday'),
-      limit: $key ? null : 100,
+      limit: $key ? null : $limit,
     );
 
     $accept= $request->getHeaderLine('Accept');
