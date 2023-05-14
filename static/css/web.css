@@ -917,3 +917,8 @@ dialog {
 dialog::backdrop {
   background: rgba(0, 0, 0, 0.25);
 }
+
+blockquote {
+  border-left: 2px solid var(--primary-color);
+  padding-left: 1em;
+}
