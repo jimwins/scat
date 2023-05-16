@@ -35,6 +35,10 @@ class Cart
     if ($yesterday) {
       $query= $query->where_raw("DATE(created) = DATE(NOW() - INTERVAL 1 DAY)");
     }
+
+    // filter out annoying Google tests
+    $query= $query->where_raw("email NOT RLIKE '^(fake.*@fakemail.com|johnsmithstore.*@gmail.com)$'");
+
     if ($limit) {
       $query= $query->limit($limit)->order_by_desc('id');
     }
