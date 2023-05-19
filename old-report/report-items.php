@@ -3,9 +3,9 @@ require '../scat.php';
 require '../lib/item.php';
 
 $sql_criteria= "1=1";
+$options= $_REQUEST['and'] ? (FIND_ALL) : (FIND_OR|FIND_ALL);
 if (($items= $_REQUEST['items'])) {
-  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'],
-                                             FIND_OR|FIND_ALL);
+  list($sql_criteria, $x)= item_terms_to_sql($db, $_REQUEST['items'], $options);
 }
 
 $begin= $_REQUEST['begin'];
