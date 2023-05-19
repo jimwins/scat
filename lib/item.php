@@ -74,6 +74,9 @@ if (@$GLOBALS['DEBUG'] || ($options & FIND_NEW_METHOD)) {
     } elseif (preg_match('/^oversized:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.oversized)"
                         : "(NOT item.oversized)";
+    } elseif (preg_match('/^no_backorder:(.+)/i', $term, $dbt)) {
+      $andor[]= $dbt[1] ? "(item.no_backorder)"
+                        : "(NOT item.no_backorder)";
     } elseif (preg_match('/^hazmat:(.+)/i', $term, $dbt)) {
       $andor[]= $dbt[1] ? "(item.hazmat)"
                         : "(NOT item.hazmat)";
