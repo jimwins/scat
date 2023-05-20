@@ -40,9 +40,17 @@
         </a>
       </li>
       <li>
-       {{ page * limit + 1 }} -
-       {{ min((page + 1) * limit + 1, items[0].total) }}
-       of {{ items[0].total }}
+        {{ page * limit + 1 }} -
+        {{ min((page + 1) * limit + 1, items[0].total) }}
+        of {{ items[0].total }}
+        <select class="form-control" style="width: auto; display: inline-block" name="limit">
+          <option value="{{ limit }}">Limit</option>
+          <option>10</option>
+          <option>25</option>
+          <option>50</option>
+          <option>100</option>
+          <option>250</option>
+        </select>
       </li>
       <li class="next">
         <a href="?page={{ page + 1 }}&amp;q={{ q }}&amp;limit={{ limit }}">
@@ -111,6 +119,23 @@
 {% block script %}
   <script>
   {
+    let limitChanged= (ev) => {
+      let params= {
+        page: {{ page }},
+        q: '{{ q }}',
+        limit: ev.target.value
+      }
+
+      let url= new URL(window.location.href)
+      url.search= (new URLSearchParams(params)).toString()
+
+      window.location.href= url.toString()
+    }
+
+    document.querySelectorAll('select[name="limit"]').forEach((el) => {
+      el.addEventListener('change', limitChanged)
+    })
+
     document.addEventListener('click', (ev) => {
       if (!ev.target.closest('.add-item')) return;
       ev.preventDefault();
