@@ -102,6 +102,12 @@ class Push
   }
 
   public function sendNotification($token, $title, $body, $action, ...$args) {
+    $apnsCert= $this->config->get('push.certificate');
+
+    if (!$apnsCert) {
+      return;
+    }
+
     $payload= [
       'aps' => [
         'alert' => [
@@ -116,7 +122,6 @@ class Push
     $payload= json_encode($payload);
     $apnsHost= 'gateway.push.apple.com';
     $apnsPort= 2195;
-    $apnsCert= $this->config->get('push.certificate');
 
     /* local_cert is dumb, has to be in a file */
     $tmp= tempnam('/tmp', 'cert');
