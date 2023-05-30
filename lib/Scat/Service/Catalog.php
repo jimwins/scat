@@ -119,7 +119,6 @@ class Catalog
 
   public function getVendorItemById($id) {
     return $this->data->factory('VendorItem')
-             ->where_gte('vendor_item.active', 1)
              ->find_one($id);
   }
 
