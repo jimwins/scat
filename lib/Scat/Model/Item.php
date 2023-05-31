@@ -341,7 +341,6 @@ class Item extends \Scat\Model {
       case 'active':
       case 'code':
       case 'description':
-      case 'variation':
       case 'tic':
       case 'color':
       case 'active':
@@ -362,6 +361,7 @@ class Item extends \Scat\Model {
         break;
       case 'name':
       case 'short_name':
+      case 'variation':
         $value= preg_replace_callback('/{{(.+?)}}/',
           function ($m) {
             if ($m[1] == 'size') {
@@ -373,7 +373,7 @@ class Item extends \Scat\Model {
             }
             return $this->{$m[1]};
           }, $value);
-        $this->$name= $value;
+        $this->$name= trim($value);
         break;
       case 'discount':
         $this->setDiscount($value);
