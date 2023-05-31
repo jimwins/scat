@@ -339,7 +339,6 @@ class Item extends \Scat\Model {
         $value= preg_replace('/^\\$/', '', $value);
         // passthrough
       case 'active':
-      case 'code':
       case 'description':
       case 'tic':
       case 'color':
@@ -358,6 +357,9 @@ class Item extends \Scat\Model {
       case 'height':
       case 'packaged_for_shipping':
         $this->$name= $value;
+        break;
+      case 'code':
+        $this->$name= trim($value);
         break;
       case 'name':
       case 'short_name':
