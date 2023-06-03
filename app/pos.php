@@ -185,6 +185,10 @@ $app->group('/sale', function (RouteCollectorProxy $app) {
   $app->get('/{id:[0-9]+}/calculate-delivery-form',
             [ \Scat\Controller\Transactions::class, 'calculateDeliveryForm' ]);
 
+  $app->post('/{id:[0-9]+}/~create-cart',
+            [ \Scat\Controller\Transactions::class, 'createOnlineCart' ]);
+
+
   /* Dropships */
   $app->get('/{id:[0-9]+}/dropship[/{dropship_id:[0-9]+}]',
             [ \Scat\Controller\Transactions::class, 'saleDropships' ]);

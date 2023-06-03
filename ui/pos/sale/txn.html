@@ -577,10 +577,17 @@
         </address>
       {% endif %}
 
+      {% if txn.status in [ 'new' ] %}
+        <a data-action="create-online-cart" class="btn btn-block btn-default">
+          <i class="fa fa-fw fa-shopping-cart"></i>
+          Convert to Cart
+        </a>
+      {% endif %}
+
       {% if txn.status in [ 'new', 'filled' ] and txn.shipping_address_id > 1 and shipping_address.state == 'CA' %}
         <a data-action="calculate-delivery"
-            class="btn btn-block btn-success">
-          <i class="fa fa-calculator"></i>
+            class="btn btn-block btn-default">
+          <i class="fa fa-fw fa-calculator"></i>
           Calculate Delivery
         </a>
       {% endif %}
@@ -831,6 +838,17 @@
           if (res) scat.reload('invoice','sidebar')
         })
     })
+
+    scat.handleAction('click', 'create-online-cart', (act) => {
+      return scat.post('/sale/{{ txn.id }}/~create-cart')
+        .then((res) => {
+          if (res) {
+            scat.reload('sidebar')
+            scat.alert('success', "Cart created (see notes for link)")
+          }
+        })
+    })
+
 
     scat.handleAction('click', 'print-packing-slip-and-process', (act) => {
       scat.print(

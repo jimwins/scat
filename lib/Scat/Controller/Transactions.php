@@ -1543,6 +1543,20 @@ class Transactions {
     return $this->view->render($response, 'dialog/calculate-delivery.html', $data);
   }
 
+  public function createOnlineCart(
+    Request $request, Response $response,
+    \Scat\Service\Ordure $ordure,
+    $id
+  ) {
+    $txn= $this->txn->fetchById($id);
+    if (!$txn)
+      throw new \Slim\Exception\HttpNotFoundException($request);
+
+    $ordure->createCartFromTxn($txn);
+
+    return $response->withJson([ 'success' => 'Cart created.' ]);
+  }
+
   /* Shipments */
 
   public function saleShipments(Request $request, Response $response,
