@@ -39,7 +39,7 @@ class InternalAd {
 
     $q= $request->getParam('q');
     if ($q) {
-      $ads= $ads->where_raw('MATCH (tag, headline, caption, button_text) AGAINST (? IN NATURAL LANGUAGE MODE)', [ $q ]);
+      $ads= $ads->where_raw('MATCH (tag, headline, caption, button_label) AGAINST (? IN NATURAL LANGUAGE MODE)', [ $q ]);
     }
 
     $ads= $ads->find_many();
