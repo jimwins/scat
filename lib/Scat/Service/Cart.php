@@ -37,7 +37,7 @@ class Cart
     }
 
     // filter out annoying Google tests
-    $query= $query->where_raw("email NOT RLIKE '^(fake.*@fakemail.com|johnsmithstore.*@gmail.com)$'");
+    $query= $query->where_raw("email is NULL OR email NOT RLIKE '^(fake.*@fakemail.com|johnsmithstore.*@gmail.com)$'");
 
     if ($limit) {
       $query= $query->limit($limit)->order_by_desc('id');
