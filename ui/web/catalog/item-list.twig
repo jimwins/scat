@@ -73,6 +73,15 @@
       border-bottom: calc(var(--border-width) / 2) solid #ddd;
     }
 
+    .item-list tr {
+      display: grid;
+      grid-template-columns: 15% 1fr 8% 8% 10% 24px 160px;
+    }
+    .item-list .long {
+      grid-column: 1 / span 7;
+      padding-left: 3em;
+    }
+
     @media (max-width: 599.98px) {
       .item-list tr {
         display: grid;
@@ -80,6 +89,9 @@
       }
       .item-list .description {
         grid-column-end: span 2;
+      }
+      .item-list .long {
+        display: none;
       }
     }
   </style>

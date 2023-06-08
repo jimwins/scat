@@ -106,4 +106,9 @@
       </button>
     {% endif %}
   </td>
+  {% if i.description %}
+    <td class="description long">
+      {{ i.description | markdown }}
+    </td>
+  {% endif %}
 </tr>
