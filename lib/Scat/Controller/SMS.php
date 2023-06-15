@@ -97,6 +97,7 @@ class SMS {
     }
 
     switch (strtolower($payload['message'])) {
+    case 'start':
     case 'rewardsplus':
     case 'unstop':
       $person->rewardsplus= 1;
