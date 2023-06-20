@@ -464,6 +464,8 @@ class Shipping
       } else {
         error_log("unable to calculate delivery cost");
       }
+    } else {
+        error_log("Not in local delivery area");
     }
 
     return $shipping_options;
