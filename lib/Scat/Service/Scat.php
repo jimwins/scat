@@ -138,7 +138,7 @@ class Scat
     return $client->post($uri);
   }
 
-  public function get_giftcard_balance($card) {
+  public function get_giftcard_details($card) {
     $client= $this->getClient();
 
     $uri= $this->url . "/gift-card/" . rawurlencode($card);
@@ -157,7 +157,7 @@ class Scat
       throw new \Exception(json_last_error_msg());
     }
 
-    return $data->balance;
+    return $data;
   }
 
   public function track_shipment($uuid, $shipment_id) {

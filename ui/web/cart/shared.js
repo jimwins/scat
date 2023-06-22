@@ -80,6 +80,7 @@ function updateCart(details) {
   .catch((err) => {
     console.log(err.message);
     disablePayButtons();
+    return Promise.reject(err)
   })
   .finally(() => {
     form.removeAttribute('disabled')

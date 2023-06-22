@@ -159,9 +159,12 @@ class Cart {
             throw new \Exception("You have already applied this gift card.");
           }
 
-          $balance= $scat->get_giftcard_balance($value);
-          if ($value == 0) {
+          $details= $scat->get_giftcard_details($value);
+          if ($details->balance == 0) {
             throw new \Exception("There is no remaining balance on this card.");
+          }
+          if ($details->expires && ((new \Datetime() > new \Datetime($details->expires)))) {
+            throw new \Exception("This gift card has expired.");
           }
 
           $amount= min($balance, $cart->due());
