@@ -226,12 +226,23 @@ class ScatUtils {
            * internally to do the rendering, which doesn't render when the
            * iframe is not visible and isn't even ready to print when the load
            * event fires when it is visible. ¯\_(ツ)_/¯
+           *
+           * Might be able to get this to work, see
+           * https://bugzilla.mozilla.org/show_bug.cgi?id=911444
+           * and
+           * https://gist.github.com/timdown/cfacd32f6b5e439bb02aaf142343ce4c
            */
           let lpr= document.createElement('iframe')
           lpr.id= 'scat-print'
           lpr.style.display= 'none'
           lpr.addEventListener('load', (ev) => {
-            setTimeout((() => ev.target.contentWindow.print()), 500)
+            /* Can't just use ev.target.contentWindow in the timeout or Chrome
+             * loses track of things. ¯\_(ツ)_/¯
+             */
+            let target= ev.target
+            setTimeout((() => {
+                target.contentWindow.print()
+            }), 500)
           })
           // holy moly, this is magic!
           lpr.src= URL.createObjectURL(blob)
