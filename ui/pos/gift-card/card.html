@@ -102,7 +102,7 @@
           let form= document.currentScript.parentNode
 
           form.querySelector('.print-card').addEventListener('click', (ev) => {
-            scat.print('/gift-card/{{ card.card }}/~print')
+            scat.print('/gift-card/{{ card.card }}/~print?download=1')
           })
 
           form.querySelector('.email-card').addEventListener('click', (ev) => {

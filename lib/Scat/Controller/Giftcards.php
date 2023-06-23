@@ -92,12 +92,24 @@ class Giftcards {
     ]);
   }
 
-  public function printCard(Request $request, Response $response, $card) {
+  public function printCard(
+    Request $request,
+    Response $response,
+    \Scat\Service\Printer $print,
+    $card
+  ) {
     $card= $this->fetch($card);
 
-    $body= $response->getBody();
-    $body->write($card->getPDF());
-    return $response->withHeader("Content-type", "application/pdf");
+    $pdf= $print->generateFromTemplate('print/gift-card.html', [
+      'card' => $card,
+    ]);
+
+    if ($request->getParam('download')) {
+      $response->getBody()->write($pdf);
+      return $response->withHeader('Content-type', 'application/pdf');
+    }
+
+    return $print->printPDF($response, 'letter', $pdf);
   }
 
   public function getEmailForm(Request $request, Response $response, $card) {
@@ -111,16 +123,20 @@ class Giftcards {
 
     return $this->view->render($response, 'dialog/email-gift-card.html', [
       "card" => $card,
-      "to_name" => $to ? $to->name : '',
-      "to_email" => $to ? $to->email : '',
-      "from_name" => $from ? $from->name : '',
-      "message" => $message ? $message->content : '',
+      "to_name" => isset($to) ? $to->name : '',
+      "to_email" => isset($to) ? $to->email : '',
+      "from_name" => isset($from) ? $from->name : '',
+      "message" => isset($message) ? $message->content : '',
     ]);
   }
 
-  public function emailCard(Request $request, Response $response,
-                            \Scat\Service\Email $email, $card)
-  {
+  public function emailCard(
+    Request $request,
+    Response $response,
+    \Scat\Service\Email $email,
+    \Scat\Service\Printer $print,
+    $card
+  ) {
     $card= $this->fetch($card);
 
     $email_body= $this->view->fetch('email/gift-card.html',
@@ -129,7 +145,10 @@ class Giftcards {
                                       'title',
                                       $request->getParams());
 
-    $giftcard_pdf= $card->getPDF();
+    $giftcard_pdf= $print->generateFromTemplate('print/gift-card.html', [
+      'card' => $card,
+    ]);
+
 
     $from_name= $request->getParam('from_name');
     $from= $from_name ? "$from_name via " . $email->from_name

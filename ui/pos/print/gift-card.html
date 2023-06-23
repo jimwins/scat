@@ -1,0 +1,147 @@
+{% import 'macros.twig' as scat %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    Gift Card #{{ card.card }} - Raw Materials Art Supplies
+  </title>
+  {% block extra_head %}
+  {% endblock %}
+  <style media="screen">
+    htmlpageheader, htmlpagefooter { display: none }
+  </style>
+
+  <style>
+    body {
+      font-size: 14px;
+      color: #000000;
+    }
+
+    /* Futz with padding so things don't get cropped. ¯\_(ツ)_/¯ */
+    .scat-header {
+      padding-top: 0.5em;
+    }
+    .scat-footer {
+      padding-bottom: 0.25em;
+    }
+
+    .content {
+      margin: 0.75in 1.5in;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    div.card {
+      width: 3.375in;
+      height: 2.125in;
+      border: 1px dotted black;
+      padding: 0.25in 0.375in;
+
+      margin: auto;
+    }
+
+  </style>
+</head>
+<body>
+  <htmlpageheader name="scat-header">
+    <div class="scat-header center">
+      <a href="https://rawmaterialsla.com/">
+        <img src="/static/logo.svg" width="90%" alt="Raw Materials Art Supplies">
+      </a>
+    </div>
+  </htmlpageheader>
+  <htmlpagefooter name="scat-footer">
+    <p class="scat-footer center">
+      645 S Los Angeles St &bull;
+      Los Angeles, CA 90014 &bull;
+      <a href="https://rawmaterialsla.com/gift-card">rawmaterialsla.com/gift-card</a>
+    </p>
+  </htmlpagefooter>
+  <sethtmlpageheader name="scat-header" value="on" show-this-page="1">
+  <sethtmlpagefooter name="scat-footer" value="on" show-this-page="1">
+
+  <div class="content">
+    <p>
+      Congratulations! You’re the proud owner of a <b>Raw Materials Gift
+      Card</b> that can be used in our online store or at our store in
+      downtown Los Angeles.
+    </p>
+
+    <div class="center">
+      <h2>Initial Balance</h2>
+
+      <p>
+        {{ scat.amount(card.balance) }}
+      </p>
+
+      <h2>Issue Date</h2>
+
+      <p>
+        {{ card.created_at | date('F j, Y') }}
+      </p>
+
+      <div class="card">
+        <a href="https://rawmaterialsla.com/">
+          <img src="/static/logo.svg" width="100%" alt="Raw Materials Art Supplies">
+        </a>
+
+        <h2>Gift Card</h2>
+
+        <barcode code="RAW-{{ card.card }}" type="C39" class="barcode" />
+        <br>
+        <small>{{ card.card }}</small>
+
+        {% if card.expires %}
+          <p>
+            Expires {{ card.expires | date ('F j, Y') }}
+            &bull;
+            No cash value.
+          </p>
+        {% endif %}
+
+        <p>
+          645 S Los Angeles St &bull; Los Angeles, CA 90014<br>
+          <a href="https://rawmaterialsla.com/gift-card">rawmaterialsla.com/gift-card</a>
+        </p>
+      </div>
+    </div><!-- .center -->
+
+    <p>
+      You can check the balance on your card online at:<br>
+      <a href="https://rawmaterialsla.com/gift-card/">http://rawmaterialsla.com/gift-card</a>
+    </p>
+
+    <p>
+      To redeem the card in our online store, use the “Pay with Gift Card”
+      option during checkout. You will still need to supply a credit card for
+      address verification and to cover any balance not covered by your gift
+      card.
+    </p>
+
+    <p>
+      To redeem the card at our store in downtown Los Angeles, just bring in the
+      card and give it to the cashier when you check out. You can also add to
+      your gift card balance. You may not use the gift card to purchase another
+      gift card.
+    </p>
+
+    {% if card.expires %}
+      <p>
+        This promotional gift card expires on {{ card.expires | date("F j, Y") }}.
+      </p>
+    {% else %}
+      <p>
+        Pursuant to California law, this gift card does not expire and is not
+        subject to any fees.  If the balance of your card is less than $10.00,
+        you can receive that balance in cash.
+      </p>
+    {% endif %}
+  </div><!-- .content -->
+
+</body>
+</html>
