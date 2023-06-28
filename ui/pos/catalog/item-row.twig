@@ -34,6 +34,11 @@
         <i class="fa fa-exclamation-circle"></i>
       </small>
     {% endif %}
+    {% if i.description %}
+      <small data-toggle="tooltip" title="{{ i.description | e('html_attr') }}">
+        <i class="fa fa-align-left"></i>
+      </small>
+    {% endif %}
   </td>
   <td class="item-name" style="{{ s.style_item_color(i.color) }}">
     <span class="editable"

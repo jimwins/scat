@@ -158,6 +158,7 @@
     scat.handleAction('click', 'edit-department', (ev) => {
       return scat.dialog('/catalog/department/{{ subdept ? subdept.id : dept.id }}')
     })
+     $('[data-toggle="tooltip"]').tooltip();
   </script>
   {% if product %}
     {{ scat.file_upload('/catalog/product/' ~ product.id ~ '/media') }}
