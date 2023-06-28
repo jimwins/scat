@@ -173,6 +173,7 @@ class Cart extends \Scat\Model {
 
   public function loyalty_reward_available($points) {
     return self::factory('LoyaltyReward')
+                ->where_raw('-(SELECT retail_price FROM item WHERE id = item_id) < ?', $this->due())
                 ->where_lte('cost', $points)
                 ->order_by_desc('cost')
                 ->find_one();
@@ -486,6 +487,10 @@ class Cart extends \Scat\Model {
           $this->payments()->where('method', 'gift')->find_one())
       {
         $this->removePayments('gift');
+      }
+
+      if ($this->due() > 0) {
+        $this->status= 'cart';
       }
     }
 
