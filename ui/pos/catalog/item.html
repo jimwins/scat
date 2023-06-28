@@ -94,7 +94,7 @@
           <h3 class="panel-title">Description</h3>
         </div>
         <div class="panel-body">
-          <span class="editable" data-name="description">
+          <span class="editable" data-name="description" data-editable-type="textarea" data-placement="bottom">
             {{- item.description -}}
           </span>
         </div>
@@ -838,6 +838,7 @@
       let el= this
       let name= el.getAttribute('data-name')
       let value= el.getAttribute('data-value')
+      let type= el.getAttribute('data-editable-type') || 'text'
       if (!value) {
         value= this.innerText
       }
@@ -846,9 +847,22 @@
                   base_el.getAttribute('data-editable-base') :
                   "/catalog/item/{{ item.code }}")
       let reload_el= el.closest('[data-editable-reload]')
-      let html= scat.htmlToElement('<form><div class="form-group" style="margin-bottom: 0"><div class="input-group"><input type="text" name="" class="form-control" value=""><span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-fw fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-fw fa-ban"></i></button></span></div><span class="help-block hidden" style="margin-bottom: 0"></span></div></form>')
-      html.querySelector('input').setAttribute('name', name)
-      html.querySelector('input').setAttribute('value', value)
+
+      let input= '<input type="text" name="" class="form-control" value="">'
+      if (type == 'textarea') {
+        input= '<textarea name="" class="form-control" cols="60" rows="5"></textarea>'
+      }
+
+      let html= scat.htmlToElement('<form><div class="form-group" style="margin-bottom: 0"><div class="input-group">' + input + '<span class="input-group-btn"><button type="submit" class="btn btn-success" style="margin-left: 0.75em"><i class="fa fa-fw fa-check"></i></button></span><span class="input-group-btn"><button type="button" class="btn btn-danger cancel"><i class="fa fa-fw fa-ban"></i></button></span></div><span class="help-block hidden" style="margin-bottom: 0"></span></div></form>')
+
+      if (type == 'textarea') {
+        html.querySelector('textarea').setAttribute('name', name)
+        html.querySelector('textarea').innerText= value
+      } else {
+        html.querySelector('input').setAttribute('name', name)
+        html.querySelector('input').setAttribute('value', value)
+      }
+
       html.addEventListener('submit', (ev) => {
         ev.preventDefault()
         let formData= new FormData(ev.target)
@@ -885,13 +899,17 @@
       return html
     }
 
+    function popoverPlacement(popover, el) {
+      return el.getAttribute('data-placement') || 'auto right'
+    }
+
     $('body').popover({
       selector: '.editable',
       content: editableContent,
       container: 'body',
       html: true,
       sanitize: false,
-      placement: 'auto right',
+      placement: popoverPlacement,
     })
     .on('shown.bs.popover', (ev) => {
       // focus on the first input or select element
