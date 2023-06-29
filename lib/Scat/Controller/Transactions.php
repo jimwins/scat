@@ -639,6 +639,20 @@ class Transactions {
              SET ordered = @asst_qty, shipped = @asst_qty";
         $this->data->execute($q);
 
+      } elseif (preg_match('/orderdetails\.csv/', $fn)) {
+        error_log("Loading Notions Marketing\n");
+        $sep= preg_match("/,/", $line) ? "," : "\t";
+        $q= "LOAD DATA LOCAL INFILE '$tmpfn'
+             INTO TABLE vendor_order
+             FIELDS TERMINATED BY '$sep'
+             OPTIONALLY ENCLOSED BY '\"'
+             LINES TERMINATED BY '\n'
+             (@code, item_no, barcode, description, @x, @brand, @ordered, ordered, @z,
+              @msrp, @net, @ext, @box_no)
+             SET msrp = REPLACE(@msrp, '$', ''), net = REPLACE(@net, '$', ''),
+                 backordered = ordered, shipped = 0";
+        $this->data->execute($q);
+
       } elseif (preg_match('/^,Name,MSRP/', $line)) {
         error_log("Loading CSV data\n");
         // CSV
