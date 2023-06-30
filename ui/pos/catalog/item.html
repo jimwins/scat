@@ -462,6 +462,7 @@
             </tfoot>
             <tbody>
               {% for vi in item.vendor_items.find_many() %}
+                {% set vendor= vi.vendor() %}
                 <tr data-id="{{ vi.id }}">
                   <td>
                     <button type="button" class="btn btn-default btn-xs"
@@ -472,7 +473,7 @@
                             data-action="unlink-vendor-item">
                       <i class="fa fa-unlink"></i>
                     </button>
-                    {% if vi.vendor_id in [ 7, 3757, 30803 ] %}
+                    {% if vendor.can_check_stock() %}
                       <a class="btn btn-default btn-xs"
                           role="button" tabindex="1"
                           data-action="check-vendor-stock">
@@ -482,7 +483,7 @@
                   </td>
                   <td>
                     <a href="/person/{{ vi.vendor_id }}">
-                      {{ vi.vendor().friendly_name }}
+                      {{ vendor.friendly_name }}
                     </a>
                   </td>
                   <td>{{ vi.code }}</td>
