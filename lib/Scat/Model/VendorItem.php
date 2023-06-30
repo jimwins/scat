@@ -66,6 +66,8 @@ class VendorItem extends \Scat\Model {
       return check_sls_stock($this->vendor_sku);
     case 30803: // PA Dist
       return check_padist_stock($this->vendor_sku);
+    case 44466: // Notions
+      return check_notions_stock($this->vendor_sku);
     default:
       throw new \Exception("Don't know how to check stock for that vendor.");
       return [];
@@ -417,4 +419,26 @@ function check_padist_stock($code) {
   $stock= $xp->query('//span[@class="StockLevel"]')->item(0)->textContent;
 
   return [ 'stock' => $stock ];
+}
+
+function check_notions_stock($code) {
+  $lookup_url= 'https://my.notionsmarketing.com/integration-web-services/services_rest/erpservice/qasInquiry';
+
+  $client= new \GuzzleHttp\Client();
+
+  $res= $client->request('POST', $lookup_url, [
+    'headers' => [
+      'Content-type' => 'application/json',
+      'Accept' => 'application/json'
+    ],
+    'json' => [
+      'skulist' => sprintf('%06d', $code)
+    ]
+  ]);
+
+  $body= $res->getBody();
+
+  $data= json_decode($body);
+
+  return [ 'stock' => $data->qas ];
 }

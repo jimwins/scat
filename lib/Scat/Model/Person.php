@@ -769,7 +769,7 @@ class Person extends \Scat\Model {
 
   public function can_check_stock() {
     // TODO hardcoded for now
-    return in_array($this->id, [ 7, 3757, 30803, 31536 ]);
+    return in_array($this->id, [ 7, 3757, 30803, 31536, 44466 ]);
   }
 
 }
