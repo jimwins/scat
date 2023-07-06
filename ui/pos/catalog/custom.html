@@ -137,7 +137,7 @@
               </label>
               <div class="col-sm-6">
                 <p class="form-control-static"
-                   data-calc="(Math.min(w, h) > 60)
+                   data-calc="(Math.min(w, h) > 60 || (Math.max(w, h) > 60 && Math.min(w, h) > 48))
                                ? 'Too big!'
                                : scat.amount(ui * 0.59)"></p>
               </div>
@@ -148,7 +148,7 @@
               </label>
               <div class="col-sm-6">
                 <p class="form-control-static"
-                   data-calc="(Math.min(w, h) > 60)
+                   data-calc="(Math.min(w, h) > 60 || (Math.max(w, h) > 60 && Math.min(w, h) > 48))
                                ? 'Too big!'
                                : (Math.min(w, h) > 48)
                                   ? scat.amount(ui * 2)
@@ -161,7 +161,7 @@
               </label>
               <div class="col-sm-6">
                 <p class="form-control-static"
-                   data-calc="(Math.min(w, h) > 60)
+                   data-calc="(Math.min(w, h) > 60 || (Math.max(w, h) > 60 && Math.min(w, h) > 48))
                                ? 'Too big!'
                                : (Math.min(w, h) > 48)
                                   ? scat.amount(ui * 3)
