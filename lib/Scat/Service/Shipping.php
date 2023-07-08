@@ -317,7 +317,7 @@ class Shipping
         }
       } else {
         if (in_array($rate->carrier, [ 'USPS' ]) &&
-            in_array($rate->service, [ 'First', 'Priority' ]))
+            in_array($rate->service, [ 'First', 'Priority', 'GroundAdvantage' ]))
         {
           if (!$best_rate || $rate->rate < $best_rate) {
             $method= "{$rate->carrier} / {$rate->service }";
@@ -402,9 +402,10 @@ class Shipping
       ];
 
       if (!$hazmat) {
-        /* We can use USPS First/Priority for non-hazmat items. */
+        /* We can use USPS First/Priority/GroundAdvantage for non-hazmat items. */
         $acceptable_options['default'][]= [ 'USPS', 'First' ];
         $acceptable_options['default'][]= [ 'USPS', 'Priority' ];
+        $acceptable_options['default'][]= [ 'USPS', 'GroundAdvantage' ];
       } else {
         /* No express options for hazmat items. */
         unset($acceptable_options['two_day']);

@@ -390,6 +390,7 @@ class Shipping {
         'Priority',
         'First',
         'Ground',
+        'GroundAdvantage',
         //'CaliforniaParcelService',
         //'FEDEX_GROUND',
         //'GROUND_HOME_DELIVERY',
