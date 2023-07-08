@@ -24,7 +24,7 @@
       } %}
     {% else %}
       {% set preferred_rates= {
-        'USPS': [ 'First', 'Priority' ],
+        'USPS': [ 'First', 'Priority', 'GroundAdvantage' ],
       } %}
     {% endif %}
   {% else %}
@@ -41,7 +41,7 @@
       {#  'FedEx': [ 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY' ], #}
     {% else %}
       {% set preferred_rates= {
-        'USPS': [ 'First', 'Priority' ],
+        'USPS': [ 'First', 'Priority', 'GroundAdvantage' ],
         'UPS':  [ 'Ground' ],
         'UPSDAP':  [ 'Ground' ],
       } %}
