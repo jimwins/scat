@@ -136,6 +136,9 @@
                 {{ not cart.ready_for_payment ? 'disabled' }}>
           Pay {{ scat.amount(cart.due) }}
         </button>
+        <div id="payment-not-ready" class="help-block">
+          {{ cart.payment_not_ready_reason }}
+        </div>
       </div>
       <div class="payment-option">
         <div class="hr mobile-only">or</div>
@@ -196,13 +199,16 @@
 
       {{ include('cart/shared.js') }}
 
-      function disablePayButtons() {
+      function disablePayButtons(reason) {
         let stripeButton= document.getElementById('pay-stripe')
         stripeButton.setAttribute('disabled', '')
 
         let paypalButtons= document.getElementById('paypal-buttons');
         paypalButtons.setAttribute('disabled', '')
         if (paypalButtons.actions) paypalButtons.actions.disable()
+
+        let reasonBlock= document.getElementById('payment-not-ready');
+        reasonBlock.textContent= reason
       }
 
       function enablePayButtons(due) {
@@ -213,6 +219,9 @@
         let paypalButtons= document.getElementById('paypal-buttons');
         paypalButtons.removeAttribute('disabled')
         if (paypalButtons.actions) paypalButtons.actions.enable()
+
+        let reasonBlock= document.getElementById('payment-not-ready');
+        reasonBlock.textContent= ""
       }
 
       const stripe= Stripe('{{ stripe.key }}', {

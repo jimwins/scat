@@ -74,12 +74,12 @@ function updateCart(details) {
     if (data.ready_for_payment) {
       enablePayButtons(data.due);
     } else {
-      disablePayButtons();
+      disablePayButtons(data.payment_not_ready_reason);
     }
   })
   .catch((err) => {
     console.log(err.message);
-    disablePayButtons();
+    disablePayButtons("An error has occured.");
     return Promise.reject(err)
   })
   .finally(() => {

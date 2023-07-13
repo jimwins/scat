@@ -165,7 +165,7 @@
 
       {{ include('cart/shared.js') }}
 
-      function disablePayButtons() {
+      function disablePayButtons(reason) {
         let amazonButton= document.getElementById('pay-amazon')
         amazonButton.setAttribute('disabled', '')
       }

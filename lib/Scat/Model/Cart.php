@@ -180,11 +180,28 @@ class Cart extends \Scat\Model {
   }
 
   public function ready_for_payment() {
-    // We require phone # with local delivery
-    if ($this->shipping_method == 'local_delivery' && !$this->phone) {
-      return false;
+    $reason= $this->payment_not_ready_reason();
+    return $reason === null;
+  }
+
+  public function payment_not_ready_reason() {
+    if (!$this->email) {
+      return "You must provide an email address.";
     }
-    return $this->shipping_method && $this->tax_calculated && $this->email;
+
+    if (!$this->shipping_method) {
+      return "A shipping method must be selected.";
+    }
+
+    if (!$this->tax_calculated) {
+      return "We were unable to calculate the sales tax for this purchase.";
+    }
+
+    if ($this->shipping_method == 'local_delivery' && !$this->phone) {
+      return "You must provide your phone number for local delivery.";
+    }
+
+    return null;
   }
 
   public function flushTotals() {
@@ -535,6 +552,7 @@ class Cart extends \Scat\Model {
     $data['tax']= $this->tax();
     $data['total']= $this->total();
     $data['due']= $this->due();
+    $data['payment_not_ready_reason']= $this->payment_not_ready_reason();
     $data['ready_for_payment']= $this->ready_for_payment();
     $data['shipping_options']= $this->shipping_options;
     return $data;
