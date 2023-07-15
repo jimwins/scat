@@ -748,10 +748,21 @@ if ($DEBUG) {
  * static files so we serve them from here.
  */
 $app->get('/{path:.*}', function (Request $request, Response $response, $path) {
-  if (preg_match('/\.(js|css|ttf|svg|eof|woff|woff2)$/', $path, $m) && file_exists("../" . $path)) {
+  if (preg_match('/\.(js|css|ttf|svg|eot|woff|woff2)$/', $path, $m) && file_exists("../" . $path)) {
     $fp= fopen("../" . $path, 'r');
-    $type= mime_content_type($fp) ?? 'application/octet-stream';
-    return $response->withHeader('Content-type', $type)->withBody(new \GuzzleHttp\Psr7\Stream($fp));
+    $types= [
+      'js' => 'application/javascript',
+      'css' => 'text/css',
+      'ttf' => 'font/ttf',
+      'svg' => 'image/svg+xml',
+      'eot' => 'application/vnd.ms-fontobject',
+      'woff' => 'font/woff',
+      'woff2' => 'font/woff2',
+    ];
+    return
+      $response
+        ->withHeader('Content-type', $types[$m[1]])
+        ->withBody(new \GuzzleHttp\Psr7\Stream($fp));
   }
   throw new \Slim\Exception\HttpNotFoundException($request);
 });
