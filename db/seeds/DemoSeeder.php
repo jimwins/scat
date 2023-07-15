@@ -27,7 +27,7 @@ class DemoSeeder extends AbstractSeed
 
     $items= $this->table('item');
     $items->insert([
-      [ 'code' => 'ZZ-GIFTCARD', 'name' => 'Gift Card', 'tic' => '10005', 'tax_free' => 1 ],
+      [ 'code' => 'ZZ-GIFTCARD', 'name' => 'Gift Card', 'tic' => '10005', 'taxfree' => 1 ],
       [ 'code' => 'ACME-001', 'name' => 'Anvil', 'retail_price' => 100.00 ],
       [ 'code' => 'ACME-002', 'name' => 'Toaster', 'retail_price' => 49.99 ],
       [ 'code' => 'ACME-003', 'name' => 'Super Outfit', 'retail_price' => 24.99 ],
