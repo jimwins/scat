@@ -16,12 +16,13 @@ $wrap= new \Phinx\Wrapper\TextWrapper($app);
 $routes= [
   'status' => 'getStatus',
   'migrate' => 'getMigrate',
+  'seed' => 'getSeed',
   'rollback' => 'getRollback',
 ];
 
 $command= @$_REQUEST['command'];
 
-if (!in_array($command, [ 'status', 'migrate', 'rollback' ])) {
+if (!in_array($command, [ 'status', 'migrate', 'seed', 'rollback' ])) {
   $command= 'status';
 }
 
@@ -55,6 +56,9 @@ header('Content-Type: text/html', true, $error ? 500 : 200);
     <p>
       <a class="button" href="setup.php?command=migrate">
         <span class="label">Set up the database</span>
+      </a>
+      <a class="button" href="setup.php?command=seed">
+        <span class="label">Load some sample data</span>
       </a>
       <?php if ($command != 'status') {?>
         <a href="/" class="button">Return to Scat</a>
