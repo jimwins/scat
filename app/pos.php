@@ -732,19 +732,6 @@ $app->map(['GET', 'POST'], '/~webhook[/{hook:[a-z]*}]',
               return $response->withJson([ 'message' => 'Received.' ]);
             });
 
-/*
- * When running with our demo docker-compose setup, nginx can't access the
- * static files so we serve them from here.
- */
-$app->get('/{path:.*}', function (Request $request, Response $response, $path) {
-  if (preg_match('/\.(js|css|ttf|svg|eof|woff|woff2)$/', $path, $m) && file_exists("../" . $path))
-    $fp= fopen("../" . $path, 'r');
-    $type= mime_content_type($fp) ?? 'application/octet-stream';
-    return $response->withHeader('Content-type', $type)->withBody(new \GuzzleHttp\Psr7\Stream($fp));
-  }
-  throw new \Slim\Exception\HttpNotFoundException($request);
-});
-
 /* Info (DEBUG only) */
 if ($DEBUG) {
   $app->get('/info',
@@ -755,5 +742,18 @@ if ($DEBUG) {
               return $response;
             })->setName('info');
 }
+
+/*
+ * When running with our demo docker-compose setup, nginx can't access the
+ * static files so we serve them from here.
+ */
+$app->get('/{path:.*}', function (Request $request, Response $response, $path) {
+  if (preg_match('/\.(js|css|ttf|svg|eof|woff|woff2)$/', $path, $m) && file_exists("../" . $path)) {
+    $fp= fopen("../" . $path, 'r');
+    $type= mime_content_type($fp) ?? 'application/octet-stream';
+    return $response->withHeader('Content-type', $type)->withBody(new \GuzzleHttp\Psr7\Stream($fp));
+  }
+  throw new \Slim\Exception\HttpNotFoundException($request);
+});
 
 $app->run();
