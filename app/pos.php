@@ -604,7 +604,6 @@ $app->group('/push', function (RouteCollectorProxy $app) {
 $app->group('/tax', function (RouteCollectorProxy $app) {
   $app->get('/~ping', [ \Scat\Controller\Tax::class, 'ping' ]);
   $app->get('/tic', [ \Scat\Controller\Tax::class, 'getTICs' ]);
-  $app->get('/test', [ \Scat\Controller\Tax::class, 'test' ]);
   $app->get('/~capture', [ \Scat\Controller\Tax::class, 'captureMissing' ]);
 });
 $app->get('/~webhook/tax',
