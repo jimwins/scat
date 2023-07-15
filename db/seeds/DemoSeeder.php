@@ -8,14 +8,14 @@ class DemoSeeder extends AbstractSeed
   public function shouldExecute() {
     $row= $this->fetchRow("SELECT value FROM config WHERE name = 'tax.default_rate'");
     /* Should not execute if tax.default_rate is set */
-    return !array_key_exists('value', $row);
+    return is_array($row) && !array_key_exists('value', $row);
   }
 
   public function run()
   {
     /* In case we're running an older Phinx without shouldExecute() */
     $row= $this->fetchRow("SELECT value FROM config WHERE name = 'tax.default_rate'");
-    if (array_key_exists('value', $row)) {
+    if (is_array($row) && array_key_exists('value', $row)) {
       return;
     }
 
