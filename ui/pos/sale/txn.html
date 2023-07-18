@@ -966,6 +966,9 @@
         .then((res) => {
           scat.reload('sidebar')
         })
+        .catch((err) => {
+          scat.alert('danger', err.message)
+        })
     })
 
     scat.handleAction('click', 'finalize-shipment', (act) => {
@@ -973,6 +976,9 @@
       return scat.dialog('/sale/{{ txn.id }}/shipment/' + id)
         .then((res) => {
           scat.reload('sidebar')
+        })
+        .catch((err) => {
+          scat.alert('danger', err.message)
         })
     })
 
