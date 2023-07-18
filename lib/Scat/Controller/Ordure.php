@@ -446,19 +446,10 @@ class Ordure {
           }
 
           $address= $this->data->factory('Address')->create();
-          $address->easypost_id= $easypost_address->id;
-          $address->name= $easypost_address->name;
-          $address->email= $easypost_address->email ?: $data->sale->email;
-          $address->company= $easypost_address->company;
-          $address->street1= $easypost_address->street1;
-          $address->street2= $easypost_address->street2;
-          $address->city= $easypost_address->city;
-          $address->state= $easypost_address->state;
-          $address->zip= $easypost_address->zip;
-          $address->country= $easypost_address->country;
-          $address->phone= $easypost_address->phone ?: $data->sale->phone;
-          $address->timezone=
-            @$easypost_address->verifications->delivery->details->time_zone;
+          $address->setFromEasypostAddress($easypost_address);
+          if (!$address->email) {
+            $address->email= $data->sale->email;
+          }
           $address->save();
 
           $txn->shipping_address_id= $address->id;

@@ -65,33 +65,7 @@ class Address {
       $details['verify']= [ 'delivery' ];
 
       $easypost_address= $this->shipping->createAddress($details);
-
-      $address->easypost_id= $easypost_address->id;
-
-      /* We copy back everything from EasyPost, which normalized it */
-      $address->name= $easypost_address->name;
-      $address->company= $easypost_address->company;
-      $address->street1= $easypost_address->street1;
-      $address->street2= $easypost_address->street2;
-      $address->city= $easypost_address->city;
-      $address->state= $easypost_address->state;
-      $address->zip= $easypost_address->zip;
-      $address->country= $easypost_address->country;
-      $address->phone= $easypost_address->phone;
-      $address->verified=
-        $easypost_address->verifications->delivery->success ? '1' : '0';
-      $address->residential=
-        $easypost_address->residential ? '1' : '0';
-      if ($easypost_address->verifications->delivery->details->longitude) {
-        $address->latitude=
-          $easypost_address->verifications->delivery->details->latitude;
-        $address->longitude=
-          $easypost_address->verifications->delivery->details->longitude;
-      } else {
-        $address->latitude= $address->longitude= null;
-      }
-      $address->timezone=
-        $easypost_address->verifications->delivery->details->time_zone;
+      $address->setFromEasypostAddress($easypost_address);
     }
 
     $address->save();
