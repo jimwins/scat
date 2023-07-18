@@ -1512,6 +1512,10 @@ class Transactions {
       $details['verify']= [ 'delivery' ];
       $easypost_address= $shipping->createAddress($details);
 
+      if (!@$details['force'] && !$easypost_address->verifications->delivery->success) {
+        throw new \Exception("Address could not be verified.");
+      }
+
       /* We always create a new address. */
       $address= $this->data->factory('Address')->create();
       $address->easypost_id= $easypost_address->id;
@@ -1524,12 +1528,16 @@ class Transactions {
       $address->zip= $easypost_address->zip;
       $address->country= $easypost_address->country;
       $address->phone= $easypost_address->phone;
-      $address->timezone=
-        $easypost_address->verifications->delivery->details->time_zone;
-      $address->latitude=
-        $easypost_address->verifications->delivery->details->latitude;
-      $address->longitude=
-        $easypost_address->verifications->delivery->details->longitude;
+      $address->verified=
+        $easypost_address->verifications->delivery->success;
+      if ($address->verified) {
+        $address->timezone=
+          $easypost_address->verifications->delivery->details->time_zone;
+        $address->latitude=
+          $easypost_address->verifications->delivery->details->latitude;
+        $address->longitude=
+          $easypost_address->verifications->delivery->details->longitude;
+      }
       $address->save();
 
       $txn->shipping_address_id= $address->id;

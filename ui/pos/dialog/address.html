@@ -64,6 +64,15 @@
                name="phone" placeholder="(optional)"
                value="{{ address.phone ?: txn.person.phone }}">
       </div>
+
+      <div id="failed-validation" class="form-group col-sm-12 hidden">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="1" name="force">
+            Address not validated, force it anyways?
+          </label>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -88,6 +97,10 @@
         scat.alert('info', 'Updated shipping address.')
         dialog.resolution= data;
         $(dialog).modal('hide')
+      })
+      .catch((err) => {
+        dialog.querySelector('#failed-validation').classList.remove('hidden')
+        scat.alert('danger', err.message)
       })
     {% else %}
       scat.patch("/address/{{ address.id }}", formData)

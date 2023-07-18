@@ -574,6 +574,9 @@
             {{ shipping_address.state }}
             {{ shipping_address.zip }}
           </div>
+          {% if not shipping_address.verified %}
+            <div class="label label-danger">Unverified</div>
+          {% endif %}
         </address>
       {% endif %}
 
