@@ -388,17 +388,22 @@ class Shipping {
     if ($request->getParam('rates')) {
       $services= [
         'Priority',
-        'First',
         'Ground',
         'GroundAdvantage',
-        //'CaliforniaParcelService',
-        //'FEDEX_GROUND',
-        //'GROUND_HOME_DELIVERY',
+        'CaliforniaParcelService',
+        'FEDEX_GROUND',
+        'FEDEX_2_DAY',
+        'FEDEX_EXPRESS_SAVER',
+        'STANDARD_OVERNIGHT',
+        'GROUND_HOME_DELIVERY',
+        'NextDayAirSaver',
+        'NextDayAir',
+        '2ndDayAir',
       ];
 
       $addresses= [
         [
-          'name' => 'Richard Q. Jonnes',
+          'name' => 'Richard Jonnes',
           'company' => 'WIBSTR',
           'street1' => '301 Platt Blvd',
           'city' => 'Claremont',
@@ -407,7 +412,7 @@ class Shipping {
           'residential' => true,
         ],
         [
-          'name' => 'Richard Q. Jonnes',
+          'name' => 'Richard Jonnes',
           'company' => 'WIBSTR',
           'street1' => '226 West 46th St',
           'city' => 'New York',
@@ -415,7 +420,7 @@ class Shipping {
           'zip' => '10036',
         ],
         [
-          'name' => 'Richard Q. Jonnes',
+          'name' => 'Richard Jonnes',
           'company' => 'WIBSTR',
           'street1' => '411 Elm St',
           'city' => 'Dallas',
@@ -423,7 +428,7 @@ class Shipping {
           'zip' => '75202',
         ],
         [
-          'name' => 'Richard Q. Jonnes',
+          'name' => 'Richard Jonnes',
           'company' => 'WIBSTR',
           'street1' => '605 S Main St',
           'city' => 'Seattle',
@@ -431,7 +436,7 @@ class Shipping {
           'zip' => '98104',
         ],
         [
-          'name' => 'Richard Q. Jonnes',
+          'name' => 'Richard Jonnes',
           'company' => 'WIBSTR',
           'street1' => '302 S Greene St',
           'city' => 'Greenville',
@@ -440,7 +445,7 @@ class Shipping {
           'residential' => true,
         ],
         [
-          'name' => 'Richard Q. Jonnes',
+          'name' => 'Richard Jonnes',
           'company' => 'WIBSTR',
           'street1' => '364 S King St',
           'city' => 'Honolulu',
@@ -455,7 +460,6 @@ class Shipping {
       }, $addresses);
 
       $parcels= [
-/*
         [
           'name' => '5x5x3.5 12oz',
           'length' => 5,
@@ -463,6 +467,7 @@ class Shipping {
           'height' => 4,
           'weight' => 12,
         ],
+/*
         [
           'name' => '5x5x3.5 2lb',
           'length' => 5,
@@ -491,13 +496,7 @@ class Shipping {
           'height' => 5,
           'weight' => 3 * 16,
         ],
-        [
-          'name' => '12x9.5x4 3lb',
-          'length' => 12,
-          'width' => 10,
-          'height' => 4.25,
-          'weight' => 3 * 16,
-        ],
+*/
         [
           'name' => '12x9.5x4 3lb',
           'length' => 12,
@@ -519,6 +518,7 @@ class Shipping {
           'height' => 12.5,
           'weight' => 12,
         ],
+/*
         [
           'name' => '3x3x12.25 3lb',
           'length' => 3.25,
