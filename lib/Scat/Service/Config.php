@@ -33,6 +33,8 @@ class Config {
     $row->save();
 
     $this->_config[$row->name]= $row->value;
+
+    return $row;
   }
 
   public function forget($name) {

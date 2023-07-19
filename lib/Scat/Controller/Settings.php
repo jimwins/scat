@@ -15,8 +15,10 @@ class Settings {
 
   public function home(Response $response, View $view) {
     $settings= $this->data->factory('Config')->order_by_asc('name')->find_many();
+    $address= $this->data->factory('Address')->find_one(1);
     return $view->render($response, 'settings/index.html', [
       'settings' => $settings,
+      'address' => $address,
     ]);
   }
 
@@ -25,18 +27,6 @@ class Settings {
     return $view->render($response, 'settings/advanced.html', [
       'settings' => $settings,
     ]);
-  }
-
-  public function create(Request $request, Response $response) {
-    $name= $request->getParam('name');
-    // TODO validate
-
-    $config= $this->data->factory('Config')->create();
-    $config->name= $name;
-    $config->value= $request->getParam('value') ?: '';
-    $config->save();
-
-    return $response->withJson($config);
   }
 
   public function update(Request $request, Response $response, $id) {
@@ -71,9 +61,25 @@ class Settings {
     return $response->withJson($config);
   }
 
-  public function printers(Request $request, Response $response,
-                                \Scat\Service\Printer $print)
-  {
+  public function updateByName(Request $request, Response $response) {
+    $name= $request->getParam('name');
+    $value= $request->getParam('value') ?: '';
+    $type= $request->getParam('type');
+
+    $config= $this->config->set($name, $value, $type);
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson($config);
+    }
+
+    return $response->withRedirect('/settings');
+  }
+
+  public function printing(
+    Request $request, Response $response,
+    \Scat\Service\Printer $print
+  ) {
     return $response->withJson($print->getPrinters());
   }
 
@@ -129,11 +135,12 @@ class Settings {
     return $response->withJson($message);
   }
 
-  public function address(Request $request, Response $response, View $view)
+  public function shipping(Request $request, Response $response, View $view)
   {
-    $address=
-      $this->data->factory('Address')->find_one(1);
-    return $view->render($response, 'settings/address.html', [
+    $settings= $this->data->factory('Config')->order_by_asc('name')->find_many();
+    $address= $this->data->factory('Address')->find_one(1);
+    return $view->render($response, 'settings/shipping.html', [
+      'settings' => $settings,
       'address' => $address,
     ]);
   }

@@ -696,19 +696,19 @@ $app->get('/scale', [ \Scat\Controller\Scale::class, 'home' ]);
 $app->group('/settings', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Controller\Settings::class, 'home' ])
       ->setName('settings');
-  $app->post('', [ \Scat\Controller\Settings::class, 'create' ]);
+  $app->post('', [ \Scat\Controller\Settings::class, 'updateByName' ]);
   $app->patch('/{id:[0-9]+}',
             [ \Scat\Controller\Settings::class, 'update' ]);
-  $app->get('/printers',
-            [ \Scat\Controller\Settings::class, 'printers' ]);
+  $app->get('/printing',
+            [ \Scat\Controller\Settings::class, 'printing' ]);
 
   $app->get('/message[/{message_id}]',
             [ \Scat\Controller\Settings::class, 'message' ]);
   $app->post('/message[/{message_id}]',
               [ \Scat\Controller\Settings::class, 'messageUpdate' ]);
 
-  $app->get('/address',
-            [ \Scat\Controller\Settings::class, 'address' ]);
+  $app->get('/shipping',
+            [ \Scat\Controller\Settings::class, 'shipping' ]);
 
   $app->get('/wordform[/{wordform_id}]',
             [ \Scat\Controller\Settings::class, 'wordform' ]);

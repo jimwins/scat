@@ -10,4 +10,80 @@
 
   {% include 'settings/nav.twig' %}
 
+  <p class="lead">
+    These are basic settings for Scat that are required for most basic operations.
+  </p>
+
+  <div class="row">
+    <div class="col-md-3">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Tax Rate</h3>
+        </div>
+        <div class="panel-body">
+          <p>This is the default tax rate, as a percentage, applied to all sales.</p>
+
+          <form method="POST" action="{{ current_url() }}">
+            <div class="form-group">
+              <label for="tax_rate">Tax Rate</label>
+              <input type="hidden" name="name" value="tax.default_rate">
+              <input type="text" class="form-control" autofocus
+                     name="value" placeholder="7.5"
+                     value="{{ config('tax.default_rate') }}">
+            </div>
+            <button type="submit" class="btn btn-primary">
+              Update Tax Rate
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-3">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Shipping Address</h3>
+        </div>
+        <div class="panel-body">
+          <p>This is the address used for calculating delivery distance and shipping costs.</p>
+
+          <address>
+            <div>{{ address.name }}</div>
+            <div>{{ address.company }}</div>
+            <div>{{ address.email }}</div>
+            {% if address.phone %}
+              <div>{{ address.phone | phone_number_format }}</div>
+            {% endif %}
+            <div>{{ address.street1 }}</div>
+            <div>{{ address.street2 }}</div>
+            <div>
+              {% if address.city %}
+                {{ address.city }},
+              {% endif %}
+              {{ address.state }}
+              {{ address.zip }}
+            </div>
+          </address>
+
+          <button class="btn btn-primary" data-action="edit-address">
+            Edit Address
+          </button>
+
+        </div><!-- .panel-body -->
+      </div><!-- .panel -->
+    </div></!-- .col-md-3 -->
+  </div>
+
+{% endblock %}
+
+{% block script %}
+  <script>
+    scat.handleAction('click', 'edit-address', (act) => {
+      return scat.dialog('/address/1').then((res) => {
+        window.location.reload()
+      })
+    })
+  </script>
 {% endblock %}
