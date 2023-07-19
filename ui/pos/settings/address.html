@@ -8,12 +8,7 @@
 
   <h1 class="page-header">Shipping Address</h1>
 
-  <ul class="nav nav-pills">
-    <li role="presentation"><a href="/settings">Advanced</a></li>
-    <li role="presentation"><a href="/settings/message">Canned Messages</a></li>
-    <li role="presentation" class="active"><a href="/settings/address">Shipping Address</a></li>
-    <li role="presentation"><a href="/settings/wordform">Wordforms</a></li>
-  </ul>
+  {% include 'settings/nav.twig' %}
 
   <address>
     <div>{{ address.name }}</div>

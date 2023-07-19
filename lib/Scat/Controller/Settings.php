@@ -20,6 +20,13 @@ class Settings {
     ]);
   }
 
+  public function advanced(Response $response, View $view) {
+    $settings= $this->data->factory('Config')->order_by_asc('name')->find_many();
+    return $view->render($response, 'settings/advanced.html', [
+      'settings' => $settings,
+    ]);
+  }
+
   public function create(Request $request, Response $response) {
     $name= $request->getParam('name');
     // TODO validate
@@ -64,7 +71,7 @@ class Settings {
     return $response->withJson($config);
   }
 
-  public function listPrinters(Request $request, Response $response,
+  public function printers(Request $request, Response $response,
                                 \Scat\Service\Printer $print)
   {
     return $response->withJson($print->getPrinters());

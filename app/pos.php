@@ -700,7 +700,7 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
   $app->patch('/{id:[0-9]+}',
             [ \Scat\Controller\Settings::class, 'update' ]);
   $app->get('/printers',
-            [ \Scat\Controller\Settings::class, 'listPrinters' ]);
+            [ \Scat\Controller\Settings::class, 'printers' ]);
 
   $app->get('/message[/{message_id}]',
             [ \Scat\Controller\Settings::class, 'message' ]);
@@ -714,6 +714,10 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Settings::class, 'wordform' ]);
   $app->post('/wordform[/{wordform_id}]',
               [ \Scat\Controller\Settings::class, 'wordformUpdate' ]);
+
+  $app->get('/advanced',
+            [ \Scat\Controller\Settings::class, 'advanced' ]);
+
 });
 
 /* Webhooks */

@@ -1,0 +1,20 @@
+{% set pages = [
+  { path: '/settings', label: 'Basic' },
+  { path: '/settings/message', label: 'Canned Messages' },
+  { path: '/settings/address', label: 'Shipping Address' },
+  { path: '/settings/wordform', label: 'Wordforms' },
+  { path: '/settings/advanced', label: 'Advanced' },
+] %}
+<style>
+  ul.nav-tabs {
+    margin-bottom: 1em;
+  }
+</style>
+<ul class="nav nav-tabs">
+  {% for page in pages %}
+    <li role="presentation" class="{{ current_url() == page.path ? 'active' }}">
+      <a href="{{ page.path }}">{{ page.label }}</a>
+    </li>
+  {% endfor %}
+</ul>
+
