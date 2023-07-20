@@ -167,7 +167,7 @@ class Cart {
             throw new \Exception("This gift card has expired.");
           }
 
-          $amount= min($balance, $cart->due());
+          $amount= min($details->balance, $cart->due());
 
           $cart->addPayment('gift', $amount, false, [ 'card' => $value ]);
           if ($cart->status == 'paid') {
