@@ -700,7 +700,10 @@ $app->group('/settings', function (RouteCollectorProxy $app) {
   $app->patch('/{id:[0-9]+}',
             [ \Scat\Controller\Settings::class, 'update' ]);
   $app->get('/printing',
-            [ \Scat\Controller\Settings::class, 'printing' ]);
+            [ \Scat\Controller\Settings::class, 'printing' ])
+      ->setName('print-settings');
+  $app->post('/printing',
+            [ \Scat\Controller\Settings::class, 'updatePrinting' ]);
 
   $app->get('/message[/{message_id}]',
             [ \Scat\Controller\Settings::class, 'message' ]);

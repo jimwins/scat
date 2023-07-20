@@ -78,9 +78,33 @@ class Settings {
 
   public function printing(
     Request $request, Response $response,
+    View $view,
     \Scat\Service\Printer $print
   ) {
-    return $response->withJson($print->getPrinters());
+    $printers= $print->getPrinters();
+    return $view->render($response, 'settings/printing.html', [
+      'printers' => $printers,
+    ]);
+  }
+
+  public function updatePrinting(Request $request, Response $response) {
+    if ($request->getParam('server')) {
+      $host= $request->getParam('host');
+      $user= $request->getParam('user');
+      $pass= $request->getParam('pass');
+
+      $this->config->set('cups.host', $host);
+      $this->config->set('cups.user', $user);
+      $this->config->set('cups.pass', $pass);
+    } else {
+      $types= [ 'label', 'letter', 'receipt', 'shipping-label' ];
+
+      foreach ($types as $type) {
+        $this->config->set('printer.' . $type, $request->getParam('printer_' . $type) ?? '');
+      }
+    }
+
+    return $response->withRedirect('/settings/printing');
   }
 
   public function message(Request $request, Response $response, View $view,
