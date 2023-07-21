@@ -170,7 +170,7 @@ class Person extends \Scat\Model {
     else if ($name == 'giftcard_id' && $this->giftcard_id) {
       $giftcard= $this->factory('Giftcard')->find_one($value);
       if (!$giftcard) {
-        throw new \Exception("Unable to find giftcard '$giftcard_id'.");
+        throw new \Exception("Unable to find giftcard '$value'.");
       }
 
       $store_credit= $this->factory('Giftcard')->find_one($this->giftcard_id);
