@@ -97,9 +97,9 @@ class ShortPixel {
 
   function reduceFile($file, $options= []) {
     $stream= @fopen($file, 'r');
-    if (!$fd)
+    if (!$stream)
       throw new ShortPixelException("Unable to open file '$file'.");
-    return $this->reduceStream($fd, basename($file), $options);
+    return $this->reduceStream($stream, basename($file), $options);
   }
 
   function reduceStream($file, $filename, $options= []) {
