@@ -2,7 +2,7 @@
 namespace Scat\Model;
 
 class Device extends \Scat\Model {
-  public function register($token) {
+  public static function register($token) {
     $device= self::factory('Device')->create();
     $device->token= $token;
     $device->save();
@@ -10,7 +10,7 @@ class Device extends \Scat\Model {
     return $device;
   }
 
-  public function forget($token) {
+  public static function forget($token) {
     $device= self::factory('Device')->where('token', $token)->find_one();
     $device->delete();
   }
