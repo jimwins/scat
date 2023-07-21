@@ -123,14 +123,14 @@ class Quickbooks {
     }
 
     try {
-      $this->connected= $this->refreshToken($request);
+      $connected= $this->refreshToken($request);
     } catch (\Exception $e) {
       $errors[]= $e->getMessage();
     }
 
     return $view->render($response, "quickbooks/index.html", [
       'qb' => $this->qb,
-      'connected' => $this->connected,
+      'connected' => $connected,
       'last_synced_payment' => $this->getLastSyncedPayment(),
       'last_synced_sale' => $this->getLastSyncedSale(),
       'errors' => $errors,
@@ -366,7 +366,7 @@ class Quickbooks {
         break;
 
       default:
-        throw new \Exception("ERROR: Unable to handle transaction type '$sale[type]'");
+        throw new \Exception("ERROR: Unable to handle transaction type '{$txn->type}'");
       }
 
       $data['Line']= array_values(array_filter($data['Line']));
