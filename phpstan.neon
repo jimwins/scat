@@ -1,0 +1,4 @@
+parameters:
+	universalObjectCratesClasses:
+		- Scat\Model
+	level: 1

@@ -374,7 +374,7 @@ class Report
                 ->find_many();
 
     $data= $person= [];
-    $day= null;
+    $day= $week= null;
     $day_reg= $day_ot= $week_reg= $week_ot= $total_reg= $total_ot= 0;
 
     foreach ($punches as $punch) {

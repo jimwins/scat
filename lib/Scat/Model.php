@@ -1,6 +1,7 @@
 <?php
 namespace Scat;
 
+#[\AllowDynamicProperties]
 class Model extends \Titi\Model implements \JsonSerializable {
 
   /* Memoize this, not sure why \Titi\Model doesn't store it on creation. */

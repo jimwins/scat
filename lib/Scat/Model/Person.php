@@ -183,7 +183,7 @@ class Person extends \Scat\Model {
       $giftcard->add_txn(-$amount);
       $store_credit->add_txn($amount);
     }
-    elseif (isset($this, $name)) {
+    elseif (property_exists($this, $name)) {
       $this->$name= ($value !== '') ? $value : null;
     } else {
       throw new \Exception("No way to set '$name' on a person.");
