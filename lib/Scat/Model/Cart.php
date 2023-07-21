@@ -345,7 +345,7 @@ class Cart extends \Scat\Model {
       $this->shipping= $option['rate'];
       $this->shipping_tax= 0;
     }
-    return parent::__set($key, $value);
+    parent::__set($key, $value);
   }
 
   public function generateCartItems() {
