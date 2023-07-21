@@ -122,6 +122,43 @@ class Catalog
              ->find_one($id);
   }
 
+  public function findVendorItemsByItemIdForVendor($item_id, $vendor_id) {
+    return $this->data->factory('VendorItem')
+             ->where('vendor_id', $vendor_id)
+             ->where('item_id', $item_id)
+             ->where('active', 1)
+             ->find_many();
+  }
+
+  public function findVendorItemsForVendor($vendor_id, $q) {
+    $scanner= new \OE\Lukas\Parser\QueryScanner();
+    $parser= new \OE\Lukas\Parser\QueryParser($scanner);
+    $parser->readString($q);
+    $query= $parser->parse();
+
+    if (!$query) {
+      $feedback= $parser->getFeedback();
+      foreach ($feedback as $msg) {
+        error_log($msg);
+      }
+      throw new \Exception($feedback[0]);
+    }
+
+    $v= new \Scat\VendorItemSearchVisitor();
+    $query->accept($v);
+
+    $items=
+      $this->data->factory('VendorItem')
+        ->select('vendor_item.*')
+        ->where('vendor_item.vendor_id', $vendor_id)
+        ->where_raw($v->where_clause())
+        ->where_gte('vendor_item.active', $v->force_all ? 0 : 1)
+        ->group_by('vendor_item.id')
+        ->order_by_asc('vendor_item.vendor_sku');
+
+    return $items;
+  }
+
   public function getPriceOverrides() {
     return $this->data->factory('PriceOverride')
       ->select('pattern')

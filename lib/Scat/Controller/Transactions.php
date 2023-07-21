@@ -8,15 +8,15 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Transactions {
-  private $view, $txn, $data, $catalog, $pole, $tax;
-
-  public function __construct(View $view, \Scat\Service\Txn $txn,
-                              \Scat\Service\Config $config,
-                              \Scat\Service\Data $data,
-                              \Scat\Service\Catalog $catalog,
-                              \Scat\Service\PoleDisplay $pole,
-                              \Scat\Service\Tax $tax)
-  {
+  public function __construct(
+    private View $view,
+    private \Scat\Service\Txn $txn,
+    private \Scat\Service\Config $config,
+    private \Scat\Service\Data $data,
+    private \Scat\Service\Catalog $catalog,
+    private \Scat\Service\PoleDisplay $pole,
+    private \Scat\Service\Tax $tax
+  ) {
     $this->view= $view;
     $this->txn= $txn;
     $this->config= $config;
@@ -2144,10 +2144,7 @@ class Transactions {
           continue;
         }
 
-        // TODO should be using Catalog Service for this
-        $vendor_items=
-          \Scat\Model\VendorItem::findByItemIdForVendor($item_id,
-                                                  $vendor_id);
+        $vendor_items= $this->catalog->findVendorItemsByItemIdForVendor($item_id, $vendor_id);
 
         // Get the lowest available price for our quantity
         $price= 0;

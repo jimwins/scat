@@ -129,8 +129,13 @@ class People {
     ]);
   }
 
-  public function items(Request $request, Response $response, $id, View $view,
-                        \Scat\Service\Data $data) {
+  public function items(
+    Request $request, Response $response,
+    View $view,
+    \Scat\Service\Catalog $catalog,
+    \Scat\Service\Data $data,
+    $id
+  ) {
     $person= $data->factory('Person')->find_one($id);
     $page= (int)$request->getParam('page');
 
@@ -142,7 +147,7 @@ class People {
 
     $q= $request->getParam('q');
 
-    $items= \Scat\Model\VendorItem::search($person->id, $q);
+    $items= $catalog->findVendorItemsForVendor($person->id, $q);
     $items= $items->select_expr('COUNT(*) OVER()', 'total')
                   ->limit($limit)->offset($page * $limit);
     $items= $items->find_many();
