@@ -921,7 +921,7 @@ endStripeFinalize:
           'item_total' => [
             'currency_code' => 'USD',
             // TODO need to use Decimal here?
-            'value' => $cart->subtotal() + cart->shipping,
+            'value' => $cart->subtotal() + $cart->shipping,
           ],
           'tax_total' => [
             'currency_code' => 'USD',
