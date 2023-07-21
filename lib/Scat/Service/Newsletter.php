@@ -50,7 +50,7 @@ class Newsletter
       $res= $client->request('POST', 'webhooks', [ 'json' => $data ]);
     }
 
-    return json_decode($body);
+    return json_decode([ 'message' => 'Webhooks registered.' ]);
   }
 
   public function signup($email, $name) {
