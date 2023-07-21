@@ -516,7 +516,7 @@ class Ordure {
         $note->full_content= $body;
         $note->save();
       }
-      catch (Exception $e) {
+      catch (\Exception $e) {
         $this->data->rollBack();
         $messages[]= "Exception: " . $e->getMessage();
       }
