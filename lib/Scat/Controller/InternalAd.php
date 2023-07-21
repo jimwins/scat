@@ -78,6 +78,8 @@ class InternalAd {
       $ad= $this->data->factory('InternalAd')->create();
     }
 
+    $dirty= false;
+
     foreach ($ad->getFields() as $field) {
       if ($field == 'id') continue; // don't allow changing id
       $value= $request->getParam($field);
