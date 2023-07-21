@@ -8,16 +8,11 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Address {
-  private $view, $data;
-
   public function __construct(
-    View $view,
-    \Scat\Service\Data $data,
-    \Scat\Service\Shipping $shipping
+    private View $view,
+    private \Scat\Service\Data $data,
+    private \Scat\Service\Shipping $shipping
   ) {
-    $this->view= $view;
-    $this->data= $data;
-    $this->shipping= $shipping;
   }
 
   public function show(Request $request, Response $response, View $view, $id) {
