@@ -1,6 +1,22 @@
 Scat is a web-based Point-of-Sale (POS) system.
 
-Scat requires PHP 7.2 or later and MySQL 8.0 or later.
+Scat requires PHP 8.1 or later and MySQL 8.0 or later.
+
+## INSTALL
+
+You shouldn't try to run this "in production" unless you know what you're doing, but you can get it running in a test/demo environment using the included docker-compose configuration.
+
+ * clone the repository
+ * `docker-compose up`
+ * connect to `http://localhost:5080` (or the server name if it’s not running on your local machine)
+ * click the “Set up the database” button
+ * click the "Load some sample data" button
+ * click the “Return to Scat” button
+ * start poking around
+
+## Dependencies
+
+See `composer.json` for most of the dependencies, but here are some notable and/or bundled ones.
 
 Scat uses the jQuery Javascript library.
   http://jquery.com/
