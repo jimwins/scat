@@ -66,6 +66,8 @@ class Timeclock {
 
     $before= clone $punch;
 
+    $dirty= false;
+
     foreach ($punch->getFields() as $field) {
       if ($field == 'id') continue; // don't allow changing id
       $value= $request->getParam($field);
