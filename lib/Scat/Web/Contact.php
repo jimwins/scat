@@ -8,18 +8,12 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Contact {
-  private $view, $data, $config;
-
   public function __construct(
-    View $view,
-    \Scat\Service\Config $config,
-    \Scat\Service\Email $email,
-    \Scat\Service\Data $data
+    private View $view,
+    private \Scat\Service\Config $config,
+    private \Scat\Service\Email $email,
+    private \Scat\Service\Data $data
   ) {
-    $this->view= $view;
-    $this->config= $config;
-    $this->email= $email;
-    $this->data= $data;
   }
 
   function handleContact(Request $request, Response $response)

@@ -2,7 +2,7 @@
 namespace Scat\Service;
 
 class Email {
-  private $postmark_key;
+  private $postmark_token;
   public $from_email, $from_name;
 
   public function __construct(Config $config) {
