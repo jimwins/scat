@@ -107,5 +107,8 @@
       "platform": {
         "ext-gd": "1"
       }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.10"
     }
 }
