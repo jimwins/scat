@@ -58,7 +58,7 @@ class Till {
 
     $txn= $this->txn->create('drawer');
 
-    if ($count != $expected) {
+    if ($counted != $expected) {
       $amount= $counted - $expected;
 
       $payment= $txn->payments()->create();
