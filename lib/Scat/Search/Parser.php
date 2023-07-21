@@ -145,7 +145,7 @@ class Parser {
         if ($pending) {
           $pending->term= $new_term;
           $new_term= $pending;
-          unset($pending);
+          $pending= null;
         }
         $terms[]= $new_term;
       }

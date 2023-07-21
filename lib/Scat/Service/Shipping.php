@@ -299,7 +299,7 @@ class Shipping
 
     $shipment= $this->createShipment($details, null, true);
 
-    $best_rate= null;
+    $best_rate= $method= null;
 
     foreach ($shipment->rates as $rate) {
       error_log("{$rate->carrier} / {$rate->service} = {$rate->rate}");
