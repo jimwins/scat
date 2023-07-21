@@ -725,6 +725,7 @@ class CartPayment extends \Scat\Model {
     return json_decode($this->data);
   }
 
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     $data= parent::jsonSerialize();
     $data['data']= json_decode($this->data);

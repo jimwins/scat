@@ -26,6 +26,7 @@ class Model extends \Titi\Model implements \JsonSerializable {
     }
   }
 
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     return $this->asArray();
   }

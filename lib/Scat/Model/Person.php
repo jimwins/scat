@@ -58,6 +58,7 @@ class Person extends \Scat\Model {
     return $this->factory('LoyaltyReward')->where_lte('cost', $points);
   }
 
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     $data= parent::jsonSerialize();
     /* Need to decode our JSON field */

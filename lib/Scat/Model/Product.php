@@ -62,6 +62,7 @@ class Product extends \Scat\Model {
                 ->max('inventoried');
   }
 
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     return array_merge($this->asArray(), [
       'full_slug' => $this->full_slug()

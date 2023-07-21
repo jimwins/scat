@@ -28,6 +28,7 @@ class Giftcard extends \Scat\Model {
     return $this->has_one('Person')->find_one();
   }
 
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     $history= array();
     $balance= new \Decimal\Decimal(0);
