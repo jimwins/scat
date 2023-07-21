@@ -10,8 +10,8 @@ class TxnLine extends \Scat\Model {
 
   public function item() {
     // Simple memoization
-    if (isset($_item)) return $_item;
-    return ($_item= $this->belongs_to('Item')->find_one());
+    if (isset($this->_item)) return $this->_item;
+    return ($this->_item= $this->belongs_to('Item')->find_one());
   }
 
   public function returned_from() {
@@ -188,7 +188,7 @@ class TxnLine extends \Scat\Model {
       parent::set('retail_price', $retail_price);
       parent::set('discount', $discount);
       parent::set('discount_type', $discount_type);
-      parent::set('discount_manual', $discount_manual);
+      return parent::set('discount_manual', $discount_manual);
     } elseif ($name == 'data') {
       return parent::set('data', json_encode($value));
     } elseif ($name == 'override_name') {
