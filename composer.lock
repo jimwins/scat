@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "227d4009f6e4ffe7d9b6f77f3141df95",
+    "content-hash": "a6ea630d40644929d9320320e30c198c",
     "packages": [
         {
             "name": "akrabat/ip-address-middleware",
@@ -3158,6 +3158,40 @@
                 "source": "https://github.com/paypal/paypalhttp_php/tree/1.0.1"
             },
             "time": "2021-09-14T21:35:26+00:00"
+        },
+        {
+            "name": "pensiero/php-openssl-cryptor",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pensiero/php-openssl-cryptor.git",
+                "reference": "85f81646a9ec5046a42b9c2259147d98525ce526"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pensiero/php-openssl-cryptor/zipball/85f81646a9ec5046a42b9c2259147d98525ce526",
+                "reference": "85f81646a9ec5046a42b9c2259147d98525ce526",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "php": ">=5.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OpensslCryptor\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Simple to use class for encrypting/decrypting using the PHP Openssl library.",
+            "support": {
+                "source": "https://github.com/pensiero/php-openssl-cryptor/tree/v0.1.0"
+            },
+            "time": "2017-12-30T01:09:54+00:00"
         },
         {
             "name": "php-di/invoker",
