@@ -110,9 +110,7 @@ class Settings {
   public function message(Request $request, Response $response, View $view,
                           $message_id= null)
   {
-    if ($message_id) {
-      $message= $this->data->factory('CannedMessage')->find_one($message_id);
-    }
+    $message= $message_id ? $this->data->factory('CannedMessage')->find_one($message_id) : null;
 
     if ($message_id && !$message)
       throw new \Slim\Exception\HttpNotFoundException($request);
@@ -172,9 +170,7 @@ class Settings {
   public function wordform(Request $request, Response $response, View $view,
                           $wordform_id= null)
   {
-    if ($wordform_id) {
-      $wordform= $this->data->factory('Wordform')->find_one($wordform_id);
-    }
+    $wordform= $wordform_id ? $this->data->factory('Wordform')->find_one($wordform_id) : null;
 
     if ($wordform_id && !$wordform)
       throw new \Slim\Exception\HttpNotFoundException($request);

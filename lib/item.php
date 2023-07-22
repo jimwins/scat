@@ -217,24 +217,15 @@ function item_load($db, $id) {
   return $items[0];
 }
 
-function item_load_vendor_items($db, $id) {
-  $q= "SELECT vendor_item.id, vendor_item.item, vendor,
-              company vendor_name, url,
-              code, vendor_sku, vendor_item.name,
-              retail_price, net_price, promo_price,
-              special_order,
-              purchase_quantity, barcode
-         FROM vendor_item
-         JOIN person ON vendor_item.vendor_id = person.id
-        WHERE item_id = $id AND vendor_item.active";
-
-  $r= $db->query($q)
-    or die_query($db, $q);
-
-  $vendor_items= array();
-  while ($row= $r->fetch_assoc()) {
-    $vendor_items[]= $row;
+function generate_upc($code) {
+  assert(strlen($code) == 11);
+  $check= 0;
+  foreach (range(0,10) as $digit) {
+    $check+= $code[$digit] * (($digit % 2) ? 1 : 3);
   }
 
-  return $vendor_items;
+  $cd= 10 - ($check % 10);
+  if ($cd == 10) $cd= 0;
+
+  return $code.$cd;
 }

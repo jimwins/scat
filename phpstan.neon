@@ -1,4 +1,6 @@
 parameters:
+	bootstrapFiles:
+		- lib/dummy-cc-terminal.php
 	universalObjectCratesClasses:
 		- Scat\Model
 	level: 1

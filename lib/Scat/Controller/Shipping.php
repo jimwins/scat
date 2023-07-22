@@ -228,12 +228,12 @@ class Shipping {
 
         $subject= $this->view->fetchBlock('email/delivered.html', 'title', [
           'tracker' => $tracker,
-          'delivered' => $delivered,
+          'delivered' => $delivered ?? null,
           'txn' => $txn,
         ]);
         $body= $this->view->fetch('email/delivered.html', [
           'tracker' => $tracker,
-          'delivered' => $delivered,
+          'delivered' => $delivered ?? null,
           'txn' => $txn,
         ]);
 
@@ -272,12 +272,12 @@ class Shipping {
 
         $subject= $this->view->fetchBlock('email/available_for_pickup.html', 'title', [
           'tracker' => $tracker,
-          'available_for_pickup' => $available_for_pickup,
+          'available_for_pickup' => $available_for_pickup ?? null,
           'txn' => $txn,
         ]);
         $body= $this->view->fetch('email/available_for_pickup.html', [
           'tracker' => $tracker,
-          'available_for_pickup' => $available_for_pickup,
+          'available_for_pickup' => $available_for_pickup ?? null,
           'txn' => $txn,
         ]);
 
@@ -316,12 +316,12 @@ class Shipping {
 
         $subject= $this->view->fetchBlock('email/out_for_delivery.html', 'title', [
           'tracker' => $tracker,
-          'out_for_delivery' => $out_for_delivery,
+          'out_for_delivery' => $out_for_delivery ?? null,
           'txn' => $txn,
         ]);
         $body= $this->view->fetch('email/out_for_delivery.html', [
           'tracker' => $tracker,
-          'out_for_delivery' => $out_for_delivery,
+          'out_for_delivery' => $out_for_delivery ?? null,
           'txn' => $txn,
         ]);
 

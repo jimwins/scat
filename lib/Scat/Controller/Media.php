@@ -100,7 +100,7 @@ class Media {
       }
     }
 
-    return $response->withJson($image);
+    return $response->withJson($image ?? null);
   }
 
   public function update(Request $request, Response $response, $id) {
@@ -190,7 +190,7 @@ class Media {
 
     $this->data->commit();
 
-    return $response->withJson($image);
+    return $response->withJson($image ?? null);
   }
 
   public function fix(Request $request, Response $response,
