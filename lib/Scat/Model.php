@@ -26,6 +26,15 @@ class Model extends \Titi\Model implements \JsonSerializable {
     }
   }
 
+  public function hasField($name) {
+    if ($this->is_new()) {
+      $fields= $this->getFields();
+      return in_array($name, $fields);
+    } else {
+      return array_key_exists($name, $this->_data);
+    }
+  }
+
   #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     return $this->asArray();
