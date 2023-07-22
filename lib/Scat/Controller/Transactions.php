@@ -218,7 +218,7 @@ class Transactions {
       // flip some values
       $data['amount']= -$data['amount'];
       $new->set($data);
-      $new->data($line->data()); // XXX fix data() magic
+      $new->data($payment->data()); // XXX fix data() magic
       $new->txn_id= $sale->id;
       $new->save();
     }
@@ -1508,6 +1508,7 @@ class Transactions {
 
     if (@$details['pickup'] == 1) {
       $txn->shipping_address_id= 1;
+      $address= $this->data->factory('Address')->find_one(1);
     } else {
       $details['verify']= [ 'delivery' ];
       $easypost_address= $shipping->createAddress($details);

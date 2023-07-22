@@ -130,10 +130,10 @@ class Quickbooks {
 
     return $view->render($response, "quickbooks/index.html", [
       'qb' => $this->qb,
-      'connected' => $connected,
+      'connected' => $connected ?? null,
       'last_synced_payment' => $this->getLastSyncedPayment(),
       'last_synced_sale' => $this->getLastSyncedSale(),
-      'errors' => $errors,
+      'errors' => $errors ?? null,
     ]);
   }
 

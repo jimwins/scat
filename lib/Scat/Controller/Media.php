@@ -109,6 +109,8 @@ class Media {
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
+    $dirty= false;
+
     foreach ($image->getFields() as $field) {
       if ($field == 'id') continue; // don't allow changing id
       $value= $request->getParam($field);

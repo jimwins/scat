@@ -242,6 +242,8 @@ class People {
 
     $data->beginTransaction();
 
+    $dirty= false;
+
     /* Copy over data that we don't have */
     foreach ($person->getFields() as $field) {
       if (in_array($field, [ 'id', 'created', 'modified' ])) continue;
@@ -516,7 +518,7 @@ class People {
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
       return $view->render($response, 'dialog/tax-exemption.html', [
         'person' => $person,
-        'exemption' => $exemption->ExemptCertificates[0],
+        'exemption' => $person->exemption_certificate_id ? $exemption->ExemptCertificates[0] : null,
       ]);
     }
 
