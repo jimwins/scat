@@ -207,11 +207,3 @@ function format_phone($phone) {
     return $phone;
   }
 }
-
-require 'extern/cryptor.php';
-
-function include_encrypted($file) {
-  $enc= file_get_contents($file);
-  $dec= Cryptor::Decrypt($enc, SCAT_ENCRYPTION_KEY);
-  eval('?>' . $dec);
-}
