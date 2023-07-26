@@ -1,7 +1,7 @@
 <?php
 # this is a very blunt hammer.
 
-require 'vendor/autoload.php';
+require '../vendor/autoload.php';
 
 $debug= true;
 
