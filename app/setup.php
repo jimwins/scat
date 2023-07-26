@@ -12,6 +12,7 @@ $_ENV['PHINX_PASSWORD']= getenv('MYSQL_ROOT_PASSWORD');
 
 $app= new \Phinx\Console\PhinxApplication();
 $wrap= new \Phinx\Wrapper\TextWrapper($app);
+$wrap->setOption('configuration', '../phinx.yml');
 
 $routes= [
   'status' => 'getStatus',
