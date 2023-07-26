@@ -50,7 +50,7 @@ try {
   $container->set('config', new \Scat\Service\Config($container->get('data')));
 } catch (\PDOException $ex) {
   if ($ex->getCode() == '42S02') {
-    header("Location: /setup.php");
+    header("Location: /app/setup.php");
     exit;
   }
 
