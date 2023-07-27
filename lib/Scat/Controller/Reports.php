@@ -23,6 +23,7 @@ class Reports {
 
   public static function registerRoutes(\Slim\Routing\RouteCollectorProxy $app) {
     $app->get('/brand', [ self::class, 'brandSales' ]);
+    $app->get('/category', [ self::class, 'categorySales' ]);
     $app->get('/empty-products', [ self::class, 'emptyProducts' ]);
     $app->get('/backordered-items', [ self::class, 'backorderedItems' ]);
     $app->get('/cashflow', [ self::class, 'cashflow' ]);
@@ -56,6 +57,18 @@ class Reports {
     $data= $this->report->brandSales($begin, $end, $items);
 
     return $this->view->render($response, 'report/brand-sales.html', $data);
+  }
+
+  public function categorySales(Request $request, Response $response) {
+    $begin= $request->getParam('begin') ?? $this->thirtydaysago();
+    $end= $request->getParam('end') ?? $this->today();
+    $items= $request->getParam('items') ?? '';
+
+    error_log("reporting sales by category from '$begin' to '$end' for '$items'\n");
+
+    $data= $this->report->categorySales($begin, $end, $items);
+
+    return $this->view->render($response, 'report/category-sales.html', $data);
   }
 
   public function sales(Request $request, Response $response) {
