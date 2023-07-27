@@ -160,6 +160,23 @@ class ScatUtils {
     .then((response) => this._handleResponse(response))
   }
 
+  postJson (url, args, opts) {
+    if (args instanceof FormData) {
+      args= Object.fromEntries(args)
+    }
+
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(args)
+    })
+    .then((response) => this._handleResponse(response))
+  }
+
+
   patch (url, args, opts) {
     if (args instanceof FormData) {
       args= Object.fromEntries(args)
@@ -196,11 +213,6 @@ class ScatUtils {
       body: JSON.stringify(Object.fromEntries(formData))
     })
     .then((response) => this._handleResponse(response))
-  }
-
-  api (func, args, opts) {
-    let url= '/api/' + func + '.php';
-    return this.post(url, args, opts)
   }
 
   print (url, args) {

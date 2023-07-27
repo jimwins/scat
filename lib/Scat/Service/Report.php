@@ -3,10 +3,9 @@ namespace Scat\Service;
 
 class Report
 {
-  private $data;
-
-  public function __construct(\Scat\Service\Data $data) {
-    $this->data= $data;
+  public function __construct(
+    private Data $data
+  ) {
   }
 
   public function sales($span= '', $begin= null, $end= null) {
@@ -267,6 +266,36 @@ class Report
                              ->having_gt('in_kit', 0)
                              ->order_by_asc('code')
                              ->find_many() ];
+  }
+
+  public function priceChanges(\Scat\Service\Catalog $catalog, $vendor, $items_query) {
+    $vendors=
+      $this->data->factory('Person')
+        ->where('role', 'vendor')
+        ->where('active', 1)
+        ->order_by_expr("IF(company != '' AND company IS NOT NULL, company, name)")
+        ->find_many();
+
+    $items= [];
+
+    if ($vendor) {
+      $items=
+        $catalog
+          ->searchItems($items_query . " vendor:" . $vendor)
+          ->join('vendor_item', [ 'vendor_item.item_id', '=', 'item.id' ])
+          ->where('vendor_item.vendor_id', $vendor)
+          ->where_raw('ABS(vendor_item.retail_price - item.retail_price) > 0.01')
+          ->select_expr('ANY_VALUE(vendor_item.retail_price)', 'new_retail_price')
+          ->select_expr('ANY_VALUE(vendor_item.net_price)', 'net_price')
+          ->find_many();
+    }
+
+    return [
+      'vendor' => $vendor,
+      'items_query' => $items_query,
+      'vendors' => $vendors,
+      'items' => $items,
+    ];
   }
 
   public function purchasesByVendor($begin, $end) {

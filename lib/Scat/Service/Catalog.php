@@ -3,10 +3,10 @@ namespace Scat\Service;
 
 class Catalog
 {
-  private $data;
-
-  public function __construct(Data $data) {
-    $this->data= $data;
+  public function __construct(
+    private Data $data,
+    private Search $search,
+  ) {
   }
 
   public function createBrand() {
@@ -177,5 +177,9 @@ class Catalog
                     'in_stocks')
       ->group_by('pattern')
       ->find_many();
+  }
+
+  public function searchItems($q) {
+    return $this->search->buildSearchItems($q);
   }
 }

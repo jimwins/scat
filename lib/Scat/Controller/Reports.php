@@ -94,6 +94,16 @@ class Reports {
     return $this->view->render($response, 'report/kit-items.html', $data);
   }
 
+  public function priceChanges(
+    Request $request, Response $response,
+    \Scat\Service\Catalog $catalog
+  ) {
+    $vendor= $request->getParam('vendor');
+    $items_query= $request->getParam('items');
+    $data= $this->report->priceChanges($catalog, $vendor, $items_query);
+    return $this->view->render($response, 'report/price-changes.html', $data);
+  }
+
   public function purchasesByVendor(Request $request, Response $response) {
     $begin= $request->getParam('begin');
     $end= $request->getParam('end');

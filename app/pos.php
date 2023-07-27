@@ -292,6 +292,8 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
               [ \Scat\Controller\Catalog::class, 'markInventoried' ]);
   $app->post('/~print-count-sheet',
               [ \Scat\Controller\Catalog::class, 'printCountSheet' ]);
+  $app->post('/~update-prices',
+              [ \Scat\Controller\Catalog::class, 'updatePrices' ]);
 
   $app->get('/custom', [ \Scat\Controller\Catalog::class, 'custom' ]);
 
@@ -534,6 +536,8 @@ $app->group('/report', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\Reports::class, 'dropByDrop' ]);
   $app->get('/kit-items',
             [ \Scat\Controller\Reports::class, 'kitItems' ]);
+  $app->get('/price-change',
+            [ \Scat\Controller\Reports::class, 'priceChanges' ]);
   $app->get('/purchases-by-vendor',
             [ \Scat\Controller\Reports::class, 'purchasesByVendor' ]);
   $app->get('/shipments',

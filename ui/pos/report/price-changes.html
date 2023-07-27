@@ -1,0 +1,203 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Price Changes
+{% endblock %}
+
+{% block content %}
+  <form id="report-params" class="form-horizontal" role="form" action="{{ current_url() }}">
+    <div class="form-group">
+      <label for="vendor" class="col-sm-1 control-label">
+        Vendor
+      </label>
+      <div class="col-sm-3">
+        <select class="form-control" name="vendor">
+          <option value="">All vendors</option>
+          {% for v in vendors %}
+            <option value="{{ v.id }}" {{ vendor == v.id ? 'selected' }}>
+              {{ v.company ?: v.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <label for="items" class="col-sm-1 control-label">
+        Items
+      </label>
+      <div class="col-sm-5">
+        <div class="input-group">
+          <input id="items" name="items" type="text"
+                 class="form-control"
+                 value="{{ items_query }}">
+          <span class="input-group-btn">
+            <input type="submit" class="btn btn-primary" value="Show">
+          </span>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        {% if vendor %}
+          <button class="btn btn-default" data-action="toggle-select">Select</button>
+          <button class="btn btn-danger" data-action="apply-all">Apply All</button>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+
+  {% if items %}
+    <style>
+      .item-select { display: none }
+      .item-select.visible {
+        display: table-cell;
+      }
+    </style>
+    </style>
+    <table class="item-list table table-striped table-condensed table-sort">
+      <thead>
+        <tr>
+          <th class="item-select">
+           <input type="checkbox" checked> 
+          </th>
+          <th class="meta">#</th>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Old List</th>
+          <th>New List</th>
+          <th>Old Sale</th>
+          <th>Discount</th>
+          <th>New Sale</th>
+          <th>Stock</th>
+          <th>Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr data-id="{{ item.id }}" data-new-retail-price="{{ item.new_retail_price }}">
+            <td class="item-select"><input type="checkbox" checked></td>
+            <td class="num">{{ loop.index }}</td>
+            <td>
+              <a href="{{ url_for('catalog-item', { code: item.code }) }}">
+                {{ item.code }}
+              </a>
+            </td>
+            <td>{{ item.name }}</td>
+            <td>{{ scat.amount(item.retail_price) }}</td>
+            <td>{{ scat.amount(item.new_retail_price) }}</td>
+            <td>{{ scat.amount(item.sale_price) }}</td>
+            <td>{{ scat.format_discount(item) }}</td>
+            <td>
+              {{ scat.amount(item.net_price / 0.6) }}
+              -
+              {{ scat.amount(item.net_price / 0.5) }}
+            </td>
+            <td>{{ item.stock }}</td>
+            <td>
+              <a class="price-change"
+                  data-code="{{ item.code }}" data-msrp="{{ item.new_retail_price }}">
+                <i class="fa fa-money"></i>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}
+
+{% block script %}
+  <script>
+    document.querySelectorAll('th.item-select input').forEach((toggle) => {
+      toggle.addEventListener('change', (ev) => {
+	// find containing table
+	let table= ev.target.closest('table')
+	let items= table.querySelectorAll('td.item-select input')
+	items.forEach((item) => {
+	  item.checked= toggle.checked
+	})
+      })
+    })
+
+    scat.handleAction('click', 'toggle-select', (act) => {
+      document.querySelectorAll('.item-select').forEach((item) => {
+        item.classList.toggle('visible')
+      })
+      return Promise.resolve()
+    })
+
+    let collectItems= (list, all= 1) => {
+      let items= list.querySelectorAll('.item-list tr[data-id]')
+      return Array.from(items)
+                  .filter((el) => {
+                    return !!el.querySelector(':checked') &&
+                            (all || el.attributes['data-stocked'].value != 0)
+                  })
+                  .map((el) => { return { id: el.attributes['data-id'].value, new_retail_price: el.attributes['data-new-retail-price'].value }; })
+    }
+
+    scat.handleAction('click', 'apply-all', (act) => {
+      let items= collectItems(document)
+
+      if (confirm("Are you sure you want to update all of these prices?")) {
+        return scat.postJson('/catalog/~update-prices', {
+          items: items,
+        }).then((res) => {
+          return res.json()
+        }).then((data) => {
+          alert(data.message)
+        }).catch((err) => {
+          scat.alert('danger', err.message)
+        })
+      }
+    })
+
+    $('.price-change').popover({
+      html: true,
+      placement: 'bottom',
+      content: function(e) {
+        var tmpl= $($('#change-template').html());
+        $('input[name="code"]', tmpl).val($(this).data('code'));
+        $('input[name="retail_price"]', tmpl).val($(this).data('msrp'));
+        return tmpl;
+      },
+    });
+
+    $('body').on('submit', '.price-change-form', function(ev) {
+      ev.preventDefault();
+      var form= $(this);
+      let formData= new FormData(ev.target)
+      if (formData.get('discount') === '') formData.delete('discount')
+      scat.patch('/catalog/item/' + formData.get('code'), formData)
+      .then((res) => res.json())
+      .then((data) => {
+        if ($('input[name="print"]:checked', form).length) {
+          Scat.printDirect('labels-price', { id: data.id });
+        }
+        $(form).parent().parent()
+               .siblings('.price-change')
+               .popover('hide');
+      });
+    });
+  </script>
+
+  <script type="text/html" id="change-template">
+    <form class="form price-change-form">
+      <input type="hidden" name="code">
+      <div class="form-group">
+        <label for="retail_price" class="control-label">New Retail Price</label>
+        <input type="text" class="form-control" name="retail_price"
+               placeholder="$0.00">
+      </div>
+      <div class="form-group">
+        <label for="discount" class="control-label">New Discount</label>
+        <input type="text" class="form-control" name="discount"
+               placeholder="$0.00 or 0%">
+      </div>
+      <div class="form-group">
+        <label class="control-label">
+          <input type="checkbox" name="print" value="1" checked>
+          Print new label?
+        </label>
+      </div>
+      <input type="submit" class="btn btn-primary" value="Save">
+    </form>
+  </script>
+{% endblock %}

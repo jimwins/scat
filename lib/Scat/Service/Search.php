@@ -49,7 +49,7 @@ class Search
     ];
   }
 
-  public function searchItems($q, $limit= null) {
+  public function buildSearchItems($q, $limit= null) {
     $scanner= new \OE\Lukas\Parser\QueryScanner();
     $parser= new \OE\Lukas\Parser\QueryParser($scanner);
     $parser->readString($q);
@@ -95,7 +95,11 @@ class Search
       $items= $items->limit($limit);
     }
 
-    return $items->find_many();
+    return $items;
+  }
+
+  public function searchItems($q, $limit= null) {
+    return $this->buildSearchItems($q, $limit)->find_many();
   }
 
   public function searchBrands($q) {

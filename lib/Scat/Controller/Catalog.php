@@ -1383,4 +1383,27 @@ class Catalog {
 
     return $response->withHeader("Content-type", "text/csv");
   }
+
+  public function updatePrices(Request $request, Response $response) {
+    $items= $request->getParam('items');
+
+    $count= 0;
+
+    $this->data->beginTransaction();
+
+    foreach ($items as $change) {
+      $item= $this->catalog->getItemById($change['id']);
+      if (!$item)
+        throw new \Slim\Exception\HttpNotFoundException($request);
+
+      $item->retail_price= $change['new_retail_price'];
+      $item->save();
+
+      $count++;
+    }
+
+    $this->data->commit();
+
+    return $response->withJson([ 'message' => "Updated $count item(s)." ]);
+  }
 }
