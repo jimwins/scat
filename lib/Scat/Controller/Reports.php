@@ -15,12 +15,26 @@ use \Respect\Validation\Validator as v;
  */
 
 class Reports {
-  private $report;
-  private $view;
+  public function __construct(
+    private \Scat\Service\Report $report,
+    private View $view
+  ) {
+  }
 
-  public function __construct(\Scat\Service\Report $report, View $view) {
-    $this->report= $report;
-    $this->view= $view;
+  public static function registerRoutes(\Slim\Routing\RouteCollectorProxy $app) {
+    $app->get('/empty-products', [ self::class, 'emptyProducts' ]);
+    $app->get('/backordered-items', [ self::class, 'backorderedItems' ]);
+    $app->get('/cashflow', [ self::class, 'cashflow' ]);
+    $app->get('/drop-by-drop', [ self::class, 'dropByDrop' ]);
+    $app->get('/kit-items', [ self::class, 'kitItems' ]);
+    $app->get('/price-change', [ self::class, 'priceChanges' ]);
+    $app->get('/purchases-by-vendor', [ self::class, 'purchasesByVendor' ]);
+    $app->get('/shipments', [ self::class, 'shipments' ]);
+    $app->get('/shipping-costs', [ self::class, 'shippingCosts' ]);
+    $app->get('/clock', [ self::class, 'clock' ]);
+    $app->get('/sales', [ self::class, 'sales' ]);
+    $app->get('/purchases', [ self::class, 'purchases' ]);
+    $app->get('/{name}', [ self::class, 'oldReport' ]);
   }
 
   public function sales(Request $request, Response $response) {

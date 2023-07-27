@@ -526,31 +526,7 @@ $app->group('/gift-card', function (RouteCollectorProxy $app) {
 
 /* Reports */
 $app->group('/report', function (RouteCollectorProxy $app) {
-  $app->get('/empty-products',
-            [ \Scat\Controller\Reports::class, 'emptyProducts' ]);
-  $app->get('/backordered-items',
-            [ \Scat\Controller\Reports::class, 'backorderedItems' ]);
-  $app->get('/cashflow',
-            [ \Scat\Controller\Reports::class, 'cashflow' ]);
-  $app->get('/drop-by-drop',
-            [ \Scat\Controller\Reports::class, 'dropByDrop' ]);
-  $app->get('/kit-items',
-            [ \Scat\Controller\Reports::class, 'kitItems' ]);
-  $app->get('/price-change',
-            [ \Scat\Controller\Reports::class, 'priceChanges' ]);
-  $app->get('/purchases-by-vendor',
-            [ \Scat\Controller\Reports::class, 'purchasesByVendor' ]);
-  $app->get('/shipments',
-            [ \Scat\Controller\Reports::class, 'shipments' ]);
-  $app->get('/shipping-costs',
-            [ \Scat\Controller\Reports::class, 'shippingCosts' ]);
-  $app->get('/clock',
-            [ \Scat\Controller\Reports::class, 'clock' ]);
-  $app->get('/sales',
-            [ \Scat\Controller\Reports::class, 'sales' ]);
-  $app->get('/purchases',
-            [ \Scat\Controller\Reports::class, 'purchases' ]);
-  $app->get('/{name}', [ \Scat\Controller\Reports::class, 'oldReport' ]);
+  \Scat\Controller\Reports::registerRoutes($app);
 });
 
 /* Media */
