@@ -22,6 +22,7 @@ class Reports {
   }
 
   public static function registerRoutes(\Slim\Routing\RouteCollectorProxy $app) {
+    $app->get('/brand', [ self::class, 'brandSales' ]);
     $app->get('/empty-products', [ self::class, 'emptyProducts' ]);
     $app->get('/backordered-items', [ self::class, 'backorderedItems' ]);
     $app->get('/cashflow', [ self::class, 'cashflow' ]);
@@ -35,6 +36,26 @@ class Reports {
     $app->get('/sales', [ self::class, 'sales' ]);
     $app->get('/purchases', [ self::class, 'purchases' ]);
     $app->get('/{name}', [ self::class, 'oldReport' ]);
+  }
+
+  /* A couple of simple helper methods */
+  public function thirtydaysago() {
+    return (new \Datetime('-30 days'))->format('Y-m-d');
+  }
+  public function today() {
+    return (new \Datetime('now'))->format('Y-m-d');
+  }
+
+  public function brandSales(Request $request, Response $response) {
+    $begin= $request->getParam('begin') ?? $this->thirtydaysago();
+    $end= $request->getParam('end') ?? $this->today();
+    $items= $request->getParam('items') ?? '';
+
+    error_log("reporting sales by brand from '$begin' to '$end' for '$items'\n");
+
+    $data= $this->report->brandSales($begin, $end, $items);
+
+    return $this->view->render($response, 'report/brand-sales.html', $data);
   }
 
   public function sales(Request $request, Response $response) {

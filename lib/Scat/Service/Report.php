@@ -4,8 +4,93 @@ namespace Scat\Service;
 class Report
 {
   public function __construct(
-    private Data $data
+    private Data $data,
+    private Search $search
   ) {
+  }
+
+  public function brandSales($begin= null, $end= null, $items= null) {
+    $sql_criteria= "1=1";
+    if ($items) {
+      list($sql_criteria, $x)= $this->search->buildSearchItemsWhere($items);
+    }
+
+    /* Current */
+    $q= "CREATE TEMPORARY TABLE current
+           (item_id INT UNSIGNED PRIMARY KEY,
+            brand_id INT UNSIGNED NOT NULL,
+            units INT NOT NULL,
+            amount DECIMAL(9,2) NOT NULL,
+            KEY (brand_id))
+         SELECT
+                txn_line.item_id, IFNULL(brand.id, 0) brand_id,
+                SUM(-1 * allocated) units,
+                SUM(-1 * allocated * sale_price(txn_line.retail_price,
+                                                txn_line.discount_type,
+                                                txn_line.discount)) amount
+           FROM txn
+           LEFT JOIN txn_line ON txn.id = txn_line.txn_id
+                JOIN item ON txn_line.item_id = item.id
+           LEFT JOIN barcode ON item.id = barcode.item_id
+           LEFT JOIN product ON product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+           LEFT JOIN department ON department.id = product.department_id
+          WHERE type = 'customer'
+            AND ($sql_criteria)
+            AND filled BETWEEN ? AND ? + INTERVAL 1 DAY
+            AND txn_line.item_id IS NOT NULL
+          GROUP BY 1";
+
+    $this->data->execute($q, [ $begin, $end ]);
+
+    /* Previous */
+    $q= "CREATE TEMPORARY TABLE previous
+           (item_id INT UNSIGNED PRIMARY KEY,
+            brand_id INT UNSIGNED NOT NULL,
+            units INT NOT NULL,
+            amount DECIMAL(9,2) NOT NULL,
+            KEY (brand_id))
+         SELECT
+                txn_line.item_id, IFNULL(brand.id, 0) brand_id,
+                SUM(-1 * allocated) units,
+                SUM(-1 * allocated * sale_price(txn_line.retail_price,
+                                                txn_line.discount_type,
+                                                txn_line.discount)) amount
+           FROM txn
+           LEFT JOIN txn_line ON txn.id = txn_line.txn_id
+                JOIN item ON txn_line.item_id = item.id
+           LEFT JOIN barcode ON item.id = barcode.item_id
+           LEFT JOIN product ON product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+           LEFT JOIN department ON department.id = product.department_id
+          WHERE type = 'customer'
+            AND ($sql_criteria)
+            AND filled BETWEEN ? - INTERVAL 1 YEAR
+                           AND ? + INTERVAL 1 DAY - INTERVAL 1 YEAR
+            AND txn_line.item_id IS NOT NULL
+          GROUP BY 1";
+
+    $this->data->execute($q, [ $begin, $end ]);
+
+    /* Report */
+    $q= "SELECT
+                name, slug, 0,
+                (SELECT SUM(amount) FROM current WHERE brand_id = id)
+                  AS current_amount,
+                (SELECT SUM(amount) FROM previous WHERE brand_id = id)
+                  AS previous_amount
+           FROM brand
+         HAVING current_amount OR previous_amount
+          ORDER BY name";
+
+    $sales= $this->data->for_table('item')->raw_query($q)->find_many();
+
+    return [
+      'begin' => $begin,
+      'end' => $end,
+      'items' => $items,
+      'sales' => $sales,
+    ];
   }
 
   public function sales($span= '', $begin= null, $end= null) {

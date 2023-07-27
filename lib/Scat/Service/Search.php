@@ -49,7 +49,7 @@ class Search
     ];
   }
 
-  public function buildSearchItems($q, $limit= null) {
+  public function buildSearchItemsWhere($q) {
     $scanner= new \OE\Lukas\Parser\QueryScanner();
     $parser= new \OE\Lukas\Parser\QueryParser($scanner);
     $parser->readString($q);
@@ -62,6 +62,12 @@ class Search
 
     $v= new \Scat\SearchVisitor();
     $query->accept($v);
+
+    return [ $v->where_clause(), $v->force_all ];
+  }
+
+  public function buildSearchItems($q, $limit= null) {
+    list($where, $force_all)= $this->buildSearchItemsWhere($q);
 
     $items= $this->data->factory('Item')->select('item.*')
                                    ->select_expr('COUNT(*) OVER()', 'records')
@@ -85,9 +91,8 @@ class Search
                                    ->left_outer_join('barcode',
                                                      array('barcode.item_id',
                                                            '=', 'item.id'))
-                                   ->where_raw($v->where_clause())
-                                   ->where_gte('item.active',
-                                               $v->force_all ? 0 : 1)
+                                   ->where_raw($where)
+                                   ->where_gte('item.active', $force_all ? 0 : 1)
                                    ->where_not_equal('item.deleted', 1)
                                    ->group_by('item.id')
                                    ->order_by_expr('!(minimum_quantity > 0 OR stock != 0), item.code');
