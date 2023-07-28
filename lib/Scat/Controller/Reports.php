@@ -24,6 +24,7 @@ class Reports {
   public static function registerRoutes(\Slim\Routing\RouteCollectorProxy $app) {
     $app->get('/brand', [ self::class, 'brandSales' ]);
     $app->get('/category', [ self::class, 'categorySales' ]);
+    $app->get('/dogs', [ self::class, 'dogs' ]);
     $app->get('/empty-products', [ self::class, 'emptyProducts' ]);
     $app->get('/backordered-items', [ self::class, 'backorderedItems' ]);
     $app->get('/cashflow', [ self::class, 'cashflow' ]);
@@ -112,6 +113,12 @@ class Reports {
 
     return $this->view->render($response, 'report/purchases.html', $data);
   }
+
+  public function dogs(Request $request, Response $response) {
+    $data= $this->report->dogs();
+    return $this->view->render($response, 'report/dogs.html', $data);
+  }
+
 
   public function emptyProducts(Request $request, Response $response) {
     $data= $this->report->emptyProducts();

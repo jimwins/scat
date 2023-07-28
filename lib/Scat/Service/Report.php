@@ -362,6 +362,34 @@ class Report
     return [ "purchases" => $purchases ];
   }
 
+  public function dogs() {
+    return [ "items" => $this->data->factory('Item')
+                          ->select('*')
+                          ->select_expr('(SELECT MIN(created)
+                                            FROM txn
+                                            JOIN txn_line ON txn.id = txn_line.txn_id
+                                           WHERE txn_line.item_id = item.id
+                                             AND type = "vendor")',
+                                        'first_seen')
+                          ->select_expr('(SELECT SUM(ordered)
+                                            FROM txn_line
+                                           WHERE txn_line.item_id = item.id)',
+                                        'stocked')
+                          ->select_expr('(SELECT MAX(paid)
+                                            FROM txn
+                                            JOIN txn_line ON txn.id = txn_line.txn_id
+                                           WHERE txn_line.item_id = item.id
+                                             AND type = "customer")',
+                                        'last_sale')
+                          ->where_gt('item.active', 0)
+                          ->where_gt('item.minimum_quantity', 0)
+                          ->having_raw('(first_seen < NOW() - INTERVAL 1 YEAR) AND
+                                        (last_sale IS NULL OR last_sale < NOW() - INTERVAL 1 YEAR) AND
+                                        (stocked > 0)')
+                          ->order_by_asc('code')
+                          ->find_many() ];
+  }
+
   public function emptyProducts() {
     return [ "products" => $this->data->factory('Product')
                              ->select('*')

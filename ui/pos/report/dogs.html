@@ -1,0 +1,46 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Dogs
+{% endblock %}
+
+{% block content %}
+
+  <p>These are in-stock items that have not moved in more than a year.</p>
+  <div id="results">
+    <table class="table table-striped table-hover table-sort">
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Last</th>
+          <th>Stocked</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr>
+            <td class="num">{{ loop.index }}</td>
+            <td>
+              <a href="{{ url_for('catalog-item', { code: item.code }) }}">
+                {{ item.code }}
+              </a>
+            </td>
+            <td>
+              {{ item.name }}
+            </td>
+            <td>
+              {{ item.last_sale }}
+            </td>
+            <td>
+              {{ item.stocked }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}
