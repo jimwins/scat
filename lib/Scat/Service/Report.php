@@ -466,6 +466,32 @@ class Report
 
   }
 
+  public function itemSales($begin= null, $end= null, $items_query= null) {
+    $items= $this->search->buildSearchItems($items_query);
+
+    return [
+      "begin" => $begin,
+      "end" => $end,
+      "items_query" => $items_query,
+      "items" =>
+        $items
+          ->select_expr('SUM(-1 * allocated)', 'sold')
+          ->select_expr('AVG(sale_price(txn_line.retail_price, txn_line.discount_type,
+                                        txn_line.discount))',
+                        'average')
+          ->select_expr('SUM(-1 * allocated * sale_price(txn_line.retail_price,
+                                                          txn_line.discount_type,
+                                                          txn_line.discount))',
+                        'total')
+          ->join('txn_line', [ 'item.id', '=', 'txn_line.item_id' ])
+          ->join('txn', [ 'txn_line.txn_id', '=', 'txn.id' ])
+          ->where('txn.type', 'customer')
+          ->where_raw('filled BETWEEN ? and ? + INTERVAL 1 DAY', [ $begin, $end ])
+          ->group_by('item.id')
+          ->find_many()
+    ];
+  }
+
   public function kitItems() {
     return [ "items" => $this->data->factory('Item')
                              ->select('*')

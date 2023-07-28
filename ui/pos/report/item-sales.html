@@ -1,0 +1,70 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Item Sales
+{% endblock %}
+
+{% block content %}
+  <form id="report-params" class="form-horizontal" role="form"
+        action="{{ current_url() }}" method="get">
+    <div class="form-group">
+      <label for="datepicker" class="col-sm-2 control-label">
+        Dates
+      </label>
+      <div class="col-sm-10">
+        <div class="input-daterange input-group" id="datepicker">
+          <input type="text" class="form-control" name="begin" value="{{ begin }}" />
+          <span class="input-group-addon">to</span>
+          <input type="text" class="form-control" name="end" value="{{ end }}" />
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="items" class="col-sm-2 control-label">
+        Items
+      </label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" name="items" value="{{ items_query }}" />
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <input type="submit" class="btn btn-primary" value="Show">
+      </div>
+    </div>
+  </form>
+
+
+  <div id="results">
+    <table class="table table-striped table-hover table-sort">
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Sold</th>
+          <th>Average</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr>
+            <td class="num">{{ loop.index }}</td>
+            <td>
+              <a href="{{ url_for('catalog-item', { code: item.code }) }}">
+                {{ item.code }}
+              </a>
+            </td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.sold }}</td>
+            <td>{{ scat.amount(item.average) }}</td>
+            <td>{{ scat.amount(item.total) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

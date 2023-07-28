@@ -29,6 +29,7 @@ class Reports {
     $app->get('/backordered-items', [ self::class, 'backorderedItems' ]);
     $app->get('/cashflow', [ self::class, 'cashflow' ]);
     $app->get('/drop-by-drop', [ self::class, 'dropByDrop' ]);
+    $app->get('/items', [ self::class, 'itemSales' ]);
     $app->get('/kit-items', [ self::class, 'kitItems' ]);
     $app->get('/price-change', [ self::class, 'priceChanges' ]);
     $app->get('/purchases-by-vendor', [ self::class, 'purchasesByVendor' ]);
@@ -119,7 +120,6 @@ class Reports {
     return $this->view->render($response, 'report/dogs.html', $data);
   }
 
-
   public function emptyProducts(Request $request, Response $response) {
     $data= $this->report->emptyProducts();
     return $this->view->render($response, 'report/empty-products.html', $data);
@@ -142,6 +142,16 @@ class Reports {
     $end= $request->getParam('end');
     $data= $this->report->sales(null, $begin, $end);
     return $this->view->render($response, 'report/drop-by-drop.html', $data);
+  }
+
+  public function itemSales(Request $request, Response $response) {
+    $begin= $request->getParam('begin') ?? $this->today();
+    $end= $request->getParam('end') ?? $this->today();
+    $items= $request->getParam('items') ?? '';
+
+    $data= $this->report->itemSales($begin, $end, $items);
+
+    return $this->view->render($response, 'report/item-sales.html', $data);
   }
 
   public function kitItems(Request $request, Response $response) {
