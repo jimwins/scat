@@ -31,6 +31,7 @@ class Reports {
     $app->get('/drop-by-drop', [ self::class, 'dropByDrop' ]);
     $app->get('/items', [ self::class, 'itemSales' ]);
     $app->get('/kit-items', [ self::class, 'kitItems' ]);
+    $app->get('/performance', [ self::class, 'performance' ]);
     $app->get('/price-change', [ self::class, 'priceChanges' ]);
     $app->get('/purchases-by-vendor', [ self::class, 'purchasesByVendor' ]);
     $app->get('/shipments', [ self::class, 'shipments' ]);
@@ -41,7 +42,10 @@ class Reports {
     $app->get('/{name}', [ self::class, 'oldReport' ]);
   }
 
-  /* A couple of simple helper methods */
+  /* A few simple helper methods */
+  public function lastyear() {
+    return (new \Datetime('-1 year'))->format('Y-m-d');
+  }
   public function thirtydaysago() {
     return (new \Datetime('-30 days'))->format('Y-m-d');
   }
@@ -157,6 +161,20 @@ class Reports {
   public function kitItems(Request $request, Response $response) {
     $data= $this->report->kitItems();
     return $this->view->render($response, 'report/kit-items.html', $data);
+  }
+
+  public function performance(Request $request, Response $response) {
+    $begin= $request->getParam('begin') ?? $this->lastyear();
+    $end= $request->getParam('end') ?? $this->today();
+    $items= $request->getParam('items') ?? '';
+
+    if (!$items && ($product= $request->getParam('product'))) {
+      $items= "product:" . $product;
+    }
+
+    $data= $this->report->performance($begin, $end, $items);
+
+    return $this->view->render($response, 'report/performance.html', $data);
   }
 
   public function priceChanges(

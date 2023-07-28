@@ -1,0 +1,184 @@
+{% extends 'layout/page.html' %}
+{% import 'macros.twig' as scat %}
+
+{% block title %}
+  Performance
+{% endblock %}
+
+{% block extra_head %}
+  <script src="/vendor/moment/moment/min/moment.min.js"></script>
+  <script src="/extern/chartjs-2.7.2/Chart.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Default Chart text color
+      Chart.defaults.global.defaultFontColor= '#000';
+    });
+  </script>
+{% endblock %}
+
+
+{% block content %}
+  <form id="report-params" class="form-horizontal" role="form"
+        action="{{ current_url() }}" method="get">
+    <div class="form-group">
+      <label for="datepicker" class="col-sm-2 control-label">
+        Dates
+      </label>
+      <div class="col-sm-10">
+        <div class="input-daterange input-group" id="datepicker">
+          <input type="text" class="form-control" name="begin" value="{{ begin }}" />
+          <span class="input-group-addon">to</span>
+          <input type="text" class="form-control" name="end" value="{{ end }}" />
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="items" class="col-sm-2 control-label">
+        Items
+      </label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" name="items" value="{{ items }}" />
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <input type="submit" class="btn btn-primary" value="Show">
+      </div>
+    </div>
+  </form>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h1 class="panel-title">Purchased</h1>
+        </div>
+        <div class="panel-body text-center text-center">
+          <span style="font-size: 300%">
+            {{ scat.amount(purchased) }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h1 class="panel-title">Sold</h1>
+        </div>
+        <div class="panel-body text-center">
+          <span style="font-size: 300%">
+            {{ scat.amount(sold) }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h1 class="panel-title">Stock</h1>
+        </div>
+        <div class="panel-body text-center">
+          <span style="font-size: 300%">
+            {{ scat.amount(stock) }}
+            <br>
+            ({{ scat.amount(stock_net) }})
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h1 class="panel-title">Ideal</h1>
+        </div>
+        <div class="panel-body text-center">
+          <span style="font-size: 300%">
+            {{ scat.amount(ideal) }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h1 class="panel-title">Turns</h1>
+        </div>
+        <div class="panel-body text-center">
+          <span style="font-size: 300%">
+            {{ ideal > 0 ? "%.2f" | format(sold / ideal) : '∞' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h1 class="panel-title">Sales</h1>
+    </div>
+    <div class="panel-body">
+      <div class="chart-container" style="position: relative">
+       <canvas id="sales-chart"></canvas>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+  $(function() {
+    $('#report-params .input-daterange').datepicker({
+        format: "yyyy-mm-dd",
+        todayHighlight: true
+    });
+
+    var data= {
+      datasets: [{
+        label: 'Sales',
+        data: {{ sales | json_encode | raw }}
+      }]
+    };
+
+    var options= {
+      legend: false,
+      scales: {
+        xAxes: [{
+          type: 'time',
+          time: {
+            unit: 'month',
+            min: '{{ begin }}',
+            max: '{{ end }}',
+          },
+          barPercentage: 1.0,
+          categoryPercentage: 1.0,
+          barThickness: 50,
+        }],
+        yAxes: [{
+          position: 'left',
+          ticks: {
+            callback: function(value, index, values) {
+              return scat.amount(value);
+            }
+          }
+        }],
+      },
+      tooltips: {
+        intersect: false,
+        callbacks: {
+          label: function (tooltipItem, data) {
+            return (tooltipItem.datasetIndex ?
+                    tooltipItem.yLabel :
+                    scat.amount(tooltipItem.yLabel));
+          }
+        }
+      }
+    };
+
+    var salesChart= new Chart(document.getElementById('sales-chart'), {
+                                   type: 'bar',
+                                   data: data,
+                                   options: options
+                             });
+    });
+  </script>
+{% endblock %}

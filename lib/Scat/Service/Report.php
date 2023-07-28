@@ -254,7 +254,7 @@ class Report
                   AS total_taxed,
                 MIN(DATE(paid)) AS raw_date,
                 COUNT(*) AS transactions
-           FROM (SELECT 
+           FROM (SELECT
                         txn.uuid,
                         txn.online_sale_id,
                         IF(person_id,
@@ -510,6 +510,104 @@ class Report
                              ->having_gt('in_kit', 0)
                              ->order_by_asc('code')
                              ->find_many() ];
+  }
+
+  public function performance($begin= null, $end= null, $items= null) {
+    $sql_criteria= "1=1";
+    if ($items) {
+      list($sql_criteria, $x)= $this->search->buildSearchItemsWhere($items);
+    }
+
+    $q= "SELECT SUM(ordered *
+                    sale_price(txn_line.retail_price, txn_line.discount_type,
+                               txn_line.discount)) total
+           FROM txn
+           JOIN txn_line ON (txn.id = txn_line.txn_id)
+           JOIN item ON (txn_line.item_id = item.id)
+           LEFT JOIN product ON item.product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+          WHERE type = 'vendor'
+            AND ($sql_criteria)
+            AND created BETWEEN ? AND ? + INTERVAL 1 DAY";
+
+    $purchased= $this->data->fetch_single_value($q, [ $begin, $end ]);
+
+    $q= "SELECT SUM(ordered * -1 *
+                    sale_price(txn_line.retail_price, txn_line.discount_type,
+                               txn_line.discount)) total
+           FROM txn
+           JOIN txn_line ON (txn.id = txn_line.txn_id)
+           JOIN item ON (txn_line.item_id = item.id)
+           LEFT JOIN product ON item.product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+          WHERE type = 'customer'
+            AND ($sql_criteria)
+            AND filled BETWEEN ? AND ? + INTERVAL 1 DAY";
+
+    $sold= $this->data->fetch_single_value($q, [ $begin, $end ]);
+
+    $q= "SELECT SUM((SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id) *
+                    sale_price(item.retail_price, item.discount_type,
+                               item.discount))
+           FROM item
+           LEFT JOIN product ON item.product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+          WHERE ($sql_criteria)";
+
+    $stock= $this->data->fetch_single_value($q);
+
+    $q= "SELECT SUM((SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id) *
+                    IFNULL((SELECT AVG(retail_price)
+                              FROM txn_line
+                              JOIN txn ON txn.id = txn_line.txn_id
+                             WHERE item_id = item.id
+                               AND type = 'vendor'),
+                           0))
+           FROM item
+           LEFT JOIN product ON item.product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+          WHERE ($sql_criteria)";
+
+    $stock_net= $this->data->fetch_single_value($q);
+
+    $q= "SELECT SUM(minimum_quantity *
+                    sale_price(item.retail_price, item.discount_type,
+                               item.discount))
+           FROM item
+           LEFT JOIN product ON item.product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+          WHERE ($sql_criteria) AND item.active";
+
+    $ideal= $this->data->fetch_single_value($q);
+
+    $q= "SELECT DATE_FORMAT(created, '%Y-%m') AS x,
+               SUM(ordered * -1 *
+                    sale_price(txn_line.retail_price, txn_line.discount_type,
+                               txn_line.discount)) AS y
+           FROM txn
+           JOIN txn_line ON (txn.id = txn_line.txn_id)
+           JOIN item ON (txn_line.item_id = item.id)
+           LEFT JOIN product ON item.product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+          WHERE type = 'customer'
+            AND ($sql_criteria)
+            AND filled BETWEEN ? AND ? + INTERVAL 1 DAY
+          GROUP BY 1
+          ORDER BY 1 DESC";
+
+    $sales= $this->data->for_table('txn')->raw_query($q, [ $begin, $end ])->find_many();
+
+    return [
+      'begin' => $begin,
+      'end' => $end,
+      'items' => $items,
+      'purchased' => $purchased,
+      'sold' => $sold,
+      'stock' => $stock,
+      'stock_net' => $stock_net,
+      'ideal' => $ideal,
+      'sales' => $sales,
+    ];
   }
 
   public function priceChanges(\Scat\Service\Catalog $catalog, $vendor, $items_query) {
