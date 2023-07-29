@@ -817,4 +817,235 @@ class Report
 
     return $data;
   }
+
+  public function summary($date) {
+    $q= "SELECT SUM(taxed + untaxed) AS sales,
+                SUM(IF(uuid,
+                       tax,
+                       ROUND_TO_EVEN(taxed * (tax_rate / 100), 2))) AS tax,
+                SUM(IF(uuid,
+                       untaxed + taxed + tax,
+                       ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed))
+                  AS total
+           FROM (SELECT
+                        filled,
+                        txn.uuid,
+                        CAST(ROUND_TO_EVEN(
+                          SUM(IF(txn_line.taxfree, 1, 0) *
+                            IF(type = 'customer', -1, 1) * ordered *
+                            sale_price(txn_line.retail_price,
+                                       txn_line.discount_type,
+                                       txn_line.discount)),
+                          2) AS DECIMAL(9,2))
+                        AS untaxed,
+                        CAST(ROUND_TO_EVEN(
+                          SUM(IF(txn_line.taxfree, 0, 1) *
+                            IF(type = 'customer', -1, 1) * ordered *
+                            sale_price(txn_line.retail_price,
+                                       txn_line.discount_type,
+                                       txn_line.discount)),
+                          2) AS DECIMAL(9,2))
+                        AS taxed,
+                        SUM(tax) AS tax,
+                        tax_rate
+                   FROM txn
+                   LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                        JOIN item ON (txn_line.item_id = item.id)
+                  WHERE filled IS NOT NULL
+                    AND filled BETWEEN ? AND ? + INTERVAL 1 DAY
+                    AND type = 'customer'
+                    AND code NOT LIKE 'ZZ-gift%'
+                  GROUP BY txn.id
+                ) t";
+
+    $sales= $this->data->fetch_single_row($q, [ $date, $date ]);
+
+    $q= "SELECT COUNT(*) total,
+                IFNULL(SUM(IF(DATE(filled) != DATE(person.created), 1, 0)), 0) returned,
+                IFNULL(SUM(IF(DATE(filled) = DATE(person.created), 1, 0)), 0) new
+           FROM txn LEFT JOIN person ON (txn.person_id = person.id)
+          WHERE DATE(filled) = ?";
+    $people= $this->data->fetch_single_row($q, [ $date ]);
+
+    $hourly= $this->getSummarySalesData('%Y-%m-%d %H:00', $date);
+
+    $begin= (new \Datetime($date))->sub(new \DateInterval('P8D'))->format('Y-m-d');
+
+    $daily= $this->getSummarySalesData('%Y-%m-%d', $begin, $date);
+
+    $q= "SELECT AVG(sales) FROM (SELECT DATE(filled),
+                SUM(taxed + untaxed) AS sales
+           FROM (SELECT
+                        filled,
+                        CAST(ROUND_TO_EVEN(
+                          SUM(IF(txn_line.taxfree, 1, 0) *
+                            IF(type = 'customer', -1, 1) * ordered *
+                            sale_price(txn_line.retail_price,
+                                       txn_line.discount_type,
+                                       txn_line.discount)),
+                          2) AS DECIMAL(9,2))
+                        AS untaxed,
+                        CAST(ROUND_TO_EVEN(
+                          SUM(IF(txn_line.taxfree, 0, 1) *
+                            IF(type = 'customer', -1, 1) * ordered *
+                            sale_price(txn_line.retail_price,
+                                       txn_line.discount_type,
+                                       txn_line.discount)),
+                          2) AS DECIMAL(9,2))
+                        AS taxed,
+                        tax_rate
+                   FROM txn
+                   LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                        JOIN item ON (txn_line.item_id = item.id)
+                  WHERE filled IS NOT NULL
+                    AND filled BETWEEN ? - INTERVAL 3 MONTH AND ? + INTERVAL 1 DAY
+                    AND DAYOFWEEK(filled) = DAYOFWEEK(?)
+                    AND type = 'customer'
+                    AND code NOT LIKE 'ZZ-gift%'
+                  GROUP BY txn.id
+                ) t
+            GROUP BY 1) s";
+    $same_day= $this->data->fetch_single_value($q, [ $date, $date, $date ]);
+
+    $q= "SELECT AVG(sales) FROM (SELECT DATE(filled),
+                SUM(taxed + untaxed) AS sales
+           FROM (SELECT
+                        filled,
+                        CAST(ROUND_TO_EVEN(
+                          SUM(IF(txn_line.taxfree, 1, 0) *
+                            IF(type = 'customer', -1, 1) * ordered *
+                            sale_price(txn_line.retail_price,
+                                       txn_line.discount_type,
+                                       txn_line.discount)),
+                          2) AS DECIMAL(9,2))
+                        AS untaxed,
+                        CAST(ROUND_TO_EVEN(
+                          SUM(IF(txn_line.taxfree, 0, 1) *
+                            IF(type = 'customer', -1, 1) * ordered *
+                            sale_price(txn_line.retail_price,
+                                       txn_line.discount_type,
+                                       txn_line.discount)),
+                          2) AS DECIMAL(9,2))
+                        AS taxed,
+                        tax_rate
+                   FROM txn
+                   LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                        JOIN item ON (txn_line.item_id = item.id)
+                  WHERE filled IS NOT NULL
+                    AND filled BETWEEN ? - INTERVAL 7 DAY AND ? + INTERVAL 1 DAY
+                    AND type = 'customer'
+                    AND code NOT LIKE 'ZZ-gift%'
+                  GROUP BY txn.id
+                ) t
+            GROUP BY 1) s";
+
+    $last_week= $this->data->fetch_single_value($q, [ $date, $date ]);
+
+    $items= $this->search->buildSearchItems("");
+
+    return [
+      'date' => $date,
+      'sales' => $sales,
+      'people' => $people,
+      'hourly' => $hourly,
+      'daily' => $daily,
+      'same_day' => $same_day,
+      'last_week' => $last_week,
+      'items' =>
+        $items
+          ->select_expr('SUM(-1 * allocated)', 'sold')
+          ->select_expr('AVG(sale_price(txn_line.retail_price, txn_line.discount_type,
+                                        txn_line.discount))',
+                        'average')
+          ->select_expr('SUM(-1 * allocated * sale_price(txn_line.retail_price,
+                                                          txn_line.discount_type,
+                                                          txn_line.discount))',
+                        'total')
+          ->join('txn_line', [ 'item.id', '=', 'txn_line.item_id' ])
+          ->join('txn', [ 'txn_line.txn_id', '=', 'txn.id' ])
+          ->where('txn.type', 'customer')
+          ->where_raw('filled BETWEEN ? and ? + INTERVAL 1 DAY', [ $date, $date ])
+          ->group_by('item.id')
+          ->order_by_desc('total') // TODO doesn't work because of pre-existing order_by
+          ->limit(12)
+          ->find_many()
+    ];
+  }
+
+  protected function getSummarySalesData($format, $begin, $end= null) {
+    if (!$end) {
+      $end= (new \Datetime($begin))->add(new \DateInterval('P1D'))->format('Y-m-d');
+    }
+
+    $q= "SELECT DATE_FORMAT(filled, ?) AS span,
+                COUNT(*) AS txns,
+                SUM(taxed + untaxed) AS total,
+                SUM(IF(tax_rate, 0, taxed + untaxed)) AS resale,
+                SUM(ROUND_TO_EVEN(taxed * (tax_rate / 100), 2)) AS tax,
+                SUM(ROUND_TO_EVEN(taxed * (1 + (tax_rate / 100)), 2) + untaxed)
+                  AS total_taxed,
+                MIN(DATE(filled)) AS raw_date
+           FROM (SELECT
+                        filled,
+                        CAST(ROUND_TO_EVEN(
+                          SUM(IF(txn_line.taxfree, 1, 0) *
+                            IF(type = 'customer', -1, 1) * ordered *
+                            sale_price(txn_line.retail_price,
+                                       txn_line.discount_type,
+                                       txn_line.discount)),
+                          2) AS DECIMAL(9,2))
+                        AS untaxed,
+                        CAST(ROUND_TO_EVEN(
+                          SUM(IF(txn_line.taxfree, 0, 1) *
+                            IF(type = 'customer', -1, 1) * ordered *
+                            sale_price(txn_line.retail_price,
+                                       txn_line.discount_type,
+                                       txn_line.discount)),
+                          2) AS DECIMAL(9,2))
+                        AS taxed,
+                        tax_rate
+                   FROM txn
+                   LEFT JOIN txn_line ON (txn.id = txn_line.txn_id)
+                        JOIN item ON (txn_line.item_id = item.id)
+                  WHERE filled IS NOT NULL
+                    AND filled BETWEEN ? AND ?
+                    AND type = 'customer'
+                    AND code NOT LIKE 'ZZ-gift%'
+                  GROUP BY txn.id
+                ) t
+          GROUP BY 1
+          ORDER BY 1 DESC";
+
+    $rows= $this->data->for_table('txn')->raw_query($q, [ $format, $begin, $end ])->find_many();
+
+    $sales= $txns= [];
+
+    foreach ($rows as $row) {
+      $sales[]= [
+        'x' => $row['span'],
+        'y' => (float)$row['total']
+      ];
+      $txns[]= [
+        'x' => $row['span'],
+        'y' => (int)$row['txns']
+      ];
+    }
+
+    return [
+      'datasets' => [
+        [
+          'label' => 'Sales',
+          'yAxisID' => 'sales',
+          'data' => $sales,
+        ],
+        [
+          'type' => 'line',
+          'fill' => false,
+          'label' => 'Transactions',
+          'yAxisID' => 'txns',
+          'data' => $txns,
+        ]
+      ]
+    ];
+  }
 }

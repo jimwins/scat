@@ -70,6 +70,14 @@ class Data
     return \Titi\ORM::get_db()->quote($value);
   }
 
+  public function fetch_single_row($query, $params= []) {
+    if (\Titi\ORM::raw_execute($query, $params)) {
+      $stmt= \Titi\ORM::get_last_statement();
+      return $stmt->fetch();
+    }
+    return false;
+  }
+
   public function fetch_single_value($query, $params= []) {
     if (\Titi\ORM::raw_execute($query, $params)) {
       $stmt= \Titi\ORM::get_last_statement();
