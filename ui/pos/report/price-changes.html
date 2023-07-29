@@ -169,7 +169,7 @@
       .then((res) => res.json())
       .then((data) => {
         if ($('input[name="print"]:checked', form).length) {
-          Scat.printDirect('labels-price', { id: data.id });
+          scat.print('/catalog/~print-labels', { items: [ data.id ] });
         }
         $(form).parent().parent()
                .siblings('.price-change')

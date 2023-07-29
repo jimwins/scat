@@ -2,7 +2,7 @@
 
 dirs=$1
 if [ -z "$dirs" ]; then
-  dirs="api app css db js lib old-report print scat.php static ui"
+  dirs="app css db js lib static ui"
 fi
 
 find $dirs \

@@ -9,6 +9,7 @@
         }
     ],
     "autoload": {
+        "classmap": [ "extern/php-barcode.php", "extern/fpdf/alphapdf.php" ],
         "psr-4": {
           "Scat\\" : "lib/Scat/"
         }

@@ -114,8 +114,7 @@
       form.querySelectorAll('.print-labels').forEach((btn) => {
         btn.addEventListener('click', (ev) => {
           // Get selected items and other options
-          let doc= (ev.target.getAttribute('data-size') == 'half' ?
-                    'labels-price-brush' : 'labels-price')
+          let half= (ev.target.getAttribute('data-size') == 'half')
           let items= collectItems(list)
           let noprice= ev.target.getAttribute('data-noprice')
           let short= ev.target.getAttribute('data-short')
@@ -124,7 +123,7 @@
             trim= window.prompt("Please enter the part of the name to trim from the labels", "");
           }
           // trim, noprice, size
-          scat.printDocument(doc, { items: items, noprice: noprice, short: short, trim: trim })
+          scat.print('/catalog/~print-labels', { half: half, items: items, noprice: noprice, short: short, trim: trim })
         })
       })
 

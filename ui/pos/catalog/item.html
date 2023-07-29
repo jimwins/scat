@@ -1160,8 +1160,7 @@
 
     scat.handleAction('click', 'print-labels', (act) => {
       // Get selected items and other options
-      let doc= (act.getAttribute('data-size') == 'half' ?
-                'labels-price-brush' : 'labels-price')
+      let half= (act.getAttribute('data-size') == 'half')
       let items= [ {{ item.id }} ]
       let noprice= act.getAttribute('data-noprice')
       let short= act.getAttribute('data-short')
@@ -1180,8 +1179,9 @@
         quantity= 1
       }
       // trim, noprice, size
-      return scat.printDocument(doc, {
+      return scat.print('/catalog/~print-labels', {
         items: items,
+        half: half,
         noprice: noprice,
         short: short,
         trim: trim,
