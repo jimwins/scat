@@ -33,7 +33,7 @@ WORKDIR /app
 
 COPY . /app
 
-COPY log.conf /usr/local/etc/php-fpm.d/
+COPY config/php-fpm-log.conf /usr/local/etc/php-fpm.d/
 
 RUN curl -sS https://getcomposer.org/installer | php \
         && mv composer.phar /usr/local/bin/ \
