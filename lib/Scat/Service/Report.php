@@ -626,6 +626,7 @@ class Report
           ->searchItems($items_query . " vendor:" . $vendor)
           ->join('vendor_item', [ 'vendor_item.item_id', '=', 'item.id' ])
           ->where('vendor_item.vendor_id', $vendor)
+          ->where('vendor_item.active', 1)
           ->where_raw('ABS(vendor_item.retail_price - item.retail_price) > 0.01')
           ->select_expr('ANY_VALUE(vendor_item.retail_price)', 'new_retail_price')
           ->select_expr('ANY_VALUE(vendor_item.net_price)', 'net_price')
