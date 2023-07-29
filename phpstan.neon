@@ -4,3 +4,6 @@ parameters:
 	universalObjectCratesClasses:
 		- Scat\Model
 	level: 1
+	paths:
+		- app
+		- lib
