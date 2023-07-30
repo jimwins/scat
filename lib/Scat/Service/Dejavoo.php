@@ -3,23 +3,19 @@ namespace Scat\Service;
 
 use OpensslCryptor\Cryptor;
 
-// TODO push this into class so it can get key from config service
-function include_encrypted($file) {
-  if (!defined('SCAT_ENCRYPTION_KEY')) return;
-  $enc= file_get_contents($file);
-  $dec= Cryptor::Decrypt($enc, constant('SCAT_ENCRYPTION_KEY'));
-  eval('?>' . $dec);
-}
-
-include_encrypted('../lib/cc-terminal.phpc');
-
 class Dejavoo {
-  private $url;
+  private $url, $key;
 
   public function __construct(
     Config $config
   ) {
     $this->url= $config->get('dejavoo.url');
+    $this->key= $config->get('dejavoo.key');
+
+    /* This pulls in CC_Terminal class which is encrypted due to NDA. */
+    $enc= file_get_contents('../lib/cc-terminal.phpc');
+    $dec= Cryptor::Decrypt($enc, $this->key);
+    eval('?>' . $dec);
   }
 
   public function runTransaction($txn, $amount) {
