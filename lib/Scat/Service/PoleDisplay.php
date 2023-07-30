@@ -22,7 +22,7 @@ class PoleDisplay
       return;
     }
 
-    $sock= @fsockopen($this->host, $this->post, $errno, $errstr, 1);
+    $sock= @fsockopen($this->host, $this->port, $errno, $errstr, 1);
     if ($sock) {
       fwrite($sock, sprintf("\x0a\x0d%-19.19s\x0a\x0d$%18.2f ", $label, $price));
     }
