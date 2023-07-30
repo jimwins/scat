@@ -7,6 +7,7 @@ class Dejavoo {
   private $url, $key;
 
   public function __construct(
+    private Data $data,
     Config $config
   ) {
     $this->url= $config->get('dejavoo.url');
