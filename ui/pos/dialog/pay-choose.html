@@ -16,7 +16,7 @@
     </button>
 
     {% if txn.due > 0 %}
-      {% if constant('DEJAVOO_URL') is defined %}
+      {% if config('dejavoo.url') != '' %}
         <button type="button" class="btn btn-primary btn-lg btn-block"
                 data-action="choose-pay-method" data-method="credit">
           Credit Card

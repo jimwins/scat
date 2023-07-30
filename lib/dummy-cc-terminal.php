@@ -6,6 +6,9 @@ class CC_Terminal {
   public $raw_response;
   public $raw_curlinfo;
 
+  public function __construct(private string $url) {
+  }
+
   public function transaction($type, $amount, $invoice, $register = 1) {
   }
 

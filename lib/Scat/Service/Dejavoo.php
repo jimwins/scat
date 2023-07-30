@@ -14,15 +14,16 @@ function include_encrypted($file) {
 include_encrypted('../lib/cc-terminal.phpc');
 
 class Dejavoo {
-  private $data, $config;
+  private $url;
 
-  public function __construct(Data $data, Config $config) {
-    $this->data= $data;
-    $this->config= $config;
+  public function __construct(
+    Config $config
+  ) {
+    $this->url= $config->get('dejavoo.url');
   }
 
   public function runTransaction($txn, $amount) {
-    $cc= new \CC_Terminal();
+    $cc= new \CC_Terminal($this->url);
 
     $label= $txn->formatted_number;
 
