@@ -59,7 +59,7 @@
             {{ scat.amount(row.previous_amount) }}
           </td>
           <td align="right">
-            {% if row.previous_amount %}
+            {% if row.previous_amount != 0 %}
               {{ "%.1f%%" | format((row.current_amount - row.previous_amount) / row.previous_amount * 100) }}
             {% else %}
               0.0%
