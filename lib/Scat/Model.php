@@ -31,7 +31,7 @@ class Model extends \Titi\Model implements \JsonSerializable {
       $fields= $this->getFields();
       return in_array($name, $fields);
     } else {
-      return array_key_exists($name, $this->_data);
+      return $this->orm->offsetExists($name);
     }
   }
 
