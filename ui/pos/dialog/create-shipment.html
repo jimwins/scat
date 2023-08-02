@@ -20,20 +20,21 @@
   {% if txn.shipping_address.is_po_box() %}
     {% if hazmat %}
       {% set preferred_rates= {
-        'USPS': [ 'ParcelSelect' ],
+        'USPS': [ 'GroundAdvantage' ],
       } %}
     {% else %}
       {% set preferred_rates= {
-        'USPS': [ 'First', 'Priority', 'GroundAdvantage' ],
+        'USPS': [ 'Priority', 'GroundAdvantage' ],
       } %}
     {% endif %}
   {% else %}
     {% if hazmat and txn.shipping_address.state in [ 'AK', 'HI' ] %}
       {% set preferred_rates= {
-        'USPS': [ 'ParcelSelect' ],
+        'USPS': [ 'GroundAdvantage' ],
       } %}
     {% elseif hazmat %}
       {% set preferred_rates= {
+        'USPS': [ 'GroundAdvantage' ],
         'GSO': [ 'CaliforniaParcelService' ],
         'UPS':  [ 'Ground' ],
         'UPSDAP':  [ 'Ground' ],
@@ -41,7 +42,7 @@
       {#  'FedEx': [ 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY' ], #}
     {% else %}
       {% set preferred_rates= {
-        'USPS': [ 'First', 'Priority', 'GroundAdvantage' ],
+        'USPS': [ 'Priority', 'GroundAdvantage' ],
         'UPS':  [ 'Ground' ],
         'UPSDAP':  [ 'Ground' ],
       } %}
@@ -73,7 +74,7 @@
             Paid
           </li>
           {% for rate in easypost.rates|sort((a,b) => a.rate <=> b.rate) %}
-            <a href="#" data-rate="{{ rate.id }}" class="list-group-item {{ rate.service in preferred_rates[rate.carrier] ? 'preferred' : 'hidden' }} {{ hazmat and rate.service not in [ 'ParcelSelect', 'Ground', 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY', 'CaliforniaParcelService' ] ? 'disabled' }}">
+            <a href="#" data-rate="{{ rate.id }}" class="list-group-item {{ rate.service in preferred_rates[rate.carrier] ? 'preferred' : 'hidden' }} {{ hazmat and rate.service not in [ 'GroundAdvantage', 'Ground', 'FEDEX_GROUND', 'GROUND_HOME_DELIVERY', 'CaliforniaParcelService' ] ? 'disabled' }}">
               <span class="badge">{{ scat.amount(rate.rate) }}</span>
               {{ scat.format_shipping_carrier(rate.carrier) }}: {{ rate.service }}
               {% if rate.delivery_days %}
