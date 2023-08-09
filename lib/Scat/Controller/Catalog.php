@@ -1255,12 +1255,15 @@ class Catalog {
     return $response->withJson($vendor_item);
   }
 
-  public function vendorItemStock(Request $request, Response $response, $id) {
+  public function vendorItemStock(
+    Request $request, Response $response, $id,
+    \Scat\Service\VendorData $vendor_data
+  ) {
     $vendor_item= $id ? $this->catalog->getVendorItemById($id) : null;
     if ($id && !$vendor_item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    return $response->withJson($vendor_item->checkVendorStock());
+    return $response->withJson($vendor_data->checkVendorStock($vendor_item));
   }
 
   public function catalogPage(Request $request, Response $response,

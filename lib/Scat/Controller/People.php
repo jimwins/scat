@@ -173,15 +173,18 @@ class People {
     return $response->withJson($sales);
   }
 
-  function uploadItems(Request $request, Response $response, $id,
-                        \Scat\Service\Data $data) {
+  function uploadItems(
+    Request $request, Response $response, $id,
+    \Scat\Service\Data $data,
+    \Scat\Service\VendorData $vendor_data
+  ) {
     $person= $data->factory('Person')->find_one($id);
     if (!$person)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
     $details= [];
     foreach ($request->getUploadedFiles() as $file) {
-      $details[]= $person->loadVendorData($file);
+      $details[]= $vendor_data->loadVendorItems($person, $file);
     }
 
     return $response->withJson($details[0]);
