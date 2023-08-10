@@ -14,6 +14,9 @@ if ($tz) date_default_timezone_set($tz);
 bcscale(2);
 
 $DEBUG= $ORM_DEBUG= false;
+if (array_key_exists('SCAT_DEBUG', $_ENV)) {
+  $DEBUG= $_ENV['SCAT_DEBUG'];
+}
 $config_file= @$_ENV['SCAT_CONFIG'] ?: dirname(__FILE__).'/../config.php';
 if (file_exists($config_file)) {
   $config= require $config_file;
