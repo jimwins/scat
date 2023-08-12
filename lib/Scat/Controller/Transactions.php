@@ -454,8 +454,10 @@ class Transactions {
   }
 
   /* Items (aka lines) */
-  public function addItem(Request $request, Response $response, $id)
-  {
+  public function addItem(
+    Request $request, Response $response, $id,
+    \Scat\Service\VendorData $vendor_data
+  ) {
     $txn= $this->txn->fetchById($id);
     if (!$txn)
       throw new \Slim\Exception\HttpNotFoundException($request);
@@ -467,7 +469,13 @@ class Transactions {
     }
 
     if ($request->getUploadedFiles()) {
-      return $this->handleUploadedItems($request, $response, $txn);
+      $update_only= false;
+
+      foreach ($request->getUploadedFiles() as $file) {
+        $vendor_data->loadVendorOrder($txn, $file);
+      }
+
+      return $response->withJson($txn);
     }
 
     $item_id= $request->getParam('item_id');
@@ -510,20 +518,6 @@ class Transactions {
 
       $kit_line->save();
     }
-  }
-
-  public function handleUploadedItems(
-    Request $request, Response $response,
-    $txn,
-    \Scat\Service\VendorData $vendor_data
-  ) {
-    $update_only= false;
-
-    foreach ($request->getUploadedFiles() as $file) {
-      $vendor_data->loadVendorOrder($txn, $file);
-    }
-
-    return $response->withJson($txn);
   }
 
   public function updateItem(Request $request, Response $response,
