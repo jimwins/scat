@@ -1816,24 +1816,25 @@
         },
         {
             "name": "jimwins/titi",
-            "version": "v0.0.4",
+            "version": "v0.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jimwins/titi.git",
-                "reference": "3adb19d22e2a5b1ae221060c428a092a3c08b018"
+                "reference": "d8c4fea9593c90a9715ae70521ad9afde735f36c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jimwins/titi/zipball/3adb19d22e2a5b1ae221060c428a092a3c08b018",
-                "reference": "3adb19d22e2a5b1ae221060c428a092a3c08b018",
+                "url": "https://api.github.com/repos/jimwins/titi/zipball/d8c4fea9593c90a9715ae70521ad9afde735f36c",
+                "reference": "d8c4fea9593c90a9715ae70521ad9afde735f36c",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.6.0"
             },
             "require-dev": {
                 "ext-pdo_sqlite": "*",
-                "phpunit/phpunit": "^9.0"
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^10.0"
             },
             "type": "library",
             "autoload": {
@@ -1868,7 +1869,13 @@
                 "issues": "https://github.com/jimwins/titi/issues",
                 "source": "https://github.com/jimwins/titi"
             },
-            "time": "2022-02-23T20:01:37+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/jimwins",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-08-13T00:44:00+00:00"
         },
         {
             "name": "laravel/serializable-closure",
