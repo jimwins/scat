@@ -50,7 +50,7 @@ services:
       - 5090:90
     volumes:
       - .:/var/www/html
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
 
 volumes:
   data:
