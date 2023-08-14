@@ -1,6 +1,34 @@
 <?php
 require '../vendor/autoload.php';
 
+/*
+ * If we're running with cli-server, we need to handle some static assets, so
+ * we take a shortcut here for those. We also output a very simple request
+ * log.
+ */
+if (php_sapi_name() == 'cli-server') {
+  $uri= $_SERVER['SCRIPT_NAME'];
+  if (preg_match('!^/(vendor|components|extern|js|static)/!', $uri) &&
+      !preg_match('/\.\./', $uri) &&
+      file_exists('..' . $uri))
+  {
+    $content_type= mime_content_type('..' . $uri);
+    if (preg_match('!.css$!', $uri)) {
+      $content_type= 'text/css';
+    }
+    header('Content-type: ' . $content_type);
+    readfile('..' . $uri);
+    exit;
+  }
+
+  error_log(date('c') . ' ' . $_SERVER['REQUEST_METHOD'] . ' ' . $uri);
+
+  if ($uri == '/app/setup.php') {
+    include 'setup.php';
+    exit;
+  }
+}
+
 use \Slim\Http\ServerRequest as Request;
 use \Slim\Http\Response as Response;
 use \Slim\Views\Twig as View;
