@@ -1,11 +1,14 @@
 <?php
 require '../vendor/autoload.php';
 
-/*
- * If we're running with cli-server, we need to handle some static assets, so
- * we take a shortcut here for those. We also output a very simple request
- * log.
- */
+/* If we're running with cli-server, we need to hand off to app/setup early */
+if (php_sapi_name() == 'cli-server') {
+  $uri= $_SERVER['SCRIPT_NAME'];
+  if ($uri == '/app/setup.php') {
+    include 'setup.php';
+    exit;
+  }
+}
 
 use \Slim\Http\ServerRequest as Request;
 use \Slim\Http\Response as Response;
