@@ -32,9 +32,10 @@ class Home {
         ->where_in('status', [ 'processing' ])
         ->find_many();
 
-    $q= trim($request->getParam('q'));
+    $q= $request->getParam('q');
     $results= null;
     if ($q) {
+      $q= trim($q);
       if (preg_match('/^((%V|@)INV-)(\d+)/i', $q, $m)) {
         $match= $txn->fetchById($m[3]);
         if ($match) {
