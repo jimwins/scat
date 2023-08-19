@@ -46,7 +46,7 @@ footer li:after {
   content: '\00a0\00a0\2022\00a0\00a0';
 }
 footer li:last-child:after {
-  content: '';
+  content: '\00a0';
 }
 
 /* special rules for only small size */
