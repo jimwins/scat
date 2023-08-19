@@ -5,18 +5,6 @@
   Performance
 {% endblock %}
 
-{% block extra_head %}
-  <script src="/vendor/moment/moment/min/moment.min.js"></script>
-  <script src="/extern/chartjs-2.7.2/Chart.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      // Default Chart text color
-      Chart.defaults.global.defaultFontColor= '#000';
-    });
-  </script>
-{% endblock %}
-
-
 {% block content %}
   <form id="report-params" class="form-horizontal" role="form"
         action="{{ current_url() }}" method="get">
@@ -132,53 +120,69 @@
         todayHighlight: true
     });
 
-    var data= {
-      datasets: [{
-        label: 'Sales',
-        data: {{ sales | json_encode | raw }}
-      }]
-    };
+    import('/extern/chart.js-4.3.3/chart.umd.js')
+      .then((module) => {
+        import('/extern/chart.js-4.3.3/chartjs-adapter-date-fns.bundle.min.js')
+        .then((module) => {
+          var data= {
+            datasets: [{
+              label: 'Sales',
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              borderColor: 'rgba(0, 0, 0, 0.3)',
+              data: {{ sales | json_encode | raw }}
+            }]
+          };
 
-    var options= {
-      legend: false,
-      scales: {
-        xAxes: [{
-          type: 'time',
-          time: {
-            unit: 'month',
-            min: '{{ begin }}',
-            max: '{{ end }}',
-          },
-          barPercentage: 1.0,
-          categoryPercentage: 1.0,
-          barThickness: 50,
-        }],
-        yAxes: [{
-          position: 'left',
-          ticks: {
-            callback: function(value, index, values) {
-              return scat.amount(value);
-            }
-          }
-        }],
-      },
-      tooltips: {
-        intersect: false,
-        callbacks: {
-          label: function (tooltipItem, data) {
-            return (tooltipItem.datasetIndex ?
-                    tooltipItem.yLabel :
-                    scat.amount(tooltipItem.yLabel));
-          }
-        }
-      }
-    };
+          var options= {
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                intersect: false,
+                callbacks: {
+                  title: function (context) {
+                    return context[0].raw.x;
+                  },
+                  label: function (context) {
+                    let label= context.formattedValue|| '0.00';
+                    return scat.amount(label);
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                type: 'time',
+                time: {
+                  unit: 'month',
+                  min: '{{ begin }}',
+                  max: '{{ end }}',
+                },
+                barPercentage: 1.0,
+                categoryPercentage: 1.0,
+                barThickness: 50,
+              },
+              y: {
+                position: 'left',
+                ticks: {
+                  callback: function(value, index, values) {
+                    return scat.amount(value);
+                  }
+                }
+              }
+            },
+          };
 
-    var salesChart= new Chart(document.getElementById('sales-chart'), {
-                                   type: 'bar',
-                                   data: data,
-                                   options: options
-                             });
-    });
+          const config= {
+            type: 'bar',
+            data: data,
+            options: options
+          };
+
+          var salesChart= new Chart(document.getElementById('sales-chart'), config);
+        })
+      })
+    })
   </script>
 {% endblock %}
