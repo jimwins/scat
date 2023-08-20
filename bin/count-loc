@@ -1,6 +1,6 @@
 #!/bin/sh
 
-dirs=$1
+dirs="$@"
 if [ -z "$dirs" ]; then
   dirs="app css db js lib static ui"
 fi
