@@ -1037,6 +1037,8 @@ class Report
         [
           'label' => 'Sales',
           'yAxisID' => 'sales',
+          'backgroundColor' => 'rgba(0,0,0,0.3)',
+          'borderColor' => 'rgba(0,0,0,0.3)',
           'data' => $sales,
         ],
         [
@@ -1044,6 +1046,8 @@ class Report
           'fill' => false,
           'label' => 'Transactions',
           'yAxisID' => 'txns',
+          'backgroundColor' => 'rgba(99,0,0,0.3)',
+          'borderColor' => 'rgba(99,0,0,0.3)',
           'data' => $txns,
         ]
       ]

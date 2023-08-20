@@ -6,14 +6,8 @@
 {% endblock %}
 
 {% block extra_head %}
-  <script src="/vendor/moment/moment/min/moment.min.js"></script>
-  <script src="/extern/chartjs-2.7.2/Chart.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      // Default Chart text color
-      Chart.defaults.global.defaultFontColor= '#000';
-    });
-  </script>
+  <script src="/extern/chart.js-4.3.3/chart.umd.js"></script>
+  <script src="/extern/chart.js-4.3.3/chartjs-adapter-date-fns.bundle.min.js"></script>
 {% endblock %}
 
 
@@ -222,11 +216,24 @@
       var data= {{ hourly | json_encode | raw }};
 
       var options= {
-        legend: {
-          display: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            intersect: false,
+            callbacks: {
+              title: function (context) {
+                return context[0].raw.x;
+              },
+              label: function (context) {
+                return context.datasetIndex ? context.formattedValue : scat.amount(context.raw.y);
+              }
+            }
+          }
         },
         scales: {
-          xAxes: [{
+          x: {
             type: 'time',
             time: {
               unit: 'hour',
@@ -236,8 +243,8 @@
             gridLines: {
               offsetGridLines: true
             }
-          }],
-          yAxes: [{
+          },
+          sales: {
             id: 'sales',
             position: 'left',
             ticks: {
@@ -246,19 +253,9 @@
               }
             }
           },
-          {
+          txns: {
             id: 'txns',
             position: 'right',
-          }]
-        },
-        tooltips: {
-          intersect: false,
-          callbacks: {
-            label: function (tooltipItem, data) {
-              return (tooltipItem.datasetIndex ?
-                      tooltipItem.yLabel :
-                      scat.amount(tooltipItem.yLabel));
-            }
           }
         }
       };
@@ -274,11 +271,24 @@
       var data= {{ daily | json_encode | raw }};
 
       var options= {
-        legend: {
-          display: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            intersect: false,
+            callbacks: {
+              title: function (context) {
+                return context[0].raw.x;
+              },
+              label: function (context) {
+                return context.datasetIndex ? context.formattedValue : scat.amount(context.raw.y);
+              }
+            }
+          }
         },
         scales: {
-          xAxes: [{
+          x: {
             type: 'time',
             time: {
               unit: 'day'
@@ -286,9 +296,8 @@
             gridLines: {
               offsetGridLines: true
             }
-          }],
-          yAxes: [{
-            id: 'sales',
+          },
+          sales: {
             position: 'left',
             ticks: {
               callback: function(value, index, values) {
@@ -296,19 +305,8 @@
               }
             }
           },
-          {
-            id: 'txns',
+          txns: {
             position: 'right',
-          }]
-        },
-        tooltips: {
-          intersect: false,
-          callbacks: {
-            label: function (tooltipItem, data) {
-              return (tooltipItem.datasetIndex ?
-                      tooltipItem.yLabel :
-                      scat.amount(tooltipItem.yLabel));
-            }
           }
         }
       };
@@ -327,35 +325,40 @@
       labels: [ 'Today', 'Same Weekday', 'Last Week' ],
       datasets: [{
         label: 'Sales',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        borderColor: 'rgba(0, 0, 0, 0.3)',
         data: [ {{ sales.sales }}, {{ same_day }}, {{ last_week }} ]
       }]
     };
 
     var options= {
-      legend: {
-        display: false,
+      indexAxis: 'y',
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return scat.amount(context.raw);
+            }
+          }
+        }
       },
       scales: {
-        xAxes: [{
+        x: {
           ticks: {
             beginAtZero: true,
             callback: function(value, index, values) {
               return scat.amount(value);
             }
           }
-        }]
-      },
-      tooltips: {
-        callbacks: {
-          label: function (tooltipItem, data) {
-            return scat.amount(tooltipItem.xLabel);
-          }
         }
       }
     };
 
     var comparisonChart= new Chart(document.getElementById('comparison-chart'), {
-                                   type: 'horizontalBar',
+                                   type: 'bar',
                                    data: data,
                                    options: options
                              });
