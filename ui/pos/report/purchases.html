@@ -8,14 +8,6 @@
 {% block extra_head %}
   <script src="/extern/jquery.event.ue.js"></script>
   <script src="/extern/jquery.udraggable.js"></script>
-  <script src="/vendor/moment/moment/min/moment.min.js"></script>
-  <script src="/extern/chartjs-2.7.2/Chart.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      // Default Chart text color
-      Chart.defaults.global.defaultFontColor= '#000';
-    });
-  </script>
 {% endblock %}
 
 {% block content %}
@@ -105,89 +97,103 @@
         todayHighlight: true
     });
 
-    let form= document.getElementById('report-params')
-    form.addEventListener('submit', (ev) => {
-      ev.preventDefault();
-      let formData= new FormData(form)
+    import('/extern/chart.js-4.3.3/chart.umd.js')
+      .then((module) => {
+        import('/extern/chart.js-4.3.3/chartjs-adapter-date-fns.bundle.min.js')
+        .then((module) => {
 
-      scat.get('/report/purchases', formData, {
-        headers: {
-          'Accept': 'application/json',
-        },
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        var table= $("#results-template").clone();
-        table.removeAttr('id');
-        var t= $("tbody", table);
-        var gdata= [];
-        $.each(data, function(i, purchases) {
-          t.append($('<tr><td>' + purchases.span +
-                     '<td>' + purchases.raw_date + '</td>' +
-                     '<td align="right">' + scat.amount(purchases.total) +
-                     '<td align="right">' + purchases.transactions +
-                     '<td align="right">' + scat.amount(purchases.total / purchases.transactions) +
-                     '</tr>'));
-          gdata.unshift({ x: purchases.raw_date, y: purchases.total });
-        });
-        var cap= $('#items').val();
-        if (cap) {
-          $(".panel-title", table).text(cap);
-        }
-        table.appendTo($("body"));
-        table.show();
+          let form= document.getElementById('report-params')
+          form.addEventListener('submit', (ev) => {
+            ev.preventDefault();
+            let formData= new FormData(form)
 
-        // Only show chart when we have multiple data points
-        if (gdata.length > 1) {
-          var data= {
-            datasets: [
-              {
-                label: 'Purchases',
-                data: gdata
+            scat.get('/report/purchases', formData, {
+              headers: {
+                'Accept': 'application/json',
               },
-            ]
-          };
-
-          var options= {
-            legend: {
-              display: false,
-            },
-            scales: {
-              xAxes: [{
-                type: 'time',
-                time: {
-                  unit: 'day'
-                }
-              }],
-              yAxes: [{
-                ticks: {
-                  callback: function(value, index, values) {
-                    return scat.amount(value);
-                  }
-                }
-              }]
-            },
-            tooltips: {
-              callbacks: {
-                label: function (tooltipItem, data) {
-                  return scat.amount(tooltipItem.yLabel);
-                }
+            })
+            .then((res) => res.json())
+            .then((data) => {
+              var table= $("#results-template").clone();
+              table.removeAttr('id');
+              var t= $("tbody", table);
+              var gdata= [];
+              $.each(data, function(i, purchases) {
+                t.append($('<tr><td>' + purchases.span +
+                           '<td>' + purchases.raw_date + '</td>' +
+                           '<td align="right">' + scat.amount(purchases.total) +
+                           '<td align="right">' + purchases.transactions +
+                           '<td align="right">' + scat.amount(purchases.total / purchases.transactions) +
+                           '</tr>'));
+                gdata.unshift({ x: purchases.raw_date, y: purchases.total });
+              });
+              var cap= $('#items').val();
+              if (cap) {
+                $(".panel-title", table).text(cap);
               }
-            }
-          };
+              table.appendTo($("body"));
+              table.show();
 
-          var chart= new Chart($('.graph', table)[0],
-                               {
-                                 type: 'line',
-                                 data: data,
-                                 options: options
-                               });
-        } else {
-          $('.graph', table).hide();
-        }
+              // Only show chart when we have multiple data points
+              if (gdata.length > 1) {
+                var data= {
+                  datasets: [
+                    {
+                      label: 'Purchases',
+                      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                      borderColor: 'rgba(0, 0, 0, 0.3)',
+                      data: gdata
+                    },
+                  ]
+                };
 
-        table.udraggable({ handle: '.panel-heading' });
-      });
-    });
+                var options= {
+                  plugins: {
+                    legend: {
+                      display: false,
+                    },
+                    tooltip: {
+                      callbacks: {
+                        title: function (context) {
+                          return context[0].raw.x;
+                        },
+                        label: function (context) {
+                          return scat.amount(context.raw.y);
+                        }
+                      }
+                    }
+                  },
+                  scales: {
+                    x: {
+                      type: 'time',
+                      time: {
+                        unit: 'day'
+                      }
+                    },
+                    y: {
+                      ticks: {
+                        callback: function(value, index, values) {
+                          return scat.amount(value);
+                        }
+                      }
+                    }
+                  },
+                };
+
+                var chart= new Chart($('.graph', table)[0],
+                                     {
+                                       type: 'line',
+                                       data: data,
+                                       options: options
+                                     });
+              } else {
+                $('.graph', table).hide();
+              }
+
+              table.udraggable({ handle: '.panel-heading' });
+            });
+          })
+        })
+      })
   </script>
 {% endblock %}
