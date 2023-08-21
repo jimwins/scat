@@ -4,12 +4,3 @@ Disallow: /
 {% endif %}
 
 Sitemap: {{ full_url_for('sitemap') }}
-
-User-agent: *
-Disallow: /sale/
-Disallow: /cart
-Disallow: /cart/
-Disallow: /account
-Disallow: /account/
-Disallow: /back
-Disallow: /back/

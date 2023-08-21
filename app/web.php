@@ -294,7 +294,7 @@ $app->group('', function (RouteCollectorProxy $app) {
             [ \Scat\Web\Auth:: class, 'getPendingSignups' ]);
   $app->post('/mark-rewards-processed',
               [ \Scat\Web\Auth:: class, 'markSignupProcessed' ]);
-});
+})->add($container->get(\Scat\Middleware\NoIndex::class));
 
 /* Webhooks */
 $app->any('/~webhook/test/{name:.*}',
@@ -308,7 +308,8 @@ $app->any('/~webhook/{name:.*}',
 $app->post('/update-pricing', [ \Scat\Web\Catalog::class, 'updatePricing' ]);
 $app->post('/~grab-image', [ \Scat\Web\Catalog::class, 'grabImage' ]);
 
-$app->get('/backroom/ad', [ \Scat\Web\Backroom::class, 'showAds' ]);
+$app->get('/backroom/ad', [ \Scat\Web\Backroom::class, 'showAds' ])
+    ->add($container->get(\Scat\Middleware\NoIndex::class));
 
 /* Info (DEBUG only) */
 if ($DEBUG) {
