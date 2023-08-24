@@ -107,7 +107,7 @@ figure img {
       {% endif %}
     </h2>
 
-    {% if item.sale_price != item.retail_price %}
+    {% if item.sale_price != item.retail_price and ((item.retail_price - item.sale_price) / item.retail_price * 100) > 3 %}
       <h3 class="text-danger" style="margin: 0px">
         Save {{ "%.0f"|format((item.retail_price - item.sale_price) / item.retail_price * 100) }}% off list
       </h3>
