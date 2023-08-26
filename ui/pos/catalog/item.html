@@ -94,8 +94,8 @@
           <h3 class="panel-title">Description</h3>
         </div>
         <div class="panel-body">
-          <span class="editable" data-name="description" data-editable-type="textarea" data-placement="bottom">
-            {{- item.description -}}
+          <span class="editable" data-name="description" data-editable-type="textarea" data-placement="bottom" data-value="{{ item.description | e('html_attr') }}">
+            {{- item.description | markdown -}}
           </span>
         </div>
       </div>
