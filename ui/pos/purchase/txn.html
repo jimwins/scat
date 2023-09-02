@@ -306,6 +306,12 @@
           <i class="fa fa-fw fa-check-circle-o"></i>
           Mark All Received
         </button>
+      {% else %}
+        <button class="btn btn-primary btn-block"
+                data-action="clear-all-received">
+          <i class="fa fa-fw fa-circle-o"></i>
+          Clear All Received
+        </button>
       {% endif %}
 
       <h3>
@@ -628,6 +634,15 @@
         scat.reload('invoice', 'sidebar')
       })
     })
+
+    scat.handleAction('click', 'clear-all-received', (act) => {
+      if (window.confirm("Are you sure you want to clear all received?")) {
+        return scat.post('/purchase/{{ txn.id }}/~clear-all-received').then(() => {
+          scat.reload('invoice', 'sidebar')
+        })
+      }
+    })
+
 
     let changePerson= () => {
       return scat.dialog('/person/search')

@@ -1854,6 +1854,28 @@ class Transactions {
     return $response->withJson($purchase);
   }
 
+  public function clearAllReceived(Request $request, Response $response, $id) {
+    $purchase= $this->txn->fetchById($id);
+    if (!$purchase) {
+      throw new \Exception("Unable to find transaction.");
+    }
+
+    $this->data->beginTransaction();
+
+    foreach ($purchase->items()->find_many() as $line) {
+      $line->allocated= 0;
+      $line->save();
+    }
+
+    $purchase->set_expr('filled', 'NOW()');
+    $purchase->status= 'waitingforitems';
+    $purchase->save();
+
+    $this->data->commit();
+
+    return $response->withJson($purchase);
+  }
+
   public function clearAll(Request $request, Response $response, $id) {
     $purchase= $this->txn->fetchById($id);
     if (!$purchase) {
