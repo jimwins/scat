@@ -273,6 +273,26 @@ class Transactions {
       $txn->rewardLoyalty();
     }
 
+    // if status was changed to 'filled', allocate all items
+    if (array_key_exists('status', $changed) && $txn->status == 'filled') {
+      // XXX could do this all at once in a raw query
+      foreach ($txn->items()->find_many() as $item) {
+        $item->allocated= $item->ordered;
+        $item->save();
+      }
+      $txn->set_expr('filled', 'NOW()');
+    }
+
+    // if set to 'new' and it was filled, clear the allocations
+    if (array_key_exists('status', $changed) && $txn->status == 'new' && $txn->filled) {
+      // XXX could do this all at once in a raw query
+      foreach ($txn->items()->find_many() as $item) {
+        $item->allocated= 0;
+        $item->save();
+      }
+      $txn->filled= NULL;
+    }
+
     // Pass along status change to Ordure when shipping
     if (array_key_exists('status', $changed) && $txn->online_sale_id) {
       if (in_array($txn->status,
@@ -941,7 +961,7 @@ class Transactions {
     if ($txn->total() == $txn->total_paid()) {
       $txn->paid= date('Y-m-d H:i:s'); // not set_expr(), we need actual value
       if (!$txn->filled) {
-        // TODO could do this all at once in a raw query
+        // XXX could do this all at once in a raw query
         foreach ($txn->items()->find_many() as $item) {
           $item->allocated= $item->ordered;
           $item->save();
