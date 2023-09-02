@@ -964,7 +964,7 @@ class Transactions {
       }
     } else {
       $txn->paid= NULL;
-      $txn->status= 'new'; // XXX not right, what about filled?
+      $txn->status= $txn->filled ? 'filled' : 'new';
     }
     $txn->save();
 
