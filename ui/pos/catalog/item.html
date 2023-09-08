@@ -454,6 +454,10 @@
                     Add Vendor Item
                   </button>
                   <button class="btn btn-primary"
+                          data-action="attach-vendor-item">
+                    Attach Vendor Item
+                  </button>
+                  <button class="btn btn-primary"
                           data-action="find-vendor-items">
                     Find Vendor Items
                   </button>
@@ -1069,6 +1073,18 @@
         return scat.dialog('/catalog/vendor-item' + (id ? '/' + id : ''), {
           item_id: {{ item.id }}
         })
+    })
+
+    scat.handleAction('click', 'attach-vendor-item', (act) => {
+        let vi= act.closest('[data-id]')
+        let id= vi ? vi.getAttribute('data-id') : 0
+        return scat.dialog('/catalog/vendor-item/search')
+          .then((vendor_item_id) => {
+            return scat.patch('/catalog/vendor-item/' + vendor_item_id, { item_id: {{ item.id }} })
+          })
+          .then((res) => {
+            scat.reload('vendors')
+          })
     })
 
     scat.handleAction('click', 'unlink-vendor-item', (act) => {

@@ -395,6 +395,7 @@ $app->group('/catalog', function (RouteCollectorProxy $app) {
   $app->get('/vendor-item[/{id:[0-9]+}]',
             [ \Scat\Controller\Catalog::class, 'vendorItem' ]);
 
+  $app->get('/vendor-item/search', [ \Scat\Controller\Catalog::class, 'showVendorItemSearch' ]);
   $app->post('/vendor-item/search',
             [ \Scat\Controller\Catalog::class, 'vendorItemSearch' ]);
 

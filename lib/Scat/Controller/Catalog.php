@@ -1228,9 +1228,29 @@ class Catalog {
     throw new \Slim\Exception\HttpNotFoundException($request);
   }
 
+  public function showVendorItemSearch(Request $request, Response $response) {
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      return $this->view->render($response, 'dialog/vendor-item-search.html');
+    }
+
+    throw new \Slim\Exception\HttpNotFoundException($request);
+  }
+
   public function vendorItemSearch(Request $request, Response $response) {
-    $item= $this->catalog->getVendorItemByCode($request->getParam('code'));
-    return $response->withJson($item);
+    $code= $request->getParam('code');
+    if ($code) {
+      $item= $this->catalog->getVendorItemByCode($request->getParam('code'));
+      return $response->withJson($item);
+    }
+
+    $q= $request->getParam('q');
+    if ($q) {
+      $items= $this->catalog->findVendorItemsForVendor(0, $q)->find_many();
+      return $response->withJson($items);
+    }
+
+    return $response->withJson([]);
   }
 
   public function updateVendorItem(Request $request, Response $response,

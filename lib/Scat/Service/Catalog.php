@@ -147,16 +147,17 @@ class Catalog
     $v= new \Scat\VendorItemSearchVisitor();
     $query->accept($v);
 
-    $items=
-      $this->data->factory('VendorItem')
-        ->select('vendor_item.*')
-        ->where('vendor_item.vendor_id', $vendor_id)
-        ->where_raw($v->where_clause())
+    $items= $this->data->factory('VendorItem')->select('vendor_item.*');
+
+    if ($vendor_id) {
+      $items= $items->where('vendor_item.vendor_id', $vendor_id);
+    }
+
+    return
+      $items->where_raw($v->where_clause())
         ->where_gte('vendor_item.active', $v->force_all ? 0 : 1)
         ->group_by('vendor_item.id')
         ->order_by_asc('vendor_item.vendor_sku');
-
-    return $items;
   }
 
   public function getPriceOverrides() {
