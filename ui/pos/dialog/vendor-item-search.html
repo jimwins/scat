@@ -44,12 +44,6 @@
 
 {% endblock %}
 
-{% block submit %}
-  <button type="button" class="btn btn-default">
-    Close
-  </button>
-{% endblock %}
-
 {% block script %}
   form.querySelector('#search').addEventListener('keyup', (ev) => {
     let q= ev.currentTarget.value
