@@ -1220,6 +1220,16 @@ class Transactions {
     if ($shipment_id && !$shipment)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
+    $tentative_shipment= null;
+    if (!$shipment) {
+      $line= $txn->items()->where('tic', '11000')->find_one();
+      if ($line) {
+        /* XXX this is very gross */
+        $tentative_shipment=
+          $shipping->getShipment((object)[ 'method_id' => $line->data()->details->shipment_id ]);
+      }
+    }
+
     $label_date= $request->getParam('label_date');
     if (!$label_date) {
       if (date('H') >= 12) {
@@ -1238,6 +1248,7 @@ class Transactions {
       return $this->view->render($response, $dialog, [
         'txn' => $txn,
         'shipment' => $shipment,
+        'tentative_shipment' => $tentative_shipment,
         'label_date' => $label_date,
         'easypost' =>
           $shipment ? $shipping->getShipment($shipment) : null,

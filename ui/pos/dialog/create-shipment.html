@@ -92,6 +92,18 @@
         </ul>
       {% endif %}
     {% else %}
+      {% if tentative_shipment %}
+        <div class="form-group">
+          <label for="expected">Expected</label>
+          <p class="form-control-static" id="expected">
+            {{ tentative_shipment.parcel.length }} &times;
+            {{ tentative_shipment.parcel.width }} &times;
+            {{ tentative_shipment.parcel.height }}
+            ({{ "%.2f"|format(tentative_shipment.parcel.weight / 16) }} lbs.)
+          </p>
+        </div>
+      {% endif %}
+
       <div class="form-group">
         <label for="label_date">Label Date</label>
         <input type="text" class="form-control"
