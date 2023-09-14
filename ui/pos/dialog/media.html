@@ -8,81 +8,150 @@
 {% block body %}
   <div class="modal-body">
 
-    {% for i in media %}
-      <div class="media" data-id="{{ i.id }}">
-        <div class="media-left" style="min-width: 128px; min-height: 128px">
-          {{ include('carousel.twig', { images: [ i ], thumb: true }) }}
-        </div>
-        <div class="media-body">
-          <h4 class="media-heading" style="overflow-wrap: break-word; max-width: 30ch">{{ i.name }}</h4>
-          {{ i.caption }}
-        </div>
-        <div class="media-right">
-          {% if i.id %}
-            <a class="btn btn-sm btn-default btn-block" target="_blank"
-               href="{{ url_for('media', { id: i.id }) }}">
-              <i class="fa fa-fw fa-file-image-o"></i>
-              Details
-            </a>
-            <button role="button" class="btn btn-sm btn-default btn-block"
-                    data-action="disconnect-media">
-              <i class="fa fa-fw fa-unlink"></i>
-              Disconnect
-            </button>
-          {% else %}
-            <button class="btn btn-sm btn-default btn-block" disabled>
-              Old Image
-            </button>
-          {% endif %}
-        </div>
-      </div>
-    {% endfor %}
+    <ul class="nav nav-tabs" style="margin-bottom: 1em">
+      <li role="presentation" class="active">
+        <a href="#current" aria-controls="current" role="tab" data-toggle="tab">Current</a>
+      </li>
+      <li role="presentation">
+        <a href="#related" aria-controls="related" role="tab" data-toggle="tab">Related</a>
+      </li>
+      <li role="presentation">
+        <a href="#vendor" aria-controls="vendor" role="tab" data-toggle="tab">Vendor</a>
+      </li>
+      <li role="presentation">
+        <a href="#library" aria-controls="library" role="tab" data-toggle="tab">Library</a>
+      </li>
+    </ul>
 
-    {% for i in related %}
-      <div class="media" data-id="{{ i.id }}">
-        <div class="media-left" style="min-width: 128px; min-height: 128px">
-          {{ include('carousel.twig', { images: [ i ], thumb: true }) }}
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="current">
+        {% for i in media %}
+          <div class="media" data-id="{{ i.id }}">
+            <div class="media-left" style="min-width: 128px; min-height: 128px">
+              {{ include('carousel.twig', { images: [ i ], thumb: true }) }}
+            </div>
+            <div class="media-body">
+              <h4 class="media-heading" style="overflow-wrap: break-word; max-width: 30ch">{{ i.name }}</h4>
+              {{ i.caption }}
+            </div>
+            <div class="media-right">
+              {% if i.id %}
+                <a class="btn btn-sm btn-default btn-block" target="_blank"
+                   href="{{ url_for('media', { id: i.id }) }}">
+                  <i class="fa fa-fw fa-file-image-o"></i>
+                  Details
+                </a>
+                <button role="button" class="btn btn-sm btn-default btn-block"
+                        data-action="disconnect-media">
+                  <i class="fa fa-fw fa-unlink"></i>
+                  Disconnect
+                </button>
+              {% else %}
+                <button class="btn btn-sm btn-default btn-block" disabled>
+                  Old Image
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="related">
+        {% for i in related %}
+          <div class="media" data-id="{{ i.id }}">
+            <div class="media-left" style="min-width: 128px; min-height: 128px">
+              {{ include('carousel.twig', { images: [ i ], thumb: true }) }}
+            </div>
+            <div class="media-body">
+              <h4 class="media-heading" style="overflow-wrap: break-word; max-width: 30ch">{{ i.name }}</h4>
+              {{ i.caption }}
+            </div>
+            <div class="media-right">
+              <a class="btn btn-sm btn-default btn-block" target="_blank"
+                 href="{{ url_for('media', { id: i.id }) }}">
+                <i class="fa fa-fw fa-file-image-o"></i>
+                Details
+              </a>
+              <button role="button" class="btn btn-sm btn-default btn-block"
+                      data-action="connect-media">
+                <i class="fa fa-fw fa-link"></i>
+                Connect
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="vendor">
+        {% for grab in grabs %}
+          <div class="media" data-url="{{ grab.values[0].download_url }}">
+            <div class="media-left" style="min-width: 128px; min-height: 128px">
+              <img src="{{ grab.values[0].thumbnail_url }}">
+            </div>
+            <div class="media-body">
+              <h4 class="media-heading" style="overflow-wrap: break-word; max-width: 30ch">{{ grab.name }}</h4>
+            </div>
+            <div class="media-right">
+              <button role="button" class="btn btn-sm btn-default btn-block"
+                      data-action="grab-media">
+                <i class="fa fa-fw fa-hand-grab-o"></i>
+                Grab
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="library">
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" class="form-control" name="q" placeholder="Search terms">
+            <div class="input-group-btn">
+              <input type="submit" class="btn btn-primary" value="Search">
+            </div>
+          </div>
         </div>
-        <div class="media-body">
-          <h4 class="media-heading" style="overflow-wrap: break-word; max-width: 30ch">{{ i.name }}</h4>
-          {{ i.caption }}
-        </div>
-        <div class="media-right">
-          <a class="btn btn-sm btn-default btn-block" target="_blank"
-             href="{{ url_for('media', { id: i.id }) }}">
-            <i class="fa fa-fw fa-file-image-o"></i>
-            Details
-          </a>
-          <button role="button" class="btn btn-sm btn-default btn-block"
-                  data-action="connect-media">
-            <i class="fa fa-fw fa-link"></i>
-            Connect
-          </button>
+
+        <div class="search-results">
         </div>
       </div>
-    {% endfor %}
-    {% for grab in grabs %}
-      <div class="media" data-url="{{ grab.values[0].download_url }}">
-        <div class="media-left" style="min-width: 128px; min-height: 128px">
-          <img src="{{ grab.values[0].thumbnail_url }}">
-        </div>
-        <div class="media-body">
-          <h4 class="media-heading" style="overflow-wrap: break-word; max-width: 30ch">{{ grab.name }}</h4>
-        </div>
-        <div class="media-right">
-          <button role="button" class="btn btn-sm btn-default btn-block"
-                  data-action="grab-media">
-            <i class="fa fa-fw fa-hand-grab-o"></i>
-            Grab
-          </button>
-        </div>
-      </div>
-    {% endfor %}
+    </div>
 
   </div>
-{% endblock %}
 
-{% block submit %}
+  <template id="media-item">
+    <div class="media" data-id="">
+      <div class="media-left" style="min-width: 128px; min-height: 128px">
+        {{ include('carousel.twig', { images: [ i ], thumb: true }) }}
+      </div>
+      <div class="media-body">
+        <h4 class="media-heading" style="overflow-wrap: break-word; max-width: 30ch">
+          {{ i.name }}
+        </h4>
+        <p class="media-caption">
+          Caption
+        </p>
+      </div>
+      <div class="media-right">
+        <a class="btn btn-sm btn-default btn-block" target="_blank"
+           href="">
+          <i class="fa fa-fw fa-file-image-o"></i>
+          Details
+        </a>
+        <button role="button" class="btn btn-sm btn-default btn-block"
+                data-action="connect-media">
+          <i class="fa fa-fw fa-link"></i>
+          Connect
+        </button>
+      </div>
+    </div>
+  </template>
+
+  <template id="no-results">
+    <div class="alert alert-danger">
+      Nothing found.
+    </div>
+  </template>
 {% endblock %}
 
 {% block script %}
@@ -116,6 +185,33 @@
   form.onsubmit= (event) => {
     event.preventDefault()
 
-    return
+    let q= form.elements["q"].value
+
+    return scat.get('/media', { q: q }, {
+      headers: {
+        'Content-type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      let results= form.querySelector('.search-results')
+      results.replaceChildren()
+
+      for (let item of data.media) {
+        let media= form.querySelector('#media-item').content.cloneNode(true);
+        media.querySelector('div').dataset['id']= item.id
+        media.querySelector('img').src= item.thumbnail
+        media.querySelector('.media-heading').textContent= item.name
+        media.querySelector('.media-caption').textContent= item.caption
+        media.querySelector('.media-right a').href= '/media/' + item.id
+        results.appendChild(media)
+      }
+
+      if (data.media.length == 0) {
+        let media= form.querySelector('#no-results').content.cloneNode(true);
+        results.appendChild(media)
+      }
+    })
   }
 {% endblock %}

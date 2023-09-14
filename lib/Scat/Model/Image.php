@@ -52,4 +52,12 @@ class Image extends \Scat\Model {
   public function itemsUsedBy() {
     return $this->has_many_through('Item');
   }
+
+  public function as_array() {
+    $data= parent::as_array();
+    $data['thumbnail']= $this->thumbnail();
+    $data['medium']= $this->medium();
+    $data['large_square']= $this->large_square();
+    return $data;
+  }
 }
