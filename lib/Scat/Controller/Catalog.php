@@ -1049,9 +1049,15 @@ class Catalog {
     if ($code && !$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    // TODO should be a Media service for this
     $url= $request->getParam('url');
-    if ($url) {
+    $media_id= $request->getParam('media_id');
+
+    if ($media_id) {
+      $image= $media->findById($media_id);
+      if (!$image)
+        throw new \Slim\Exception\HttpNotFoundException($request);
+      $item->addImage($image);
+    } elseif ($url) {
       $image= $media->createFromUrl($url);
       $item->addImage($image);
     } else {
