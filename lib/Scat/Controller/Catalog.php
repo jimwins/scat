@@ -580,11 +580,9 @@ class Catalog {
     if ($id && !$product)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    $grabs= [];
-    if ($request->getParam('grab')) {
-      foreach($product->items()->find_many() as $item) {
-        $grabs= array_merge($item->media(), $grabs);
-      }
+    $related= [];
+    foreach($product->items()->find_many() as $item) {
+      $related= array_merge($item->media(), $related);
     }
 
     $accept= $request->getHeaderLine('Accept');
@@ -592,7 +590,7 @@ class Catalog {
       return $this->view->render($response, 'dialog/media.html', [
         'product' => $product,
         'media' => $product->media(),
-        'related' => $grabs,
+        'related' => $related,
       ]);
     }
 
@@ -1007,34 +1005,35 @@ class Catalog {
 
     $grabs= [];
 
-    if ($request->getParam('grab')) {
-      foreach ($item->vendor_items()->find_many() as $vi) {
-        $vendor= $vi->vendor();
-        if ($vendor->salsify_url) {
-          $search_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products?filter=%3D&page=1&per_page=36&product_identifier_collection_id=&query=' . rawurlencode($vi->vendor_sku);
+    foreach ($item->vendor_items()->find_many() as $vi) {
+      $vendor= $vi->vendor();
+      if ($vendor->salsify_url) {
+        $search_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products?filter=%3D&page=1&per_page=36&product_identifier_collection_id=&query=' . rawurlencode($vi->vendor_sku);
 
-          error_log("checking $search_url for images from {$vendor->company}\n");
+        error_log("checking $search_url for images from {$vendor->company}\n");
 
-          $results= json_decode(file_get_contents($search_url));
+        $results= json_decode(file_get_contents($search_url));
 
-          if ($results->products) {
-            foreach ($results->products as $product) {
-              $product_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products/' . $product->id;
-              error_log("checking $product_url for images\n");
-              $details= json_decode(file_get_contents($product_url));
+        if ($results->products) {
+          foreach ($results->products as $product) {
+            $product_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products/' . $product->id;
+            error_log("checking $product_url for images\n");
+            $details= json_decode(file_get_contents($product_url));
 
-              $grabs= array_merge($grabs, $details->asset_properties);
-            }
+            $grabs= array_merge($grabs, $details->asset_properties);
           }
         }
       }
     }
 
+    $related= $item->product()->media();
+
     $accept= $request->getHeaderLine('Accept');
     if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
       return $this->view->render($response, 'dialog/media.html', [
         'item' => $item,
-        'grabs' => $grabs,
+        'related' => $related,
+        'vendor' => $grabs,
         'media' => $item->media(),
       ]);
     }
