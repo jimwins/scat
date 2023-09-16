@@ -26,6 +26,7 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <form class="form">
+
             <div class="form-group">
               <label for="alt_text" class="control-label">
                 Text description (alt text)
@@ -45,6 +46,15 @@
                  data-name="caption">
                 {{- image.caption -}}
               </p>
+            </div>
+
+            <div class="form-group">
+              <button type="button" class="btn btn-link toggle"
+                      style="color: inherit"
+                      data-name="use_as_swatch" data-value="{{ image.use_as_swatch}}">
+                <i class="fa fa-fw {{ image.use_as_swatch ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+                Use as swatch?
+              </button>
             </div>
 
           </form>
@@ -170,6 +180,43 @@
           window.location.href= '/media'
         })
       }
+    })
+
+    let handleToggle= (toggle) => {
+      let current= toggle.getAttribute('data-value')
+
+      let name= toggle.getAttribute('data-name')
+      let value= current === '1' ? 0 : 1
+
+      let icon= toggle.querySelector('i')
+      icon.classList.remove('fa-square-o','fa-check-square-o')
+      icon.classList.add('fa-spin','fa-spinner')
+
+      return fetch("/media/{{ image.id }}", {
+        method: 'PATCH',
+        headers: {
+          'Content-type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ [name] : value })
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        icon.classList.remove('fa-spin','fa-spinner')
+        icon.classList.add(data[name] !== 0 ?
+                           'fa-check-square-o' : 'fa-square-o')
+        toggle.setAttribute('data-value', data[name])
+
+        let reload= toggle.closest('[data-reload-block]').getAttribute('data-reload-block')
+        if (reload) {
+          scat.reload(reload)
+        }
+      })
+    }
+
+    document.addEventListener('click', (ev) => {
+      let toggle= ev.target.closest('.toggle')
+      if (toggle) handleToggle(toggle)
     })
   </script>
 {% endblock %}

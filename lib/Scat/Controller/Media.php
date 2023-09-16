@@ -48,6 +48,9 @@ class Media {
           if ($name == 'height') {
             $media= $media->where('height', $term->value);
           }
+          if ($name == 'swatch') {
+            $media= $media->where('use_as_swatch', $term->value);
+          }
         } elseif ($term instanceof \Scat\Search\Term) {
           $natural[]= '"' . $term->value . '"';
         }
