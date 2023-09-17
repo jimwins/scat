@@ -225,6 +225,16 @@ class Item extends \Scat\Model {
     return $media[0]->large_square();
   }
 
+  public function swatch() {
+    $media= $this->media();
+    foreach ($media as $image) {
+      if ($image->use_as_swatch) {
+        return $image;
+      }
+    }
+    return null;
+  }
+
   public function brand_name() {
     $product= $this->product();
     if ($product) {

@@ -45,9 +45,12 @@
     {% endif %}
   </td>
   <td class="description item-short-name" style="{{ s.style_item_color(i.color) }}">
-    <span class="editable"
-          data-pk="{{ i.code }}"
-          data-name="short_name">
+    {% set swatch = i.swatch() %}
+    {% if swatch %}
+      <div style="float: left">
+        <img src="{{ swatch.thumbnail }}" width="48" height="48" alt="{{ swatch.alt_text ?? ('Swatch for ' ~ i.name) }}">
+      </div>
+    {% endif %}
     {{- i.short_name -}}
   </td>
   <td class="text-right">
