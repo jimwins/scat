@@ -228,7 +228,7 @@
         {% if cart.tax_exemption %}
           Exempt
         {% elseif cart.tax_calculated %}
-          {{ scat.amount(cart.tax) }}
+          {{ scat.amount(cart.tax + cart.shipping_tax) }}
         {% else %}
           <span class="text-danger">TBD</span>
         {% endif %}
