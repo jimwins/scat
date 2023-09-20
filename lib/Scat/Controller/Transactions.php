@@ -1223,7 +1223,7 @@ class Transactions {
     $tentative_shipment= null;
     if (!$shipment) {
       $line= $txn->items()->where('tic', '11000')->find_one();
-      if ($line) {
+      if ($line && $line->data) {
         /* XXX this is very gross */
         $tentative_shipment=
           $shipping->getShipment((object)[ 'method_id' => $line->data()->details->shipment_id ]);
