@@ -337,7 +337,7 @@ class Cart extends \Scat\Model {
     if ($key == 'shipping_options' && $value !== null) {
       $value= json_encode($value);
     }
-    if ($key == 'shipping_method' && $value !== null && $value != 'pickup') {
+    if ($key == 'shipping_method' && $value !== null && $value != 'pickup' && !$this->shipping_manual) {
       $option= @$this->shipping_options[$value];
       if (!$option) {
         throw new \Exception("No such shipping option '$value'");

@@ -104,12 +104,12 @@ class Cart {
         case 'address':
           if ($value['city']) {
             $cart->updateShippingAddress($this->shipping, [
-              'name' => $cart->name,
-              'street1' => $value['line1'],
-              'street2' => $value['line2'] ?? '',
+              'name' => $value['name'] ?? $cart->name,
+              'street1' => $value['line1'] ?? $value['street1'],
+              'street2' => $value['line2'] ?? $value['street2'] ?? '',
               'city' => $value['city'],
               'state' => $value['state'],
-              'zip' => $value['postal_code'],
+              'zip' => $value['postal_code'] ?? $value['zip'],
             ]);
             $recalculate= true;
           }
@@ -146,6 +146,16 @@ class Cart {
         case 'method':
         case 'shipping_method':
           $cart->shipping_method= $value;
+          $cart->recalculateTax($this->tax);
+          break;
+
+        case 'manual_shipping':
+          if ($value['key'] != $this->config->get('ordure.key')) {
+            throw new \Exception("Wrong key.");
+          }
+          $cart->shipping= $value['shipping_cost'];
+          $cart->shipping_manual= 1;
+          $cart->shipping_method= 'default';
           $cart->recalculateTax($this->tax);
           break;
 
@@ -353,6 +363,7 @@ class Cart {
     // get item details
     $item= $this->catalog->getItemByCode($item_code);
     if (!$item || $item->no_online_sale) {
+      error_log("no such item found '{$item_code}'");
       throw new \Slim\Exception\HttpNotFoundException($request);
     }
 
@@ -367,7 +378,12 @@ class Cart {
       $cart->save();
     }
 
-    $existing=
+    $key= $request->getParam('key');
+    if ($key && $key != $this->config->get('ordure.key')) {
+      throw new \Exception("Wrong key.");
+    }
+
+    $existing= $key ? null :
       $cart->items()
             ->where('item_id', $item->id)
             ->where_null('kit_id')
@@ -382,9 +398,18 @@ class Cart {
         'item_id' => $item->id,
       ]);
 
-      $line->retail_price= $item->retail_price;
-      $line->discount= $item->discount;
-      $line->discount_type= $item->discount_type;
+      if ($key) {
+        $line->retail_price= $request->getParam('retail_price');
+        $line->discount= $request->getParam('discount');
+        $line->discount_type= $request->getParam('discount_type');
+        $line->discount_manual= $request->getParam('discount_manual');
+        $line->override_name= $request->getParam('override_name');
+      } else {
+        $line->retail_price= $item->retail_price;
+        $line->discount= $item->discount;
+        $line->discount_type= $item->discount_type;
+      }
+
       $line->tic= $item->tic;
 
       $line->updateQuantity($quantity);
@@ -745,6 +770,11 @@ class Cart {
     $cart->recalculateTax($this->tax);
 
     $cart->save();
+
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/json') !== false) {
+      return $response->withJson([ 'message' => 'Processed' ] );
+    }
 
     return $response->withRedirect('/cart/checkout');
   }

@@ -54,32 +54,70 @@ class Ordure
     $client= new \GuzzleHttp\Client();
     $jar= new \GuzzleHttp\Cookie\CookieJar();
 
-    $person= $txn->person();
+    $data= [];
 
+    $person= $txn->person();
     if ($person) {
       $data= [
         'email' => $person->email,
         'name' => $person->name,
         'phone' => $person->phone,
       ];
+    }
 
+    // create the cart
+    $res= $client->request('POST', $url,
+                           [
+                             'cookies' => $jar,
+                             'headers' => [ 'Accept' => 'application/json' ],
+                             'form_params' => $data,
+                           ]);
+
+    if ($txn->shipping_address_id > 1) {
+      $data= [
+        'address' => $txn->shipping_address()
+      ];
       $res= $client->request('POST', $url,
                              [
                                'cookies' => $jar,
                                'headers' => [ 'Accept' => 'application/json' ],
-                               'form_params' => $data,
+                               \GuzzleHttp\RequestOptions::JSON => $data,
+                             ]);
+    } elseif ($txn->shipping_address_id == 1) {
+      $res= $client->request('GET', $url . '/checkout/set-pickup',
+                             [
+                               'cookies' => $jar,
+                               'headers' => [ 'Accept' => 'application/json' ]
                              ]);
     }
 
     foreach ($txn->items()->find_many() as $item) {
       if ($item->tic == '11000') {
-        // TODO handle shipping, we just ignore for now
+        $data= [
+          'manual_shipping' => [
+            'key' => $this->key,
+            'shipping_cost' => $item->retail_price
+          ]
+        ];
+        $res= $client->request('POST', $url,
+                               [
+                                 'cookies' => $jar,
+                                 'headers' => [ 'Accept' => 'application/json' ],
+                                 'form_params' => $data,
+                               ]);
         continue;
       }
 
       $data= [
-        'item' => $item->code(),
+        'item' => $item->item()->code, // just $item->code() sometimes hides the real code
         'quantity' => - $item->ordered,
+        // We send a key so we can set these other values
+        'key' => $this->key,
+        'retail_price' => $item->retail_price,
+        'discount_type' => $item->discount_type,
+        'discount' => $item->discount,
+        'discount_manual' => $item->discount_manual,
+        'override_name' => $item->override_name,
       ];
 
       $res= $client->request('POST', $url . '/add-item',
