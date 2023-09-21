@@ -143,7 +143,7 @@
             {% endif %}
           </small>
         </td>
-        <td class="hidden-xs"><small>{{ item.code }}</small></td>
+        <td class="hidden-xs"><small>{{ item.code matches '/^ZZ-/' ? '' : item.code }}</small></td>
         <td class="description">
           {% if item.hazmat %}
             <a class="pull-right" href="/shipping#hazmat" data-toggle="tooltip" title="Hazardous materials: special shipping is required, and there may be additional costs."><img src="{{ STATIC }}/msds/dot-limited-quantity-surface.svg" width="20" alt="Hazardous Materials"></a>
