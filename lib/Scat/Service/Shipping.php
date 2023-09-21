@@ -376,6 +376,12 @@ class Shipping
 
       $shipment= $this->createShipment($details, null, true);
 
+      /*
+       * XXX
+       * USPS Priority Mail could be used as a two_day or next_day
+       * possibility, would need to get the rate, check the delivery_dates,
+       * and slot it into the correct option category.
+       */
       $acceptable_options= [
         'default' => [
           [ 'UPS', 'Ground' ],
