@@ -112,8 +112,6 @@ class Sale {
       ]);
     }
 
-    // TODO redirect to correct URL depending on $sale->status
-
     $key= $request->getParam('key');
 
     if ($key && !$this->auth->verify_access_key($key)) {
