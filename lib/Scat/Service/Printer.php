@@ -42,8 +42,6 @@ class Printer
 
     $mpdf= new \Mpdf\Mpdf([ 'mode' => 'utf-8', 'format' => 'letter',
                             'tempDir' => '/tmp',
-                            // TODO receipt had default_font_size of 28,
-                            // can we fix this in template?
                             'default_font_size' => 11  ]);
     $mpdf->setAutoTopMargin= 'stretch';
     $mpdf->setAutoBottomMargin= 'stretch';
