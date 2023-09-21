@@ -35,9 +35,8 @@ final class Cart implements MiddlewareInterface
       if ($cart && $cart->status != 'cart') {
         if ($cart->status == 'paid') {
           error_log("Cart is already paid");
-          // TODO this is ugly, but it works
           $this->dumpCookies();
-          $response= $GLOBALS['app']->getResponseFactory()->createResponse();
+          $response= new \Slim\Http\Response();
           return $response->withRedirect(
             '/sale/' . $cart->uuid . '/thanks'
           );
