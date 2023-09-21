@@ -126,7 +126,9 @@
             {% if item.no_backorder %}
               Limited to stock on hand ({{ item.stock }}).<br>
             {% endif %}
-            {% if item.stock %}
+            {% if not item.purchase_quantity %}
+              <span data-toggle="tooltip" title="We don't normally stock this, but we can get it for you!">Special order</span>
+            {% elseif item.stock %}
               {% if item.stock < line.quantity %}
                 {{ max(item.stock, 0) }} currently available.
               {% endif %}
