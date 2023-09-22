@@ -1666,7 +1666,7 @@ class Transactions {
                         AND vendor_id = $vendor_id
                         AND vendor_item.active)
                       AS vendor_item_id,
-                     (SELECT MIN(IF(promo_price, promo_price, net_price))
+                     (SELECT MIN(IF(promo_price AND promo_price < net_price, promo_price, net_price))
                         FROM vendor_item
                         JOIN person ON vendor_item.vendor_id = person.id
                       WHERE item_id = item.id
