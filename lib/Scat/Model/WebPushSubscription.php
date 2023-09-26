@@ -8,7 +8,7 @@ class WebPushSubscription extends \Scat\Model {
     $sub->data= json_encode($keys);
     $sub->save();
 
-    return $device;
+    return $sub;
   }
 
   public static function forget($endpoint) {
