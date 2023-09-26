@@ -9,8 +9,6 @@ self.addEventListener('push', function (event) {
 
     return self.registration.showNotification(title, {
       body,
-      // Safari doesn't actually use this yet, but be ready
-      icon: '/static/icon.iconset/icon_128x128.png',
     });
   };
 
