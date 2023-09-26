@@ -587,15 +587,19 @@ $app->group('/till', function (RouteCollectorProxy $app) {
 /* Safari notifications */
 $app->group('/push', function (RouteCollectorProxy $app) {
   $app->get('', [ \Scat\Controller\Push::class, 'home' ]);
-  $app->post('/v2/pushPackages/{id}',
-              [ \Scat\Controller\Push::class, 'pushPackages' ]);
-  $app->post('/v1/devices/{token}/registrations/{id}',
-              [ \Scat\Controller\Push::class, 'registerDevice' ]);
-  $app->delete('/v1/devices/{token}/registrations/{id}',
-                [ \Scat\Controller\Push::class, 'forgetDevice' ]);
-  $app->post('/v1/log', [ \Scat\Controller\Push::class, 'log' ]);
+
+  $app->get('/~generate-keys', [ \Scat\Controller\Push::class, 'generateKeys' ]);
+
+  $app->post('/~subscribe', [ \Scat\Controller\Push::class, 'addSubscription' ]);
+  $app->put('/~subscribe', [ \Scat\Controller\Push::class, 'updateSubscription' ]);
+  $app->delete('/~subscribe', [ \Scat\Controller\Push::class, 'removeSubscription' ]);
+
   $app->post('/~notify', [ \Scat\Controller\Push::class, 'pushNotification' ]);
+
 });
+
+/* Lives at top level to avoid scope problems. */
+$app->get('/push-service-worker.js', [ \Scat\Controller\Push::class, 'getServiceWorker' ]);
 
 /* Tax stuff */
 $app->group('/tax', function (RouteCollectorProxy $app) {
