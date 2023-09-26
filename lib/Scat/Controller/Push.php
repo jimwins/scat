@@ -8,67 +8,98 @@ use \Slim\Views\Twig as View;
 use \Respect\Validation\Validator as v;
 
 class Push {
+  private $publicKey, $privateKey;
+
+  public function __construct(
+    private \Scat\Service\Config $config
+  ) {
+    $this->publicKey= $config->get('push.publicKey');
+    $this->privateKey= $config->get('push.privateKey');
+  }
+
+  public function generateKeys(Request $request, Response $response) {
+    if ($this->publicKey) {
+      throw new \Exception("Already have keys, delete them before generating new ones.");
+    }
+
+    $keys= \Minishlink\WebPush\VAPID::createVapidKeys();
+
+    $this->config->set('push.publicKey', $keys['publicKey']);
+    $this->config->set('push.privateKey', $keys['privateKey']);
+
+    return $response->withRedirect("/push");
+  }
+
+
   function home(Request $request, Response $response,
                 View $view, \Scat\Service\Config $config) {
+    return $view->render($response, "push/index.html");
+  }
+
+  function addSubscription(Request $request, Response $response) {
+    $subscription= $request->getParams();
+    error_log("Adding subscription: " . json_encode($subscription));
+
+    \Scat\Model\WebPushSubscription::register($subscription['endpoint'], $subscription['keys']);
+
+    return $response->withJson([]);
+  }
+
+  function updateSubscription(Request $request, Response $response) {
+    $subscription= $request->getParams();
+
+    error_log("Updating subscription: " . json_encode($subscription));
+
+    return $response->withJson([]);
+  }
+
+  function removeSubscription(Request $request, Response $response) {
+    $subscription= $request->getParams();
+
+    \Scat\Model\WebPushSubscription::forget($subscription['endpoint']);
+
+    return $response->withJson([]);
+  }
+
+  function pushNotification(
+    Request $request, Response $response,
+    \Scat\Service\Data $data
+  ) {
     $uri= $request->getUri();
-    // Not getting \Slim\Http\Uri for some reason, so more work
-    $scheme = $uri->getScheme();
-    $authority = $uri->getAuthority();
-    $baseUrl= ($scheme !== '' ? $scheme . ':' : '') .
-              ($authority !== '' ? '//' . $authority : '');
-    $ident= $config->get('push.websitePushID');
-    return $view->render($response, "push/index.html", [
-                          'url' => $baseUrl,
-                          'ident' => $ident,
-                        ]);
-  }
+    $routeContext= \Slim\Routing\RouteContext::fromRequest($request);
+    $link= $routeContext->getRouteParser()->fullUrlFor($uri, 'home');
 
-  function pushPackages(Request $request, Response $response, $id,
-                        \Scat\Service\Push $push) {
-    $uri= $request->getUri();
-    // Not getting \Slim\Http\Uri for some reason, so more work
-    $scheme = $uri->getScheme();
-    $authority = $uri->getAuthority();
-    $baseUrl= ($scheme !== '' ? $scheme . ':' : '') .
-              ($authority !== '' ? '//' . $authority : '');
-    $zip= $push->getPushPackage($baseUrl, $id);
-    return $response->withHeader("Content-type", "application/zip")
-                ->withBody($zip);
-  }
+    $push= new \Minishlink\WebPush\WebPush([
+      'VAPID' => [
+        'subject' => $link,
+        'publicKey' => $this->publicKey,
+        'privateKey' => $this->privateKey
+      ],
+    ],
+    [
+      'urgency' => 'normal',
+    ]);
 
-  function registerDevice(Request $request, Response $response, $token, $id) {
-    error_log("PUSH: Registered device: '$token'");
-    $device= \Scat\Model\Device::register($token);
-    return $response;
-  }
+    $subscriptions= $data->factory('WebPushSubscription')->find_many();
 
-  function forgetDevice(Request $request, Response $response, $token, $id) {
-    error_log("PUSH: Forget device: '$token'");
-    $device= \Scat\Model\Device::forget($token);
-    return $response;
-  }
-
-  function log(Request $request, Response $response) {
-    $data= $request->getParsedBody();
-    error_log("PUSH: " . json_encode($data));
-    return $response;
-  }
-
-  function pushNotification(Request $request, Response $response,
-                            \Scat\Service\Data $data,
-                            \Scat\Service\Push $push) {
-     $devices= $data->factory('Device')->find_many();
-
-     foreach ($devices as $device) {
-       $push->sendNotification(
-         $device->token,
-         $request->getParam('title'),
-         $request->getParam('body'),
-         $request->getParam('action'),
-         'clicked' /* Not sure what to do about arguments yet. */
-       );
-     }
+    /*
+     * Should really build an array of notifications and send them all at
+     * once, but we are just using this internally right now for few
+     * subscribers.
+     */
+    foreach ($subscriptions as $sub) {
+      $keys= json_decode($sub->data);
+      $res= $push->sendOneNotification(
+        new \Minishlink\WebPush\Subscription($sub->endpoint, $keys->p256dh, $keys->auth, 'aesgcm'),
+        $request->getParam('body')
+      );
+    }
 
      return $response->withRedirect("/push");
+  }
+
+  function getServiceWorker(Request $request, Response $response, View $view) {
+    return $view->render($response, 'push/service-worker.js')
+                ->withHeader('Content-type', 'application/javascript;charset=UTF-8');
   }
 }
