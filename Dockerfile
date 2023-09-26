@@ -6,6 +6,7 @@ RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         freetype-dev \
         gifsicle \
         git \
+        gmp-dev \
         jpegoptim \
         libjpeg-turbo-dev \
         libpng-dev \
@@ -23,6 +24,7 @@ RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing \
       && docker-php-ext-install \
           bcmath \
           gd \
+          gmp \
           mysqli \
           pdo \
           pdo_mysql \
