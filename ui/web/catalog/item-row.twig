@@ -47,7 +47,7 @@
   <td class="description item-short-name" style="{{ s.style_item_color(i.color) }}">
     {% set swatch = i.swatch() %}
     {% if swatch %}
-      <div style="float: left">
+      <div style="float: left; margin-right: 0.5em">
         <img src="{{ swatch.thumbnail }}" width="48" height="48" alt="{{ swatch.alt_text ?? ('Swatch for ' ~ i.name) }}">
       </div>
     {% endif %}
