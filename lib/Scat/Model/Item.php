@@ -616,6 +616,11 @@ class Item extends \Scat\Model {
       return false; // Easy no.
     }
 
+    // "Special" items don't ship free, either.
+    if ($this->purchase_quantity == 0) {
+      return false;
+    }
+
     return ($this->weight < 10 &&
             \Scat\Service\Shipping::fits_in_box($boxes, [
               [ $this->width, $this->height, $this->length ]
