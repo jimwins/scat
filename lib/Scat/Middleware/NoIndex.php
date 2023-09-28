@@ -6,7 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-final class Noindex implements MiddlewareInterface
+final class NoIndex implements MiddlewareInterface
 {
   public function process(
     ServerRequestInterface $request,
