@@ -87,9 +87,9 @@
         "yidas/google-maps-services": "^1.0",
         "mailerlite/mailerlite-api-v2-php-sdk": "^0.3.2",
         "whatwedo/twig-bootstrap-icons": "^1.0",
-        "sentry/sdk": "^3.2",
         "pensiero/php-openssl-cryptor": "^0.1.0",
-        "minishlink/web-push": "^8.0"
+        "minishlink/web-push": "^8.0",
+        "php-http/guzzle7-adapter": "^1.0"
     },
     "scripts": {
       "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
@@ -103,9 +103,10 @@
     },
     "config": {
       "allow-plugins": {
-        "composer/installers": true,
-        "oomphinc/composer-installers-extender": true
-      },
+            "composer/installers": true,
+            "oomphinc/composer-installers-extender": true,
+            "php-http/discovery": true
+        },
       "platform": {
         "ext-gd": "1"
       }
