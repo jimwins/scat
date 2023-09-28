@@ -2,10 +2,6 @@
 namespace Scat\Model;
 
 class VendorItem extends \Scat\Model {
-  public static
-  function search($vendor_id, $q) {
-  }
-
   public function item() {
     return $this->belongs_to('Item')->find_one();
   }
