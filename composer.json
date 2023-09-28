@@ -45,7 +45,7 @@
         }
     ],
     "require": {
-        "components/jquery": "=3.5.1",
+        "components/jquery": "=3.7.1",
         "phpoffice/phpspreadsheet": "^1.6",
         "giggsey/libphonenumber-for-php": "^8.1",
         "guzzlehttp/guzzle": "^7.4",
@@ -55,7 +55,7 @@
         "mpdf/mpdf": "^8.1",
         "oe/lukas": "dev-master",
         "smalot/cups-ipp": "dev-dev-local",
-        "monolog/monolog": "^1.24",
+        "monolog/monolog": "^3.4",
         "php-http/logger-plugin": "^1.0",
         "tarikozket/backblaze-b2-sdk-php": "dev-master",
         "slim/slim": "4.*",
@@ -81,7 +81,7 @@
         "amzn/amazon-pay-api-sdk-php": "^2.2",
         "cloudstek/php-laff": "dev-master",
         "twig/html-extra": "^3.3",
-        "google/apiclient": "^2.12.1",
+        "google/apiclient": "^v2.15",
         "cleantalk/php-antispam": "^2.6",
         "akrabat/ip-address-middleware": "^2.1",
         "yidas/google-maps-services": "^1.0",
