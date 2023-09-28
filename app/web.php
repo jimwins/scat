@@ -72,8 +72,14 @@ $container->set('view', function($container) {
   }
 
   // Add the Markdown extension
-  $engine= new \Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine();
-  $view->addExtension(new \Aptoma\Twig\Extension\MarkdownExtension($engine));
+  $view->addExtension(new \Twig\Extra\Markdown\MarkdownExtension());
+  $view->addRuntimeLoader(new class implements \Twig\RuntimeLoader\RuntimeLoaderInterface {
+    public function load($class) {
+      if (\Twig\Extra\Markdown\MarkdownRuntime::class === $class) {
+        return new \Twig\Extra\Markdown\MarkdownRuntime(new \Twig\Extra\Markdown\DefaultMarkdown());
+      }
+    }
+  });
 
   // Add the HTML extension
   $view->addExtension(new \Twig\Extra\Html\HtmlExtension());

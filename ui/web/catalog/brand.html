@@ -47,7 +47,7 @@
     </div>
   {% endif %}
   {% if brand.description %}
-    <p>{{ brand.description|markdown }}</p>
+    <p>{{ brand.description|markdown_to_html }}</p>
     <div class="clearfix"></div>
     <hr>
   {% endif %}

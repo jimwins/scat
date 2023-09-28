@@ -90,7 +90,7 @@
     {% block catalog_content %}
       {% if dept and not subdept  %}
         <p>
-          {{ dept.description | markdown }}
+          {{ dept.description | markdown_to_html }}
         </p>
       {% endif %}
       {% if products and not product %}

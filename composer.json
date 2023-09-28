@@ -61,7 +61,6 @@
         "slim/slim": "4.*",
         "twig/twig": "^3.3",
         "slim/twig-view": "^3.3",
-        "aptoma/twig-markdown": "^3.0",
         "robmorgan/phinx": "^0.12.10",
         "publitio/publitio": "dev-master",
         "easypost/easypost-php": "^5.5",
@@ -89,7 +88,8 @@
         "whatwedo/twig-bootstrap-icons": "^1.0",
         "pensiero/php-openssl-cryptor": "^0.1.0",
         "minishlink/web-push": "^8.0",
-        "php-http/guzzle7-adapter": "^1.0"
+        "php-http/guzzle7-adapter": "^1.0",
+        "twig/markdown-extra": "^3.7"
     },
     "scripts": {
       "pre-autoload-dump": "Google\\Task\\Composer::cleanup"

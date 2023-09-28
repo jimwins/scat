@@ -195,13 +195,13 @@ figure img {
     {% if item.description %}
       <details open>
         <summary>Item Description</summary>
-        {{ item.description | markdown }}
+        {{ item.description | markdown_to_html }}
       </details>
     {% endif %}
 
     <details open>
       <summary>Product Description</summary>
-      {{ product.description | markdown }}
+      {{ product.description | markdown_to_html }}
     </details>
 
     <details open>

@@ -31,7 +31,7 @@
         {% endif %}
       </h4>
       {# Just extract the first paragraph #}
-      {% set paragraphs= p.description|markdown|split('</p>', 2) %}
+      {% set paragraphs= p.description|markdown_to_html|split('</p>', 2) %}
       {% set firstParagraph= paragraphs|first ~ '</p>' %}
       {{ firstParagraph | raw }}
     </div>

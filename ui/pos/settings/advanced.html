@@ -46,7 +46,7 @@
                   data-pk="{{ setting.id }}"
                   data-name="value">
                 {%- if setting.type == 'text' -%}
-                  {{- setting.value|markdown -}}
+                  {{- setting.value|markdown_to_html -}}
                 {%- elseif setting.type == 'password' -%}
                   {{- '********' -}}
                 {%- else -%}

@@ -100,7 +100,7 @@
         {{ dept.name }}
       </h1>
       <p>
-        {{ dept.description | markdown }}
+        {{ dept.description | markdown_to_html }}
       </p>
       <div class="smol-grid">
         {% for subdept in subdepts %}

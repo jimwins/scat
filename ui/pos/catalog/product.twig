@@ -50,7 +50,7 @@
   </div>
   <div class="col-sm-8">
     <div class="content">
-      {{ product.description | replace({'{{ @STATIC }}' : STATIC}) | markdown }}
+      {{ product.description | replace({'{{ @STATIC }}' : STATIC}) | markdown_to_html }}
     </div>
   </div>
 </div>

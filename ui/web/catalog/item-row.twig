@@ -111,7 +111,7 @@
   </td>
   {% if i.description %}
     <td class="description long">
-      {{ i.description | markdown }}
+      {{ i.description | markdown_to_html }}
     </td>
   {% endif %}
 </tr>
