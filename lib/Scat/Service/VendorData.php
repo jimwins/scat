@@ -408,7 +408,7 @@ class VendorData
     /* If this is a promo, unset existing promos for this vendor */
     if ($action == 'promo') {
       $q= "UPDATE vendor_item SET promo_price = NULL, promo_quantity = NULL
-            WHERE vendor_id = {$this->id}";
+            WHERE vendor_id = {$person->id}";
       if (!$this->data->execute($q))
         throw new \Exception("Unable to clear old promos");
     }
@@ -520,6 +520,8 @@ class VendorData
         $this->data->execute("DROP TABLE IF EXISTS vendor_order");
         $temporary= "";
       }
+
+      $update_only= false;
 
       error_log("Loading order data from '$fn'\n");
 
