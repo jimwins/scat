@@ -133,7 +133,7 @@ class Item extends \Scat\Model {
                 ->where_gte('vendor_item.active', $active);
   }
 
-  public function vendor_item($person_id) {
+  public function vendor_item($person_id, $active= 1) {
     $item= $this->has_many('VendorItem')
                 ->where_gte('active', $active)
                 ->where('vendor_id', $person_id)
@@ -247,6 +247,7 @@ class Item extends \Scat\Model {
   }
 
   public function category() {
+    $subdept= $dept= null;
     $product= $this->product();
     if ($product) {
       $subdept= $product->dept();
@@ -265,6 +266,7 @@ class Item extends \Scat\Model {
 
   public function full_slug() {
     $product= $this->product();
+    $subdept= $dept= null;
     if ($product)
       $subdept= $product->dept()->find_one();
     if ($subdept)
