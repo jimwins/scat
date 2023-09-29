@@ -18,7 +18,7 @@ class Catalog {
   public function search(Request $request, Response $response,
                           \Scat\Service\Search $search)
   {
-    $q= trim($request->getParam('q'));
+    $q= trim($request->getParam('q') ?? '');
     $original_q= null;
 
     /* Check for a direct match to a item code */

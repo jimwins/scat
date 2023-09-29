@@ -56,8 +56,8 @@ class People {
 
   public function search(Request $request, Response $response, View $view,
                           \Scat\Service\Data $data) {
-    $q= trim($request->getParam('q'));
-    $loyalty= trim($request->getParam('loyalty'));
+    $q= trim($request->getParam('q') ?? '');
+    $loyalty= trim($request->getParam('loyalty') ?? '');
 
     if ($q) {
       $people= \Scat\Model\Person::find($q);

@@ -39,7 +39,7 @@ class Giftcard {
     switch ($request->getParam('action')) {
       case 'update':
         $payment_intent_id= $request->getParam('payment_intent_id');
-        $amount= trim($request->getParam('amount'));
+        $amount= trim($request->getParam('amount') ?? '');
         $amount= preg_replace('/^\$/', '', $amount); // strip leading $
         if ($amount == '' || !preg_match('/^\d*(\.\d*)?$/', $amount)) {
           throw new \Exception("Invalid amount ({$amount}).");

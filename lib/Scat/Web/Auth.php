@@ -54,7 +54,7 @@ class Auth {
   public function handleLogin(Request $request, Response $response,
                               \Scat\Service\Email $email)
   {
-    $loyalty= trim($request->getParam('loyalty'));
+    $loyalty= trim($request->getParam('loyalty') ?? '');
 
     $people= $this->scat->find_person($loyalty);
 
@@ -130,9 +130,9 @@ class Auth {
 
   public function processSignup(Request $request, Response $response)
   {
-    $name= trim($request->getParam('name'));
-    $email= trim($request->getParam('email'));
-    $phone= trim($request->getParam('phone'));
+    $name= trim($request->getParam('name') ?? '');
+    $email= trim($request->getParam('email') ?? '');
+    $phone= trim($request->getParam('phone') ?? '');
 
     if (!$email && !$phone) {
       throw new \Exception("You need to provide an email or phone number.");

@@ -27,7 +27,7 @@ class Transactions {
   }
 
   public function search(Request $request, Response $response, $type) {
-    $q= trim($request->getParam('q'));
+    $q= trim($request->getParam('q') ?? '');
 
     if (preg_match('/^((%V|@)INV-)(\d+)/i', $q, $m)) {
       $txn= $this->txn->fetchById($m[3]);
@@ -1067,7 +1067,7 @@ class Transactions {
 
     $to_name= $request->getParam('name');
     $to_email= $request->getParam('email');
-    $subject= trim($request->getParam('subject'));
+    $subject= trim($request->getParam('subject') ?? '');
 
     $body= $this->view->fetch('email/invoice.html', [
       'txn' => $txn,
@@ -1346,7 +1346,7 @@ class Transactions {
 
     /* New package info? */
     if (($weight= $request->getParam('weight'))) {
-      $dims= preg_split('/[^\d.]+/', trim($request->getParam('dimensions')));
+      $dims= preg_split('/[^\d.]+/', trim($request->getParam('dimensions') ?? ''));
       if (preg_match('/(([0-9.]+)( *lbs)?)? +(([0-9.]+) *oz)?/', $weight, $m)) {
         $weight= $m[2] + (@$m[5] / 16);
       }
@@ -1701,7 +1701,7 @@ class Transactions {
                                   AND vendor_item.active)";
     }
 
-    $code= trim($request->getParam('code'));
+    $code= trim($request->getParam('code') ?? '');
     if ($code) {
       $extra.= " AND code LIKE " . $this->data->escape($code.'%');
     }

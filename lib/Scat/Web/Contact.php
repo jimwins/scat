@@ -18,14 +18,14 @@ class Contact {
 
   function handleContact(Request $request, Response $response)
   {
-    $email= trim($request->getParam('email'));
+    $email= trim($request->getParam('email') ?? '');
     if (!v::email()->validate($email)) {
       throw new \Exception("Sorry, you must provide a valid email address.");
     }
 
     $donation= (int)$request->getParam('donation');
 
-    $name= trim($request->getParam('name'));
+    $name= trim($request->getParam('name') ?? '');
     $ip= $request->getAttribute('ip_address');
 
     $subject= $request->getParam('subject') ?: 'Contact';

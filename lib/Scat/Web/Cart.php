@@ -353,7 +353,7 @@ class Cart {
     $cart= $request->getAttribute('cart');
     $person= $this->auth->get_person_details($request);
 
-    $item_code= trim($request->getParam('item'));
+    $item_code= trim($request->getParam('item') ?? '');
     $quantity= max((int)$request->getParam('quantity'), 1);
 
     if ($cart->closed()) {

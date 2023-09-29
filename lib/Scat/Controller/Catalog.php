@@ -19,7 +19,7 @@ class Catalog {
                           \Scat\Service\Txn $txn,
                           \Scat\Service\Search $search)
   {
-    $q= trim($request->getParam('q'));
+    $q= trim($request->getParam('q') ?? '');
     $scope= $request->getParam('scope');
     $limit= $request->getParam('limit');
 
@@ -176,7 +176,7 @@ class Catalog {
                           ->order_by_asc('code')
                           ->find_many();
 
-    $trim= trim($request->getParam('trim') ?? "");
+    $trim= trim($request->getParam('trim') ?? '');
     $half= $request->getParam('half') === 'true';
     $short= (int)$request->getParam('short');
     $noprice= (int)$request->getParam('noprice');
@@ -881,7 +881,7 @@ class Catalog {
     if (!$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    $code= trim($request->getParam('barcode'));
+    $code= trim($request->getParam('barcode') ?? '');
 
     if (preg_match('/^(000000|400400)/', $code)) {
       throw new \Exception("That barcode is for internal use only.");
@@ -889,7 +889,7 @@ class Catalog {
 
     $barcode= $item->barcodes()->create();
     $barcode->item_id= $item->id;
-    $barcode->code= trim($request->getParam('barcode'));
+    $barcode->code= trim($request->getParam('barcode') ?? '');
     $barcode->quantity= 1;
     $barcode->save();
 
