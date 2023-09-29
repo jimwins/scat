@@ -1,4 +1,4 @@
-<?
+<?php
 namespace Scat\Model;
 
 class VendorItem extends \Scat\Model {
