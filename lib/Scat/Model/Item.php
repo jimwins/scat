@@ -1,4 +1,4 @@
-<?
+<?php
 namespace Scat\Model;
 
 class Item extends \Scat\Model {
