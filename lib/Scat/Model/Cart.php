@@ -328,7 +328,7 @@ class Cart extends \Scat\Model {
   public function __get($key) {
     $value= parent::__get($key);
     if ($key == 'shipping_options') {
-      return json_decode($value, true);
+      return $value ? json_decode($value, true) : null;
     }
     return $value;
   }
