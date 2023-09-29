@@ -135,7 +135,7 @@ class TxnLine extends \Scat\Model {
   public function as_array() {
     $data= parent::as_array();
     $data['sale_price']= $this->sale_price();
-    $data['data']= json_decode($this->data);
+    $data['data']= $this->data ? json_decode($this->data) : null;
     return $data;
   }
 

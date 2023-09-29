@@ -434,7 +434,7 @@ class Txn extends \Scat\Model {
 
       /* turn off logging here, it's just too much */
       $this->orm->configure('logging', false);
-      $count= abs($items->sum('ordered'));
+      $count= abs($items->sum('ordered') ?? 0);
       $items->limit(null); // reset limit that sum() injects into $items
       $this->orm->configure('logging', true);
 
