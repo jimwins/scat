@@ -455,7 +455,7 @@ class People {
       }
     }
 
-    $response= $response->withBody(\GuzzleHttp\Psr7\stream_for($output));
+    $response= $response->withBody(\GuzzleHttp\Psr7\Utils::streamFor($output));
 
     return $response->withHeader("Content-type", "text/csv");
   }
