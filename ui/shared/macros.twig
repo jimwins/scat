@@ -1,5 +1,5 @@
 {% macro amount(d) %}
-  {{- d < 0 ? '(' }}${{ (d ?? 0 | abs) | number_format(2, '.', ',') }}{{ d < 0 ? ')' -}}
+  {{- d < 0 ? '(' }}${{ ((d ?? 0) | abs) | number_format(2, '.', ',') }}{{ d < 0 ? ')' -}}
 {% endmacro %}
 
 {% macro format_discount(item) %}
