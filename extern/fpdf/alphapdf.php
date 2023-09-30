@@ -41,21 +41,22 @@ class AlphaPDF extends FPDF
 		{
 			$this->_newobj();
 			$this->extgstates[$i]['n'] = $this->n;
-			$this->_out('<</Type /ExtGState');
+			$this->_put('<</Type /ExtGState');
 			foreach ($this->extgstates[$i]['parms'] as $k=>$v)
-				$this->_out('/'.$k.' '.$v);
-			$this->_out('>>');
-			$this->_out('endobj');
+				$this->_put('/'.$k.' '.$v);
+			$this->_put('>>');
+			$this->_put('endobj');
 		}
+                $this->extgstates= [];
 	}
 
 	function _putresourcedict()
 	{
 		parent::_putresourcedict();
-		$this->_out('/ExtGState <<');
+		$this->_put('/ExtGState <<');
 		foreach($this->extgstates as $k=>$extgstate)
-			$this->_out('/GS'.$k.' '.$extgstate['n'].' 0 R');
-		$this->_out('>>');
+			$this->_put('/GS'.$k.' '.$extgstate['n'].' 0 R');
+		$this->_put('>>');
 	}
 
 	function _putresources()
