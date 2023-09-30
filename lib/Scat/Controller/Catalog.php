@@ -209,7 +209,7 @@ class Catalog {
         $pdf->SetTextColor(0);
 
         // write the name
-        $name= utf8_decode($short ? $item->short_name : $item->name);
+        $name= mb_convert_encoding($short ? $item->short_name : $item->name, 'ISO-8859-1', 'UTF-8');
 
         if ($trim)
           $name= trim(preg_replace("!$trim!i", '', $name));
@@ -310,7 +310,7 @@ class Catalog {
         $pdf->SetTextColor(0);
 
         // write the name
-        $name= utf8_decode($item->name);
+        $name= mb_convert_encoding($item->name, 'ISO-8859-1', 'UTF-8');
 
         if ($trim)
           $name= preg_replace("/$trim/i", '', $name);
