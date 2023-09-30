@@ -4,7 +4,6 @@ namespace Deployer;
 require 'recipe/composer.php';
 
 require 'contrib/phinx.php';
-require 'contrib/sentry.php';
 
 // Project name
 set('application', 'scat');
@@ -22,10 +21,6 @@ import('hosts.yml');
 // Tasks
 
 after('deploy:cleanup', 'phinx:migrate');
-
-if ($_ENV['SENTRY_TOKEN']) {
-  after('deploy:success', 'deploy:sentry');
-}
 
 // [Optional] If deploy fails automatically unlock.
 after('deploy:failed', 'deploy:unlock');
