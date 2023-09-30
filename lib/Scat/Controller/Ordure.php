@@ -118,6 +118,10 @@ class Ordure {
 
     $updates= json_decode($res->getBody());
 
+    if (!$updates) {
+      return $response;
+    }
+
     foreach ($updates as $update) {
       $person= null;
 
