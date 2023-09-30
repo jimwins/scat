@@ -231,7 +231,9 @@ class ScatUtils {
 
     return scat.post(url, formData)
     .then((res) => {
-      if (res.headers.get('Content-type').includes("application/pdf")) {
+      if (res.headers.get('Content-type').includes("application/pdf") ||
+          res.headers.get('Content-type').includes("image/"))
+      {
         res.blob().then((blob) => {
           /* XXX
            * This doesn't work with Firefox, because it uses PDF.js
