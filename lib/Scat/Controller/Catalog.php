@@ -180,6 +180,14 @@ class Catalog {
     $half= $request->getParam('half') === 'true';
     $short= (int)$request->getParam('short');
     $noprice= (int)$request->getParam('noprice');
+    $quantity= (int)$request->getParam('quantity');
+
+    if ($quantity > 1) {
+      if (count($items) > 1) {
+        throw new \Exception("Can only print multiple of a single label");
+      }
+      $items= array_pad($items, $quantity, $items[0]);
+    }
 
     $left_margin= 0.2;
 
