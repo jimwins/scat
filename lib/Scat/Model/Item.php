@@ -73,7 +73,7 @@ class Item extends \Scat\Model {
     // note: has to be at the end of the name.
     $title= preg_replace_callback(
       '!(\d+)/(\w\w\w?)(?:/([\d.]+)(gsm|#)(\w\w?)?)?$!',
-      [ self::class, $title ],
+      [ self::class, 'expand_pad_details' ],
       $title);
     // 5oz Titanium White Acrylic
     $title= preg_replace('/^([\d.]+)oz /', '\1 oz. ', $title);

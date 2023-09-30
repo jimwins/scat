@@ -1360,7 +1360,7 @@ class Transactions {
         $parcel['height']= $dims[2];
       }
       $predefined_package= $request->getParam('predefined_package');
-      if (strlen($predefined_package)) {
+      if (strlen($predefined_package ?? "")) {
         $parcel['predefined_package']= $predefined_package;
       }
       if ($request->getParam('letter')) {
@@ -1414,14 +1414,14 @@ class Transactions {
     /* Select a rate? */
     if (($rate_id= $request->getParam('rate_id'))) {
       $ep= $shipping->getShipment($shipment);
-      $details= [ 'rate' => [ 'id' => $rate_id ] ];
+      $options= [ 'rate' => [ 'id' => $rate_id ] ];
       $insurance= $txn->subtotal();
       $no_insurance= (int)$request->getParam('no_insurance');
       if ($insurance > 100.00 && !$no_insurance) {
-        $details['insurance']= $insurance;
+        $options['insurance']= $insurance;
       }
 
-      $res= $ep->buy($details);
+      $res= $shipping->buyShipment($shipment, $options);
 
       $shipment->carrier= $res->selected_rate->carrier;
       $shipment->service= $res->selected_rate->service;
@@ -1429,7 +1429,7 @@ class Transactions {
       $shipment->insurance= $res->insurance;
 
       $shipment->status= 'unknown';
-      $shipment->tracker_id= $ep->tracker->id;
+      $shipment->tracker_id= $res->tracker->id;
     }
 
     if (!$shipment->method_id && !$shipment->tracker_id) {

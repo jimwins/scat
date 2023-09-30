@@ -5,9 +5,8 @@ use Scat\Distance;
 
 class Shipping
 {
+  private $client;
   private $webhook_url;
-  private $data;
-  private $google;
 
   # TODO put this in a database table
   # width, height, depth, weight (lb), cost
@@ -121,28 +120,28 @@ class Shipping
   ];
 
   public function __construct(
-    Config $config,
-    Data $data,
-    \Scat\Service\Google $google,
+    private Config $config,
+    private Data $data,
+    private Google $google,
   ) {
     $this->data= $data;
     $this->google= $google;
 
-    \EasyPost\EasyPost::setApiKey($config->get('shipping.key'));
+    $this->client= new \EasyPost\EasyPostClient($config->get('shipping.key'));
     $this->webhook_url= $config->get('shipping.webhook_url');
   }
 
   public function registerWebhook() {
-    return \EasyPost\Webhook::create([ 'url' => $this->webhook_url ]);
+    return $this->client->webhook->create([ 'url' => $this->webhook_url ]);
   }
 
   public function getDefaultFromAddress() {
     $address= $this->data->factory('Address')->find_one(1);
 
     try {
-      $ep= \EasyPost\Address::retrieve($address->easypost_id);
+      $ep= $this->client->address->retrieve($address->easypost_id);
     } catch (\Exception $e) {
-      $ep= \EasyPost\Address::create($address->as_array());
+      $ep= $this->client->address->create($address->as_array());
       $address->easypost_id= $ep->id;
       $address->save();
     }
@@ -151,16 +150,16 @@ class Shipping
   }
 
   public function createAddress($details) {
-    return \EasyPost\Address::create($details);
+    return $this->client->address->create($details);
   }
 
   public function retrieveAddress($address_id) {
-    return \EasyPost\Address::retrieve($address_id);
+    return $this->client->address->retrieve($address_id);
   }
 
   public function getAddress($address) {
     if ($address->easypost_id) {
-      return \EasyPost\Address::retrieve($address->easypost_id);
+      return $this->client->address->retrieve($address->easypost_id);
     }
 
     $easypost_params= [
@@ -176,7 +175,7 @@ class Shipping
       "phone" => $address->phone,
     ];
 
-    $easypost= \EasyPost\Address::create($easypost_params);
+    $easypost= $this->client->address->create($easypost_params);
 
     $address->easypost_id= $easypost->id;
     $address->verified= $easypost->verifications->delivery->success ? '1' : '0';
@@ -200,7 +199,7 @@ class Shipping
   }
 
   public function createTracker($tracking_code, $carrier) {
-    $tracker= \EasyPost\Tracker::create([
+    $tracker= $this->client->tracker->create([
       'tracking_code' => $tracking_code,
       'carrier' => $carrier,
     ]);
@@ -208,19 +207,23 @@ class Shipping
   }
 
   public function createParcel($details) {
-    return \EasyPost\Parcel::create($details);
+    return $this->client->parcel->create($details);
   }
 
   public function createShipment($details, $apiKey= null, $withCarbonOffset= false) {
-    return \EasyPost\Shipment::create($details, $apiKey, $withCarbonOffset);
+    return $this->client->shipment->create($details, $apiKey, $withCarbonOffset);
   }
 
   public function getShipment($shipment) {
-    return \EasyPost\Shipment::retrieve($shipment->method_id);
+    return $this->client->shipment->retrieve($shipment->method_id);
+  }
+
+  public function buyShipment($shipment, $rate) {
+    return $this->client->shipment->buy($shipment->method_id, $rate);
   }
 
   public function createReturn($shipment) {
-    $ep= \EasyPost\Shipment::retrieve($shipment->method_id);
+    $ep= $this->client->shipment->retrieve($shipment->method_id);
     // Keep original to/from, is_return signals to flip them
     $details= [
       'to_address' => $ep->to_address,
@@ -228,26 +231,24 @@ class Shipping
       'parcel' => $ep->parcel,
       'is_return' => true,
     ];
-    return \EasyPost\Shipment::create($details);
+    return $this->client->shipment->create($details);
   }
 
   public function getTracker($shipment) {
-    return \EasyPost\Tracker::retrieve($shipment->tracker_id);
+    return $this->client->tracker->retrieve($shipment->tracker_id);
   }
 
   public function getTrackerUrl($shipment) {
-    $tracker= \EasyPost\Tracker::retrieve($shipment->tracker_id);
+    $tracker= $this->client->tracker->retrieve($shipment->tracker_id);
     return $tracker->public_url;
   }
 
   public function createBatch($shipments) {
-      return \EasyPost\Batch::create([ 'shipments' => $shipments ]);
+      return $this->client->batch->create([ 'shipments' => $shipments ]);
   }
 
   public function refundShipment($shipment) {
-    $ep= \EasyPost\Shipment::retrieve($shipment->method_id);
-
-    return $ep->refund();
+    return $this->client->shipment->refund($shipment->method_id);
   }
 
   static function fits_in_box($boxes, $items) {
