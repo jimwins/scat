@@ -53,7 +53,7 @@ class Wishlist {
     $details= json_encode([
       'items' => $wishlist->items()->count()
     ]);
-    SetCookie('wishlistID', $wishlist->uuid, null /* don't expire */,
+    SetCookie('wishlistID', $wishlist->uuid, strtotime("+365 days"),
               '/', $domain, true, false); /* JavaScript accessible */
     SetCookie('wishlistDetails', $details, 0 /* session cookie */,
               '/', $domain, true, false); /* JavaScript accessible */
