@@ -2,12 +2,13 @@
 namespace Scat\Service;
 
 class Stripe {
-  private $public_key, $secret_key, $webhook_secret;
+  private $public_key, $secret_key, $webhook_secret, $blocked_email_list;
 
   public function __construct(Config $config) {
     $this->public_key= $config->get('stripe.key');
     $this->secret_key= $config->get('stripe.secret_key');
     $this->webhook_secret= $config->get('stripe.webhook_secret');
+    $this->blocked_email_list= $config->get('stripe.blocked_email_list');
   }
 
   private function getClient() {
@@ -93,5 +94,13 @@ class Stripe {
       $signature,
       $this->webhook_secret
     );
+  }
+
+  public function blockEmailAddress(string $email) {
+    $client= $this->getClient();
+    return $client->radar->valueListItems->create([
+      'value_list' => $this->blocked_email_list, 
+      'value' => $email
+    ]);
   }
 }

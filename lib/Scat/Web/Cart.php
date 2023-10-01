@@ -80,6 +80,7 @@ class Cart {
   public function cartUpdate(
     Request $request, Response $response,
     \Scat\Service\Stripe $stripe,
+    \Scat\Service\Fraud $fraud,
     \Scat\Service\Scat $scat
   ) {
     $cart= $request->getAttribute('cart');
@@ -261,6 +262,8 @@ class Cart {
         $intent_options
       );
     }
+
+    $fraud->checkForFraud($cart, $stripe);
 
     $data= $cart->as_array();
 
@@ -549,7 +552,8 @@ class Cart {
   public function checkout(
     Request $request, Response $response,
     \Scat\Service\PayPal $paypal,
-    \Scat\Service\Stripe $stripe
+    \Scat\Service\Stripe $stripe,
+    \Scat\Service\Fraud $fraud
   ) {
     $cart= $request->getAttribute('cart');
     if (!$cart->id) {
@@ -561,6 +565,8 @@ class Cart {
     if ($disabled) {
       throw new \Exception("Sorry, checkout is currently disabled.");
     }
+
+    $fraud->checkForFraud($cart, $stripe);
 
     $paymentIntent= $stripe->getPaymentIntent($cart);
 

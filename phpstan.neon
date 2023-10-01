@@ -1,6 +1,7 @@
 parameters:
 	bootstrapFiles:
 		- lib/dummy-cc-terminal.php
+		- lib/dummy-fraud-checker.php
 	universalObjectCratesClasses:
 		- Scat\Model
 	level: 1

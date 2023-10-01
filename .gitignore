@@ -2,4 +2,5 @@ config.php
 /vendor/
 /components/
 lib/cc-terminal.php
+lib/fraud-checker.php
 hosts.yml
