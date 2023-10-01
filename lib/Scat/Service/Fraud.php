@@ -22,7 +22,7 @@ class Fraud {
 
     $action= $checker->checkForFraud($cart, $stripe);
 
-    if ($action) {
+    if ($action && $action != 'already detected') {
       $this->email->send(
         $this->email->default_from_address(),
         "Fraud detected by {$cart->email}",
