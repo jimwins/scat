@@ -1058,15 +1058,14 @@ class Catalog {
 
     $url= $request->getParam('url');
     $media_id= $request->getParam('media_id');
+    $use_as_swatch= $request->getParam('use_as_swatch');
 
     if ($media_id) {
       $image= $media->findById($media_id);
       if (!$image)
         throw new \Slim\Exception\HttpNotFoundException($request);
-      $item->addImage($image);
     } elseif ($url) {
       $image= $media->createFromUrl($url);
-      $item->addImage($image);
     } else {
       foreach ($request->getUploadedFiles() as $file) {
         if ($file->getError() != UPLOAD_ERR_OK) {
@@ -1074,11 +1073,17 @@ class Catalog {
         }
         $image= $media->createFromStream($file->getStream(),
                                           $file->getClientFilename());
-        $item->addImage($image);
       }
     }
 
-    return $response->withJson($item);
+    $item->addImage($image);
+
+    if ($use_as_swatch) {
+      $image->use_as_swatch= 1;
+      $image->save();
+    }
+
+    return $response->withJson($image);
   }
 
   public function itemUnlinkMedia(Request $request, Response $response,
