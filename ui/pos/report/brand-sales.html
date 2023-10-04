@@ -39,9 +39,9 @@
     <thead>
       <tr>
         <th>Brand</th>
-        <th style="text-align: right">Current</th>
-        <th style="text-align: right">Previous</th>
-        <th style="text-align: right">Change</th>
+        <th class="data-sort data-numeric" style="text-align: right">Current</th>
+        <th class="data-sort data-numeric" style="text-align: right">Previous</th>
+        <th class="data-sort data-numeric" style="text-align: right">Change</th>
       </tr>
     </thead>
     <tbody id="results">
@@ -52,19 +52,15 @@
               {{ row.name }}
             </a>
           </td>
-          <td align="right">
+          <td align="right" data-sort="{{ row.current_amount ?? 0.00 }}">
             {{ scat.amount(row.current_amount) }}
           </td>
-          <td align="right">
+          <td align="right" data-sort="{{ row.previous_amount ?? 0.00 }}">
             {{ scat.amount(row.previous_amount) }}
           </td>
-          <td align="right">
-            {% if row.previous_amount != 0 %}
-              {{ "%.1f%%" | format((row.current_amount - row.previous_amount) / row.previous_amount * 100) }}
-            {% else %}
-              0.0%
-            {% endif %}
-            <?=sprintf("%.1f%%", $change)?>
+          {% set pct= row.previous_amount != 0 ? ((row.current_amount - row.previous_amount) / row.previous_amount * 100) : 0.00 %}
+          <td align="right" data-sort="{{ pct }}">
+            {{ "%.1f%%" | format(pct) }}
           </td>
         </tr>
       {% endfor %}

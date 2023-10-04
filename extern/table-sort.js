@@ -165,7 +165,7 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
       }
     }
 
-    function getTableData(tableRows, columnData, isFileSize, isDataAttribute) {
+    function getTableData(tableRows, columnData, isFileSize, isDataAttribute, isNumeric) {
       for (let [i, tr] of tableRows.entries()) {
         // inner text for column we click on
         let tdTextContent = tr
@@ -189,22 +189,30 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
         }
       }
 
-      function naturalSortAscending(a, b) {
+      function compareText(a, b) {
+        return a.localeCompare(
+          b,
+          navigator.languages[0] || navigator.language,
+          { numeric: true, ignorePunctuation: true }
+        );
+      }
+
+      function compareFloat(a, b) {
+        return a == b ? 0 : parseFloat(a) < parseFloat(b) ? -1 : 1;
+      }
+
+      function sortAscending(a, b, num) {
         if (a.includes("X!Y!Z!#")) {
           return 1;
         } else if (b.includes("X!Y!Z!#")) {
           return -1;
         } else {
-          return a.localeCompare(
-            b,
-            navigator.languages[0] || navigator.language,
-            { numeric: true, ignorePunctuation: true }
-          );
+          return num ? compareFloat(a, b) : compareText(a, b)
         }
       }
 
-      function naturalSortDescending(a, b) {
-        return naturalSortAscending(b, a);
+      function sortDescending(a, b, num) {
+        return sortAscending(b, a, num);
       }
 
       function clearArrows(arrowUp = "▲", arrowDown = "▼") {
@@ -224,16 +232,13 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
             clearArrows(arrowUp, arrowDown);
             th.insertAdjacentText("beforeend", arrowDown);
           }
-          columnData.sort(naturalSortDescending, {
-            numeric: true,
-            ignorePunctuation: true,
-          });
+          columnData.sort((a,b) => sortDescending(a, b, isNumeric));
         } else {
           if (tableArrows) {
             clearArrows(arrowUp, arrowDown);
             th.insertAdjacentText("beforeend", arrowUp);
           }
-          columnData.sort(naturalSortAscending);
+          columnData.sort((a,b) => sortAscending(a, b, isNumeric));
         }
       } else if (timesClickedColumn === 2) {
         timesClickedColumn = 0;
@@ -242,16 +247,13 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
             clearArrows(arrowUp, arrowDown);
             th.insertAdjacentText("beforeend", arrowUp);
           }
-          columnData.sort(naturalSortAscending, {
-            numeric: true,
-            ignorePunctuation: true,
-          });
+          columnData.sort((a,b) => sortAscending(a, b, isNumeric));
         } else {
           if (tableArrows) {
             clearArrows(arrowUp, arrowDown);
             th.insertAdjacentText("beforeend", arrowDown);
           }
-          columnData.sort(naturalSortDescending);
+          columnData.sort((a, b) => sortDescending(a, b, isNumeric));
         }
       }
     }
@@ -343,6 +345,8 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
         sortDataAttributes(visibleTableRows, columnData);
       }
 
+      let isDataNumeric = th.classList.contains("data-numeric");
+
       let isFileSize = th.classList.contains("file-size");
       // Handle filesize sorting (e.g KB, MB, GB, TB) - Turns data into KiB.
       if (isFileSize) {
@@ -358,7 +362,7 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
 
       timesClickedColumn += 1;
 
-      getTableData(visibleTableRows, columnData, isFileSize, isDataAttribute);
+      getTableData(visibleTableRows, columnData, isFileSize, isDataAttribute, isDataNumeric);
       updateTable(visibleTableRows, columnData, isFileSize);
     });
   }
