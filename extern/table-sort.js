@@ -189,7 +189,7 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
         }
       }
 
-      function naturalSortAescending(a, b) {
+      function naturalSortAscending(a, b) {
         if (a.includes("X!Y!Z!#")) {
           return 1;
         } else if (b.includes("X!Y!Z!#")) {
@@ -204,7 +204,7 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
       }
 
       function naturalSortDescending(a, b) {
-        return naturalSortAescending(b, a);
+        return naturalSortAscending(b, a);
       }
 
       function clearArrows(arrowUp = "▲", arrowDown = "▼") {
@@ -233,7 +233,7 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
             clearArrows(arrowUp, arrowDown);
             th.insertAdjacentText("beforeend", arrowUp);
           }
-          columnData.sort(naturalSortAescending);
+          columnData.sort(naturalSortAscending);
         }
       } else if (timesClickedColumn === 2) {
         timesClickedColumn = 0;
@@ -242,7 +242,7 @@ function tableSortJs(testingTableSortJS = false, domDocumentWindow = document) {
             clearArrows(arrowUp, arrowDown);
             th.insertAdjacentText("beforeend", arrowUp);
           }
-          columnData.sort(naturalSortAescending, {
+          columnData.sort(naturalSortAscending, {
             numeric: true,
             ignorePunctuation: true,
           });
