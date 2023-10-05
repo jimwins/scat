@@ -1011,33 +1011,33 @@ class Catalog {
     if ($code && !$item)
       throw new \Slim\Exception\HttpNotFoundException($request);
 
-    $grabs= [];
+    $accept= $request->getHeaderLine('Accept');
+    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
+      $grabs= [];
 
-    foreach ($item->vendor_items()->find_many() as $vi) {
-      $vendor= $vi->vendor();
-      if ($vendor->salsify_url) {
-        $search_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products?filter=%3D&page=1&per_page=36&product_identifier_collection_id=&query=' . rawurlencode($vi->vendor_sku);
+      foreach ($item->vendor_items()->find_many() as $vi) {
+        $vendor= $vi->vendor();
+        if ($vendor->salsify_url) {
+          $search_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products?filter=%3D&page=1&per_page=36&product_identifier_collection_id=&query=' . rawurlencode($vi->vendor_sku);
 
-        error_log("checking $search_url for images from {$vendor->company}\n");
+          error_log("checking $search_url for images from {$vendor->company}\n");
 
-        $results= json_decode(file_get_contents($search_url));
+          $results= json_decode(file_get_contents($search_url));
 
-        if ($results->products) {
-          foreach ($results->products as $product) {
-            $product_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products/' . $product->id;
-            error_log("checking $product_url for images\n");
-            $details= json_decode(file_get_contents($product_url));
+          if ($results->products) {
+            foreach ($results->products as $product) {
+              $product_url= 'https://app.salsify.com/catalogs/api/catalogs/' . $vendor->salsify_url . '/products/' . $product->id;
+              error_log("checking $product_url for images\n");
+              $details= json_decode(file_get_contents($product_url));
 
-            $grabs= array_merge($grabs, $details->asset_properties);
+              $grabs= array_merge($grabs, $details->asset_properties);
+            }
           }
         }
       }
-    }
 
-    $related= $item->product()->media();
+      $related= $item->product()->media();
 
-    $accept= $request->getHeaderLine('Accept');
-    if (strpos($accept, 'application/vnd.scat.dialog+html') !== false) {
       return $this->view->render($response, 'dialog/media.html', [
         'item' => $item,
         'related' => $related,
