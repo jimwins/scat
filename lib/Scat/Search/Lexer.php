@@ -16,7 +16,7 @@ class Lexer {
 
     $offset= 0;
     while (isset($string[$offset])) {
-      if (!preg_match($this->regex, $string, $matches, null, $offset)) {
+      if (!preg_match($this->regex, $string, $matches, 0, $offset)) {
         throw new LexingException(
           sprintf('Unexpected character "%s" at %d', $string[$offset], $offset)
         );
