@@ -88,13 +88,29 @@ class Media
     $b2= $this->getB2Client();
     $bucket= $this->config->get('b2.bucketName');
 
-    $url= $image->original() . '?fm=jpg';
-    $upload= $this->ordure->grabImage($url, [ 'ext' => 'jpg' ]);
+    if (!in_array($image->ext, [ 'jpg', 'jpeg', 'png' ])) {
+      error_log("converting image {$image->id} to jpg");
+      $url= $image->original() . '?fm=jpg';
+      $upload= $this->ordure->grabImage($url, [ 'ext' => 'jpg' ]);
 
-    $image->uuid= $upload->uuid;
-    $image->b2_file_id= $upload->id;
-    $image->ext= $upload->ext;
-    $image->save();
+      $image->uuid= $upload->uuid;
+      $image->b2_file_id= $upload->id;
+      $image->ext= $upload->ext;
+      $image->save();
+    }
+
+    if (!$image->width || !$image->height) {
+      error_log("fixing image {$image->id} dimensions");
+      $base= $this->config->get('gumlet.base_url');
+      $url= $base .
+             $image->uuid . '.' . $image->ext .
+             '?fm=json';
+      $body= file_get_contents($url);
+      $details= json_decode($body);
+      $image->width= $details->width;
+      $image->height= $details->height;
+      $image->save();
+    }
 
     return $image;
   }
