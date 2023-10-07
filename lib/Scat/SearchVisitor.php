@@ -178,6 +178,13 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
         $this->current[]= "(SELECT COUNT(*) FROM item_to_image WHERE item_id = item.id) = 0";
       }
       break;
+    case 'swatch':
+      if ($value) {
+        $this->current[]= "(SELECT COUNT(*) FROM item_to_image JOIN image ON item_to_image.image_id = image.id WHERE item_id = item.id AND use_as_swatch) > 0";
+      } else {
+        $this->current[]= "(SELECT COUNT(*) FROM item_to_image JOIN image ON item_to_image.image_id = image.id WHERE item_id = item.id AND use_as_swatch) = 0";
+      }
+      break;
     default:
       throw new \Exception("Don't know how to handle '$name'");
     }
