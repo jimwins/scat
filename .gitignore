@@ -4,3 +4,4 @@ config.php
 lib/cc-terminal.php
 lib/fraud-checker.php
 hosts.yml
+/scratch/
