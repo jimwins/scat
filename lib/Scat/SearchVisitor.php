@@ -159,6 +159,7 @@ class SearchVisitor implements \OE\Lukas\Visitor\IQueryItemVisitor
       break;
     case 'tic':
     case 'variation':
+    case 'short_name':
     case 'purchase_quantity':
     case 'reviewed':
       $this->current[]= "(item.$name = '$value')";
