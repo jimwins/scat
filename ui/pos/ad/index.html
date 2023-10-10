@@ -71,6 +71,11 @@
       {% for ad in ads %}
         <div class="col-sm-3" {{ not ad.active ? 'style="opacity: 50%"' }}>
           <div class="pull-right" style="margin-right: 1em; margin-top: 1em">
+            {% if ad.expires_at %}
+              <span class="{{ date() > date(ad.expires_at) ? 'text-muted' }}">
+                <i class="fa fa-clock-o"></i>
+              </span>
+            {% endif %}
             <button data-id="{{ ad.id }}" data-action="edit-ad"
                     class="btn btn-default btn-xs">
               <i class="fa fa-edit"></i>

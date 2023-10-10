@@ -102,6 +102,7 @@ class TwigExtension
           ->where('tag', $tag)
           ->limit(1)->offset($start)
           ->order_by_expr('RAND(TO_DAYS(NOW()))')
+          ->where_raw('(expires_at IS NULL OR expires_at > NOW())')
           ->where('active', 1)
           ->find_one();
     if (!$ad) return;

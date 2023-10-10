@@ -84,6 +84,9 @@ class InternalAd {
       if ($field == 'id') continue; // don't allow changing id
       $value= $request->getParam($field);
       if ($value !== null) {
+        if ($field == 'expires_at' && $value == '') {
+          $value= null;
+        }
         $ad->$field= $value;
         $dirty= true;
       }

@@ -22,6 +22,12 @@
     </div>
 
     <div class="form-group">
+      <label for="expires_at">Expires At</label>
+      <input type="datetime-local" class="form-control" autofocus
+             name="expires_at" value="{{ ad.expires_at }}">
+    </div>
+
+    <div class="form-group">
       <label for="name">Tag</label>
       <input type="text" class="form-control" autofocus
              name="tag" value="{{ ad.tag }}">
