@@ -90,7 +90,7 @@ class Catalog {
     $key= $request->getParam('key');
     $version= (int)$request->getParam('version');
 
-    if ($version != 2) {
+    if ($version != 3) {
       throw new \Exception("Don't know how to handle version {$version}");
     }
 
@@ -113,7 +113,7 @@ class Catalog {
               (id, retail_price, @discount_type, @discount,
                minimum_quantity, purchase_quantity,
                @stock, active,
-               @code, is_in_warehouse)
+               @code, is_in_warehouse, no_backorder)
                  SET discount_type = IF(@discount_type = 'NULL', NULL,
                                         @discount_type),
                      discount = IF(@discount = 'NULL', NULL, @discount),

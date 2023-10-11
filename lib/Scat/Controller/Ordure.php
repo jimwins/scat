@@ -51,7 +51,7 @@ class Ordure {
               ->find_many();
 
     /* Second version of this */
-    $version= 2;
+    $version= 3;
 
     /* Just in-memory, could be clever and build a stream interface. */
     $data= "id\tretail_price\tdiscount_type\tdiscount\t".
@@ -69,7 +69,8 @@ class Ordure {
               ($item->stock ?: 'NULL') . "\t" .
               $item->active . "\t" .
               $item->code . "\t" .
-              ($item->is_in_warehouse ?: '0') .
+              ($item->is_in_warehouse ?: '0') . "\t" .
+              '1' . #($item->no_backorder ?: '0') .
               "\r\n";
     }
 
