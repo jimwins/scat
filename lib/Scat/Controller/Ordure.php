@@ -50,7 +50,7 @@ class Ordure {
                             'is_in_warehouse')
               ->find_many();
 
-    /* Second version of this */
+    /* Third version of this */
     $version= 3;
 
     /* Just in-memory, could be clever and build a stream interface. */
@@ -70,6 +70,7 @@ class Ordure {
               $item->active . "\t" .
               $item->code . "\t" .
               ($item->is_in_warehouse ?: '0') . "\t" .
+              /* XXX Treat everything as no_backorder for now */
               '1' . #($item->no_backorder ?: '0') .
               "\r\n";
     }
