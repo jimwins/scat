@@ -28,7 +28,7 @@ class Ordure {
 
     $items= $catalog
               ->getItems()
-              ->select_many('id','active')
+              ->select_many('id','active','is_kit')
               ->select_many('retail_price','discount_type','discount')
               ->select_expr('IF(is_kit,
                                 (SELECT MIN((SELECT SUM(allocated)
