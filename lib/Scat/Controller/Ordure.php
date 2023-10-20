@@ -70,8 +70,8 @@ class Ordure {
               $item->active . "\t" .
               $item->code . "\t" .
               ($item->is_in_warehouse ?: '0') . "\t" .
-              /* XXX Treat everything as no_backorder for now */
-              '1' . #($item->no_backorder ?: '0') .
+              /* XXX Treat all non-kits as no_backorder for now */
+              ($item->is_kit ? '0' : '1') . #($item->no_backorder ?: '0') .
               "\r\n";
     }
 
