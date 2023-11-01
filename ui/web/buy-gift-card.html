@@ -8,6 +8,10 @@
 {% block content %}
   <h1 class="page-heading">Buy a Gift Card</h1>
 
+  {% if config('giftcard.disabled') %}
+    <p class="lead">Sorry, but gift cards are not currently available for purchase online.</p>
+  {% else %}
+
   <p class="lead">We offer gift cards in any amount that can be used at our store in downtown Los Angeles or in our online store.</p>
 
   <p>Give the gift of art supplies!</p>
@@ -51,6 +55,7 @@
       Complete Details Above
     </button>
   </form>
+  {% endif %}
 {% endblock %}
 
 {% block extra_header %}
