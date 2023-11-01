@@ -2,10 +2,12 @@
 
 <h2>{{ kit.name }}</h2>
 
+{#
 <div style="float:right; margin-left: 1em; width: 40%" class="alert alert-warning">
   We will substitute equivalent items from a different manufacturer for out of
   stock items as necessary.
 </div>
+#}
 
 <p>
   This kit contains items with a total retail value of {{ scat.amount(kit.retail_price) }}.
@@ -14,7 +16,13 @@
 <h3>Our Price <span class="text-primary">{{ scat.amount(kit.sale_price) }}</span></h3>
 
 <p>
-  {{ include('add-to-cart.twig', { item: kit, button_size: '', fixed_quantity: 1, no_add_to_wishlist: 1 }) }}
+  {% if kit.stock %}
+    {{ include('add-to-cart.twig', { item: kit, button_size: '', fixed_quantity: 1, no_add_to_wishlist: 1 }) }}
+  {% else %}
+    <button class="button block" disabled>
+      Unavailable
+    </button>
+  {% endif %}
 </p>
 
 {% if options.individual %}
