@@ -161,6 +161,48 @@ class People {
     ]);
   }
 
+  public function inventory(
+    Request $request, Response $response,
+    View $view,
+    \Scat\Service\Catalog $catalog,
+    \Scat\Service\Data $data,
+    $id
+  ) {
+    $person= $data->factory('Person')->find_one($id);
+
+    if ($person->role != 'vendor') {
+      throw new \Exception("That person is not a vendor.");
+    }
+
+    $items= $catalog->searchItems("vendor:{$person->id} stock:1")->find_many();
+
+    $content_type= 'text/tsv';
+    $ext= 'tsv';
+
+    $name= 'vendor-' . $person->id . '.' . $ext;
+
+    $response= $response
+      ->withHeader('Content-type', $content_type)
+      ->withHeader('Content-disposition',
+                    'attachment; filename="' . $name . '"')
+      ->withHeader('Cache-control', 'max-age=0');
+
+    $body= $response->getBody();
+
+    $body->write("vendor_sku\tcode\tbarcode\tqty\r\n");
+
+    foreach ($items as $item) {
+      $body->write(
+        ($item->vendor_sku($person->id) ?: $item->code()) . "\t" .
+        $item->code . "\t" .
+        $item->barcode() . "\t" .
+        $item->stock() . "\r\n"
+      );
+    }
+
+    return $response->withBody($body);
+  }
+
   public function sales(Request $request, Response $response, $id)
   {
     $person= $this->data->factory('Person')->find_one($id);

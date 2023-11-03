@@ -489,6 +489,8 @@ $app->group('/person', function (RouteCollectorProxy $app) {
             [ \Scat\Controller\People::class, 'updatePerson' ]);
   $app->get('/{id:[0-9]+}/items',
             [ \Scat\Controller\People::class, 'items' ]);
+  $app->get('/{id:[0-9]+}/inventory',
+            [ \Scat\Controller\People::class, 'inventory' ]);
   $app->post('/{id:[0-9]+}/items',
              [ \Scat\Controller\People::class, 'uploadItems' ]);
   $app->post('/{id:[0-9]+}/items/~clear-promos',
