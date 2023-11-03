@@ -7,6 +7,7 @@ class Shipping
 {
   private $client;
   private $webhook_url;
+  private $free_shipping_minimum;
 
   # TODO put this in a database table
   # width, height, depth, weight (lb), cost
@@ -126,6 +127,8 @@ class Shipping
   ) {
     $this->data= $data;
     $this->google= $google;
+
+    $this->free_shipping_minimum= (int)$config->get('shipping.free_minimum');
 
     $this->client= new \EasyPost\EasyPostClient($config->get('shipping.key'));
     $this->webhook_url= $config->get('shipping.webhook_url');
@@ -432,10 +435,11 @@ class Shipping
       }
 
       /* Set free shipping */
-      if (isset($shipping_options['default']) &&
+      if ($this->free_shipping_minimum &&
+          isset($shipping_options['default']) &&
           $cart->eligible_for_free_shipping() &&
           self::state_in_continental_us($to->state) &&
-          $cart->subtotal() >= 79)
+          $cart->subtotal() >= $this->free_shipping_minimum)
       {
         $shipping_options['default']['rate']= 0.00;
       }

@@ -153,7 +153,7 @@
           {% else %}
             {% if not item.dimensions or not item.weight %}
               <a class="pull-right" href="/shipping" data-toggle="tooltip" title="The system doesn't have enough information to calculate shipping for this item.">{{ bootstrap_icon('patch-question', { class: 'text-danger' }) }}</a>
-            {% elseif not item.can_ship_free %}
+            {% elseif config('shipping.free_minimum') > 0 and not item.can_ship_free %}
               <a class="pull-right" href="/shipping" data-toggle="tooltip" title="This item is not eligible for free shipping.">{{ bootstrap_icon('truck', { class: 'text-success' }) }}</a>
             {% endif %}
           {% endif %}

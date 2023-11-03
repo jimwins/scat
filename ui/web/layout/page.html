@@ -153,7 +153,7 @@
           </div>
           <div>
             <p class="lead">
-              <b>Raw Materials Art Supplies</b> is an independent art supply store in Downtown Los Angeles serving art professionals, hobbyists, students, and aspiring artists of all ages and stages of artistic development. Family owned and operated since 2008, open for in-store and online shopping, with local delivery, and nationwide shipping (with <b>free shipping on most orders over $79</b>).
+              <b>Raw Materials Art Supplies</b> is an independent art supply store in Downtown Los Angeles serving art professionals, hobbyists, students, and aspiring artists of all ages and stages of artistic development. Family owned and operated since 2008, open for in-store and online shopping, with local delivery, and nationwide shipping{% if config('shipping.free_minimum') > 0 %} (with <b>free shipping on most orders over ${{config('shipping.free_minimum')}}</b>){% endif %}.
             </p>
           </div>
         </div>
