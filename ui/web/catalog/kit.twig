@@ -16,7 +16,7 @@
 <h3>Our Price <span class="text-primary">{{ scat.amount(kit.sale_price) }}</span></h3>
 
 <p>
-  {% if kit.stock %}
+  {% if kit.stock > 0 %}
     {{ include('add-to-cart.twig', { item: kit, button_size: '', fixed_quantity: 1, no_add_to_wishlist: 1 }) }}
   {% else %}
     <button class="button block" disabled>
