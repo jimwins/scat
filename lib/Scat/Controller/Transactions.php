@@ -1227,7 +1227,7 @@ class Transactions {
         $data= $line->data();
         if ($data &&
             property_exists($data, 'details') &&
-            property_exists($data->details, 'shipment_id')
+            $data->details && property_exists($data->details, 'shipment_id')
         ) {
           $tentative_shipment=
             $shipping->getShipment((object)[ 'method_id' => $data->details->shipment_id ]);
