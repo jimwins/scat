@@ -1355,9 +1355,9 @@ class Transactions {
         'weight' => $weight * 16, // Needs to be oz.
       ];
       if (count($dims) == 3) {
-        $parcel['length']= $dims[0];
-        $parcel['width']= $dims[1];
-        $parcel['height']= $dims[2];
+        $parcel['length']= (float)$dims[0];
+        $parcel['width']= (float)$dims[1];
+        $parcel['height']= (float)$dims[2];
       }
       $predefined_package= $request->getParam('predefined_package');
       if (strlen($predefined_package ?? "")) {
@@ -1365,6 +1365,10 @@ class Transactions {
       }
       if ($request->getParam('letter')) {
         $parcel['predefined_package']= 'Letter';
+      } else {
+        if (count($dims) != 3 || !$parcel['length'] || !$parcel['width'] || !$parcel['height']) {
+          throw new \Exception("Dimensions for package don't look valid");
+        }
       }
 
       $options= [
