@@ -792,6 +792,9 @@ table {
 .card.hot {
   cursor: pointer;
 }
+.card.square {
+  --img-ratio: 1/1;
+}
 
 /* Soon we can replace this with: gap: 1rem; */
 .card > * + * {
