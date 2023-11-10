@@ -466,6 +466,42 @@ class Report
 
   }
 
+  public function inventoryValue($items= null) {
+    $sql_criteria= "1=1";
+    if ($items) {
+      list($sql_criteria, $x)= $this->search->buildSearchItemsWhere($items);
+    }
+
+    $q= "SELECT SUM((SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id) *
+                    sale_price(item.retail_price, item.discount_type, item.discount))
+           FROM item
+           LEFT JOIN product ON item.product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+          WHERE ($sql_criteria)";
+
+    $at_sale_price= $this->data->fetch_single_value($q);
+
+    $q= "SELECT SUM((SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id) *
+                    IFNULL((SELECT AVG(retail_price)
+                              FROM txn_line
+                              JOIN txn ON txn.id = txn_line.txn_id
+                             WHERE item_id = item.id
+                               AND type = 'vendor'),
+                           0))
+           FROM item
+           LEFT JOIN product ON item.product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+          WHERE ($sql_criteria)";
+
+    $at_cost= $this->data->fetch_single_value($q);
+
+    return [
+      'items' => $items,
+      'at_sale_price' => $at_sale_price,
+      'at_cost' => $at_cost,
+    ];
+  }
+
   public function itemSales($begin= null, $end= null, $items_query= null) {
     $items= $this->search->buildSearchItems($items_query);
 

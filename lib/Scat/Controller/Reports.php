@@ -23,6 +23,7 @@ class Reports {
     $app->get('/cashflow', [ self::class, 'cashflow' ]);
     $app->get('/drop-by-drop', [ self::class, 'dropByDrop' ]);
     $app->get('/items', [ self::class, 'itemSales' ]);
+    $app->get('/inventory-value', [ self::class, 'inventoryValue' ]);
     $app->get('/kit-items', [ self::class, 'kitItems' ]);
     $app->get('/performance', [ self::class, 'performance' ]);
     $app->get('/price-change', [ self::class, 'priceChanges' ]);
@@ -139,6 +140,14 @@ class Reports {
     $end= $request->getParam('end');
     $data= $this->report->sales(null, $begin, $end);
     return $this->view->render($response, 'report/drop-by-drop.html', $data);
+  }
+
+  public function inventoryValue(Request $request, Response $response) {
+    $items= $request->getParam('items') ?? '';
+
+    $data= $this->report->inventoryValue('stock:1 ' . $items);
+
+    return $this->view->render($response, 'report/inventory-value.html', $data);
   }
 
   public function itemSales(Request $request, Response $response) {
