@@ -145,7 +145,7 @@ class Reports {
   public function inventoryValue(Request $request, Response $response) {
     $items= $request->getParam('items') ?? '';
 
-    $data= $this->report->inventoryValue('stock:1 ' . $items);
+    $data= $this->report->inventoryValue($items);
 
     return $this->view->render($response, 'report/inventory-value.html', $data);
   }

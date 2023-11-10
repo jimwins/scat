@@ -12,7 +12,7 @@ class Report
   public function brandSales($begin= null, $end= null, $items= null) {
     $sql_criteria= "1=1";
     if ($items) {
-      list($sql_criteria, $x)= $this->search->buildSearchItemsWhere($items);
+      list($sql_criteria, $x)= $this->search->buildSearchItemsWhere('stock:1 ' . $items);
     }
 
     /* Current */
