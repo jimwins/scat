@@ -40,7 +40,19 @@ class Ordure {
                                    FROM txn_line
                                   WHERE item_id = item.id))',
                             'stock')
-              ->select_many('code', 'minimum_quantity', 'purchase_quantity')
+              ->select_many('code')
+              ->select_expr('IF(is_kit,
+                                IFNULL((SELECT MIN((SELECT SUM(allocated)
+                                               FROM txn_line
+                                              WHERE txn_line.item_id = kit_item.item_id))
+                                   FROM kit_item
+                                  WHERE kit_id = item.id), 0),
+                                IF((SELECT SUM(allocated)
+                                      FROM txn_line
+                                     WHERE item_id = item.id) > 0, 1, 0))',
+                            'minimum_quantity')
+              ->select_many('purchase_quantity')
+              /*
               ->select_expr('(SELECT MIN(purchase_quantity)
                                 FROM vendor_item
                                WHERE item_id = item.id
@@ -48,6 +60,8 @@ class Ordure {
                                  AND vendor_item.active
                                  AND NOT special_order)',
                             'is_in_warehouse')
+              */
+              ->select_expr('0', 'is_in_warehouse')
               ->find_many();
 
     /* Third version of this */
