@@ -477,7 +477,8 @@ class Report
            FROM item
            LEFT JOIN product ON item.product_id = product.id
            LEFT JOIN brand ON product.brand_id = brand.id
-          WHERE ($sql_criteria)";
+          WHERE ($sql_criteria)
+            AND item.active AND purchase_quantity";
 
     $at_sale_price= $this->data->fetch_single_value($q);
 
@@ -491,7 +492,8 @@ class Report
            FROM item
            LEFT JOIN product ON item.product_id = product.id
            LEFT JOIN brand ON product.brand_id = brand.id
-          WHERE ($sql_criteria)";
+          WHERE ($sql_criteria)
+            AND item.active AND purchase_quantity";
 
     $at_cost= $this->data->fetch_single_value($q);
 
