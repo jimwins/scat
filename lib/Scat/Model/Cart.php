@@ -618,7 +618,7 @@ class CartLine extends \Scat\Model {
         ((floor($this->quantity / $item->purchase_quantity) + 1) *
           $item->purchase_quantity);
     }
-    if ($item->no_backorder && item->purchase_quantity && $this->quantity > $item->stock) {
+    if ($item->no_backorder && $item->purchase_quantity && $this->quantity > $item->stock) {
       $this->quantity= $item->stock;
     }
 
