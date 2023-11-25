@@ -466,6 +466,32 @@ class Report
 
   }
 
+  public function inventoryByBrand($items= null) {
+    $sql_criteria= "1=1";
+    if ($items) {
+      list($sql_criteria, $x)= $this->search->buildSearchItemsWhere($items);
+    }
+
+    $q= "SELECT brand.id, brand.slug, brand.name,
+                SUM(GREATEST((SELECT SUM(allocated) FROM txn_line WHERE item_id = item.id), 0) *
+                    sale_price(item.retail_price, item.discount_type, item.discount))
+                  AS total
+           FROM item
+           LEFT JOIN product ON item.product_id = product.id
+           LEFT JOIN brand ON product.brand_id = brand.id
+          WHERE ($sql_criteria)
+            AND item.active AND purchase_quantity
+          GROUP BY brand.id
+          ORDER BY brand.name";
+
+    $brands= $this->data->for_table('Item')->raw_query($q)->find_many();
+
+    return [
+      'items' => $items,
+      'brands' => $brands,
+    ];
+  }
+
   public function inventoryValue($items= null) {
     $sql_criteria= "1=1";
     if ($items) {
