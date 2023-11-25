@@ -482,6 +482,7 @@ class Report
           WHERE ($sql_criteria)
             AND item.active AND purchase_quantity
           GROUP BY brand.id
+         HAVING total > 0
           ORDER BY brand.name";
 
     $brands= $this->data->for_table('Item')->raw_query($q)->find_many();

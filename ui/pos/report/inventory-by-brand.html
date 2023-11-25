@@ -23,18 +23,18 @@
     </div>
   </form>
 
-  <table class="table table-striped table-sort">
+  <table class="table table-striped table-hover table-sort table-arrows">
     <thead>
       <tr>
         <th>Brand</th>
-        <th>Total</th>
+        <th class="data-sort data-numeric">Total</th>
       </tr>
     </thead>
     <tbody>
       {% for brand in brands %}
         <tr>
-          <td><a href="/catalog/search?q=brand:{{brand.slug|e('html_attr')}}&amp;stocked:1">{{ brand.name }}</a></td>
-          <td>{{ scat.amount(brand.total) }}</td>
+          <td><a href="/catalog/search?q=brand:{{(brand.slug ?? 0) | e('html_attr')}}&amp;stocked:1">{{ brand.name ?? '(unknown)' }}</a></td>
+          <td data-sort="{{ brand.total ?? 0.00 }}">{{ scat.amount(brand.total) }}</td>
         </tr>
       {% endfor %}
     </tbody>
