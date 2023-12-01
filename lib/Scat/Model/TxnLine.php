@@ -29,7 +29,7 @@ class TxnLine extends \Scat\Model {
       $this->data= json_encode($update);
     }
 
-    return json_decode($this->data);
+    return $this->data ? json_decode($this->data) : null;
   }
 
   public function name() {
