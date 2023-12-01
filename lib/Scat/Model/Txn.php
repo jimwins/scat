@@ -429,6 +429,7 @@ class Txn extends \Scat\Model {
         ->join('item', [ 'item_id', '=', 'item.id' ])
         ->where('txn_id', $this->id)
         ->where_null('kit_id')
+        ->where_null('returned_from_id')
         ->where_raw($condition)
         ->where_raw('NOT `discount_manual`');
 
