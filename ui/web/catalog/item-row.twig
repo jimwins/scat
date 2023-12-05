@@ -57,23 +57,11 @@
     {{ scat.amount(i.retail_price) }}
   </td>
   <td class="text-right">
-    {% set override= i.override_price %}
-    {% if override %}
-      <span class="text-danger">
-        {{ scat.amount(override) }}
-        <div>
-          <small>
-            Override
-          </small>
-        </div>
-      </span>
-    {% else %}
-      <strong class="text-important">{{ scat.amount(i.sale_price) }}</strong>
-      {% if i.discount_type in [ 'percentage', 'relative' ] %}
-        <div>
-          <small>{{ scat.format_discount(i) }}</small>
-        </div>
-      {% endif %}
+    <strong class="text-important">{{ scat.amount(i.sale_price) }}</strong>
+    {% if i.discount_type in [ 'percentage', 'relative' ] %}
+      <div>
+        <small>{{ scat.format_discount(i) }}</small>
+      </div>
     {% endif %}
   </td>
   <td class="avail">
