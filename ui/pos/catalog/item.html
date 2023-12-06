@@ -591,7 +591,7 @@
   <div id="pricing">
     <h3 style="margin-top: 0">
       {% set cost= item.usual_cost %}
-      {% if cost and item.sale_price %}
+      {% if cost != 0 and item.sale_price != 0 %}
         {% set margin= ((item.sale_price - cost) / item.sale_price * 100) %}
         {% set label= "%.1f"|format(margin) ~ "%" %}
         {% set best= item.best_cost %}
@@ -625,7 +625,7 @@
         </span>
       </small>
     </h3>
-    {% if item.retail_price and item.sale_price != item.retail_price %}
+    {% if item.retail_price != 0 and item.sale_price != item.retail_price %}
       <h4>
         Save {{ "%.0f"|format((item.retail_price - item.sale_price) / item.retail_price * 100) }}% off list
       </h4>
