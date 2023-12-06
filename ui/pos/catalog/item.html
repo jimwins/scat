@@ -625,7 +625,7 @@
         </span>
       </small>
     </h3>
-    {% if item.sale_price != item.retail_price %}
+    {% if item.retail_price and item.sale_price != item.retail_price %}
       <h4>
         Save {{ "%.0f"|format((item.retail_price - item.sale_price) / item.retail_price * 100) }}% off list
       </h4>
