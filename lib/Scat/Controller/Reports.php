@@ -23,6 +23,7 @@ class Reports {
     $app->get('/cashflow', [ self::class, 'cashflow' ]);
     $app->get('/drop-by-drop', [ self::class, 'dropByDrop' ]);
     $app->get('/items', [ self::class, 'itemSales' ]);
+    $app->get('/inventory-list', [ self::class, 'inventoryList' ]);
     $app->get('/inventory-by-brand', [ self::class, 'inventoryByBrand' ]);
     $app->get('/inventory-value', [ self::class, 'inventoryValue' ]);
     $app->get('/kit-items', [ self::class, 'kitItems' ]);
@@ -150,6 +151,42 @@ class Reports {
 
     return $this->view->render($response, 'report/inventory-by-brand.html', $data);
   }
+
+  public function inventoryList(
+    Request $request, Response $response,
+    \Scat\Service\Catalog $catalog
+  ) {
+    $items= $request->getParam('items') ?? 'stock:1';
+
+    $items= $catalog->searchItems($items)->find_many();
+
+    $content_type= 'text/tsv';
+    $ext= 'tsv';
+
+    $name= 'inventory.' . $ext;
+
+    $response= $response
+      ->withHeader('Content-type', $content_type)
+      ->withHeader('Content-disposition',
+                    'attachment; filename="' . $name . '"')
+      ->withHeader('Cache-control', 'max-age=0');
+
+    $body= $response->getBody();
+
+    $body->write("code\tname\tbarcode\tqty\r\n");
+
+    foreach ($items as $item) {
+      $body->write(
+        $item->code . "\t" .
+        $item->name . "\t" .
+        $item->barcode() . "\t" .
+        $item->stock() . "\r\n"
+      );
+    }
+
+    return $response->withBody($body);
+  }
+
 
   public function inventoryValue(Request $request, Response $response) {
     $items= $request->getParam('items') ?? '';
