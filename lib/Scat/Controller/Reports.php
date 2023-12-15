@@ -156,7 +156,7 @@ class Reports {
     Request $request, Response $response,
     \Scat\Service\Catalog $catalog
   ) {
-    $items= $request->getParam('items') ?? 'stock:1';
+    $items= $request->getParam('items') ?? 'is_kit:0 stock:1';
 
     $items= $catalog->searchItems($items)->find_many();
 
