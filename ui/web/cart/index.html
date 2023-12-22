@@ -22,7 +22,14 @@
 
 {% block content %}
   {% set items= cart.items.find_many() %}
-  {% if not items|length %}
+  {% if (config('disable_checkout')) %}
+    <h1 class="page-header">
+      Unavailable
+    </h1>
+    <p class="lead">
+      Sorry, checkout is currently disabled.
+    </p>
+  {% elseif not items|length %}
 
     {% if person %}
       <h2>

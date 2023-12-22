@@ -1,47 +1,53 @@
 {% import 'macros.twig' as scat %}
-<form class="add-item" action="/cart/add-item" method="POST">
-  <input type="hidden" name="item" value="{{ item.code }}">
-  <input type="hidden" name="name" value="{{ item.name }}">
-  <input type="hidden" name="brand" value="{{ item.brand_name }}">
-  <input type="hidden" name="category" value="{{ item.category }}">
-  <input type="hidden" name="sale_price" value="{{ item.sale_price }}">
-  {% if not fixed_quantity and not quantity %}
-    <div class="input-group">
-      <label for="quantity">
-        Quantity
-      </label>
-      <input type="number" class="input"
-             id="quantity" name="quantity"
-             min="{{ item.purchase_quantity ?: 1 }}"
-             step="{{ item.purchase_quantity ?: 1 }}"
-             value="{{ item.purchase_quantity ?: 1 }}">
-    </div>
-    {% if item.purchase_quantity > 1 %}
-      <span class="help-block">
-        Must be multiple of {{ item.purchase_quantity }}.
-      </span>
-    {% endif %}
-  {% else %}
-    <input type="hidden" name="quantity"
-            value="{{ quantity ?? item.purchase_quantity ?: 1}}">
-  {% endif %}
-  <button type="submit" class="button {{ button_size ?? 'block' }}">
-    {{ bootstrap_icon('cart-plus') }}
-    <span class="label">Add to Cart</span>
+{% if config('disable_cart') %}
+  <button class="button" disabled>
+    Unavailable
   </button>
-</form>
-{% if not no_add_to_wishlist %}
-  <form class="add-wishlist" action="/wishlist/~add" method="POST">
+{% else %}
+  <form class="add-item" action="/cart/add-item" method="POST">
     <input type="hidden" name="item" value="{{ item.code }}">
     <input type="hidden" name="name" value="{{ item.name }}">
     <input type="hidden" name="brand" value="{{ item.brand_name }}">
     <input type="hidden" name="category" value="{{ item.category }}">
     <input type="hidden" name="sale_price" value="{{ item.sale_price }}">
-    <input type="hidden" name="quantity"
-            value="{{ quantity ?? item.purchase_quantity ?: 1}}">
-    <button type="submit" class="button outline {{ button_size ?? 'block' }}">
-      {{ bootstrap_icon('bookmark-star') }}
-      <span class="label">Add to Wishlist</span>
+    {% if not fixed_quantity and not quantity %}
+      <div class="input-group">
+        <label for="quantity">
+          Quantity
+        </label>
+        <input type="number" class="input"
+               id="quantity" name="quantity"
+               min="{{ item.purchase_quantity ?: 1 }}"
+               step="{{ item.purchase_quantity ?: 1 }}"
+               value="{{ item.purchase_quantity ?: 1 }}">
+      </div>
+      {% if item.purchase_quantity > 1 %}
+        <span class="help-block">
+          Must be multiple of {{ item.purchase_quantity }}.
+        </span>
+      {% endif %}
+    {% else %}
+      <input type="hidden" name="quantity"
+              value="{{ quantity ?? item.purchase_quantity ?: 1}}">
+    {% endif %}
+    <button type="submit" class="button {{ button_size ?? 'block' }}">
+      {{ bootstrap_icon('cart-plus') }}
+      <span class="label">Add to Cart</span>
     </button>
   </form>
+  {% if not no_add_to_wishlist %}
+    <form class="add-wishlist" action="/wishlist/~add" method="POST">
+      <input type="hidden" name="item" value="{{ item.code }}">
+      <input type="hidden" name="name" value="{{ item.name }}">
+      <input type="hidden" name="brand" value="{{ item.brand_name }}">
+      <input type="hidden" name="category" value="{{ item.category }}">
+      <input type="hidden" name="sale_price" value="{{ item.sale_price }}">
+      <input type="hidden" name="quantity"
+              value="{{ quantity ?? item.purchase_quantity ?: 1}}">
+      <button type="submit" class="button outline {{ button_size ?? 'block' }}">
+        {{ bootstrap_icon('bookmark-star') }}
+        <span class="label">Add to Wishlist</span>
+      </button>
+    </form>
+  {% endif %}
 {% endif %}
