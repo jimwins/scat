@@ -7,40 +7,44 @@
     <link rel="stylesheet" href="/css/web.css">
     <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <style>
+      @media (min-width: 600px) {
+        main {
+          display: grid;
+          grid-template-columns: minmax(60ch, 50%) auto;
+        }
+      }
+    </style>
   </head>
   <body>
     <main>
-      <div style="display: grid; grid-template-columns: 60ch auto;">
-        <div>
-          <h1 class="page-header">
-            Raw Materials Art Supplies is closed.
-          </h1>
-          <p class="lead">
-            Our last day of business was December 23, 2023.
-          </p>
-          <p>
-            Thank you for all of your support over our fifteen years serving the community of artists in downtown Los Angeles and beyond.
-          </p>
-          <p>
-            You can <a href="closing.html">read about our decision to close here</a>.
-          </p>
-          <p>
-            You can contact us via email at <a href="mailto:info@rawmaterialsla.com">info@rawmaterialsla.com</a> with any questions or if you need copies of receipts.
-          </p>
-          <p>
-            <b>Celia and Jim Winstead</b>
-          </p>
-          <p style="color: #c45417">
-            P.S. Wonton forever.
-          </p>
-        </div>
-        <div>
-          <figure>
-            <img src="https://rawmats.gumlet.io/i/o/62910bb30009656a3c4719e8e3.jpeg" alt="Wonton" width="649" height="649">
-            <figcaption style="text-align: center">Wonton logo designed by <a href="https://www.instagram.com/jpnsamericancat/">@jpnsamericancat</a></figcaption>
-          </figure>
-        </div>
+      <div>
+        <h1 class="page-header">
+          Raw Materials Art Supplies is closed.
+        </h1>
+        <p class="lead">
+          Our last day of business was December 23, 2023.
+        </p>
+        <p>
+          Thank you for all of your support over our fifteen years serving the community of artists in downtown Los Angeles and beyond.
+        </p>
+        <p>
+          You can <a href="closing.html">read about our decision to close here</a>.
+        </p>
+        <p>
+          You can contact us via email at <a href="mailto:info@rawmaterialsla.com">info@rawmaterialsla.com</a> with any questions or if you need copies of receipts.
+        </p>
+        <p>
+          <b>Celia and Jim Winstead</b>
+        </p>
+        <p style="color: #c45417">
+          P.S. Wonton forever.
+        </p>
       </div>
+      <figure>
+        <img class="responsive" src="https://rawmats.gumlet.io/i/o/62910bb30009656a3c4719e8e3.jpeg" alt="Wonton" width="649" height="649">
+        <figcaption style="text-align: center">Wonton logo designed by <a href="https://www.instagram.com/jpnsamericancat/">@jpnsamericancat</a></figcaption>
+      </figure>
     </main>
     <footer>
       <p>Copyright &copy; 2023 Imperial Dog, Inc.</p>
