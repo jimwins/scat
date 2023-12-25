@@ -32,7 +32,7 @@
     it, please let us know right away so we can get it sorted out!
   </p>
 
-  {% if person.points_available() > 50 %}
+  {% if 0 and person.points_available() > 50 %}
     <p>
       <b>Did you know that you have a reward waiting?</b> You have enough
       points for a reward on your next purchase, just make sure to
@@ -40,7 +40,7 @@
       during checkout so you can take advantage of it.
     </p>
   {% else %}
-    {% if not person.suppress_loyalty %}
+    {% if 0 and not person.suppress_loyalty %}
       <p>
         <b>Keep going to earn a reward for future purchases.</b> You don't have
         enough points yet for a reward on your next purchase, but make sure to
@@ -57,7 +57,6 @@
 
 {% block content_bottom %}
   <p>
-    Thank you for your business and we look forward to serving you in the
-    future!
+    Thank you for your business!
   </p>
 {% endblock %}
