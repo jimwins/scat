@@ -173,13 +173,14 @@ class Reports {
 
     $body= $response->getBody();
 
-    $body->write("code\tname\tbarcode\tqty\r\n");
+    $body->write("code\tname\tbarcode\tcost\tqty\r\n");
 
     foreach ($items as $item) {
       $body->write(
         $item->code . "\t" .
         $item->name . "\t" .
         $item->barcode() . "\t" .
+        ($item->most_recent_cost() ?? 0.00) . "\t" .
         $item->stock() . "\r\n"
       );
     }
