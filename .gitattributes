@@ -1,2 +1,3 @@
 ui/** linguist-language=twig
 extern/** linguist-vendored
+static/css/bootstrap-icons-1.8.2/index.html linguist-vendored
